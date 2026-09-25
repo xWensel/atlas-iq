@@ -1,4 +1,4 @@
-/* Atlas IQ v0.2 - logica del juego, campañas y pantallas. */
+/* Atlas IQ v0.3 - logica del juego, campañas y pantallas. */
 (function (A) {
   const $ = id => document.getElementById(id);
   const KEY = "atlasiq.v2";
@@ -7,20 +7,21 @@
   const S = {
     mode: "classic", campId: null, camp: null, level: 0, qs: [], qi: 0, levelScore: 0, runTotal: 0, runMax: 0, completed: 0, streak: 0,
     phase: "title", limit: 10, t0: 0, pausedAcc: 0, pauseAt: 0, paused: false, lastTick: -1, tense: false, startLevel: 0, prog: {},
-    quality: "auto", settingsOpen: false, lastTimeStr: "",
+    quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, fsGate: true, booting: true,
   };
   const prog = id => (S.prog[id] = S.prog[id] || { unlocked: 1, best: 0, bestIq: 0 });
   function load() {
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || "{}");
-      A.lang = d.lang || ((navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en");
+      A.lang = d.lang && A.STR[d.lang] ? d.lang : A.detectLang();
+      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false;
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
-    } catch (e) { A.lang = "es"; }
+    } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
@@ -31,8 +32,9 @@
   /* ------------------------------------------------------------ arranque */
   load();
   const world = A.geo.buildWorld();
-  const map = new A.MapView($("map"), world, onPick);
-  map.quality = S.quality; map.resize(true);
+  const map = A.createMap($("map"), world, onPick);
+  map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce;
+  document.documentElement.classList.toggle("reduce-motion", S.reduce);
   map.animateTo(map.home(), 0);
 
   /* ------------------------------------------------------------ odometro mecanico */
@@ -136,7 +138,9 @@
       const sw = f.querySelector(".sw");
       if (sw) { const on = k === "music" ? A.audio.musicOn : A.audio.sfxOn; sw.setAttribute("aria-checked", on); f.classList.toggle("off", !on); }
     }
-    segSet(document.querySelector('[data-seg="lang"]'), A.lang); segSet(document.querySelector('[data-seg="gfx"]'), S.quality);
+    segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs();
+    const sm = document.querySelector('.sw[data-sw="motion"]'), si = document.querySelector('.sw[data-sw="intro"]');
+    if (sm) sm.setAttribute("aria-checked", S.reduce); if (si) si.setAttribute("aria-checked", S.intro);
   }
   function openSettings(on) {
     S.settingsOpen = on; const sh = $("setSh");
@@ -161,18 +165,42 @@
     else { const willOn = !A.audio.sfxOn; if (!willOn) A.sfx.flip(false); A.audio.sfxOn = willOn; if (willOn) A.sfx.flip(true); }
     save(); syncSettings();
   }
-  document.querySelector('[data-seg="lang"]').addEventListener("click", e => {
-    const b = e.target.closest("button"); if (!b || b.dataset.v === A.lang) return;
-    A.lang = b.dataset.v; save(); A.sfx.ui(); applyLang();
-    if (S.phase === "title") renderMenu(); else if (S.phase === "reveal") { const o = q(); $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}` : A.tx(o.fact); }
-  });
+  /* ---- idioma: cuadricula en ajustes, popover en el menu y chips en la entrada ---- */
+  function langChips(host, onPick) {
+    host.innerHTML = "";
+    A.LANGS.forEach(L => {
+      const b = document.createElement("button"); b.type = "button"; b.dataset.l = L.code; b.textContent = L.name; b.lang = L.code;
+      b.className = L.code === A.lang ? "on" : ""; b.onclick = e => { e.stopPropagation(); onPick(L.code); }; host.appendChild(b);
+    });
+  }
+  function refreshLangUIs() { for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
+  function setLang(code) {
+    if (code === A.lang || !A.STR[code]) return;
+    A.lang = code; save(); A.sfx.ui(); applyLang(); refreshLangUIs();
+    if (S.phase === "title" && !S.booting) renderMenu();
+    else if (S.phase === "reveal") { const o = q(); $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}` : A.tx(o.fact); }
+    if (S.camp) updateHud();
+  }
+  langChips($("langGrid"), setLang); langChips($("langPopGrid"), code => { setLang(code); $("langPop").classList.add("hidden"); });
+  function openLangPop(anchor) {
+    const pop = $("langPop"); if (!pop.classList.contains("hidden")) { pop.classList.add("hidden"); return; }
+    pop.classList.remove("hidden"); refreshLangUIs();
+    const r = anchor.getBoundingClientRect(), w = pop.offsetWidth;
+    pop.style.left = Math.max(12, Math.min(innerWidth - w - 12, r.right - w)) + "px"; pop.style.top = r.bottom + 10 + "px";
+  }
+  document.addEventListener("pointerdown", e => { if (!e.target.closest("#langPop, #menuLang")) $("langPop").classList.add("hidden"); }, true);
+  function applyMotion() { document.documentElement.classList.toggle("reduce-motion", S.reduce); map.fxOn = !S.reduce; }
+  for (const sw of document.querySelectorAll(".sw[data-sw='motion'], .sw[data-sw='intro']")) {
+    sw.addEventListener("click", () => { if (sw.dataset.sw === "motion") { S.reduce = !S.reduce; applyMotion(); } else S.intro = !S.intro; A.sfx.flip(true); save(); syncSettings(); });
+  }
+  $("setFs").onclick = () => { toggleFs(); A.sfx.ui(); };
   document.querySelector('[data-seg="gfx"]').addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b || b.dataset.v === S.quality) return;
     S.quality = b.dataset.v; save(); A.sfx.ui(); map.setQuality(S.quality); syncSettings();
   });
   $("setBtn").onclick = () => openSettings(!S.settingsOpen);
   $("setClose").onclick = () => openSettings(false);
-  document.addEventListener("pointerdown", e => { if (S.settingsOpen && !e.target.closest("#setSh, #setBtn, .menu-gear")) openSettings(false); }, true);
+  document.addEventListener("pointerdown", e => { if (S.settingsOpen && !e.target.closest("#setSh, #setBtn, .menu-gear, #langPop")) openSettings(false); }, true);
 
   /* ------------------------------------------------------------ tooltips propios */
   let tipT = 0;
@@ -195,6 +223,10 @@
     const el = e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear");
     if (el && el !== lastHover) A.sfx.hover(); lastHover = el;
   });
+
+  /* ------------------------------------------------------------ movimiento de camara -> sonido */
+  let zsT = 0;
+  map.onMotion = (zv, pan) => { const now = performance.now(); if (now - zsT < 33) return; zsT = now; A.sfx.zoomVel(zv, pan); };
 
   /* ------------------------------------------------------------ carril de zoom */
   let zT = 0;
@@ -230,7 +262,11 @@
     }
     dialog(`<div class="menu-in">
       <div class="menu-top"><svg class="menu-rose"><use href="#rose"/></svg>
-        <button class="menu-gear" id="menuGear" aria-label="${A.t("tip.set")}" data-tip="tip.set"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button></div>
+        <div class="menu-tools">
+          <button class="menu-gear txt" id="menuLang" aria-label="${A.t("tip.lang")}" data-tip="tip.lang">${A.lang.toUpperCase()}</button>
+          <button class="menu-gear" id="menuFs" aria-label="${A.t("tip.fs")}" data-tip="tip.fs" data-key="F"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+          <button class="menu-gear" id="menuGear" aria-label="${A.t("tip.set")}" data-tip="tip.set"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+        </div></div>
       <h1>Atlas<em>IQ</em></h1>
       <p class="tagline">${A.t("title.tag")}</p>
       <p class="lede">${A.t("title.p")}</p>
@@ -249,6 +285,7 @@
     document.querySelectorAll(".lv").forEach(b => (b.onclick = () => { S.startLevel = +b.dataset.lv; renderMenu(); }));
     $("goBtn").onclick = () => { A.sfx.depart(); newRun(); };
     $("menuGear").onclick = () => openSettings(!S.settingsOpen);
+    $("menuLang").onclick = e => openLangPop(e.currentTarget); $("menuFs").onclick = toggleFs;
     requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => map.drawThumb(b.querySelector("canvas"), camps[i].home)));
     // la brujula del boton sigue al cursor
     const go = $("goBtn");
@@ -403,6 +440,13 @@
     const btns = [];
     if (!win) btns.push({ id: "retryBtn", cls: "btn-ink", label: A.t("btn.retry"), arrow: true, primary: true, onclick: () => startLevel_(S.level) });
     btns.push({ id: "newBtn", cls: win ? "btn-ink" : "btn-line", label: A.t("btn.newGame"), primary: win, onclick: () => { S.startLevel = 0; showTitle(); } });
+    btns.push({ id: "shareBtn", cls: "btn-line", label: A.t("share"), onclick: async () => {
+      const text = A.t("share.text", { iq, tier: tierName, s: A.fmt(shown) }), url = location.href.split("#")[0];
+      try {
+        if (navigator.share) await navigator.share({ title: "Atlas IQ", text, url });
+        else { await navigator.clipboard.writeText(text + " " + url); const sp = $("shareBtn").querySelector("span"); sp.textContent = A.t("share.copied"); setTimeout(() => (sp.textContent = A.t("share")), 1600); }
+      } catch (e) { /* cancelado */ }
+    } });
     btns.push({ id: "badgeBtn", cls: "btn-line", label: A.t("btn.badge"), onclick: () => {
       const cv = A.makeBadge(iq, tierName, `${A.tx(S.camp.title)} · ${A.fmt(shown)} ${A.t("pts")} · ${S.completed}/${S.camp.levels.length}`);
       const a = document.createElement("a"); a.download = `atlas-iq-${iq}.png`; a.href = cv.toDataURL("image/png"); a.click();
@@ -451,14 +495,15 @@
   document.addEventListener("fullscreenchange", () => $("fsBtn").classList.toggle("on", !!document.fullscreenElement));
 
   document.addEventListener("pointerdown", e => {
-    A.audio.unlock();
+    A.audio.unlock(!S.booting);
     if (e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv, #dock button, #rail button, .seg button, .menu-gear")) A.sfx.ui();
   }, true);
 
   addEventListener("keydown", e => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.target && e.target.tagName === "INPUT") { if (e.key === "Escape") openSettings(false); return; }
-    A.audio.unlock();
+    A.audio.unlock(!S.booting);
+    if (S.booting) return;
     const k = e.key.toLowerCase();
     if (k === "escape") openSettings(false);
     else if (k === "f") toggleFs();
@@ -475,10 +520,56 @@
     }
   });
 
-  applyLang();
-  const boot = () => showTitle();
-  if (document.fonts && document.fonts.load) Promise.race([Promise.all([document.fonts.load("800 40px Fraunces"), document.fonts.load("500 12px 'DM Mono'"), document.fonts.load("500 16px 'Bricolage Grotesque'")]), new Promise(r => setTimeout(r, 1200))]).then(boot, boot);
-  else boot();
+  /* ------------------------------------------------------------ entrada + intro del estudio */
+  function requestFs() { const el = document.documentElement; try { (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el); } catch (e) { /* denegado */ } }
+  function buildStudioBits() {
+    const ticks = document.querySelector(".d-ticks");
+    if (!ticks.children.length) for (let i = 0; i < 36; i++) {
+      const a = (i * 10 * Math.PI) / 180, r1 = 66, r2 = i % 3 === 0 ? 75 : 70, l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      l.setAttribute("x1", Math.sin(a) * r1); l.setAttribute("y1", -Math.cos(a) * r1); l.setAttribute("x2", Math.sin(a) * r2); l.setAttribute("y2", -Math.cos(a) * r2); ticks.appendChild(l);
+    }
+    const sp = $("stSparks"); sp.innerHTML = ""; const cols = ["#f7b4ff", "#ffd98a", "#ffffff", "#d9a8ff"];
+    for (let i = 0; i < 34; i++) {
+      const el = document.createElement("i"), ang = Math.random() * Math.PI * 2, dist = 120 + Math.random() * Math.min(innerWidth, innerHeight) * 0.45;
+      el.style.setProperty("--x", Math.cos(ang) * dist + "px"); el.style.setProperty("--y", Math.sin(ang) * dist * 0.75 + "px");
+      el.style.setProperty("--s", 5 + Math.random() * 9 + "px"); el.style.setProperty("--c", cols[i % cols.length]); el.style.setProperty("--d", 1.35 + Math.random() * 0.6 + "s"); sp.appendChild(el);
+    }
+  }
+  function playStudio(done) {
+    const st = $("studio"); st.classList.remove("hidden"); $("stLogo").innerHTML = ""; A.buildLogo($("stLogo"), { animated: true }); buildStudioBits();
+    A.sfx.vault(); st.classList.add("shake");
+    let ended = false;
+    const end = fast => { if (ended) return; ended = true; st.classList.add("leave"); setTimeout(done, fast ? 320 : 540); };
+    const timer = A._holdStudio ? 0 : setTimeout(() => end(false), S.reduce ? 1800 : 4700);
+    const skip = () => { clearTimeout(timer); end(true); };
+    st.addEventListener("pointerdown", skip, { once: true });
+    addEventListener("keydown", function k(e) { if (["Enter", " ", "Escape"].includes(e.key)) { skip(); removeEventListener("keydown", k); } });
+  }
+  function finishBoot() {
+    S.booting = false; const boot = $("boot"); boot.classList.add("out"); setTimeout(() => boot.classList.add("hidden"), 850);
+    A.audio.unlock(true); showTitle();
+  }
+  function runBoot() {
+    const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden"); A.buildLogo($("gateLogo"));
+    langChips($("gateLangs"), setLang);
+    const fsBtn = $("gateFs"); fsBtn.setAttribute("aria-checked", S.fsGate);
+    fsBtn.onclick = e => { e.stopPropagation(); S.fsGate = !S.fsGate; fsBtn.setAttribute("aria-checked", S.fsGate); save(); };
+    let entered = false;
+    const enter = () => {
+      if (entered) return; entered = true; A.audio.unlock(false); if (S.fsGate) requestFs();
+      gate.classList.add("hidden"); if (S.intro) playStudio(finishBoot); else finishBoot();
+    };
+    gate.addEventListener("pointerdown", e => { if (e.target.closest(".gate-opts")) return; enter(); });
+    addEventListener("keydown", function k(e) { if (entered) { removeEventListener("keydown", k); return; } if (e.key === "Enter" || e.key === " ") { e.preventDefault(); enter(); } });
+    (A._debug = A._debug || {}).enterBoot = enter;
+  }
 
-  A._debug = { S, map, world, reveal, startLevel_, showTitle, odoSet };
+  applyLang(); syncSettings();
+  const start = () => { if (/[?&]skipboot/.test(location.search)) { S.booting = false; showTitle(); } else runBoot(); };
+  if (document.fonts && document.fonts.load) Promise.race([Promise.all([document.fonts.load("800 40px Fraunces"), document.fonts.load("500 12px 'DM Mono'"), document.fonts.load("500 16px 'Bricolage Grotesque'")]), new Promise(r => setTimeout(r, 1200))]).then(start, start);
+  else start();
+
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  A._debug = Object.assign(A._debug || {}, { S, map, world, reveal, startLevel_, showTitle, odoSet, setLang, finishBoot, playStudio });
 })(window.AIQ);

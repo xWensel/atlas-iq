@@ -30,7 +30,7 @@ window.AIQ = window.AIQ || {};
     comp.threshold.value = -16; comp.knee.value = 20; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.25;
     master.connect(comp).connect(ctx.destination);
     sfxBus = ctx.createGain(); sfxBus.gain.value = A.audio.vol.sfx; sfxBus.connect(master);
-    musFilter = ctx.createBiquadFilter(); musFilter.type = "lowpass"; musFilter.frequency.value = 16000;
+    musFilter = ctx.createBiquadFilter(); musFilter.type = "lowpass"; musFilter.frequency.value = 8600;
     musBus = ctx.createGain(); musBus.gain.value = MUS_BASE * A.audio.vol.music; musBus.connect(musFilter).connect(master);
     const rv = ctx.createConvolver(); rv.buffer = impulse(1.9, 2.8);
     const rvOut = ctx.createGain(); rvOut.gain.value = 0.42;
@@ -84,7 +84,7 @@ window.AIQ = window.AIQ || {};
     os.type = "sine"; os.frequency.setValueAtTime(f0, t); os.frequency.exponentialRampToValueAtTime(f1, t + dur);
     os.connect(g).connect(bus); env(g, t, 0.003, vol, dur); os.start(t); os.stop(t + dur + 0.05);
   }
-  function pad(notes, t, dur, vol = 0.05) {
+  function pad(notes, t, dur, vol = 0.05, bus = musBus) {
     const g = ctx.createGain(), lp = ctx.createBiquadFilter();
     lp.type = "lowpass"; lp.frequency.setValueAtTime(500, t); lp.frequency.linearRampToValueAtTime(1300, t + dur * 0.6);
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + dur * 0.4); g.gain.linearRampToValueAtTime(0.0001, t + dur);
@@ -92,45 +92,104 @@ window.AIQ = window.AIQ || {};
       const os = ctx.createOscillator(); os.type = "sawtooth"; os.frequency.value = mtof(m); os.detune.value = det;
       os.connect(g); os.start(t); os.stop(t + dur + 0.1);
     }));
-    g.connect(lp); lp.connect(musBus); send(lp, 0.5);
+    g.connect(lp); lp.connect(bus); send(lp, 0.5);
   }
 
-  /* ------------------------------------------------------------------ musica */
-  const CHORDS = [[60, 64, 67, 71], [57, 60, 64, 67], [53, 57, 60, 64], [55, 59, 62, 64]];   // Cmaj7 · Am7 · Fmaj7 · G6
-  const BPM = 92, STEP = 60 / BPM / 4;
-  let timer = null, nextT = 0, step = 0, mode = 0, lastIdx = 5;
+  /* ------------------------------------------------------------------ musica: jazz lo-fi con swing (estilo Balatro) */
+  /*
+   *  Piano electrico FM (Rhodes) haciendo stabs sincopados, contrabajo con notas de aproximacion, escobillas y charles con swing,
+   *  melodia de blues-pentatonica con licks al azar, crujido de vinilo y "tape wobble" (vibrato lento de cinta) en toda la banda.
+   *  Progresion de 8 compases: Dm9 . G13 . Cmaj9 . A7b13  |  Gm9 . C13 . Fmaj9 . D7b13
+   */
+  const BPM = 86, STEP = 60 / BPM / 4, SW = 0.3;
+  const PROG_A = [
+    { root: 38, v: [53, 57, 60, 64], tonic: 50 },   // Dm9
+    { root: 43, v: [53, 57, 59, 64], tonic: 50 },   // G13
+    { root: 36, v: [52, 55, 59, 62], tonic: 50 },   // Cmaj9
+    { root: 33, v: [55, 61, 64, 65], tonic: 50 },   // A7b13
+  ];
+  const PROG = [...PROG_A, ...PROG_A.map(c => ({ root: c.root + 5, v: c.v.map(n => n + 5), tonic: c.tonic + 5 }))];
+  const PENTA_MIN = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22];
+  const LICKS = [
+    [[2, 4], [3, 3], [6, 2], [10, 0]], [[0, 5], [2, 4], [4, 2], [7, 3]], [[6, 3], [7, 4], [10, 5], [14, 4]],
+    [[2, 2], [4, 3], [5, 4], [8, 6]], [[3, 6], [6, 5], [9, 3], [12, 2]], [[0, 4], [3, 2], [8, 3], [11, 0]],
+  ];
+  let timer = null, nextT = 0, step = 0, mode = 0, wob = null, curLick = null;
 
-  function playStep(s, t) {
-    const bar = Math.floor(s / 16) % 4, st = s % 16, chord = CHORDS[bar];
-    const first = s < 16;                                            // el bucle abre con la firma de Atlas
-    if (st === 0) pad(chord.map(m => m - 12), t, STEP * 16 * 1.02, mode === 0 ? 0.05 : 0.04);
-    if (first && mode < 2) { const k = [0, 4, 8].indexOf(st); if (k >= 0) pluck(MOTIF[k], t, { bus: musBus, vol: 0.11, dur: 0.9, rev: 0.5 }); }
+  function wobble() {
+    if (wob) return wob;
+    const slow = ctx.createOscillator(), fast = ctx.createOscillator(), g1 = ctx.createGain(), g2 = ctx.createGain(), out = ctx.createGain();
+    slow.frequency.value = 0.55; g1.gain.value = 9; fast.frequency.value = 6.2; g2.gain.value = 2.6;   // centesimas
+    slow.connect(g1).connect(out); fast.connect(g2).connect(out); slow.start(); fast.start();
+    return (wob = out);
+  }
+  /* piano electrico FM: portadora + modulador que decae (timbre de "tine") */
+  function epiano(m, t, o = {}) {
+    const { vol = 0.07, dur = 0.9, mod = 1, idx = 2.2, rev = 0.35, bus = musBus } = o;
+    const f = mtof(m), car = ctx.createOscillator(), md = ctx.createOscillator(), mg = ctx.createGain(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+    car.type = "sine"; md.type = "sine"; car.frequency.value = f; md.frequency.value = f * mod;
+    mg.gain.setValueAtTime(f * idx, t); mg.gain.exponentialRampToValueAtTime(f * 0.12, t + Math.min(0.5, dur));
+    md.connect(mg).connect(car.frequency);
+    const w = wobble(); w.connect(car.detune); w.connect(md.detune);
+    lp.type = "lowpass"; lp.frequency.value = 4200;
+    car.connect(g); g.connect(lp); lp.connect(bus); send(lp, rev);
+    env(g, t, 0.004, vol, dur);
+    [car, md].forEach(x => { x.start(t); x.stop(t + dur + 0.1); });
+    const tn = ctx.createOscillator(), tg = ctx.createGain(); tn.type = "sine"; tn.frequency.value = f * 7.1; tn.connect(tg).connect(lp); env(tg, t, 0.002, vol * 0.18, 0.06); tn.start(t); tn.stop(t + 0.15);
+  }
+  function upright(m, t, dur = 0.34, vol = 0.2) {
+    const f = mtof(m), o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter(), g2 = ctx.createGain();
+    o1.type = "triangle"; o2.type = "sine"; o1.frequency.value = f; o2.frequency.value = f * 2; wobble().connect(o1.detune);
+    g2.gain.value = 0.25; o2.connect(g2).connect(g); o1.connect(g);
+    lp.type = "lowpass"; lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(260, t + dur);
+    g.connect(lp); lp.connect(musBus); env(g, t, 0.006, vol, dur); [o1, o2].forEach(x => { x.start(t); x.stop(t + dur + 0.1); });
+  }
+  const brush = (t, v = 1) => noise(t, 0.17, { lp: 3400, vol: 0.022 * v, bus: musBus, type: "bandpass", q: 0.6 });
+  const hat = (t, v = 1, open = false) => noise(t, open ? 0.16 : 0.04, { hp: 7800, vol: 0.016 * v, bus: musBus });
+  const crackle = t => noise(t, 0.012, { hp: 2600, vol: 0.009 * Math.random(), bus: musBus });
+
+  function playStep(s, t0) {
+    const bar = Math.floor(s / 16) % 8, st = s % 16, ch = PROG[bar], nx = PROG[(bar + 1) % 8];
+    const t = t0 + (Math.floor(st / 2) % 2 === 1 ? STEP * 2 * SW : 0);          // swing en las corcheas de contratiempo
+    const full = mode >= 1, rnd = Math.random;
     // bajo
-    if (mode >= 1 && (st === 0 || st === 10)) pluck(chord[0] - 24, t, { bus: musBus, vol: 0.2, dur: 0.45, bright: 2.2, rev: 0.1, wave: "sine" });
-    // melodia por paseo aleatorio en la pentatonica (siempre suena bien)
-    const density = mode === 0 ? 0.28 : mode === 1 ? 0.5 : 0.62;
-    if (st % 2 === 0 && !(first && mode < 2) && Math.random() < density) {
-      lastIdx = Math.max(3, Math.min(13, lastIdx + [-2, -1, -1, 0, 1, 1, 2][Math.floor(Math.random() * 7)]));
-      pluck(scaleNote(lastIdx, 60), t, { bus: musBus, vol: 0.09, dur: 0.55, rev: 0.45 });
+    if (st === 0) upright(ch.root, t, 0.42, 0.22);
+    if (full && st === 6) upright(ch.root + 7, t, 0.3, 0.16);
+    if (st === 8) upright(ch.root + (rnd() < 0.4 ? 12 : 0), t, 0.32, 0.17);
+    if (full && st === 10 && rnd() < 0.6) upright(ch.root + 3 + (bar % 2 ? 4 : 0), t, 0.24, 0.13);
+    if (st === 14) upright(nx.root + (rnd() < 0.5 ? 1 : -1), t, 0.2, 0.14);      // nota de aproximacion al siguiente acorde
+    // piano electrico: stabs sincopados con "strum"
+    const comp = (v, dur) => ch.v.forEach((n, i) => epiano(n + (rnd() < 0.05 ? 12 : 0), t + i * 0.011, { vol: 0.045 * v * (0.85 + rnd() * 0.3), dur }));
+    if (st === 2 && (full || rnd() < 0.75)) comp(1, 0.7);
+    if (st === 9 && (full ? rnd() < 0.8 : rnd() < 0.35)) comp(0.75, 0.55);
+    if (full && st === 13 && rnd() < 0.4) comp(0.55, 0.4);
+    // melodia por licks (blues-pentatonica)
+    if (st === 0) curLick = rnd() < (mode === 0 ? 0.16 : mode === 1 ? 0.6 : 0.75) ? LICKS[Math.floor(rnd() * LICKS.length)] : null;
+    if (curLick) for (const [ls, deg] of curLick) if (ls === st) {
+      const n = ch.tonic + 24 + PENTA_MIN[deg] + (rnd() < 0.1 ? -1 : 0);
+      epiano(n, t, { vol: 0.07, dur: 0.8, mod: 2, idx: 1.4, rev: 0.55 });
     }
-    // percusion suave: escobilla en contratiempos y pulso grave
-    if (mode >= 1 && st % 4 === 2) noise(t, 0.05, { hp: 7500, vol: mode === 2 ? 0.02 : 0.012, bus: musBus });
-    if (mode >= 1 && (st === 0 || st === 8)) thump(t, { vol: 0.07, f0: 90, f1: 45, dur: 0.14, bus: musBus });
-    if (mode === 2 && st % 4 === 0) thump(t, { vol: 0.16, f0: 110, f1: 44, dur: 0.16, bus: musBus });   // "latido" de tension
+    // bateria
+    if (full) {
+      if (st === 0 || (st === 6 && rnd() < 0.7) || (st === 10 && rnd() < 0.85)) thump(t, { vol: st === 0 ? 0.16 : 0.1, f0: 100, f1: 44, dur: 0.14, bus: musBus });
+      if (st === 4 || st === 12) brush(t, 1);
+      if ((st === 7 || st === 15) && rnd() < 0.4) brush(t, 0.35);
+    } else if (st === 4 || st === 12) brush(t, 0.55);
+    if (st % 2 === 0) hat(t, (st % 4 === 0 ? 0.6 : 1) * (mode === 0 ? 0.6 : 1), st === 14 && rnd() < 0.3);
+    if (mode === 2) { if (st % 2 === 1) hat(t, 0.5); if (st % 4 === 0) noise(t, 0.03, { hp: 1800, vol: 0.02, bus: musBus }); }   // reloj de tension
+    if (rnd() < 0.14) crackle(t);
   }
-  function schedule() {
-    while (nextT < ctx.currentTime + 0.3) { playStep(step, nextT); nextT += STEP; step++; }
-  }
+  function schedule() { while (nextT < ctx.currentTime + 0.3) { playStep(step, nextT); nextT += STEP; step++; } }
   A.music = {
-    start() { if (!A.audio.musicOn || timer || !init()) return; nextT = ctx.currentTime + 0.06; step = 0; timer = setInterval(schedule, 60); },
+    start() { if (!A.audio.musicOn || timer || !init()) return; nextT = ctx.currentTime + 0.08; step = 0; timer = setInterval(schedule, 60); },
     stop() { clearInterval(timer); timer = null; },
-    mode(m) { mode = m; },                                        // 0 menu · 1 juego · 2 tension
+    mode(m) { mode = m; if (ctx) musFilter.frequency.setTargetAtTime(m === 2 ? 12500 : 8600, ctx.currentTime, 0.15); },
     duck(level = 0.3, ms = 1400) {
       if (!ctx || !timer) return;
       const base = MUS_BASE * A.audio.vol.music, t = ctx.currentTime; musBus.gain.cancelScheduledValues(t);
       musBus.gain.setTargetAtTime(base * level, t, 0.05); musBus.gain.setTargetAtTime(base, t + ms / 1000, 0.4);
     },
-    muffle(on) { if (ctx) musFilter.frequency.setTargetAtTime(on ? 320 : 16000, ctx.currentTime, 0.08); },
+    muffle(on) { if (ctx) musFilter.frequency.setTargetAtTime(on ? 320 : 8600, ctx.currentTime, 0.08); },
   };
   A.audio.state = () => (ctx ? ctx.state : 'none');
   /* volumen 0..1 de "master" | "music" | "sfx" */
@@ -142,7 +201,7 @@ window.AIQ = window.AIQ || {};
     else if (kind === "music") { musBus.gain.cancelScheduledValues(t); musBus.gain.setTargetAtTime(MUS_BASE * v, t, 0.03); }
     else sfxBus.gain.setTargetAtTime(v, t, 0.03);
   };
-  A.audio.unlock = () => { init(); if (A.audio.musicOn && !timer && ctx) A.music.start(); };
+  A.audio.unlock = (music = true) => { init(); if (music && A.audio.musicOn && !timer && ctx) A.music.start(); };
   A.audio.setMusic = on => { A.audio.musicOn = on; if (on) A.music.start(); else A.music.stop(); };
 
   /* ------------------------------------------------------------------ efectos */
@@ -185,6 +244,38 @@ window.AIQ = window.AIQ || {};
       pad([48, 55, 60, 64, 67], t + 0.4, 4, 0.06); thump(t + 0.5, { vol: 0.3, f0: 100, f1: 36, dur: 0.5 }); A.music.duck(0.25, 4200);
     }),
     pause: go(t => pluck(60, t, { vol: 0.08, dur: 0.3, bright: 3 })),
+    /* Vault Raiders: marcado de caja fuerte -> clunk -> puerta -> dos notas brillantes (quinta ascendente) */
+    vault: go(t => {
+      [0.10, 0.36, 0.60].forEach(d => { noise(t + d, 0.035, { hp: 2600, vol: 0.10 }); thump(t + d, { vol: 0.07, f0: 440, f1: 190, dur: 0.05 }); });
+      noise(t + 0.1, 0.8, { lp: 220, sweepTo: 1500, vol: 0.05, type: "bandpass", q: 1.1 });
+      thump(t + 0.92, { vol: 0.6, f0: 95, f1: 32, dur: 0.5 }); noise(t + 0.92, 0.1, { lp: 1800, vol: 0.18 });
+      bell(57, t + 0.93, { vol: 0.11, dur: 1.0, rev: 0.4 }); bell(64.4, t + 0.94, { vol: 0.05, dur: 0.7, rev: 0.4 });
+      noise(t + 0.95, 0.7, { hp: 1400, vol: 0.06, sweepTo: 6500, type: "highpass" });
+      pad([48, 55, 59, 62, 64], t + 1.15, 2.8, 0.08, sfxBus);
+      bell(79, t + 1.22, { vol: 0.14, dur: 1.7, rev: 0.6 }); bell(86, t + 1.44, { vol: 0.17, dur: 2.2, rev: 0.75 });
+      [91, 95, 98, 103].forEach((m, i) => bell(m, t + 1.72 + i * 0.06, { vol: 0.045, dur: 0.9, rev: 0.7 }));
+      noise(t + 1.7, 0.7, { hp: 5000, vol: 0.035, sweepTo: 12000, type: "highpass" });
+    }),
+    /* carta que se desliza (UI) y ficha que cae */
+    card: go(t => { noise(t, 0.05, { lp: 2600, vol: 0.08, type: "bandpass", q: 0.8 }); noise(t + 0.04, 0.03, { hp: 3000, vol: 0.04 }); }),
+    chip: go((t, k = 0) => { bell(84 + Math.round(k * 7), t, { vol: 0.05, dur: 0.25, rev: 0.2 }); noise(t, 0.01, { hp: 5000, vol: 0.04 }); }),
+    /* zoom sensorial: silbido de aire continuo cuyo tono y volumen siguen la velocidad del zoom */
+    zoomVel: (() => {
+      let src = null, gain = null, filt = null;
+      return (zv, pan) => {
+        if (!A.audio.sfxOn || !ctx) return;
+        if (!src) {
+          const n = ctx.sampleRate * 2, buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+          for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+          src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+          filt = ctx.createBiquadFilter(); filt.type = "bandpass"; filt.Q.value = 0.9; filt.frequency.value = 500;
+          gain = ctx.createGain(); gain.gain.value = 0; src.connect(filt).connect(gain).connect(sfxBus); src.start();
+        }
+        const a = Math.min(1, Math.abs(zv) / 3.2 + Math.min(0.35, pan / 2600)), t = ctx.currentTime;
+        gain.gain.setTargetAtTime(a * 0.045, t, 0.06);
+        filt.frequency.setTargetAtTime(380 + a * 2400 + (zv > 0 ? 500 : 0), t, 0.07);
+      };
+    })(),
     /* feedback de sliders: el tono sube con el valor (0..1) */
     blip: go((t, v) => pluck(scaleNote(Math.round(v * 9), 67), t, { vol: 0.09, dur: 0.16, bright: 3, rev: 0.15 })),
     /* interruptores: clic seco de palanca */

@@ -1,102 +1,17 @@
 /* Atlas IQ - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  const STR = {
-    es: {
-      "brand.sub": "Desafío de geografía",
-      "title.tag": "¿Sabes dónde queda?",
-      "title.p": "Haz clic lo más cerca posible del lugar que te pidan. Cuanto más rápido, más puntos.",
-      "mode.classic": "Clásico", "mode.extended": "Extendido",
-      "mode.classic.d": "Las preguntas, los tiempos y los puntos exactos del juego original.",
-      "mode.extended.d": "Contenido nuevo hecho para Atlas IQ.",
-      "mode.classic.note": "Los textos del modo Clásico están en inglés, como en el original.",
-      "camp.levels": "{n} niveles", "camp.best": "Mejor {s}", "camp.new": "Sin jugar",
-      "title.from": "Empezar en el nivel", "title.pick": "Elige tu expedición",
-      "btn.start": "Empezar", "btn.next": "Siguiente", "btn.finish": "Terminar nivel", "btn.go": "¡Vamos!",
-      "btn.nextLevel": "Siguiente nivel", "btn.retry": "Reintentar nivel", "btn.newGame": "Menú principal",
-      "btn.badge": "Descargar insignia", "btn.resume": "Continuar",
-      "intro.level": "Nivel", "intro.q": "{n} lugares", "intro.t": "{s} s por pregunta", "intro.goal": "Meta: {a} pts", "intro.bonus": "Ronda bonus",
-      "ask.no": "Nº {n} / {m}",
-      "score.level": "Puntos del nivel", "score.need": "Meta", "score.total": "Total", "streak": "Racha ×{n}",
-      "lvl": "Nivel {n}/{m} · {name}",
-      "diff.easy": "Fácil", "diff.medium": "Medio", "diff.hard": "Difícil", "diff.expert": "Experto",
-      "kind.city": "Ciudad", "kind.country": "País", "kind.landmark": "Lugar famoso", "kind.nature": "Naturaleza",
-      "kind.water": "Mar, lago o isla", "kind.capital": "Capital", "kind.strait": "Estrecho o cabo", "kind.place": "Lugar",
-      "kind.clue": "Pista", "kind.battle": "Batalla", "kind.event": "Suceso",
-      "res.timeout": "¡Tiempo!", "res.inside": "¡Dentro!",
-      "res.t1": "¡Diana!", "res.t2": "¡Casi!", "res.t3": "Bien apuntado", "res.t4": "Lejos…", "res.t5": "Muy lejos",
-      "res.from": "de {name}", "res.border": "del borde de {name}", "res.clicked": "en {t} s",
-      "res.dist": "Distancia", "res.speed": "Velocidad", "res.streak": "Racha", "res.total": "Total", "res.was": "Era",
-      "stamp.ok": "NIVEL SUPERADO", "stamp.no": "CASI", "stamp.win": "EXPEDICIÓN COMPLETA",
-      "lc.p": "{s} pts. Necesitabas {a}.", "lf.p": "Necesitabas {a} pts y conseguiste {s}.", "win.p": "Completaste todos los niveles con {s} pts.",
-      "iq.label": "Tu Atlas IQ", "pts": "pts", "km": "km",
-      "pause.h": "En pausa", "pause.p": "El mapa se oculta mientras dura la pausa.",
-      "tip.in": "Acercar", "tip.out": "Alejar", "tip.home": "Vista inicial", "tip.fs": "Pantalla completa",
-      "tip.snd": "Efectos", "tip.mus": "Música", "tip.pause": "Pausa", "tip.lang": "Idioma", "tip.set": "Ajustes",
-      "set.title": "Ajustes", "set.sound": "Sonido", "set.lang": "Idioma", "set.gfx": "Gráficos",
-      "vol.master": "General", "vol.music": "Música", "vol.sfx": "Efectos",
-      "gfx.auto": "Auto", "gfx.high": "Alto", "gfx.saver": "Ahorro",
-      "set.gfx.d": "Auto baja el detalle solo al mover el mapa si tu equipo va justo. Ahorro reduce siempre la resolución.",
-      "key.fs": "Pantalla completa", "key.pause": "Pausa", "key.sfx": "Efectos", "key.mus": "Música",
-      "go.label": "Empezar expedición", "go.sub": "Nivel {n} · {name}",
-      "v.ok": "Nivel superado", "v.no": "Casi lo logras", "v.win": "Expedición completada",
-      "v.points": "Puntos", "v.goal": "Meta", "v.total": "Total", "v.iq": "IQ", "v.level": "Nivel {n}",
-      "tier.0": "Turista despistado", "tier.1": "Viajero novato", "tier.2": "Mochilero", "tier.3": "Explorador",
-      "tier.4": "Navegante", "tier.5": "Trotamundos", "tier.6": "Cartógrafo", "tier.7": "Leyenda",
-    },
-    en: {
-      "brand.sub": "Geography challenge",
-      "title.tag": "Do you know where it is?",
-      "title.p": "Click as close as you can to the place you're asked for. The faster you are, the more you score.",
-      "mode.classic": "Classic", "mode.extended": "Extended",
-      "mode.classic.d": "The original game's exact questions, timings and scoring.",
-      "mode.extended.d": "New content made for Atlas IQ.",
-      "mode.classic.note": "",
-      "camp.levels": "{n} levels", "camp.best": "Best {s}", "camp.new": "Not played",
-      "title.from": "Start at level", "title.pick": "Choose your expedition",
-      "btn.start": "Start", "btn.next": "Next", "btn.finish": "Finish level", "btn.go": "Let's go!",
-      "btn.nextLevel": "Next level", "btn.retry": "Retry level", "btn.newGame": "Main menu",
-      "btn.badge": "Download badge", "btn.resume": "Resume",
-      "intro.level": "Level", "intro.q": "{n} places", "intro.t": "{s} s per question", "intro.goal": "Goal: {a} pts", "intro.bonus": "Bonus round",
-      "ask.no": "No. {n} / {m}",
-      "score.level": "Level score", "score.need": "Goal", "score.total": "Total", "streak": "Streak ×{n}",
-      "lvl": "Level {n}/{m} · {name}",
-      "diff.easy": "Easy", "diff.medium": "Medium", "diff.hard": "Hard", "diff.expert": "Expert",
-      "kind.city": "City", "kind.country": "Country", "kind.landmark": "Famous place", "kind.nature": "Nature",
-      "kind.water": "Sea, lake or island", "kind.capital": "Capital", "kind.strait": "Strait or cape", "kind.place": "Place",
-      "kind.clue": "Clue", "kind.battle": "Battle", "kind.event": "Event",
-      "res.timeout": "Time's up!", "res.inside": "Inside!",
-      "res.t1": "Bullseye!", "res.t2": "So close!", "res.t3": "Good aim", "res.t4": "Far off…", "res.t5": "Way off",
-      "res.from": "from {name}", "res.border": "from the border of {name}", "res.clicked": "in {t} s",
-      "res.dist": "Distance", "res.speed": "Speed", "res.streak": "Streak", "res.total": "Total", "res.was": "It was",
-      "stamp.ok": "LEVEL CLEARED", "stamp.no": "SO CLOSE", "stamp.win": "EXPEDITION COMPLETE",
-      "lc.p": "{s} pts. You needed {a}.", "lf.p": "You needed {a} pts and scored {s}.", "win.p": "You cleared every level with {s} pts.",
-      "iq.label": "Your Atlas IQ", "pts": "pts", "km": "km",
-      "pause.h": "Paused", "pause.p": "The map is hidden while the game is paused.",
-      "tip.in": "Zoom in", "tip.out": "Zoom out", "tip.home": "Home view", "tip.fs": "Fullscreen",
-      "tip.snd": "Effects", "tip.mus": "Music", "tip.pause": "Pause", "tip.lang": "Language", "tip.set": "Settings",
-      "set.title": "Settings", "set.sound": "Sound", "set.lang": "Language", "set.gfx": "Graphics",
-      "vol.master": "Master", "vol.music": "Music", "vol.sfx": "Effects",
-      "gfx.auto": "Auto", "gfx.high": "High", "gfx.saver": "Saver",
-      "set.gfx.d": "Auto lowers detail only while moving the map if your device struggles. Saver always reduces resolution.",
-      "key.fs": "Fullscreen", "key.pause": "Pause", "key.sfx": "Effects", "key.mus": "Music",
-      "go.label": "Start expedition", "go.sub": "Level {n} · {name}",
-      "v.ok": "Level cleared", "v.no": "So close", "v.win": "Expedition complete",
-      "v.points": "Points", "v.goal": "Goal", "v.total": "Total", "v.iq": "IQ", "v.level": "Level {n}",
-      "tier.0": "Lost Tourist", "tier.1": "Rookie Traveler", "tier.2": "Backpacker", "tier.3": "Explorer",
-      "tier.4": "Navigator", "tier.5": "Globetrotter", "tier.6": "Cartographer", "tier.7": "Legend",
-    },
-  };
-  A.VERSION = "0.2";
+  A.VERSION = "0.3";
   A.lang = "es";
   A.t = (key, p) => {
-    let s = (STR[A.lang] && STR[A.lang][key]) || STR.en[key] || key;
+    let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
     if (p) for (const k in p) s = s.replaceAll("{" + k + "}", p[k]);
     return s;
   };
-  A.fmt = n => Math.round(n).toLocaleString(A.lang === "es" ? "es-ES" : "en-US");
-  /* texto multilingue: objeto {en,es} o cadena */
-  A.tx = v => (v && typeof v === "object" ? v[A.lang] || v.en || "" : v || "");
+  const locOf = () => (A.LANGS.find(l => l.code === A.lang) || A.LANGS[0]).loc;
+  A.fmt = n => Math.round(n).toLocaleString(locOf());
+  /* texto multilingue: objeto {en,es,...} o cadena. Si falta el idioma, ingles y luego espanol */
+  A.tx = v => (v && typeof v === "object" ? v[A.lang] || v.en || v.es || "" : v || "");
 
   /* ------------------------------------------------------------ IQ */
   A.iqTier = iq => (iq < 80 ? 0 : iq < 95 ? 1 : iq < 110 ? 2 : iq < 125 ? 3 : iq < 140 ? 4 : iq < 155 ? 5 : iq < 175 ? 6 : 7);
@@ -139,7 +54,7 @@ window.AIQ = window.AIQ || {};
     c.font = "italic 700 44px 'Fraunces', Georgia, serif"; c.fillStyle = RED; c.fillText(tierName, 400, 345);
     c.font = "500 22px 'DM Mono', monospace"; c.fillStyle = INK; c.fillText(subtitle, 400, 395);
     c.fillStyle = "rgba(20,35,43,.55)"; c.font = "500 16px 'DM Mono', monospace";
-    c.fillText(new Date().toLocaleDateString(A.lang === "es" ? "es-ES" : "en-US", { year: "numeric", month: "long", day: "numeric" }).toUpperCase(), 400, 430);
+    c.fillText(new Date().toLocaleDateString(locOf(), { year: "numeric", month: "long", day: "numeric" }).toUpperCase(), 400, 430);
     // sello
     c.save(); c.translate(760, 150); c.rotate(-0.22); c.strokeStyle = RED; c.fillStyle = RED; c.lineWidth = 5;
     c.beginPath(); c.arc(0, 0, 62, 0, 7); c.stroke(); c.lineWidth = 2; c.beginPath(); c.arc(0, 0, 54, 0, 7); c.stroke();

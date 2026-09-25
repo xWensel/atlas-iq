@@ -136,7 +136,7 @@ window.AIQ = window.AIQ || {};
       const [px0, py0] = project(bx0, Math.max(-90, by0)), [px1, py1] = project(bx1, Math.min(90, by1));
       return {
         name, polys, path, px0, px1, py0, py1, wrap: bx0 < -180 || bx1 > 180,
-        color: name === "Antarctica" ? "#f4efe3" : PALETTE[colorIdx[i]],
+        color: name === "Antarctica" ? "#f4efe3" : PALETTE[colorIdx[i]], ci: name === "Antarctica" ? 6 : colorIdx[i] % 6,
       };
     });
 
