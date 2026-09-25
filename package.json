@@ -1,0 +1,7 @@
+{
+  "name": "atlas-iq",
+  "version": "0.1.0",
+  "description": "Atlas IQ - juego de geografia: haz clic lo mas cerca posible del lugar que te piden.",
+  "private": true,
+  "license": "UNLICENSED"
+}

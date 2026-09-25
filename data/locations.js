@@ -1,0 +1,235 @@
+/*
+ * Atlas IQ - preguntas y niveles (contenido propio).
+ * Punto:  P(en, es, paisEn, paisEs, lat, lon, datoEn, datoEs)
+ * Pais:   C(nombreEnNaturalEarth, es, datoEn, datoEs)   -> se acierta haciendo clic DENTRO del pais
+ */
+window.AIQ = window.AIQ || {};
+(function (A) {
+  const P = (en, es, cEn, cEs, lat, lon, fEn, fEs) =>
+    ({ t: "p", n: { en, es }, c: { en: cEn, es: cEs }, lat, lon, f: { en: fEn, es: fEs } });
+  const C = (key, es, fEn, fEs, en) =>
+    ({ t: "c", key, n: { en: en || key, es }, c: { en: "", es: "" }, f: { en: fEn, es: fEs } });
+
+  A.LEVELS = [
+    /* 1 ------------------------------------------------------------- */
+    { kind: "city", diff: "easy", name: { en: "World Cities", es: "Ciudades del mundo" }, pool: [
+      P("Paris", "París", "France", "Francia", 48.857, 2.352, "Paris is nicknamed the City of Light.", "París es conocida como la Ciudad de la Luz."),
+      P("London", "Londres", "United Kingdom", "Reino Unido", 51.507, -0.128, "Big Ben is the name of the bell, not of the tower.", "Big Ben es el nombre de la campana, no de la torre."),
+      P("New York", "Nueva York", "USA", "EE. UU.", 40.713, -74.006, "Hundreds of languages are spoken in New York City.", "En Nueva York se hablan cientos de idiomas."),
+      P("Tokyo", "Tokio", "Japan", "Japón", 35.690, 139.692, "Tokyo was called Edo until 1868.", "Tokio se llamaba Edo hasta 1868."),
+      P("Rome", "Roma", "Italy", "Italia", 41.903, 12.496, "Vatican City is an independent state inside Rome.", "La Ciudad del Vaticano es un estado independiente dentro de Roma."),
+      P("Sydney", "Sídney", "Australia", "Australia", -33.869, 151.209, "Sydney is not Australia's capital; Canberra is.", "Sídney no es la capital de Australia; lo es Canberra."),
+      P("Cairo", "El Cairo", "Egypt", "Egipto", 30.044, 31.236, "Cairo is the largest city in the Arab world.", "El Cairo es la mayor ciudad del mundo árabe."),
+      P("Rio de Janeiro", "Río de Janeiro", "Brazil", "Brasil", -22.907, -43.173, "Its name means 'River of January'.", "Su nombre significa 'Río de Enero'."),
+      P("Moscow", "Moscú", "Russia", "Rusia", 55.756, 37.617, "Moscow's metro stations are famous for their palace-like decoration.", "Las estaciones del metro de Moscú son famosas por su decoración de palacio."),
+      P("Beijing", "Pekín", "China", "China", 39.904, 116.407, "Beijing hosted both the Summer (2008) and Winter (2022) Olympics.", "Pekín acogió los Juegos de verano (2008) y de invierno (2022)."),
+      P("Buenos Aires", "Buenos Aires", "Argentina", "Argentina", -34.604, -58.382, "Its name means 'fair winds'.", "Su nombre significa 'buenos aires' o 'vientos favorables'."),
+      P("Mexico City", "Ciudad de México", "Mexico", "México", 19.433, -99.133, "It was built on top of the Aztec capital, Tenochtitlan.", "Se construyó sobre la capital azteca, Tenochtitlan."),
+      P("Madrid", "Madrid", "Spain", "España", 40.417, -3.703, "Madrid is the highest capital city in the European Union.", "Madrid es la capital más alta de la Unión Europea."),
+      P("Berlin", "Berlín", "Germany", "Alemania", 52.520, 13.405, "The Berlin Wall fell in 1989.", "El Muro de Berlín cayó en 1989."),
+    ]},
+    /* 2 ------------------------------------------------------------- */
+    { kind: "country", diff: "easy", name: { en: "Countries", es: "Países" }, pool: [
+      C("Brazil", "Brasil", "Brazil is the only Portuguese-speaking country in South America.", "Brasil es el único país de habla portuguesa de Sudamérica."),
+      C("Australia", "Australia", "Australia is both a country and a continent.", "Australia es a la vez un país y un continente."),
+      C("Canada", "Canadá", "Canada has the longest coastline of any country.", "Canadá tiene la costa más larga de todos los países."),
+      C("Egypt", "Egipto", "Most Egyptians live along the banks of the Nile.", "La mayoría de los egipcios vive a orillas del Nilo."),
+      C("India", "India", "India is the most populous country in the world.", "India es el país más poblado del mundo."),
+      C("France", "Francia", "France is one of the most visited countries on Earth.", "Francia es uno de los países más visitados del planeta."),
+      C("Japan", "Japón", "Japan is made up of more than 6,800 islands.", "Japón está formado por más de 6.800 islas."),
+      C("Italy", "Italia", "Italy is one of the countries with the most UNESCO World Heritage Sites.", "Italia es uno de los países con más sitios Patrimonio de la Humanidad."),
+      C("Mexico", "México", "Mexico officially recognises 68 national indigenous languages.", "México reconoce oficialmente 68 lenguas indígenas nacionales."),
+      C("United States of America", "Estados Unidos", "The United States stretches across several time zones.", "Estados Unidos se extiende por varias zonas horarias.", "United States"),
+      C("China", "China", "China spans five geographic time zones but uses a single official time.", "China abarca cinco husos horarios pero usa una única hora oficial."),
+      C("Spain", "España", "Spain is the world's largest producer of olive oil.", "España es el mayor productor de aceite de oliva del mundo."),
+      C("Argentina", "Argentina", "Argentina is home to Aconcagua, the highest peak outside Asia.", "Argentina alberga el Aconcagua, la cima más alta fuera de Asia."),
+      C("South Africa", "Sudáfrica", "South Africa has three capital cities.", "Sudáfrica tiene tres capitales."),
+      C("Germany", "Alemania", "Germany shares borders with nine countries.", "Alemania comparte frontera con nueve países."),
+      C("United Kingdom", "Reino Unido", "The United Kingdom is made up of four nations.", "El Reino Unido está formado por cuatro naciones."),
+    ]},
+    /* 3 ------------------------------------------------------------- */
+    { kind: "landmark", diff: "easy", name: { en: "World Landmarks", es: "Monumentos del mundo" }, pool: [
+      P("Eiffel Tower", "Torre Eiffel", "France", "Francia", 48.858, 2.294, "It was built for the 1889 World's Fair.", "Se construyó para la Exposición Universal de 1889."),
+      P("Statue of Liberty", "Estatua de la Libertad", "USA", "EE. UU.", 40.689, -74.045, "It was a gift from France to the United States.", "Fue un regalo de Francia a Estados Unidos."),
+      P("Pyramids of Giza", "Pirámides de Guiza", "Egypt", "Egipto", 29.979, 31.134, "The Great Pyramid was the tallest man-made structure for about 3,800 years.", "La Gran Pirámide fue la construcción más alta durante unos 3.800 años."),
+      P("Taj Mahal", "Taj Mahal", "India", "India", 27.175, 78.042, "It was built as a mausoleum for Mumtaz Mahal.", "Se construyó como mausoleo para Mumtaz Mahal."),
+      P("Colosseum", "Coliseo", "Italy", "Italia", 41.890, 12.492, "The Colosseum could hold around 50,000 spectators.", "El Coliseo tenía capacidad para unos 50.000 espectadores."),
+      P("Sydney Opera House", "Ópera de Sídney", "Australia", "Australia", -33.857, 151.215, "It opened in 1973.", "Se inauguró en 1973."),
+      P("Great Wall of China", "Gran Muralla china", "China", "China", 40.432, 116.570, "It cannot be seen from space with the naked eye.", "No se puede ver a simple vista desde el espacio."),
+      P("Christ the Redeemer", "Cristo Redentor", "Brazil", "Brasil", -22.952, -43.211, "It is one of the New Seven Wonders of the World (2007).", "Es una de las Nuevas Siete Maravillas del Mundo (2007)."),
+      P("Big Ben", "Big Ben", "United Kingdom", "Reino Unido", 51.501, -0.125, "The tower's official name is Elizabeth Tower.", "El nombre oficial de la torre es Torre Elizabeth."),
+      P("Machu Picchu", "Machu Picchu", "Peru", "Perú", -13.163, -72.545, "The Inca built it in the 15th century.", "Los incas lo construyeron en el siglo XV."),
+      P("Petra", "Petra", "Jordan", "Jordania", 30.329, 35.444, "Its buildings are carved into rose-coloured sandstone cliffs.", "Sus edificios están tallados en acantilados de arenisca rosada."),
+      P("Golden Gate Bridge", "Puente Golden Gate", "USA", "EE. UU.", 37.820, -122.479, "It is painted a colour called 'International Orange'.", "Está pintado de un color llamado 'naranja internacional'."),
+      P("Angkor Wat", "Angkor Wat", "Cambodia", "Camboya", 13.412, 103.867, "It is the largest religious monument in the world.", "Es el mayor monumento religioso del mundo."),
+      P("Burj Khalifa", "Burj Khalifa", "United Arab Emirates", "Emiratos Árabes", 25.197, 55.274, "At 828 metres, it is the tallest building in the world.", "Con 828 metros, es el edificio más alto del mundo."),
+    ]},
+    /* 4 ------------------------------------------------------------- */
+    { kind: "city", diff: "medium", name: { en: "World Cities", es: "Ciudades del mundo" }, pool: [
+      P("Istanbul", "Estambul", "Turkey", "Turquía", 41.008, 28.978, "Istanbul spans two continents: Europe and Asia.", "Estambul se extiende por dos continentes: Europa y Asia."),
+      P("Bangkok", "Bangkok", "Thailand", "Tailandia", 13.756, 100.502, "Its full ceremonial name is one of the longest place names in the world.", "Su nombre ceremonial completo es uno de los topónimos más largos del mundo."),
+      P("Cape Town", "Ciudad del Cabo", "South Africa", "Sudáfrica", -33.925, 18.424, "Table Mountain towers over the city.", "La Montaña de la Mesa domina la ciudad."),
+      P("Lima", "Lima", "Peru", "Perú", -12.046, -77.043, "Despite the coast, Lima receives almost no rain.", "Aunque está en la costa, en Lima casi no llueve."),
+      P("Nairobi", "Nairobi", "Kenya", "Kenia", -1.292, 36.822, "It has a national park within its city limits.", "Tiene un parque nacional dentro de los límites de la ciudad."),
+      P("Mumbai", "Bombay (Mumbai)", "India", "India", 19.076, 72.878, "Mumbai is the home of Bollywood.", "Bombay es la cuna de Bollywood."),
+      P("Singapore", "Singapur", "Singapore", "Singapur", 1.352, 103.820, "Singapore is a city, an island and a country all at once.", "Singapur es a la vez ciudad, isla y país."),
+      P("Reykjavik", "Reikiavik", "Iceland", "Islandia", 64.147, -21.943, "It is the northernmost capital of a sovereign state.", "Es la capital más septentrional de un estado soberano."),
+      P("Seoul", "Seúl", "South Korea", "Corea del Sur", 37.567, 126.978, "Around half of South Korea's population lives in the Seoul area.", "Cerca de la mitad de la población surcoreana vive en el área de Seúl."),
+      P("Lagos", "Lagos", "Nigeria", "Nigeria", 6.524, 3.379, "Lagos is Nigeria's largest city.", "Lagos es la ciudad más grande de Nigeria."),
+      P("Santiago", "Santiago", "Chile", "Chile", -33.449, -70.669, "The snowy Andes can be seen from the city.", "Desde la ciudad se ven los Andes nevados."),
+      P("Vancouver", "Vancouver", "Canada", "Canadá", 49.283, -123.121, "It sits between the mountains and the Pacific Ocean.", "Se encuentra entre las montañas y el océano Pacífico."),
+      P("Havana", "La Habana", "Cuba", "Cuba", 23.114, -82.366, "Havana's streets are famous for their classic American cars.", "Las calles de La Habana son famosas por sus coches clásicos americanos."),
+      P("Athens", "Atenas", "Greece", "Grecia", 37.984, 23.728, "Athens is one of the oldest cities in the world.", "Atenas es una de las ciudades más antiguas del mundo."),
+      P("Kuala Lumpur", "Kuala Lumpur", "Malaysia", "Malasia", 3.139, 101.687, "Its name means 'muddy confluence'.", "Su nombre significa 'confluencia fangosa'."),
+    ]},
+    /* 5 ------------------------------------------------------------- */
+    { kind: "capital", diff: "medium", name: { en: "World Capitals", es: "Capitales del mundo" }, pool: [
+      P("Ottawa", "Ottawa", "Canada", "Canadá", 45.421, -75.697, "Ottawa, not Toronto, is the capital of Canada.", "La capital de Canadá es Ottawa, no Toronto."),
+      P("Canberra", "Canberra", "Australia", "Australia", -35.281, 149.129, "Canberra was purpose-built as a capital.", "Canberra se construyó expresamente para ser capital."),
+      P("Brasília", "Brasilia", "Brazil", "Brasil", -15.794, -47.883, "Brasília was built in just a few years and inaugurated in 1960.", "Brasilia se construyó en pocos años y se inauguró en 1960."),
+      P("Washington, D.C.", "Washington D. C.", "USA", "EE. UU.", 38.907, -77.037, "It is not part of any US state.", "No pertenece a ningún estado de EE. UU."),
+      P("Wellington", "Wellington", "New Zealand", "Nueva Zelanda", -41.286, 174.776, "It is the southernmost capital of a sovereign state.", "Es la capital soberana situada más al sur."),
+      P("Bern", "Berna", "Switzerland", "Suiza", 46.948, 7.447, "Bern's old town is a UNESCO World Heritage Site.", "El casco antiguo de Berna es Patrimonio de la Humanidad."),
+      P("Ankara", "Ankara", "Turkey", "Turquía", 39.933, 32.860, "Ankara, not Istanbul, is the capital of Turkey.", "La capital de Turquía es Ankara, no Estambul."),
+      P("Pretoria", "Pretoria", "South Africa", "Sudáfrica", -25.747, 28.188, "Pretoria is known as the Jacaranda City.", "Pretoria es conocida como la Ciudad de las Jacarandas."),
+      P("Rabat", "Rabat", "Morocco", "Marruecos", 34.021, -6.841, "Rabat, not Casablanca, is the capital of Morocco.", "La capital de Marruecos es Rabat, no Casablanca."),
+      P("Stockholm", "Estocolmo", "Sweden", "Suecia", 59.329, 18.069, "Stockholm is built across 14 islands.", "Estocolmo está construida sobre 14 islas."),
+      P("Oslo", "Oslo", "Norway", "Noruega", 59.914, 10.752, "Oslo lies at the head of a fjord.", "Oslo se encuentra al fondo de un fiordo."),
+      P("Helsinki", "Helsinki", "Finland", "Finlandia", 60.170, 24.938, "Helsinki is one of Europe's northernmost capitals.", "Helsinki es una de las capitales más septentrionales de Europa."),
+      P("Warsaw", "Varsovia", "Poland", "Polonia", 52.230, 21.012, "Warsaw's Old Town was rebuilt after World War II.", "El casco antiguo de Varsovia se reconstruyó tras la Segunda Guerra Mundial."),
+      P("Vienna", "Viena", "Austria", "Austria", 48.208, 16.373, "Vienna is often called the City of Music.", "Viena suele llamarse la Ciudad de la Música."),
+      P("Lisbon", "Lisboa", "Portugal", "Portugal", 38.722, -9.139, "Lisbon is the westernmost capital of mainland Europe.", "Lisboa es la capital más occidental de la Europa continental."),
+      P("Dublin", "Dublín", "Ireland", "Irlanda", 53.350, -6.260, "Dublin is home to the Guinness Storehouse.", "Dublín alberga el Guinness Storehouse."),
+    ]},
+    /* 6 ------------------------------------------------------------- */
+    { kind: "nature", diff: "medium", name: { en: "Natural Wonders", es: "Maravillas naturales" }, pool: [
+      P("Mount Everest", "Monte Everest", "Nepal / China", "Nepal / China", 27.988, 86.925, "Its summit is about 8,849 metres above sea level.", "Su cima está a unos 8.849 metros sobre el nivel del mar."),
+      P("Niagara Falls", "Cataratas del Niágara", "Canada / USA", "Canadá / EE. UU.", 43.080, -79.075, "The falls sit on the border between Canada and the USA.", "Las cataratas están en la frontera entre Canadá y EE. UU."),
+      P("Victoria Falls", "Cataratas Victoria", "Zambia / Zimbabwe", "Zambia / Zimbabue", -17.925, 25.857, "Locals call them 'the smoke that thunders'.", "Los lugareños las llaman 'el humo que truena'."),
+      P("Grand Canyon", "Gran Cañón", "USA", "EE. UU.", 36.107, -112.113, "The Colorado River carved the canyon over millions of years.", "El río Colorado excavó el cañón durante millones de años."),
+      P("Mount Kilimanjaro", "Kilimanjaro", "Tanzania", "Tanzania", -3.067, 37.356, "It is the highest mountain in Africa.", "Es la montaña más alta de África."),
+      P("Great Barrier Reef", "Gran Barrera de Coral", "Australia", "Australia", -18.290, 147.700, "It is the largest coral reef system on Earth.", "Es el mayor sistema de arrecifes de coral del planeta."),
+      P("Uluru", "Uluru", "Australia", "Australia", -25.344, 131.036, "Uluru is sacred to the Anangu people.", "Uluru es sagrado para el pueblo anangu."),
+      P("Mount Fuji", "Monte Fuji", "Japan", "Japón", 35.361, 138.727, "It is Japan's highest mountain.", "Es la montaña más alta de Japón."),
+      P("Iguazú Falls", "Cataratas del Iguazú", "Argentina / Brazil", "Argentina / Brasil", -25.695, -54.436, "The falls are made up of around 270 separate drops.", "Las cataratas se componen de unos 270 saltos."),
+      P("Lake Baikal", "Lago Baikal", "Russia", "Rusia", 53.500, 108.000, "It is the deepest lake in the world.", "Es el lago más profundo del mundo."),
+      P("Galápagos Islands", "Islas Galápagos", "Ecuador", "Ecuador", -0.677, -90.550, "Darwin's visit here helped inspire his theory of evolution.", "La visita de Darwin ayudó a inspirar su teoría de la evolución."),
+      P("Matterhorn", "Cervino (Matterhorn)", "Switzerland / Italy", "Suiza / Italia", 45.976, 7.658, "Its pyramid shape is one of the best-known in the Alps.", "Su forma piramidal es de las más reconocibles de los Alpes."),
+      P("Angel Falls", "Salto Ángel", "Venezuela", "Venezuela", 5.967, -62.536, "It is the tallest uninterrupted waterfall in the world.", "Es la mayor caída de agua ininterrumpida del mundo."),
+      P("Dead Sea", "Mar Muerto", "Israel / Jordan", "Israel / Jordania", 31.500, 35.500, "Its shore is the lowest land elevation on Earth.", "Su orilla es el punto más bajo de la superficie terrestre."),
+      P("Aconcagua", "Aconcagua", "Argentina", "Argentina", -32.653, -70.011, "It is the highest mountain outside Asia.", "Es la montaña más alta fuera de Asia."),
+      P("Denali", "Denali", "USA", "EE. UU.", 63.069, -151.007, "Denali is the highest peak in North America.", "El Denali es la cima más alta de Norteamérica."),
+    ]},
+    /* 7 ------------------------------------------------------------- */
+    { kind: "country", diff: "medium", name: { en: "Countries", es: "Países" }, pool: [
+      C("Peru", "Perú", "Peru is the birthplace of the potato, with thousands of native varieties.", "Perú es la cuna de la papa, con miles de variedades nativas."),
+      C("Turkey", "Turquía", "Turkey lies in both Europe and Asia.", "Turquía se encuentra entre Europa y Asia."),
+      C("Kenya", "Kenia", "The Maasai Mara hosts the great wildebeest migration.", "El Masái Mara acoge la gran migración de ñus."),
+      C("Thailand", "Tailandia", "Thailand is the only Southeast Asian country never colonised by a European power.", "Tailandia es el único país del sudeste asiático que nunca fue colonizado por una potencia europea."),
+      C("Sweden", "Suecia", "Sweden has more islands than any other country, about 267,000.", "Suecia tiene más islas que ningún otro país, unas 267.000."),
+      C("Poland", "Polonia", "Poland's Białowieża Forest is home to Europe's largest land mammal, the bison.", "En el bosque de Białowieża vive el mayor mamífero terrestre de Europa, el bisonte."),
+      C("Colombia", "Colombia", "Colombia is a leading producer of coffee and emeralds.", "Colombia es un gran productor de café y esmeraldas."),
+      C("Indonesia", "Indonesia", "Indonesia has more than 17,000 islands.", "Indonesia tiene más de 17.000 islas."),
+      C("Saudi Arabia", "Arabia Saudita", "Saudi Arabia has no permanent rivers.", "Arabia Saudita no tiene ríos permanentes."),
+      C("Norway", "Noruega", "Norway's coastline is cut by thousands of fjords.", "La costa de Noruega está recortada por miles de fiordos."),
+      C("Chile", "Chile", "Chile is over 4,000 km long but rarely more than 200 km wide.", "Chile mide más de 4.000 km de largo pero rara vez supera los 200 km de ancho."),
+      C("Nigeria", "Nigeria", "Nigeria is the most populous country in Africa.", "Nigeria es el país más poblado de África."),
+      C("Ukraine", "Ucrania", "Ukraine is the largest country entirely within Europe.", "Ucrania es el mayor país íntegramente europeo."),
+      C("Vietnam", "Vietnam", "Vietnam is one of the world's largest coffee exporters.", "Vietnam es uno de los mayores exportadores de café del mundo."),
+    ]},
+    /* 8 ------------------------------------------------------------- */
+    { kind: "water", diff: "hard", name: { en: "Seas, Lakes & Islands", es: "Mares, lagos e islas" }, pool: [
+      P("Mediterranean Sea", "Mar Mediterráneo", "", "", 35.000, 18.000, "Its name means 'in the middle of the land'.", "Su nombre significa 'en medio de las tierras'."),
+      P("Caribbean Sea", "Mar Caribe", "", "", 15.000, -75.000, "It takes its name from the Caribs, the people who lived in the region.", "Debe su nombre a los caribes, el pueblo que habitaba la región."),
+      P("Lake Victoria", "Lago Victoria", "Uganda / Kenya / Tanzania", "Uganda / Kenia / Tanzania", -1.000, 33.000, "It is the largest lake in Africa.", "Es el mayor lago de África."),
+      P("Madagascar", "Madagascar", "", "", -19.000, 46.700, "Lemurs live in the wild only in Madagascar.", "Los lémures solo viven en libertad en Madagascar."),
+      P("Greenland", "Groenlandia", "", "", 72.000, -40.000, "Greenland is the largest island in the world.", "Groenlandia es la isla más grande del mundo."),
+      P("Hawaii (Big Island)", "Hawái (Isla Grande)", "USA", "EE. UU.", 19.600, -155.500, "The Big Island has some of the world's most active volcanoes.", "La Isla Grande tiene algunos de los volcanes más activos del mundo."),
+      P("Tasmania", "Tasmania", "Australia", "Australia", -42.000, 146.600, "Tasmania is home to the Tasmanian devil.", "En Tasmania vive el diablo de Tasmania."),
+      P("Sri Lanka", "Sri Lanka", "", "", 7.800, 80.700, "It is often described as a teardrop off the tip of India.", "Suele describirse como una lágrima junto a la punta de la India."),
+      P("Cuba", "Cuba", "", "", 21.500, -79.000, "Cuba is the largest island in the Caribbean.", "Cuba es la mayor isla del Caribe."),
+      P("Sicily", "Sicilia", "Italy", "Italia", 37.600, 14.000, "Sicily is the largest island in the Mediterranean.", "Sicilia es la mayor isla del Mediterráneo."),
+      P("Borneo", "Borneo", "", "", 0.500, 114.000, "Borneo is shared by three countries.", "Borneo se reparte entre tres países."),
+      P("Easter Island", "Isla de Pascua", "Chile", "Chile", -27.110, -109.350, "It is famous for its giant moai statues.", "Es famosa por sus gigantescas estatuas moái."),
+      P("Black Sea", "Mar Negro", "", "", 43.500, 34.000, "The Black Sea connects to the Mediterranean via the Bosphorus.", "El mar Negro se conecta con el Mediterráneo por el Bósforo."),
+      P("Red Sea", "Mar Rojo", "", "", 20.000, 38.500, "It is one of the saltiest seas in the world.", "Es uno de los mares más salados del mundo."),
+      P("Lake Titicaca", "Lago Titicaca", "Peru / Bolivia", "Perú / Bolivia", -15.840, -69.330, "It is one of the highest large navigable lakes in the world.", "Es uno de los grandes lagos navegables más altos del mundo."),
+      P("Lake Superior", "Lago Superior", "USA / Canada", "EE. UU. / Canadá", 47.700, -87.500, "It is the largest of the Great Lakes by surface area.", "Es el mayor de los Grandes Lagos por superficie."),
+      P("Baltic Sea", "Mar Báltico", "", "", 58.000, 20.000, "The Baltic Sea has very low salinity for a sea.", "El Báltico tiene una salinidad muy baja para ser un mar."),
+    ]},
+    /* 9 ------------------------------------------------------------- */
+    { kind: "landmark", diff: "hard", name: { en: "World Landmarks", es: "Monumentos del mundo" }, pool: [
+      P("Stonehenge", "Stonehenge", "United Kingdom", "Reino Unido", 51.179, -1.826, "Its huge stones were put in place over 4,000 years ago.", "Sus enormes piedras se colocaron hace más de 4.000 años."),
+      P("Sagrada Família", "Sagrada Familia", "Spain", "España", 41.404, 2.174, "Construction began in 1882 and is still going.", "Sus obras empezaron en 1882 y aún continúan."),
+      P("Neuschwanstein Castle", "Castillo de Neuschwanstein", "Germany", "Alemania", 47.558, 10.750, "It inspired the castle in Disney's Sleeping Beauty.", "Inspiró el castillo de La Bella Durmiente de Disney."),
+      P("Hagia Sophia", "Santa Sofía", "Turkey", "Turquía", 41.008, 28.980, "It was a cathedral, a mosque and a museum during its long history.", "Ha sido catedral, mezquita y museo a lo largo de su historia."),
+      P("Mount Rushmore", "Monte Rushmore", "USA", "EE. UU.", 43.879, -103.459, "It portrays four US presidents carved in granite.", "Representa a cuatro presidentes de EE. UU. tallados en granito."),
+      P("Chichén Itzá", "Chichén Itzá", "Mexico", "México", 20.683, -88.568, "Its main pyramid is called El Castillo.", "Su pirámide principal se llama El Castillo."),
+      P("Saint Basil's Cathedral", "Catedral de San Basilio", "Russia", "Rusia", 55.752, 37.623, "Its colourful onion domes stand on Red Square.", "Sus coloridas cúpulas de cebolla se alzan en la Plaza Roja."),
+      P("Forbidden City", "Ciudad Prohibida", "China", "China", 39.916, 116.397, "It was the imperial palace for almost 500 years.", "Fue el palacio imperial durante casi 500 años."),
+      P("Alhambra", "La Alhambra", "Spain", "España", 37.177, -3.588, "It is a palace-fortress built by the Nasrid dynasty.", "Es un palacio-fortaleza levantado por la dinastía nazarí."),
+      P("Leaning Tower of Pisa", "Torre de Pisa", "Italy", "Italia", 43.723, 10.396, "It began to lean during construction because of soft ground.", "Empezó a inclinarse durante su construcción por un terreno blando."),
+      P("Petronas Towers", "Torres Petronas", "Malaysia", "Malasia", 3.158, 101.712, "They were the tallest buildings in the world from 1998 to 2004.", "Fueron los edificios más altos del mundo de 1998 a 2004."),
+      P("Abu Simbel", "Abu Simbel", "Egypt", "Egipto", 22.337, 31.626, "The temples were moved to save them from the rising waters of the Nile.", "Los templos se trasladaron para salvarlos de las aguas del Nilo."),
+      P("Borobudur", "Borobudur", "Indonesia", "Indonesia", -7.608, 110.204, "It is the largest Buddhist temple in the world.", "Es el mayor templo budista del mundo."),
+      P("Acropolis", "Acrópolis", "Greece", "Grecia", 37.972, 23.726, "The Parthenon crowns the Acropolis of Athens.", "El Partenón corona la Acrópolis de Atenas."),
+      P("Potala Palace", "Palacio de Potala", "China (Tibet)", "China (Tíbet)", 29.658, 91.117, "It was the winter residence of the Dalai Lama.", "Fue la residencia de invierno del Dalái Lama."),
+    ]},
+    /* 10 ------------------------------------------------------------ */
+    { kind: "country", diff: "hard", name: { en: "Countries", es: "Países" }, pool: [
+      C("Bhutan", "Bután", "Bhutan famously measures its progress in Gross National Happiness.", "Bután mide su progreso con la Felicidad Nacional Bruta."),
+      C("Slovenia", "Eslovenia", "More than half of Slovenia is covered by forest.", "Más de la mitad de Eslovenia está cubierta de bosques."),
+      C("Costa Rica", "Costa Rica", "Costa Rica abolished its army in 1948.", "Costa Rica abolió su ejército en 1948."),
+      C("Lebanon", "Líbano", "The cedar tree appears on Lebanon's flag.", "El cedro aparece en la bandera del Líbano."),
+      C("Uruguay", "Uruguay", "Uruguay hosted and won the first FIFA World Cup in 1930.", "Uruguay organizó y ganó el primer Mundial de fútbol, en 1930."),
+      C("Georgia", "Georgia", "Georgia is considered one of the cradles of winemaking.", "Georgia se considera una de las cunas del vino."),
+      C("Uzbekistan", "Uzbekistán", "Uzbekistan is doubly landlocked.", "Uzbekistán es un país doblemente sin litoral."),
+      C("Ghana", "Ghana", "Ghana was the first sub-Saharan African country to gain independence, in 1957.", "Ghana fue el primer país del África subsahariana en independizarse, en 1957."),
+      C("Bolivia", "Bolivia", "Bolivia has two capitals: Sucre and La Paz.", "Bolivia tiene dos capitales: Sucre y La Paz."),
+      C("Laos", "Laos", "Laos is the only landlocked country in Southeast Asia.", "Laos es el único país sin litoral del sudeste asiático."),
+      C("Nepal", "Nepal", "Nepal is home to eight of the ten highest mountains on Earth.", "Nepal alberga ocho de las diez montañas más altas de la Tierra."),
+      C("Latvia", "Letonia", "About half of Latvia is covered by forest.", "Cerca de la mitad de Letonia está cubierta de bosques."),
+      C("Rwanda", "Ruanda", "Rwanda is known as the land of a thousand hills.", "Ruanda es conocida como la tierra de las mil colinas."),
+      C("Azerbaijan", "Azerbaiyán", "Azerbaijan is nicknamed the Land of Fire.", "A Azerbaiyán se le llama la Tierra del Fuego."),
+    ]},
+    /* 11 ------------------------------------------------------------ */
+    { kind: "city", diff: "expert", name: { en: "World Cities", es: "Ciudades del mundo" }, pool: [
+      P("Ulaanbaatar", "Ulán Bator", "Mongolia", "Mongolia", 47.886, 106.906, "It is often called the coldest capital city in the world.", "Suele llamarse la capital más fría del mundo."),
+      P("Nuuk", "Nuuk", "Greenland", "Groenlandia", 64.175, -51.739, "Nuuk is the capital of Greenland.", "Nuuk es la capital de Groenlandia."),
+      P("Timbuktu", "Tombuctú", "Mali", "Malí", 16.766, -3.003, "It was a medieval centre of Islamic learning.", "Fue un centro medieval del saber islámico."),
+      P("Kathmandu", "Katmandú", "Nepal", "Nepal", 27.717, 85.324, "It lies in a valley surrounded by the Himalayas.", "Se encuentra en un valle rodeado por el Himalaya."),
+      P("Addis Ababa", "Adís Abeba", "Ethiopia", "Etiopía", 9.030, 38.740, "Its name means 'new flower'.", "Su nombre significa 'nueva flor'."),
+      P("Tashkent", "Taskent", "Uzbekistan", "Uzbekistán", 41.299, 69.240, "It is one of the largest cities in Central Asia.", "Es una de las mayores ciudades de Asia central."),
+      P("Perth", "Perth", "Australia", "Australia", -31.951, 115.858, "Perth is one of the most isolated major cities in the world.", "Perth es una de las grandes ciudades más aisladas del mundo."),
+      P("Marrakesh", "Marrakech", "Morocco", "Marruecos", 31.629, -7.981, "Its old city is famed for the Jemaa el-Fnaa square.", "Su medina es famosa por la plaza Jemaa el-Fnaa."),
+      P("Ushuaia", "Ushuaia", "Argentina", "Argentina", -54.801, -68.303, "It is often called the southernmost city in the world.", "Suele llamarse la ciudad más austral del mundo."),
+      P("Dakar", "Dakar", "Senegal", "Senegal", 14.716, -17.467, "Dakar lies near the westernmost point of mainland Africa.", "Dakar está cerca del punto más occidental del África continental."),
+      P("Hanoi", "Hanói", "Vietnam", "Vietnam", 21.028, 105.834, "Hanoi is over a thousand years old.", "Hanói tiene más de mil años de historia."),
+      P("Quito", "Quito", "Ecuador", "Ecuador", -0.181, -78.468, "It sits at about 2,850 metres above sea level.", "Se encuentra a unos 2.850 metros sobre el nivel del mar."),
+      P("La Paz", "La Paz", "Bolivia", "Bolivia", -16.500, -68.150, "It is the highest seat of government in the world.", "Es la sede de gobierno más alta del mundo."),
+      P("Vladivostok", "Vladivostok", "Russia", "Rusia", 43.116, 131.886, "It is the eastern end of the Trans-Siberian Railway.", "Es el extremo oriental del ferrocarril Transiberiano."),
+    ]},
+    /* 12 ------------------------------------------------------------ */
+    { kind: "strait", diff: "expert", name: { en: "Straits, Canals & Capes", es: "Estrechos, canales y cabos" }, pool: [
+      P("Strait of Gibraltar", "Estrecho de Gibraltar", "", "", 36.000, -5.500, "It separates Europe from Africa by only about 14 km.", "Separa Europa de África por apenas unos 14 km."),
+      P("Suez Canal", "Canal de Suez", "Egypt", "Egipto", 30.500, 32.350, "It connects the Mediterranean and the Red Sea.", "Conecta el Mediterráneo con el mar Rojo."),
+      P("Panama Canal", "Canal de Panamá", "Panama", "Panamá", 9.080, -79.680, "It links the Atlantic and Pacific oceans.", "Une los océanos Atlántico y Pacífico."),
+      P("Cape of Good Hope", "Cabo de Buena Esperanza", "South Africa", "Sudáfrica", -34.357, 18.474, "Sailors once feared rounding this cape.", "Los marineros temían doblar este cabo."),
+      P("Strait of Malacca", "Estrecho de Malaca", "", "", 2.500, 101.500, "It is one of the busiest shipping lanes in the world.", "Es una de las rutas marítimas más transitadas del mundo."),
+      P("Strait of Magellan", "Estrecho de Magallanes", "Chile", "Chile", -53.500, -70.500, "It was long a key passage between the Atlantic and Pacific.", "Fue durante mucho tiempo un paso clave entre el Atlántico y el Pacífico."),
+      P("Bering Strait", "Estrecho de Bering", "Russia / USA", "Rusia / EE. UU.", 65.700, -168.700, "It separates Asia from North America.", "Separa Asia de Norteamérica."),
+      P("Cape Horn", "Cabo de Hornos", "Chile", "Chile", -55.980, -67.270, "It is the southernmost tip of South America's islands.", "Es la punta más austral de las islas de Sudamérica."),
+      P("Bosphorus", "Bósforo", "Turkey", "Turquía", 41.120, 29.060, "It divides Istanbul between Europe and Asia.", "Divide Estambul entre Europa y Asia."),
+      P("Strait of Hormuz", "Estrecho de Ormuz", "Iran / Oman", "Irán / Omán", 26.570, 56.250, "A large share of the world's oil passes through it.", "Por él pasa gran parte del petróleo del mundo."),
+      P("Strait of Dover", "Paso de Calais", "France / United Kingdom", "Francia / Reino Unido", 51.000, 1.500, "It is the narrowest part of the English Channel.", "Es la parte más estrecha del canal de la Mancha."),
+      P("Drake Passage", "Pasaje de Drake", "", "", -58.000, -65.000, "It lies between Cape Horn and Antarctica.", "Se extiende entre el cabo de Hornos y la Antártida."),
+    ]},
+  ];
+
+  /* Ajustes por nivel: segundos, escala de distancia (km) y puntos necesarios para avanzar */
+  A.LEVELS.forEach((lv, i) => {
+    lv.seconds = [10, 10, 10, 10, 9, 9, 9, 9, 8, 8, 8, 8][i];
+    lv.scaleKm = [1400, 1400, 1300, 1100, 1000, 900, 900, 800, 700, 700, 600, 600][i];
+    lv.advance = 2600 + 150 * i;
+  });
+})(window.AIQ);

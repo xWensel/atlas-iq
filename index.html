@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2530">
+<title>Atlas IQ</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314232b'/%3E%3Cpath d='M32 6l6 20 20 6-20 6-6 20-6-20-20-6 20-6z' fill='%23f2e9d6'/%3E%3Cpath d='M32 6l4 22-4 4-4-4z' fill='%23e0492b'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="rose" viewBox="-50 -50 100 100">
+    <circle r="44" fill="none" stroke="currentColor" stroke-width="2.2"/>
+    <circle r="38" fill="none" stroke="currentColor" stroke-width=".8"/>
+    <path d="M0-48L7-7 48 0 7 7 0 48-7 7-48 0-7-7z" fill="currentColor"/>
+    <path d="M0-48L7-7 0 0z" fill="var(--rose-accent,#e0492b)"/>
+    <path d="M34-34L4-4-4 4z M-34-34L-4-4 4 4z M34 34L4 4-4-4z M-34 34L-4 4 4-4z" fill="currentColor" opacity=".55" transform="scale(.62)"/>
+    <circle r="4" fill="var(--rose-hole,#f2e9d6)"/>
+  </symbol>
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/></filter>
+</svg>
+
+<div id="app">
+  <canvas id="map" aria-label="Mapa del mundo"></canvas>
+  <div id="grain"></div>
+  <div class="vignette"></div>
+
+  <header id="hud">
+    <div class="brand">
+      <svg class="brand-rose"><use href="#rose"/></svg>
+      <div class="brand-txt"><b>Atlas</b><i>IQ</i></div>
+    </div>
+
+    <section id="plate" class="paper hidden">
+      <div class="plate-top"><span id="askNo"></span><span id="askKind" class="tag"></span></div>
+      <h2 id="askName"></h2>
+      <p id="askSub"></p>
+      <div class="clock"><div class="ruler"><i id="timeFill"></i></div><b id="timeTxt">10.0</b></div>
+      <div id="pips"></div>
+    </section>
+
+    <section class="ledger paper" id="ledger">
+      <div class="lg-label" data-i="score.level"></div>
+      <div class="lg-num" id="scLevel">0</div>
+      <div class="gauge"><i id="scBar"></i><em id="scMark"></em></div>
+      <div class="lg-row"><span><span data-i="score.need"></span> <b id="scNeed">0</b></span><span><span data-i="score.total"></span> <b id="scTotal">0</b></span></div>
+      <div id="streakChip" class="hidden"></div>
+    </section>
+  </header>
+
+  <nav id="dock">
+    <button id="zoomIn" data-tip="tip.in" aria-label="Acercar"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button id="zoomOut" data-tip="tip.out" aria-label="Alejar"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+    <button id="zoomHome" data-tip="tip.home" aria-label="Vista inicial"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg></button>
+    <span class="sep"></span>
+    <button id="pauseBtn" class="hidden" data-tip="tip.pause" aria-label="Pausa"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
+    <button id="sndBtn" data-tip="tip.snd" aria-label="Efectos"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10z"/><path class="wave" d="M16.5 9a4 4 0 010 6M19 6.5a8 8 0 010 11"/><path class="cut" d="M4 4l16 16"/></svg></button>
+    <button id="musBtn" data-tip="tip.mus" aria-label="Música"><svg viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/><path class="cut" d="M4 4l16 16"/></svg></button>
+    <button id="fsBtn" data-tip="tip.fs" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button id="langBtn" class="txt" data-tip="tip.lang" aria-label="Idioma">ES</button>
+  </nav>
+
+  <footer id="note" class="paper">
+    <span id="lvlText"></span>
+    <p id="factText"></p>
+  </footer>
+
+  <div id="layer" class="hidden"><section id="dlg"></section></div>
+  <div id="intro" class="hidden"></div>
+  <div id="veil" class="hidden"></div>
+</div>
+
+<script src="js/vendor/topojson-client.min.js"></script>
+<script src="data/world.js"></script>
+<script src="data/classic.js"></script>
+<script src="data/locations.js"></script>
+<script src="data/history.js"></script>
+<script src="data/campaigns.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/support.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/map.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
