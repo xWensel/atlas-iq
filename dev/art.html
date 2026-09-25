@@ -1,0 +1,5 @@
+<!doctype html><meta charset="utf-8"><title>art</title>
+<style>body{margin:0;background:#1d1631;color:#f3eddc;font:12px monospace}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px;padding:12px}.c{display:grid;gap:4px}.art{width:100%;height:auto;filter:drop-shadow(0 6px 0 rgba(0,0,0,.4))}</style>
+<div class="g" id="g"></div>
+<script src="../js/support.js"></script><script src="../js/icons.js"></script><script src="../js/art.js"></script>
+<script>const A=window.AIQ;document.getElementById('g').innerHTML=Object.keys(A.ART).map(k=>`<div class="c">${A.art(k)}<span>${k}</span></div>`).join('')</script>

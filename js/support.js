@@ -1,7 +1,7 @@
 /* Atlas IQ - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.6";
+  A.VERSION = "0.7";
   A.lang = "es";
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
@@ -11,7 +11,13 @@ window.AIQ = window.AIQ || {};
   const locOf = () => (A.LANGS.find(l => l.code === A.lang) || A.LANGS[0]).loc;
   A.fmt = n => Math.round(n).toLocaleString(locOf());
   /* texto multilingue: objeto {en,es,...} o cadena. Si falta el idioma, ingles y luego espanol */
-  A.tx = v => (v && typeof v === "object" ? v[A.lang] || v.en || v.es || "" : v || "");
+  /* texto {es, en, ...}: idioma propio -> traduccion del ingles (js/i18n2.js) -> ingles -> espanol */
+  const TRI = { fr: 0, pt: 1, de: 2, it: 3 };
+  const trOf = en => { const t = A.TR && A.TR[en], i = TRI[A.lang]; return t && i != null ? t[i] : undefined; };
+  A.tx = v => (v && typeof v === "object" ? v[A.lang] || (v.en && trOf(v.en)) || (A.lang === "es" ? v.es : v.en) || v.en || v.es || "" : v || "");
+  A.L = (es, en) => ({ es, en });                                    // texto perezoso: se resuelve al pintar (sigue el idioma activo)
+  A.T = (es, en) => A.tx({ es, en });                                // texto inmediato
+  A.tf = (es, en, params) => A.T(es, en).replace(/\{(\w+)\}/g, (m, k) => (params && params[k] != null ? params[k] : m));
 
   /* ------------------------------------------------------------ IQ */
   A.iqTier = iq => (iq < 80 ? 0 : iq < 95 ? 1 : iq < 110 ? 2 : iq < 125 ? 3 : iq < 140 ? 4 : iq < 155 ? 5 : iq < 175 ? 6 : 7);

@@ -286,7 +286,7 @@ window.AIQ = window.AIQ || {};
   /* ================================================================== interfaz */
   const ui = { built: false, filter: "all", sort: "recent", only: false, q: "", shown: 0, list: [], cur: null, tilt: null };
   const nameOf = (e, rec) => (A.lang === "es" && e.name.es) || (rec && rec.title && rec.lang === A.lang ? rec.title : "") || (A.lang === "en" ? e.name.en : e.name.es || e.name.en);
-  const rarDots = r => "◆".repeat(r + 1);
+  const rarDots = r => A.icon("g_" + r, "gem").repeat(r + 1);
   const contOf = e => A.t(CONT[continent(e.lat, e.lon)]);
   const fmtNo = n => "Nº " + String(n).padStart(3, "0");
 
@@ -296,7 +296,7 @@ window.AIQ = window.AIQ || {};
     root.innerHTML = `
       <div class="cx-shell">
         <header class="cx-head">
-          <button class="cx-x" id="cxBack" type="button"><span>←</span> <b data-cx="back"></b></button>
+          <button class="cx-x" id="cxBack" type="button">${A.icon("u_back", "sm")}<b data-cx="back"></b></button>
           <div class="cx-title"><h2 data-cx="title"></h2><p id="cxProg"></p><div class="cx-bar"><i id="cxBar"></i></div></div>
           <label class="cx-search"><input id="cxSearch" type="search" autocomplete="off"></label>
         </header>
@@ -359,14 +359,14 @@ window.AIQ = window.AIQ || {};
     const g = $("cxGrid"), sent = $("cxSent"); if (ui.shown >= ui.list.length) return;
     const frag = document.createDocumentFragment();
     for (const id of ui.list.slice(ui.shown, ui.shown + 48)) frag.appendChild(cardEl(id));
-    ui.shown = Math.min(ui.list.length, ui.shown + 48); g.insertBefore(frag, sent);
+    ui.shown = Math.min(ui.list.length, ui.shown + 48); g.insertBefore(frag, sent); A.genFill($("codex"));
   }
   const io = new IntersectionObserver(en => en.forEach(x => { if (x.isIntersecting) { io.unobserve(x.target); paintThumb(x.target.dataset.id); } }), { rootMargin: "300px" });
   function cardEl(id) {
     const e = E[id], un = isUnlocked(id), b = document.createElement("button"); b.type = "button"; b.dataset.id = id;
     b.className = `cx-card r${e.rarity} ${un ? "open" : "locked"}${un && !store.seen[id] ? " fresh" : ""}`;
     const rec = contentMem[A.lang + ":" + id];
-    b.innerHTML = `<span class="cx-art">${un ? "" : `<span class="q">?</span>`}${iconSvg(e.type)}</span>
+    b.innerHTML = `<span class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}</span>
       <span class="cx-nm">${un ? nameOf(e, rec) : "· · ·"}</span>
       <span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span><span class="cx-no">${fmtNo(e.no)}</span>${un && !store.seen[id] ? `<span class="cx-new">${A.t("codex.new")}</span>` : ""}`;
     b.onclick = () => openDetail(id);
@@ -379,7 +379,7 @@ window.AIQ = window.AIQ || {};
     try {
       const rec = await loadContent(E[id], A.lang); if (rec.none) return;
       b.querySelector(".cx-nm").textContent = nameOf(E[id], rec);
-      if (rec.img && !b.querySelector(".cx-art img")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.onload = () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }; im.src = rec.img.thumb; }
+      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.onload = () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }; im.src = rec.img.thumb; }
     } catch (x) { /* sin conexion: se queda el icono */ }
   }
   function tiltMove(el, ev, deg) {
@@ -413,13 +413,13 @@ window.AIQ = window.AIQ || {};
     d.innerHTML = `
       <div class="cx-d-wrap">
         <div class="cx-d-card"><div class="cx-bigcard r${e.rarity} ${un ? "open" : "locked"}" id="cxBig">
-          <div class="cx-art">${un ? "" : `<span class="q">?</span>`}${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" alt="" src="${rec.img.card}" decoding="async">` : ""}</div>
+          <div class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" alt="" src="${rec.img.card}" decoding="async">` : ""}</div>
           <div class="cx-cap"><span class="cx-nm">${un ? nameOf(e, rec) : A.t("codex.locked")}</span><span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span></div><span class="cx-no">${fmtNo(e.no)}</span><span class="cx-foil"></span>
         </div>
         ${rec && rec.img && rec.credit ? `<p class="cx-credit">${A.t("codex.photo")}: ${rec.credit.artist ? rec.credit.artist + " · " : ""}<a href="${rec.credit.page}" target="_blank" rel="noopener">${rec.credit.license || "Wikimedia Commons"}</a></p>` : ""}
-        ${rec && rec.img ? `<button class="cx-hd" id="cxHd" type="button">⤢ ${A.t("codex.hd")}</button>` : ""}</div>
+        ${rec && rec.img ? `<button class="cx-hd" id="cxHd" type="button">${A.icon("a_lens", "sm")}${A.t("codex.hd")}</button>` : ""}</div>
         <div class="cx-d-body">
-          <div class="cx-d-tags"><span class="tag">${typeLabel(e.type)}</span><span class="tag r">${A.t("rar." + RARITY[e.rarity])} ${rarDots(e.rarity)}</span>${e.lat != null ? `<span class="tag c">${contOf(e)}</span>` : ""}</div>
+          <div class="cx-d-tags"><span class="tag">${typeLabel(e.type)}</span><span class="tag r">${A.t("rar." + RARITY[e.rarity])} ${rarDots(e.rarity)}</span>${e.lat != null ? `<span class="tag c">${A.icon("k_" + continent(e.lat, e.lon), "sm")}${contOf(e)}</span>` : ""}</div>
           <h2>${un ? nameOf(e, rec) : "???"}</h2>
           ${un && rec && rec.desc ? `<p class="cx-desc">${rec.desc}</p>` : ""}
           ${un ? "" : `<p class="cx-hint">${e.src === "curated" ? A.t("codex.hint.chain") : A.t("codex.hint.place")}</p>`}
@@ -430,7 +430,7 @@ window.AIQ = window.AIQ || {};
         </div>
       </div>`;
     $("cxBig").addEventListener("pointermove", ev => tiltMove($("cxBig"), ev, 12)); $("cxBig").addEventListener("pointerleave", () => tiltReset($("cxBig")));
-    d.querySelectorAll(".cx-rel").forEach(b => (b.onclick = () => openDetail(b.dataset.id)));
+    A.genFill(d); d.querySelectorAll(".cx-rel").forEach(b => (b.onclick = () => openDetail(b.dataset.id)));
     if ($("cxHd")) $("cxHd").onclick = () => lightbox(id); if ($("cxHero")) $("cxHero").onclick = () => lightbox(id);
     if (un && e.lat != null && map && $("cxMini")) requestAnimationFrame(() => { try { map.drawThumb($("cxMini"), { lat: e.lat, lon: e.lon, zoom: e.type === "country" ? 3 : e.type === "water" ? 3.5 : 9 }); } catch (x) { /* sin miniatura */ } });
     if (un) fillText(id);
@@ -449,7 +449,7 @@ window.AIQ = window.AIQ || {};
   }
   function lightbox(id) {
     const rec = contentMem[A.lang + ":" + id], L = $("cxLight"); if (!rec || !rec.img) return;
-    L.innerHTML = `<img alt="" src="${rec.img.hd}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">✕</button><p>${rec.credit ? (rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "") : ""}</p>`;
+    L.innerHTML = `<img alt="" src="${rec.img.hd}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">${A.icon("u_close")}</button><p>${rec.credit ? (rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "") : ""}</p>`;
     L.classList.remove("hidden"); L.onclick = () => L.classList.add("hidden"); A.sfx.card();
   }
 

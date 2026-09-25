@@ -392,7 +392,7 @@
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
       ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${A.T("doblones", "doubloons")}</div>` : ""}
       ${guess ? `<div class="tk-cx l${cxr.level}" title="≤100 km · ≤50 km · ≤40 km"><span>${A.t("codex.title")}</span><i><u></u><u></u><u></u></i><b>${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;100 km"}</b></div>` : ""}
-      <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">→</span> <kbd>↵</kbd></button>
+      <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });
     if (showKm) { const kmEl = $("kmNum"); odoNow(kmEl, 0); requestAnimationFrame(() => odoSet(kmEl, Math.round(km), { ms: 1100, delay: 560 })); }
@@ -405,16 +405,16 @@
   }
 
   /* ------------------------------------------------------------ veredictos */
-  function verdict({ kind, level, title, text, stats, stamp, stampSub, iq, tierName, buttons }) {
-    const idc = iq != null ? `<div class="idcard"><svg><use href="#rose"/></svg><span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
+  function verdict({ kind, level, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art }) {
+    const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : `<svg><use href="#rose"/></svg>`}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
     dialog(`<div class="vd">
       <div class="v-main">
         <span class="tag">${A.t("v.level", { n: pad2(level) })}</span>
         <h2>${title}</h2><p>${text}</p>
         <div class="v-stats">${stats.map((s, i) => `<div><span>${s[0]}</span><span class="odo" id="vs${i}"></span></div>`).join("")}</div>
-        <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? '<span class="ar">→</span>' : ""}</button>`).join("")}</div>
+        <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? '<span class="ar">${A.icon("u_next", "sm")}</span>' : ""}</button>`).join("")}</div>
       </div>
-      <div class="v-side"><div class="stamp ${kind}"><div>${stamp}<b>${stampSub}</b></div></div>${idc}</div>
+      <div class="v-side">${art ? `<div class="v-art">${A.pic(art)}</div>` : ""}<div class="stamp ${kind}"><div>${stamp}<b>${stampSub}</b></div></div>${idc}</div>
     </div>`, "verdict");
     stats.forEach((s, i) => { const el = $("vs" + i); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, s[1], { ms: 1300, delay: 700 + i * 120, tick: i === 0 && s[1] > 0 })); });
     if (iq != null) { const el = $("iqNum"); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, iq, { ms: 1400, delay: 1000 })); }
@@ -469,7 +469,7 @@
       kind: win ? "win" : "", level: S.level + 1, title: win ? A.t("v.win") : A.t("v.no"),
       text: win ? A.t("win.p", { s: A.fmt(shown) }) : A.t("lf.p", { a: A.fmt(L.advance), s: A.fmt(S.levelScore) }),
       stats: win ? [[A.t("v.total"), shown]] : [[A.t("v.points"), S.levelScore], [A.t("v.goal"), L.advance]],
-      stamp: win ? A.t("stamp.win") : A.t("stamp.no"), stampSub: win ? "★" : pad2(S.level + 1), iq, tierName, buttons: btns,
+      stamp: win ? A.t("stamp.win") : A.t("stamp.no"), stampSub: win ? A.icon("u_star", "st") : pad2(S.level + 1), iq, tier, tierName, buttons: btns,
     });
   }
 
@@ -480,7 +480,7 @@
     if (S.paused) {
       S.pauseAt = performance.now(); map.setPick(false);
       $("veil").classList.remove("hidden");
-      $("veil").innerHTML = `<div><h2>${A.t("pause.h")}</h2><p>${A.t("pause.p")}</p><button class="btn-ink" id="resBtn" data-primary><span>${A.t("btn.resume")}</span><span class="ar">→</span></button></div>`;
+      $("veil").innerHTML = `<div><h2>${A.t("pause.h")}</h2><p>${A.t("pause.p")}</p><button class="btn-ink" id="resBtn" data-primary><span>${A.t("btn.resume")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button></div>`;
       $("resBtn").onclick = togglePause; $("resBtn").focus();
     } else { S.pausedAcc += performance.now() - S.pauseAt; map.setPick(true); $("veil").classList.add("hidden"); }
   }

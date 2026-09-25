@@ -1,5 +1,11 @@
 # Atlas IQ
 
+**v0.7** – Arte propio en todas partes, ilustraciones generadas y 6 idiomas:
+- **Ilustraciones vectoriales** (`js/art.js`): escenas de jefes, actos, campamento, cofre, victoria y derrota, mas gemas de rareza, continentes, medallas, iconos de rango IQ e insignias de logros.
+- **Ilustraciones generadas** con Pollinations (`tools/gen-art.mjs`, solo desarrollo): 26 imagenes en `assets/gen/` (jefes, actos, campamento, hub y una ilustracion de respaldo por tipo de tarjeta). Se muestran encima de la version vectorial si existen. La clave va en `.env.local` (ignorado por git/Vercel), nunca en el juego. `node tools/gen-art.mjs` genera lo que falte.
+- **Traducciones** del contenido nuevo a fr/pt/de/it (`js/i18n2.js`, ~330 textos). Los datos de preguntas del modo Extendido (datos curiosos) siguen en es/en.
+- Correccion: reliquias, herramientas, jefes y barajas se traducian una sola vez al cargar; ahora siguen el idioma activo.
+
 **v0.6** – Modos, Aventura (roguelike), Competitivo y logros:
 - **Un solo aspecto principal: Casino** (estilo Balatro). Expedición queda como alternativa; Plano y Riso se eliminaron.
 - **Pantalla principal por modos:** Aventura · Clásico · Competitivo · Extendido, más Enciclopedia y Perfil.

@@ -152,3 +152,33 @@ html[data-skin="casino"] #factText, html[data-skin="casino"] #lvlText { font-siz
 html[data-skin="casino"] .cx-sec p { font-size: 19px; line-height: 1.5; } html[data-skin="casino"] .cx-fact { font-size: 22px; }
 html[data-skin="casino"] .mc-t { font-size: 30px; } html[data-skin="casino"] .mode-card.hero .mc-t { font-size: 38px; } html[data-skin="casino"] .camp-t { font-size: 25px; }
 html[data-skin="casino"] .offer b { font-size: 23px; } html[data-skin="casino"] .ach b { font-size: 17px; } html[data-skin="casino"] .tk-perks > div { font-size: 13px; }
+
+/* ---------- ilustraciones (js/art.js) ---------- */
+.art { display: block; width: 100%; height: auto; filter: drop-shadow(0 8px 0 rgba(0, 0, 0, .4)); }
+.art.bare { filter: none; } .art.bare .art-b { display: none; }
+.intro-in.adv { align-items: center; } .intro-art { flex: none; width: min(42vw, 470px); transform: rotate(2deg); animation: rise .6s .5s var(--spring) both; }
+.v-art { width: min(100%, 420px); margin-bottom: 14px; transform: rotate(-2deg); animation: rise .6s .4s var(--spring) both; }
+.shop header { grid-template-columns: 1fr minmax(220px, 340px); grid-template-areas: "tag art" "title art" "top art"; align-items: start; column-gap: 24px; } .shop header .tag { grid-area: tag; } .shop header h2 { grid-area: title; } .shop-top { grid-area: top; }
+.shop-art { grid-area: art; grid-row: 1 / span 3; transform: rotate(2deg); animation: rise .6s .2s var(--spring) both; }
+.mode-card.hero { position: relative; overflow: hidden; } .mc-art { position: absolute; right: 0; top: 0; bottom: 0; width: 52%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 55%); mask-image: linear-gradient(90deg, transparent, #000 55%); opacity: .85; pointer-events: none; }
+.mc-art .art { height: 100%; } .mode-card.hero .mc-body, .mode-card.hero .mc-ic, .mode-card.hero .mc-ar { position: relative; z-index: 1; } .mode-card.hero .mc-body { max-width: 62%; }
+.ic.gem { display: inline-block; width: 14px; height: 14px; margin-left: 1px; vertical-align: -2px; filter: none; }
+.stamp b .ic.st { width: .95em; height: .95em; display: inline-block; vertical-align: -.1em; filter: none; }
+.btn-ink .ar .ic, .btn-line .ar .ic { width: 22px; height: 22px; margin: 0; } kbd .ic.sm { width: 14px; height: 14px; margin: 0; vertical-align: -2px; filter: none; }
+.ic.badge { width: 100%; height: 100%; } .ach:not(.got) .ic { filter: grayscale(1) brightness(.6); }
+.cx-art .ic.q { position: absolute; right: 8%; bottom: 8%; width: 30%; height: auto; opacity: .95; filter: none; } .cx-card.locked .cx-ic { opacity: .35; }
+.cx-x .ic.sm, .cx-hd .ic.sm { margin-right: 6px; } .cx-lx .ic { width: 34px; height: 34px; } .tag .ic.sm { width: 16px; height: 16px; margin-right: 5px; }
+.medal-ic { display: inline-block; }
+@media (max-width: 760px) { .intro-in.adv { flex-direction: column; } .intro-art { width: min(80vw, 330px); } .shop header { grid-template-columns: 1fr; grid-template-areas: "art" "tag" "title" "top"; } .shop-art { grid-row: auto; max-width: 340px; } .mode-card.hero .mc-body { max-width: 100%; } .mc-art { opacity: .35; } }
+
+/* ---------- ilustraciones generadas (encima de la version vectorial, si existen) ---------- */
+.pic { position: relative; display: block; border-radius: 14px; overflow: hidden; background: #1c1640; box-shadow: 0 0 0 4px #191325, 0 10px 0 4px rgba(0, 0, 0, .4); aspect-ratio: 8 / 5; }
+.pic .art { position: absolute; inset: 0; width: 100%; height: 100%; filter: none; }
+.pic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .7s ease; image-rendering: auto; } .pic-img.on { opacity: 1; }
+.pic-frame { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .16), inset 0 -18px 30px -18px rgba(0, 0, 0, .5); border-radius: inherit; }
+.mc-art .pic { height: 100%; aspect-ratio: auto; box-shadow: none; border-radius: 0; background: none; } .mc-art .pic-frame { display: none; }
+.intro-art .pic { transform: none; } .v-art .pic, .shop-art .pic { width: 100%; }
+.cx-art .cx-ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0; transition: opacity .5s; } .cx-art .cx-ph.on { opacity: 1; }
+.cx-art:has(.cx-ph.on) > .cx-ic { display: none; } .cx-art > img:not(.cx-ph) { z-index: 1; }
+.shop-art { width: min(100%, 340px); justify-self: end; } @media (max-width: 760px) { .shop-art { justify-self: start; } }
+.mc-art { width: 44%; }

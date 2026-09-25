@@ -26,7 +26,7 @@ window.AIQ = window.AIQ || {};
   function home() {
     const c = C(), P = A.profile.get(), adv = P.adv, today = A.rank.boards.daily(), done = P.daily[today];
     const saved = A.adv.hasSave();
-    const card = (id, cls, title, desc, meta, badge) => `<button class="cut mode-card ${cls}" data-mode="${id}"><span class="mc-ic">${A.icon(ICO[id])}</span><span class="mc-body"><span class="mc-t">${title}${badge ? `<em>${badge}</em>` : ""}</span><span class="mc-d">${desc}</span><span class="mc-m">${meta}</span></span><span class="mc-ar">${A.icon("u_next", "sm")}</span></button>`;
+    const card = (id, cls, title, desc, meta, badge) => `<button class="cut mode-card ${cls}" data-mode="${id}">${cls === "hero" ? `<span class="mc-art">${A.pic("hub_hero", "", "act_0")}</span>` : ""}<span class="mc-ic">${A.icon(ICO[id])}</span><span class="mc-body"><span class="mc-t">${title}${badge ? `<em>${badge}</em>` : ""}</span><span class="mc-d">${desc}</span><span class="mc-m">${meta}</span></span><span class="mc-ar">${A.icon("u_next", "sm")}</span></button>`;
     c.dialog(shell(`
       <h1>Atlas<em>IQ</em></h1><p class="tagline">${A.t("title.tag")}</p>
       <div class="modes">
@@ -51,7 +51,7 @@ window.AIQ = window.AIQ || {};
     const list = camps.map((x, i) => {
       const p = c.prog(x.id), ticks = x.levels.map((_, k) => `<i class="${p.best && k < p.unlocked ? "on" : ""}"></i>`).join(""), md = A.profile.get().medals[x.id];
       return `<button class="cut camp${x.id === S.campId ? " sel" : ""}" data-id="${x.id}" style="animation-delay:${i * 45}ms"><canvas class="camp-thumb" aria-hidden="true"></canvas>
-        <span class="camp-body"><span class="camp-t">${A.tx(x.title)}${md ? ` <span class="medal ${md}">●</span>` : ""}</span><span class="camp-d">${A.tx(x.blurb)}</span>
+        <span class="camp-body"><span class="camp-t">${A.tx(x.title)}${md ? ` ${A.icon("medal_" + md, "sm")}` : ""}</span><span class="camp-d">${A.tx(x.blurb)}</span>
         <span class="camp-m"><span class="camp-p">${ticks}</span><span>${p.best ? A.t("camp.best", { s: A.fmt(p.best) }) : A.t("camp.new")}</span></span></span></button>`;
     }).join("");
     let picker = "";
@@ -80,7 +80,7 @@ window.AIQ = window.AIQ || {};
     const ascTxt = [T("Estándar", "Standard"), T("Objetivos +10 %, −1 s", "Targets +10%, −1 s"), T("+20 %, −2 s", "+20%, −2 s"), T("+30 %, −3 s, una provisión menos", "+30%, −3 s, one fewer provision"), T("+40 %, −4 s, jefes dobles", "+40%, −4 s, double bosses"), T("+50 %, −5 s. Solo para leyendas", "+50%, −5 s. Legends only")][advSel.asc];
     c.dialog(shell(`<h2 class="hub-h">${T("Aventura", "Adventure")}</h2>
       <p class="mode-d">${T("Eres un aventurero con un mapa a medio hacer. Cada ronda te pide una puntuación; entre rondas gastas doblones en reliquias y herramientas. Cada acto acaba con un jefe.", "You're an adventurer with a half-drawn map. Each round asks for a score; between rounds you spend doubloons on relics and tools. Every act ends with a boss.")}</p>
-      ${saved ? `<div class="cut resume"><span class="tag">${T("Expedición en curso", "Expedition in progress")}</span><b>${runInfo}</b><div><button class="btn-ink" id="contBtn" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">→</span></button><button class="btn-line" id="abandonBtn">${T("Abandonar", "Abandon")}</button></div></div>` : ""}
+      ${saved ? `<div class="cut resume"><span class="tag">${T("Expedición en curso", "Expedition in progress")}</span><b>${runInfo}</b><div><button class="btn-ink" id="contBtn" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="abandonBtn">${T("Abandonar", "Abandon")}</button></div></div>` : ""}
       <h4 class="hub-sub">${T("Baraja inicial", "Starting deck")}</h4><div class="decks">${decks}</div>
       <h4 class="hub-sub">${T("Ascensión", "Ascension")} <em>${ascTxt}</em></h4><div class="ascs">${asc}</div>
       <div class="adv-stats"><span>${T("Récord", "Best")} <b>${A.fmt(adv.bestScore)}</b></span><span>${T("Mejor ronda", "Best round")} <b>${adv.bestRound}</b></span><span>${T("Victorias", "Wins")} <b>${adv.wins}</b></span><span>${T("Expediciones", "Runs")} <b>${adv.runs}</b></span></div>
@@ -106,7 +106,7 @@ window.AIQ = window.AIQ || {};
       <label class="nick"><span>${T("Tu nombre en la clasificación", "Your leaderboard name")}</span><input id="nickIn" maxlength="16" value="${esc(P.name)}" placeholder="${T("Aventurero", "Adventurer")}"></label>
       <div class="cut daily"><span class="tag">${T("Reto diario", "Daily challenge")} · ${dstr}</span><b>${T("Aventura con semilla común", "Adventure with a shared seed")}</b>
         <i>${T("Baraja Explorador, Ascensión 1. Un intento puntúa; después puedes practicar.", "Explorer deck, Ascension 1. One attempt counts; then you can practise.")}</i>
-        <div>${done ? `<span class="daily-done">${T("Hoy: ", "Today: ")} <b>${A.fmt(done.score)}</b></span><button class="btn-line" id="dailyGo">${T("Practicar (no puntúa)", "Practise (unranked)")}</button>` : `<button class="btn-ink" id="dailyGo" data-primary><span>${T("Jugar el reto de hoy", "Play today's challenge")}</span><span class="ar">→</span></button>`}</div></div>
+        <div>${done ? `<span class="daily-done">${T("Hoy: ", "Today: ")} <b>${A.fmt(done.score)}</b></span><button class="btn-line" id="dailyGo">${T("Practicar (no puntúa)", "Practise (unranked)")}</button>` : `<button class="btn-ink" id="dailyGo" data-primary><span>${T("Jugar el reto de hoy", "Play today's challenge")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button>`}</div></div>
       <div class="cut daily"><span class="tag">${T("Clásico clasificado", "Ranked Classic")}</span><b>${T("Una campaña original de principio a fin", "An original campaign start to finish")}</b>
         <div class="rk-camps">${A.CAMPAIGNS.filter(x => x.mode === "classic").map(x => `<button class="btn-line" data-rk="${x.id}">${A.tx(x.title)}</button>`).join("")}</div></div>
       <h4 class="hub-sub">${T("Clasificación", "Leaderboard")}</h4>
@@ -130,7 +130,7 @@ window.AIQ = window.AIQ || {};
   function profile() {
     const c = C(), P = A.profile.get(), s = P.stats, avg = s.questions - s.timeouts > 0 ? Math.round(s.km / (s.questions - s.timeouts)) : 0, st = A.codexStats();
     const cell = (l, v) => `<div><span>${l}</span><b>${v}</b></div>`;
-    const ach = A.ACH.map(a => { const got = P.ach[a.id]; return `<div class="ach${got ? " got" : ""}" title="${got || !a.secret ? A.tx(a.desc) : "?"}"><span class="ach-i">${got || !a.secret ? A.icon(A.ACH_ICON[a.id] || "a_medal") : A.icon("lock")}</span><b>${got || !a.secret ? A.tx(a.name) : "???"}</b><i>${got || !a.secret ? A.tx(a.desc) : T("Logro secreto", "Secret achievement")}</i></div>`; }).join("");
+    const ach = A.ACH.map(a => { const got = P.ach[a.id]; return `<div class="ach${got ? " got" : ""}" title="${got || !a.secret ? A.tx(a.desc) : "?"}"><span class="ach-i">${got || !a.secret ? A.badge(a.id) : A.icon("lock")}</span><b>${got || !a.secret ? A.tx(a.name) : "???"}</b><i>${got || !a.secret ? A.tx(a.desc) : T("Logro secreto", "Secret achievement")}</i></div>`; }).join("");
     c.dialog(shell(`<h2 class="hub-h">${T("Perfil", "Profile")}</h2>
       <div class="prof-grid">${cell(T("Preguntas", "Questions"), A.fmt(s.questions))}${cell(T("Dianas", "Bullseyes"), A.fmt(s.bulls))}${cell(T("Error medio", "Avg. error"), A.fmt(avg) + " km")}${cell(T("Mejor racha", "Best streak"), s.bestStreak)}${cell(T("Enciclopedia", "Encyclopedia"), st.u + "/" + st.t)}${cell(T("Récord aventura", "Adventure best"), A.fmt(P.adv.bestScore))}</div>
       <h4 class="hub-sub">${T("Logros", "Achievements")} ${A.ach.count()}/${A.ach.total()}</h4><div class="ach-grid">${ach}</div>`, true), "menu");

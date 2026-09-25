@@ -7,67 +7,67 @@
  */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  const T = A.T, $ = id => document.getElementById(id), C = () => A.core;
+  const T = A.T, L = A.L, $ = id => document.getElementById(id), C = () => A.core;
   const RUNKEY = "atlasiq.run.v1";
   const ic = (id, cls) => A.icon(id, cls), CN = () => A.icon("coin", "cn");
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const R_NAMES = ["Común", "Poco común", "Rara"], R_EN = ["Common", "Uncommon", "Rare"];
   const ACTS = [
-    { n: T("Acto I", "Act I"), t: T("Las rutas conocidas", "The known roads"), f: T("El gremio de cartógrafos te encarga tus primeras rutas.", "The Cartographers' Guild hands you your first routes.") },
-    { n: T("Acto II", "Act II"), t: T("Más allá del mapa", "Beyond the map"), f: T("Las fronteras se difuminan y los nombres se vuelven raros.", "Borders blur and the names get strange.") },
-    { n: T("Acto III", "Act III"), t: T("Terra Incognita", "Terra Incognita"), f: T("Nadie ha vuelto de aquí con un mapa completo.", "No one has come back from here with a complete map.") },
+    { n: L("Acto I", "Act I"), t: L("Las rutas conocidas", "The known roads"), f: L("El gremio de cartógrafos te encarga tus primeras rutas.", "The Cartographers' Guild hands you your first routes.") },
+    { n: L("Acto II", "Act II"), t: L("Más allá del mapa", "Beyond the map"), f: L("Las fronteras se difuminan y los nombres se vuelven raros.", "Borders blur and the names get strange.") },
+    { n: L("Acto III", "Act III"), t: L("Terra Incognita", "Terra Incognita"), f: L("Nadie ha vuelto de aquí con un mapa completo.", "No one has come back from here with a complete map.") },
   ];
-  const actInfo = act => ACTS[act] || { n: T("Acto " + ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][act] || act + 1, "Act " + (["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][act] || act + 1)), t: T("Leyenda", "Legend"), f: T("Ya no hay guía: solo tu pulso.", "There is no guide now: only your aim.") };
+  const actInfo = act => ACTS[act] || { n: L("Acto " + ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][act] || act + 1, "Act " + (["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][act] || act + 1)), t: L("Leyenda", "Legend"), f: L("Ya no hay guía: solo tu pulso.", "There is no guide now: only your aim.") };
 
   /* ------------------------------------------------------------------ herramientas (activas, cargas por ronda) */
   const TOOLS = {
-    sonar: { ico: "sonar", uses: 2, cost: 5, r: 1, n: T("Sonar", "Sonar"), d: T("Toca un punto del mapa: te dice a cuántos km está el objetivo (±6 %) y dibuja el anillo. Con 3 sondas, triangulas.", "Tap a point: tells you how far the target is (±6%) and draws the ring. Three probes triangulate."), kind: "probe" },
-    compass: { ico: "compass", uses: 3, cost: 4, r: 0, n: T("Brújula", "Compass"), d: T("Toca un punto: una flecha señala el rumbo (8 direcciones) hacia el objetivo.", "Tap a point: an arrow shows the heading (8 directions) to the target."), kind: "probe" },
-    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: T("Pasaporte", "Passport"), d: T("Revela el país del lugar (o el continente, si es un país).", "Reveals the place's country (or the continent for a country)."), kind: "instant" },
-    journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: T("Cuaderno", "Field journal"), d: T("Lee la nota de campo del lugar antes de responder.", "Read the place's field note before answering."), kind: "instant" },
-    hourglass: { ico: "hourglass", uses: 2, cost: 4, r: 0, n: T("Reloj de arena", "Hourglass"), d: T("+6 segundos en la pregunta actual.", "+6 seconds on the current question."), kind: "instant" },
+    sonar: { ico: "sonar", uses: 2, cost: 5, r: 1, n: L("Sonar", "Sonar"), d: L("Toca un punto del mapa: te dice a cuántos km está el objetivo (±6 %) y dibuja el anillo. Con 3 sondas, triangulas.", "Tap a point: tells you how far the target is (±6%) and draws the ring. Three probes triangulate."), kind: "probe" },
+    compass: { ico: "compass", uses: 3, cost: 4, r: 0, n: L("Brújula", "Compass"), d: L("Toca un punto: una flecha señala el rumbo (8 direcciones) hacia el objetivo.", "Tap a point: an arrow shows the heading (8 directions) to the target."), kind: "probe" },
+    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pasaporte", "Passport"), d: L("Revela el país del lugar (o el continente, si es un país).", "Reveals the place's country (or the continent for a country)."), kind: "instant" },
+    journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Cuaderno", "Field journal"), d: L("Lee la nota de campo del lugar antes de responder.", "Read the place's field note before answering."), kind: "instant" },
+    hourglass: { ico: "hourglass", uses: 2, cost: 4, r: 0, n: L("Reloj de arena", "Hourglass"), d: L("+6 segundos en la pregunta actual.", "+6 seconds on the current question."), kind: "instant" },
   };
 
   /* ------------------------------------------------------------------ reliquias (pasivas) */
-  const CONT = { af: T("África", "Africa"), na: T("Norteamérica", "North America"), sa: T("Sudamérica", "South America"), as: T("Asia", "Asia"), eu: T("Europa", "Europe"), oc: T("Oceanía", "Oceania") };
-  const region = (id, ico, es, en, conts, r, cost) => ({ r, cost, ico, n: T(es, en), d: T(`×1,5 al multiplicador en ${conts.map(c => A.tx(CONT[c])).join(" y ")}.`, `×1.5 multiplier in ${conts.map(c => A.tx(CONT[c])).join(" & ")}.`), post: c => (conts.includes(c.cont) ? (c.xmult *= 1.5, "×1.5") : null) });
+  const CONT = { af: L("África", "Africa"), na: L("Norteamérica", "North America"), sa: L("Sudamérica", "South America"), as: L("Asia", "Asia"), eu: L("Europa", "Europe"), oc: L("Oceanía", "Oceania") };
+  const region = (id, ico, es, en, conts, r, cost) => ({ r, cost, ico, n: L(es, en), d: { get es() { return A.tf("×1,5 al multiplicador en {c}.", "×1.5 multiplier in {c}.", { c: conts.map(c => A.tx(CONT[c])).join(A.T(" y ", " & ")) }); }, get en() { return this.es; } }, post: c => (conts.includes(c.cont) ? (c.xmult *= 1.5, "×1.5") : null) });
   const PERKS = {
-    steady: { r: 0, cost: 4, ico: "steady", n: T("Pulso firme", "Steady hand"), d: T("La distancia perdona un 25 % más.", "Distance scoring is 25% more forgiving."), q: c => { c.scale *= 1.25; } },
-    boots: { r: 0, cost: 4, ico: "boots", n: T("Botas ligeras", "Light boots"), d: T("+3 s por pregunta.", "+3 s per question."), round: c => { c.seconds += 3; } },
-    purse: { r: 0, cost: 4, ico: "purse", n: T("Faltriquera", "Purse"), d: T("+1 doblón por cada acierto bueno (750+ de distancia).", "+1 doubloon per good hit (750+ distance)."), post: c => (c.dist >= 750 ? (c.coins += 1, "+1") : null) },
-    gale: { r: 0, cost: 5, ico: "gale", n: T("Viento de cola", "Tailwind"), d: T("Las rachas suben el multiplicador más deprisa (+0,35 por acierto en vez de +0,2).", "Streaks raise the multiplier faster (+0.35 per hit instead of +0.2)."), q: c => { c.streakStep = 0.35; } },
-    anchor: { r: 0, cost: 4, ico: "anchor", n: T("Ancla", "Anchor"), d: T("+200 fichas en la primera pregunta de cada ronda.", "+200 chips on the first question of each round."), post: (c, run) => (run.qi === 0 ? (c.chips += 200, "+200") : null) },
-    eagle: { r: 1, cost: 6, ico: "eagle", n: T("Ojo de halcón", "Hawk eye"), d: T("+150 fichas en cada diana.", "+150 chips on every bullseye."), post: c => (c.dist >= 960 ? (c.chips += 150, "+150") : null) },
-    mapper: { r: 1, cost: 6, ico: "mapper", n: T("Cartógrafo", "Cartographer"), d: T("+0,1 de mult. por cada 10 tarjetas de la Enciclopedia (máx. +1,0). ¡Colecciona!", "+0.1 mult per 10 Encyclopedia cards (max +1.0). Collect!"), post: c => { const m = Math.min(1, Math.floor(A.codexStats().u / 10) * 0.1); if (m > 0) { c.mult += m; return "+" + m.toFixed(1); } return null; } },
+    steady: { r: 0, cost: 4, ico: "steady", n: L("Pulso firme", "Steady hand"), d: L("La distancia perdona un 25 % más.", "Distance scoring is 25% more forgiving."), q: c => { c.scale *= 1.25; } },
+    boots: { r: 0, cost: 4, ico: "boots", n: L("Botas ligeras", "Light boots"), d: L("+3 s por pregunta.", "+3 s per question."), round: c => { c.seconds += 3; } },
+    purse: { r: 0, cost: 4, ico: "purse", n: L("Faltriquera", "Purse"), d: L("+1 doblón por cada acierto bueno (750+ de distancia).", "+1 doubloon per good hit (750+ distance)."), post: c => (c.dist >= 750 ? (c.coins += 1, "+1") : null) },
+    gale: { r: 0, cost: 5, ico: "gale", n: L("Viento de cola", "Tailwind"), d: L("Las rachas suben el multiplicador más deprisa (+0,35 por acierto en vez de +0,2).", "Streaks raise the multiplier faster (+0.35 per hit instead of +0.2)."), q: c => { c.streakStep = 0.35; } },
+    anchor: { r: 0, cost: 4, ico: "anchor", n: L("Ancla", "Anchor"), d: L("+200 fichas en la primera pregunta de cada ronda.", "+200 chips on the first question of each round."), post: (c, run) => (run.qi === 0 ? (c.chips += 200, "+200") : null) },
+    eagle: { r: 1, cost: 6, ico: "eagle", n: L("Ojo de halcón", "Hawk eye"), d: L("+150 fichas en cada diana.", "+150 chips on every bullseye."), post: c => (c.dist >= 960 ? (c.chips += 150, "+150") : null) },
+    mapper: { r: 1, cost: 6, ico: "mapper", n: L("Cartógrafo", "Cartographer"), d: L("+0,1 de mult. por cada 10 tarjetas de la Enciclopedia (máx. +1,0). ¡Colecciona!", "+0.1 mult per 10 Encyclopedia cards (max +1.0). Collect!"), post: c => { const m = Math.min(1, Math.floor(A.codexStats().u / 10) * 0.1); if (m > 0) { c.mult += m; return "+" + m.toFixed(1); } return null; } },
     marco: region("marco", "marco", "Marco Polo", "Marco Polo", ["as"], 1, 6),
     columbus: region("columbus", "columbus", "Colón", "Columbus", ["na", "sa"], 1, 6),
     battuta: region("battuta", "battuta", "Ibn Battuta", "Ibn Battuta", ["af"], 1, 6),
     cook: region("cook", "cook", "Capitán Cook", "Captain Cook", ["oc"], 1, 6),
     tour: region("tour", "tour", "Gran Tour", "Grand Tour", ["eu"], 1, 6),
-    flash: { r: 1, cost: 6, ico: "flash", n: T("Relámpago", "Lightning"), d: T("Las fichas por velocidad se duplican.", "Speed chips are doubled."), post: c => { const b = c.time; c.chips += b; return b ? "+" + b : null; } },
-    hoard: { r: 1, cost: 5, ico: "hoard", n: T("Tesorero", "Treasurer"), d: T("+3 doblones al superar una ronda.", "+3 doubloons when you clear a round."), clear: c => { c.coins += 3; return "+3"; } },
-    finisher: { r: 1, cost: 6, ico: "finisher", n: T("Broche de oro", "Grand finale"), d: T("×1,5 en la última pregunta de cada ronda.", "×1.5 on the last question of each round."), post: (c, run) => (run.qi === run.qn - 1 ? (c.xmult *= 1.5, "×1.5") : null) },
-    scholar: { r: 1, cost: 6, ico: "scholar", n: T("Erudito", "Scholar"), d: T("×1,3 en batallas, sucesos y pistas.", "×1.3 on battles, events and clues."), post: c => (["battle", "event", "clue"].includes(c.kind) ? (c.xmult *= 1.3, "×1.3") : null) },
-    banker: { r: 2, cost: 8, ico: "banker", n: T("Banquero", "Banker"), d: T("El interés (1 doblón por cada 5) llega hasta +6 en vez de +3.", "Interest (1 doubloon per 5) caps at +6 instead of +3."), interest: 6 },
-    glass: { r: 2, cost: 8, ico: "glass", n: T("Catalejo", "Spyglass"), d: T("+1 carga en todas tus herramientas.", "+1 charge on all your tools."), toolBonus: 1 },
-    luck: { r: 2, cost: 9, ico: "luck", n: T("Amuleto", "Lucky charm"), d: T("Una vez por ronda, un fallo (menos de 400 de distancia) cuenta como 700.", "Once per round, a miss (under 400 distance) counts as 700."), q: (c, run) => { c.luck = !run.luckUsed; } },
-    blindperk: { r: 2, cost: 9, ico: "blindperk", n: T("Ciego valiente", "Brave blind"), d: T("+1,0 de mult. en las preguntas en las que no uses herramientas.", "+1.0 mult on questions where you use no tools."), post: (c, run) => (run.qTools === 0 ? (c.mult += 1, "+1.0") : null) },
-    heart: { r: 2, cost: 8, ico: "heartperk", n: T("Corazón de explorador", "Explorer's heart"), d: T("+1 provisión máxima y la recuperas al comprarlo.", "+1 max provision, restored on purchase."), buy: run => { run.maxLives++; run.lives++; } },
-    crown: { r: 2, cost: 10, ico: "crown", n: T("Corona", "Crown"), d: T("+0,5 de mult. fijo.", "+0.5 flat mult."), post: c => { c.mult += 0.5; return "+0.5"; } },
-    omen: { r: 2, cost: 9, ico: "omen", n: T("Augurio", "Omen"), d: T("Los efectos de los jefes se reducen a la mitad.", "Boss effects are halved."), omen: true },
+    flash: { r: 1, cost: 6, ico: "flash", n: L("Relámpago", "Lightning"), d: L("Las fichas por velocidad se duplican.", "Speed chips are doubled."), post: c => { const b = c.time; c.chips += b; return b ? "+" + b : null; } },
+    hoard: { r: 1, cost: 5, ico: "hoard", n: L("Tesorero", "Treasurer"), d: L("+3 doblones al superar una ronda.", "+3 doubloons when you clear a round."), clear: c => { c.coins += 3; return "+3"; } },
+    finisher: { r: 1, cost: 6, ico: "finisher", n: L("Broche de oro", "Grand finale"), d: L("×1,5 en la última pregunta de cada ronda.", "×1.5 on the last question of each round."), post: (c, run) => (run.qi === run.qn - 1 ? (c.xmult *= 1.5, "×1.5") : null) },
+    scholar: { r: 1, cost: 6, ico: "scholar", n: L("Erudito", "Scholar"), d: L("×1,3 en batallas, sucesos y pistas.", "×1.3 on battles, events and clues."), post: c => (["battle", "event", "clue"].includes(c.kind) ? (c.xmult *= 1.3, "×1.3") : null) },
+    banker: { r: 2, cost: 8, ico: "banker", n: L("Banquero", "Banker"), d: L("El interés (1 doblón por cada 5) llega hasta +6 en vez de +3.", "Interest (1 doubloon per 5) caps at +6 instead of +3."), interest: 6 },
+    glass: { r: 2, cost: 8, ico: "glass", n: L("Catalejo", "Spyglass"), d: L("+1 carga en todas tus herramientas.", "+1 charge on all your tools."), toolBonus: 1 },
+    luck: { r: 2, cost: 9, ico: "luck", n: L("Amuleto", "Lucky charm"), d: L("Una vez por ronda, un fallo (menos de 400 de distancia) cuenta como 700.", "Once per round, a miss (under 400 distance) counts as 700."), q: (c, run) => { c.luck = !run.luckUsed; } },
+    blindperk: { r: 2, cost: 9, ico: "blindperk", n: L("Ciego valiente", "Brave blind"), d: L("+1,0 de mult. en las preguntas en las que no uses herramientas.", "+1.0 mult on questions where you use no tools."), post: (c, run) => (run.qTools === 0 ? (c.mult += 1, "+1.0") : null) },
+    heart: { r: 2, cost: 8, ico: "heartperk", n: L("Corazón de explorador", "Explorer's heart"), d: L("+1 provisión máxima y la recuperas al comprarlo.", "+1 max provision, restored on purchase."), buy: run => { run.maxLives++; run.lives++; } },
+    crown: { r: 2, cost: 10, ico: "crown", n: L("Corona", "Crown"), d: L("+0,5 de mult. fijo.", "+0.5 flat mult."), post: c => { c.mult += 0.5; return "+0.5"; } },
+    omen: { r: 2, cost: 9, ico: "omen", n: L("Augurio", "Omen"), d: L("Los efectos de los jefes se reducen a la mitad.", "Boss effects are halved."), omen: true },
   };
   const BOSSES = {
-    wind: { ico: "wind", n: T("Vendaval", "Gale"), d: T("El viento desvía tu pin. Apunta compensando la flecha.", "The wind pushes your pin. Aim to compensate for the arrow.") },
-    clock: { ico: "storm", n: T("Tormenta", "Storm"), d: T("Solo dispones del 55 % del tiempo.", "You only get 55% of the time.") },
-    strict: { ico: "strict", n: T("Rigor", "Rigor"), d: T("La distancia castiga mucho más.", "Distance is punished far more.") },
-    silence: { ico: "silence", n: T("Silencio", "Silence"), d: T("Tus herramientas no funcionan.", "Your tools don't work.") },
-    fog: { ico: "fog", n: T("Niebla", "Fog"), d: T("Las fronteras desaparecen del mapa.", "Borders vanish from the map.") },
+    wind: { ico: "wind", art: "boss_wind", n: L("Vendaval", "Gale"), d: L("El viento desvía tu pin. Apunta compensando la flecha.", "The wind pushes your pin. Aim to compensate for the arrow.") },
+    clock: { ico: "storm", art: "boss_storm", n: L("Tormenta", "Storm"), d: L("Solo dispones del 55 % del tiempo.", "You only get 55% of the time.") },
+    strict: { ico: "strict", art: "boss_strict", n: L("Rigor", "Rigor"), d: L("La distancia castiga mucho más.", "Distance is punished far more.") },
+    silence: { ico: "silence", art: "boss_silence", n: L("Silencio", "Silence"), d: L("Tus herramientas no funcionan.", "Your tools don't work.") },
+    fog: { ico: "fog", art: "boss_fog", n: L("Niebla", "Fog"), d: L("Las fronteras desaparecen del mapa.", "Borders vanish from the map.") },
   };
   const DECKS = {
-    explorer: { ico: "deck_explorer", n: T("Explorador", "Explorer"), d: T("Un Sonar y 4 doblones. La baraja para aprender.", "A Sonar and 4 doubloons. The deck for learning."), tools: ["sonar"], perks: [], coins: 4, lives: 3, unlock: null },
-    historian: { ico: "deck_historian", n: T("Historiador", "Historian"), d: T("Cuaderno + Erudito. Brillas con batallas y pistas.", "Field journal + Scholar. You shine on battles and clues."), tools: ["journal"], perks: ["scholar"], coins: 3, lives: 3, unlock: "adv_act1" },
-    navigator: { ico: "deck_navigator", n: T("Navegante", "Navigator"), d: T("Brújula + Capitán Cook. Islas, mares y rumbos.", "Compass + Captain Cook. Islands, seas and headings."), tools: ["compass", "compass"], perks: ["cook"], coins: 3, lives: 3, unlock: "adv_boss" },
-    blind: { ico: "deck_blind", n: T("Aventurero ciego", "Blind adventurer"), d: T("Sin herramientas, con Ciego valiente y 4 provisiones.", "No tools, with Brave blind and 4 provisions."), tools: [], perks: ["blindperk"], coins: 6, lives: 4, unlock: "adv_win" },
+    explorer: { ico: "deck_explorer", n: L("Explorador", "Explorer"), d: L("Un Sonar y 4 doblones. La baraja para aprender.", "A Sonar and 4 doubloons. The deck for learning."), tools: ["sonar"], perks: [], coins: 4, lives: 3, unlock: null },
+    historian: { ico: "deck_historian", n: L("Historiador", "Historian"), d: L("Cuaderno + Erudito. Brillas con batallas y pistas.", "Field journal + Scholar. You shine on battles and clues."), tools: ["journal"], perks: ["scholar"], coins: 3, lives: 3, unlock: "adv_act1" },
+    navigator: { ico: "deck_navigator", n: L("Navegante", "Navigator"), d: L("Brújula + Capitán Cook. Islas, mares y rumbos.", "Compass + Captain Cook. Islands, seas and headings."), tools: ["compass", "compass"], perks: ["cook"], coins: 3, lives: 3, unlock: "adv_boss" },
+    blind: { ico: "deck_blind", n: L("Aventurero ciego", "Blind adventurer"), d: L("Sin herramientas, con Ciego valiente y 4 provisiones.", "No tools, with Brave blind and 4 provisions."), tools: [], perks: ["blindperk"], coins: 6, lives: 4, unlock: "adv_win" },
   };
   A.ADV = { TOOLS, PERKS, BOSSES, DECKS };
 
@@ -151,7 +151,7 @@ window.AIQ = window.AIQ || {};
     const qs = pickQuestions(run.qn).map(q => ({ ...q }));
     const info = actInfo(run.act);
     return {
-      name: { es: `${A.tx(info.n)} · ${boss ? "Jefe" : "Ronda " + (run.round + 1) + "/3"}`, en: `${A.tx(info.n)} · ${boss ? "Boss" : "Round " + (run.round + 1) + "/3"}` }, kind: "adventure", boss: !!boss,
+      name: `${A.tx(info.n)} · ${boss ? A.T("Jefe", "Boss") : A.tf("Ronda {n}/3", "Round {n}/3", { n: run.round + 1 })}`, kind: "adventure", boss: !!boss,
       seconds: ctx.seconds, advance: target(), maxPerQ: 1400, bonus: false, plainName: true, questions: () => qs,
       score: (q, km, left) => A.adv.score(q, km, left, true).sc,
     };
@@ -174,7 +174,8 @@ window.AIQ = window.AIQ || {};
     const debuffs = b.map(id => `<div class="adv-debuff"><span>${ic(BOSSES[id].ico)}</span><div><b>${A.tx(BOSSES[id].n)}</b><i>${A.tx(BOSSES[id].d)}</i>${id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${run.wind.km} km</em>` : ""}</div></div>`).join("");
     return `<div class="intro-in adv"><div class="intro-num">${L.boss ? ic("skull", "big") : String(run.round + 1).padStart(2, "0")}</div><div class="intro-body">
       <span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${L.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)}</h2>
-      <p>${A.tx(info.f)}</p><p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(L.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${L.seconds} s</p>${debuffs}</div></div>`;
+      <p>${A.tx(info.f)}</p><p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(L.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${L.seconds} s</p>${debuffs}</div>
+      <div class="intro-art">${A.pic(b.length ? BOSSES[b[0]].art : "act_" + Math.min(run.act, 3))}</div></div>`;
   };
   const DIRS8 = [["N", "N"], ["NE", "NE"], ["E", "E"], ["SE", "SE"], ["S", "S"], ["SW", "SO"], ["W", "O"], ["NW", "NO"]];
   const dirName = brg => { const d = DIRS8[Math.round((((brg % 360) + 360) % 360) / 45) % 8]; return A.lang === "es" ? d[1] : d[0]; };
@@ -230,7 +231,7 @@ window.AIQ = window.AIQ || {};
     t.left--; run.qTools++; run.rTools++; A.sfx.buy();
     const o = C().S.qs[S.qi];
     if (id === "hourglass") { S.limit += 6; note(A.T("+6 segundos", "+6 seconds")); }
-    else if (id === "journal") { const txt = o.clue ? A.T(`Empieza por «${A.tx(o.answer).trim()[0]}» y está en ${continentName(o)}.`, `Starts with “${A.tx(o.answer).trim()[0]}” and lies in ${continentName(o)}.`) : (A.tx(o.fact) || A.T("Sin notas para este lugar.", "No notes for this place.")); note(txt, "journal"); }
+    else if (id === "journal") { const txt = o.clue ? A.tf("Empieza por «{l}» y está en {c}.", "Starts with “{l}” and lies in {c}.", { l: A.tx(o.answer).trim()[0], c: continentName(o) }) : (A.tx(o.fact) || A.T("Sin notas para este lugar.", "No notes for this place.")); note(txt, "journal"); }
     else if (id === "passport") {
       const e = o.cid && A.codex.entry(o.cid[0]);
       if (o.t === "c") note(A.T("Continente: ", "Continent: ") + continentName(o), "passport");
@@ -309,7 +310,7 @@ window.AIQ = window.AIQ || {};
         kind: "ok", level: roundNo() + 1, title: boss ? A.T("¡Jefe derrotado!", "Boss defeated!") : A.T("Ronda superada", "Round cleared"),
         text: `${A.fmt(S.levelScore)} / ${A.fmt(L.advance)} — ${lines.map(l => l[0] + " " + l[1]).join(" · ")}`,
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]],
-        stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"),
+        stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : null,
         buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => { if (actDone && run.act + 1 === 3 && !run.won) return winScreen(); nextStep(boss); } }],
       });
     } else {
@@ -317,8 +318,8 @@ window.AIQ = window.AIQ || {};
       A.sfx.stamp(); setTimeout(A.sfx.lose, 300);
       if (run.lives <= 0) return endRun(false);
       C().verdict({
-        kind: "", level: roundNo() + 1, title: A.T("No llegaste al objetivo", "Target missed"), text: A.T(`Te quedaste en ${A.fmt(S.levelScore)} de ${A.fmt(L.advance)}. Pierdes una provisión: te quedan ${run.lives}.`, `You scored ${A.fmt(S.levelScore)} of ${A.fmt(L.advance)}. You lose a provision: ${run.lives} left.`),
-        stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), L.advance]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives),
+        kind: "", level: roundNo() + 1, title: A.T("No llegaste al objetivo", "Target missed"), text: A.tf("Te quedaste en {s} de {a}. Pierdes una provisión: te quedan {n}.", "You scored {s} of {a}. You lose a provision: {n} left.", { s: A.fmt(S.levelScore), a: A.fmt(L.advance), n: run.lives }),
+        stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), L.advance]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives), art: "lose",
         buttons: [{ id: "rtBtn", cls: "btn-ink", label: A.T("Reintentar con lugares nuevos", "Retry with new places"), arrow: true, primary: true, onclick: () => openShop(false) }, { id: "abBtn", cls: "btn-line", label: A.T("Abandonar", "Abandon"), onclick: () => endRun(false) }],
       });
     }
@@ -333,7 +334,7 @@ window.AIQ = window.AIQ || {};
     C().verdict({
       kind: "win", level: 12, title: A.T("¡Terra Incognita conquistada!", "Terra Incognita conquered!"),
       text: A.T("Has completado los tres actos. Puedes cobrar tu gloria ahora o seguir hacia la Leyenda: rondas infinitas cada vez más duras, con el mismo marcador.", "You've completed all three acts. Cash out your glory now, or push on into Legend: endless, ever-harder rounds on the same scoreboard."),
-      stats: [[A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("VICTORIA", "VICTORY"), stampSub: "★",
+      stats: [[A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("VICTORIA", "VICTORY"), stampSub: A.icon("u_star", "st"), art: "win",
       buttons: [{ id: "legBtn", cls: "btn-ink", label: A.T("Seguir a la Leyenda", "Push into Legend"), arrow: true, primary: true, onclick: () => openShop(true) }, { id: "endBtn", cls: "btn-line", label: A.T("Cobrar y terminar", "Cash out"), onclick: () => endRun(true) }],
     });
   }
@@ -361,16 +362,16 @@ window.AIQ = window.AIQ || {};
       if (s.k === "perk") { const p = PERKS[s.id], c = cost(p.cost); return `<div class="offer r${p.r}${bought ? " sold" : ""}" data-i="${i}"><span class="of-r">${A.tx(A.T(R_NAMES[p.r], R_EN[p.r]))}</span><div class="of-ico">${ic(p.ico)}</div><b>${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`; }
       const t = TOOLS[s.id], c = cost(t.cost), have = run.tools[s.id]; return `<div class="offer otool r${t.r}${bought ? " sold" : ""}" data-i="${i}"><span class="of-r">${A.T("Herramienta", "Tool")}</span><div class="of-ico">${ic(t.ico)}</div><b>${A.tx(t.n)}${have ? ` <em>+1 ${A.T("carga", "charge")}</em>` : ""}</b><p>${A.tx(t.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : CN() + c}</button></div>`;
     }).join("");
-    const life = chest ? "" : `<div class="offer life${run.lives >= run.maxLives ? " sold" : ""}"><span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico">${ic("heart")}</div><b>+1 ${A.T("provisión", "provision")}</b><p>${A.T("Recupera una provisión (máx. " + run.maxLives + ").", "Restore a provision (max " + run.maxLives + ").")}</p><button class="buy" ${run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${price(6)}</button></div>`;
+    const life = chest ? "" : `<div class="offer life${run.lives >= run.maxLives ? " sold" : ""}"><span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico">${ic("heart")}</div><b>+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${price(6)}</button></div>`;
     const inv = `<div class="inv"><div class="inv-col"><h4>${A.T("Reliquias", "Relics")} ${run.perks.length}/${slots}</h4><div class="inv-row">${run.perks.map(id => `<button class="inv-perk" data-sell="${id}" title="${A.tx(PERKS[id].n)} — ${A.tx(PERKS[id].d)}">${ic(PERKS[id].ico)}${chest ? "" : `<em>${A.T("vender", "sell")} ${Math.floor(PERKS[id].cost / 2)}</em>`}</button>`).join("") || `<i class="empty">${A.T("Vacío", "Empty")}</i>`}</div></div>
       <div class="inv-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="inv-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" title="${A.tx(TOOLS[id].n)}">${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
       <div class="inv-col"><h4>${A.T("Provisiones", "Provisions")}</h4><div class="inv-row hearts">${hearts()}</div></div></div>`;
     const info = actInfo(run.act);
-    C().dialog(`<div class="shop"><header><span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2>
+    C().dialog(`<div class="shop"><header><div class="shop-art">${A.pic(chest ? "chest" : "camp")}</div><span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2>
       <div class="shop-top"><span class="coins" id="shopCoins">${CN()}${run.coins}</span><div class="route">${routeHtml()}</div></div></header>
       ${chest ? `<p class="shop-note">${A.T("Elige UNA reliquia gratis.", "Pick ONE relic for free.")}</p>` : ""}
       <div class="offers">${cards}${life}</div>${inv}
-      <footer>${chest ? "" : `<button class="btn-line" id="rerollBtn">${A.T("Cambiar ofertas", "Reroll")} ${CN()}${2 + run.rerolls}</button>`}<button class="btn-ink" id="goRound" data-primary><span>${chest ? A.T("Continuar sin elegir", "Continue without picking") : A.T("Siguiente ronda", "Next round")}</span><span class="ar">→</span></button></footer></div>`, "verdict");
+      <footer>${chest ? "" : `<button class="btn-line" id="rerollBtn">${A.T("Cambiar ofertas", "Reroll")} ${CN()}${2 + run.rerolls}</button>`}<button class="btn-ink" id="goRound" data-primary><span>${chest ? A.T("Continuar sin elegir", "Continue without picking") : A.T("Siguiente ronda", "Next round")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "verdict");
     document.querySelectorAll(".offer").forEach(el => {
       const btn = el.querySelector(".buy"); if (!btn) return; btn.onclick = () => buy(el, chest);
     });
@@ -417,9 +418,9 @@ window.AIQ = window.AIQ || {};
     A.sfx.stamp(); setTimeout(win ? A.sfx.victory : A.sfx.lose, 300);
     C().verdict({
       kind: win ? "win" : "", level: r.cleared, title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
-      text: A.T(`Superaste ${r.cleared} rondas y llegaste al ${actInfo(r.act).n.es}. Puntos: ${A.fmt(r.score)} + bonus ${A.fmt(bonus)}.${rec ? " ¡Nuevo récord personal!" : ""}`, `You cleared ${r.cleared} rounds and reached ${A.tx(actInfo(r.act).n)}. Points: ${A.fmt(r.score)} + bonus ${A.fmt(bonus)}.${rec ? " New personal best!" : ""}`),
+      text: A.tf("Superaste {r} rondas y llegaste al {act}. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and reached {act}. Points: {p} + bonus {b}.", { r: r.cleared, act: A.tx(actInfo(r.act).n), p: A.fmt(r.score), b: A.fmt(bonus) }) + (rec ? A.T(" ¡Nuevo récord personal!", " New personal best!") : ""),
       stats: [[A.T("Puntuación final", "Final score"), final], [A.T("Rondas superadas", "Rounds cleared"), r.cleared], [A.T("Doblones ganados", "Doubloons earned"), r.stats.coinsEarned]],
-      stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? "★" : "✕",
+      stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
       buttons: [{ id: "nrBtn", cls: "btn-ink", label: A.T("Otra expedición", "Another expedition"), arrow: true, primary: true, onclick: () => C().showHub("adventure") }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],
     });
     C().map.setStyle(mapStyleFor(null)); A.adv.hideBars();

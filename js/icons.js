@@ -138,6 +138,38 @@ window.AIQ = window.AIQ || {};
   I.u_next = t("M8 24h30", "w", 4.4) + t("M26 10l14 14-14 14", "w", 4.4);
   I.u_check = p("M6 26l10 10L42 10", "none", 'fill="none" stroke="#191325" stroke-width="9"') + l("M6 26l10 10L42 10", "t", 5.4);
 
+  /* ============================== gemas de rareza ============================== */
+  I.g_0 = p("M8 30c-2-8 4-16 14-17s18 4 18 12-6 14-15 14S10 36 8 30Z", "s") + q("M12 27c0-6 5-10 11-10-6 2-9 5-11 10Z", "w") + l("M16 36c5 2 12 1 17-4", "S", 1.8);
+  I.g_1 = p("M24 5l15 8v18l-15 12L9 31V13Z", "t") + q("M24 5l15 8-15 9-15-9Z", "#8ff0d2") + q("M24 22v21L9 31V13Z", "T", 'opacity=".55"') + l("M9 13l15 9 15-9M24 22v21", "k", 1.6) + h("M14 14l6-3");
+  I.g_2 = p("M24 3l17 14-17 28L7 17Z", "p") + q("M7 17h34L24 3Z", "#dbb1ff") + q("M24 45L7 17h17Z", "P", 'opacity=".55"') + l("M7 17h34M17 17l7-14 7 14-7 28-7-28", "k", 1.5) + h("M12 15l6-6");
+  I.g_3 = star(24, 24, 22, 10, "g", 6, 0) + star(24, 24, 15, 7, "y", 6, 30) + c(24, 24, 5.4, "r") + dot(22, 22, 1.6, "w");
+
+  /* ============================== continentes ============================== */
+  I.k_af = p("M13 8C19 4 28 5 33 9c4 3 8 3 9 8-3 3-4 9-7 15-3 7-6 12-11 9-4-4-2-11-6-15-4-3-11-4-11-10 0-4 3-6 6-8Z", "o") + q("M15 10c4-3 10-3 14-1-6-1-11 1-14 5Z", "#ffc28f") + l("M22 36c-1-4 1-8-2-12", "N", 1.6, 'opacity=".45"');
+  I.k_eu = p("M9 32l2-9 6-2 2-9 7-4 5 4-2 6 8 0 4 6-4 6-6-2-4 6-6 2-4-2Z", "m") + q("M13 24l3-1 2-6 4-2-6 1-3 6Z", "#ffc2e0") + c(38, 12, 3, "m", 1.6) + l("M20 30l6-4", "R", 1.6, 'opacity=".5"');
+  I.k_as = p("M5 17l8-9 13-2 12 2 6 8-2 8-6 4 2 8-6-2-4 6-4-8-8-2-8-4Z", "g") + q("M9 16l6-6 9-1-8 6Z", "y") + p("M37 36l4 2-2 4-4-2Z", "g") + l("M17 24l10 4", "G", 1.6, 'opacity=".45"');
+  I.k_na = p("M6 12l10-6 16 2 10 6-5 7-4 2-2 9-4 9-5-8-8-3-6-8Z", "b") + q("M10 12l8-4 10 1-9 6Z", "#a9d4ff") + p("M2 6l6-2 2 4-5 2Z", "b") + l("M20 24l6 3", "B", 1.6, 'opacity=".5"');
+  I.k_sa = p("M14 5l14 1 8 8-2 10-6 8-4 14-6-4-2-14-6-10Z", "l") + q("M18 7l10 0 5 5-8-1Z", "#c8f29a") + l("M22 24l0 12", "L", 1.6, 'opacity=".5"');
+  I.k_oc = p("M6 22l10-8 14 0 10 8-4 10-12 3-12-3Z", "y") + q("M11 21l8-5 9 0-9 6Z", "w") + p("M40 36l4 2-3 5-4-3Z", "y") + c(9, 38, 3, "y", 1.6) + c(16, 42, 2.4, "y", 1.4);
+  I.k_an = p("M3 32q4-10 21-12t21 12v10H3Z", "w") + q("M8 32q4-8 16-9-10 3-13 12Z", "#dff3ff") + l("M12 38h24M20 33l3 3", "s", 2, 'opacity=".8"') + p("M30 18l4-8 4 8Z", "#dff3ff", 'opacity="0"');
+  I.k_sea = I.t_water;
+
+  /* ============================== medallas y rangos ============================== */
+  const medal = (f, f2) => p("M13 3h9l4 13h-9ZM35 3h-9l-4 13h9Z", "B") + c(24, 30, 14, f) + c(24, 30, 9.4, f2, 1.8) + star(24, 30, 6.4, 2.6, f, 5) + h("M13 26a12 12 0 0 1 6-8");
+  I.medal_bronze = medal("n", "#d9a25f"); I.medal_silver = medal("S", "s"); I.medal_gold = medal("g", "y");
+  I.iq_0 = p("M24 44S10 31 10 20a14 14 0 0 1 28 0c0 11-14 24-14 24Z", "w") + l("M19 19q0-6 5-6t5 5q0 4-5 6v3", "k", 3.4) + dot(24, 30, 2.4, "k");
+  I.iq_1 = p("M6 16h36a3 3 0 0 1 3 3v20a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V19a3 3 0 0 1 3-3Z", "n") + p("M17 16v-5a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v5", "none", 'fill="none"') + t("M18 16v-6h12v6", "N", 3) + p("M3 27h42v4H3Z", "N") + p("M21 24h6v10h-6Z", "g") + h("M8 21v4");
+  I.iq_2 = I.a_pack; I.iq_3 = I.m_adv; I.iq_4 = I.deck_navigator; I.iq_6 = I.mapper;
+  I.iq_5 = I.globe + l("M2 30Q24 14 46 26", "k", 5) + l("M2 30Q24 14 46 26", "y", 2.4) + p("M40 20l6 4-7 3Z", "r");
+  I.iq_7 = c(24, 30, 15, "b") + q("M16 26c3-4 8-3 8 1s-4 3-3 7-5 4-6 0 0-5 1-8ZM27 32c3-2 6 1 5 4s-5 3-6 1 0-4 1-5Z", "l") + p("M9 18l3-11 8 8 4-11 4 11 8-8 3 11Z", "g") + p("M9 18h30v5H9Z", "G") + c(24, 9, 2.4, "r", 1.4);
+
+  /* ============================== interfaz extra ============================== */
+  I.u_close = t("M10 10l28 28M38 10L10 38", "r", 5.6);
+  I.u_enter = t("M40 10v16H12", "w", 4.4) + t("M22 16L10 26l12 10", "w", 4.4);
+  I.u_star = star(24, 24, 21, 9, "g", 5, 0) + star(24, 24, 13, 6, "y", 5, 36);
+  I.u_x = I.u_close;
+
+  A._g = { K, C, col, p, q, l, t, c, e, h, dot, star };
   A.ICONS = I;
   A.icon = (id, cls = "") => {
     const b = I[id]; if (!b) return "";
@@ -153,6 +185,19 @@ window.AIQ = window.AIQ || {};
     codex_all: "crown", codex_people: "t_person", codex_capitals: "t_capital", codex_events: "t_battle", adv_start: "m_adv", adv_clear1: "boots", adv_boss: "skull",
     adv_act1: "a_sun", adv_act2: "a_peak", adv_win: "a_moai", adv_endless: "a_inf", adv_rich: "hoard", adv_build: "a_pack", adv_flawless: "a_shield", adv_blind: "blindperk", adv_asc: "a_peak",
     daily_1: "t_event", daily_7: "t_event", night: "a_moon", marathon: "boots",
+  };
+  /* insignia de logro: marco por categoria + icono dentro */
+  const FRAME = {
+    round: c(24, 24, 22, "g") + c(24, 24, 17.5, "y", 1.6),
+    shield: p("M24 2l19 6v14c0 12-8 20-19 24C13 42 5 34 5 22V8Z", "b") + p("M24 7l14 4.5V22c0 9-6 15-14 19-8-4-14-10-14-19V11.5Z", "#a9d4ff", "opacity=\".8\""),
+    hex: p("M24 2l19 11v22L24 46 5 35V13Z", "r") + p("M24 7l14.6 8.5v17L24 41 9.4 32.5v-17Z", "#ffb0a8", "opacity=\".8\""),
+    book: p("M7 6h34a3 3 0 0 1 3 3v30a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3Z", "p") + p("M11 10h26a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2Z", "#dbb1ff", "opacity=\".85\""),
+    cal: p("M6 8h36a3 3 0 0 1 3 3v29a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3Z", "t") + p("M6 8h36a3 3 0 0 1 3 3v6H3v-6a3 3 0 0 1 3-3Z", "T") + p("M9 21h30v18H9Z", "#a5ecd6", "opacity=\".9\""),
+  };
+  const ACH_FRAME = { q: "round", level: "round", classic: "shield", codex: "book", adv: "hex", daily: "cal" };
+  A.badge = (achId, cls = "") => {
+    const a = A.ACH.find(x => x.id === achId), ic = I[A.ACH_ICON[achId]] || I.a_medal, fr = FRAME[ACH_FRAME[a && a.ev] || "round"];
+    return `<svg class="ic badge ${cls}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${fr}<g transform="translate(10.5 10.5) scale(.56)">${ic}</g></svg>`;
   };
   /* iconos como imagen CSS (--ic-nombre) para decorar con ::before/::after */
   A.iconVars = () => { const st = document.documentElement.style; for (const k of ["spark", "heart", "coin"]) { const id = { spark: "a_spark", heart: "heart", coin: "coin" }[k]; st.setProperty("--ic-" + k, `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">${I[id]}</svg>`)}")`); } };
