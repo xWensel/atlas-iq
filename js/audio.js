@@ -101,7 +101,7 @@ window.AIQ = window.AIQ || {};
    *  melodia de blues-pentatonica con licks al azar, crujido de vinilo y "tape wobble" (vibrato lento de cinta) en toda la banda.
    *  Progresion de 8 compases: Dm9 . G13 . Cmaj9 . A7b13  |  Gm9 . C13 . Fmaj9 . D7b13
    */
-  const BPM = 86, STEP = 60 / BPM / 4, SW = 0.3;
+  let BPM = 86, STEP = 60 / BPM / 4, SW = 0.3, SHIFT = 0, EPMOD = 1, EPIDX = 2.2;   // se ajustan por skin
   const PROG_A = [
     { root: 38, v: [53, 57, 60, 64], tonic: 50 },   // Dm9
     { root: 43, v: [53, 57, 59, 64], tonic: 50 },   // G13
@@ -125,7 +125,7 @@ window.AIQ = window.AIQ || {};
   }
   /* piano electrico FM: portadora + modulador que decae (timbre de "tine") */
   function epiano(m, t, o = {}) {
-    const { vol = 0.07, dur = 0.9, mod = 1, idx = 2.2, rev = 0.35, bus = musBus } = o;
+    const { vol = 0.07, dur = 0.9, mod = EPMOD, idx = EPIDX, rev = 0.35, bus = musBus } = o;
     const f = mtof(m), car = ctx.createOscillator(), md = ctx.createOscillator(), mg = ctx.createGain(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
     car.type = "sine"; md.type = "sine"; car.frequency.value = f; md.frequency.value = f * mod;
     mg.gain.setValueAtTime(f * idx, t); mg.gain.exponentialRampToValueAtTime(f * 0.12, t + Math.min(0.5, dur));
@@ -149,7 +149,8 @@ window.AIQ = window.AIQ || {};
   const crackle = t => noise(t, 0.012, { hp: 2600, vol: 0.009 * Math.random(), bus: musBus });
 
   function playStep(s, t0) {
-    const bar = Math.floor(s / 16) % 8, st = s % 16, ch = PROG[bar], nx = PROG[(bar + 1) % 8];
+    const bar = Math.floor(s / 16) % 8, st = s % 16, c0 = PROG[bar], n0 = PROG[(bar + 1) % 8];
+    const ch = { root: c0.root + SHIFT, v: c0.v.map(n => n + SHIFT), tonic: c0.tonic + SHIFT }, nx = { root: n0.root + SHIFT };
     const t = t0 + (Math.floor(st / 2) % 2 === 1 ? STEP * 2 * SW : 0);          // swing en las corcheas de contratiempo
     const full = mode >= 1, rnd = Math.random;
     // bajo
@@ -167,7 +168,7 @@ window.AIQ = window.AIQ || {};
     if (st === 0) curLick = rnd() < (mode === 0 ? 0.16 : mode === 1 ? 0.6 : 0.75) ? LICKS[Math.floor(rnd() * LICKS.length)] : null;
     if (curLick) for (const [ls, deg] of curLick) if (ls === st) {
       const n = ch.tonic + 24 + PENTA_MIN[deg] + (rnd() < 0.1 ? -1 : 0);
-      epiano(n, t, { vol: 0.07, dur: 0.8, mod: 2, idx: 1.4, rev: 0.55 });
+      epiano(n, t, { vol: 0.07, dur: 0.8, mod: EPMOD * 2, idx: EPIDX * 0.6, rev: 0.55 });
     }
     // bateria
     if (full) {
@@ -190,6 +191,11 @@ window.AIQ = window.AIQ || {};
       musBus.gain.setTargetAtTime(base * level, t, 0.05); musBus.gain.setTargetAtTime(base, t + ms / 1000, 0.4);
     },
     muffle(on) { if (ctx) musFilter.frequency.setTargetAtTime(on ? 320 : 8600, ctx.currentTime, 0.08); },
+  };
+  /* cada skin tiene su propia banda: tempo, swing, transposicion y timbre del piano */
+  A.audio.setSkin = cfg => {
+    if (!cfg) return;
+    BPM = cfg.bpm; STEP = 60 / BPM / 4; SW = cfg.sw; SHIFT = cfg.shift; EPMOD = cfg.mod; EPIDX = cfg.idx;
   };
   A.audio.state = () => (ctx ? ctx.state : 'none');
   /* volumen 0..1 de "master" | "music" | "sfx" */

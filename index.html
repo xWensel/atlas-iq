@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/boot.css">
+<link rel="stylesheet" href="css/skins.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -21,6 +22,7 @@
     <path d="M34-34L4-4-4 4z M-34-34L-4-4 4 4z M34 34L4 4-4-4z M-34 34L-4 4 4-4z" fill="currentColor" opacity=".55" transform="scale(.62)"/>
     <circle r="4" fill="var(--rose-hole,#f2e9d6)"/>
   </symbol>
+  <filter id="handcut" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4.5"/></filter>
   <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/></filter>
 </svg>
 
@@ -83,6 +85,7 @@
       <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
     </div>
 
+    <div class="set-sec"><h3 data-i="set.skin"></h3><div class="skins" id="skinGrid"></div></div>
     <div class="set-sec"><h3 data-i="set.lang"></h3>
       <div class="langgrid" id="langGrid"></div>
       <p class="set-note" data-i="set.lang.note"></p>
@@ -129,6 +132,7 @@
   <div id="layer" class="hidden"><section id="dlg"></section></div>
   <div id="intro" class="hidden"></div>
   <div id="veil" class="hidden"></div>
+  <div id="skinFlash"></div>
 </div>
 
 <script src="js/vendor/topojson-client.min.js"></script>
@@ -145,6 +149,7 @@
 <script src="js/vendor/earcut.min.js"></script>
 <script src="js/map2d.js"></script>
 <script src="js/map.js"></script>
+<script src="js/skins.js"></script>
 <script src="js/game.js"></script>
 </body>
 </html>

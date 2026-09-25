@@ -1,5 +1,10 @@
 # Atlas IQ
 
+**v0.4** – 4 skins que cambian TODO (mapa por shader, paleta, formas, tipografia y sonido):
+- **Expedicion** (papel y tinta) · **Casino** (mesa de cartas, remolino animado, monitor CRT, tipografia pixel, estilo "Balatro") · **Plano** (cianotipo con letra de delineante) · **Riso** (poster serigrafiado con desregistro de tinta y bordes recortados a mano).
+- Modo Extendido con **FICHAS x MULT**: las rachas multiplican la puntuacion, con animacion y sacudida de pantalla. El modo Clasico conserva la puntuacion exacta del original.
+- Cada skin tiene su propia banda (tempo, swing, transposicion y timbre del piano).
+
 **v0.3** – mapa en la GPU, entrada de estudio y mas idiomas:
 - Mapa **WebGL2 vectorial puro**: paises triangulados una vez, fronteras instanciadas de ancho constante, resplandor de costas por desenfoque en GPU, reticula con LOD en el shader. Siempre nitido a cualquier zoom, 144 fps medidos.
 - Zoom **sensorial**: camara con fisica (zoom suavizado hacia el cursor, inercia), desenfoque radial y aberracion cromatica segun la velocidad, viñeta que respira, silbido de aire sincronizado.

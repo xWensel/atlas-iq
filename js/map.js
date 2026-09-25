@@ -41,29 +41,42 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ shaders */
   const VS_FILL = `#version 300 es
 layout(location=0) in vec2 a_pos; layout(location=1) in float a_ci;
-uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res;
+uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform vec2 u_off;
 flat out float v_ci;
-void main(){ vec2 p=(a_pos-u_center)*u_scale; gl_Position=vec4(p/(0.5*u_res),0.0,1.0); v_ci=a_ci; }`;
+void main(){ vec2 p=(a_pos-u_center)*u_scale+u_off; gl_Position=vec4(p/(0.5*u_res),0.0,1.0); v_ci=a_ci; }`;
 
   const FS_SIL = `#version 300 es
 precision mediump float; out vec4 o; void main(){ o=vec4(1.0); }`;
+  const FS_SOLID = `#version 300 es
+precision mediump float; uniform vec4 u_col; out vec4 o; void main(){ o=u_col; }`;
 
   const NOISE = `
 float hash(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }`;
 
+  /* tierra: color de paleta + sombreado de litoral + tratamiento propio de cada skin */
   const FS_LAND = `#version 300 es
 precision highp float;
 flat in float v_ci;
-uniform vec3 u_pal[8]; uniform vec2 u_res; uniform sampler2D u_blurN; uniform vec4 u_fx; // ao, grain
+uniform vec3 u_pal[8]; uniform vec2 u_res; uniform sampler2D u_blurN; uniform vec4 u_fx; uniform int u_style; uniform float u_dpr;
 out vec4 o;
 ${NOISE}
 void main(){
   vec3 c=u_pal[int(v_ci+0.5)];
-  vec2 uv=gl_FragCoord.xy/u_res;
+  vec2 uv=gl_FragCoord.xy/u_res; vec2 f=gl_FragCoord.xy;
   float n=texture(u_blurN,uv).r;
   float ao=smoothstep(0.60,0.97,n);
   c*=mix(1.0-u_fx.x,1.0,ao);
-  c+=(hash(gl_FragCoord.xy)-0.5)*u_fx.y;
+  if(u_style==1){                                   // casino: cara de carta con brillo suave
+    c*=1.0+0.05*uv.y; c=mix(c,vec3(1.0),0.05*smoothstep(0.6,1.0,n));
+  } else if(u_style==2){                            // plano: rayado diagonal de dibujo tecnico
+    float h=step(0.5,fract((f.x-f.y)/(6.5*u_dpr))); c=mix(c,vec3(0.74,0.86,1.0),h*0.20);
+    float h2=step(0.5,fract((f.x+f.y)/(26.0*u_dpr))); c=mix(c,vec3(0.86,0.93,1.0),h2*0.05);
+  } else if(u_style==3){                            // riso: trama de semitono en las costas y grano de tinta
+    vec2 g=f/(4.5*u_dpr); float d=length(fract(g)-0.5);
+    float dots=step(d,0.5*(1.0-ao)*1.05); c=mix(c,c*0.74,dots*0.85);
+    c*=0.94+0.12*hash(floor(f/(2.0*u_dpr)));
+  }
+  c+=(hash(f)-0.5)*u_fx.y;
   o=vec4(c,1.0);
 }`;
 
@@ -105,17 +118,19 @@ void main(){
   o=vec4(s,s,s,1.0);
 }`;
 
+  /* oceano: degradado + aguas someras + reticula con LOD; casino = remolino animado, riso = semitono */
   const FS_OCEAN = `#version 300 es
 precision highp float;
-uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform float u_dpr;
+uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform float u_dpr; uniform float u_time; uniform int u_style;
 uniform sampler2D u_blurN; uniform sampler2D u_blurW;
 uniform vec3 u_oTop; uniform vec3 u_oBot; uniform vec3 u_shallow; uniform vec3 u_grid; uniform vec3 u_tropic;
+uniform vec3 u_sw1; uniform vec3 u_sw2; uniform vec3 u_sw3;
 uniform vec4 u_gp; // stepA, stepB, tB, gridAlpha
 out vec4 o;
 const float D2R=0.017453292519943295;
 ${NOISE}
 float lineAlpha(float dpx){ return clamp(0.5*u_dpr*1.2+0.5-dpx,0.0,1.0); }
-vec2 gridLevel(float stp, vec2 wp, float lonDeg, float latDeg, float pxPerDeg){
+float gridLevel(float stp, vec2 wp, float lonDeg, float latDeg, float pxPerDeg){
   float dl=abs(mod(lonDeg+stp*0.5,stp)-stp*0.5);
   float lonLine=floor(lonDeg/stp+0.5)*stp;
   float k=floor(latDeg/stp+0.5); float latLine=k*stp;
@@ -124,7 +139,26 @@ vec2 gridLevel(float stp, vec2 wp, float lonDeg, float latDeg, float pxPerDeg){
   float majLon=step(abs(mod(lonLine+15.0,30.0)-15.0),0.001);
   float a=lineAlpha(dl*pxPerDeg)*(0.45+0.55*majLon);
   float b=lineAlpha(dLat)*(0.45+0.55*majLat);
-  return vec2(max(a,b),0.0);
+  return max(a,b);
+}
+/* remolino de pintura (inspirado en los fondos de los juegos de cartas): giro + deformacion iterada */
+vec3 swirl(vec2 frag){
+  float t=u_time;
+  vec2 uv=(frag-0.5*u_res)/u_res.y*2.4;
+  float len=length(uv);
+  float ang=atan(uv.y,uv.x)+(1.9+0.3*sin(t*0.13))*len-t*0.32;
+  vec2 u=vec2(len*cos(ang),len*sin(ang))-vec2(1.0);
+  vec2 u2=u;
+  for(int i=0;i<5;i++){
+    u2+=vec2(sin(u2.y*1.25+t*0.35+float(i)),cos(u2.x*1.05-t*0.28+float(i)*1.7))*0.55;
+    u+=0.42*vec2(cos(u2.y+t*0.21),sin(u2.x-t*0.24));
+    u-=cos(u.x+u.y)-sin(u.x*0.711-u.y);
+  }
+  float p=clamp(length(u)*0.32,0.0,1.0);
+  float band=0.5+0.5*sin(p*9.42+t*0.45);
+  vec3 col=mix(u_sw1,u_sw2,smoothstep(0.15,0.85,band));
+  col=mix(col,u_sw3,smoothstep(0.55,1.0,p)*0.55);
+  return col;
 }
 void main(){
   vec2 frag=gl_FragCoord.xy; vec2 uv=frag/u_res;
@@ -135,32 +169,42 @@ void main(){
   float r=length((uv-vec2(0.5,0.55))*vec2(u_res.x/u_res.y,1.0));
   ocean+=0.06*exp(-r*r*3.0);
   float w=texture(u_blurW,uv).r; float n=texture(u_blurN,uv).r;
-  ocean=mix(ocean,u_shallow,clamp(smoothstep(0.03,0.42,w)*0.70+smoothstep(0.02,0.5,n)*0.30,0.0,1.0));
+  float shal=clamp(smoothstep(0.03,0.42,w)*0.70+smoothstep(0.02,0.5,n)*0.30,0.0,1.0);
+  if(u_style==1){ ocean=swirl(frag); ocean=mix(ocean,u_shallow,shal*0.55); }
+  else if(u_style==3){
+    float dots=step(length(fract(frag/(6.0*u_dpr))-0.5),0.5*smoothstep(0.04,0.6,w)*1.1);
+    ocean=mix(ocean,u_shallow,dots);
+    ocean=mix(ocean,ocean*0.9,step(0.5,hash(floor(frag/(3.0*u_dpr))))*0.10);
+  } else ocean=mix(ocean,u_shallow,shal);
   // reticula con dos niveles de detalle fundidos
-  float ga=gridLevel(u_gp.x,wp,lonDeg,latDeg,pxPerDeg).x;
-  float gb=gridLevel(u_gp.y,wp,lonDeg,latDeg,pxPerDeg).x*u_gp.z;
+  float ga=gridLevel(u_gp.x,wp,lonDeg,latDeg,pxPerDeg);
+  float gb=gridLevel(u_gp.y,wp,lonDeg,latDeg,pxPerDeg)*u_gp.z;
   float g=max(ga,gb)*u_gp.w;
   ocean=mix(ocean,u_grid,g);
   // ecuador y tropicos punteados
   float dash=step(0.5,fract(frag.x/(11.0*u_dpr)));
-  float yE=0.0; float t=0.0;
-  float dE=abs(wp.y-yE)*u_scale;
+  float dE=abs(wp.y)*u_scale;
   float yT=1.25*log(tan(0.78539816339+0.4*23.4366*D2R));
   float dT=min(abs(wp.y-yT),abs(wp.y+yT))*u_scale;
-  t=max(lineAlpha(dE),lineAlpha(dT))*dash*0.55;
-  ocean=mix(ocean,u_tropic,t);
+  float t2=max(lineAlpha(dE),lineAlpha(dT))*dash*0.55*step(0.001,u_gp.w);
+  ocean=mix(ocean,u_tropic,t2);
   ocean+=(hash(frag*0.91)-0.5)*0.014;
   o=vec4(ocean,1.0);
 }`;
 
+  /* post-proceso: efecto de zoom sensorial + (casino) monitor CRT + viñeta y grano */
   const FS_POST = `#version 300 es
 precision highp float;
 uniform sampler2D u_scene; uniform vec2 u_res; uniform vec2 u_zc; uniform float u_zv; uniform vec2 u_pv; uniform float u_vig; uniform float u_grain; uniform vec3 u_tint; uniform float u_time;
+uniform float u_crt; uniform float u_dpr;
 out vec4 o;
 ${NOISE}
 void main(){
   vec2 frag=gl_FragCoord.xy; vec2 uv=frag/u_res;
-  vec2 toC=(u_zc-frag);
+  if(u_crt>0.5){ vec2 q=uv*2.0-1.0; q*=1.0+dot(q,q)*0.045; uv=q*0.5+0.5; }
+  float inside=step(0.0,uv.x)*step(uv.x,1.0)*step(0.0,uv.y)*step(uv.y,1.0);
+  vec2 fr=uv*u_res;
+  vec2 toC=(u_zc-fr);
   float zvA=clamp(u_zv,-4.0,4.0);
   vec2 off=toC*zvA*0.06+u_pv*0.014;
   float lenPx=length(off);
@@ -173,17 +217,24 @@ void main(){
     col+=texture(u_scene,p).rgb;
   }
   col/=float(N);
-  // aberracion cromatica proporcional a la velocidad
-  float ca=min(lenPx,40.0)*0.0009;
+  float ca=min(lenPx,40.0)*0.0009+u_crt*0.0011;
   vec2 dir=normalize(toC+vec2(0.0001));
-  col.r=mix(col.r,texture(u_scene,uv+dir*ca*u_res.y/u_res*0.5).r,step(0.001,ca));
-  col.b=mix(col.b,texture(u_scene,uv-dir*ca*u_res.y/u_res*0.5).b,step(0.001,ca));
-  // viñeta (se cierra un poco al hacer zoom) y grano
-  vec2 q=uv-0.5; float v=1.0-u_vig*smoothstep(0.30,0.95,length(q*vec2(1.05,1.0))+min(abs(zvA)*0.02,0.08));
+  vec2 cav=dir*ca*u_res.y/u_res*0.5;
+  col.r=mix(col.r,texture(u_scene,uv+cav).r,step(0.0005,ca));
+  col.b=mix(col.b,texture(u_scene,uv-cav).b,step(0.0005,ca));
+  if(u_crt>0.5){
+    float sl=0.5+0.5*sin(fr.y*3.14159265/(1.5*u_dpr));
+    col*=0.90+0.10*sl;                                          // lineas de barrido
+    float tri=fract(fr.x/(3.0*u_dpr)); col*=0.965+0.035*vec3(step(tri,0.34),step(0.34,tri)*step(tri,0.67),step(0.67,tri));   // mascara RGB
+    vec3 bl=vec3(0.0); for(int i=0;i<6;i++){ float a=float(i)*1.0472; bl+=texture(u_scene,uv+vec2(cos(a),sin(a))*3.5*u_dpr/u_res).rgb; } bl/=6.0;
+    col+=max(bl-0.72,0.0)*0.55;                                 // resplandor de fosforo
+    col*=1.0+0.03*sin(u_time*40.0);                             // parpadeo minimo
+  }
+  vec2 q2=uv-0.5; float v=1.0-u_vig*smoothstep(0.30,0.95,length(q2*vec2(1.05,1.0))+min(abs(zvA)*0.02,0.08));
   col*=v*u_tint;
   col+=(hash(frag+fract(u_time)*61.0)-0.5)*u_grain;
-  gl_FragColor_placeholder
-}`.replace("gl_FragColor_placeholder", "o=vec4(col,1.0);");
+  o=vec4(col*inside,1.0);
+}`;
 
   const VS_LABEL = null;
 
@@ -199,7 +250,7 @@ void main(){
   }
   function buildPrograms(gl) {
     return {
-      sil: compile(gl, VS_FILL, FS_SIL), land: compile(gl, VS_FILL, FS_LAND), hatch: compile(gl, VS_FILL, FS_HATCH),
+      sil: compile(gl, VS_FILL, FS_SIL), solid: compile(gl, VS_FILL, FS_SOLID), land: compile(gl, VS_FILL, FS_LAND), hatch: compile(gl, VS_FILL, FS_HATCH),
       line: compile(gl, VS_LINE, FS_LINE), blur: compile(gl, VS_FULL, FS_BLUR), ocean: compile(gl, VS_FULL, FS_OCEAN), post: compile(gl, VS_FULL, FS_POST),
     };
   }
@@ -237,6 +288,7 @@ void main(){
     _prepStyle(st) {
       return {
         raw: st, oTop: hex(st.oceanTop), oBot: hex(st.oceanBot), shallow: hex(st.shallow), grid: hex(st.grid), tropic: hex(st.tropic),
+        sw: (st.swirl || ["#123a3a", "#1c6b5b", "#7a2b3f"]).map(hex),
         pal: st.land.map(hex), line: st.line, hl: hex(st.hl || "#e0492b"),
       };
     }
@@ -466,6 +518,7 @@ void main(){
       const m = this.marks;
       if (m.guess || m.answer || (this.pickEnabled && this.mouse)) this.fxDirty = true;
       if (m.highlight && now - m.t0 < 700) this.dirty = true;
+      if (this.sk.animated && this.fxOn !== false && !this.pointers.size) this.dirty = true;
       if (this.dirty) { this.dirty = false; this._drawGL(now); if (this.onView) this.onView(this.view); }
       if (this.fxDirty) { this.fxDirty = false; this._drawFx(now); }
     }
@@ -494,7 +547,7 @@ void main(){
 
       // 1) silueta de tierra a baja resolucion
       gl.bindFramebuffer(gl.FRAMEBUFFER, sil.fbo); gl.viewport(0, 0, silW, silH); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.useProgram(P.sil); this._u(P.sil, "u_center", v.cx, v.cy); this._u(P.sil, "u_scale", scale(silW)); this._u(P.sil, "u_res", silW, silH);
+      gl.useProgram(P.sil); this._u(P.sil, "u_off", 0, 0); this._u(P.sil, "u_center", v.cx, v.cy); this._u(P.sil, "u_scale", scale(silW)); this._u(P.sil, "u_res", silW, silH);
       gl.bindVertexArray(this.vaoFill); gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
 
       // 2) desenfoques (estrecho y ancho) en la GPU: ancho constante en pantalla
@@ -515,10 +568,21 @@ void main(){
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, bW.tex); gl.uniform1i(P.ocean.u.u_blurW, 1);
       this._u(P.ocean, "u_center", v.cx, v.cy); this._u(P.ocean, "u_scale", sc); this._u(P.ocean, "u_res", sw, sh); this._u(P.ocean, "u_dpr", dpr * this.rs);
       this._u(P.ocean, "u_oTop", ...ms.oTop); this._u(P.ocean, "u_oBot", ...ms.oBot); this._u(P.ocean, "u_shallow", ...ms.shallow); this._u(P.ocean, "u_grid", ...ms.grid); this._u(P.ocean, "u_tropic", ...ms.tropic);
-      this._u(P.ocean, "u_gp", gp.a, gp.b, gp.t, st.gridA); gl.drawArrays(gl.TRIANGLES, 0, 3);
+      this._u(P.ocean, "u_gp", gp.a, gp.b, gp.t, st.gridA);
+      this._u(P.ocean, "u_time", this.fxOn === false ? 0 : now / 1000); gl.uniform1i(P.ocean.u.u_style, st.style || 0);
+      this._u(P.ocean, "u_sw1", ...ms.sw[0]); this._u(P.ocean, "u_sw2", ...ms.sw[1]); this._u(P.ocean, "u_sw3", ...ms.sw[2]);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-      gl.useProgram(P.land); gl.bindVertexArray(this.vaoFill);
+      gl.bindVertexArray(this.vaoFill);
+      if (st.shadow) {                                               // sombra dura de "pegatina" bajo la tierra
+        gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.solid);
+        this._u(P.solid, "u_center", v.cx, v.cy); this._u(P.solid, "u_scale", sc); this._u(P.solid, "u_res", sw, sh);
+        this._u(P.solid, "u_off", st.shadow.off[0] * dpr * this.rs, st.shadow.off[1] * dpr * this.rs); this._u(P.solid, "u_col", ...st.shadow.col);
+        gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0); gl.disable(gl.BLEND);
+      }
+      gl.useProgram(P.land); this._u(P.land, "u_off", 0, 0);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.land.u.u_blurN, 0);
+      gl.uniform1i(P.land.u.u_style, st.style || 0); this._u(P.land, "u_dpr", dpr * this.rs);
       this._u(P.land, "u_center", v.cx, v.cy); this._u(P.land, "u_scale", sc); this._u(P.land, "u_res", sw, sh); this._u(P.land, "u_fx", st.ao, st.grain, 0, 0);
       const pal = new Float32Array(24); ms.pal.forEach((c, i) => pal.set(c, i * 3)); gl.uniform3fv(P.land.u.u_pal, pal);
       gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
@@ -527,7 +591,7 @@ void main(){
       const hl = this.marks.highlight && this.world.byName[this.marks.highlight];
       if (hl) {
         const k = Math.min(1, (now - this.marks.t0) / 500);
-        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.hatch);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.hatch); this._u(P.hatch, "u_off", 0, 0);
         this._u(P.hatch, "u_center", v.cx, v.cy); this._u(P.hatch, "u_scale", sc); this._u(P.hatch, "u_res", sw, sh); this._u(P.hatch, "u_col", ...ms.hl); this._u(P.hatch, "u_dpr", dpr * this.rs); this._u(P.hatch, "u_alpha", k);
         gl.drawElements(gl.TRIANGLES, hl.gl.n, gl.UNSIGNED_INT, hl.gl.i0 * 4);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -558,6 +622,7 @@ void main(){
       this._u(P.post, "u_res", this.cv.width, this.cv.height); this._u(P.post, "u_zc", zc[0] * dpr, (H - zc[1]) * dpr);
       const fxk = this.fxOn === false ? 0 : 1;
       this._u(P.post, "u_zv", this.zv * fxk); this._u(P.post, "u_pv", this.pv[0] * dpr * 0.06 * fxk, -this.pv[1] * dpr * 0.06 * fxk);
+      this._u(P.post, "u_crt", st.crt ? 1 : 0); this._u(P.post, "u_dpr", dpr);
       this._u(P.post, "u_vig", st.vignette); this._u(P.post, "u_grain", st.postGrain); this._u(P.post, "u_tint", ...st.tint); this._u(P.post, "u_time", now / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }

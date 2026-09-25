@@ -1,9 +1,9 @@
 /* Atlas IQ - service worker: funciona sin conexion (cache de la app) y se actualiza solo. */
-const CACHE = "atlas-iq-v0.3";
+const CACHE = "atlas-iq-v0.4";
 const CORE = [
-  "./", "index.html", "manifest.webmanifest", "css/style.css", "css/boot.css",
+  "./", "index.html", "manifest.webmanifest", "css/style.css", "css/boot.css", "css/skins.css",
   "js/vendor/topojson-client.min.js", "js/vendor/earcut.min.js", "data/world.js", "data/classic.js", "data/locations.js", "data/history.js", "data/campaigns.js",
-  "js/geo.js", "js/i18n.js", "js/logo.js", "js/support.js", "js/audio.js", "js/map2d.js", "js/map.js", "js/game.js",
+  "js/geo.js", "js/i18n.js", "js/logo.js", "js/support.js", "js/audio.js", "js/map2d.js", "js/map.js", "js/skins.js", "js/game.js",
   "assets/icon-192.png", "assets/icon-512.png",
 ];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });

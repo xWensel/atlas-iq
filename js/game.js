@@ -7,21 +7,21 @@
   const S = {
     mode: "classic", campId: null, camp: null, level: 0, qs: [], qi: 0, levelScore: 0, runTotal: 0, runMax: 0, completed: 0, streak: 0,
     phase: "title", limit: 10, t0: 0, pausedAcc: 0, pauseAt: 0, paused: false, lastTick: -1, tense: false, startLevel: 0, prog: {},
-    quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, fsGate: true, booting: true,
+    quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, fsGate: true, booting: true, skin: "expedicion",
   };
   const prog = id => (S.prog[id] = S.prog[id] || { unlocked: 1, best: 0, bestIq: 0 });
   function load() {
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || "{}");
       A.lang = d.lang && A.STR[d.lang] ? d.lang : A.detectLang();
-      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false;
+      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false; S.skin = A.SKINS[d.skin] ? d.skin : "expedicion";
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
     } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate, skin: S.skin })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
@@ -33,7 +33,7 @@
   load();
   const world = A.geo.buildWorld();
   const map = A.createMap($("map"), world, onPick);
-  map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce;
+  map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
   map.animateTo(map.home(), 0);
 
@@ -173,7 +173,7 @@
       b.className = L.code === A.lang ? "on" : ""; b.onclick = e => { e.stopPropagation(); onPick(L.code); }; host.appendChild(b);
     });
   }
-  function refreshLangUIs() { for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
+  function refreshLangUIs() { if ($("skinGrid")) skinChips($("skinGrid")); for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
   function setLang(code) {
     if (code === A.lang || !A.STR[code]) return;
     A.lang = code; save(); A.sfx.ui(); applyLang(); refreshLangUIs();
@@ -181,6 +181,25 @@
     else if (S.phase === "reveal") { const o = q(); $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}` : A.tx(o.fact); }
     if (S.camp) updateHud();
   }
+  /* ---- skins ---- */
+  function skinChips(host) {
+    host.innerHTML = "";
+    A.SKIN_ORDER.forEach(id => {
+      const sk = A.SKINS[id], b = document.createElement("button"); b.type = "button"; b.dataset.skin = id; b.className = "skin-btn" + (id === S.skin ? " on" : "");
+      b.innerHTML = `<span class="sk-sw">${sk.swatch.map(c => `<i style="background:${c}"></i>`).join("")}</span><span>${A.tx(sk.name)}</span>`;
+      b.onclick = e => { e.stopPropagation(); setSkin(id); }; host.appendChild(b);
+    });
+  }
+  function setSkin(id) {
+    if (id === S.skin || !A.SKINS[id]) return;
+    S.skin = id; save(); A.applySkin(id, map); A.sfx.card();
+    const f = $("skinFlash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
+    if (S.phase === "title" && !S.booting) renderMenu(); else if (S.camp) { updateHud(); if (S.phase === "asking") setPrompt(); }
+    refreshSkinUI();
+  }
+  function refreshSkinUI() { const h = $("skinGrid"); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.skin === S.skin)); }
+  const cycleSkin = () => setSkin(A.SKIN_ORDER[(A.SKIN_ORDER.indexOf(S.skin) + 1) % A.SKIN_ORDER.length]);
+  skinChips($("skinGrid"));
   langChips($("langGrid"), setLang); langChips($("langPopGrid"), code => { setLang(code); $("langPop").classList.add("hidden"); });
   function openLangPop(anchor) {
     const pop = $("langPop"); if (!pop.classList.contains("hidden")) { pop.classList.add("hidden"); return; }
@@ -263,6 +282,7 @@
     dialog(`<div class="menu-in">
       <div class="menu-top"><svg class="menu-rose"><use href="#rose"/></svg>
         <div class="menu-tools">
+          <button class="menu-gear" id="menuSkin" aria-label="${A.t("tip.skin")}" data-tip="tip.skin"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c1.4 0 2-.9 2-1.8 0-1.3-1-1.7-1-2.7 0-1 .8-1.5 2-1.5h2.5A3.5 3.5 0 0021 11.5C21 6.8 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10" cy="7" r="1.1"/><circle cx="14.5" cy="7" r="1.1"/></svg></button>
           <button class="menu-gear txt" id="menuLang" aria-label="${A.t("tip.lang")}" data-tip="tip.lang">${A.lang.toUpperCase()}</button>
           <button class="menu-gear" id="menuFs" aria-label="${A.t("tip.fs")}" data-tip="tip.fs" data-key="F"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
           <button class="menu-gear" id="menuGear" aria-label="${A.t("tip.set")}" data-tip="tip.set"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
@@ -285,7 +305,7 @@
     document.querySelectorAll(".lv").forEach(b => (b.onclick = () => { S.startLevel = +b.dataset.lv; renderMenu(); }));
     $("goBtn").onclick = () => { A.sfx.depart(); newRun(); };
     $("menuGear").onclick = () => openSettings(!S.settingsOpen);
-    $("menuLang").onclick = e => openLangPop(e.currentTarget); $("menuFs").onclick = toggleFs;
+    $("menuSkin").onclick = cycleSkin; $("menuLang").onclick = e => openLangPop(e.currentTarget); $("menuFs").onclick = toggleFs;
     requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => map.drawThumb(b.querySelector("canvas"), camps[i].home)));
     // la brujula del boton sigue al cursor
     const go = $("goBtn");
@@ -351,8 +371,10 @@
     const sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
     const ratio = sc.dist / sc.distMax;
     S.streak = guess && ratio >= 0.6 ? S.streak + 1 : 0;
-    const bonus = S.camp.mode === "extended" && S.streak >= 2 ? Math.round((sc.dist + sc.time) * 0.05 * (Math.min(S.streak, 6) - 1)) : 0;
-    const total = sc.dist + sc.time + bonus;
+    /* FICHAS x MULT (solo modo Extendido; el Clasico mantiene la puntuacion exacta del original) */
+    const chips = sc.dist + sc.time;
+    const mult = S.camp.mode === "extended" && S.streak >= 2 ? Math.min(2, 1 + 0.2 * (S.streak - 1)) : 1;
+    const total = Math.round(chips * mult), bonus = total - chips;
     S.levelScore += total; S.runMax += L.maxPerQ;
 
     const label = o.clue ? A.tx(o.answer) : A.tx(o.name);
@@ -365,7 +387,7 @@
     const tier = !guess ? 5 : isC && km === 0 ? 4 : ratio >= 0.96 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.4 ? 2 : ratio >= 0.05 ? 1 : 0;
     const title = !guess ? A.t("res.timeout") : isC && km === 0 ? A.t("res.inside") : A.t(["res.t5", "res.t4", "res.t3", "res.t2", "res.t1"][tier]);
     setTimeout(() => A.sfx.reveal(tier), 480);
-    if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); }, 1500); else setStreak();
+    if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
 
     const last = S.qi === S.qs.length - 1;
     const place = o.answer ? A.tx(o.answer) : A.tx(o.name) + (A.tx(o.sub) ? ", " + A.tx(o.sub) : "");
@@ -381,8 +403,8 @@
       <dl class="tk-rows">
         <div style="--i:0"><dt>${A.t("res.dist")}</dt><i></i><dd>+${A.fmt(sc.dist)}</dd></div>
         <div style="--i:1"><dt>${A.t("res.speed")}</dt><i></i><dd>+${A.fmt(sc.time)}</dd></div>
-        ${bonus ? `<div class="bonus" style="--i:2"><dt>${A.t("res.streak")} ×${S.streak}</dt><i></i><dd>+${A.fmt(bonus)}</dd></div>` : ""}
       </dl>
+      ${mult > 1 ? `<div class="tk-mult"><div class="c"><span>${A.t("res.chips")}</span><b>${A.fmt(chips)}</b></div><i>×</i><div class="m"><span>${A.t("res.mult")} · ${A.t("res.streak")} ${S.streak}</span><b>${mult.toFixed(1)}</b></div></div>` : ""}
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
       <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">→</span> <kbd>↵</kbd></button>
     </div>`, "side");
