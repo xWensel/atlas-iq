@@ -1,5 +1,10 @@
 # Atlas IQ
 
+**v0.2** – rendimiento y rediseño de interfaz:
+- Mapa reescrito para 144 fps: el mundo se dibuja una vez en texturas (antes ~700 ms por frame), capa vectorial nítida al parar la cámara con mucho zoom y resolución dinámica si los frames se alargan.
+- Interfaz nueva: esquinas cortadas, odómetros mecánicos, botón de salida con brújula que sigue al cursor, miniaturas de cada región, páginas de veredicto a pantalla completa, tooltips propios.
+- Ajustes con faders (general / música / efectos), palancas de silencio, idioma y modo de gráficos (Auto / Alto / Ahorro).
+
 Juego de geografía: haz clic lo más cerca posible del lugar que te piden, cuanto más rápido mejor.
 Sin dependencias ni servidor: abre `index.html` (o `JUGAR.bat`). ES/EN.
 
@@ -15,7 +20,7 @@ Sin dependencias ni servidor: abre `index.html` (o `JUGAR.bat`). ES/EN.
 
 ## Estructura
 - `index.html`, `css/style.css` – interfaz (cuaderno de expedición: papel, tinta, sellos)
-- `js/game.js` – niveles, campañas, pantallas · `js/map.js` – mapa vectorial (zoom, cursor de precisión, chinchetas)
+- `js/game.js` – niveles, campañas, pantallas, ajustes · `js/map.js` – mapa: texturas, capa nítida, resalte y efectos en capas separadas
 - `js/audio.js` – identidad sonora sintetizada (motivo de tres notas, música generativa, sonidos por resultado)
 - `js/geo.js`, `js/support.js` – geografía, textos, IQ e insignia
 - `data/campaigns.js` – une los modos · `data/locations.js`, `data/history.js` – **aquí se añaden preguntas propias**

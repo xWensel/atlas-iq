@@ -27,44 +27,70 @@
   <div class="vignette"></div>
 
   <header id="hud">
-    <div class="brand">
+    <div class="sh brand-sh"><div class="cut ink brand">
       <svg class="brand-rose"><use href="#rose"/></svg>
       <div class="brand-txt"><b>Atlas</b><i>IQ</i></div>
-    </div>
+    </div></div>
 
-    <section id="plate" class="paper hidden">
+    <div class="sh plate-sh"><section id="plate" class="cut paper hidden">
       <div class="plate-top"><span id="askNo"></span><span id="askKind" class="tag"></span></div>
       <h2 id="askName"></h2>
       <p id="askSub"></p>
       <div class="clock"><div class="ruler"><i id="timeFill"></i></div><b id="timeTxt">10.0</b></div>
       <div id="pips"></div>
-    </section>
+    </section></div>
 
-    <section class="ledger paper" id="ledger">
+    <div class="sh ledger-sh" id="ledgerSh"><section class="cut paper ledger" id="ledger">
       <div class="lg-label" data-i="score.level"></div>
-      <div class="lg-num" id="scLevel">0</div>
+      <div class="lg-num odo" id="scLevel">0</div>
       <div class="gauge"><i id="scBar"></i><em id="scMark"></em></div>
       <div class="lg-row"><span><span data-i="score.need"></span> <b id="scNeed">0</b></span><span><span data-i="score.total"></span> <b id="scTotal">0</b></span></div>
       <div id="streakChip" class="hidden"></div>
-    </section>
+    </section></div>
   </header>
 
-  <nav id="dock">
-    <button id="zoomIn" data-tip="tip.in" aria-label="Acercar"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button id="zoomOut" data-tip="tip.out" aria-label="Alejar"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
-    <button id="zoomHome" data-tip="tip.home" aria-label="Vista inicial"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg></button>
-    <span class="sep"></span>
-    <button id="pauseBtn" class="hidden" data-tip="tip.pause" aria-label="Pausa"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
-    <button id="sndBtn" data-tip="tip.snd" aria-label="Efectos"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10z"/><path class="wave" d="M16.5 9a4 4 0 010 6M19 6.5a8 8 0 010 11"/><path class="cut" d="M4 4l16 16"/></svg></button>
-    <button id="musBtn" data-tip="tip.mus" aria-label="Música"><svg viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/><path class="cut" d="M4 4l16 16"/></svg></button>
-    <button id="fsBtn" data-tip="tip.fs" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-    <button id="langBtn" class="txt" data-tip="tip.lang" aria-label="Idioma">ES</button>
-  </nav>
+  <!-- carril de zoom -->
+  <div class="sh rail-sh" id="railSh"><aside id="rail" class="cut ink">
+    <button id="zoomIn" data-tip="tip.in" data-key="+" aria-label="Acercar"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></button>
+    <div class="zscale" aria-hidden="true"><i id="zoomFill"></i></div>
+    <button id="zoomOut" data-tip="tip.out" data-key="−" aria-label="Alejar"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></button>
+    <button id="zoomHome" data-tip="tip.home" data-key="0" aria-label="Vista inicial"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/></svg></button>
+  </aside></div>
 
-  <footer id="note" class="paper">
+  <!-- dock inferior -->
+  <div class="sh dock-sh" id="dockSh"><nav id="dock" class="cut ink">
+    <button id="setBtn" data-tip="tip.set" aria-label="Ajustes" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+    <button id="pauseBtn" class="hidden" data-tip="tip.pause" data-key="P" aria-label="Pausa"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
+    <button id="fsBtn" data-tip="tip.fs" data-key="F" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  </nav></div>
+
+  <!-- nota de campo (curiosidad) -->
+  <div class="sh note-sh" id="noteSh"><footer id="note" class="cut paper">
     <span id="lvlText"></span>
     <p id="factText"></p>
-  </footer>
+  </footer></div>
+
+  <!-- panel de ajustes -->
+  <div class="sh set-sh hidden" id="setSh"><section id="settings" class="cut ink" role="dialog" aria-label="Ajustes">
+    <div class="set-head"><span data-i="set.title"></span><button id="setClose" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+
+    <div class="set-sec"><h3 data-i="set.sound"></h3>
+      <div class="fader" data-k="master"><label data-i="vol.master"></label><output>85</output><input type="range" min="0" max="100" value="85" aria-label="Volumen general"><div class="ftrack"></div></div>
+      <div class="fader" data-k="music"><label data-i="vol.music"></label><button class="sw" data-sw="music" role="switch" aria-checked="true" aria-label="Música"><i></i></button><output>70</output><input type="range" min="0" max="100" value="70" aria-label="Volumen de la música"><div class="ftrack"></div></div>
+      <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
+    </div>
+
+    <div class="set-sec"><h3 data-i="set.lang"></h3>
+      <div class="seg" data-seg="lang"><button data-v="es">Español</button><button data-v="en">English</button><i></i></div>
+    </div>
+    <div class="set-sec"><h3 data-i="set.gfx"></h3>
+      <div class="seg s3" data-seg="gfx"><button data-v="auto" data-i="gfx.auto"></button><button data-v="high" data-i="gfx.high"></button><button data-v="saver" data-i="gfx.saver"></button><i></i></div>
+      <p class="set-note" data-i="set.gfx.d"></p>
+    </div>
+    <div class="set-keys"><span><kbd>F</kbd> <em data-i="key.fs"></em></span><span><kbd>P</kbd> <em data-i="key.pause"></em></span><span><kbd>M</kbd> <em data-i="key.sfx"></em></span><span><kbd>N</kbd> <em data-i="key.mus"></em></span></div>
+  </section></div>
+
+  <div id="tip" class="hidden"></div>
 
   <div id="layer" class="hidden"><section id="dlg"></section></div>
   <div id="intro" class="hidden"></div>

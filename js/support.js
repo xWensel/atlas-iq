@@ -31,8 +31,16 @@ window.AIQ = window.AIQ || {};
       "lc.p": "{s} pts. Necesitabas {a}.", "lf.p": "Necesitabas {a} pts y conseguiste {s}.", "win.p": "Completaste todos los niveles con {s} pts.",
       "iq.label": "Tu Atlas IQ", "pts": "pts", "km": "km",
       "pause.h": "En pausa", "pause.p": "El mapa se oculta mientras dura la pausa.",
-      "tip.in": "Acercar (+)", "tip.out": "Alejar (−)", "tip.home": "Vista inicial (0)", "tip.fs": "Pantalla completa (F)",
-      "tip.snd": "Efectos (M)", "tip.mus": "Música (N)", "tip.pause": "Pausa (P)", "tip.lang": "Idioma",
+      "tip.in": "Acercar", "tip.out": "Alejar", "tip.home": "Vista inicial", "tip.fs": "Pantalla completa",
+      "tip.snd": "Efectos", "tip.mus": "Música", "tip.pause": "Pausa", "tip.lang": "Idioma", "tip.set": "Ajustes",
+      "set.title": "Ajustes", "set.sound": "Sonido", "set.lang": "Idioma", "set.gfx": "Gráficos",
+      "vol.master": "General", "vol.music": "Música", "vol.sfx": "Efectos",
+      "gfx.auto": "Auto", "gfx.high": "Alto", "gfx.saver": "Ahorro",
+      "set.gfx.d": "Auto baja el detalle solo al mover el mapa si tu equipo va justo. Ahorro reduce siempre la resolución.",
+      "key.fs": "Pantalla completa", "key.pause": "Pausa", "key.sfx": "Efectos", "key.mus": "Música",
+      "go.label": "Empezar expedición", "go.sub": "Nivel {n} · {name}",
+      "v.ok": "Nivel superado", "v.no": "Casi lo logras", "v.win": "Expedición completada",
+      "v.points": "Puntos", "v.goal": "Meta", "v.total": "Total", "v.iq": "IQ", "v.level": "Nivel {n}",
       "tier.0": "Turista despistado", "tier.1": "Viajero novato", "tier.2": "Mochilero", "tier.3": "Explorador",
       "tier.4": "Navegante", "tier.5": "Trotamundos", "tier.6": "Cartógrafo", "tier.7": "Leyenda",
     },
@@ -65,13 +73,21 @@ window.AIQ = window.AIQ || {};
       "lc.p": "{s} pts. You needed {a}.", "lf.p": "You needed {a} pts and scored {s}.", "win.p": "You cleared every level with {s} pts.",
       "iq.label": "Your Atlas IQ", "pts": "pts", "km": "km",
       "pause.h": "Paused", "pause.p": "The map is hidden while the game is paused.",
-      "tip.in": "Zoom in (+)", "tip.out": "Zoom out (−)", "tip.home": "Home view (0)", "tip.fs": "Fullscreen (F)",
-      "tip.snd": "Effects (M)", "tip.mus": "Music (N)", "tip.pause": "Pause (P)", "tip.lang": "Language",
+      "tip.in": "Zoom in", "tip.out": "Zoom out", "tip.home": "Home view", "tip.fs": "Fullscreen",
+      "tip.snd": "Effects", "tip.mus": "Music", "tip.pause": "Pause", "tip.lang": "Language", "tip.set": "Settings",
+      "set.title": "Settings", "set.sound": "Sound", "set.lang": "Language", "set.gfx": "Graphics",
+      "vol.master": "Master", "vol.music": "Music", "vol.sfx": "Effects",
+      "gfx.auto": "Auto", "gfx.high": "High", "gfx.saver": "Saver",
+      "set.gfx.d": "Auto lowers detail only while moving the map if your device struggles. Saver always reduces resolution.",
+      "key.fs": "Fullscreen", "key.pause": "Pause", "key.sfx": "Effects", "key.mus": "Music",
+      "go.label": "Start expedition", "go.sub": "Level {n} · {name}",
+      "v.ok": "Level cleared", "v.no": "So close", "v.win": "Expedition complete",
+      "v.points": "Points", "v.goal": "Goal", "v.total": "Total", "v.iq": "IQ", "v.level": "Level {n}",
       "tier.0": "Lost Tourist", "tier.1": "Rookie Traveler", "tier.2": "Backpacker", "tier.3": "Explorer",
       "tier.4": "Navigator", "tier.5": "Globetrotter", "tier.6": "Cartographer", "tier.7": "Legend",
     },
   };
-  A.VERSION = "0.1";
+  A.VERSION = "0.2";
   A.lang = "es";
   A.t = (key, p) => {
     let s = (STR[A.lang] && STR[A.lang][key]) || STR.en[key] || key;

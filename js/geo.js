@@ -130,8 +130,12 @@ window.AIQ = window.AIQ || {};
         return { rings, bbox: [x0, y0, x1, y1] };
       });
       const name = ft.properties.name;
+      // caja del pais en coordenadas proyectadas (para recortar lo que no se ve)
+      let bx0 = 1e9, by0 = 1e9, bx1 = -1e9, by1 = -1e9;
+      for (const p of polys) { bx0 = Math.min(bx0, p.bbox[0]); bx1 = Math.max(bx1, p.bbox[2]); by0 = Math.min(by0, p.bbox[1]); by1 = Math.max(by1, p.bbox[3]); }
+      const [px0, py0] = project(bx0, Math.max(-90, by0)), [px1, py1] = project(bx1, Math.min(90, by1));
       return {
-        name, polys, path,
+        name, polys, path, px0, px1, py0, py1, wrap: bx0 < -180 || bx1 > 180,
         color: name === "Antarctica" ? "#f4efe3" : PALETTE[colorIdx[i]],
       };
     });

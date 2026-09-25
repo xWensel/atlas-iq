@@ -14,7 +14,8 @@ window.AIQ = window.AIQ || {};
   const scaleNote = (i, base = 60) => base + 12 * Math.floor(i / 5) + PENTA[((i % 5) + 5) % 5];
 
   let ctx = null, master, sfxBus, musBus, musFilter, revIn;
-  A.audio = { sfxOn: true, musicOn: true };
+  A.audio = { sfxOn: true, musicOn: true, vol: { master: 0.85, music: 0.7, sfx: 0.9 } };
+  const MUS_BASE = 0.55;
 
   function impulse(seconds, decay) {
     const n = Math.floor(ctx.sampleRate * seconds), buf = ctx.createBuffer(2, n, ctx.sampleRate);
@@ -24,13 +25,13 @@ window.AIQ = window.AIQ || {};
   function init() {
     if (ctx) { if (ctx.state === "suspended") ctx.resume(); return true; }
     try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return false; }
-    master = ctx.createGain(); master.gain.value = 0.9;
+    master = ctx.createGain(); master.gain.value = A.audio.vol.master;
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -16; comp.knee.value = 20; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.25;
     master.connect(comp).connect(ctx.destination);
-    sfxBus = ctx.createGain(); sfxBus.connect(master);
+    sfxBus = ctx.createGain(); sfxBus.gain.value = A.audio.vol.sfx; sfxBus.connect(master);
     musFilter = ctx.createBiquadFilter(); musFilter.type = "lowpass"; musFilter.frequency.value = 16000;
-    musBus = ctx.createGain(); musBus.gain.value = 0.55; musBus.connect(musFilter).connect(master);
+    musBus = ctx.createGain(); musBus.gain.value = MUS_BASE * A.audio.vol.music; musBus.connect(musFilter).connect(master);
     const rv = ctx.createConvolver(); rv.buffer = impulse(1.9, 2.8);
     const rvOut = ctx.createGain(); rvOut.gain.value = 0.42;
     revIn = ctx.createGain(); revIn.connect(rv); rv.connect(rvOut).connect(master);
@@ -126,12 +127,21 @@ window.AIQ = window.AIQ || {};
     mode(m) { mode = m; },                                        // 0 menu · 1 juego · 2 tension
     duck(level = 0.3, ms = 1400) {
       if (!ctx || !timer) return;
-      const t = ctx.currentTime; musBus.gain.cancelScheduledValues(t);
-      musBus.gain.setTargetAtTime(0.55 * level, t, 0.05); musBus.gain.setTargetAtTime(0.55, t + ms / 1000, 0.4);
+      const base = MUS_BASE * A.audio.vol.music, t = ctx.currentTime; musBus.gain.cancelScheduledValues(t);
+      musBus.gain.setTargetAtTime(base * level, t, 0.05); musBus.gain.setTargetAtTime(base, t + ms / 1000, 0.4);
     },
     muffle(on) { if (ctx) musFilter.frequency.setTargetAtTime(on ? 320 : 16000, ctx.currentTime, 0.08); },
   };
   A.audio.state = () => (ctx ? ctx.state : 'none');
+  /* volumen 0..1 de "master" | "music" | "sfx" */
+  A.audio.setVol = (kind, v) => {
+    v = Math.max(0, Math.min(1, v)); A.audio.vol[kind] = v;
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    if (kind === "master") master.gain.setTargetAtTime(v, t, 0.03);
+    else if (kind === "music") { musBus.gain.cancelScheduledValues(t); musBus.gain.setTargetAtTime(MUS_BASE * v, t, 0.03); }
+    else sfxBus.gain.setTargetAtTime(v, t, 0.03);
+  };
   A.audio.unlock = () => { init(); if (A.audio.musicOn && !timer && ctx) A.music.start(); };
   A.audio.setMusic = on => { A.audio.musicOn = on; if (on) A.music.start(); else A.music.stop(); };
 
@@ -175,5 +185,11 @@ window.AIQ = window.AIQ || {};
       pad([48, 55, 60, 64, 67], t + 0.4, 4, 0.06); thump(t + 0.5, { vol: 0.3, f0: 100, f1: 36, dur: 0.5 }); A.music.duck(0.25, 4200);
     }),
     pause: go(t => pluck(60, t, { vol: 0.08, dur: 0.3, bright: 3 })),
+    /* feedback de sliders: el tono sube con el valor (0..1) */
+    blip: go((t, v) => pluck(scaleNote(Math.round(v * 9), 67), t, { vol: 0.09, dur: 0.16, bright: 3, rev: 0.15 })),
+    /* interruptores: clic seco de palanca */
+    flip: go((t, on) => { thump(t, { vol: 0.16, f0: on ? 260 : 190, f1: 80, dur: 0.06 }); pluck(on ? 84 : 72, t + 0.015, { vol: 0.06, dur: 0.1, bright: 3, rev: 0.05 }); }),
+    /* pulsar el boton de salida */
+    depart: go(t => { thump(t, { vol: 0.3, f0: 180, f1: 50, dur: 0.14 }); noise(t, 0.35, { lp: 300, sweepTo: 5000, vol: 0.08, type: "bandpass", q: 1.2 }); MOTIF.forEach((m, i) => pluck(m, t + 0.05 + i * 0.09, { vol: 0.15, dur: 0.9, rev: 0.6 })); }),
   };
 })(window.AIQ);
