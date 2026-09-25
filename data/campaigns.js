@@ -47,7 +47,7 @@ window.AIQ = window.AIQ || {};
             const clue = L.bonus && d.f;
             const sp = clue ? { name: d.n, sub: "" } : splitName(d.n);
             return {
-              t: "p", lat: d.lat, lon: d.lon,
+              t: "p", lat: d.lat, lon: d.lon, cid: [A.ckey(clue ? d.f : d.n)],
               name: { en: sp.name, es: sp.name }, sub: { en: sp.sub, es: sp.sub },
               clue: !!clue, answer: clue ? { en: d.f, es: d.f } : null,
               fact: { en: clue ? "" : d.f, es: clue ? "" : d.f },
@@ -68,7 +68,7 @@ window.AIQ = window.AIQ || {};
       return { dist, time, distMax: 1000, timeMax: 400 };
     },
     questions: () => shuffle(L.pool).slice(0, 5).map(o => ({
-      t: o.t, lat: o.lat, lon: o.lon, key: o.key, name: o.n, sub: o.c, clue: false, answer: null, fact: o.f,
+      t: o.t, lat: o.lat, lon: o.lon, key: o.key, name: o.n, sub: o.c, clue: false, answer: null, fact: o.f, cid: [o.t === "c" ? "c:" + o.key : A.ckey(o.n.en)],
     })),
   }));
 
@@ -82,7 +82,7 @@ window.AIQ = window.AIQ || {};
     questions: () => shuffle(L.pool).slice(0, 5).map(a => {
       const clue = L.kind === "clue";
       return {
-        t: "p", lat: a[4], lon: a[5], clue,
+        t: "p", lat: a[4], lon: a[5], clue, cid: clue ? [A.ckey(a[2])] : [A.ckey(a[0]), A.ckey(a[2])],
         name: { en: a[0], es: a[1] }, sub: { en: "", es: "" },
         answer: { en: a[2], es: a[3] }, fact: { en: a[6], es: a[7] },
       };

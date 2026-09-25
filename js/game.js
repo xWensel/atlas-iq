@@ -33,6 +33,7 @@
   load();
   const world = A.geo.buildWorld();
   const map = A.createMap($("map"), world, onPick);
+  A.codex.init(world, map);
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
   map.animateTo(map.home(), 0);
@@ -180,6 +181,7 @@
     if (S.phase === "title" && !S.booting) renderMenu();
     else if (S.phase === "reveal") { const o = q(); $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}` : A.tx(o.fact); }
     if (S.camp) updateHud();
+    A.codex.refresh();
   }
   /* ---- skins ---- */
   function skinChips(host) {
@@ -239,7 +241,7 @@
   /* sonido suave al pasar por controles */
   let lastHover = null;
   document.addEventListener("mouseover", e => {
-    const el = e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear");
+    const el = e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear, .cx-strip");
     if (el && el !== lastHover) A.sfx.hover(); lastHover = el;
   });
 
@@ -282,6 +284,7 @@
     dialog(`<div class="menu-in">
       <div class="menu-top"><svg class="menu-rose"><use href="#rose"/></svg>
         <div class="menu-tools">
+          <button class="menu-gear" id="menuCodex" aria-label="${A.t("tip.codex")}" data-tip="tip.codex" data-key="C"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h11"/></svg></button>
           <button class="menu-gear" id="menuSkin" aria-label="${A.t("tip.skin")}" data-tip="tip.skin"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c1.4 0 2-.9 2-1.8 0-1.3-1-1.7-1-2.7 0-1 .8-1.5 2-1.5h2.5A3.5 3.5 0 0021 11.5C21 6.8 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10" cy="7" r="1.1"/><circle cx="14.5" cy="7" r="1.1"/></svg></button>
           <button class="menu-gear txt" id="menuLang" aria-label="${A.t("tip.lang")}" data-tip="tip.lang">${A.lang.toUpperCase()}</button>
           <button class="menu-gear" id="menuFs" aria-label="${A.t("tip.fs")}" data-tip="tip.fs" data-key="F"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
@@ -293,6 +296,7 @@
       <div class="seg" data-seg="mode"><button data-v="classic">${A.t("mode.classic")}</button><button data-v="extended">${A.t("mode.extended")}</button><i></i></div>
       <p class="mode-d">${A.t("mode." + S.mode + ".d")}${S.mode === "classic" && A.t("mode.classic.note") ? `<small>${A.t("mode.classic.note")}</small>` : ""}</p>
       <div class="camps">${list}</div>${picker}
+      <button class="cut cx-strip" id="codexBtn" type="button"><span class="cx-strip-ic"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h11"/></svg></span><span class="cx-strip-t"><b>${A.t("codex.title")}</b><i>${A.t("codex.teaser")}</i></span><span class="cx-strip-n">${A.codexStats().u}<em>/${A.codexStats().t}</em></span></button>
       <button class="cut go" id="goBtn" data-primary>
         <span class="go-dial"><svg><use href="#rose"/></svg></span>
         <span class="go-txt"><b>${A.t("go.label")}</b><i>${A.t("go.sub", { n: S.startLevel + 1, name: A.tx(cur.title) })}</i></span>
@@ -304,7 +308,7 @@
     document.querySelectorAll(".camp").forEach(b => (b.onclick = () => { S.campId = b.dataset.id; S.startLevel = 0; save(); renderMenu(); }));
     document.querySelectorAll(".lv").forEach(b => (b.onclick = () => { S.startLevel = +b.dataset.lv; renderMenu(); }));
     $("goBtn").onclick = () => { A.sfx.depart(); newRun(); };
-    $("menuGear").onclick = () => openSettings(!S.settingsOpen);
+    $("menuGear").onclick = () => openSettings(!S.settingsOpen); $("codexBtn").onclick = $("menuCodex").onclick = () => A.codex.open();
     $("menuSkin").onclick = cycleSkin; $("menuLang").onclick = e => openLangPop(e.currentTarget); $("menuFs").onclick = toggleFs;
     requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => map.drawThumb(b.querySelector("canvas"), camps[i].home)));
     // la brujula del boton sigue al cursor
@@ -387,6 +391,7 @@
     const tier = !guess ? 5 : isC && km === 0 ? 4 : ratio >= 0.96 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.4 ? 2 : ratio >= 0.05 ? 1 : 0;
     const title = !guess ? A.t("res.timeout") : isC && km === 0 ? A.t("res.inside") : A.t(["res.t5", "res.t4", "res.t3", "res.t2", "res.t1"][tier]);
     setTimeout(() => A.sfx.reveal(tier), 480);
+    if (guess) A.codexUnlock(o, tier);
     if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
 
     const last = S.qi === S.qs.length - 1;
@@ -529,6 +534,7 @@
     const k = e.key.toLowerCase();
     if (k === "escape") openSettings(false);
     else if (k === "f") toggleFs();
+    else if (k === "c" && S.phase === "title") (A.codex.isOpen() ? A.codex.close() : A.codex.open());
     else if (k === "m") toggleSwitch("sfx");
     else if (k === "n") toggleSwitch("music");
     else if (k === "p") togglePause();

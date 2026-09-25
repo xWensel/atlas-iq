@@ -1,5 +1,10 @@
 # Atlas IQ
 
+**v0.5** – **Enciclopedia geografica** (tecla `C` en el menu):
+- ~970 tarjetas coleccionables: ciudades, capitales, paises, monumentos, naturaleza, mares, estrechos, batallas, sucesos, **personajes** y **curiosidades**. Empiezan bloqueadas.
+- Se desbloquean acertando. Un acierto abre la tarjeta del lugar y su pais; con un acierto muy bueno (>=75 %) tambien se abren personajes, sucesos y curiosidades relacionados (p. ej. Paris -> Napoleon, Revolucion francesa, baguette).
+- Foto en alta definicion, descripcion e historia de Wikipedia/Wikimedia Commons en tu idioma (con atribucion CC), guardadas en IndexedDB para verlas sin conexion. Rarezas con brillo holografico, filtros, busqueda, mini-mapa y tarjetas relacionadas.
+
 **v0.4** – 4 skins que cambian TODO (mapa por shader, paleta, formas, tipografia y sonido):
 - **Expedicion** (papel y tinta) · **Casino** (mesa de cartas, remolino animado, monitor CRT, tipografia pixel, estilo "Balatro") · **Plano** (cianotipo con letra de delineante) · **Riso** (poster serigrafiado con desregistro de tinta y bordes recortados a mano).
 - Modo Extendido con **FICHAS x MULT**: las rachas multiplican la puntuacion, con animacion y sacudida de pantalla. El modo Clasico conserva la puntuacion exacta del original.
