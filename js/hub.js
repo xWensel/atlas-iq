@@ -26,7 +26,7 @@ window.AIQ = window.AIQ || {};
   function home() {
     const c = C(), P = A.profile.get(), adv = P.adv, today = A.rank.boards.daily(), done = P.daily[today];
     const saved = A.adv.hasSave();
-    const card = (id, cls, title, desc, meta, badge) => `<button class="cut mode-card ${cls}" data-mode="${id}">${cls === "hero" ? `<span class="mc-art">${A.pic("hub_hero", "", "act_0")}</span>` : ""}<span class="mc-ic">${A.icon(ICO[id])}</span><span class="mc-body"><span class="mc-t">${title}${badge ? `<em>${badge}</em>` : ""}</span><span class="mc-d">${desc}</span><span class="mc-m">${meta}</span></span><span class="mc-ar">${A.icon("u_next", "sm")}</span></button>`;
+    const card = (id, cls, title, desc, meta, badge) => `<button class="cut mode-card ${cls}" data-mode="${id}">${cls === "hero" ? `<i class="marq"></i><span class="mc-art">${A.pic("hub_hero", "", "act_0")}</span>` : ""}<span class="mc-ic">${A.icon(ICO[id])}</span><span class="mc-body"><span class="mc-t">${title}${badge ? `<em>${badge}</em>` : ""}</span><span class="mc-d">${desc}</span><span class="mc-m">${meta}</span></span><span class="mc-ar">${A.icon("u_next", "sm")}</span></button>`;
     c.dialog(shell(`
       <h1>Atlas<em>IQ</em></h1><p class="tagline">${A.t("title.tag")}</p>
       <div class="modes">

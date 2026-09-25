@@ -1,5 +1,12 @@
 # Atlas IQ
 
+**v0.8** – Casino x Geografia (la mezcla fiel):
+- **Fichas-globo:** el doblon es una ficha de casino con un globo grabado; fichas de colores, pilas y "ciegas" (blinds) para cada ronda y jefe que caen y giran al empezar.
+- **Palos geograficos:** chincheta, rosa de los vientos, cumbre y palmera en lugar de corazones/picas/rombos/treboles. Las reliquias son cartas de poker (el numero de la carta es su precio) y las herramientas forman la mano en abanico, como en Balatro.
+- **Fieltro impreso como mapa** (meridianos y paralelos), luces de marquesina, dados, ruleta-globo, tragaperras con monumentos y comodin cartografo.
+- **Enciclopedia:** cada tarjeta lleva indice de carta (5, 8, K, A por rareza) y palo geografico segun su tipo.
+- Ilustraciones regeneradas con Pollinations fusionando casino y geografia (`tools/gen-art.mjs`).
+
 **v0.7** – Arte propio en todas partes, ilustraciones generadas y 6 idiomas:
 - **Ilustraciones vectoriales** (`js/art.js`): escenas de jefes, actos, campamento, cofre, victoria y derrota, mas gemas de rareza, continentes, medallas, iconos de rango IQ e insignias de logros.
 - **Ilustraciones generadas** con Pollinations (`tools/gen-art.mjs`, solo desarrollo): 26 imagenes en `assets/gen/` (jefes, actos, campamento, hub y una ilustracion de respaldo por tipo de tarjeta). Se muestran encima de la version vectorial si existen. La clave va en `.env.local` (ignorado por git/Vercel), nunca en el juego. `node tools/gen-art.mjs` genera lo que falte.

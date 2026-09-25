@@ -22,7 +22,6 @@ window.AIQ = window.AIQ || {};
   const I = {};
 
   /* ============================== moneda, provision, calavera, candado ============================== */
-  I.coin = c(24, 24, 18, "g") + c(24, 24, 12.5, "y", 1.8) + q("M24 14l2.6 7.4L34 24l-7.4 2.6L24 34l-2.6-7.4L14 24l7.4-2.6Z", "G") + l("M24 14l2.6 7.4L34 24l-7.4 2.6L24 34l-2.6-7.4L14 24l7.4-2.6Z", "k", 1.4) + h("M9 20a16 16 0 0 1 8-9");
   I.heart = p("M24 41C8 30 5 20 8 14c3-6 12-6 16 0 4-6 13-6 16 0 3 6 0 16-16 27Z", "r") + q("M9 15c2-4 7-4 10-1-4-1-7 1-8 5Z", "#ff9d94") + l("M14 22l3 3M20 27l3 3M28 27l-3 3", "R", 1.8) + h("M12 16c1-3 4-4 7-2");
   I.skull = p("M10 22C10 11 17 6 24 6s14 5 14 16c0 5-2 8-5 10v6H15v-6c-3-2-5-5-5-10Z", "w") + c(17, 22, 4.6, "k", 0) + c(31, 22, 4.6, "k", 0) + q("M24 26l-3 6h6Z", "k") + l("M20 40v-5M24 40v-5M28 40v-5", "k", 1.8) + h("M13 16c1-4 4-7 8-8");
   I.lock = p("M13 22h22v18H13Z", "g") + l("M17 22v-6a7 7 0 0 1 14 0v6", "k", 3.6) + l("M17 22v-6a7 7 0 0 1 14 0v6", "s", 1.4) + c(24, 30, 3.2, "k", 0) + q("M23 31h2l1 6h-4Z", "k") + h("M16 25v10");
@@ -124,6 +123,35 @@ window.AIQ = window.AIQ || {};
   I.a_spark = star(24, 24, 20, 5, "y", 4, 0) + star(24, 24, 12, 4, "w", 4, 45);
   I.a_night = I.a_moon;
 
+  /* ============================== CASINO x GEOGRAFIA: fichas-globo, palos geograficos, dados, comodin, tragaperras ============================== */
+  const notches = (f = "#fff8e0", n = 8) => { let o = ""; for (let i = 0; i < n; i++) o += `<rect x="21" y="3.6" width="6" height="8.4" rx="1.4" fill="${f}" stroke="${K}" stroke-width="1.6" transform="rotate(${(360 / n) * i} 24 24)"/>`; return o; };
+  /* mini globo en el centro de la ficha */
+  const globeMini = (x, y, r) => `<g transform="translate(${x - r} ${y - r}) scale(${r / 24})">${c(24, 24, 22, "b", 3)}${q("M10 16c4-5 9-4 10 0s-3 5-2 9-6 5-8 1-3-6 0-10ZM27 24c4-2 8 1 8 5s-5 6-8 3-2-6 0-8Z", "l")}${l("M24 2v44M4 24h40M9 12q15 6 30 0M9 36q15-6 30 0", "k", 1.6, 'opacity=".45"')}${c(24, 24, 22, "none", 3)}</g>`;
+  const chip = (main, ring) => c(24, 24, 21, main) + notches() + c(24, 24, 13.6, ring, 2) + globeMini(24, 24, 10.4) + h("M8 19a17 17 0 0 1 8-10");
+  I.coin = chip("g", "y");
+  I.chip_r = chip("r", "#ff8f86"); I.chip_b = chip("B", "b"); I.chip_g = chip("T", "t"); I.chip_k = chip("#2b2340", "#5a4b7a"); I.chip_p = chip("P", "p");
+  I.chips = e(30, 36, 13, 6, "r") + p("M17 36v5a13 6 0 0 0 26 0v-5", "R") + l("M17 39a13 6 0 0 0 26 0", "w", 1.8) + e(30, 36, 13, 6, "r") + globeMini(30, 36, 4.2) + p("M4 26v6a13 6 0 0 0 26 0v-6", "B") + l("M4 29a13 6 0 0 0 26 0", "w", 1.8) + e(17, 26, 13, 6, "b") + globeMini(17, 26, 4.4) + h("M8 24q4-3 8-2");
+  const ink = "#3a2f5e";
+  /* palos geograficos: chincheta (rojo), rosa de los vientos (rojo), cumbre (oscuro), palmera (oscuro) */
+  I.s_pin = p("M24 44S9 30 9 19a15 15 0 0 1 30 0c0 11-15 25-15 25Z", "r") + c(24, 19, 5.8, "w", 2) + q("M13 14c2-5 6-8 11-8-6 1-9 4-11 8Z", "#ff9d94");
+  I.s_compass = p("M24 2l6.4 15.6L46 24l-15.6 6.4L24 46l-6.4-15.6L2 24l15.6-6.4Z", "r") + c(24, 24, 5.4, "w", 2) + q("M24 6l3 8-6 3Z", "#ff9d94") + l("M24 2v6", "k", 1.2, 'opacity="0"');
+  I.s_peak = p("M2 42L17 14l7 10 5-7 17 25Z", ink) + p("M17 14l-5 9 3-1.6 2.6 3 2.6-3 2.2 1.6Z", "w") + p("M29 17l-3.4 6 2.4-1 2 2 2-2 2 1Z", "w") + h("M6 38l9-17");
+  I.s_palm = p("M6 42q18-12 36 0Z", ink) + t("M25 38q-3-12 1-24", ink, 3) + p("M26 14c-9-6-17-2-19 4 8-4 13-2 19-4Z", ink) + p("M26 14c1-9 10-11 15-6-7 0-11 2-15 6Z", ink) + p("M26 14c9 0 15 6 13 13-3-6-7-10-13-13Z", ink) + p("M26 14c-8 3-11 10-8 15 1-7 4-11 8-15Z", ink) + q("M9 17c5-3 9-3 13-2-6 0-10 1-13 2Z", "#7a6b9c");
+  I.dice = p("M8 18l16-9 16 9v18L24 45 8 36Z", "w") + q("M8 18l16-9 16 9-16 9Z", "#ffffff") + q("M24 27v18L8 36V18Z", "w2") + q("M24 27l16-9v18L24 45Z", "s") + l("M8 18l16 9 16-9M24 27v18", "k", 1.8) + dot(24, 18, 2.4, "k") + dot(18, 14.6, 2, "k") + dot(30, 21.4, 2, "k") + `<g transform="translate(9.5 26) scale(.26) rotate(0)">${I.s_pin}</g>` + `<g transform="translate(29 29) scale(.3)">${I.s_compass}</g>` + dot(16, 33, 2.2, "r") + dot(20, 38, 2.2, "r");
+  I.joker = p("M6 30C2 18 8 8 14 4c1 6 2 9 6 12-2-8 2-13 6-13 4 3 6 8 4 13 4-3 6-6 6-12 6 4 10 14 6 26Z", "p") + q("M8 26C6 18 9 11 12 8c0 5 2 8 4 10-3 2-6 5-8 8Z", "#dbb1ff") + p("M6 30h36v6H6Z", "r") + c(4, 4, 3.6, "g") + c(24, 3, 3.6, "g") + c(44, 4, 3.6, "g") + c(20, 41, 7.4, "#f1c7a0") + dot(17, 40, 1.4, "k") + dot(23, 40, 1.4, "k") + l("M17 44q3 2 6 0", "R", 1.6) + `<g transform="translate(29 30) scale(.38)">${I.globe}</g>` + h("M9 12l2-4");
+  I.cards = p("M6 34L2 12 16 8l6 24Z", "w2", 'transform="rotate(-12 12 30)"') + p("M32 8h14v24H32Z", "w2", 'transform="rotate(14 39 34)"') + p("M14 6h20a3 3 0 0 1 3 3v30a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3Z", "w") + `<g transform="translate(15 9) scale(.26)">${I.s_pin}</g>` + `<g transform="translate(17 19) scale(.6)">${I.s_compass}</g>` + l("M30 36l2 0", "k", 1.6);
+  I.slot = p("M6 14a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v28H6Z", "r") + p("M10 19h24v16H10Z", "w") + l("M17.3 19v16M26.6 19v16", "S", 1.4) + `<g transform="translate(10.8 21.4) scale(.25)">${I.s_pin}</g>` + `<g transform="translate(19 21.6) scale(.25)">${I.s_compass}</g>` + `<g transform="translate(27.2 21.4) scale(.25)">${I.globe}</g>` + p("M38 18h4v12h-4Z", "S") + c(40, 14, 4, "r") + t("M40 18v-4", "S", 2) + p("M6 42h32v3H6Z", "R") + c(12, 6, 2.4, "y", 1.4) + c(22, 5, 2.4, "y", 1.4) + c(32, 6, 2.4, "y", 1.4) + h("M9 14v22");
+  I.roulette = c(24, 24, 20, "N") + (() => { let o = ""; for (let i = 0; i < 12; i++) { const a0 = (i / 12) * Math.PI * 2 - Math.PI / 2, a1 = ((i + 1) / 12) * Math.PI * 2 - Math.PI / 2, pt = (a, r) => `${(24 + Math.cos(a) * r).toFixed(1)} ${(24 + Math.sin(a) * r).toFixed(1)}`; o += `<path d="M${pt(a0, 9)}L${pt(a0, 17)}A17 17 0 0 1 ${pt(a1, 17)}L${pt(a1, 9)}Z" fill="${i % 2 ? "#191325" : "#fe5f55"}" stroke="${K}" stroke-width="1"/>`; } return o; })() + globeMini(24, 24, 8.4) + c(35, 13, 2.6, "w", 1.4) + l("M8 16a17 17 0 0 1 8-8", "#fff", 2, 'opacity=".5"');
+  I.cardback = p("M9 3h30a3 3 0 0 1 3 3v36a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z", "w") + p("M11 6h26a2 2 0 0 1 2 2v32a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z", "B") + l("M24 6v36M9 24h30M11 14q13 6 26 0M11 34q13-6 26 0", "b", 1.4, 'opacity=".7"') + star(24, 24, 11, 3.6, "g", 4) + c(24, 24, 3.4, "r", 1.6);
+  I.ace = p("M9 4h30a3 3 0 0 1 3 3v34a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z", "w") + l("M13 15l3-9 3 9M14.2 11.6h3.6", "k", 2.2) + `<g transform="translate(11.5 17) scale(.32)">${I.s_peak}</g>` + `<g transform="translate(15 21) scale(.72)">${I.s_peak}</g>` + h("M9 8v30");
+  I.felt = c(24, 24, 20, "L") + c(24, 24, 15, "l", 1.6) + l("M24 4v40M4 24h40M9 14q15 8 30 0M9 34q15-8 30 0", "w", 1.2, 'opacity=".4"') + `<g transform="translate(15 15) scale(.4)">${I.s_compass}</g>`;
+
+  /* ficha-"ciega" (blind) con un icono dentro: pequena=azul, grande=naranja, jefe=roja */
+  A.blind = (kind, inner) => {
+    const main = { small: "B", big: "o", boss: "R" }[kind] || "R", ring = { small: "b", big: "#ffc28f", boss: "#ff8f86" }[kind] || "b";
+    return `<svg class="ic blindchip" viewBox="0 0 48 48" aria-hidden="true">${c(24, 24, 22, main) + notches() + c(24, 24, 15, ring, 2) + c(24, 24, 12.4, "#2b2340", 1.6)}<g transform="translate(11.5 11.5) scale(.52)">${I[inner] || ""}</g></svg>`;
+  };
+
   /* ============================== interfaz ============================== */
   const gear = () => { let d = ""; const n = 8; for (let i = 0; i < n; i++) { const a0 = (i / n) * Math.PI * 2, w = 0.2, pt = (a, r) => (24 + Math.cos(a) * r).toFixed(1) + " " + (24 + Math.sin(a) * r).toFixed(1); d += (i ? "L" : "M") + pt(a0 - w, 15) + "L" + pt(a0 - w * 0.6, 21) + "L" + pt(a0 + w * 0.6, 21) + "L" + pt(a0 + w, 15) + "L" + pt(a0 + Math.PI / n - w, 15) + "L" + pt(a0 + Math.PI / n + w, 15); } return d + "Z"; };
   I.u_set = p(gear(), "s") + c(24, 24, 7, "n") + c(24, 24, 3, "N", 1.6) + h("M12 15a14 14 0 0 1 7-6");
@@ -188,7 +216,7 @@ window.AIQ = window.AIQ || {};
   };
   /* insignia de logro: marco por categoria + icono dentro */
   const FRAME = {
-    round: c(24, 24, 22, "g") + c(24, 24, 17.5, "y", 1.6),
+    round: c(24, 24, 22, "r") + notches() + c(24, 24, 16, "#ff8f86", 2) + c(24, 24, 13, "#2b2340", 1.4),
     shield: p("M24 2l19 6v14c0 12-8 20-19 24C13 42 5 34 5 22V8Z", "b") + p("M24 7l14 4.5V22c0 9-6 15-14 19-8-4-14-10-14-19V11.5Z", "#a9d4ff", "opacity=\".8\""),
     hex: p("M24 2l19 11v22L24 46 5 35V13Z", "r") + p("M24 7l14.6 8.5v17L24 41 9.4 32.5v-17Z", "#ffb0a8", "opacity=\".8\""),
     book: p("M7 6h34a3 3 0 0 1 3 3v30a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3Z", "p") + p("M11 10h26a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2Z", "#dbb1ff", "opacity=\".85\""),
@@ -200,6 +228,8 @@ window.AIQ = window.AIQ || {};
     return `<svg class="ic badge ${cls}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${fr}<g transform="translate(10.5 10.5) scale(.56)">${ic}</g></svg>`;
   };
   /* iconos como imagen CSS (--ic-nombre) para decorar con ::before/::after */
-  A.iconVars = () => { const st = document.documentElement.style; for (const k of ["spark", "heart", "coin"]) { const id = { spark: "a_spark", heart: "heart", coin: "coin" }[k]; st.setProperty("--ic-" + k, `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">${I[id]}</svg>`)}")`); } };
+  A.iconVars = () => { const st = document.documentElement.style;
+    const tile = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><g opacity=".9"><g transform="translate(6 6) scale(.9) rotate(-12 24 24)">${I.s_compass}</g><g transform="translate(66 12) scale(.8) rotate(10 24 24)">${I.s_pin}</g><g transform="translate(12 68) scale(.8) rotate(8 24 24)">${I.s_palm}</g><g transform="translate(64 64) scale(.9) rotate(-8 24 24)">${I.s_peak}</g></g></svg>`;
+    st.setProperty("--ic-suits", `url("data:image/svg+xml,${encodeURIComponent(tile)}")`); for (const k of ["spark", "heart", "coin"]) { const id = { spark: "a_spark", heart: "heart", coin: "coin" }[k]; st.setProperty("--ic-" + k, `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">${I[id]}</svg>`)}")`); } };
   A.iconVars(); A.iconize();
 })(window.AIQ);

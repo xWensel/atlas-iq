@@ -18,6 +18,10 @@ window.AIQ = window.AIQ || {};
 
   /* iconos propios por tipo (js/icons.js) */
   const TYPE_IC = { city: "t_city", capital: "t_capital", country: "t_country", landmark: "t_landmark", nature: "t_nature", water: "t_water", strait: "t_strait", battle: "t_battle", event: "t_event", person: "t_person", curiosity: "t_curio", place: "t_place" };
+  /* cada tarjeta lleva indice de carta de poker: rango por rareza (5, 8, K, A) y palo geografico por tipo */
+  const TYPE_SUIT = { city: "s_pin", capital: "s_compass", country: "s_compass", landmark: "s_peak", nature: "s_peak", water: "s_palm", strait: "s_palm", battle: "s_peak", event: "s_pin", person: "s_compass", curiosity: "s_palm", place: "s_pin" };
+  const RANK = ["5", "8", "K", "A"], SUIT_RED = { s_pin: 1, s_compass: 1 };
+  const ixs = e => { const su = TYPE_SUIT[e.type] || "s_pin", red = SUIT_RED[su] ? " red" : ""; return `<span class="ix tl${red}"><b>${RANK[e.rarity]}</b>${A.icon(su)}</span><span class="ix br${red}"><b>${RANK[e.rarity]}</b>${A.icon(su)}</span>`; };
   const iconSvg = t => A.icon(TYPE_IC[t] || "t_place", "cx-ic");
 
   const continent = (lat, lon) => {
@@ -367,7 +371,7 @@ window.AIQ = window.AIQ || {};
     b.className = `cx-card r${e.rarity} ${un ? "open" : "locked"}${un && !store.seen[id] ? " fresh" : ""}`;
     const rec = contentMem[A.lang + ":" + id];
     b.innerHTML = `<span class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}</span>
-      <span class="cx-nm">${un ? nameOf(e, rec) : "· · ·"}</span>
+      ${ixs(e)}<span class="cx-nm">${un ? nameOf(e, rec) : "· · ·"}</span>
       <span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span><span class="cx-no">${fmtNo(e.no)}</span>${un && !store.seen[id] ? `<span class="cx-new">${A.t("codex.new")}</span>` : ""}`;
     b.onclick = () => openDetail(id);
     b.addEventListener("pointermove", ev => tiltMove(b, ev, 7)); b.addEventListener("pointerleave", () => tiltReset(b));
@@ -414,7 +418,7 @@ window.AIQ = window.AIQ || {};
       <div class="cx-d-wrap">
         <div class="cx-d-card"><div class="cx-bigcard r${e.rarity} ${un ? "open" : "locked"}" id="cxBig">
           <div class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" alt="" src="${rec.img.card}" decoding="async">` : ""}</div>
-          <div class="cx-cap"><span class="cx-nm">${un ? nameOf(e, rec) : A.t("codex.locked")}</span><span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span></div><span class="cx-no">${fmtNo(e.no)}</span><span class="cx-foil"></span>
+          ${ixs(e)}<div class="cx-cap"><span class="cx-nm">${un ? nameOf(e, rec) : A.t("codex.locked")}</span><span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span></div><span class="cx-no">${fmtNo(e.no)}</span><span class="cx-foil"></span>
         </div>
         ${rec && rec.img && rec.credit ? `<p class="cx-credit">${A.t("codex.photo")}: ${rec.credit.artist ? rec.credit.artist + " · " : ""}<a href="${rec.credit.page}" target="_blank" rel="noopener">${rec.credit.license || "Wikimedia Commons"}</a></p>` : ""}
         ${rec && rec.img ? `<button class="cx-hd" id="cxHd" type="button">${A.icon("a_lens", "sm")}${A.t("codex.hd")}</button>` : ""}</div>

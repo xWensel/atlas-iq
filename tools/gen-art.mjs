@@ -18,35 +18,35 @@ try { for (const l of fs.readFileSync(path.join(ROOT, ".env.local"), "utf8").spl
 const KEY = process.env.POLLINATIONS_KEY;
 
 /* ---------- estilo comun: todo debe parecer del mismo juego ---------- */
-const STYLE = "chunky 16-bit pixel art illustration, roguelike card game art, bold dark purple outlines, flat cel shading, limited saturated palette of teal green, coral red, warm gold and deep violet, playful casino-table mood, crisp pixels, no text, no letters, no watermark";
+const STYLE = "chunky 16-bit pixel art illustration, Balatro-like roguelike card game art that fuses CASINO and GEOGRAPHY: green felt printed with world maps and latitude longitude lines, globe-engraved poker chips, playing cards with map faces and compass-rose pin mountain palm suits, dice, roulette and slot machines showing landmarks, warm neon marquee bulbs, bold dark purple outlines, flat cel shading, limited saturated palette of teal green, coral red, warm gold and deep violet, crisp pixels, no text, no letters, no watermark";
 const SCENE = "wide panoramic scene, dramatic lighting, rich detail";
 
 const W = [768, 480], SQ = [512, 512];
 const A = (id, prompt, size = SQ, seed = 11) => ({ id, prompt, size, seed });
 const M = [
-  /* jefes */
-  A("boss_wind", `a howling gale battering a tiny wooden caravel on rough sea, huge white wind ribbons and swirls, flying scraps of old maps, ${SCENE}`, W),
-  A("boss_storm", `a monstrous thunderstorm cloud with forked lightning over a dark sea, a tiny ship below, heavy rain, ${SCENE}`, W),
-  A("boss_strict", `enormous golden balance scales and a cartographer's ruler and dividers on old parchment, stern strict mood, rays of light, ${SCENE}`, W),
-  A("boss_silence", `a giant golden bell struck silent under a purple moonlit night, muffled sound waves fading, a red cross over it, ${SCENE}`, W),
-  A("boss_fog", `a striped red and white lighthouse in thick sea fog, light beams cutting the mist, calm dark water, ${SCENE}`, W),
+  /* jefes: "la casa" al otro lado de la mesa */
+  A("boss_wind", `a howling gale blowing map-faced playing cards, globe poker chips and torn atlas pages off a card table on a ship deck over rough sea, huge white wind swirls, ${SCENE}`, W),
+  A("boss_storm", `lightning striking a giant slot machine whose reels show landmarks and globes, floating on a dark stormy sea, jackpot bulbs, heavy rain, ${SCENE}`, W),
+  A("boss_strict", `a stern cartographer pit boss behind a felt table printed with latitude lines, giant golden scales weighing a globe against stacks of poker chips, huge ruler and brass dividers, spotlight, ${SCENE}`, W),
+  A("boss_silence", `a roulette wheel that is a spinning world globe frozen in eerie silence at night, muted giant golden bell with a red cross, slot machines showing pins, purple moonlight, ${SCENE}`, W),
+  A("boss_fog", `a lighthouse made of neon marquee bulbs guiding ships over a sea of green felt printed with a map, thick fog, globe poker chips glowing on a pier, ${SCENE}`, W),
   /* actos y escenas */
-  A("act_0", `sunrise over green hills with a winding dirt road, a brass compass and a folded treasure map, explorer's first day, ${SCENE}`, W),
-  A("act_1", `a caravel sailing at twilight toward the torn edge of the world map, sea serpent tentacle, first stars, ${SCENE}`, W),
-  A("act_2", `ancient moai statues in a moonlit jungle, glowing vines, mysterious ruins, ${SCENE}`, W),
-  A("act_3", `a starry night with constellations drawn over a glowing globe crowned with gold, aurora, legendary finale, ${SCENE}`, W),
-  A("camp", `an explorer's night camp with a red tent, crackling campfire, lantern, journal and a map on a log, mountains and stars behind, ${SCENE}`, W),
-  A("chest", `an overflowing open treasure chest of gold coins and gems with a crown, golden light rays, sparkles, ${SCENE}`, W),
-  A("win", `a golden laurel wreath around a glowing world globe, confetti, triumphant sunburst, ${SCENE}`, W),
-  A("lose", `a cracked brass compass and a torn treasure map lying on wet dark ground in the rain, a small skull, sad mood, ${SCENE}`, W),
-  A("hub_hero", `an adventurer's table seen from above, big old world map, brass compass, spyglass, dice and gold coins on green felt, ${SCENE}`, W),
+  A("act_0", `sunrise over hills of green felt printed with a world map graticule, a road paved with globe poker chips, a flag with a compass rose suit, dice and a brass compass, ${SCENE}`, W),
+  A("act_1", `a caravel with map-faced playing card sails on a sea of green felt with meridian lines heading to the torn edge of the world map, a roulette globe as the moon, twilight, ${SCENE}`, W),
+  A("act_2", `ancient moai statues wearing jester hats among glowing slot machines that show landmarks in a moonlit jungle, globe poker chips scattered around, ${SCENE}`, W),
+  A("act_3", `a glowing world globe crowned with gold between four giant constellations shaped like a compass, a map pin, a mountain and a palm tree card suits, marquee bulbs, aurora, starry night, ${SCENE}`, W),
+  A("camp", `an explorer's high-roller camp at night: a striped tent, a green felt table printed with a world map with pins, map-faced playing cards, globe poker chips, campfire and lantern, marquee bulbs, ${SCENE}`, W),
+  A("chest", `a jackpot: an overflowing treasure chest spilling globe-engraved poker chips, dice, map playing cards, a compass and gold coins, slot machine lights and golden rays, ${SCENE}`, W),
+  A("win", `a golden laurel wreath around a glowing globe, a royal flush of map-faced playing cards fanned out, confetti of tiny globes and chips, jackpot sunburst, ${SCENE}`, W),
+  A("lose", `a cracked brass compass, a torn treasure map and scattered losing map-faced playing cards on green felt printed with a map, a single die showing one pip, dim lamp, sad mood, ${SCENE}`, W),
+  A("hub_hero", `casino table seen from above: green felt printed as a world map with latitude and longitude lines, globe-engraved poker chip stacks, a fan of playing cards with compass suits, dice, a brass compass and spyglass, warm neon glow, ${SCENE}`, W),
   /* Enciclopedia: ilustracion de respaldo por tipo (cuando no hay foto) */
   ...[["city", "a dense old city skyline at dusk with lit windows"], ["capital", "a grand capital building with a golden dome and flags"], ["country", "a tall flagpole with a big red waving flag over a landscape"],
     ["landmark", "a majestic ancient temple with columns"], ["nature", "snowy mountain peaks with a sun and a forest"], ["water", "a deep blue ocean with big waves and a small island"],
     ["strait", "a narrow sea strait between two green coasts seen from above"], ["battle", "crossed swords and shields on a battlefield with banners"],
     ["event", "an old calendar page with a golden star and a wax seal"], ["person", "a marble bust of a historical figure with a laurel wreath on a pedestal"],
     ["curiosity", "a glowing lightbulb with sparkles and a magnifying glass"], ["place", "a big red map pin on a folded map"]]
-    .map(([t, d]) => A("type_" + t, `${d}, framed illustration, dark purple background`, SQ, 5)),
+    .map(([t, d]) => A("type_" + t, `${d}, shown on a green felt table printed with a world map, like the illustration on a casino playing card, framed, warm neon glow`, SQ, 5)),
 ];
 
 if (process.argv.includes("--list")) { console.log(M.map(m => m.id).join("\n")); process.exit(0); }

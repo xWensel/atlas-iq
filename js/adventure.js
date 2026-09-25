@@ -10,6 +10,11 @@ window.AIQ = window.AIQ || {};
   const T = A.T, L = A.L, $ = id => document.getElementById(id), C = () => A.core;
   const RUNKEY = "atlasiq.run.v1";
   const ic = (id, cls) => A.icon(id, cls), CN = () => A.icon("coin", "cn");
+  /* palos geograficos: chincheta (rojo) y rosa de los vientos (rojo) / cumbre y palmera (oscuros). El numero de la carta es su precio. */
+  const SUIT = { steady: "s_compass", eagle: "s_compass", mapper: "s_compass", flash: "s_compass", finisher: "s_compass", crown: "s_compass", luck: "s_compass", blindperk: "s_compass", scholar: "s_compass",
+    purse: "s_pin", hoard: "s_pin", banker: "s_pin", heart: "s_pin", anchor: "s_pin", marco: "s_peak", columbus: "s_peak", battuta: "s_peak", cook: "s_peak", tour: "s_peak", boots: "s_palm", glass: "s_palm", omen: "s_palm", gale: "s_palm" };
+  const suitCol = s => (s === "s_pin" || s === "s_compass" || s === "heart" ? "red" : "blk");
+  const ixs = (rank, suit) => `<span class="ix tl"><b>${rank}</b>${A.icon(suit)}</span><span class="ix br"><b>${rank}</b>${A.icon(suit)}</span>`;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const R_NAMES = ["Común", "Poco común", "Rara"], R_EN = ["Common", "Uncommon", "Rare"];
   const ACTS = [
@@ -172,7 +177,7 @@ window.AIQ = window.AIQ || {};
   A.adv.introHtml = L => {
     const info = actInfo(run.act), b = run.boss || [];
     const debuffs = b.map(id => `<div class="adv-debuff"><span>${ic(BOSSES[id].ico)}</span><div><b>${A.tx(BOSSES[id].n)}</b><i>${A.tx(BOSSES[id].d)}</i>${id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${run.wind.km} km</em>` : ""}</div></div>`).join("");
-    return `<div class="intro-in adv"><div class="intro-num">${L.boss ? ic("skull", "big") : String(run.round + 1).padStart(2, "0")}</div><div class="intro-body">
+    return `<div class="intro-in adv"><div class="intro-num blind">${A.blind(L.boss ? "boss" : run.round === 0 ? "small" : "big", L.boss ? BOSSES[b[0]].ico : run.round === 0 ? "s_pin" : "s_compass")}</div><div class="intro-body">
       <span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${L.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)}</h2>
       <p>${A.tx(info.f)}</p><p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(L.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${L.seconds} s</p>${debuffs}</div>
       <div class="intro-art">${A.pic(b.length ? BOSSES[b[0]].art : "act_" + Math.min(run.act, 3))}</div></div>`;
@@ -280,7 +285,7 @@ window.AIQ = window.AIQ || {};
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${run.wind.km} km</span></div>` : ""}`;
     const ids = Object.keys(run.tools);
     tb.classList.toggle("hidden", !ids.length || C().S.phase !== "asking");
-    tb.innerHTML = ids.map((id, i) => { const t = run.tools[id], on = C().S.tool === id; return `<button class="tool${on ? " on" : ""}${t.left <= 0 || silenced ? " off" : ""}" data-tool="${id}" title="${A.tx(TOOLS[id].n)} — ${A.tx(TOOLS[id].d)}"><span class="tl-ico">${ic(TOOLS[id].ico)}</span><b>${A.tx(TOOLS[id].n)}</b><span class="tl-pips">${Array.from({ length: toolMax(id) }, (_, k) => `<i class="${k < t.left ? "on" : ""}"></i>`).join("")}</span><kbd>${i + 1}</kbd></button>`; }).join("");
+    tb.innerHTML = ids.map((id, i) => { const t = run.tools[id], on = C().S.tool === id, off = t.left <= 0 || silenced; return `<button class="tool pc-hand${on ? " on" : ""}${off ? " off" : ""}" data-tool="${id}" style="--r:${((i - (ids.length - 1) / 2) * 6).toFixed(1)}deg" title="${A.tx(TOOLS[id].n)} — ${A.tx(TOOLS[id].d)}"><span class="ix tl"><b>A</b>${A.icon("s_palm")}</span><span class="tl-ico felt">${ic(TOOLS[id].ico)}</span><b>${A.tx(TOOLS[id].n)}</b><span class="tl-pips">${Array.from({ length: toolMax(id) }, (_, k) => `<i class="${k < t.left ? "on" : ""}"></i>`).join("")}</span><kbd>${i + 1}</kbd></button>`; }).join("");
     tb.querySelectorAll(".tool").forEach(b => (b.onclick = () => A.adv.useTool(b.dataset.tool)));
   }
   A.adv.refresh = renderBars;
@@ -359,10 +364,10 @@ window.AIQ = window.AIQ || {};
     const cost = c => (chest ? 0 : price(c)), slots = 5;
     const cards = run.stock.map((s, i) => {
       const bought = run.bought.includes(i);
-      if (s.k === "perk") { const p = PERKS[s.id], c = cost(p.cost); return `<div class="offer r${p.r}${bought ? " sold" : ""}" data-i="${i}"><span class="of-r">${A.tx(A.T(R_NAMES[p.r], R_EN[p.r]))}</span><div class="of-ico">${ic(p.ico)}</div><b>${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`; }
-      const t = TOOLS[s.id], c = cost(t.cost), have = run.tools[s.id]; return `<div class="offer otool r${t.r}${bought ? " sold" : ""}" data-i="${i}"><span class="of-r">${A.T("Herramienta", "Tool")}</span><div class="of-ico">${ic(t.ico)}</div><b>${A.tx(t.n)}${have ? ` <em>+1 ${A.T("carga", "charge")}</em>` : ""}</b><p>${A.tx(t.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : CN() + c}</button></div>`;
+      if (s.k === "perk") { const p = PERKS[s.id], c = cost(p.cost); const su = SUIT[s.id] || "s_compass"; return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-i="${i}" data-suit="${suitCol(su)}">${ixs(p.cost, su)}<span class="of-r">${A.tx(A.T(R_NAMES[p.r], R_EN[p.r]))}</span><div class="of-ico felt">${ic(p.ico)}</div><b>${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`; }
+      const t = TOOLS[s.id], c = cost(t.cost), have = run.tools[s.id]; return `<div class="offer pc otool r${t.r}${bought ? " sold" : ""}" data-i="${i}" data-suit="blk">${ixs("A", "s_palm")}<span class="of-r">${A.T("Herramienta", "Tool")}</span><div class="of-ico felt">${ic(t.ico)}</div><b>${A.tx(t.n)}${have ? ` <em>+1 ${A.T("carga", "charge")}</em>` : ""}</b><p>${A.tx(t.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : CN() + c}</button></div>`;
     }).join("");
-    const life = chest ? "" : `<div class="offer life${run.lives >= run.maxLives ? " sold" : ""}"><span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico">${ic("heart")}</div><b>+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${price(6)}</button></div>`;
+    const life = chest ? "" : `<div class="offer pc life${run.lives >= run.maxLives ? " sold" : ""}" data-suit="red">${ixs("♥", "heart")}<span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico felt">${ic("heart")}</div><b>+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${price(6)}</button></div>`;
     const inv = `<div class="inv"><div class="inv-col"><h4>${A.T("Reliquias", "Relics")} ${run.perks.length}/${slots}</h4><div class="inv-row">${run.perks.map(id => `<button class="inv-perk" data-sell="${id}" title="${A.tx(PERKS[id].n)} — ${A.tx(PERKS[id].d)}">${ic(PERKS[id].ico)}${chest ? "" : `<em>${A.T("vender", "sell")} ${Math.floor(PERKS[id].cost / 2)}</em>`}</button>`).join("") || `<i class="empty">${A.T("Vacío", "Empty")}</i>`}</div></div>
       <div class="inv-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="inv-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" title="${A.tx(TOOLS[id].n)}">${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
       <div class="inv-col"><h4>${A.T("Provisiones", "Provisions")}</h4><div class="inv-row hearts">${hearts()}</div></div></div>`;

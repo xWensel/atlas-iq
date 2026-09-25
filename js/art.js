@@ -92,6 +92,6 @@ window.AIQ = window.AIQ || {};
     im.onload = () => { im.classList.add("on"); if (im.parentElement) im.parentElement.classList.add("has-gen"); };
     im.src = "assets/gen/" + im.dataset.gen + ".jpg";
   }));
-  A.pic = (id, cls = "", vec) => { setTimeout(() => A.genFill(), 0); return `<span class="pic ${cls}">${A.art(vec || id, "bare")}<img class="pic-img" alt="" data-gen="${id}" decoding="async"><i class="pic-frame"></i></span>`; };
+  A.pic = (id, cls = "", vec) => { setTimeout(() => A.genFill(), 0); return `<span class="pic ${cls}">${A.art(vec || id, "bare")}<img class="pic-img" alt="" data-gen="${id}" decoding="async"><i class="pic-frame"></i><i class="marq"></i></span>`; };
   A.art = (id, cls = "") => (S[id] ? S[id].replace('class="art"', `class="art ${cls}"`).replace(/id="artc"/g, `id="artc-${id}"`).replace(/url\(#artc\)/g, `url(#artc-${id})`).replace(/clip-path="url\(#artc\)"/g, `clip-path="url(#artc-${id})"`) : "");
 })(window.AIQ);
