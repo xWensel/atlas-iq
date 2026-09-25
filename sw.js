@@ -1,5 +1,5 @@
 /* Atlas IQ - service worker: funciona sin conexion (cache de la app) y se actualiza solo. */
-const CACHE = "atlas-iq-v0.9.2";
+const CACHE = "atlas-iq-v0.9.3";
 const CORE = [
   "./", "index.html", "manifest.webmanifest", "css/style.css", "css/boot.css", "css/skins.css", "css/codex.css", "css/hub.css", "css/premium.css", "css/premium2.css", "css/premium3.css", "css/premium4.css", "js/profile.js", "js/rank.js", "js/relics.js", "js/adventure.js", "js/hub.js", "js/icons.js", "js/i18n2.js", "js/i18n3.js", "js/art.js", "data/codex.js", "data/places.js", "js/codex.js", "js/wiki.js",
   "js/vendor/topojson-client.min.js", "js/vendor/earcut.min.js", "data/world.js", "data/classic.js", "data/locations.js", "data/history.js", "data/campaigns.js",

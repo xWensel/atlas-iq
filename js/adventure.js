@@ -125,6 +125,7 @@ window.AIQ = window.AIQ || {};
   let run = null;
   A.adv = { get run() { return run; }, hasSave() { try { return !!localStorage.getItem(RUNKEY); } catch (e) { return false; } } };
   A.adv.poolStats = () => Object.fromEntries(Object.entries(pools()).map(([k, v]) => [k, v.length]));
+  A.adv.roundPlaces = (r, act) => poolFor(roundDefOf(r), act == null ? Math.floor(r / 4) : act);
   A.adv.roundPool = (r, act) => poolFor(roundDefOf(r), act == null ? Math.floor(r / 4) : act).length;
   const persist = () => { try { if (run) localStorage.setItem(RUNKEY, JSON.stringify(run)); else localStorage.removeItem(RUNKEY); } catch (e) { /* sin almacenamiento */ } };
 

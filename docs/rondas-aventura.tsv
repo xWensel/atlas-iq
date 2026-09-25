@@ -1,0 +1,961 @@
+﻿ronda	n	id	nombre_es	pais_es	nombre_en	tema	jefe
+1	1	paris	París	Francia	Paris	Capitales del mundo (fáciles)	0
+1	2	london	Londres	Reino Unido	London	Capitales del mundo (fáciles)	0
+1	3	rome	Roma	Italia	Rome	Capitales del mundo (fáciles)	0
+1	4	madrid	Madrid	España	Madrid	Capitales del mundo (fáciles)	0
+1	5	berlin	Berlín	Alemania	Berlin	Capitales del mundo (fáciles)	0
+1	6	washington	Washington D. C.	Estados Unidos	Washington	Capitales del mundo (fáciles)	0
+1	7	moscow	Moscú	Rusia	Moscow	Capitales del mundo (fáciles)	0
+1	8	beijing	Pekín	República Popular China	Beijing	Capitales del mundo (fáciles)	0
+1	9	tokyo	Tokio	Japón	Tokyo	Capitales del mundo (fáciles)	0
+1	10	cairo	El Cairo	Egipto	Cairo	Capitales del mundo (fáciles)	0
+1	11	ottawa	Ottawa	Canadá	Ottawa	Capitales del mundo (fáciles)	0
+1	12	canberra	Camberra	Australia	Canberra	Capitales del mundo (fáciles)	0
+1	13	brasilia	Brasilia	Brasil	Brasília	Capitales del mundo (fáciles)	0
+1	14	buenos-aires	Buenos Aires	Argentina	Buenos Aires	Capitales del mundo (fáciles)	0
+1	15	mexico-city	Ciudad de México	México	Mexico City	Capitales del mundo (fáciles)	0
+1	16	new-delhi	Nueva Delhi	India	New Delhi	Capitales del mundo (fáciles)	0
+1	17	lisbon	Lisboa	Portugal	Lisbon	Capitales del mundo (fáciles)	0
+1	18	athens	Atenas	Grecia	Athens	Capitales del mundo (fáciles)	0
+1	19	vienna	Viena	Austria	Vienna	Capitales del mundo (fáciles)	0
+1	20	amsterdam	Ámsterdam	Países Bajos	Amsterdam	Capitales del mundo (fáciles)	0
+1	21	brussels	Región de Bruselas-Capital	Bélgica	Brussels	Capitales del mundo (fáciles)	0
+1	22	bern	Berna	Suiza	Bern	Capitales del mundo (fáciles)	0
+1	23	stockholm	Estocolmo	Suecia	Stockholm	Capitales del mundo (fáciles)	0
+1	24	oslo	Oslo	Noruega	Oslo	Capitales del mundo (fáciles)	0
+1	25	copenhagen	Copenhague	Dinamarca	Copenhagen	Capitales del mundo (fáciles)	0
+1	26	helsinki	Helsinki	Finlandia	Helsinki	Capitales del mundo (fáciles)	0
+1	27	dublin	Dublín	Irlanda	Dublin	Capitales del mundo (fáciles)	0
+1	28	warsaw	Varsovia	Polonia	Warsaw	Capitales del mundo (fáciles)	0
+1	29	prague	Praga	República Checa	Prague	Capitales del mundo (fáciles)	0
+1	30	budapest	Budapest	Hungría	Budapest	Capitales del mundo (fáciles)	0
+1	31	bucharest	Bucarest	Rumania	Bucharest	Capitales del mundo (fáciles)	0
+1	32	sofia	Sofía	Bulgaria	Sofia	Capitales del mundo (fáciles)	0
+1	33	belgrade	Belgrado	Serbia	Belgrade	Capitales del mundo (fáciles)	0
+1	34	zagreb	Zagreb	Croacia	Zagreb	Capitales del mundo (fáciles)	0
+1	35	ankara	Ankara	Turquía	Ankara	Capitales del mundo (fáciles)	0
+1	36	tehran	Teherán	Irán	Tehran	Capitales del mundo (fáciles)	0
+1	37	baghdad	Bagdad	Irak	Baghdad	Capitales del mundo (fáciles)	0
+1	38	riyadh	Riad	Arabia Saudí	Riyadh	Capitales del mundo (fáciles)	0
+1	39	jerusalem	Jerusalén	Israel	Jerusalem	Capitales del mundo (fáciles)	0
+1	40	kabul	Kabul	Afganistán	Kabul	Capitales del mundo (fáciles)	0
+1	41	islamabad	Islamabad	Pakistán	Islamabad	Capitales del mundo (fáciles)	0
+1	42	seoul	Seúl	Corea del Sur	Seoul	Capitales del mundo (fáciles)	0
+1	43	bangkok	Bangkok	Tailandia	Bangkok	Capitales del mundo (fáciles)	0
+1	44	hanoi	Hanói	Vietnam	Hanoi	Capitales del mundo (fáciles)	0
+1	45	jakarta	Yakarta	Indonesia	Jakarta	Capitales del mundo (fáciles)	0
+1	46	manila	Manila	Filipinas	Manila	Capitales del mundo (fáciles)	0
+1	47	kuala-lumpur	Kuala Lumpur	Malasia	Kuala Lumpur	Capitales del mundo (fáciles)	0
+1	48	wellington	Wellington	Nueva Zelanda	Wellington	Capitales del mundo (fáciles)	0
+1	49	lima	Lima	Perú	Lima	Capitales del mundo (fáciles)	0
+1	50	bogota	Bogotá	Colombia	Bogotá	Capitales del mundo (fáciles)	0
+1	51	caracas	Caracas	Venezuela	Caracas	Capitales del mundo (fáciles)	0
+1	52	santiago	Santiago de Chile	Chile	Santiago	Capitales del mundo (fáciles)	0
+1	53	havana	La Habana	Cuba	Havana	Capitales del mundo (fáciles)	0
+1	54	nairobi	Nairobi	Kenia	Nairobi	Capitales del mundo (fáciles)	0
+1	55	pretoria	Pretoria	Sudáfrica	Pretoria	Capitales del mundo (fáciles)	0
+1	56	addis-ababa	Adís Abeba	Etiopía	Addis Ababa	Capitales del mundo (fáciles)	0
+1	57	rabat	Rabat	Marruecos	Rabat	Capitales del mundo (fáciles)	0
+1	58	algiers	Argel	Argelia	Algiers	Capitales del mundo (fáciles)	0
+1	59	tunis	Túnez	Túnez	Tunis	Capitales del mundo (fáciles)	0
+1	60	kyiv	Kiev	Ucrania	Kyiv	Capitales del mundo (fáciles)	0
+1	61	minsk	Minsk	Bielorrusia	Minsk	Capitales del mundo (fáciles)	0
+1	62	pyongyang	Pionyang	Corea del Norte	Pyongyang	Capitales del mundo (fáciles)	0
+1	63	ulaanbaatar	Ulán Bator	Mongolia	Ulaanbaatar	Capitales del mundo (fáciles)	0
+1	64	kathmandu	Katmandú	Nepal	Kathmandu	Capitales del mundo (fáciles)	0
+1	65	dhaka	Daca	Bangladés	Dhaka	Capitales del mundo (fáciles)	0
+1	66	colombo	Colombo	Sri Lanka	Colombo	Capitales del mundo (fáciles)	0
+1	67	singapore	Singapur	Singapur	Singapore	Capitales del mundo (fáciles)	0
+1	68	quito	Quito	Ecuador	Quito	Capitales del mundo (fáciles)	0
+1	69	la-paz	La Paz	Bolivia	La Paz	Capitales del mundo (fáciles)	0
+1	70	montevideo	Montevideo	Uruguay	Montevideo	Capitales del mundo (fáciles)	0
+1	71	asuncion	Asunción	Paraguay	Asunción	Capitales del mundo (fáciles)	0
+1	72	panama-city	Ciudad de Panamá	Panamá	Panama City	Capitales del mundo (fáciles)	0
+1	73	san-jose	San José	Costa Rica	San José	Capitales del mundo (fáciles)	0
+1	74	kingston-jamaica	Kingston	Jamaica	Kingston	Capitales del mundo (fáciles)	0
+1	75	tripoli	Trípoli	Libia	Tripoli	Capitales del mundo (fáciles)	0
+1	76	khartoum	Jartum	Sudán	Khartoum	Capitales del mundo (fáciles)	0
+1	77	accra	Acra	Ghana	Accra	Capitales del mundo (fáciles)	0
+1	78	abuja	Abuya	Nigeria	Abuja	Capitales del mundo (fáciles)	0
+1	79	dakar	Dakar	Senegal	Dakar	Capitales del mundo (fáciles)	0
+1	80	luanda	Luanda	Angola	Luanda	Capitales del mundo (fáciles)	0
+2	1	eiffel-tower	Torre Eiffel	Francia	Eiffel Tower	Monumentos y lugares famosos	0
+2	2	statue-of-liberty	Estatua de la Libertad	Estados Unidos	Statue of Liberty	Monumentos y lugares famosos	0
+2	3	colosseum	Coliseo	Italia	Colosseum	Monumentos y lugares famosos	0
+2	4	big-ben	Big Ben	Reino Unido	Big Ben	Monumentos y lugares famosos	0
+2	5	taj-mahal	Taj Mahal	India	Taj Mahal	Monumentos y lugares famosos	0
+2	6	great-wall-of-china	Gran Muralla china	República Popular China	Great Wall of China	Monumentos y lugares famosos	0
+2	7	giza-pyramid-complex	Necrópolis de Guiza	Egipto	Giza pyramid complex	Monumentos y lugares famosos	0
+2	8	machu-picchu	Machu Picchu	Perú	Machu Picchu	Monumentos y lugares famosos	0
+2	9	christ-the-redeemer	Cristo Redentor	Brasil	Christ the Redeemer	Monumentos y lugares famosos	0
+2	10	sydney-opera-house	Ópera de Sídney	Australia	Sydney Opera House	Monumentos y lugares famosos	0
+2	11	golden-gate-bridge	Puente Golden Gate	Estados Unidos	Golden Gate Bridge	Monumentos y lugares famosos	0
+2	12	burj-khalifa	Burj Khalifa	Emiratos Árabes Unidos	Burj Khalifa	Monumentos y lugares famosos	0
+2	13	acropolis-of-athens	Acrópolis de Atenas	Grecia	Acropolis of Athens	Monumentos y lugares famosos	0
+2	14	sagrada-familia	Templo Expiatorio de la Sagrada Familia	España	Sagrada Família	Monumentos y lugares famosos	0
+2	15	angkor-wat	Angkor Wat	Camboya	Angkor Wat	Monumentos y lugares famosos	0
+2	16	stonehenge	Stonehenge	Reino Unido	Stonehenge	Monumentos y lugares famosos	0
+2	17	leaning-tower-of-pisa	Torre de Pisa	Italia	Leaning Tower of Pisa	Monumentos y lugares famosos	0
+2	18	brandenburg-gate	Puerta de Brandeburgo	Alemania	Brandenburg Gate	Monumentos y lugares famosos	0
+2	19	notre-dame-de-paris	Catedral de Notre Dame de París	Francia	Notre-Dame de Paris	Monumentos y lugares famosos	0
+2	20	louvre	Museo del Louvre	Francia	Louvre	Monumentos y lugares famosos	0
+2	21	buckingham-palace	Palacio de Buckingham	Reino Unido	Buckingham Palace	Monumentos y lugares famosos	0
+2	22	tower-bridge	Puente de la Torre	Reino Unido	Tower Bridge	Monumentos y lugares famosos	0
+2	23	empire-state-building	Empire State Building	Estados Unidos	Empire State Building	Monumentos y lugares famosos	0
+2	24	times-square	Times Square	Estados Unidos	Times Square	Monumentos y lugares famosos	0
+2	25	hollywood-sign	Hollywood Sign	Estados Unidos	Hollywood Sign	Monumentos y lugares famosos	0
+2	26	mount-rushmore	Monte Rushmore	Estados Unidos	Mount Rushmore	Monumentos y lugares famosos	0
+2	27	white-house	Casa Blanca	Estados Unidos	White House	Monumentos y lugares famosos	0
+2	28	moscow-kremlin	Kremlin de Moscú	Rusia	Kremlin	Monumentos y lugares famosos	0
+2	29	saint-basil-s-cathedral	Catedral de San Basilio	Rusia	Saint Basil's Cathedral	Monumentos y lugares famosos	0
+2	30	hagia-sophia	Santa Sofía	Turquía	Hagia Sophia	Monumentos y lugares famosos	0
+2	31	blue-mosque	Mezquita Azul	Turquía	Blue Mosque	Monumentos y lugares famosos	0
+2	32	alhambra	Alhambra	España	Alhambra	Monumentos y lugares famosos	0
+2	33	neuschwanstein-castle	Neuschwanstein	Alemania	Neuschwanstein Castle	Monumentos y lugares famosos	0
+2	34	palace-of-versailles	Palacio de Versalles	Francia	Palace of Versailles	Monumentos y lugares famosos	0
+2	35	mont-saint-michel	Monte Saint-Michel	Francia	Mont-Saint-Michel	Monumentos y lugares famosos	0
+2	36	forbidden-city	Ciudad Prohibida	República Popular China	Forbidden City	Monumentos y lugares famosos	0
+2	37	terracotta-army	Guerreros de terracota	República Popular China	Terracotta Army	Monumentos y lugares famosos	0
+2	38	potala-palace	Potala	República Popular China	Potala Palace	Monumentos y lugares famosos	0
+2	39	borobudur	Borobudur	Indonesia	Borobudur	Monumentos y lugares famosos	0
+2	40	chichen-itza	Chichén Itzá	México	Chichen Itza	Monumentos y lugares famosos	0
+2	41	teotihuacan	Teotihuacán	México	Teotihuacan	Monumentos y lugares famosos	0
+2	42	moai	Moái	Chile	Moai	Monumentos y lugares famosos	0
+2	43	sphinx	Gran Esfinge de Guiza	Egipto	Great Sphinx of Giza	Monumentos y lugares famosos	0
+2	44	petronas-towers	Torres Petronas	Malasia	Petronas Towers	Monumentos y lugares famosos	0
+2	45	cn-tower	CN Tower	Canadá	CN Tower	Monumentos y lugares famosos	0
+2	46	space-needle	Space Needle	Estados Unidos	Space Needle	Monumentos y lugares famosos	0
+2	47	atomium	Atomium	Bélgica	Atomium	Monumentos y lugares famosos	0
+2	48	manneken-pis	Manneken Pis	Bélgica	Manneken Pis	Monumentos y lugares famosos	0
+2	49	the-little-mermaid	La sirenita	Dinamarca	The Little Mermaid	Monumentos y lugares famosos	0
+2	50	park-guell	Parque Güell	España	Park Güell	Monumentos y lugares famosos	0
+2	51	alcatraz-island	Isla de Alcatraz	Estados Unidos	Alcatraz Island	Monumentos y lugares famosos	0
+2	52	hoover-dam	Presa Hoover	Estados Unidos	Hoover Dam	Monumentos y lugares famosos	0
+2	53	arc-de-triomphe	Arco de Triunfo de París	Francia	Arc de Triomphe	Monumentos y lugares famosos	0
+2	54	sacre-c-ur	Basílica del Sagrado Corazón	Francia	Sacré-Cœur	Monumentos y lugares famosos	0
+2	55	trevi-fountain	Fontana di Trevi	Italia	Trevi Fountain	Monumentos y lugares famosos	0
+2	56	st-peter-s-basilica	Basílica de San Pedro	Ciudad del Vaticano	St. Peter's Basilica	Monumentos y lugares famosos	0
+2	57	milan-cathedral	Catedral de Milán	Italia	Milan Cathedral	Monumentos y lugares famosos	0
+2	58	pompeii	Pompeya	Italia	Pompeii	Monumentos y lugares famosos	0
+2	59	pantheon	Panteón de Agripa	Italia	Pantheon	Monumentos y lugares famosos	0
+2	60	cologne-cathedral	Catedral de Colonia	Alemania	Cologne Cathedral	Monumentos y lugares famosos	0
+2	61	prague-castle	Castillo de Praga	República Checa	Prague Castle	Monumentos y lugares famosos	0
+2	62	charles-bridge	Puente Carlos	República Checa	Charles Bridge	Monumentos y lugares famosos	0
+2	63	schonbrunn-palace	Palacio de Schönbrunn	Austria	Schönbrunn Palace	Monumentos y lugares famosos	0
+2	64	belem-tower	Torre de Belém	Portugal	Belém Tower	Monumentos y lugares famosos	0
+2	65	mezquita-catedral-de-cordoba	Mezquita-catedral de Córdoba	España	Mosque–Cathedral of Córdoba	Monumentos y lugares famosos	0
+2	66	guggenheim-museum-bilbao	Museo Guggenheim Bilbao	España	Guggenheim Museum Bilbao	Monumentos y lugares famosos	0
+2	67	meteora	Meteora	Grecia	Meteora	Monumentos y lugares famosos	0
+2	68	ephesus	Éfeso	Turquía	Ephesus	Monumentos y lugares famosos	0
+2	69	pamukkale	Pamukkale	Turquía	Pamukkale	Monumentos y lugares famosos	0
+2	70	cappadocia	Capadocia	Turquía	Cappadocia	Monumentos y lugares famosos	0
+2	71	gobekli-tepe	Göbekli Tepe	Turquía	Göbekli Tepe	Monumentos y lugares famosos	0
+2	72	persepolis	Persépolis	Irán	Persepolis	Monumentos y lugares famosos	0
+2	73	ellora-caves	Ellora	India	Ellora Caves	Monumentos y lugares famosos	0
+2	74	hampi	Hampi	India	Hampi	Monumentos y lugares famosos	0
+2	75	konark-sun-temple	Templo de Suria	India	Konark Sun Temple	Monumentos y lugares famosos	0
+2	76	golden-temple	Templo Dorado	India	Golden Temple	Monumentos y lugares famosos	0
+2	77	red-fort	Fuerte rojo de Delhi	India	Red Fort	Monumentos y lugares famosos	0
+2	78	gateway-of-india	Puerta de la India	India	Gateway of India	Monumentos y lugares famosos	0
+2	79	lotus-temple	Templo del loto	India	Lotus Temple	Monumentos y lugares famosos	0
+2	80	mysore-palace	Palacio Real de Mysore	India	Mysore Palace	Monumentos y lugares famosos	0
+3	1	new-york-city	Nueva York	Estados Unidos	New York City	Grandes ciudades	0
+3	2	los-angeles	Los Ángeles	Estados Unidos	Los Angeles	Grandes ciudades	0
+3	3	chicago	Chicago	Estados Unidos	Chicago	Grandes ciudades	0
+3	4	toronto	Toronto	Canadá	Toronto	Grandes ciudades	0
+3	5	sydney	Sídney	Australia	Sydney	Grandes ciudades	0
+3	6	melbourne	Melbourne	Australia	Melbourne	Grandes ciudades	0
+3	7	mumbai	Bombay	India	Mumbai	Grandes ciudades	0
+3	8	shanghai	Shanghái	República Popular China	Shanghai	Grandes ciudades	0
+3	9	hong-kong	Hong Kong	República Popular China	Hong Kong	Grandes ciudades	0
+3	10	istanbul	Estambul	Turquía	Istanbul	Grandes ciudades	0
+3	11	dubai	Dubái	Emiratos Árabes Unidos	Dubai	Grandes ciudades	0
+3	12	rio-de-janeiro	Río de Janeiro	Brasil	Rio de Janeiro	Grandes ciudades	0
+3	13	sao-paulo	São Paulo	Brasil	São Paulo	Grandes ciudades	0
+3	14	lagos	Lagos	Nigeria	Lagos	Grandes ciudades	0
+3	15	johannesburg	Johannesburgo	Sudáfrica	Johannesburg	Grandes ciudades	0
+3	16	cape-town	Ciudad del Cabo	Sudáfrica	Cape Town	Grandes ciudades	0
+3	17	casablanca	Casablanca	Marruecos	Casablanca	Grandes ciudades	0
+3	18	marrakesh	Marrakech	Marruecos	Marrakesh	Grandes ciudades	0
+3	19	barcelona	Barcelona	España	Barcelona	Grandes ciudades	0
+3	20	milan	Milán	Italia	Milan	Grandes ciudades	0
+3	21	venice	Venecia	Italia	Venice	Grandes ciudades	0
+3	22	florence	Florencia	Italia	Florence	Grandes ciudades	0
+3	23	munich	Múnich	Alemania	Munich	Grandes ciudades	0
+3	24	hamburg	Hamburgo	Alemania	Hamburg	Grandes ciudades	0
+3	25	frankfurt	Fráncfort del Meno	Alemania	Frankfurt	Grandes ciudades	0
+3	26	zurich	Zúrich	Suiza	Zurich	Grandes ciudades	0
+3	27	geneva	Ginebra	Suiza	Geneva	Grandes ciudades	0
+3	28	edinburgh	Edimburgo	Reino Unido	Edinburgh	Grandes ciudades	0
+3	29	manchester	Mánchester	Reino Unido	Manchester	Grandes ciudades	0
+3	30	liverpool	Liverpool	Reino Unido	Liverpool	Grandes ciudades	0
+3	31	glasgow	Glasgow	Reino Unido	Glasgow	Grandes ciudades	0
+3	32	naples	Nápoles	Italia	Naples	Grandes ciudades	0
+3	33	seville	Sevilla	España	Seville	Grandes ciudades	0
+3	34	valencia	Valencia	España	Valencia	Grandes ciudades	0
+3	35	lyon	Lyon	Francia	Lyon	Grandes ciudades	0
+3	36	marseille	Marsella	Francia	Marseille	Grandes ciudades	0
+3	37	nice	Niza	Francia	Nice	Grandes ciudades	0
+3	38	saint-petersburg	San Petersburgo	Rusia	Saint Petersburg	Grandes ciudades	0
+3	39	kyoto	Kioto	Japón	Kyoto	Grandes ciudades	0
+3	40	osaka	Osaka	Japón	Osaka	Grandes ciudades	0
+3	41	busan	Busan	Corea del Sur	Busan	Grandes ciudades	0
+3	42	taipei	Taipéi	República de China	Taipei	Grandes ciudades	0
+3	43	kolkata	Calcuta	India	Kolkata	Grandes ciudades	0
+3	44	bangalore	Bangalore	India	Bengaluru	Grandes ciudades	0
+3	45	karachi	Karachi	Pakistán	Karachi	Grandes ciudades	0
+3	46	lahore	Lahore	Pakistán	Lahore	Grandes ciudades	0
+3	47	ho-chi-minh-city	Ciudad Ho Chi Minh	Vietnam	Ho Chi Minh City	Grandes ciudades	0
+3	48	las-vegas	Las Vegas	Estados Unidos	Las Vegas	Grandes ciudades	0
+3	49	san-francisco	San Francisco	Estados Unidos	San Francisco	Grandes ciudades	0
+3	50	boston	Boston	Estados Unidos	Boston	Grandes ciudades	0
+3	51	miami	Miami	Estados Unidos	Miami	Grandes ciudades	0
+3	52	seattle	Seattle	Estados Unidos	Seattle	Grandes ciudades	0
+3	53	houston	Houston	Estados Unidos	Houston	Grandes ciudades	0
+3	54	dallas	Dallas	Estados Unidos	Dallas	Grandes ciudades	0
+3	55	philadelphia	Filadelfia	Estados Unidos	Philadelphia	Grandes ciudades	0
+3	56	atlanta	Atlanta	Estados Unidos	Atlanta	Grandes ciudades	0
+3	57	new-orleans	Nueva Orleans	Estados Unidos	New Orleans	Grandes ciudades	0
+3	58	vancouver	Vancouver	Canadá	Vancouver	Grandes ciudades	0
+3	59	montreal	Montreal	Canadá	Montreal	Grandes ciudades	0
+3	60	cartagena	Cartagena de Indias	Colombia	Cartagena	Grandes ciudades	0
+3	61	quebec-city	Quebec	Canadá	Quebec City	Grandes ciudades	0
+3	62	medellin	Medellín	Colombia	Medellín	Grandes ciudades	0
+3	63	cusco	Cusco	Perú	Cusco	Grandes ciudades	0
+3	64	salvador	Salvador	Brasil	Salvador	Grandes ciudades	0
+3	65	guadalajara	Guadalajara	México	Guadalajara	Grandes ciudades	0
+3	66	cancun	Cancún	México	Cancún	Grandes ciudades	0
+3	67	auckland	Auckland	Nueva Zelanda	Auckland	Grandes ciudades	0
+3	68	perth	Perth	Australia	Perth	Grandes ciudades	0
+3	69	brisbane	Brisbane	Australia	Brisbane	Grandes ciudades	0
+3	70	krakow	Cracovia	Polonia	Kraków	Grandes ciudades	0
+3	71	gdansk	Gdansk	Polonia	Gdańsk	Grandes ciudades	0
+3	72	porto	Oporto	Portugal	Porto	Grandes ciudades	0
+3	73	bordeaux	Burdeos	Francia	Bordeaux	Grandes ciudades	0
+3	74	toulouse	Toulouse	Francia	Toulouse	Grandes ciudades	0
+3	75	dubrovnik	Dubrovnik	Croacia	Dubrovnik	Grandes ciudades	0
+3	76	split	Split	Croacia	Split	Grandes ciudades	0
+3	77	salzburg	Salzburgo	Austria	Salzburg	Grandes ciudades	0
+3	78	innsbruck	Innsbruck	Austria	Innsbruck	Grandes ciudades	0
+3	79	bruges	Brujas	Bélgica	Bruges	Grandes ciudades	0
+3	80	antwerp	Amberes	Bélgica	Antwerp	Grandes ciudades	0
+4	1	c:United States of America	Estados Unidos		United States	Países (haz clic dentro)	1
+4	2	c:Canada	Canadá		Canada	Países (haz clic dentro)	1
+4	3	c:Mexico	México		Mexico	Países (haz clic dentro)	1
+4	4	c:Brazil	Brasil		Brazil	Países (haz clic dentro)	1
+4	5	c:Argentina	Argentina		Argentina	Países (haz clic dentro)	1
+4	6	c:Chile	Chile		Chile	Países (haz clic dentro)	1
+4	7	c:Peru	Perú		Peru	Países (haz clic dentro)	1
+4	8	c:Colombia	Colombia		Colombia	Países (haz clic dentro)	1
+4	9	c:Venezuela	Venezuela		Venezuela	Países (haz clic dentro)	1
+4	10	c:Cuba	Cuba		Cuba	Países (haz clic dentro)	1
+4	11	c:United Kingdom	Reino Unido		United Kingdom	Países (haz clic dentro)	1
+4	12	c:Ireland	Irlanda		Republic of Ireland	Países (haz clic dentro)	1
+4	13	c:France	Francia		France	Países (haz clic dentro)	1
+4	14	c:Spain	España		Spain	Países (haz clic dentro)	1
+4	15	c:Portugal	Portugal		Portugal	Países (haz clic dentro)	1
+4	16	c:Italy	Italia		Italy	Países (haz clic dentro)	1
+4	17	c:Germany	Alemania		Germany	Países (haz clic dentro)	1
+4	18	c:Netherlands	Países Bajos		Netherlands	Países (haz clic dentro)	1
+4	19	c:Belgium	Bélgica		Belgium	Países (haz clic dentro)	1
+4	20	c:Switzerland	Suiza		Switzerland	Países (haz clic dentro)	1
+4	21	c:Austria	Austria		Austria	Países (haz clic dentro)	1
+4	22	c:Poland	Polonia		Poland	Países (haz clic dentro)	1
+4	23	c:Sweden	Suecia		Sweden	Países (haz clic dentro)	1
+4	24	c:Norway	Noruega		Norway	Países (haz clic dentro)	1
+4	25	c:Finland	Finlandia		Finland	Países (haz clic dentro)	1
+4	26	c:Denmark	Dinamarca		Denmark	Países (haz clic dentro)	1
+4	27	c:Iceland	Islandia		Iceland	Países (haz clic dentro)	1
+4	28	c:Greece	Grecia		Greece	Países (haz clic dentro)	1
+4	29	c:Turkey	Turquía		Turkey	Países (haz clic dentro)	1
+4	30	c:Russia	Rusia		Russia	Países (haz clic dentro)	1
+4	31	c:Ukraine	Ucrania		Ukraine	Países (haz clic dentro)	1
+4	32	c:Egypt	Egipto		Egypt	Países (haz clic dentro)	1
+4	33	c:Morocco	Marruecos		Morocco	Países (haz clic dentro)	1
+4	34	c:Algeria	Argelia		Algeria	Países (haz clic dentro)	1
+4	35	c:Libya	Libia		Libya	Países (haz clic dentro)	1
+4	36	c:Nigeria	Nigeria		Nigeria	Países (haz clic dentro)	1
+4	37	c:Ethiopia	Etiopía		Ethiopia	Países (haz clic dentro)	1
+4	38	c:Kenya	Kenia		Kenya	Países (haz clic dentro)	1
+4	39	c:South Africa	Sudáfrica		South Africa	Países (haz clic dentro)	1
+4	40	c:Tanzania	Tanzania		Tanzania	Países (haz clic dentro)	1
+4	41	c:Ghana	Ghana		Ghana	Países (haz clic dentro)	1
+4	42	c:Senegal	Senegal		Senegal	Países (haz clic dentro)	1
+4	43	c:Madagascar	Madagascar		Madagascar	Países (haz clic dentro)	1
+4	44	c:Saudi Arabia	Arabia Saudita		Saudi Arabia	Países (haz clic dentro)	1
+4	45	c:Iran	Irán		Iran	Países (haz clic dentro)	1
+4	46	c:Iraq	Irak		Iraq	Países (haz clic dentro)	1
+4	47	c:Israel	Israel		Israel	Países (haz clic dentro)	1
+4	48	c:Syria	Siria		Syria	Países (haz clic dentro)	1
+4	49	c:Jordan	Jordania		Jordan	Países (haz clic dentro)	1
+4	50	c:Lebanon	Líbano		Lebanon	Países (haz clic dentro)	1
+4	51	c:United Arab Emirates	Emiratos Árabes Unidos		United Arab Emirates	Países (haz clic dentro)	1
+4	52	c:Afghanistan	Afganistán		Afghanistan	Países (haz clic dentro)	1
+4	53	c:Pakistan	Pakistán		Pakistan	Países (haz clic dentro)	1
+4	54	c:India	India		India	Países (haz clic dentro)	1
+4	55	c:Bangladesh	Bangladés		Bangladesh	Países (haz clic dentro)	1
+4	56	c:Sri Lanka	Sri Lanka		Sri Lanka	Países (haz clic dentro)	1
+4	57	c:Nepal	Nepal		Nepal	Países (haz clic dentro)	1
+4	58	c:China	República Popular China		China	Países (haz clic dentro)	1
+4	59	c:Mongolia	Mongolia		Mongolia	Países (haz clic dentro)	1
+4	60	c:Japan	Japón		Japan	Países (haz clic dentro)	1
+4	61	c:South Korea	Corea del Sur		South Korea	Países (haz clic dentro)	1
+4	62	c:North Korea	Corea del Norte		North Korea	Países (haz clic dentro)	1
+4	63	c:Vietnam	Vietnam		Vietnam	Países (haz clic dentro)	1
+4	64	c:Thailand	Tailandia		Thailand	Países (haz clic dentro)	1
+4	65	c:Cambodia	Camboya		Cambodia	Países (haz clic dentro)	1
+4	66	c:Laos	Laos		Laos	Países (haz clic dentro)	1
+4	67	c:Myanmar	Birmania		Myanmar	Países (haz clic dentro)	1
+4	68	c:Malaysia	Malasia		Malaysia	Países (haz clic dentro)	1
+4	69	c:Singapore	Singapur		Singapore	Países (haz clic dentro)	1
+4	70	c:Indonesia	Indonesia		Indonesia	Países (haz clic dentro)	1
+4	71	c:Philippines	Filipinas		Philippines	Países (haz clic dentro)	1
+4	72	c:Australia	Australia		Australia	Países (haz clic dentro)	1
+4	73	c:New Zealand	Nueva Zelanda		New Zealand	Países (haz clic dentro)	1
+4	74	c:Papua New Guinea	Papúa Nueva Guinea		Papua New Guinea	Países (haz clic dentro)	1
+4	75	c:Ecuador	Ecuador		Ecuador	Países (haz clic dentro)	1
+4	76	c:Bolivia	Bolivia		Bolivia	Países (haz clic dentro)	1
+4	77	c:Paraguay	Paraguay		Paraguay	Países (haz clic dentro)	1
+4	78	c:Uruguay	Uruguay		Uruguay	Países (haz clic dentro)	1
+4	79	c:Panama	Panamá		Panama	Países (haz clic dentro)	1
+4	80	c:Costa Rica	Costa Rica		Costa Rica	Países (haz clic dentro)	1
+5	1	andorra-la-vella	Andorra la Vieja	Andorra	Andorra la Vella	Capitales del mundo (difíciles)	0
+5	2	vatican-city	Ciudad del Vaticano	Ciudad del Vaticano	Vatican City	Capitales del mundo (difíciles)	0
+5	3	bishkek	Biskek	Kirguistán	Bishkek	Capitales del mundo (difíciles)	0
+5	4	dushanbe	Dusambé	Tayikistán	Dushanbe	Capitales del mundo (difíciles)	0
+5	5	ashgabat	Asjabad	Turkmenistán	Ashgabat	Capitales del mundo (difíciles)	0
+5	6	naypyidaw	Naipyidó	Birmania	Naypyidaw	Capitales del mundo (difíciles)	0
+5	7	vientiane	Vientián	Laos	Vientiane	Capitales del mundo (difíciles)	0
+5	8	phnom-penh	Nom Pen	Camboya	Phnom Penh	Capitales del mundo (difíciles)	0
+5	9	bandar-seri-begawan	Bandar Seri Begawan	Brunéi	Bandar Seri Begawan	Capitales del mundo (difíciles)	0
+5	10	dili	Dili	Timor Oriental	Dili	Capitales del mundo (difíciles)	0
+5	11	thimphu	Timbu	Bután	Thimphu	Capitales del mundo (difíciles)	0
+5	12	male	Malé	Maldivas	Malé	Capitales del mundo (difíciles)	0
+5	13	port-moresby	Puerto Moresby	Papúa Nueva Guinea	Port Moresby	Capitales del mundo (difíciles)	0
+5	14	suva	Suva	Fiyi	Suva	Capitales del mundo (difíciles)	0
+5	15	apia	Apia	Samoa	Apia	Capitales del mundo (difíciles)	0
+5	16	nuku-alofa	Nukualofa	Tonga	Nukuʻalofa	Capitales del mundo (difíciles)	0
+5	17	port-vila	Port Vila	Vanuatu	Port Vila	Capitales del mundo (difíciles)	0
+5	18	honiara	Honiara	Islas Salomón	Honiara	Capitales del mundo (difíciles)	0
+5	19	south-tarawa	Tarawa Sur	Kiribati	South Tarawa	Capitales del mundo (difíciles)	0
+5	20	funafuti	Funafuti	Tuvalu	Funafuti	Capitales del mundo (difíciles)	0
+5	21	majuro	Majuro	Islas Marshall	Majuro	Capitales del mundo (difíciles)	0
+5	22	palikir	Palikir	Estados Federados de Micronesia	Palikir	Capitales del mundo (difíciles)	0
+5	23	yaren	Distrito de Yaren	Nauru	Yaren	Capitales del mundo (difíciles)	0
+5	24	port-au-prince	Puerto Príncipe	Haití	Port-au-Prince	Capitales del mundo (difíciles)	0
+5	25	santo-domingo	Santo Domingo	República Dominicana	Santo Domingo	Capitales del mundo (difíciles)	0
+5	26	nassau	Nasáu	Bahamas	Nassau	Capitales del mundo (difíciles)	0
+5	27	bridgetown	Bridgetown	Barbados	Bridgetown	Capitales del mundo (difíciles)	0
+5	28	port-of-spain	Puerto España	Trinidad y Tobago	Port of Spain	Capitales del mundo (difíciles)	0
+5	29	castries	Castries	Santa Lucía	Castries	Capitales del mundo (difíciles)	0
+5	30	kingstown	Kingstown	San Vicente y las Granadinas	Kingstown	Capitales del mundo (difíciles)	0
+5	31	st-george-s	Saint George	Granada	St. George's	Capitales del mundo (difíciles)	0
+5	32	roseau	Roseau	Dominica	Roseau	Capitales del mundo (difíciles)	0
+5	33	basseterre	Basseterre	San Cristóbal y Nieves	Basseterre	Capitales del mundo (difíciles)	0
+5	34	st-john-s	San Juan de Terranova	Canadá	St. John's	Capitales del mundo (difíciles)	0
+5	35	belmopan	Belmopán	Belice	Belmopan	Capitales del mundo (difíciles)	0
+5	36	guatemala-city	Ciudad de Guatemala	Guatemala	Guatemala City	Capitales del mundo (difíciles)	0
+5	37	san-salvador	San Salvador	El Salvador	San Salvador	Capitales del mundo (difíciles)	0
+5	38	tegucigalpa	Tegucigalpa	Honduras	Tegucigalpa	Capitales del mundo (difíciles)	0
+5	39	managua	Managua	Nicaragua	Managua	Capitales del mundo (difíciles)	0
+5	40	georgetown-guyana	Georgetown	Guyana	Georgetown	Capitales del mundo (difíciles)	0
+5	41	paramaribo	Paramaribo	Surinam	Paramaribo	Capitales del mundo (difíciles)	0
+5	42	freetown	Freetown	Sierra Leona	Freetown	Capitales del mundo (difíciles)	0
+5	43	monrovia	Monrovia	Liberia	Monrovia	Capitales del mundo (difíciles)	0
+5	44	conakry	Conakri	Guinea	Conakry	Capitales del mundo (difíciles)	0
+5	45	bissau	Bisáu	Guinea-Bisáu	Bissau	Capitales del mundo (difíciles)	0
+5	46	banjul	Banjul	Gambia	Banjul	Capitales del mundo (difíciles)	0
+5	47	nouakchott	Nuakchot	Mauritania	Nouakchott	Capitales del mundo (difíciles)	0
+5	48	bamako	Bamako	Mali	Bamako	Capitales del mundo (difíciles)	0
+5	49	ouagadougou	Uagadugú	Burkina Faso	Ouagadougou	Capitales del mundo (difíciles)	0
+5	50	niamey	Niamey	Níger	Niamey	Capitales del mundo (difíciles)	0
+5	51	n-djamena	Yamena	Chad	N'Djamena	Capitales del mundo (difíciles)	0
+5	52	yaounde	Yaundé	Camerún	Yaoundé	Capitales del mundo (difíciles)	0
+5	53	libreville	Libreville	Gabón	Libreville	Capitales del mundo (difíciles)	0
+5	54	malabo	Malabo	Guinea Ecuatorial	Malabo	Capitales del mundo (difíciles)	0
+5	55	sao-tome	Santo Tomé	Santo Tomé y Príncipe	São Tomé	Capitales del mundo (difíciles)	0
+5	56	brazzaville	Brazzaville	Congo	Brazzaville	Capitales del mundo (difíciles)	0
+5	57	bangui	Bangui	República Centroafricana	Bangui	Capitales del mundo (difíciles)	0
+5	58	kigali	Kigali	Ruanda	Kigali	Capitales del mundo (difíciles)	0
+5	59	bujumbura	Buyumbura	Burundi	Bujumbura	Capitales del mundo (difíciles)	0
+5	60	kampala	Kampala	Uganda	Kampala	Capitales del mundo (difíciles)	0
+5	61	dodoma	Dodoma	Tanzania	Dodoma	Capitales del mundo (difíciles)	0
+5	62	lusaka	Lusaka	Zambia	Lusaka	Capitales del mundo (difíciles)	0
+5	63	lilongwe	Lilongüe	Malaui	Lilongwe	Capitales del mundo (difíciles)	0
+5	64	harare	Harare	Zimbabue	Harare	Capitales del mundo (difíciles)	0
+5	65	gaborone	Gaborone	Botsuana	Gaborone	Capitales del mundo (difíciles)	0
+5	66	windhoek	Windhoek	Namibia	Windhoek	Capitales del mundo (difíciles)	0
+5	67	maseru	Maseru	Lesoto	Maseru	Capitales del mundo (difíciles)	0
+5	68	mbabane	Babane	Suazilandia	Mbabane	Capitales del mundo (difíciles)	0
+5	69	maputo	Maputo	Mozambique	Maputo	Capitales del mundo (difíciles)	0
+5	70	antananarivo	Antananarivo	Madagascar	Antananarivo	Capitales del mundo (difíciles)	0
+5	71	port-louis	Port Louis	Mauricio	Port Louis	Capitales del mundo (difíciles)	0
+5	72	victoria	Victoria	Seychelles	Victoria	Capitales del mundo (difíciles)	0
+5	73	moroni	Moroni	Comoras	Moroni	Capitales del mundo (difíciles)	0
+5	74	djibouti	Ciudad de Yibuti	Yibuti	Djibouti City	Capitales del mundo (difíciles)	0
+5	75	asmara	Asmara	Eritrea	Asmara	Capitales del mundo (difíciles)	0
+5	76	mogadishu	Mogadiscio	Somalia	Mogadishu	Capitales del mundo (difíciles)	0
+5	77	juba	Yuba	Sudán del Sur	Juba	Capitales del mundo (difíciles)	0
+5	78	lome	Lomé	Togo	Lomé	Capitales del mundo (difíciles)	0
+5	79	porto-novo	Porto Novo	Benín	Porto-Novo	Capitales del mundo (difíciles)	0
+5	80	yamoussoukro	Yamusukro	Costa de Marfil	Yamoussoukro	Capitales del mundo (difíciles)	0
+6	1	battle-of-the-somme	Batalla del Somme	Francia	Battle of the Somme	Batallas y sucesos famosos	0
+6	2	battle-of-midway	Batalla de Midway	Estados Unidos	Battle of Midway	Batallas y sucesos famosos	0
+6	3	attack-on-pearl-harbor	Ataque a Pearl Harbor	Estados Unidos	Attack on Pearl Harbor	Batallas y sucesos famosos	0
+6	4	battle-of-tours	Batalla de Poitiers	Francia	Battle of Tours	Batallas y sucesos famosos	0
+6	5	battle-of-agincourt	Batalla de Azincourt	Francia	Battle of Agincourt	Batallas y sucesos famosos	0
+6	6	battle-of-lepanto	Batalla de Lepanto	Grecia	Battle of Lepanto	Batallas y sucesos famosos	0
+6	7	battle-of-culloden	Batalla de Culloden	Reino Unido	Battle of Culloden	Batallas y sucesos famosos	0
+6	8	siege-of-yorktown	Batalla de Yorktown	Estados Unidos	Siege of Yorktown	Batallas y sucesos famosos	0
+6	9	battle-of-bunker-hill	Batalla de Bunker Hill	Estados Unidos	Battle of Bunker Hill	Batallas y sucesos famosos	0
+6	10	battle-of-the-alamo	Batalla de El Álamo	Estados Unidos	Battle of the Alamo	Batallas y sucesos famosos	0
+6	11	battle-of-the-little-bighorn	Batalla de Little Bighorn	Estados Unidos	Battle of the Little Bighorn	Batallas y sucesos famosos	0
+6	12	battle-of-rorke-s-drift	Batalla de Rorke's Drift	Sudáfrica	Battle of Rorke's Drift	Batallas y sucesos famosos	0
+6	13	gallipoli-campaign	Batalla de Galípoli	Turquía	Gallipoli campaign	Batallas y sucesos famosos	0
+6	14	battle-of-passchendaele	Tercera batalla de Ypres	Bélgica	Battle of Passchendaele	Batallas y sucesos famosos	0
+6	15	second-battle-of-el-alamein	Segunda batalla de El Alamein	Egipto	Second Battle of El Alamein	Batallas y sucesos famosos	0
+6	16	battle-of-kursk	Batalla de Kursk	Rusia	Battle of Kursk	Batallas y sucesos famosos	0
+6	17	dunkirk-evacuation	Operación Dinamo	Francia	Dunkirk evacuation	Batallas y sucesos famosos	0
+6	18	battle-of-iwo-jima	Batalla de Iwo Jima	Japón	Battle of Iwo Jima	Batallas y sucesos famosos	0
+6	19	battle-of-okinawa	Batalla de Okinawa	Japón	Battle of Okinawa	Batallas y sucesos famosos	0
+6	20	atomic-bombing-of-hiroshima	Bombardeos atómicos de Hiroshima y Nagasaki	Japón	Atomic bombings of Hiroshima and Nagasaki	Batallas y sucesos famosos	0
+6	21	battle-of-dien-bien-phu	Batalla de Dien Bien Phu	Vietnam	Battle of Dien Bien Phu	Batallas y sucesos famosos	0
+6	22	battle-of-inchon	Batalla de Incheon	Corea del Sur	Battle of Inchon	Batallas y sucesos famosos	0
+6	23	bay-of-pigs-invasion	Invasión de bahía de Cochinos	Cuba	Bay of Pigs Invasion	Batallas y sucesos famosos	0
+6	24	battle-of-karbala	Batalla de Kerbala	Irak	Battle of Karbala	Batallas y sucesos famosos	0
+6	25	battle-of-manzikert	Batalla de Manzikert	Turquía	Battle of Manzikert	Batallas y sucesos famosos	0
+6	26	fall-of-constantinople	Caída de Constantinopla	Turquía	Fall of Constantinople	Batallas y sucesos famosos	0
+6	27	battle-of-cannae	Batalla de Cannas	Italia	Battle of Cannae	Batallas y sucesos famosos	0
+6	28	battle-of-zama	Batalla de Zama	Túnez	Battle of Zama	Batallas y sucesos famosos	0
+6	29	battle-of-actium	Batalla de Accio	Grecia	Battle of Actium	Batallas y sucesos famosos	0
+6	30	battle-of-gaugamela	Batalla de Gaugamela	Irak	Battle of Gaugamela	Batallas y sucesos famosos	0
+6	31	battle-of-salamis	Batalla de Salamina	Grecia	Battle of Salamis	Batallas y sucesos famosos	0
+6	32	battle-of-plataea	Batalla de Platea	Grecia	Battle of Plataea	Batallas y sucesos famosos	0
+6	33	battle-of-crecy	Batalla de Crécy	Francia	Battle of Crécy	Batallas y sucesos famosos	0
+6	34	battle-of-bannockburn	Batalla de Bannockburn	Reino Unido	Battle of Bannockburn	Batallas y sucesos famosos	0
+6	35	battle-of-bosworth-field	Batalla de Bosworth	Reino Unido	Battle of Bosworth Field	Batallas y sucesos famosos	0
+6	36	battle-of-naseby	Batalla de Naseby	Reino Unido	Battle of Naseby	Batallas y sucesos famosos	0
+6	37	battle-of-blenheim	Batalla de Höchstädt	Alemania	Battle of Blenheim	Batallas y sucesos famosos	0
+6	38	battle-of-leipzig	Batalla de Leipzig	Alemania	Battle of Leipzig	Batallas y sucesos famosos	0
+6	39	battle-of-borodino	Batalla de Borodinó	Rusia	Battle of Borodino	Batallas y sucesos famosos	0
+6	40	battle-of-sedan	Batalla de Sedán	Francia	Battle of Sedan	Batallas y sucesos famosos	0
+6	41	battle-of-solferino	Batalla de Solferino	Italia	Battle of Solferino	Batallas y sucesos famosos	0
+6	42	battle-of-balaclava	Batalla de Balaclava	Ucrania	Battle of Balaclava	Batallas y sucesos famosos	0
+6	43	battle-of-isandlwana	Batalla de Isandlwana	Sudáfrica	Battle of Isandlwana	Batallas y sucesos famosos	0
+6	44	battle-of-omdurman	Batalla de Omdurmán	Sudán	Battle of Omdurman	Batallas y sucesos famosos	0
+6	45	battle-of-adwa	Batalla de Adua	Etiopía	Battle of Adwa	Batallas y sucesos famosos	0
+6	46	battle-of-tsushima	Batalla de Tsushima	Japón	Battle of Tsushima	Batallas y sucesos famosos	0
+6	47	battle-of-tannenberg	Batalla de Tannenberg	Polonia	Battle of Tannenberg	Batallas y sucesos famosos	0
+6	48	battle-of-jutland	Batalla de Jutlandia		Battle of Jutland	Batallas y sucesos famosos	0
+6	49	first-battle-of-the-marne	Primera batalla del Marne	Francia	First Battle of the Marne	Batallas y sucesos famosos	0
+6	50	battle-of-britain	Batalla de Inglaterra	Reino Unido	Battle of Britain	Batallas y sucesos famosos	0
+6	51	battle-of-berlin	Batalla de Berlín	Alemania	Battle of Berlin	Batallas y sucesos famosos	0
+6	52	battle-of-leyte-gulf	Batalla del golfo de Leyte	Filipinas	Battle of Leyte Gulf	Batallas y sucesos famosos	0
+6	53	battle-of-the-bulge	Batalla de las Ardenas	Bélgica	Battle of the Bulge	Batallas y sucesos famosos	0
+6	54	siege-of-leningrad	Sitio de Leningrado	Rusia	Siege of Leningrad	Batallas y sucesos famosos	0
+6	55	battle-of-monte-cassino	Batalla de Montecassino	Italia	Battle of Monte Cassino	Batallas y sucesos famosos	0
+6	56	battle-of-ia-drang	Batalla del valle de Ia Drang	Vietnam	Battle of Ia Drang	Batallas y sucesos famosos	0
+6	57	tet-offensive	Ofensiva del Tet	Vietnam	Tet Offensive	Batallas y sucesos famosos	0
+6	58	battle-of-khe-sanh	Sitio de Khe Sanh		Siege of Khe Sanh	Batallas y sucesos famosos	0
+6	59	six-day-war	Guerra de los Seis Días	Egipto	Six-Day War	Batallas y sucesos famosos	0
+6	60	yom-kippur-war	Guerra de Yom Kipur	Egipto	Yom Kippur War	Batallas y sucesos famosos	0
+6	61	falklands-war	Guerra de las Malvinas	Reino Unido	Falklands War	Batallas y sucesos famosos	0
+6	62	gulf-war	Guerra del Golfo	Kuwait	Gulf War	Batallas y sucesos famosos	0
+6	63	battle-of-puebla	Batalla de Puebla	México	Battle of Puebla	Batallas y sucesos famosos	0
+6	64	battle-of-boyaca	Batalla de Boyacá	Colombia	Battle of Boyacá	Batallas y sucesos famosos	0
+6	65	battle-of-ayacucho	Batalla de Ayacucho	Perú	Battle of Ayacucho	Batallas y sucesos famosos	0
+6	66	battle-of-carabobo	Batalla de Carabobo	Venezuela	Battle of Carabobo	Batallas y sucesos famosos	0
+6	67	battle-of-maipu	Batalla de Maipú	Chile	Battle of Maipú	Batallas y sucesos famosos	0
+6	68	battle-of-chacabuco	Batalla de Chacabuco	Chile	Battle of Chacabuco	Batallas y sucesos famosos	0
+6	69	storming-of-the-bastille	Toma de la Bastilla	Francia	Storming of the Bastille	Batallas y sucesos famosos	0
+6	70	fall-of-the-berlin-wall	Caída del Muro de Berlín	Alemania Oriental	Fall of the Berlin Wall	Batallas y sucesos famosos	0
+6	71	signing-of-the-magna-carta	Carta Magna	Reino Unido	Magna Carta	Batallas y sucesos famosos	0
+6	72	boston-tea-party	Motín del té	Estados Unidos	Boston Tea Party	Batallas y sucesos famosos	0
+6	73	assassination-of-archduke-franz-ferdinand	Atentado de Sarajevo	Bosnia y Herzegovina	Assassination of Archduke Franz Ferdinand	Batallas y sucesos famosos	0
+6	74	sinking-of-the-titanic	Hundimiento del RMS Titanic		Sinking of the Titanic	Batallas y sucesos famosos	0
+6	75	chernobyl-disaster	Accidente de Chernóbil	Ucrania	Chernobyl disaster	Batallas y sucesos famosos	0
+6	76	apollo-11	Apolo 11	Estados Unidos	Apollo 11	Batallas y sucesos famosos	0
+6	77	wright-brothers	Hermanos Wright	Estados Unidos	Wright brothers	Batallas y sucesos famosos	0
+6	78	hindenburg-disaster	Accidente del Hindenburg	Estados Unidos	Hindenburg disaster	Batallas y sucesos famosos	0
+6	79	great-fire-of-london	Gran incendio de Londres	Reino Unido	Great Fire of London	Batallas y sucesos famosos	0
+6	80	voyages-of-christopher-columbus	Voyages of Christopher Columbus	Bahamas	Voyages of Christopher Columbus	Batallas y sucesos famosos	0
+7	1	mount-etna	Etna	Italia	Mount Etna	Maravillas de la naturaleza	0
+7	2	krakatoa	Krakatoa	Indonesia	Krakatoa	Maravillas de la naturaleza	0
+7	3	mount-st-helens	Monte Santa Helena	Estados Unidos	Mount St. Helens	Maravillas de la naturaleza	0
+7	4	kilauea	Kīlauea	Estados Unidos	Kīlauea	Maravillas de la naturaleza	0
+7	5	uluru	Uluru	Australia	Uluru	Maravillas de la naturaleza	0
+7	6	grand-canyon	Gran Cañón	Estados Unidos	Grand Canyon	Maravillas de la naturaleza	0
+7	7	niagara-falls	Cataratas del Niágara	Estados Unidos	Niagara Falls	Maravillas de la naturaleza	0
+7	8	victoria-falls	Cataratas Victoria	Zambia	Victoria Falls	Maravillas de la naturaleza	0
+7	9	angel-falls	Salto Ángel	Venezuela	Angel Falls	Maravillas de la naturaleza	0
+7	10	sahara	Sahara	Argelia	Sahara	Maravillas de la naturaleza	0
+7	11	gobi-desert	Desierto de Gobi	República Popular China	Gobi Desert	Maravillas de la naturaleza	0
+7	12	atacama-desert	Desierto de Atacama	Chile	Atacama Desert	Maravillas de la naturaleza	0
+7	13	great-barrier-reef	Gran Barrera de Coral	Australia	Great Barrier Reef	Maravillas de la naturaleza	0
+7	14	dead-sea	Mar Muerto	Jordania	Dead Sea	Maravillas de la naturaleza	0
+7	15	lake-victoria	Lago Victoria	Tanzania	Lake Victoria	Maravillas de la naturaleza	0
+7	16	lake-titicaca	Lago Titicaca	Perú	Lake Titicaca	Maravillas de la naturaleza	0
+7	17	lake-superior	Lago Superior	Canadá	Lake Superior	Maravillas de la naturaleza	0
+7	18	lake-geneva	Lago Lemán	Suiza	Lake Geneva	Maravillas de la naturaleza	0
+7	19	lake-como	Lago de Como	Italia	Lake Como	Maravillas de la naturaleza	0
+7	20	galapagos-islands	Islas Galápagos	Ecuador	Galápagos Islands	Maravillas de la naturaleza	0
+7	21	madagascar	Madagascar	Madagascar	Madagascar	Maravillas de la naturaleza	0
+7	22	iceland	Islandia	Islandia	Iceland	Maravillas de la naturaleza	0
+7	23	greenland	Groenlandia	Groenlandia	Greenland	Maravillas de la naturaleza	0
+7	24	hawaii	Hawái	Estados Unidos	Hawaii	Maravillas de la naturaleza	0
+7	25	bora-bora	Bora Bora	Francia	Bora Bora	Maravillas de la naturaleza	0
+7	26	maldives	Maldivas	Maldivas	Maldives	Maravillas de la naturaleza	0
+7	27	santorini	Santorini	Grecia	Santorini	Maravillas de la naturaleza	0
+7	28	amalfi-coast	Costa Amalfitana	Italia	Amalfi Coast	Maravillas de la naturaleza	0
+7	29	geirangerfjord	Fiordo de Geiranger	Noruega	Geirangerfjord	Maravillas de la naturaleza	0
+7	30	halong-bay	Bahía de Ha-Long	Vietnam	Hạ Long Bay	Maravillas de la naturaleza	0
+7	31	zhangjiajie-national-forest-park	Parque forestal nacional de Zhangjiajie	República Popular China	Zhangjiajie National Forest Park	Maravillas de la naturaleza	0
+7	32	yosemite-national-park	Parque nacional de Yosemite	Estados Unidos	Yosemite National Park	Maravillas de la naturaleza	0
+7	33	yellowstone-national-park	Parque nacional de Yellowstone	Estados Unidos	Yellowstone National Park	Maravillas de la naturaleza	0
+7	34	serengeti	Serengueti	Kenia	Serengeti	Maravillas de la naturaleza	0
+7	35	okavango-delta	Delta del Okavango	Botsuana	Okavango Delta	Maravillas de la naturaleza	0
+7	36	ngorongoro-conservation-area	Zona de conservación de Ngorongoro	Tanzania	Ngorongoro Conservation Area	Maravillas de la naturaleza	0
+7	37	mount-kenya	Monte Kenia	Kenia	Mount Kenya	Maravillas de la naturaleza	0
+7	38	rock-of-gibraltar	Peñón de Gibraltar	Reino Unido	Rock of Gibraltar	Maravillas de la naturaleza	0
+7	39	strait-of-gibraltar	Estrecho de Gibraltar	España	Strait of Gibraltar	Maravillas de la naturaleza	0
+7	40	bosporus	Bósforo	Turquía	Bosporus	Maravillas de la naturaleza	0
+7	41	suez-canal	Canal de Suez	Egipto	Suez Canal	Maravillas de la naturaleza	0
+7	42	panama-canal	Canal de Panamá	Panamá	Panama Canal	Maravillas de la naturaleza	0
+7	43	cape-horn	Cabo de Hornos	Chile	Cape Horn	Maravillas de la naturaleza	0
+7	44	cape-of-good-hope	Cabo de Buena Esperanza	Sudáfrica	Cape of Good Hope	Maravillas de la naturaleza	0
+7	45	strait-of-malacca	Estrecho de Malaca	Indonesia	Strait of Malacca	Maravillas de la naturaleza	0
+7	46	english-channel	Canal de la Mancha	Reino Unido	English Channel	Maravillas de la naturaleza	0
+7	47	drake-passage	Pasaje de Drake	Chile	Drake Passage	Maravillas de la naturaleza	0
+7	48	bering-strait	Estrecho de Bering	Estados Unidos	Bering Strait	Maravillas de la naturaleza	0
+7	49	nile-delta	Delta del Nilo	Egipto	Nile Delta	Maravillas de la naturaleza	0
+7	50	danube-delta	Delta del Danubio	Rumania	Danube Delta	Maravillas de la naturaleza	0
+7	51	kalahari-desert	Kalahari	Botsuana	Kalahari Desert	Maravillas de la naturaleza	0
+7	52	mojave-desert	Desierto de Mojave	Estados Unidos	Mojave Desert	Maravillas de la naturaleza	0
+7	53	death-valley	Valle de la Muerte	Estados Unidos	Death Valley	Maravillas de la naturaleza	0
+7	54	mount-olympus	Olimpo	Grecia	Mount Olympus	Maravillas de la naturaleza	0
+7	55	mount-sinai	Monte Sinaí	Egipto	Mount Sinai	Maravillas de la naturaleza	0
+7	56	mount-ararat	Monte Ararat	Turquía	Mount Ararat	Maravillas de la naturaleza	0
+7	57	mount-kailash	Monte Kailāsh	República Popular China	Mount Kailash	Maravillas de la naturaleza	0
+7	58	annapurna	Annapurna	Nepal	Annapurna	Maravillas de la naturaleza	0
+7	59	lhotse	Lhotse	Nepal	Lhotse	Maravillas de la naturaleza	0
+7	60	kangchenjunga	Kanchenjunga	India	Kangchenjunga	Maravillas de la naturaleza	0
+7	61	makalu	Makalu	Nepal	Makalu	Maravillas de la naturaleza	0
+7	62	aoraki-mount-cook	Monte Cook	Nueva Zelanda	Aoraki / Mount Cook	Maravillas de la naturaleza	0
+7	63	nanga-parbat	Nanga Parbat	Pakistán	Nanga Parbat	Maravillas de la naturaleza	0
+7	64	mount-kosciuszko	Monte Kosciuszko	Australia	Mount Kosciuszko	Maravillas de la naturaleza	0
+7	65	vinson-massif	Macizo Vinson		Vinson Massif	Maravillas de la naturaleza	0
+7	66	pico-de-orizaba	Citlaltépetl	México	Pico de Orizaba	Maravillas de la naturaleza	0
+7	67	popocatepetl	Popocatépetl	México	Popocatépetl	Maravillas de la naturaleza	0
+7	68	cotopaxi	Volcán Cotopaxi	Ecuador	Cotopaxi	Maravillas de la naturaleza	0
+7	69	chimborazo	Volcán Chimborazo	Ecuador	Chimborazo	Maravillas de la naturaleza	0
+7	70	mauna-kea	Mauna Kea	Estados Unidos	Mauna Kea	Maravillas de la naturaleza	0
+7	71	mount-erebus	Monte Erebus		Mount Erebus	Maravillas de la naturaleza	0
+7	72	mediterranean-sea	Mar Mediterráneo	España	Mediterranean Sea	Maravillas de la naturaleza	0
+7	73	caribbean-sea	Mar Caribe	México	Caribbean Sea	Maravillas de la naturaleza	0
+7	74	baltic-sea	Mar Báltico	Suecia	Baltic Sea	Maravillas de la naturaleza	0
+7	75	black-sea	Mar Negro	Bulgaria	Black Sea	Maravillas de la naturaleza	0
+7	76	red-sea	Mar Rojo	Egipto	Red Sea	Maravillas de la naturaleza	0
+7	77	caspian-sea	Mar Caspio	Irán	Caspian Sea	Maravillas de la naturaleza	0
+7	78	arctic-ocean	Océano Ártico		Arctic Ocean	Maravillas de la naturaleza	0
+7	79	sea-of-japan	Mar del Japón	Rusia	Sea of Japan	Maravillas de la naturaleza	0
+7	80	indian-ocean	Océano Índico		Indian Ocean	Maravillas de la naturaleza	0
+8	1	incheon	Incheon	Corea del Sur	Incheon	Ciudades importantes	1
+8	2	mombasa	Mombasa	Kenia	Mombasa	Ciudades importantes	1
+8	3	zanzibar-city	Zanzíbar	Tanzania	Zanzibar City	Ciudades importantes	1
+8	4	dar-es-salaam	Dar es-Salam	Tanzania	Dar es Salaam	Ciudades importantes	1
+8	5	durban	Durban	Sudáfrica	Durban	Ciudades importantes	1
+8	6	port-elizabeth	Puerto Elizabeth	Sudáfrica	Gqeberha	Ciudades importantes	1
+8	7	aswan	Asuán	Egipto	Aswan	Ciudades importantes	1
+8	8	fez	Fez	Marruecos	Fez	Ciudades importantes	1
+8	9	tangier	Tánger	Marruecos	Tangier	Ciudades importantes	1
+8	10	oran	Orán	Argelia	Oran	Ciudades importantes	1
+8	11	carthage	Cartago	Túnez	Carthage	Ciudades importantes	1
+8	12	timbuktu	Tombuctú	Mali	Timbuktu	Ciudades importantes	1
+8	13	kumasi	Kumasi	Ghana	Kumasi	Ciudades importantes	1
+8	14	abidjan	Abiyán	Costa de Marfil	Abidjan	Ciudades importantes	1
+8	15	douala	Duala	Camerún	Douala	Ciudades importantes	1
+8	16	lubumbashi	Lubumbashi	República Democrática del Congo	Lubumbashi	Ciudades importantes	1
+8	17	benguela	Benguela	Angola	Benguela	Ciudades importantes	1
+8	18	giza	Guiza	Egipto	Giza	Ciudades importantes	1
+8	19	haifa	Haifa	Israel	Haifa	Ciudades importantes	1
+8	20	aleppo	Alepo	Siria	Aleppo	Ciudades importantes	1
+8	21	petra	Petra	Jordania	Petra	Ciudades importantes	1
+8	22	basra	Basora	Irak	Basra	Ciudades importantes	1
+8	23	mosul	Mosul	Irak	Mosul	Ciudades importantes	1
+8	24	isfahan	Isfahán	Irán	Isfahan	Ciudades importantes	1
+8	25	shiraz	Shiraz	Irán	Shiraz	Ciudades importantes	1
+8	26	mashhad	Mashhad	Irán	Mashhad	Ciudades importantes	1
+8	27	tabriz	Tabriz	Irán	Tabriz	Ciudades importantes	1
+8	28	samarkand	Samarcanda	Uzbekistán	Samarkand	Ciudades importantes	1
+8	29	bukhara	Bujará	Uzbekistán	Bukhara	Ciudades importantes	1
+8	30	almaty	Almaty	Kazajistán	Almaty	Ciudades importantes	1
+8	31	novosibirsk	Novosibirsk	Rusia	Novosibirsk	Ciudades importantes	1
+8	32	vladivostok	Vladivostok	Rusia	Vladivostok	Ciudades importantes	1
+8	33	yekaterinburg	Ekaterimburgo	Rusia	Yekaterinburg	Ciudades importantes	1
+8	34	kazan	Kazán	Rusia	Kazan	Ciudades importantes	1
+8	35	sochi	Sochi	Rusia	Sochi	Ciudades importantes	1
+8	36	murmansk	Múrmansk	Rusia	Murmansk	Ciudades importantes	1
+8	37	kaliningrad	Kaliningrado	Rusia	Kaliningrad	Ciudades importantes	1
+8	38	wroc-aw	Breslavia	Polonia	Wrocław	Ciudades importantes	1
+8	39	poznan	Poznan	Polonia	Poznań	Ciudades importantes	1
+8	40	odz	Lodz	Polonia	Łódź	Ciudades importantes	1
+8	41	brno	Brno	República Checa	Brno	Ciudades importantes	1
+8	42	ostrava	Ostrava	República Checa	Ostrava	Ciudades importantes	1
+8	43	kosice	Košice	Eslovaquia	Košice	Ciudades importantes	1
+8	44	graz	Graz	Austria	Graz	Ciudades importantes	1
+8	45	linz	Linz	Austria	Linz	Ciudades importantes	1
+8	46	basel	Basilea	Suiza	Basel	Ciudades importantes	1
+8	47	lausanne	Lausana	Suiza	Lausanne	Ciudades importantes	1
+8	48	lugano	Lugano	Suiza	Lugano	Ciudades importantes	1
+8	49	turin	Turín	Italia	Turin	Ciudades importantes	1
+8	50	bologna	Bolonia	Italia	Bologna	Ciudades importantes	1
+8	51	genoa	Génova	Italia	Genoa	Ciudades importantes	1
+8	52	verona	Verona	Italia	Verona	Ciudades importantes	1
+8	53	pisa	Pisa	Italia	Pisa	Ciudades importantes	1
+8	54	palermo	Palermo	Italia	Palermo	Ciudades importantes	1
+8	55	catania	Catania	Italia	Catania	Ciudades importantes	1
+8	56	cagliari	Cagliari	Italia	Cagliari	Ciudades importantes	1
+8	57	bari	Bari	Italia	Bari	Ciudades importantes	1
+8	58	bilbao	Bilbao	España	Bilbao	Ciudades importantes	1
+8	59	granada	Granada	España	Granada	Ciudades importantes	1
+8	60	malaga	Málaga	España	Málaga	Ciudades importantes	1
+8	61	zaragoza	Zaragoza	España	Zaragoza	Ciudades importantes	1
+8	62	palma-de-mallorca	Palma de Mallorca	España	Palma de Mallorca	Ciudades importantes	1
+8	63	toledo	Toledo	España	Toledo	Ciudades importantes	1
+8	64	salamanca	Salamanca	España	Salamanca	Ciudades importantes	1
+8	65	santiago-de-compostela	Santiago de Compostela	España	Santiago de Compostela	Ciudades importantes	1
+8	66	faro	Faro	Portugal	Faro	Ciudades importantes	1
+8	67	coimbra	Coímbra	Portugal	Coimbra	Ciudades importantes	1
+8	68	madeira	Madeira	Portugal	Madeira	Ciudades importantes	1
+8	69	ponta-delgada	Ponta Delgada	Portugal	Ponta Delgada	Ciudades importantes	1
+8	70	cork	Cork	Irlanda	Cork	Ciudades importantes	1
+8	71	galway	Galway	Irlanda	Galway	Ciudades importantes	1
+8	72	belfast	Belfast	Reino Unido	Belfast	Ciudades importantes	1
+8	73	cardiff	Cardiff	Reino Unido	Cardiff	Ciudades importantes	1
+8	74	aberdeen	Aberdeen	Reino Unido	Aberdeen	Ciudades importantes	1
+8	75	bristol	Bristol	Reino Unido	Bristol	Ciudades importantes	1
+8	76	birmingham	Birmingham	Reino Unido	Birmingham	Ciudades importantes	1
+8	77	leeds	Leeds	Reino Unido	Leeds	Ciudades importantes	1
+8	78	sheffield	Sheffield	Reino Unido	Sheffield	Ciudades importantes	1
+8	79	newcastle-upon-tyne	Newcastle upon Tyne	Reino Unido	Newcastle upon Tyne	Ciudades importantes	1
+8	80	nottingham	Nottingham	Reino Unido	Nottingham	Ciudades importantes	1
+9	1	utrecht	Utrecht	Países Bajos	Utrecht	Ciudades difíciles	0
+9	2	the-hague	La Haya	Países Bajos	The Hague	Ciudades difíciles	0
+9	3	groningen	Groninga	Países Bajos	Groningen	Ciudades difíciles	0
+9	4	aarhus	Aarhus	Dinamarca	Aarhus	Ciudades difíciles	0
+9	5	odense	Odense	Dinamarca	Odense	Ciudades difíciles	0
+9	6	malmo	Malmö	Suecia	Malmö	Ciudades difíciles	0
+9	7	uppsala	Upsala	Suecia	Uppsala	Ciudades difíciles	0
+9	8	troms	Tromsø	Noruega	Tromsø	Ciudades difíciles	0
+9	9	trondheim	Trondheim	Noruega	Trondheim	Ciudades difíciles	0
+9	10	stavanger	Stavanger	Noruega	Stavanger	Ciudades difíciles	0
+9	11	tampere	Tampere	Finlandia	Tampere	Ciudades difíciles	0
+9	12	turku	Turku	Finlandia	Turku	Ciudades difíciles	0
+9	13	rovaniemi	Rovaniemi	Finlandia	Rovaniemi	Ciudades difíciles	0
+9	14	akureyri	Akureyri	Islandia	Akureyri	Ciudades difíciles	0
+9	15	torshavn	Tórshavn	Dinamarca	Tórshavn	Ciudades difíciles	0
+9	16	nuuk	Nuuk	Groenlandia	Nuuk	Ciudades difíciles	0
+9	17	anchorage	Anchorage	Estados Unidos	Anchorage	Ciudades difíciles	0
+9	18	honolulu	Honolulu	Estados Unidos	Honolulu	Ciudades difíciles	0
+9	19	denver	Denver	Estados Unidos	Denver	Ciudades difíciles	0
+9	20	phoenix	Phoenix	Estados Unidos	Phoenix	Ciudades difíciles	0
+9	21	san-diego	San Diego	Estados Unidos	San Diego	Ciudades difíciles	0
+9	22	portland	Portland	Estados Unidos	Portland	Ciudades difíciles	0
+9	23	austin	Austin	Estados Unidos	Austin	Ciudades difíciles	0
+9	24	nashville	Nashville	Estados Unidos	Nashville	Ciudades difíciles	0
+9	25	detroit	Detroit	Estados Unidos	Detroit	Ciudades difíciles	0
+9	26	minneapolis	Minneapolis	Estados Unidos	Minneapolis	Ciudades difíciles	0
+9	27	albuquerque	Albuquerque	Estados Unidos	Albuquerque	Ciudades difíciles	0
+9	28	salt-lake-city	Salt Lake City	Estados Unidos	Salt Lake City	Ciudades difíciles	0
+9	29	santa-fe	Santa Fe	Estados Unidos	Santa Fe	Ciudades difíciles	0
+9	30	charleston	Charleston	Estados Unidos	Charleston	Ciudades difíciles	0
+9	31	savannah	Savannah	Estados Unidos	Savannah	Ciudades difíciles	0
+9	32	memphis	Memphis	Estados Unidos	Memphis	Ciudades difíciles	0
+9	33	pittsburgh	Pittsburgh	Estados Unidos	Pittsburgh	Ciudades difíciles	0
+9	34	cleveland	Cleveland	Estados Unidos	Cleveland	Ciudades difíciles	0
+9	35	baltimore	Baltimore	Estados Unidos	Baltimore	Ciudades difíciles	0
+9	36	buffalo	Búfalo	Estados Unidos	Buffalo	Ciudades difíciles	0
+9	37	calgary	Calgary	Canadá	Calgary	Ciudades difíciles	0
+9	38	edmonton	Edmonton	Canadá	Edmonton	Ciudades difíciles	0
+9	39	winnipeg	Winnipeg	Canadá	Winnipeg	Ciudades difíciles	0
+9	40	halifax	Halifax	Canadá	Halifax	Ciudades difíciles	0
+9	41	whitehorse	Whitehorse	Canadá	Whitehorse	Ciudades difíciles	0
+9	42	monterrey	Monterrey	México	Monterrey	Ciudades difíciles	0
+9	43	tijuana	Tijuana	México	Tijuana	Ciudades difíciles	0
+9	44	puebla	Puebla	México	Puebla	Ciudades difíciles	0
+9	45	oaxaca	Oaxaca	México	Oaxaca	Ciudades difíciles	0
+9	46	guanajuato	Guanajuato	México	Guanajuato	Ciudades difíciles	0
+9	47	san-juan	San Juan	Estados Unidos	San Juan	Ciudades difíciles	0
+9	48	cali	Cali	Colombia	Cali	Ciudades difíciles	0
+9	49	barranquilla	Barranquilla	Colombia	Barranquilla	Ciudades difíciles	0
+9	50	guayaquil	Guayaquil	Ecuador	Guayaquil	Ciudades difíciles	0
+9	51	arequipa	Arequipa	Perú	Arequipa	Ciudades difíciles	0
+9	52	trujillo	Trujillo	Perú	Trujillo	Ciudades difíciles	0
+9	53	potosi	Potosí	Bolivia	Potosí	Ciudades difíciles	0
+9	54	sucre	Sucre	Bolivia	Sucre	Ciudades difíciles	0
+9	55	santa-cruz-de-la-sierra	Santa Cruz de la Sierra	Bolivia	Santa Cruz de la Sierra	Ciudades difíciles	0
+9	56	cordoba	Córdoba	Argentina	Córdoba	Ciudades difíciles	0
+9	57	mendoza	Mendoza	Argentina	Mendoza	Ciudades difíciles	0
+9	58	rosario	Rosario	Argentina	Rosario	Ciudades difíciles	0
+9	59	ushuaia	Ushuaia	Argentina	Ushuaia	Ciudades difíciles	0
+9	60	bariloche	San Carlos de Bariloche	Argentina	Bariloche	Ciudades difíciles	0
+9	61	valparaiso	Valparaíso	Chile	Valparaíso	Ciudades difíciles	0
+9	62	punta-arenas	Punta Arenas	Chile	Punta Arenas	Ciudades difíciles	0
+9	63	curitiba	Curitiba	Brasil	Curitiba	Ciudades difíciles	0
+9	64	recife	Recife	Brasil	Recife	Ciudades difíciles	0
+9	65	fortaleza	Fortaleza	Brasil	Fortaleza	Ciudades difíciles	0
+9	66	manaus	Manaos	Brasil	Manaus	Ciudades difíciles	0
+9	67	belem	Belém	Brasil	Belém	Ciudades difíciles	0
+9	68	porto-alegre	Porto Alegre	Brasil	Porto Alegre	Ciudades difíciles	0
+9	69	belo-horizonte	Belo Horizonte	Brasil	Belo Horizonte	Ciudades difíciles	0
+9	70	florianopolis	Florianópolis	Brasil	Florianópolis	Ciudades difíciles	0
+9	71	adelaide	Adelaida	Australia	Adelaide	Ciudades difíciles	0
+9	72	darwin	Darwin	Australia	Darwin	Ciudades difíciles	0
+9	73	hobart	Hobart	Australia	Hobart	Ciudades difíciles	0
+9	74	alice-springs	Alice Springs	Australia	Alice Springs	Ciudades difíciles	0
+9	75	cairns	Cairns	Australia	Cairns	Ciudades difíciles	0
+9	76	christchurch	Christchurch	Nueva Zelanda	Christchurch	Ciudades difíciles	0
+9	77	queenstown	Queenstown	Nueva Zelanda	Queenstown	Ciudades difíciles	0
+9	78	dunedin	Dunedin	Nueva Zelanda	Dunedin	Ciudades difíciles	0
+9	79	noumea	Numea	Francia	Nouméa	Ciudades difíciles	0
+9	80	papeete	Papeete	Francia	Papeete	Ciudades difíciles	0
+10	1	table-mountain	Montaña de la Mesa	Sudáfrica	Table Mountain	Maravillas del mundo (difíciles)	0
+10	2	abu-simbel-temples	Abu Simbel	Egipto	Abu Simbel	Maravillas del mundo (difíciles)	0
+10	3	karnak	Karnak	Egipto	Karnak	Maravillas del mundo (difíciles)	0
+10	4	valley-of-the-kings	Valle de los Reyes	Egipto	Valley of the Kings	Maravillas del mundo (difíciles)	0
+10	5	great-mosque-of-djenne	Gran Mezquita de Djenné	Mali	Great Mosque of Djenné	Maravillas del mundo (difíciles)	0
+10	6	robben-island	Isla Robben	Sudáfrica	Robben Island	Maravillas del mundo (difíciles)	0
+10	7	great-zimbabwe	Gran Zimbabue	Zimbabue	Great Zimbabwe	Maravillas del mundo (difíciles)	0
+10	8	lalibela	Lalibela	Etiopía	Lalibela	Maravillas del mundo (difíciles)	0
+10	9	jemaa-el-fnaa	Plaza de Yamaa el Fna	Marruecos	Jemaa el-Fnaa	Maravillas del mundo (difíciles)	0
+10	10	hassan-ii-mosque	Mezquita Hassan II	Marruecos	Hassan II Mosque	Maravillas del mundo (difíciles)	0
+10	11	ait-benhaddou	Ksar de Ait Ben Hadu	Marruecos	Aït Benhaddou	Maravillas del mundo (difíciles)	0
+10	12	tikal	Tikal	Guatemala	Tikal	Maravillas del mundo (difíciles)	0
+10	13	copacabana	Copacabana	Brasil	Copacabana	Maravillas del mundo (difíciles)	0
+10	14	sugarloaf-mountain	Pan de Azúcar	Brasil	Sugarloaf Mountain	Maravillas del mundo (difíciles)	0
+10	15	nazca-lines	Líneas de Nazca	Perú	Nazca lines	Maravillas del mundo (difíciles)	0
+10	16	sacsayhuaman	Sacsayhuamán	Perú	Sacsayhuamán	Maravillas del mundo (difíciles)	0
+10	17	sydney-harbour-bridge	Puente de la bahía de Sídney	Australia	Sydney Harbour Bridge	Maravillas del mundo (difíciles)	0
+10	18	hobbiton-movie-set	Hobbiton Movie Set	Nueva Zelanda	Hobbiton Movie Set	Maravillas del mundo (difíciles)	0
+10	19	brooklyn-bridge	Puente de Brooklyn	Estados Unidos	Brooklyn Bridge	Maravillas del mundo (difíciles)	0
+10	20	chrysler-building	Edificio Chrysler	Estados Unidos	Chrysler Building	Maravillas del mundo (difíciles)	0
+10	21	grand-central-terminal	Grand Central Terminal	Estados Unidos	Grand Central Terminal	Maravillas del mundo (difíciles)	0
+10	22	lincoln-memorial	Monumento a Lincoln	Estados Unidos	Lincoln Memorial	Maravillas del mundo (difíciles)	0
+10	23	washington-monument	Monumento a Washington	Estados Unidos	Washington Monument	Maravillas del mundo (difíciles)	0
+10	24	united-states-capitol	Capitolio de los Estados Unidos	Estados Unidos	United States Capitol	Maravillas del mundo (difíciles)	0
+10	25	lincoln-center	Lincoln Center	Estados Unidos	Lincoln Center	Maravillas del mundo (difíciles)	0
+10	26	fenway-park	Fenway Park	Estados Unidos	Fenway Park	Maravillas del mundo (difíciles)	0
+10	27	wrigley-field	Wrigley Field	Estados Unidos	Wrigley Field	Maravillas del mundo (difíciles)	0
+10	28	cloud-gate	Cloud Gate	Estados Unidos	Cloud Gate	Maravillas del mundo (difíciles)	0
+10	29	willis-tower	Torre Willis	Estados Unidos	Willis Tower	Maravillas del mundo (difíciles)	0
+10	30	gateway-arch	Arco Gateway	Estados Unidos	Gateway Arch	Maravillas del mundo (difíciles)	0
+10	31	graceland	Graceland	Estados Unidos	Graceland	Maravillas del mundo (difíciles)	0
+10	32	alamo-mission	Misión de El Álamo	Estados Unidos	Alamo Mission	Maravillas del mundo (difíciles)	0
+10	33	cinderella-castle	Castillo de la Cenicienta	Estados Unidos	Cinderella Castle	Maravillas del mundo (difíciles)	0
+10	34	walt-disney-world	Walt Disney World Resort	Estados Unidos	Walt Disney World	Maravillas del mundo (difíciles)	0
+10	35	universal-studios-hollywood	Universal Studios Hollywood	Estados Unidos	Universal Studios Hollywood	Maravillas del mundo (difíciles)	0
+10	36	griffith-observatory	Observatorio Griffith	Estados Unidos	Griffith Observatory	Maravillas del mundo (difíciles)	0
+10	37	hearst-castle	Castillo Hearst	Estados Unidos	Hearst Castle	Maravillas del mundo (difíciles)	0
+10	38	biltmore-estate	Biltmore Estate	Estados Unidos	Biltmore Estate	Maravillas del mundo (difíciles)	0
+10	39	mount-vernon	Mount Vernon	Estados Unidos	Mount Vernon	Maravillas del mundo (difíciles)	0
+10	40	independence-hall	Independence Hall	Estados Unidos	Independence Hall	Maravillas del mundo (difíciles)	0
+10	41	liberty-bell	Campana de la Libertad	Estados Unidos	Liberty Bell	Maravillas del mundo (difíciles)	0
+10	42	fort-knox	Fort Knox	Estados Unidos	Fort Knox	Maravillas del mundo (difíciles)	0
+10	43	area-51	Área 51	Estados Unidos	Area 51	Maravillas del mundo (difíciles)	0
+10	44	roswell	Roswell	Estados Unidos	Roswell	Maravillas del mundo (difíciles)	0
+10	45	kitty-hawk	Kitty Hawk	Estados Unidos	Kitty Hawk	Maravillas del mundo (difíciles)	0
+10	46	chateau-frontenac	Château Frontenac	Canadá	Château Frontenac	Maravillas del mundo (difíciles)	0
+10	47	parliament-hill	Parliament Hill	Canadá	Parliament Hill	Maravillas del mundo (difíciles)	0
+10	48	casa-loma	Casa Loma	Canadá	Casa Loma	Maravillas del mundo (difíciles)	0
+10	49	lake-louise	Lago Louise	Canadá	Lake Louise	Maravillas del mundo (difíciles)	0
+10	50	banff	Banff	Canadá	Banff	Maravillas del mundo (difíciles)	0
+10	51	niagara-on-the-lake	Niagara-on-the-Lake	Canadá	Niagara-on-the-Lake	Maravillas del mundo (difíciles)	0
+10	52	palacio-de-bellas-artes	Palacio de Bellas Artes	México	Palacio de Bellas Artes	Maravillas del mundo (difíciles)	0
+10	53	zocalo	Plaza de la Constitución	México	Zócalo	Maravillas del mundo (difíciles)	0
+10	54	tulum	Tulum	México	Tulum	Maravillas del mundo (difíciles)	0
+10	55	uxmal	Uxmal	México	Uxmal	Maravillas del mundo (difíciles)	0
+10	56	palenque	Zona arqueológica de Palenque	México	Palenque	Maravillas del mundo (difíciles)	0
+10	57	monte-alban	Monte Albán	México	Monte Albán	Maravillas del mundo (difíciles)	0
+10	58	cartagena-s-walled-city	Cartagena de Indias	Colombia	Cartagena	Maravillas del mundo (difíciles)	0
+10	59	red-fort	Fuerte rojo de Delhi	India	Red Fort	Maravillas del mundo (difíciles)	0
+10	60	golden-temple	Templo Dorado	India	Golden Temple	Maravillas del mundo (difíciles)	0
+10	61	konark-sun-temple	Templo de Suria	India	Konark Sun Temple	Maravillas del mundo (difíciles)	0
+10	62	hampi	Hampi	India	Hampi	Maravillas del mundo (difíciles)	0
+10	63	ellora-caves	Ellora	India	Ellora Caves	Maravillas del mundo (difíciles)	0
+10	64	persepolis	Persépolis	Irán	Persepolis	Maravillas del mundo (difíciles)	0
+10	65	gobekli-tepe	Göbekli Tepe	Turquía	Göbekli Tepe	Maravillas del mundo (difíciles)	0
+10	66	cappadocia	Capadocia	Turquía	Cappadocia	Maravillas del mundo (difíciles)	0
+10	67	pamukkale	Pamukkale	Turquía	Pamukkale	Maravillas del mundo (difíciles)	0
+10	68	ephesus	Éfeso	Turquía	Ephesus	Maravillas del mundo (difíciles)	0
+10	69	meteora	Meteora	Grecia	Meteora	Maravillas del mundo (difíciles)	0
+10	70	guggenheim-museum-bilbao	Museo Guggenheim Bilbao	España	Guggenheim Museum Bilbao	Maravillas del mundo (difíciles)	0
+10	71	mezquita-catedral-de-cordoba	Mezquita-catedral de Córdoba	España	Mosque–Cathedral of Córdoba	Maravillas del mundo (difíciles)	0
+10	72	belem-tower	Torre de Belém	Portugal	Belém Tower	Maravillas del mundo (difíciles)	0
+10	73	schonbrunn-palace	Palacio de Schönbrunn	Austria	Schönbrunn Palace	Maravillas del mundo (difíciles)	0
+10	74	charles-bridge	Puente Carlos	República Checa	Charles Bridge	Maravillas del mundo (difíciles)	0
+10	75	prague-castle	Castillo de Praga	República Checa	Prague Castle	Maravillas del mundo (difíciles)	0
+10	76	cologne-cathedral	Catedral de Colonia	Alemania	Cologne Cathedral	Maravillas del mundo (difíciles)	0
+10	77	pantheon	Panteón de Agripa	Italia	Pantheon	Maravillas del mundo (difíciles)	0
+10	78	pompeii	Pompeya	Italia	Pompeii	Maravillas del mundo (difíciles)	0
+10	79	milan-cathedral	Catedral de Milán	Italia	Milan Cathedral	Maravillas del mundo (difíciles)	0
+10	80	st-peter-s-basilica	Basílica de San Pedro	Ciudad del Vaticano	St. Peter's Basilica	Maravillas del mundo (difíciles)	0
+11	1	falklands-war	Guerra de las Malvinas	Reino Unido	Falklands War	Historia (difícil)	0
+11	2	gulf-war	Guerra del Golfo	Kuwait	Gulf War	Historia (difícil)	0
+11	3	battle-of-puebla	Batalla de Puebla	México	Battle of Puebla	Historia (difícil)	0
+11	4	battle-of-boyaca	Batalla de Boyacá	Colombia	Battle of Boyacá	Historia (difícil)	0
+11	5	battle-of-ayacucho	Batalla de Ayacucho	Perú	Battle of Ayacucho	Historia (difícil)	0
+11	6	battle-of-carabobo	Batalla de Carabobo	Venezuela	Battle of Carabobo	Historia (difícil)	0
+11	7	battle-of-maipu	Batalla de Maipú	Chile	Battle of Maipú	Historia (difícil)	0
+11	8	battle-of-chacabuco	Batalla de Chacabuco	Chile	Battle of Chacabuco	Historia (difícil)	0
+11	9	storming-of-the-bastille	Toma de la Bastilla	Francia	Storming of the Bastille	Historia (difícil)	0
+11	10	fall-of-the-berlin-wall	Caída del Muro de Berlín	Alemania Oriental	Fall of the Berlin Wall	Historia (difícil)	0
+11	11	signing-of-the-magna-carta	Carta Magna	Reino Unido	Magna Carta	Historia (difícil)	0
+11	12	boston-tea-party	Motín del té	Estados Unidos	Boston Tea Party	Historia (difícil)	0
+11	13	assassination-of-archduke-franz-ferdinand	Atentado de Sarajevo	Bosnia y Herzegovina	Assassination of Archduke Franz Ferdinand	Historia (difícil)	0
+11	14	sinking-of-the-titanic	Hundimiento del RMS Titanic		Sinking of the Titanic	Historia (difícil)	0
+11	15	chernobyl-disaster	Accidente de Chernóbil	Ucrania	Chernobyl disaster	Historia (difícil)	0
+11	16	apollo-11	Apolo 11	Estados Unidos	Apollo 11	Historia (difícil)	0
+11	17	wright-brothers	Hermanos Wright	Estados Unidos	Wright brothers	Historia (difícil)	0
+11	18	hindenburg-disaster	Accidente del Hindenburg	Estados Unidos	Hindenburg disaster	Historia (difícil)	0
+11	19	great-fire-of-london	Gran incendio de Londres	Reino Unido	Great Fire of London	Historia (difícil)	0
+11	20	voyages-of-christopher-columbus	Voyages of Christopher Columbus	Bahamas	Voyages of Christopher Columbus	Historia (difícil)	0
+11	21	1883-eruption-of-krakatoa	Erupción del Krakatoa de 1883	Indias Orientales Neerlandesas	1883 eruption of Krakatoa	Historia (difícil)	0
+11	22	trinity	Prueba Trinity	Estados Unidos	Trinity	Historia (difícil)	0
+11	23	cuban-missile-crisis	Crisis de los misiles de Cuba	Cuba	Cuban Missile Crisis	Historia (difícil)	0
+11	24	tiananmen-square-protests-of-1989	Protestas y masacre de la plaza de Tiananmén de 1989	República Popular China	1989 Tiananmen Square protests and massacre	Historia (difícil)	0
+11	25	yalta-conference	Conferencia de Yalta	Ucrania	Yalta Conference	Historia (difícil)	0
+11	26	potsdam-conference	Conferencia de Potsdam	Alemania	Potsdam Conference	Historia (difícil)	0
+11	27	treaty-of-versailles	Tratado de Versalles	Francia	Treaty of Versailles	Historia (difícil)	0
+11	28	congress-of-vienna	Congreso de Viena	Austria	Congress of Vienna	Historia (difícil)	0
+11	29	united-states-declaration-of-independence	Declaración de Independencia de los Estados Unidos	Estados Unidos	United States Declaration of Independence	Historia (difícil)	0
+11	30	gettysburg-address	Discurso de Gettysburg	Estados Unidos	Gettysburg Address	Historia (difícil)	0
+11	31	suez-crisis	Guerra del Sinaí	Egipto	Suez Crisis	Historia (difícil)	0
+11	32	partition-of-india	Partición de la India	India	Partition of India	Historia (difícil)	0
+11	33	woodstock	Festival de Woodstock	Estados Unidos	Woodstock	Historia (difícil)	0
+11	34	live-aid	Live Aid	Estados Unidos	Live Aid	Historia (difícil)	0
+11	35	september-11-attacks	Atentados del 11 de septiembre de 2001	Estados Unidos	September 11 attacks	Historia (difícil)	0
+11	36	1755-lisbon-earthquake	Terremoto de Lisboa de 1755	Portugal	1755 Lisbon earthquake	Historia (difícil)	0
+11	37	eruption-of-mount-vesuvius-in-79-ad	Erupción del Vesubio en 79	Italia	Eruption of Mount Vesuvius in 79 AD	Historia (difícil)	0
+11	38	storming-of-the-winter-palace	Revolución de Octubre	Rusia	October Revolution	Historia (difícil)	0
+11	39	long-march	Larga Marcha	República Popular China	Long March	Historia (difícil)	0
+11	40	salt-march	Marcha de la sal	India	Salt March	Historia (difícil)	0
+11	41	boxer-rebellion	Levantamiento de los bóxers	República Popular China	Boxer Rebellion	Historia (difícil)	0
+11	42	taiping-rebellion	Rebelión Taiping	República Popular China	Taiping Rebellion	Historia (difícil)	0
+11	43	meiji-restoration	Restauración Meiji	Japón	Meiji Restoration	Historia (difícil)	0
+11	44	opium-wars	Guerras del Opio	República Popular China	Opium Wars	Historia (difícil)	0
+11	45	berlin-conference	Conferencia de Berlín	Alemania	Berlin Conference	Historia (difícil)	0
+11	46	scramble-for-africa	Reparto de África		Scramble for Africa	Historia (difícil)	0
+11	47	fall-of-saigon	Caída de Saigón	Vietnam	Fall of Saigon	Historia (difícil)	0
+11	48	cuban-revolution	Revolución cubana	Cuba	Cuban Revolution	Historia (difícil)	0
+11	49	mexican-revolution	Revolución mexicana	México	Mexican Revolution	Historia (difícil)	0
+11	50	russian-revolution	Revolución rusa	Rusia	Russian Revolution	Historia (difícil)	0
+11	51	french-revolution	Revolución francesa	Francia	French Revolution	Historia (difícil)	0
+11	52	glorious-revolution	Revolución Gloriosa	Reino Unido	Glorious Revolution	Historia (difícil)	0
+11	53	spanish-civil-war	Guerra civil española	España	Spanish Civil War	Historia (difícil)	0
+11	54	bombing-of-guernica	Bombardeo de Guernica	Segunda República Española en guerra	Bombing of Guernica	Historia (difícil)	0
+11	55	nuremberg-trials	Juicios de Núremberg	Alemania	Nuremberg trials	Historia (difícil)	0
+11	56	battle-of-cajamarca	Captura de Atahualpa	Perú	Battle of Cajamarca	Historia (difícil)	0
+11	57	fall-of-tenochtitlan	Sitio de Tenochtitlan	México	Fall of Tenochtitlan	Historia (difícil)	0
+11	58	siege-of-vienna	Batalla de Kahlenberg	Austria	Battle of Vienna	Historia (difícil)	0
+11	59	battle-of-poitiers	Batalla de Poitiers	Francia	Battle of Tours	Historia (difícil)	0
+11	60	battle-of-kadesh	Batalla de Qadesh	Siria	Battle of Kadesh	Historia (difícil)	0
+11	61	battle-of-megiddo	Batalla de Megido	Israel	Battle of Megiddo	Historia (difícil)	0
+11	62	fall-of-rome	Caída del Imperio romano de Occidente	Italia	Fall of the Western Roman Empire	Historia (difícil)	0
+11	63	sack-of-rome	Saqueo de Roma	Italia	Sack of Rome	Historia (difícil)	0
+11	64	battle-of-teutoburg-forest	Batalla del bosque de Teutoburgo	Alemania	Battle of the Teutoburg Forest	Historia (difícil)	0
+11	65	battle-of-hattin	Batalla de los Cuernos de Hattin	Israel	Battle of Hattin	Historia (difícil)	0
+11	66	siege-of-acre	Caída de Acre	Israel	Siege of Acre	Historia (difícil)	0
+11	67	battle-of-sedan	Batalla de Sedán	Francia	Battle of Sedan	Historia (difícil)	0
+11	68	battle-of-borodino	Batalla de Borodinó	Rusia	Battle of Borodino	Historia (difícil)	0
+11	69	battle-of-leipzig	Batalla de Leipzig	Alemania	Battle of Leipzig	Historia (difícil)	0
+11	70	battle-of-blenheim	Batalla de Höchstädt	Alemania	Battle of Blenheim	Historia (difícil)	0
+11	71	battle-of-naseby	Batalla de Naseby	Reino Unido	Battle of Naseby	Historia (difícil)	0
+11	72	battle-of-bosworth-field	Batalla de Bosworth	Reino Unido	Battle of Bosworth Field	Historia (difícil)	0
+11	73	battle-of-bannockburn	Batalla de Bannockburn	Reino Unido	Battle of Bannockburn	Historia (difícil)	0
+11	74	battle-of-crecy	Batalla de Crécy	Francia	Battle of Crécy	Historia (difícil)	0
+11	75	battle-of-plataea	Batalla de Platea	Grecia	Battle of Plataea	Historia (difícil)	0
+11	76	battle-of-salamis	Batalla de Salamina	Grecia	Battle of Salamis	Historia (difícil)	0
+11	77	battle-of-gaugamela	Batalla de Gaugamela	Irak	Battle of Gaugamela	Historia (difícil)	0
+11	78	battle-of-actium	Batalla de Accio	Grecia	Battle of Actium	Historia (difícil)	0
+11	79	battle-of-zama	Batalla de Zama	Túnez	Battle of Zama	Historia (difícil)	0
+11	80	battle-of-cannae	Batalla de Cannas	Italia	Battle of Cannae	Historia (difícil)	0
+12	1	battle-of-solferino	Batalla de Solferino	Italia	Battle of Solferino	¡Jackpot! De todo un poco	1
+12	2	brighton	Brighton	Reino Unido	Brighton	¡Jackpot! De todo un poco	1
+12	3	mojave-desert	Desierto de Mojave	Estados Unidos	Mojave Desert	¡Jackpot! De todo un poco	1
+12	4	ipanema	Ipanema	Brasil	Ipanema	¡Jackpot! De todo un poco	1
+12	5	c:Lithuania	Lituania		Lithuania	¡Jackpot! De todo un poco	1
+12	6	battle-of-tsushima	Batalla de Tsushima	Japón	Battle of Tsushima	¡Jackpot! De todo un poco	1
+12	7	strasbourg	Estrasburgo	Francia	Strasbourg	¡Jackpot! De todo un poco	1
+12	8	monaco	Mónaco	Mónaco	Monaco	¡Jackpot! De todo un poco	1
+12	9	c:Slovenia	Eslovenia		Slovenia	¡Jackpot! De todo un poco	1
+12	10	incheon	Incheon	Corea del Sur	Incheon	¡Jackpot! De todo un poco	1
+12	11	tokyo-tower	Torre de Tokio	Japón	Tokyo Tower	¡Jackpot! De todo un poco	1
+12	12	bishkek	Biskek	Kirguistán	Bishkek	¡Jackpot! De todo un poco	1
+12	13	siege-of-leningrad	Sitio de Leningrado	Rusia	Siege of Leningrad	¡Jackpot! De todo un poco	1
+12	14	dusseldorf	Düsseldorf	Alemania	Düsseldorf	¡Jackpot! De todo un poco	1
+12	15	chimborazo	Volcán Chimborazo	Ecuador	Chimborazo	¡Jackpot! De todo un poco	1
+12	16	recoleta-cemetery	Cementerio de la Recoleta	Argentina	La Recoleta Cemetery	¡Jackpot! De todo un poco	1
+12	17	c:Turkmenistan	Turkmenistán		Turkmenistan	¡Jackpot! De todo un poco	1
+12	18	bremen	Bremen	Alemania	Bremen	¡Jackpot! De todo un poco	1
+12	19	merlion	Merlión	Singapur	Merlion	¡Jackpot! De todo un poco	1
+12	20	casapueblo	Casapueblo	Uruguay	Casapueblo	¡Jackpot! De todo un poco	1
+12	21	port-moresby	Puerto Moresby	Papúa Nueva Guinea	Port Moresby	¡Jackpot! De todo un poco	1
+12	22	douala	Duala	Camerún	Douala	¡Jackpot! De todo un poco	1
+12	23	abu-simbel-temples	Abu Simbel	Egipto	Abu Simbel	¡Jackpot! De todo un poco	1
+12	24	port-vila	Port Vila	Vanuatu	Port Vila	¡Jackpot! De todo un poco	1
+12	25	battle-of-maipu	Batalla de Maipú	Chile	Battle of Maipú	¡Jackpot! De todo un poco	1
+12	26	uppsala	Upsala	Suecia	Uppsala	¡Jackpot! De todo un poco	1
+12	27	hudson-bay	Bahía de Hudson	Canadá	Hudson Bay	¡Jackpot! De todo un poco	1
+12	28	sargasso-sea	Mar de los Sargazos		Sargasso Sea	¡Jackpot! De todo un poco	1
+12	29	c:Kosovo	Kosovo		Kosovo	¡Jackpot! De todo un poco	1
+12	30	rovaniemi	Rovaniemi	Finlandia	Rovaniemi	¡Jackpot! De todo un poco	1
+12	31	hassan-ii-mosque	Mezquita Hassan II	Marruecos	Hassan II Mosque	¡Jackpot! De todo un poco	1
+12	32	nassau	Nasáu	Bahamas	Nassau	¡Jackpot! De todo un poco	1
+12	33	chernobyl-disaster	Accidente de Chernóbil	Ucrania	Chernobyl disaster	¡Jackpot! De todo un poco	1
+12	34	honolulu	Honolulu	Estados Unidos	Honolulu	¡Jackpot! De todo un poco	1
+12	35	sugarloaf-mountain	Pan de Azúcar	Brasil	Sugarloaf Mountain	¡Jackpot! De todo un poco	1
+12	36	c:Guyana	Guyana		Guyana	¡Jackpot! De todo un poco	1
+12	37	voyages-of-christopher-columbus	Voyages of Christopher Columbus	Bahamas	Voyages of Christopher Columbus	¡Jackpot! De todo un poco	1
+12	38	sydney-harbour-bridge	Puente de la bahía de Sídney	Australia	Sydney Harbour Bridge	¡Jackpot! De todo un poco	1
+12	39	mount-pinatubo	Pinatubo	Filipinas	Mount Pinatubo	¡Jackpot! De todo un poco	1
+12	40	guatemala-city	Ciudad de Guatemala	Guatemala	Guatemala City	¡Jackpot! De todo un poco	1
+12	41	albuquerque	Albuquerque	Estados Unidos	Albuquerque	¡Jackpot! De todo un poco	1
+12	42	santa-fe	Santa Fe	Estados Unidos	Santa Fe	¡Jackpot! De todo un poco	1
+12	43	lake-tanganyika	Lago Tanganica	Tanzania	Lake Tanganyika	¡Jackpot! De todo un poco	1
+12	44	rock-of-cashel	Roca de Cashel	Irlanda	Rock of Cashel	¡Jackpot! De todo un poco	1
+12	45	c:Zambia	Zambia		Zambia	¡Jackpot! De todo un poco	1
+12	46	united-states-declaration-of-independence	Declaración de Independencia de los Estados Unidos	Estados Unidos	United States Declaration of Independence	¡Jackpot! De todo un poco	1
+12	47	lincoln-center	Lincoln Center	Estados Unidos	Lincoln Center	¡Jackpot! De todo un poco	1
+12	48	bissau	Bisáu	Guinea-Bisáu	Bissau	¡Jackpot! De todo un poco	1
+12	49	c:eSwatini	Suazilandia		Eswatini	¡Jackpot! De todo un poco	1
+12	50	winnipeg	Winnipeg	Canadá	Winnipeg	¡Jackpot! De todo un poco	1
+12	51	willis-tower	Torre Willis	Estados Unidos	Willis Tower	¡Jackpot! De todo un poco	1
+12	52	niamey	Niamey	Níger	Niamey	¡Jackpot! De todo un poco	1
+12	53	eruption-of-mount-vesuvius-in-79-ad	Erupción del Vesubio en 79	Italia	Eruption of Mount Vesuvius in 79 AD	¡Jackpot! De todo un poco	1
+12	54	pisa	Pisa	Italia	Pisa	¡Jackpot! De todo un poco	1
+12	55	sutherland-falls	Cascada Sutherland	Nueva Zelanda	Sutherland Falls	¡Jackpot! De todo un poco	1
+12	56	malabo	Malabo	Guinea Ecuatorial	Malabo	¡Jackpot! De todo un poco	1
+12	57	c:Chad	Chad		Chad	¡Jackpot! De todo un poco	1
+12	58	guayaquil	Guayaquil	Ecuador	Guayaquil	¡Jackpot! De todo un poco	1
+12	59	antelope-canyon	Cañón del Antílope	Estados Unidos	Antelope Canyon	¡Jackpot! De todo un poco	1
+12	60	trans-siberian-railway	Transiberiano	Rusia	Trans-Siberian Railway	¡Jackpot! De todo un poco	1
+12	61	sucre	Sucre	Bolivia	Sucre	¡Jackpot! De todo un poco	1
+12	62	palma-de-mallorca	Palma de Mallorca	España	Palma de Mallorca	¡Jackpot! De todo un poco	1
+12	63	liberty-bell	Campana de la Libertad	Estados Unidos	Liberty Bell	¡Jackpot! De todo un poco	1
+12	64	casa-batllo	Casa Batlló	España	Casa Batlló	¡Jackpot! De todo un poco	1
+12	65	russian-revolution	Revolución rusa	Rusia	Russian Revolution	¡Jackpot! De todo un poco	1
+12	66	roswell	Roswell	Estados Unidos	Roswell	¡Jackpot! De todo un poco	1
+12	67	kitty-hawk	Kitty Hawk	Estados Unidos	Kitty Hawk	¡Jackpot! De todo un poco	1
+12	68	mbabane	Babane	Suazilandia	Mbabane	¡Jackpot! De todo un poco	1
+12	69	c:Djibouti	Yibuti		Djibouti	¡Jackpot! De todo un poco	1
+12	70	manaus	Manaos	Brasil	Manaus	¡Jackpot! De todo un poco	1
+12	71	lake-louise	Lago Louise	Canadá	Lake Louise	¡Jackpot! De todo un poco	1
+12	72	moroni	Moroni	Comoras	Moroni	¡Jackpot! De todo un poco	1
+12	73	siege-of-vienna	Batalla de Kahlenberg	Austria	Battle of Vienna	¡Jackpot! De todo un poco	1
+12	74	adelaide	Adelaida	Australia	Adelaide	¡Jackpot! De todo un poco	1
+12	75	leeds	Leeds	Reino Unido	Leeds	¡Jackpot! De todo un poco	1
+12	76	c:Vanuatu	Vanuatu		Vanuatu	¡Jackpot! De todo un poco	1
+12	77	christchurch	Christchurch	Nueva Zelanda	Christchurch	¡Jackpot! De todo un poco	1
+12	78	oxford	Oxford	Reino Unido	Oxford	¡Jackpot! De todo un poco	1
+12	79	cyprus	Chipre	Chipre	Cyprus	¡Jackpot! De todo un poco	1
+12	80	sanaa	Saná	Yemen	Sanaa	¡Jackpot! De todo un poco	1

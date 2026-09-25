@@ -110,7 +110,7 @@ async function resolve(it) {
   rec.title = S.title; rec.qid = S.wikibase_item || null;
   let c = S.coordinates;
   if (!c && it.hint) { const H = await summary("en", it.hint); c = H && H.coordinates; if (H && H.wikibase_item && !rec.qid) rec.qid = H.wikibase_item; rec.hintQid = H && H.wikibase_item; }
-  if (fx) { rec.lat = fx[1]; rec.lon = fx[2]; }                      // correccion manual: coordenadas fiables
+  if (fx && it.kind !== "country") { rec.lat = fx[1]; rec.lon = fx[2]; }                      // correccion manual: coordenadas fiables
   else if (c) { rec.lat = +c.lat.toFixed(4); rec.lon = +c.lon.toFixed(4); }
   if (S.originalimage || S.thumbnail) { const o = S.originalimage || S.thumbnail; rec.img = { s: o.source.split("?")[0], w: o.width, h: o.height }; rec.img.c = await credit(o.source); }
   // titulos en cada idioma (langlinks)
@@ -124,13 +124,21 @@ async function resolve(it) {
 
 const clean = t => String(t || "").replace(/\s*\(.*?\)\s*/g, " ").split(",")[0].replace(/\s+/g, " ").trim();
 async function assemble(recs) {
+  const MODERN = new Set(recs.filter(r => r.ok && r.kind === "country" && !r.extra && r.qid).map(r => r.qid));
   // paises (Wikidata P17) y sus nombres
   const qids = [...new Set(recs.filter(r => r.ok && r.qid).map(r => r.hintQid && !r.qid ? r.hintQid : r.qid))];
   const P17 = {};
   for (let i = 0; i < qids.length; i += 40) {
     const j = await jget(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qids.slice(i, i + 40).join("|")}&props=claims&format=json`);
-    for (const q of Object.keys((j && j.entities) || {})) { const cl = (j.entities[q].claims || {}).P17 || (j.entities[q].claims || {}).P495 || []; const m = cl[0] && cl[0].mainsnak && cl[0].mainsnak.datavalue && cl[0].mainsnak.datavalue.value; if (m) P17[q] = m.id; }
+    for (const q of Object.keys((j && j.entities) || {})) { const cl = (j.entities[q].claims || {}).P17 || (j.entities[q].claims || {}).P495 || [];
+      const cand = cl.filter(c => c.rank !== "deprecated" && c.mainsnak && c.mainsnak.datavalue && c.mainsnak.datavalue.value && c.mainsnak.datavalue.value.id).map(c => ({ id: c.mainsnak.datavalue.value.id, ended: !!(c.qualifiers && c.qualifiers.P582), pref: c.rank === "preferred" }));
+      // preferimos un pais actual (uno de los de la lista de paises) sin fecha de fin; nunca imperios o reinos historicos si hay alternativa
+      const pick = cand.find(c => MODERN.has(c.id) && !c.ended && c.pref) || cand.find(c => MODERN.has(c.id) && !c.ended) || cand.find(c => MODERN.has(c.id)) || cand.find(c => !c.ended && c.pref) || cand.find(c => !c.ended);
+      if (pick) P17[q] = pick.id; }
   }
+  const CFIX = fs.existsSync(path.join(ROOT, "tools", "country-fix.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "country-fix.json"), "utf8")) : {};   // id -> nombre Natural Earth ("" = sin pais: mares y oceanos)
+  const cqid = ne => { const r = recs.find(x => x.id === "c:" + ne && x.qid); return r ? r.qid : null; };
+  for (const r of recs) if (r.ok && r.id in CFIX && r.qid) { const q = CFIX[r.id] ? cqid(CFIX[r.id]) : null; if (q) { P17[r.qid] = q; r.forceQ = q; } else { r.noCountry = true; } }
   const cq = [...new Set(Object.values(P17))], CN = {};
   for (let i = 0; i < cq.length; i += 40) {
     const j = await jget(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${cq.slice(i, i + 40).join("|")}&props=labels&languages=${LANGS.join("|")}&format=json`);
@@ -143,7 +151,7 @@ async function assemble(recs) {
     if (!r.ok) continue;
     const names = Object.fromEntries(LANGS.map(l => [l, clean((r.w[l] || r.w.en).t)]));
     if (r.extra) { /* solo contenido */ }
-    else if (r.kind !== "country") places.push([r.id, r.kind, r.tier, r.lat, r.lon, P17[r.qid] || null, names, fameOf(r)]);
+    else if (r.kind !== "country") places.push([r.id, r.kind, r.tier, r.lat, r.lon, (r.noCountry ? null : P17[r.qid] || null), names, fameOf(r)]);
     else if (!r.extra) places.push([r.id, "country", r.tier, r.lat == null ? null : r.lat, r.lon == null ? null : r.lon, null, names, fameOf(r)]);
     for (const l of LANGS) if (r.w[l]) wiki[l][r.id] = [r.w[l].t, r.w[l].d, tidy(r.w[l].x), tidy(r.w[l].h)];
     if (r.img) img[r.id] = [r.img.s, r.img.w, r.img.h, r.img.c ? [r.img.c.a, r.img.c.l, r.img.c.p] : null];
