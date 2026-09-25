@@ -10,21 +10,20 @@ window.AIQ = window.AIQ || {};
   const BOOK = () => A.icon("m_codex");
   const tools = () => `<div class="menu-tools">
       <button class="menu-gear" id="menuCodex" aria-label="${A.t("tip.codex")}" data-tip="tip.codex" data-key="C">${A.icon("m_codex")}</button>
-      <button class="menu-gear" id="menuSkin" aria-label="${A.t("tip.skin")}" data-tip="tip.skin">${A.icon("u_skin")}</button>
       <button class="menu-gear txt" id="menuLang" aria-label="${A.t("tip.lang")}" data-tip="tip.lang">${A.lang.toUpperCase()}</button>
       <button class="menu-gear" id="menuFs" aria-label="${A.t("tip.fs")}" data-tip="tip.fs" data-key="F">${A.icon("u_fs")}</button>
       <button class="menu-gear" id="menuGear" aria-label="${A.t("tip.set")}" data-tip="tip.set">${A.icon("u_set")}</button></div>`;
   const wireTools = () => {
     const c = C();
     $("menuGear").onclick = () => c.openSettings(!c.S.settingsOpen); $("menuCodex").onclick = () => A.codex.open();
-    $("menuSkin").onclick = c.cycleSkin; $("menuLang").onclick = e => c.openLangPop(e.currentTarget); $("menuFs").onclick = c.toggleFs;
+    $("menuLang").onclick = e => c.openLangPop(e.currentTarget); $("menuFs").onclick = c.toggleFs;
   };
   const top = (back) => `<div class="menu-top">${back ? `<button class="hub-back" id="hubBack">${A.icon("u_back", "sm")}${T("Menú", "Menu")}</button>` : `<svg class="menu-rose"><use href="#rose"/></svg>`}${tools()}</div>`;
   const shell = (inner, back) => `<div class="menu-in hub">${top(back)}${inner}<p class="menu-foot">Atlas IQ · v${A.VERSION}</p></div>`;
 
   /* ------------------------------------------------------------------ pantalla principal */
   function home() {
-    const c = C(), P = A.profile.get(), adv = P.adv, today = A.rank.boards.daily(), done = P.daily[today], saved = A.adv.hasSave();
+    const c = C(), P = A.profile.get(), adv = P.adv, today = A.rank.boards.daily(), done = P.daily[today], saved = A.adv.hasSave(), sm = saved && A.adv.summary();
     /* cada modo es una carta de la baraja real: A (aventura), K (clasico), Q (competitivo), J (extendido) */
     const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}">
       ${id === "adventure" ? '<i class="marq"></i>' : ""}<span class="ix tl"><b>${rank}</b>${A.icon(suit)}</span><span class="ix br"><b>${rank}</b>${A.icon(suit)}</span>
@@ -34,17 +33,19 @@ window.AIQ = window.AIQ || {};
       <p class="hh-tag">${A.t("title.tag")}</p>
       <div class="hh-cards">
         ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Las preguntas y la puntuación exactas del juego original: seis partidas.", "The original game's exact questions and scoring: six campaigns."), T("Pulido y sin trampas", "Untouched"))}
-        ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: cada partida es distinta. Temas, reliquias, doblones y jefes.", "Roguelike: every run is different. Topics, relics, doubloons and bosses."), saved ? T("▶ Expedición en curso", "▶ Expedition in progress") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
+        ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: cada partida es distinta. Temas, reliquias, doblones y jefes.", "Roguelike: every run is different. Topics, relics, doubloons and bosses."), saved ? T("▶ Partida guardada", "▶ Saved run") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
         ${mc("compete", "Q", "s_compass", "card_compete", T("Competitivo", "Competitive"), T("Reto diario con la misma semilla para todos y clasificaciones.", "A daily challenge with a shared seed, plus leaderboards."), done ? T("Hoy: ", "Today: ") + A.fmt(done.score) : T("Reto de hoy pendiente", "Today's challenge is waiting"))}
         ${mc("extended", "J", "s_pin", "card_ext", T("Extendido", "Extended"), T("Vuelta al mundo Atlas, Historia y pistas: contenido nuevo con fichas × mult.", "Atlas World Tour, History & Clues: new content with chips × mult."), T("Contenido nuevo", "New content"))}
       </div>
       <div class="hh-bottom">
+      ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${T("Acto", "Act")} ${sm.act} · ${T("Ronda", "Round")} ${sm.round} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
         <button class="chipbtn big" id="codexBtn" type="button">${A.icon("m_codex", "sm")}<span>${A.t("codex.title")}</span><em>${A.codexStats().u}/${A.codexStats().t}</em></button>
         <button class="chipbtn big" id="profBtn" type="button">${A.icon("m_prof", "sm")}<span>${T("Perfil", "Profile")}</span><em>${A.ach.count()}/${A.ach.total()}</em></button>
         <span class="hh-ver">Atlas IQ · v${A.VERSION}</span>
       </div></div>`, "home");
     wireTools(); $("codexBtn").onclick = () => A.codex.open(); $("profBtn").onclick = () => screen("profile");
     document.querySelectorAll(".mcard").forEach(b => (b.onclick = () => { A.sfx.card(); screen(b.dataset.mode); }));
+    if ($("homeCont")) { $("homeCont").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume()); }; $("homeNew").onclick = () => { A.sfx.card(); screen("adventure"); }; }
   }
 
   /* ------------------------------------------------------------------ marco comun de las sub-pantallas (a pantalla completa, sobre el mapa) */
@@ -94,7 +95,7 @@ window.AIQ = window.AIQ || {};
     const road = A.ADV.ROUNDS.map((r, i) => `<span class="rm-node${r.boss ? " boss" : ""}" title="${A.tx(TN[r.topic][Math.min(r.tier, TN[r.topic].length - 1)])}"><span class="rm-ic">${A.icon(r.boss ? "skull" : TOPIC_ICON[r.topic])}</span><em>${i + 1}</em></span>`).join("");
     c.dialog(scr(T("Aventura", "Adventure"), `<div class="adv-setup">
       <section class="as-main">
-        ${saved ? `<div class="resume"><span class="tag">${T("Expedición en curso", "Expedition in progress")}</span><b>${runInfo}</b><div><button class="btn-ink" id="contBtn" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="abandonBtn">${T("Abandonar", "Abandon")}</button></div></div>` : ""}
+        ${saved ? `<div class="resume"><span class="tag">${T("Partida guardada", "Saved run")}</span><b>${runInfo}</b><div><button class="btn-ink" id="contBtn" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line danger" id="abandonBtn">${T("Descartar partida", "Discard run")}</button></div></div>` : ""}
         <h4 class="hub-sub">${T("Baraja inicial", "Starting deck")}</h4><div class="deckrow">${decks}</div>
         <h4 class="hub-sub">${T("Ruta de la expedición", "Expedition route")} <em>${T("12 rondas en 3 actos, cada una de un tema distinto; el jefe cierra el acto", "12 rounds in 3 acts, each on a different topic; a boss closes the act")}</em></h4><div class="roadmap">${road}</div>
       </section>
@@ -107,8 +108,14 @@ window.AIQ = window.AIQ || {};
     wireTools(); $("hubBack").onclick = () => screen("home");
     document.querySelectorAll(".dcard").forEach(b => (b.onclick = () => { advSel.deck = b.dataset.deck; A.sfx.card(); adventure(); }));
     document.querySelectorAll(".stake").forEach(b => (b.onclick = () => { advSel.asc = +b.dataset.asc; A.sfx.ui(); adventure(); }));
-    if (saved) { $("contBtn").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume()); }; $("abandonBtn").onclick = () => { A.adv.abandon(); A.sfx.deny(); adventure(); }; }
+    const confirm2 = (btn, msg, act) => { let armed = false, tm = 0; const html = btn.innerHTML; btn.addEventListener("click", e => { if (armed) { clearTimeout(tm); return act(); } e.stopImmediatePropagation(); armed = true; btn.classList.add("armed"); (btn.querySelector("b") || btn).textContent = msg; A.sfx.deny(); tm = setTimeout(() => { armed = false; btn.classList.remove("armed"); btn.innerHTML = html; }, 4000); }, true); };
+    if (saved) {
+      $("contBtn").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume()); };
+      $("abandonBtn").onclick = () => { A.adv.abandon(); A.sfx.deny(); adventure(); };
+      confirm2($("abandonBtn"), T("¿Seguro? Pulsa otra vez", "Sure? Press again"), () => {});
+    }
     $("goBtn").onclick = () => { A.sfx.depart(); if (saved) A.adv.abandon(); enterRun(() => A.adv.begin({ deck: advSel.deck, asc: advSel.asc })); };
+    if (saved) confirm2($("goBtn"), T("Esto borra tu partida guardada. Pulsa otra vez", "This deletes your saved run. Press again"), () => {});
   }
   function enterRun(fn) { const c = C(); c.S.ranked = null; c.prepareRun(); fn(); }
 

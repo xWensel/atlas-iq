@@ -15,7 +15,7 @@
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || "{}");
       A.lang = d.lang && A.STR[d.lang] ? d.lang : A.detectLang();
-      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false; S.skin = A.SKINS[d.skin] ? d.skin : "casino";
+      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false; S.skin = "casino";
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
@@ -144,7 +144,15 @@
     segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs();
     const sm = document.querySelector('.sw[data-sw="motion"]'), si = document.querySelector('.sw[data-sw="intro"]');
     if (sm) sm.setAttribute("aria-checked", S.reduce); if (si) si.setAttribute("aria-checked", S.intro);
+    const rc = $("resetCodex"); if (rc && !rc.classList.contains("armed")) rc.textContent = A.T("Restablecer Enciclopedia", "Reset Encyclopedia");
+    $("dataH").textContent = A.T("Datos", "Data"); $("resetCodexNote").textContent = A.T("Borra todas las tarjetas desbloqueadas. Tu perfil, logros y récords no cambian.", "Deletes every unlocked card. Your profile, achievements and records stay.");
   }
+  /* restablecer la Enciclopedia: hay que pulsar dos veces (la primera arma el boton) */
+  { const rc = $("resetCodex"); let tm = 0;
+    rc.onclick = () => {
+      if (!rc.classList.contains("armed")) { rc.classList.add("armed"); rc.textContent = A.T("¿Seguro? Pulsa otra vez para borrar", "Sure? Press again to delete"); A.sfx.ui(); clearTimeout(tm); tm = setTimeout(() => { rc.classList.remove("armed"); syncSettings(); }, 4000); return; }
+      clearTimeout(tm); rc.classList.remove("armed"); A.codex.reset(); A.sfx.card(); rc.textContent = A.T("Enciclopedia restablecida", "Encyclopedia reset"); setTimeout(syncSettings, 2200);
+    }; }
   function openSettings(on) {
     S.settingsOpen = on; const sh = $("setSh");
     sh.classList.toggle("hidden", !on); sh.classList.toggle("on-menu", S.phase === "title");
@@ -176,7 +184,7 @@
       b.className = L.code === A.lang ? "on" : ""; b.onclick = e => { e.stopPropagation(); onPick(L.code); }; host.appendChild(b);
     });
   }
-  function refreshLangUIs() { if ($("skinGrid")) skinChips($("skinGrid")); for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
+  function refreshLangUIs() { for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
   function setLang(code) {
     if (code === A.lang || !A.STR[code]) return;
     A.lang = code; save(); A.sfx.ui(); A.wiki.loadShort(code); applyLang(); refreshLangUIs();
@@ -185,25 +193,6 @@
     if (S.camp) updateHud();
     A.codex.refresh();
   }
-  /* ---- skins ---- */
-  function skinChips(host) {
-    host.innerHTML = "";
-    A.SKIN_ORDER.forEach(id => {
-      const sk = A.SKINS[id], b = document.createElement("button"); b.type = "button"; b.dataset.skin = id; b.className = "skin-btn" + (id === S.skin ? " on" : "");
-      b.innerHTML = `<span class="sk-sw">${sk.swatch.map(c => `<i style="background:${c}"></i>`).join("")}</span><span>${A.tx(sk.name)}</span>`;
-      b.onclick = e => { e.stopPropagation(); setSkin(id); }; host.appendChild(b);
-    });
-  }
-  function setSkin(id) {
-    if (id === S.skin || !A.SKINS[id]) return;
-    S.skin = id; save(); A.applySkin(id, map); A.sfx.card();
-    const f = $("skinFlash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
-    if (S.phase === "title" && !S.booting) renderMenu(); else if (S.camp) { updateHud(); if (S.phase === "asking") setPrompt(); }
-    refreshSkinUI();
-  }
-  function refreshSkinUI() { const h = $("skinGrid"); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.skin === S.skin)); }
-  const cycleSkin = () => setSkin(A.SKIN_ORDER[(A.SKIN_ORDER.indexOf(S.skin) + 1) % A.SKIN_ORDER.length]);
-  skinChips($("skinGrid"));
   langChips($("langGrid"), setLang); langChips($("langPopGrid"), code => { setLang(code); $("langPop").classList.add("hidden"); });
   function openLangPop(anchor) {
     const pop = $("langPop"); if (!pop.classList.contains("hidden")) { pop.classList.add("hidden"); return; }
@@ -474,15 +463,37 @@
   }
 
   /* ------------------------------------------------------------ pausa y reloj */
+  /* menu de la partida (pausa): reanudar, guardar y salir, o empezar otra. Se abre desde el boton de pausa, con P/Esc o desde el Campamento */
+  function closeVeil() { $("veil").classList.add("hidden"); $("veil").innerHTML = ""; }
+  function veilMenu(onResume) {
+    const adv = !!S.run || A.adv.active(), v = $("veil"); v.classList.remove("hidden");
+    v.innerHTML = `<div class="pv"><h2>${A.t("pause.h")}</h2>
+      <p>${adv ? A.T("Tu expedición se guarda sola. Puedes salir y continuarla desde Aventura.", "Your expedition saves itself. You can leave and pick it up again from Adventure.") : A.t("pause.p")}</p>
+      <div class="pv-btns"><button class="btn-ink" id="resBtn" data-primary><span>${A.t("btn.resume")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button>
+      ${adv ? `<button class="btn-line" id="saveExitBtn">${A.T("Guardar y salir al menú", "Save and exit to menu")}</button><button class="btn-line danger" id="newRunBtn">${A.T("Empezar una partida nueva", "Start a new run")}</button>`
+            : `<button class="btn-line" id="exitBtn">${A.T("Salir al menú", "Exit to menu")}</button>`}</div></div>`;
+    $("resBtn").onclick = onResume; $("resBtn").focus();
+    const leave = to => { closeVeil(); S.paused = false; A.music.muffle(false); if (adv) A.adv.leave(); showTitle(to); };
+    if (adv) {
+      $("saveExitBtn").onclick = () => { A.sfx.ui(); leave("adventure"); };
+      let armed = false, tm = 0; const nb = $("newRunBtn");
+      nb.onclick = () => {
+        if (!armed) { armed = true; nb.classList.add("armed"); nb.textContent = A.T("¿Seguro? Se pierde esta partida. Pulsa otra vez", "Sure? This run is lost. Press again"); A.sfx.deny(); tm = setTimeout(() => { armed = false; nb.classList.remove("armed"); nb.textContent = A.T("Empezar una partida nueva", "Start a new run"); }, 4000); return; }
+        clearTimeout(tm); A.adv.abandon(); A.sfx.deny(); leave("adventure");
+      };
+    } else $("exitBtn").onclick = () => { A.sfx.ui(); leave(); };
+  }
   function togglePause() {
     if (S.phase !== "asking") return;
     S.paused = !S.paused; A.sfx.pause(); A.music.muffle(S.paused);
-    if (S.paused) {
-      S.pauseAt = performance.now(); map.setPick(false);
-      $("veil").classList.remove("hidden");
-      $("veil").innerHTML = `<div><h2>${A.t("pause.h")}</h2><p>${A.t("pause.p")}</p><button class="btn-ink" id="resBtn" data-primary><span>${A.t("btn.resume")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button></div>`;
-      $("resBtn").onclick = togglePause; $("resBtn").focus();
-    } else { S.pausedAcc += performance.now() - S.pauseAt; map.setPick(true); $("veil").classList.add("hidden"); }
+    if (S.paused) { S.pauseAt = performance.now(); map.setPick(false); veilMenu(togglePause); }
+    else { S.pausedAcc += performance.now() - S.pauseAt; map.setPick(true); closeVeil(); }
+  }
+  function runMenu() {
+    if (S.booting || !(S.run || S.camp || A.adv.active()) || S.phase === "title" || S.phase === "intro") return;
+    if (S.phase === "asking") return togglePause();
+    if (!$("veil").classList.contains("hidden")) return closeVeil();
+    A.sfx.pause(); veilMenu(closeVeil);
   }
   (function clock() {
     if (S.phase === "asking" && !S.paused) {
@@ -519,7 +530,7 @@
     A.audio.unlock(!S.booting);
     if (S.booting) return;
     const k = e.key.toLowerCase();
-    if (k === "escape") { openSettings(false); if (S.run) A.adv.cancelTool(); }
+    if (k === "escape") { if (S.settingsOpen) openSettings(false); else if (S.run && S.tool) A.adv.cancelTool(); else runMenu(); }
     else if (S.run && S.phase === "asking" && /^[1-4]$/.test(k)) A.adv.toolKey(+k - 1);
     else if (k === "f") toggleFs();
     else if (k === "c" && S.phase === "title") (A.codex.isOpen() ? A.codex.close() : A.codex.open());
@@ -580,7 +591,7 @@
     (A._debug = A._debug || {}).enterBoot = enter;
   }
 
-  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, cycleSkin, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
+  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
 
   applyLang(); syncSettings();
   const start = () => { if (/[?&]skipboot/.test(location.search)) { S.booting = false; showTitle(); } else runBoot(); };

@@ -20,6 +20,11 @@ window.AIQ = window.AIQ || {};
     "Starts with “{l}”": ["Commence par « {l} »", "Começa com “{l}”", "Beginnt mit „{l}“", "Inizia con «{l}»"],
     "Northern hemisphere": ["Hémisphère nord", "Hemisfério norte", "Nordhalbkugel", "Emisfero nord"], "Southern hemisphere": ["Hémisphère sud", "Hemisfério sul", "Südhalbkugel", "Emisfero sud"],
     "east": ["est", "leste", "Ost", "est"], "west": ["ouest", "oeste", "West", "ovest"],
+    "Reset Encyclopedia": ["Réinitialiser l'Encyclopédie", "Redefinir a Enciclopédia", "Enzyklopädie zurücksetzen", "Ripristina l'Enciclopedia"],
+    "Data": ["Données", "Dados", "Daten", "Dati"],
+    "Deletes every unlocked card. Your profile, achievements and records stay.": ["Supprime toutes les cartes débloquées. Ton profil, tes succès et tes records restent.", "Apaga todas as cartas desbloqueadas. Seu perfil, conquistas e recordes continuam.", "Löscht alle freigeschalteten Karten. Profil, Erfolge und Rekorde bleiben.", "Elimina tutte le carte sbloccate. Profilo, obiettivi e record restano."],
+    "Sure? Press again to delete": ["Sûr ? Appuie encore pour supprimer", "Tem certeza? Toque de novo para apagar", "Sicher? Nochmal drücken zum Löschen", "Sicuro? Premi ancora per eliminare"],
+    "Encyclopedia reset": ["Encyclopédie réinitialisée", "Enciclopédia redefinida", "Enzyklopädie zurückgesetzt", "Enciclopedia ripristinata"],
     "Boss": ["Boss", "Chefe", "Boss", "Boss"], "Legend": ["Légende", "Lenda", "Legende", "Leggenda"],
   });
 })(window.AIQ);

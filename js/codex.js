@@ -498,6 +498,7 @@ window.AIQ = window.AIQ || {};
     isUnlocked: id => !!store.unlocked[id],
     _load: (id, lang) => loadContent(E[id], lang || A.lang),
     ids: () => order.slice(),
+    reset() { store = { unlocked: {}, seen: {} }; save(); ui.cur = null; if (isOpen()) { labels(); renderGrid(true); } },
     byType,
     refresh() { if (isOpen()) { labels(); if (ui.cur) renderDetail(ui.cur); else renderGrid(true); } },
   };

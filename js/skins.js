@@ -1,6 +1,6 @@
 /*
  * Atlas IQ - skins. Cada uno cambia TODO: mapa (shader), paleta de interfaz, tipografia, formas, sonido.
- *   expedicion  cuaderno de campo (papel y tinta)             Fraunces + Bricolage + DM Mono
+ * Solo queda el aspecto Casino (el de Expedicion se retiro en v0.9).
  *   casino      mesa de cartas + monitor CRT (estilo "Balatro") Pixelify Sans + Silkscreen
  */
 window.AIQ = window.AIQ || {};
@@ -18,10 +18,9 @@ window.AIQ = window.AIQ || {};
 
   const N = (es, en, fr, pt, de, it) => ({ es, en, fr, pt, de, it });
   A.SKINS = {
-    expedicion: { name: N("Expedición", "Expedition", "Expédition", "Expedição", "Expedition", "Spedizione"), swatch: ["#14232b", "#f2e9d6", "#e0492b"], theme: "#0b2530", music: { bpm: 86, sw: 0.3, shift: 0, mod: 1, idx: 2.2 } },
     casino: { name: N("Casino", "Casino", "Casino", "Cassino", "Casino", "Casinò"), swatch: ["#1f7a63", "#fe5f55", "#f8b449"], theme: "#0f3b3a", music: { bpm: 92, sw: 0.34, shift: 0, mod: 1, idx: 2.6 } },
   };
-  A.SKIN_ORDER = ["casino", "expedicion"];
+  A.SKIN_ORDER = ["casino"];
   A.skin = "casino";
 
   /* aplica un skin a toda la aplicacion */

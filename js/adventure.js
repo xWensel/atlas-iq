@@ -151,7 +151,7 @@ window.AIQ = window.AIQ || {};
     return a.filter(b => { if (perkList().some(p => (p.immune || []).includes(b))) return false; if (ign > 0) { ign--; return false; } return true; });
   };
   const omen = () => has("omen");
-  const handInfo = () => A.pokerHand(run.perks);
+  const handInfo = () => null;                                       // la mano de poker esta desactivada: sus parejas no se entendian (v0.9)
 
   A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null } = {}) {
     const d = DECKS[deck] || DECKS.explorer;
@@ -168,10 +168,18 @@ window.AIQ = window.AIQ || {};
   A.adv.resume = function () {
     try { run = JSON.parse(localStorage.getItem(RUNKEY)); } catch (e) { run = null; }
     if (!run) return false;
-    if (run.phase === "shop" || run.phase === "chest") openShop(run.phase === "chest"); else startRound();
+    if (run.phase === "shop" || run.phase === "chest") openShop(run.phase === "chest");
+    else if (run.phase === "verdict") afterVerdict(!!run.vBoss);                            // la ronda ya estaba superada y cobrada: seguimos al campamento
+    else if (run.phase === "win") openShop(true);                                             // ya habias ganado: sigues hacia la Leyenda
+    else if (run.phase === "retry") openShop(false);                                        // ronda fallida: vuelves al campamento para reintentar
+    else if (run.phase === "round" && run.qi > 0 && run.qi < run.qn && run.curQ) { run.used = run.used.filter(id => !run.curQ.includes(id)); startRound(true); }   // sigue en la misma pregunta con las mismas preguntas
+    else startRound();
     return true;
   };
   A.adv.abandon = () => { run = null; persist(); };
+  A.adv.save = () => persist();
+  A.adv.leave = () => { if (run) persist(); clearTimers(); run = null; };
+  A.adv.summary = () => { try { const r = run || JSON.parse(localStorage.getItem(RUNKEY)); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives } : null; } catch (e) { return null; } };
   A.adv.active = () => !!run;
 
   function toolMax(id) { const t = run.tools[id]; if (!t) return 0; const plus = perkList().reduce((n, p) => n + (p.toolBonus || 0) + ((p.toolPlus && p.toolPlus[id]) || 0), 0); return t.max + plus; }
@@ -184,7 +192,7 @@ window.AIQ = window.AIQ || {};
     let cand = list.filter(q => !used.has(q.cid[0]));
     if (cand.length < n) { run.used = []; cand = list.slice(); }
     const out = rr.shuffle(cand).slice(0, n);
-    run.used = run.used.concat(out.map(q => q.cid[0]));
+    run.curQ = out.map(q => q.cid[0]); run.used = run.used.concat(run.curQ);
     return out.map(q => ({ ...q }));
   }
   function roundLevel() {
@@ -203,12 +211,14 @@ window.AIQ = window.AIQ || {};
       score: (q, km, left) => A.adv.score(q, km, left, true).sc,
     };
   }
-  function startRound() {
-    run.phase = "round"; run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; refillTools();
+  function startRound(keep) {
+    run.phase = "round";
+    if (!keep) { run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
     const Lv = roundLevel(), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor(run.boss));
     persist(); A.ach.emit("adv", { kind: "round", act: run.act }); C().startLevel(0);
+    if (keep) { S.qi = run.qi; S.levelScore = run.roundScore; S.streak = run.streak || 0; S.hits = run.rGood; C().updateHud && C().updateHud(); }
     if (Lv.boss) setTimeout(() => A.sfx.boss(), 200);
   }
   function mapStyleFor(bosses) {
@@ -259,7 +269,7 @@ window.AIQ = window.AIQ || {};
     run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) run.stats.bulls++; run.stats.best = Math.max(run.stats.best, res.total);
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
     if (res.dist >= 750 && has("recycle")) { const id = Object.keys(run.tools).find(k => run.tools[k].left < toolMax(k)); if (id) run.tools[id].left++; }
-    run.qi++; run.qTools = 0; persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
+    run.streak = res.streak || 0; run.qi++; run.qTools = 0; persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
   };
 
   /* ---------------- pistas gratis de reliquias ---------------- */
@@ -380,18 +390,18 @@ window.AIQ = window.AIQ || {};
       const actDone = boss, winAct = actDone ? run.act + 1 : 0;
       if (actDone) { const flawless = run.livesLostAct === 0; A.ach.emit("adv", { kind: "act", act: winAct, flawless, asc: run.asc }); run.livesLostAct = 0; A.profile.get().adv.bestAct = Math.max(A.profile.get().adv.bestAct || 0, winAct); }
       A.profile.get().adv.bestRound = Math.max(A.profile.get().adv.bestRound, roundNo() + 1);
-      persist(); A.profile.save();
+      run.phase = "verdict"; run.vBoss = boss; persist(); A.profile.save();
       C().verdict({
         kind: "ok", level: roundNo() + 1, title: boss ? A.T("¡Jefe derrotado!", "Boss defeated!") : A.T("Ronda superada", "Round cleared"),
         text: `${A.fmt(S.levelScore)} / ${A.fmt(Lv.advance)}`, lines,
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]],
         stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : "win",
-        buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => { if (actDone && run.act + 1 === 3 && !run.won) return winScreen(); nextStep(boss); } }],
+        buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => afterVerdict(boss) }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
       });
     } else {
       const shielded = has("shieldAct") && run.shieldAct !== run.act;
       if (shielded) run.shieldAct = run.act; else { run.lives--; run.livesLostAct++; }
-      run.attempt++; persist();
+      run.attempt++; run.phase = "retry"; persist();
       A.sfx.stamp(); setTimeout(A.sfx.lose, 300);
       if (run.lives <= 0) return endRun(false);
       C().verdict({
@@ -402,12 +412,13 @@ window.AIQ = window.AIQ || {};
       });
     }
   };
+  function afterVerdict(boss) { if (boss && run.act + 1 === 3 && !run.won) return winScreen(); nextStep(boss); }
   function nextStep(boss) {
     if (boss) { run.act++; run.round = 0; run.attempt = 0; perkList().forEach(p => p.actStart && p.actStart(run)); openShop(true); }
     else { run.round++; run.attempt = 0; openShop(false); }
   }
   function winScreen() {
-    run.won = true; run.act++; run.round = 0; run.attempt = 0; persist(); A.sfx.victory();
+    run.won = true; run.act++; run.round = 0; run.attempt = 0; run.phase = "win"; persist(); A.sfx.victory();
     A.profile.get().adv.wins++; A.profile.save();
     C().verdict({
       kind: "win", level: 12, title: A.T("¡Terra Incognita conquistada!", "Terra Incognita conquered!"),
@@ -459,11 +470,11 @@ window.AIQ = window.AIQ || {};
     const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b>${chest ? "" : `<em>${A.T("vender", "sell")} ${sellValue(id)}</em>`}</button>` : `<span class="inv-empty"></span>`; }).join("");
     C().dialog(`<div class="table${chest ? " chest" : ""}">
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
-        <div class="route">${routeHtml()}</div><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></header>
+        <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
       ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${A.T("Tres cartas sobre la mesa. ¿Compras o rolas?", "Three cards on the table. Buy, or roll?")}</p>`}
       <section class="offers">${cards}</section>
       <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Rolear", "Roll")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
-        ${hand ? `<span class="hand-tag">${ic("cards", "sm")}${A.T("Mano de póker", "Poker hand")}: <b>${A.tx(hand.name)}</b> +${hand.coins} ${CN()}${A.T("por ronda", "per round")}</span>` : `<span class="hand-tag dim">${ic("cards", "sm")}${A.T("Junta pares o palos iguales para cobrar mano de póker", "Match ranks or suits for a poker-hand bonus")}</span>`}</div>
+        </div>
       <footer class="tb-tray"><div class="tray-col"><h4>${A.T("Reliquias", "Relics")} ${run.perks.length}/${slots}</h4><div class="tray-row">${relicSlots}</div></div>
         <div class="tray-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" title="${A.tx(TOOLS[id].n)}">${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
         <div class="tray-col"><h4>${A.T("Provisiones", "Provisions")}</h4><div class="tray-row hearts">${hearts()}</div></div>
@@ -471,6 +482,7 @@ window.AIQ = window.AIQ || {};
     document.querySelectorAll(".offer").forEach(el => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); });
     document.querySelectorAll(".inv-perk").forEach(b => (b.onclick = () => { if (chest) return; sell(b.dataset.sell); }));
     if ($("rerollBtn")) $("rerollBtn").onclick = () => { const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll(); openShop(false); };
+    $("shopMenu").onclick = () => C().runMenu();
     $("goRound").onclick = () => { run.stock = null; persist(); chest ? openShop(false) : startRound(); };
     A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
   }

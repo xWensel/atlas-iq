@@ -62,3 +62,33 @@
 
 /* el aviso de tarjeta nueva no debe tapar los botones inferiores de la tienda ni del mapa */
 .cx-toast { bottom: auto; top: 150px; right: 16px; }
+
+/* ajustes: boton peligroso (restablecer) */
+.row-btn.danger { color: #ffb4a8; box-shadow: inset 0 0 0 2px rgba(254, 95, 85, .55); }
+.row-btn.danger.armed { background: #fe5f55; color: #191325; animation: none; }
+
+/* menu de pausa / guardar y salir */
+#veil .pv { display: grid; gap: 8px; justify-items: center; max-width: min(520px, 92vw); }
+#veil .pv h2 { margin: 0; } #veil .pv > p { margin: 4px 0 18px; font-size: 17px; line-height: 1.35; }
+#veil .pv-btns { display: grid; gap: 12px; width: min(420px, 90vw); }
+#veil .pv-btns .btn-ink, #veil .pv-btns .btn-line { width: 100%; justify-content: center; font-size: 18px; padding: 14px 18px; }
+.btn-line.danger { color: #ffb4a8; box-shadow: inset 0 0 0 2px rgba(254, 95, 85, .55); }
+.btn-line.danger.armed, .startbtn.armed { background: #fe5f55; color: #191325; }
+.startbtn.armed .sb-t i { display: none; }
+
+/* boton Menu en el Campamento */
+.tb-right { justify-self: end; display: flex; align-items: center; gap: 14px; }
+
+/* banner de partida guardada en la portada */
+.hh-resume { display: flex; align-items: center; gap: 16px; flex: 1 0 100%; max-width: 1000px; margin: 0 auto; padding: 12px 18px; border-radius: 16px; background: linear-gradient(90deg, rgba(90, 60, 14, .9), rgba(20, 14, 34, .92) 70%); box-shadow: inset 0 0 0 2px var(--brass), 0 0 24px rgba(248, 180, 73, .2); }
+.hh-resume .hr-ic .ic { width: 44px; height: 44px; } .hh-resume .hr-t { flex: 1; display: grid; gap: 2px; }
+.hh-resume .hr-t b { font-size: 20px; color: #ffe9b0; } .hh-resume .hr-t i { font-style: normal; font-size: 15px; opacity: .85; }
+@media (max-width: 720px) { .hh-resume { flex-wrap: wrap; } .hh-resume .hr-t { flex-basis: 100%; } }
+#veil { z-index: 60; }
+html[data-skin] .btn-line.danger { background: #3a1730; color: #ffb4a8; box-shadow: inset 0 0 0 2px rgba(254, 95, 85, .7), 0 5px 0 rgba(0, 0, 0, .35); }
+html[data-skin] .btn-line.danger.armed, html[data-skin] .startbtn.armed { background: #fe5f55; color: #191325; }
+html[data-skin] .row-btn.danger { color: #ffb4a8; box-shadow: inset 0 0 0 2px rgba(254, 95, 85, .55); }
+html[data-skin] .row-btn.danger.armed { background: #fe5f55; color: #191325; }
+
+.hh-resume .btn-ink, .hh-resume .btn-line { flex: 0 0 auto; width: auto; min-width: 150px; padding: 10px 18px; font-size: 16px; }
+.hh-resume .hr-t b { font-size: clamp(15px, 2.2vh, 20px); }

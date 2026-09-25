@@ -91,7 +91,6 @@
       <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
     </div>
 
-    <div class="set-sec"><h3 data-i="set.skin"></h3><div class="skins" id="skinGrid"></div></div>
     <div class="set-sec"><h3 data-i="set.lang"></h3>
       <div class="langgrid" id="langGrid"></div>
       <p class="set-note" data-i="set.lang.note"></p>
@@ -105,6 +104,10 @@
     <div class="set-sec"><h3 data-i="set.gfx"></h3>
       <div class="seg s3" data-seg="gfx"><button data-v="auto" data-i="gfx.auto"></button><button data-v="high" data-i="gfx.high"></button><button data-v="saver" data-i="gfx.saver"></button><i></i></div>
       <p class="set-note" data-i="set.gfx.d"></p>
+    </div>
+    <div class="set-sec"><h3 id="dataH"></h3>
+      <button class="row-btn danger" id="resetCodex" type="button"></button>
+      <p class="set-note" id="resetCodexNote"></p>
     </div>
     <div class="set-keys"><span><kbd>F</kbd> <em data-i="key.fs"></em></span><span><kbd>P</kbd> <em data-i="key.pause"></em></span><span><kbd>M</kbd> <em data-i="key.sfx"></em></span><span><kbd>N</kbd> <em data-i="key.mus"></em></span></div>
   </section></div>
@@ -138,7 +141,6 @@
   <div id="layer" class="hidden"><section id="dlg"></section></div>
   <div id="intro" class="hidden"></div>
   <div id="veil" class="hidden"></div>
-  <div id="skinFlash"></div>
 </div>
 
 <script src="js/vendor/topojson-client.min.js"></script>
