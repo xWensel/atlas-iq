@@ -31,9 +31,20 @@ window.AIQ = window.AIQ || {};
     const meta = CLASSIC_META[g.id];
     return {
       id: "c-" + g.id, mode: "classic", title: { en: meta.en, es: meta.es }, blurb: meta.d, home: g.home,
-      levels: g.levels.map(L => {
+      levels: g.levels.map((L, li) => {
         const kind = L.bonus ? "clue" : kindOf(L.name);
+        const mk = d => {
+            const clue = L.bonus && d.f;
+            const sp = clue ? { name: d.n, sub: "" } : splitName(d.n);
+            return {
+              t: "p", lat: d.lat, lon: d.lon, cid: [A.ckey(clue ? d.f : d.n)],
+              name: { en: sp.name, es: sp.name }, sub: { en: sp.sub, es: sp.sub },
+              clue: !!clue, answer: clue ? { en: d.f, es: d.f } : null,
+              fact: { en: clue ? "" : d.f, es: clue ? "" : d.f },
+            };
+          };
         return {
+          tier: L.bonus ? 2 : Math.min(2, Math.floor((li / g.levels.length) * 3)), all: () => L.dests.map(mk),
           name: { en: L.name, es: L.name }, kind, bonus: L.bonus, plainName: true,
           seconds: L.tpq, advance: L.advance, maxPerQ: L.kmBase + L.speed,
           /* Puntuacion identica al original:
@@ -43,22 +54,16 @@ window.AIQ = window.AIQ || {};
             const time = Math.max(0, Math.floor((1 - (L.tpq - timeLeft) / (L.tpq - L.cutoff)) * L.speed));
             return { dist, time, distMax: L.kmBase, timeMax: L.speed };
           },
-          questions: () => L.dests.map(d => {
-            const clue = L.bonus && d.f;
-            const sp = clue ? { name: d.n, sub: "" } : splitName(d.n);
-            return {
-              t: "p", lat: d.lat, lon: d.lon, cid: [A.ckey(clue ? d.f : d.n)],
-              name: { en: sp.name, es: sp.name }, sub: { en: sp.sub, es: sp.sub },
-              clue: !!clue, answer: clue ? { en: d.f, es: d.f } : null,
-              fact: { en: clue ? "" : d.f, es: clue ? "" : d.f },
-            };
-          }),
+          questions: () => L.dests.map(mk),
         };
       }),
     };
   });
 
   /* ------------------------------------------------------------------ EXTENDIDO */
+  const atlasQ = o => ({
+    t: o.t, lat: o.lat, lon: o.lon, key: o.key, name: o.n, sub: o.c, clue: false, answer: null, fact: o.f, cid: [o.t === "c" ? "c:" + o.key : A.ckey(o.n.en)],
+  });
   const atlasLevels = (A.LEVELS || []).map((L, i) => ({
     name: L.name, kind: L.kind, diff: L.diff, seconds: L.seconds, advance: L.advance, maxPerQ: 1400,
     score(q, km, timeLeft) {
@@ -67,11 +72,19 @@ window.AIQ = window.AIQ || {};
       const time = Math.round(400 * Math.max(0, timeLeft / L.seconds) * (0.3 + 0.7 * dist / 1000));
       return { dist, time, distMax: 1000, timeMax: 400 };
     },
-    questions: () => shuffle(L.pool).slice(0, 5).map(o => ({
-      t: o.t, lat: o.lat, lon: o.lon, key: o.key, name: o.n, sub: o.c, clue: false, answer: null, fact: o.f, cid: [o.t === "c" ? "c:" + o.key : A.ckey(o.n.en)],
-    })),
+    tier: Math.min(4, Math.floor((i / A.LEVELS.length) * 5)),
+    all: () => L.pool.map(atlasQ),
+    questions: () => shuffle(L.pool).slice(0, 5).map(atlasQ),
   }));
 
+  const histQ = L => a => {
+    const clue = L.kind === "clue";
+    return {
+      t: "p", lat: a[4], lon: a[5], clue, cid: clue ? [A.ckey(a[2])] : [A.ckey(a[0]), A.ckey(a[2])],
+      name: { en: a[0], es: a[1] }, sub: { en: "", es: "" },
+      answer: { en: a[2], es: a[3] }, fact: { en: a[6], es: a[7] },
+    };
+  };
   const historyLevels = (A.HISTORY || []).map((L, i) => ({
     name: L.name, kind: L.kind, seconds: L.seconds, advance: 2600 + 150 * i, maxPerQ: 1400,
     score(q, km, timeLeft) {
@@ -79,14 +92,9 @@ window.AIQ = window.AIQ || {};
       const time = Math.round(400 * Math.max(0, timeLeft / L.seconds) * (0.3 + 0.7 * dist / 1000));
       return { dist, time, distMax: 1000, timeMax: 400 };
     },
-    questions: () => shuffle(L.pool).slice(0, 5).map(a => {
-      const clue = L.kind === "clue";
-      return {
-        t: "p", lat: a[4], lon: a[5], clue, cid: clue ? [A.ckey(a[2])] : [A.ckey(a[0]), A.ckey(a[2])],
-        name: { en: a[0], es: a[1] }, sub: { en: "", es: "" },
-        answer: { en: a[2], es: a[3] }, fact: { en: a[6], es: a[7] },
-      };
-    }),
+    tier: L.kind === "clue" ? 2 : 3,
+    all: () => L.pool.map(histQ(L)),
+    questions: () => shuffle(L.pool).slice(0, 5).map(histQ(L)),
   }));
 
   A.CAMPAIGNS = [

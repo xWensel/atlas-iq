@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>icons</title>
+<style>body{margin:0;background:#1d1631;color:#f3eddc;font:11px monospace}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;padding:10px}
+.c{display:grid;justify-items:center;gap:4px;padding:8px 4px;background:#2b2340}.c:nth-child(3n){background:#f3eddc;color:#191325}
+.ic{width:84px;height:84px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.4))}</style>
+<div class="g" id="g"></div>
+<script src="../js/support.js"></script><script src="../js/icons.js"></script>
+<script>const A=window.AIQ;document.getElementById('g').innerHTML=Object.keys(A.ICONS).map(k=>`<div class="c">${A.icon(k)}<span>${k}</span></div>`).join('')</script>

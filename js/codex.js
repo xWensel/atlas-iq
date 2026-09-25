@@ -16,22 +16,9 @@ window.AIQ = window.AIQ || {};
   const typeLabel = t => A.t(TYPE_KEY[t] || "kind." + t);
   const CONT = { af: "cont.af", na: "cont.na", sa: "cont.sa", as: "cont.as", eu: "cont.eu", oc: "cont.oc", an: "cont.an", sea: "cont.sea" };
 
-  /* iconos simples por tipo (trazo) */
-  const ICON = {
-    city: "M4 20V9l4-2v13M10 20V5l5-2v17M17 20v-9l3 1v8M3 20h18",
-    capital: "M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.4 6.8 19.2l1-5.9L3.5 9.2l5.9-.8z",
-    country: "M5 21V4M5 5h13l-2.5 3.5L18 12H5",
-    landmark: "M4 20h16M6 20V10M10 20V10M14 20V10M18 20V10M3 10l9-6 9 6",
-    nature: "M3 20l6-10 4 6 3-4 5 8z",
-    water: "M3 9c3-3 6 3 9 0s6 3 9 0M3 15c3-3 6 3 9 0s6 3 9 0",
-    strait: "M4 5c4 3 4 11 0 14M20 5c-4 3-4 11 0 14M9 12h6",
-    battle: "M5 19L19 5M19 19L5 5M4 4l4 1-1 4M20 4l-4 1 1 4",
-    event: "M7 3h10M7 21h10M8 3c0 6 8 6 8 9s-8 3-8 9M16 3c0 6-8 6-8 9s8 3 8 9",
-    person: "M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-5 4-7 8-7s8 2 8 7",
-    curiosity: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z",
-    place: "M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11zM12 12a2.5 2.5 0 100-5 2.5 2.5 0 000 5z",
-  };
-  const iconSvg = t => `<svg viewBox="0 0 24 24" class="cx-ic"><path d="${ICON[t] || ICON.place}"/></svg>`;
+  /* iconos propios por tipo (js/icons.js) */
+  const TYPE_IC = { city: "t_city", capital: "t_capital", country: "t_country", landmark: "t_landmark", nature: "t_nature", water: "t_water", strait: "t_strait", battle: "t_battle", event: "t_event", person: "t_person", curiosity: "t_curio", place: "t_place" };
+  const iconSvg = t => A.icon(TYPE_IC[t] || "t_place", "cx-ic");
 
   const continent = (lat, lon) => {
     if (lat == null) return "sea";
@@ -155,22 +142,30 @@ window.AIQ = window.AIQ || {};
     if (!E[id] || store.unlocked[id]) return false;
     store.unlocked[id] = { t: Date.now(), tier }; out.push(id); return true;
   }
-  /* q.cid: claves de la pregunta. tier: 2 = acierto, 3 = muy bien, 4 = diana */
-  A.codexUnlock = (q, tier) => {
-    const added = [];
-    if (tier < 2 || !q.cid) return added;
+  /* Desbloqueo por PRECISION (km al objetivo; 0 = dentro del pais):
+       <= 100 km  el lugar (y su pais)      <= 50 km  sucesos y curiosidades relacionados      <= 40 km  personajes y todo lo demas
+     Las zonas enormes (mares, naturaleza, estrechos) tienen umbrales x2.  Devuelve { added: [ids], level: 0..3 }. */
+  const LIM = [100, 50, 40];
+  const SCALE = { water: 2, nature: 2, strait: 2 };
+  A.codexUnlock = (q, km) => {
+    const out = { added: [], level: 0 };
+    if (km == null || !q.cid) return out;
+    const first = E[q.cid[0]], sc = (first && SCALE[first.type]) || 1;
+    const level = km <= LIM[2] * sc ? 3 : km <= LIM[1] * sc ? 2 : km <= LIM[0] * sc ? 1 : 0;
+    out.level = level; if (!level) return out;
+    const lateral = x => (E[x].type === "event" || E[x].type === "curiosity" || E[x].type === "battle") ? 2 : 3;
     for (const cid of q.cid) {
       const e = E[cid]; if (!e) continue;
-      unlockOne(cid, tier, added);
-      if (e.country && E["c:" + e.country]) unlockOne("c:" + e.country, tier, added);
-      if (tier >= 3) {
-        for (const x of chain[cid] || []) unlockOne(x, tier, added);
-        if (e.country) for (const x of chain["c:" + e.country] || []) unlockOne(x, tier, added);
-      }
+      unlockOne(cid, level, out.added);
+      if (e.country && E["c:" + e.country]) unlockOne("c:" + e.country, level, out.added);
+      for (const x of (chain[cid] || []).concat(e.country ? chain["c:" + e.country] || [] : [])) if (level >= lateral(x)) unlockOne(x, level, out.added);
     }
-    if (added.length) { save(); listeners.forEach(f => f(added)); prefetch(added); }
-    return added;
+    if (out.added.length) { save(); listeners.forEach(f => f(out.added)); prefetch(out.added); emitStats(); }
+    return out;
   };
+  const byType = () => { const cnt = {}; order.forEach(id => { const e = E[id], c = cnt[e.type] || (cnt[e.type] = [0, 0]); c[1]++; if (isUnlocked(id)) c[0]++; }); return cnt; };
+  const emitStats = () => { if (A.ach) { const st = stats(); A.ach.emit("codex", { u: st.u, t: st.t, by: byType() }); } };
+  A.continent = continent;
 
   /* ================================================================== Wikipedia (con cache en IndexedDB) */
   const db = new Promise(res => { try { const r = indexedDB.open("atlasiq-codex", 1); r.onupgradeneeded = () => r.result.createObjectStore("wiki"); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
@@ -478,7 +473,7 @@ window.AIQ = window.AIQ || {};
     el.classList.remove("hidden", "in"); void el.offsetWidth; el.classList.add("in"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.add("hidden"), 7000);
     loadContent(e, A.lang).then(rec => { if (rec && rec.img && el.isConnected) { const im = new Image(); im.onload = () => { const a = el.querySelector(".cx-art"); if (a) a.prepend(im); }; im.src = rec.img.thumb; im.alt = ""; } }).catch(() => {});
   }
-  listeners.push(added => { setTimeout(() => { A.sfx.chip(0.5); toast(added); }, 1700); });
+  listeners.push(added => { setTimeout(() => { A.sfx.unlock(); toast(added); }, 1700); });
 
   A.codex = {
     init(w, m) { world = w; map = m; load(); build(); },
@@ -486,6 +481,7 @@ window.AIQ = window.AIQ || {};
     unlocked: () => order.filter(isUnlocked), total: () => order.length,
     _load: (id, lang) => loadContent(E[id], lang || A.lang),
     ids: () => order.slice(),
+    byType,
     refresh() { if (isOpen()) { labels(); if (ui.cur) renderDetail(ui.cur); else renderGrid(true); } },
   };
 })(window.AIQ);

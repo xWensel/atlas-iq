@@ -1,4 +1,4 @@
-/* Atlas IQ v0.3 - logica del juego, campañas y pantallas. */
+/* Atlas IQ v0.6 - logica del juego, campañas y pantallas. */
 (function (A) {
   const $ = id => document.getElementById(id);
   const KEY = "atlasiq.v2";
@@ -7,14 +7,15 @@
   const S = {
     mode: "classic", campId: null, camp: null, level: 0, qs: [], qi: 0, levelScore: 0, runTotal: 0, runMax: 0, completed: 0, streak: 0,
     phase: "title", limit: 10, t0: 0, pausedAcc: 0, pauseAt: 0, paused: false, lastTick: -1, tense: false, startLevel: 0, prog: {},
-    quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, fsGate: true, booting: true, skin: "expedicion",
+    quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, fsGate: true, booting: true, skin: "casino",
+    hub: "home", ranked: null, run: null, tool: null, hits: 0,
   };
   const prog = id => (S.prog[id] = S.prog[id] || { unlocked: 1, best: 0, bestIq: 0 });
   function load() {
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || "{}");
       A.lang = d.lang && A.STR[d.lang] ? d.lang : A.detectLang();
-      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false; S.skin = A.SKINS[d.skin] ? d.skin : "expedicion";
+      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false; S.skin = A.SKINS[d.skin] ? d.skin : "casino";
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
@@ -98,7 +99,8 @@
   function levelTitle(L) { return A.tx(L.name) + (L.diff ? " · " + A.t("diff." + L.diff) : ""); }
   function updateHud() {
     const L = lv();
-    $("lvlText").textContent = A.t("lvl", { n: S.level + 1, m: S.camp.levels.length, name: levelTitle(L) });
+    $("lvlText").textContent = S.run ? A.adv.hudTitle() : A.t("lvl", { n: S.level + 1, m: S.camp.levels.length, name: levelTitle(L) });
+    if (S.run) A.adv.refresh();
     odoSet($("scLevel"), S.levelScore, { ms: 900 });
     $("scTotal").textContent = A.fmt(S.runTotal + S.levelScore);
     $("scNeed").textContent = L.advance > 1 ? A.fmt(L.advance) : "—";
@@ -115,7 +117,7 @@
   }
   function setPrompt() {
     const o = q(); if (!o) return;
-    $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : lv().kind));
+    $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : o.kind || lv().kind));
     $("askName").textContent = A.tx(o.name); $("askSub").textContent = A.tx(o.sub);
     $("plate").classList.toggle("clue", !!o.clue);
   }
@@ -241,7 +243,7 @@
   /* sonido suave al pasar por controles */
   let lastHover = null;
   document.addEventListener("mouseover", e => {
-    const el = e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear, .cx-strip");
+    const el = e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear, .cx-strip, .mode-card, .deck:not(:disabled), .asc:not(:disabled), .tool, .buy:not(:disabled), .hub-back, .inv-perk");
     if (el && el !== lastHover) A.sfx.hover(); lastHover = el;
   });
 
@@ -258,78 +260,24 @@
   };
 
   /* ------------------------------------------------------------ menu principal */
-  function showTitle() {
-    S.phase = "title"; S.camp = null; map.setPick(false); map.clearMarks(); map.setHome({ lat: 0, lon: 0, zoom: 1 });
+  function showTitle(screen) {
+    S.phase = "title"; S.camp = null; S.run = null; S.tool = null; S.ranked = null; A.adv.hideBars(); map.setStyle(A.MAPSTYLES[S.skin] || A.MAPSTYLES.casino); map.setPick(false); map.clearMarks(); map.setHome({ lat: 0, lon: 0, zoom: 1 });
     $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("veil").classList.add("hidden"); $("intro").classList.add("hidden");
     chrome(false); $("factText").textContent = ""; A.music.mode(0); map.startDrift(); openSettings(false);
-    renderMenu();
+    renderMenu(screen);
   }
-  function renderMenu() {
-    const camps = A.CAMPAIGNS.filter(c => c.mode === S.mode);
-    if (!camps.find(c => c.id === S.campId)) { S.campId = camps[0].id; S.startLevel = 0; }
-    const cur = camps.find(c => c.id === S.campId), pr = prog(cur.id);
-    S.startLevel = Math.min(S.startLevel, pr.unlocked - 1);
-    const list = camps.map((c, i) => {
-      const p = prog(c.id), ticks = c.levels.map((_, k) => `<i class="${p.best && k < p.unlocked ? "on" : ""}"></i>`).join("");
-      return `<button class="cut camp${c.id === S.campId ? " sel" : ""}" data-id="${c.id}" style="animation-delay:${i * 45}ms">
-        <canvas class="camp-thumb" aria-hidden="true"></canvas>
-        <span class="camp-body"><span class="camp-t">${A.tx(c.title)}</span><span class="camp-d">${A.tx(c.blurb)}</span>
-        <span class="camp-m"><span class="camp-p">${ticks}</span><span>${p.best ? A.t("camp.best", { s: A.fmt(p.best) }) : A.t("camp.new")}</span></span></span></button>`;
-    }).join("");
-    let picker = "";
-    if (pr.unlocked > 1) {
-      for (let i = 0; i < cur.levels.length; i++) picker += `<button class="lv${i === S.startLevel ? " sel" : ""}" data-lv="${i}" ${i >= pr.unlocked ? "disabled" : ""}>${i + 1}</button>`;
-      picker = `<div class="picker"><span>${A.t("title.from")}</span><div class="lrail">${picker}</div></div>`;
-    }
-    dialog(`<div class="menu-in">
-      <div class="menu-top"><svg class="menu-rose"><use href="#rose"/></svg>
-        <div class="menu-tools">
-          <button class="menu-gear" id="menuCodex" aria-label="${A.t("tip.codex")}" data-tip="tip.codex" data-key="C"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h11"/></svg></button>
-          <button class="menu-gear" id="menuSkin" aria-label="${A.t("tip.skin")}" data-tip="tip.skin"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c1.4 0 2-.9 2-1.8 0-1.3-1-1.7-1-2.7 0-1 .8-1.5 2-1.5h2.5A3.5 3.5 0 0021 11.5C21 6.8 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10" cy="7" r="1.1"/><circle cx="14.5" cy="7" r="1.1"/></svg></button>
-          <button class="menu-gear txt" id="menuLang" aria-label="${A.t("tip.lang")}" data-tip="tip.lang">${A.lang.toUpperCase()}</button>
-          <button class="menu-gear" id="menuFs" aria-label="${A.t("tip.fs")}" data-tip="tip.fs" data-key="F"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-          <button class="menu-gear" id="menuGear" aria-label="${A.t("tip.set")}" data-tip="tip.set"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
-        </div></div>
-      <h1>Atlas<em>IQ</em></h1>
-      <p class="tagline">${A.t("title.tag")}</p>
-      <p class="lede">${A.t("title.p")}</p>
-      <div class="seg" data-seg="mode"><button data-v="classic">${A.t("mode.classic")}</button><button data-v="extended">${A.t("mode.extended")}</button><i></i></div>
-      <p class="mode-d">${A.t("mode." + S.mode + ".d")}${S.mode === "classic" && A.t("mode.classic.note") ? `<small>${A.t("mode.classic.note")}</small>` : ""}</p>
-      <div class="camps">${list}</div>${picker}
-      <button class="cut cx-strip" id="codexBtn" type="button"><span class="cx-strip-ic"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h11"/></svg></span><span class="cx-strip-t"><b>${A.t("codex.title")}</b><i>${A.t("codex.teaser")}</i></span><span class="cx-strip-n">${A.codexStats().u}<em>/${A.codexStats().t}</em></span></button>
-      <button class="cut go" id="goBtn" data-primary>
-        <span class="go-dial"><svg><use href="#rose"/></svg></span>
-        <span class="go-txt"><b>${A.t("go.label")}</b><i>${A.t("go.sub", { n: S.startLevel + 1, name: A.tx(cur.title) })}</i></span>
-        <span class="go-ar">→</span></button>
-      <p class="menu-foot">Atlas IQ · v${A.VERSION}</p>
-    </div>`, "menu");
-    segSet(document.querySelector('.menu-in [data-seg="mode"]'), S.mode);
-    document.querySelector('.menu-in [data-seg="mode"]').addEventListener("click", e => { const b = e.target.closest("button"); if (!b || b.dataset.v === S.mode) return; S.mode = b.dataset.v; S.startLevel = 0; save(); renderMenu(); });
-    document.querySelectorAll(".camp").forEach(b => (b.onclick = () => { S.campId = b.dataset.id; S.startLevel = 0; save(); renderMenu(); }));
-    document.querySelectorAll(".lv").forEach(b => (b.onclick = () => { S.startLevel = +b.dataset.lv; renderMenu(); }));
-    $("goBtn").onclick = () => { A.sfx.depart(); newRun(); };
-    $("menuGear").onclick = () => openSettings(!S.settingsOpen); $("codexBtn").onclick = $("menuCodex").onclick = () => A.codex.open();
-    $("menuSkin").onclick = cycleSkin; $("menuLang").onclick = e => openLangPop(e.currentTarget); $("menuFs").onclick = toggleFs;
-    requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => map.drawThumb(b.querySelector("canvas"), camps[i].home)));
-    // la brujula del boton sigue al cursor
-    const go = $("goBtn");
-    go.addEventListener("pointermove", e => {
-      const r = go.querySelector(".go-dial").getBoundingClientRect();
-      go.style.setProperty("--rot", (Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180) / Math.PI + 90 + "deg");
-    });
-    go.addEventListener("pointerleave", () => go.style.setProperty("--rot", "0deg"));
-  }
+  function renderMenu(screen) { A.hub.screen(screen || S.hub || "home"); }
 
   /* ------------------------------------------------------------ partida */
+  function prepareRun() { S.run = null; S.tool = null; openSettings(false); A.audio.unlock(); A.music.mode(1); A.profile.get().stats.plays++; A.profile.save(); }
   function newRun() {
     S.camp = A.CAMPAIGNS.find(c => c.id === S.campId);
-    S.runTotal = 0; S.runMax = 0; S.completed = 0; save();
-    map.setHome(S.camp.home); openSettings(false);
-    A.audio.unlock(); A.music.mode(1);
+    S.runTotal = 0; S.runMax = 0; S.completed = 0; save(); prepareRun();
+    map.setHome(S.camp.home);
     startLevel_(S.startLevel);
   }
   function startLevel_(idx) {
-    S.level = idx; S.qs = lv().questions(); S.qi = 0; S.levelScore = 0; S.streak = 0; S.phase = "intro";
+    S.level = idx; S.qs = lv().questions(); S.qi = 0; S.levelScore = 0; S.streak = 0; S.hits = 0; S.phase = "intro";
     closeDialog(); $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("streakChip").classList.add("hidden");
     chrome(true); $("factText").textContent = ""; odoNow($("scLevel"), 0); updateHud();
     showIntro(nextQuestion);
@@ -337,24 +285,45 @@
   function showIntro(cb) {
     const L = lv(), el = $("intro");
     el.className = "";
+    if (S.run) el.innerHTML = A.adv.introHtml(L); else
     el.innerHTML = `<div class="intro-in"><div class="intro-num">${pad2(S.level + 1)}</div><div class="intro-body">
       <span class="tag">${L.bonus ? A.t("intro.bonus") : A.t("kind." + L.kind)}</span><h2>${A.tx(L.name)}</h2>
       <p>${A.t("intro.q", { n: S.qs.length })} · ${A.t("intro.t", { s: L.seconds })}${L.advance > 1 ? " · " + A.t("intro.goal", { a: A.fmt(L.advance) }) : ""}</p></div></div>`;
     A.sfx.intro(); map.animateTo(map.home(), 1100);
     let done = false;
     const end = () => { if (done) return; done = true; el.onclick = null; el.classList.add("out"); setTimeout(() => { el.classList.add("hidden"); cb(); }, 430); };
-    S.skipIntro = end; el.onclick = end; setTimeout(end, 2600);
+    S.skipIntro = end; el.onclick = end; setTimeout(end, S.run ? (L.boss ? 4200 : 3300) : 2600);
   }
   function nextQuestion() {
     S.phase = "asking"; S.paused = false; S.tense = false; S.limit = lv().seconds; S.t0 = performance.now(); S.pausedAcc = 0; S.lastTick = -1; S.lastTimeStr = "";
     map.clearMarks(); map.animateTo(map.home(), 800); map.setPick(true); A.music.mode(1);
     closeDialog(); setPrompt(); setTimer(S.limit);
     $("plate").classList.remove("hidden", "hurry"); $("pauseBtn").classList.remove("hidden"); $("factText").textContent = "";
+    if (S.run) A.adv.onQuestion();
     updateHud();
+  }
+  /* efectos del clic: pin que cae, ondas y chispas donde pulsas */
+  let lastPtr = { x: innerWidth / 2, y: innerHeight / 2 };
+  document.addEventListener("pointerdown", e => { lastPtr = { x: e.clientX, y: e.clientY }; }, true);
+  function pingFx(x, y, kind) {
+    if (S.reduce) return; const el = document.createElement("div"); el.className = "ping " + (kind || "");
+    el.style.left = x + "px"; el.style.top = y + "px";
+    let h = "<i></i><i></i><i></i>"; for (let k = 0; k < 10; k++) { const a = (k / 10) * Math.PI * 2 + Math.random() * 0.4, d = 34 + Math.random() * 46; h += `<u style="--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d}px;--r:${Math.random() * 360}deg"></u>`; }
+    el.innerHTML = h; $("app").appendChild(el); setTimeout(() => el.remove(), 900);
+  }
+  function coinFx(n) {
+    if (S.reduce || !n) return; const to = $("abCoins") && $("abCoins").getBoundingClientRect(); if (!to) return;
+    for (let k = 0; k < Math.min(n, 8); k++) setTimeout(() => {
+      const c = document.createElement("div"); c.className = "coin-fly"; c.innerHTML = A.icon("coin"); c.style.left = lastPtr.x + "px"; c.style.top = lastPtr.y + "px";
+      c.style.setProperty("--dx", to.left + to.width / 2 - lastPtr.x + "px"); c.style.setProperty("--dy", to.top + to.height / 2 - lastPtr.y + "px"); $("app").appendChild(c);
+      setTimeout(() => { c.remove(); A.sfx.coin(k / 6); }, 720);
+    }, 900 + k * 90);
   }
   function onPick(lon, lat) {
     if (S.phase !== "asking" || S.paused) return;
-    A.sfx.tap();
+    if (S.run && S.tool) { pingFx(lastPtr.x, lastPtr.y, "probe"); A.adv.probe(lon, lat); return; }
+    if (S.run) ({ lon, lat } = A.adv.adjust(lon, lat));
+    pingFx(lastPtr.x, lastPtr.y); A.sfx.tap(); A.sfx.pin(S.streak);
     reveal({ lon, lat }, Math.max(0, S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000));
   }
   const padForDialog = () => (window.innerWidth > 900 ? { l: 60, r: 410, t: 170, b: 130 } : { l: 30, r: 30, t: 240, b: 410 });
@@ -372,14 +341,22 @@
       ans = [o.lon, o.lat]; span = [ans];
       if (guess) km = A.geo.haversine(guess.lat, guess.lon, o.lat, o.lon);
     }
-    const sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
+    let sc, chips, mult, total, adv = null;
+    if (S.run) {                                                   // Aventura: reliquias, jefes y fichas x mult
+      adv = A.adv.score(o, guess ? km : null, left, false); sc = adv.sc; S.streak = adv.streak; chips = adv.chips; mult = adv.mult * adv.xmult; total = adv.total;
+      A.adv.afterQuestion(adv);
+    } else {
+      sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
+      S.streak = guess && sc.dist / sc.distMax >= 0.6 ? S.streak + 1 : 0;
+      /* FICHAS x MULT (solo modo Extendido; el Clasico mantiene la puntuacion exacta del original) */
+      chips = sc.dist + sc.time;
+      mult = S.camp.mode === "extended" && S.streak >= 2 ? Math.min(2, 1 + 0.2 * (S.streak - 1)) : 1;
+      total = Math.round(chips * mult);
+    }
     const ratio = sc.dist / sc.distMax;
-    S.streak = guess && ratio >= 0.6 ? S.streak + 1 : 0;
-    /* FICHAS x MULT (solo modo Extendido; el Clasico mantiene la puntuacion exacta del original) */
-    const chips = sc.dist + sc.time;
-    const mult = S.camp.mode === "extended" && S.streak >= 2 ? Math.min(2, 1 + 0.2 * (S.streak - 1)) : 1;
-    const total = Math.round(chips * mult), bonus = total - chips;
+    if (guess && ratio >= 0.75) S.hits++;
     S.levelScore += total; S.runMax += L.maxPerQ;
+    A.profile.question({ km: guess ? km : null, inside: !!(guess && isC && km === 0), ratio, streak: S.streak, left, limit: S.limit, timeout: !guess });
 
     const label = o.clue ? A.tx(o.answer) : A.tx(o.name);
     map.setMarks({
@@ -391,7 +368,8 @@
     const tier = !guess ? 5 : isC && km === 0 ? 4 : ratio >= 0.96 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.4 ? 2 : ratio >= 0.05 ? 1 : 0;
     const title = !guess ? A.t("res.timeout") : isC && km === 0 ? A.t("res.inside") : A.t(["res.t5", "res.t4", "res.t3", "res.t2", "res.t1"][tier]);
     setTimeout(() => A.sfx.reveal(tier), 480);
-    if (guess) A.codexUnlock(o, tier);
+    const cxr = guess ? A.codexUnlock(o, km) : { added: [], level: 0 };
+    if (adv && adv.coins) coinFx(adv.coins);
     if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
 
     const last = S.qi === S.qs.length - 1;
@@ -399,7 +377,7 @@
     const from = !guess ? "" : isC ? A.t("res.border", { name: A.tx(o.name) }) : o.clue ? "" : A.t("res.from", { name: place });
     const showKm = guess && !(isC && km === 0);
     dialog(`<div class="sheet ticket">
-      <div class="tk-band"><span>${A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : L.kind))}</span></div>
+      <div class="tk-band"><span>${A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : o.kind || L.kind))}</span></div>
       <div class="tk-title">${title}</div>
       ${showKm ? `<div class="tk-km"><span class="odo" id="kmNum"></span><span>km</span></div>` : ""}
       <div class="tk-from">${[from, guess ? A.t("res.clicked", { t: (S.limit - left).toFixed(1) }) : ""].filter(Boolean).join(" · ")}</div>
@@ -409,8 +387,11 @@
         <div style="--i:0"><dt>${A.t("res.dist")}</dt><i></i><dd>+${A.fmt(sc.dist)}</dd></div>
         <div style="--i:1"><dt>${A.t("res.speed")}</dt><i></i><dd>+${A.fmt(sc.time)}</dd></div>
       </dl>
+      ${adv && adv.lines.length ? `<div class="tk-perks">${adv.lines.map(l => `<div><span>${A.icon(l[0])}</span><i>${l[1]}</i><b>${l[2]}</b></div>`).join("")}</div>` : ""}
       ${mult > 1 ? `<div class="tk-mult"><div class="c"><span>${A.t("res.chips")}</span><b>${A.fmt(chips)}</b></div><i>×</i><div class="m"><span>${A.t("res.mult")} · ${A.t("res.streak")} ${S.streak}</span><b>${mult.toFixed(1)}</b></div></div>` : ""}
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
+      ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${A.T("doblones", "doubloons")}</div>` : ""}
+      ${guess ? `<div class="tk-cx l${cxr.level}" title="≤100 km · ≤50 km · ≤40 km"><span>${A.t("codex.title")}</span><i><u></u><u></u><u></u></i><b>${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;100 km"}</b></div>` : ""}
       <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">→</span> <kbd>↵</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });
@@ -441,6 +422,8 @@
   }
 
   function finishLevel() {
+    if (S.run) { map.clearMarks(); map.animateTo(map.home(), 900); map.setPick(false); $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("factText").textContent = ""; $("streakChip").classList.add("hidden"); return A.adv.roundEnd(); }
+    A.ach.emit("level", { perfect: S.qs.length >= 5 && S.hits === S.qs.length });
     const L = lv(), pass = S.levelScore >= L.advance, p = prog(S.camp.id);
     map.clearMarks(); map.animateTo(map.home(), 900); map.setPick(false);
     $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("factText").textContent = ""; $("streakChip").classList.add("hidden");
@@ -463,6 +446,10 @@
   function endScreen(win, iq) {
     const L = lv(), tier = A.iqTier(iq), tierName = A.t("tier." + tier);
     const shown = win ? S.runTotal : S.runTotal + S.levelScore;
+    if (S.camp.mode === "classic") {
+      if (win) { A.profile.record("classic:" + S.camp.id + ":win", 1); const r = shown / Math.max(1, S.runMax); A.profile.medal(S.camp.id, r >= 0.85 ? "gold" : r >= 0.7 ? "silver" : "bronze"); A.ach.emit("classic", { win: true }); }
+      if (S.ranked) A.rank.submit("classic-" + S.camp.id, { score: shown, extra: { win, lv: S.level + 1 } });
+    }
     if (win) { A.sfx.stamp(); setTimeout(A.sfx.victory, 380); }
     const btns = [];
     if (!win) btns.push({ id: "retryBtn", cls: "btn-ink", label: A.t("btn.retry"), arrow: true, primary: true, onclick: () => startLevel_(S.level) });
@@ -523,7 +510,7 @@
 
   document.addEventListener("pointerdown", e => {
     A.audio.unlock(!S.booting);
-    if (e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv, #dock button, #rail button, .seg button, .menu-gear")) A.sfx.ui();
+    if (e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv, #dock button, #rail button, .seg button, .menu-gear, .hub-back, .asc, .tool")) A.sfx.ui();
   }, true);
 
   addEventListener("keydown", e => {
@@ -532,7 +519,8 @@
     A.audio.unlock(!S.booting);
     if (S.booting) return;
     const k = e.key.toLowerCase();
-    if (k === "escape") openSettings(false);
+    if (k === "escape") { openSettings(false); if (S.run) A.adv.cancelTool(); }
+    else if (S.run && S.phase === "asking" && /^[1-4]$/.test(k)) A.adv.toolKey(+k - 1);
     else if (k === "f") toggleFs();
     else if (k === "c" && S.phase === "title") (A.codex.isOpen() ? A.codex.close() : A.codex.open());
     else if (k === "m") toggleSwitch("sfx");
@@ -592,9 +580,11 @@
     (A._debug = A._debug || {}).enterBoot = enter;
   }
 
+  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, cycleSkin, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
+
   applyLang(); syncSettings();
   const start = () => { if (/[?&]skipboot/.test(location.search)) { S.booting = false; showTitle(); } else runBoot(); };
-  if (document.fonts && document.fonts.load) Promise.race([Promise.all([document.fonts.load("800 40px Fraunces"), document.fonts.load("500 12px 'DM Mono'"), document.fonts.load("500 16px 'Bricolage Grotesque'")]), new Promise(r => setTimeout(r, 1200))]).then(start, start);
+  if (document.fonts && document.fonts.load) Promise.race([Promise.all([document.fonts.load("800 40px Fraunces"), document.fonts.load("400 20px 'Jersey 15'"), document.fonts.load("500 12px 'DM Mono'"), document.fonts.load("500 16px 'Bricolage Grotesque'")]), new Promise(r => setTimeout(r, 1200))]).then(start, start);
   else start();
 
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});

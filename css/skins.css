@@ -1,16 +1,10 @@
 /* ==========================================================================
    Skins de Atlas IQ (v0.4). El de "expedicion" es la base (style.css); los otros redefinen tokens, formas y tipografia.
    ========================================================================== */
+@font-face { font-family: "Jersey 15"; src: url("../fonts/jersey-15-latin-400-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
 @font-face { font-family: "Pixelify Sans"; src: url("../fonts/pixelify-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
 @font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
-@font-face { font-family: "Big Shoulders Display"; src: url("../fonts/big-shoulders-display-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: "Overpass Mono"; src: url("../fonts/overpass-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Overpass Mono"; src: url("../fonts/overpass-mono-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
-@font-face { font-family: "Architects Daughter"; src: url("../fonts/architects-daughter-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Caprasimo"; src: url("../fonts/caprasimo-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Courier Prime"; src: url("../fonts/courier-prime-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Courier Prime"; src: url("../fonts/courier-prime-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 
 /* selector de skins (comun) */
 .skins { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -28,7 +22,7 @@ body { transition: none; }
 html[data-skin="casino"] {
   --ink: #191325; --ink-2: #5a4b7a; --ink-deep: #0d0a16; --paper: #f3eddc; --paper-2: #e4dcc4; --paper-3: #cfc4a4;
   --red: #fe5f55; --red-deep: #b3322a; --brass: #f8b449; --brass-lt: #ffd98a; --teal: #009dff; --green: #4bc292;
-  --serif: "Pixelify Sans", "Segoe UI", sans-serif; --sans: "Pixelify Sans", system-ui, sans-serif; --mono: "Silkscreen", "Pixelify Sans", monospace;
+  --serif: "Jersey 15", "Pixelify Sans", sans-serif; --sans: "Jersey 15", "Pixelify Sans", system-ui, sans-serif; --mono: "Silkscreen", "Jersey 15", monospace;
   --disp: "wght" 700; --paper-grain: none; --spring: cubic-bezier(.3, 1.7, .4, 1);
 }
 html[data-skin="casino"] #app { background: #0d2c33; }
@@ -39,8 +33,8 @@ html[data-skin="casino"] .cut.paper { --edge: #191325; }
 html[data-skin="casino"] .cut.ink { --edge: #0d0a16; --fill: #2b2340; }
 html[data-skin="casino"] .cut.ink::before { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .09), inset 0 -4px 0 rgba(0, 0, 0, .25); }
 html[data-skin="casino"] .cut.paper::before { box-shadow: inset 0 -5px 0 rgba(120, 90, 40, .13); }
-html[data-skin="casino"] #plate::after, html[data-skin="casino"] .ledger::after { content: "♠"; position: absolute; left: 12px; bottom: 6px; font-size: 16px; color: var(--ink); opacity: .85; line-height: 1; }
-html[data-skin="casino"] .ledger::after { content: "♥"; color: var(--red); left: auto; right: 12px; top: 8px; bottom: auto; }
+html[data-skin="casino"] #plate::after, html[data-skin="casino"] .ledger::after { content: ""; position: absolute; left: 12px; bottom: 5px; width: 18px; height: 18px; background: var(--ic-spark) center / contain no-repeat; opacity: .9; }
+html[data-skin="casino"] .ledger::after { background-image: var(--ic-heart); left: auto; right: 12px; top: 8px; bottom: auto; }
 html[data-skin="casino"] .brand-txt b, html[data-skin="casino"] #askName, html[data-skin="casino"] .lg-num, html[data-skin="casino"] .menu-in h1, html[data-skin="casino"] .tk-km, html[data-skin="casino"] .tk-total .odo,
 html[data-skin="casino"] .v-main h2, html[data-skin="casino"] .v-stats .odo, html[data-skin="casino"] .idcard .odo, html[data-skin="casino"] .camp-t, html[data-skin="casino"] .intro-num, html[data-skin="casino"] .intro-body h2,
 html[data-skin="casino"] #veil h2, html[data-skin="casino"] .go-txt b, html[data-skin="casino"] .fader label, html[data-skin="casino"] .row-sw label, html[data-skin="casino"] .tk-title, html[data-skin="casino"] .tagline { letter-spacing: 0; font-style: normal; }
@@ -80,98 +74,4 @@ html[data-skin="casino"] .fader label, html[data-skin="casino"] .set-head { colo
 html[data-skin="casino"] #tip { border-radius: 8px; box-shadow: 0 4px 0 rgba(0, 0, 0, .5); } html[data-skin="casino"] .langpop { clip-path: none; border-radius: 14px; }
 html[data-skin="casino"] #factText { font-style: normal; font-size: 17px; }
 
-/* ==========================================================================
-   PLANO  -  cianotipo de ingenieria, letra de delineante
-   ========================================================================== */
-html[data-skin="plano"] {
-  --ink: #06285e; --ink-2: #2a4f8f; --ink-deep: #041b45; --paper: #e6f0ff; --paper-2: #cfe0fb; --paper-3: #b3ccf3;
-  --red: #ff7a1a; --red-deep: #b04f00; --brass: #7fd6ff; --brass-lt: #c9ecff; --teal: #3f8dff; --green: #5ee0a0;
-  --serif: "Big Shoulders Display", "Arial Narrow", sans-serif; --sans: "Overpass Mono", ui-monospace, monospace; --mono: "Overpass Mono", ui-monospace, monospace;
-  --hand: "Architects Daughter", "Comic Sans MS", cursive; --disp: "wght" 800; --paper-grain: none; --spring: cubic-bezier(.2, 1.1, .3, 1);
-}
-html[data-skin="plano"] #app { background: #072f7e; }
-html[data-skin="plano"] .sh { filter: drop-shadow(3px 3px 0 rgba(2, 14, 50, .5)); }
-html[data-skin="plano"] .cut { clip-path: none; border-radius: 0; --bw: 1.5px; }
-html[data-skin="plano"] .cut::before { clip-path: none; }
-html[data-skin="plano"] .cut.paper { --edge: #06285e; }
-html[data-skin="plano"] .cut.ink { --edge: rgba(200, 230, 255, .6); --fill: #06285e; }
-html[data-skin="plano"] .cut.paper::after { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(6, 40, 94, .35); pointer-events: none; }
-html[data-skin="plano"] .cut.paper::before { background-image: linear-gradient(rgba(6, 40, 94, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 40, 94, .05) 1px, transparent 1px); background-size: 14px 14px; }
-html[data-skin="plano"] .brand-txt b, html[data-skin="plano"] #askName, html[data-skin="plano"] .menu-in h1, html[data-skin="plano"] .camp-t, html[data-skin="plano"] .v-main h2, html[data-skin="plano"] .go-txt b, html[data-skin="plano"] .intro-body h2, html[data-skin="plano"] #veil h2 { text-transform: uppercase; letter-spacing: .01em; font-style: normal; }
-html[data-skin="plano"] #askName { font-size: clamp(34px, 4.4vw, 60px); line-height: .95; } html[data-skin="plano"] .lg-num { font-size: 52px; } html[data-skin="plano"] .tk-km { font-size: 72px; }
-html[data-skin="plano"] .menu-in h1 { font-size: clamp(70px, 10.5vw, 112px); }
-html[data-skin="plano"] #askSub, html[data-skin="plano"] .tagline, html[data-skin="plano"] #factText, html[data-skin="plano"] .tk-title, html[data-skin="plano"] .tk-answer, html[data-skin="plano"] .tk-from { font-family: var(--hand); font-style: normal; letter-spacing: 0; }
-html[data-skin="plano"] .tagline { color: var(--brass); font-size: 24px; } html[data-skin="plano"] #factText { font-size: 16px; line-height: 1.3; } html[data-skin="plano"] .tk-title { color: var(--red); font-size: 28px; transform: rotate(-2deg); display: inline-block; }
-html[data-skin="plano"] .tag { background: #06285e; clip-path: none; } html[data-skin="plano"] .tk-band .tag { background: var(--red); color: #041b45; }
-html[data-skin="plano"] .brand-txt i { background: var(--red); color: #041b45; }
-html[data-skin="plano"] .btn-ink { background: var(--paper); color: #06285e; clip-path: none; box-shadow: 3px 3px 0 #041b45; border: 2px solid #06285e; }
-html[data-skin="plano"] .btn-ink:hover { background: var(--brass-lt); } html[data-skin="plano"] .btn-ink::before { display: none; }
-html[data-skin="plano"] .btn-line { clip-path: none; } html[data-skin="plano"] .v-actions .btn-ink { background: var(--red); color: #041b45; border-color: #041b45; }
-html[data-skin="plano"] #dock button, html[data-skin="plano"] #rail button, html[data-skin="plano"] .menu-gear, html[data-skin="plano"] .row-btn, html[data-skin="plano"] .gate-langs button, html[data-skin="plano"] .langgrid button, html[data-skin="plano"] .skin-btn, html[data-skin="plano"] .gate-fs { clip-path: none; }
-html[data-skin="plano"] .camp { --fill: #0a3576; --edge: rgba(200, 230, 255, .4); } html[data-skin="plano"] .camp.sel { --edge: var(--red); --fill: #0c3f8c; }
-html[data-skin="plano"] .menu-in { background: linear-gradient(90deg, rgba(4, 27, 69, .97), rgba(4, 27, 69, .94) 84%, rgba(4, 27, 69, 0)); }
-html[data-skin="plano"] .go { --fill: #041b45; --edge: var(--brass); } html[data-skin="plano"] .go-txt b { font-style: normal; }
-html[data-skin="plano"] .stamp { border-radius: 0; transform: rotate(-8deg); filter: none; border-style: solid; }
-html[data-skin="plano"] .idcard { clip-path: none; box-shadow: 0 0 0 2px #06285e inset, 3px 3px 0 #041b45; }
-html[data-skin="plano"] .ticket { -webkit-mask: none; mask: none; box-shadow: 0 0 0 2px #06285e inset; } html[data-skin="plano"] .tk-band { background: #06285e; }
-html[data-skin="plano"] .tk-perf { border-top-style: dashed; } html[data-skin="plano"] .gauge em, html[data-skin="plano"] #streakChip { background: var(--red); color: #041b45; }
-html[data-skin="plano"] #streakChip { clip-path: none; } html[data-skin="plano"] #tip { border-radius: 0; box-shadow: 3px 3px 0 #041b45; } html[data-skin="plano"] .langpop { clip-path: none; }
-html[data-skin="plano"] #grain { opacity: 0; }
 
-/* ==========================================================================
-   RISO (serigrafia)  -  poster a dos tintas con desregistro, recortado a mano
-   ========================================================================== */
-html[data-skin="riso"] {
-  --ink: #1b2a7a; --ink-2: #4256c2; --ink-deep: #101a55; --paper: #f5ecd9; --paper-2: #eadfc4; --paper-3: #d9caa5;
-  --red: #ff4f1f; --red-deep: #b83210; --brass: #ffd800; --brass-lt: #fff08a; --teal: #17b3a0; --green: #17b3a0;
-  --serif: "Caprasimo", Georgia, serif; --sans: "Courier Prime", "Courier New", monospace; --mono: "Courier Prime", "Courier New", monospace;
-  --disp: normal; --spring: cubic-bezier(.3, 1.5, .4, 1);
-}
-html[data-skin="riso"] #app { background: #1c2aa6; }
-html[data-skin="riso"] #grain { opacity: .2; }
-html[data-skin="riso"] .sh { filter: url(#handcut) drop-shadow(5px 6px 0 var(--red)); }
-html[data-skin="riso"] .cut { clip-path: none; border-radius: 6px; --bw: 3px; }
-html[data-skin="riso"] .cut::before { clip-path: none; border-radius: 3px; }
-html[data-skin="riso"] .cut.paper { --edge: #1b2a7a; } html[data-skin="riso"] .cut.ink { --edge: #101a55; --fill: #1b2a7a; }
-html[data-skin="riso"] .brand-sh { transform: rotate(-1.2deg); } html[data-skin="riso"] .plate-sh { transform: rotate(-.7deg); } html[data-skin="riso"] .ledger-sh { transform: rotate(1.4deg); } html[data-skin="riso"] .dock-sh { transform: rotate(.8deg); } html[data-skin="riso"] .rail-sh { transform: translateY(-50%) rotate(-.8deg); }
-html[data-skin="riso"] .note-sh { transform: translateX(-50%) rotate(.5deg); }
-html[data-skin="riso"] .brand-txt b, html[data-skin="riso"] #askName, html[data-skin="riso"] .lg-num, html[data-skin="riso"] .menu-in h1, html[data-skin="riso"] .tk-km, html[data-skin="riso"] .tk-total .odo, html[data-skin="riso"] .v-main h2, html[data-skin="riso"] .v-stats .odo,
-html[data-skin="riso"] .idcard .odo, html[data-skin="riso"] .camp-t, html[data-skin="riso"] .intro-num, html[data-skin="riso"] .intro-body h2, html[data-skin="riso"] #veil h2, html[data-skin="riso"] .go-txt b, html[data-skin="riso"] .fader label, html[data-skin="riso"] .row-sw label, html[data-skin="riso"] .tk-title, html[data-skin="riso"] .tagline { letter-spacing: -.01em; font-style: normal; font-weight: 400; font-variation-settings: normal; }
-html[data-skin="riso"] #askName { font-size: clamp(28px, 3.6vw, 50px); } html[data-skin="riso"] .lg-num { font-size: 42px; } html[data-skin="riso"] .tk-km { font-size: 58px; } html[data-skin="riso"] .menu-in h1 { font-size: clamp(64px, 9.5vw, 100px); }
-html[data-skin="riso"] .tagline { color: var(--brass); font-size: 25px; } html[data-skin="riso"] .tk-title { color: var(--red); font-size: 32px; transform: rotate(-2.5deg); display: inline-block; }
-html[data-skin="riso"] .tk-from, html[data-skin="riso"] #factText, html[data-skin="riso"] #askSub, html[data-skin="riso"] .tk-answer, html[data-skin="riso"] .lede, html[data-skin="riso"] .camp-d { font-family: "Courier Prime", monospace; font-weight: 700; font-style: normal; }
-html[data-skin="riso"] #factText { font-size: 15.5px; }
-html[data-skin="riso"] .tag { background: var(--brass); color: var(--ink); clip-path: none; border-radius: 3px; border: 2px solid var(--ink); font-weight: 700; } html[data-skin="riso"] .tk-band .tag { background: var(--red); color: var(--paper); }
-html[data-skin="riso"] .brand-txt i { background: var(--red); color: var(--paper); border: 2px solid var(--ink-deep); }
-html[data-skin="riso"] .btn-ink { background: var(--red); color: var(--paper); clip-path: none; border-radius: 4px; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); font-weight: 700; transition: transform .1s, box-shadow .1s; }
-html[data-skin="riso"] .btn-ink:hover { transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--ink); background: #ff6a3d; } html[data-skin="riso"] .btn-ink:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); } html[data-skin="riso"] .btn-ink::before { display: none; }
-html[data-skin="riso"] .btn-line { clip-path: none; border-radius: 4px; font-weight: 700; } html[data-skin="riso"] .v-actions .btn-ink { background: var(--brass); color: var(--ink); } html[data-skin="riso"] .v-actions .btn-ink:hover { background: var(--brass-lt); }
-html[data-skin="riso"] #dock button, html[data-skin="riso"] #rail button, html[data-skin="riso"] .menu-gear, html[data-skin="riso"] .row-btn, html[data-skin="riso"] .gate-langs button, html[data-skin="riso"] .langgrid button, html[data-skin="riso"] .skin-btn, html[data-skin="riso"] .gate-fs { clip-path: none; border-radius: 4px; }
-html[data-skin="riso"] .camp { --fill: #223197; --edge: #101a55; } html[data-skin="riso"] .camp.sel { --edge: var(--brass); --fill: #2b3bb0; }
-html[data-skin="riso"] .camp-thumb { border: 2px solid #101a55; border-radius: 3px; }
-html[data-skin="riso"] .menu-in { background: linear-gradient(90deg, rgba(20, 30, 110, .97), rgba(20, 30, 110, .94) 84%, rgba(20, 30, 110, 0)); }
-html[data-skin="riso"] .go { --fill: #223197; --edge: var(--brass); } html[data-skin="riso"] .go-dial { background: var(--brass); box-shadow: 0 0 0 3px #101a55, 4px 5px 0 3px var(--red); } html[data-skin="riso"] .go-dial svg { color: var(--ink-deep); --rose-hole: var(--brass); --rose-accent: var(--red); }
-html[data-skin="riso"] .stamp { border-radius: 50% 46% 52% 48%; filter: url(#handcut); border-width: 5px; mix-blend-mode: multiply; }
-html[data-skin="riso"] .idcard { clip-path: none; border-radius: 6px; box-shadow: 0 0 0 3px #1b2a7a inset, 6px 6px 0 var(--red); }
-html[data-skin="riso"] .ticket { -webkit-mask: none; mask: none; border-radius: 6px; box-shadow: 0 0 0 3px #1b2a7a inset; } html[data-skin="riso"] .tk-band { background: var(--ink); }
-html[data-skin="riso"] #tip { border-radius: 3px; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--red); } html[data-skin="riso"] .langpop { clip-path: none; border-radius: 8px; }
-html[data-skin="riso"] .gauge i { background: var(--red); } html[data-skin="riso"] .gauge i.done { background: var(--teal); } html[data-skin="riso"] #pips i.cur { background: var(--red); }
-
-
-/* ==========================================================================
-   FICHAS x MULT (todos los skins) + rejilla de monitor CRT del casino
-   ========================================================================== */
-.tk-mult { display: flex; align-items: stretch; gap: 8px; margin: 10px 0 6px; }
-.tk-mult > i { align-self: center; font-style: normal; font-family: var(--serif); font-weight: 900; font-size: 26px; }
-.tk-mult > div { flex: 1; padding: 6px 8px 7px; text-align: center; color: #fff; border-radius: 4px; position: relative; }
-.tk-mult .c { background: var(--teal); box-shadow: 0 3px 0 rgba(0, 0, 0, .28); animation: slide-l .45s cubic-bezier(.2, .9, .2, 1) 1.0s both; }
-.tk-mult .m { background: var(--red); box-shadow: 0 3px 0 rgba(0, 0, 0, .28); animation: mult-pop .55s cubic-bezier(.2, 1.7, .3, 1) 1.45s both; }
-.tk-mult span { display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; opacity: .9; }
-.tk-mult b { display: block; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: 30px; line-height: 1.05; font-variant-numeric: lining-nums tabular-nums; }
-@keyframes mult-pop { 0% { opacity: 0; transform: scale(.3) rotate(-8deg); } 60% { opacity: 1; transform: scale(1.22) rotate(3deg); } 100% { opacity: 1; transform: none; } }
-#app.shake { animation: app-shake .42s ease; } @keyframes app-shake { 15% { transform: translate(-7px, 4px); } 35% { transform: translate(6px, -5px); } 55% { transform: translate(-4px, 3px); } 75% { transform: translate(3px, -2px); } }
-html[data-skin="casino"] #app::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 150;
-  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .10) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, .38) 100%); }
-html[data-skin="riso"] .tk-mult > div { border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); } html[data-skin="riso"] .tk-mult .c { background: var(--teal); } html[data-skin="riso"] .tk-mult .m { background: var(--red); }
-html[data-skin="plano"] .tk-mult > div { border-radius: 0; border: 2px solid #06285e; color: #041b45; } html[data-skin="plano"] .tk-mult .c { background: var(--brass); } html[data-skin="plano"] .tk-mult .m { background: var(--red); }
-html[data-skin="casino"] .tk-mult > div { border-radius: 8px; border: 3px solid #191325; box-shadow: 0 4px 0 #191325; }

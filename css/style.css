@@ -109,7 +109,7 @@ kbd { font-family: var(--mono); font-size: .85em; }
   clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px); }
 #dock button:hover, #rail button:hover { background: rgba(242,233,214,.14); transform: translateY(-2px); }
 #dock button:active, #rail button:active { transform: translateY(1px) scale(.94); background: rgba(242,233,214,.22); }
-#dock svg, #rail svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+#dock svg:not(.ic), #rail svg:not(.ic) { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 #setBtn[aria-expanded="true"] { color: var(--brass); background: rgba(200,150,62,.16); }
 #fsBtn.on { color: var(--brass); }
 .zscale { width: 4px; height: 70px; margin: 3px 0; position: relative; background: repeating-linear-gradient(to top, rgba(242,233,214,.34) 0 1px, transparent 1px 7px); border-left: 1px solid rgba(242,233,214,.3); }
@@ -259,7 +259,7 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 .menu-rose { width: 72px; height: 72px; color: var(--paper); --rose-hole: var(--ink-deep); animation: spin-in 1.6s cubic-bezier(.2, .9, .2, 1) both; }
 .menu-gear { width: 40px; height: 40px; display: grid; place-items: center; color: var(--paper); border: 1.5px solid rgba(242,233,214,.3); transition: transform .3s var(--spring), border-color .2s, color .2s;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px); } .menu-gear:hover { border-color: var(--brass); color: var(--brass); transform: rotate(60deg); }
-.menu-gear svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.menu-gear svg:not(.ic) { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .menu-in h1 { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: clamp(60px, 9vw, 96px); line-height: .9; letter-spacing: -.035em; display: flex; align-items: flex-start; gap: 10px; margin-top: 6px; }
 .menu-in h1 em { font-family: var(--mono); font-style: normal; font-weight: 500; font-size: 16px; letter-spacing: .16em; background: var(--red); padding: 5px 8px 4px; margin-top: 10px; transform: rotate(-4deg); }
 .tagline { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 26px; margin-top: 10px; color: var(--brass); }
@@ -320,6 +320,6 @@ body.vd-on #hud, body.vd-on .dock-sh, body.vd-on .rail-sh, body.vd-on .note-sh {
   .vd { grid-template-columns: 1fr; gap: 22px; padding: 22px 20px 30px; align-content: start; } .v-side { order: -1; justify-items: start; grid-template-columns: auto 1fr; align-items: center; } .v-side .stamp { width: 110px; height: 110px; font-size: 10px; } .v-side .stamp b { font-size: 22px; } .idcard { width: 100%; }
 }
 @media (max-width: 480px) {
-  #dock button, #rail button { width: 38px; height: 38px; } #dock svg, #rail svg { width: 20px; height: 20px; }
+  #dock button, #rail button { width: 38px; height: 38px; } #dock svg:not(.ic), #rail svg:not(.ic) { width: 20px; height: 20px; } #dock .ic, #rail .ic { width: 24px; height: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; } }

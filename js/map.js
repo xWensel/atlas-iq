@@ -271,7 +271,7 @@ void main(){
       this.view = { cx: 0, cy: 0.3, s: 100 }; this.tv = null; this.inertia = null;
       this.homeSpec = { lat: 0, lon: 0, zoom: 1 };
       this.anim = null; this.drift = null;
-      this.marks = this._emptyMarks(); this.pickEnabled = false; this.mouse = null;
+      this.marks = this._emptyMarks(); this.probes = []; this.pickEnabled = false; this.mouse = null;
       this.quality = "auto"; this.rs = 1; this.frameEma = 0; this.baseDt = 1e9; this.lastT = 0; this.calm = 0;
       this.fxOn = true; this.zv = 0; this.lastLz = null; this.pv = [0, 0]; this.zc = null; this.lastView = { cx: 0, cy: 0, s: 0 };
       this.dirty = this.fxDirty = true; this.pointers = new Map(); this.samples = [];
@@ -350,7 +350,9 @@ void main(){
     /* ---------- tamano / camara ---------- */
     _emptyMarks() { return { guess: null, answer: null, highlight: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
     setMarks(m) { this.marks = { ...this._emptyMarks(), ...m, t0: performance.now() }; this.fxDirty = this.dirty = true; }
-    clearMarks() { this.marks = this._emptyMarks(); this.fxDirty = this.dirty = true; }
+    clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.dirty = true; }
+    /* sondas de la Aventura: [{lon,lat,km?,bearing?,label}] -> anillo de distancia y flecha de rumbo, siempre nitidos (vector 2D) */
+    setProbes(list) { this.probes = list.map(p => ({ ...p, t0: performance.now() })); this.fxDirty = this.dirty = true; this._probeAnim = performance.now() + 1400; }
     setPick(on) { this.pickEnabled = on; this.fxDirty = true; for (const c of [this.cv, this.fx]) c.classList.toggle("aiming", on); }
     setQuality(q) { this.quality = q; this.rs = 1; this.resize(true); }
 
@@ -647,6 +649,7 @@ void main(){
       const { fctx: c, W, H, dpr } = this, m = this.marks, sk = this.sk;
       c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
       this._drawGridLabels(c);
+      if (this.probes.length) this._drawProbes(c, now);
       const age = now - m.t0;
       if (m.guess || m.answer || m.labelAt) {
         const G = m.guess && this.lonLatToScreen(m.guess[0], m.guess[1]), Aa = m.answer && this.lonLatToScreen(m.answer[0], m.answer[1]);
@@ -671,6 +674,39 @@ void main(){
         }
       }
       if (this.pickEnabled && this.mouse && !this.pointers.size) this._reticle(c, this.mouse.x, this.mouse.y);
+    }
+    _drawProbes(c, now) {
+      const sk = this.sk, D2R = Math.PI / 180;
+      const dest = (lat, lon, brg, km) => { const d = km / 6371, la = lat * D2R, lo = lon * D2R, b = brg * D2R; const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b)); const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); return [((lo2 / D2R + 540) % 360) - 180, la2 / D2R]; };
+      for (const p of this.probes) {
+        const k = clamp((now - p.t0) / 700, 0, 1), e = easeOutBounce(k), P0 = this.lonLatToScreen(p.lon, p.lat);
+        c.save(); c.lineJoin = "round";
+        if (p.km) {
+          c.beginPath(); let prev = null;
+          for (let i = 0; i <= 96; i++) {
+            const [lo, la] = dest(p.lat, p.lon, (i / 96) * 360, p.km * k), q = this.lonLatToScreen(lo, la);
+            if (prev && Math.abs(q[0] - prev[0]) > this.W * 0.6) c.moveTo(q[0], q[1]); else if (i === 0 || !prev) c.moveTo(q[0], q[1]); else c.lineTo(q[0], q[1]);
+            prev = q;
+          }
+          c.setLineDash([10, 8]); c.lineDashOffset = -now / 60; c.lineWidth = 5; c.strokeStyle = this._rgba(sk.ink, 0.75); c.stroke();
+          c.lineWidth = 2.2; c.strokeStyle = this._rgba(sk.brass, 0.95); c.stroke();
+          c.fillStyle = this._rgba(sk.brass, 0.07); c.fill();
+          const top = dest(p.lat, p.lon, 0, p.km), T = this.lonLatToScreen(top[0], top[1]);
+          if (p.label && k >= 1) this._chip(c, p.label, T[0], T[1] - 4, { center: true, font: `600 13px ${this._fm()}` });
+        }
+        if (p.bearing != null) {
+          const f = dest(p.lat, p.lon, p.bearing, 400), F = this.lonLatToScreen(f[0], f[1]);
+          let dx = F[0] - P0[0], dy = F[1] - P0[1]; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+          const len = 76 * e, x2 = P0[0] + dx * len, y2 = P0[1] + dy * len, nx = -dy, ny = dx;
+          c.setLineDash([]); c.lineCap = "round"; c.lineWidth = 8; c.strokeStyle = this._rgba(sk.ink, 0.85); c.beginPath(); c.moveTo(P0[0], P0[1]); c.lineTo(x2, y2); c.stroke();
+          c.lineWidth = 4; c.strokeStyle = sk.brass; c.stroke();
+          c.fillStyle = sk.brass; c.strokeStyle = this._rgba(sk.ink, 0.85); c.lineWidth = 2.4; c.beginPath(); c.moveTo(x2 + dx * 14, y2 + dy * 14); c.lineTo(x2 + nx * 10, y2 + ny * 10); c.lineTo(x2 - nx * 10, y2 - ny * 10); c.closePath(); c.stroke(); c.fill();
+          if (p.label && k >= 1) this._chip(c, p.label, P0[0], P0[1] + 26, { center: true, font: `600 13px ${this._fm()}` });
+        }
+        c.setLineDash([]); c.fillStyle = sk.ink; c.strokeStyle = sk.brass; c.lineWidth = 2.6; c.beginPath(); c.arc(P0[0], P0[1], 7 * e, 0, Math.PI * 2); c.fill(); c.stroke();
+        c.restore();
+      }
+      if (now < this._probeAnim || this.probes.some(p => p.km || p.bearing != null)) this.fxDirty = true;   // el borde discontinuo se anima
     }
     _fd() { return getComputedStyle(document.documentElement).getPropertyValue("--serif") || "Fraunces, Georgia, serif"; }
     _fm() { return getComputedStyle(document.documentElement).getPropertyValue("--mono") || "'DM Mono', monospace"; }

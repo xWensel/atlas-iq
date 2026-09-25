@@ -1,5 +1,21 @@
 # Atlas IQ
 
+**v0.6** – Modos, Aventura (roguelike), Competitivo y logros:
+- **Un solo aspecto principal: Casino** (estilo Balatro). Expedición queda como alternativa; Plano y Riso se eliminaron.
+- **Pantalla principal por modos:** Aventura · Clásico · Competitivo · Extendido, más Enciclopedia y Perfil.
+- **Aventura (roguelike):** partidas aleatorias con semilla. Rondas con puntuación objetivo creciente, 3 actos + Leyenda infinita, un jefe por acto (Vendaval, Tormenta, Rigor, Silencio, Niebla), tienda de doblones entre rondas, 5 herramientas activas (Sonar, Brújula, Pasaporte, Cuaderno, Reloj de arena), 22 reliquias, 4 barajas y 6 niveles de Ascensión. La reliquia *Cartógrafo* suma según tus tarjetas de la Enciclopedia.
+- **Enciclopedia por precisión:** ≤100 km desbloquea el lugar y su país, ≤50 km sucesos y curiosidades, ≤40 km personajes y el resto (×2 en mares/naturaleza).
+- **Competitivo:** Reto diario con semilla común, Clásico clasificado y clasificaciones. Global si activas la API (ver abajo); si no, local.
+- **Perfil y logros:** estadísticas persistentes, medallas por campaña y 40 logros (con ocultos) listos para mapear a Steamworks.
+- **Iconografía propia:** ~110 iconos dibujados a mano en estilo "pin esmaltado" (`js/icons.js`, hoja de contacto en `dev/icons.html`): reliquias, herramientas, jefes, barajas, modos, tipos de tarjeta, logros, doblón, provisiones e interfaz. Sin emojis ni iconos genéricos. Tipografía del Casino: Jersey 15 (pixel legible).
+- Efectos y sonidos nuevos: pin que cae con ondas y chispas, monedas que vuelan, sonar, jefe, compra, logro.
+
+### Clasificación global (opcional)
+`api/top.js` y `api/submit.js` guardan las tablas en Upstash Redis. En Vercel: *Storage → Marketplace → Upstash Redis* (crea `KV_REST_API_URL` y `KV_REST_API_TOKEN`) y vuelve a desplegar. Sin eso, el juego usa la clasificación local.
+**Antitrampas:** hoy la puntuación es de confianza (límites de plausibilidad y de frecuencia). Antes de Steam hay que reproducir cada partida en servidor a partir de la semilla y los clics.
+
+Herramienta de desarrollo: `dev/bot.js` (jugador automático para equilibrar la Aventura: `bot2(errorKm)`).
+
 **v0.5** – **Enciclopedia geografica** (tecla `C` en el menu):
 - ~970 tarjetas coleccionables: ciudades, capitales, paises, monumentos, naturaleza, mares, estrechos, batallas, sucesos, **personajes** y **curiosidades**. Empiezan bloqueadas.
 - Se desbloquean acertando. Un acierto abre la tarjeta del lugar y su pais; con un acierto muy bueno (>=75 %) tambien se abren personajes, sucesos y curiosidades relacionados (p. ej. Paris -> Napoleon, Revolucion francesa, baguette).

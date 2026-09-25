@@ -445,6 +445,7 @@ window.AIQ = window.AIQ || {};
     }
 
     /* miniatura de una region (usa la textura ya dibujada: coste casi nulo) */
+    setProbes(list) { this.probes = list; }
     drawThumb(cv, spec) {
       if (!this.landTex) return;
       const dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 120, h = cv.clientHeight || 76;
