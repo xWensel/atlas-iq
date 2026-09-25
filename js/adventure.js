@@ -73,24 +73,25 @@ window.AIQ = window.AIQ || {};
     }
     return POOLS;
   }
-  const MINPOOL = 125;                                               // tras la ventana de dificultad del Acto I (80 %) quedan >= 100
+  const ROUND_POOL = 80;                                             // lugares distintos por ronda: de ahi salen las preguntas de cada ronda
   const byFame = (a, b) => (a.fame || 0) - (b.fame || 0);
-  /* carrete de una ronda: el banco de su tema y nivel, ordenado de mas a menos famoso. Siempre >= 100 lugares en cualquier acto (se completa con el vecino
-     mas cercano en dificultad) y, en el Acto I, solo los mas conocidos: la primera ronda son las capitales que todo el mundo sabe. */
+  /* carrete de una ronda: exactamente ~80 lugares de su tema, ordenados de mas a menos famoso. El banco de cada tema y nivel (~100) se completa con el
+     vecino mas cercano en dificultad y cada acto usa una ventana de 80 mas dificil que la anterior: la ronda 1 son las capitales que todo el mundo sabe. */
   const poolFor = (def, act) => {
     const P = pools(); let list;
-    if (def.topic === "mixed") list = [].concat(...Object.keys(P).filter(k => !k.startsWith("clue")).filter(k => +k.split("|")[1] >= def.tier).map(k => P[k]));
-    else list = (P[def.topic + "|" + def.tier] || []).slice();
-    list.sort(byFame);
-    if (def.topic !== "mixed" && list.length < MINPOOL) {
+    if (def.topic === "mixed") {
+      list = [].concat(...Object.keys(P).filter(k => !k.startsWith("clue")).filter(k => +k.split("|")[1] >= def.tier).map(k => P[k])).sort(byFame);
+      const step = list.length / ROUND_POOL; return Array.from({ length: ROUND_POOL }, (_, i) => list[Math.floor(i * step)]);   // muestra repartida de todos los temas
+    }
+    list = (P[def.topic + "|" + def.tier] || []).slice().sort(byFame);
+    if (list.length < ROUND_POOL + 20) {
       const lo = (P[def.topic + "|" + (def.tier - 1)] || []).slice().sort(byFame).reverse(), hi = (P[def.topic + "|" + (def.tier + 1)] || []).slice().sort(byFame);
       const first = def.tier === 0 ? hi : lo, second = def.tier === 0 ? lo : hi;                // el nivel 0 se completa con lo mas facil del 1; el resto, con lo mas dificil del anterior
-      list = list.concat(first, second).slice(0, Math.max(MINPOOL, list.length));
+      list = list.concat(first, second).slice(0, Math.max(ROUND_POOL + 20, list.length));
     }
-    if (list.length < 25) list = [].concat(...Object.values(P));
-    const cap = act === 0 ? 0.8 : act === 1 ? 0.92 : 1;                                        // ventana de dificultad por acto
-    if (cap < 1 && def.topic !== "mixed") { const n = Math.max(100, Math.ceil(list.length * cap)); if (list.length > n) list = list.slice(0, n); }
-    return list;
+    if (list.length < ROUND_POOL) list = [].concat(...Object.values(P)).sort(byFame);
+    const off = Math.round(Math.max(0, list.length - ROUND_POOL) * [0, 0.5, 1][Math.min(2, act || 0)]);
+    return list.slice(off, off + ROUND_POOL);
   };
   const CONT = { af: L("África", "Africa"), na: L("Norteamérica", "North America"), sa: L("Sudamérica", "South America"), as: L("Asia", "Asia"), eu: L("Europa", "Europe"), oc: L("Oceanía", "Oceania") };
   const centre = o => { const f = C().world.byName[o.key], big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a)); return [(big.bbox[1] + big.bbox[3]) / 2, (big.bbox[0] + big.bbox[2]) / 2]; };

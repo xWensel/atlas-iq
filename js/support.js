@@ -1,7 +1,7 @@
 /* Atlas IQ - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.9.1";
+  A.VERSION = "0.9.2";
   A.lang = "es";
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;

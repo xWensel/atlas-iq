@@ -1,5 +1,7 @@
 # Atlas IQ
 
+**v0.9.2** – Cada ronda de la Aventura usa un carrete de 80 lugares (ventana mas dificil en cada acto; el jackpot muestrea todos los temas).
+
 **v0.9.1** – Guardar y salir, un solo aspecto:
 - **Menu de partida:** boton de pausa / `P` / `Esc` en cualquier fase (pregunta, ticket, Campamento) con *Continuar*, *Guardar y salir al menu* y *Empezar una partida nueva* (pide confirmacion). La partida se guarda sola y se reanuda exactamente en la misma pregunta, con las mismas preguntas y los puntos de la ronda.
 - **Portada y pantalla de Aventura:** banner de "expedicion guardada" con *Continuar* / *Nueva partida*; descartar o sobrescribir una partida guardada pide confirmacion.
@@ -8,7 +10,7 @@
 - **Mano de poker desactivada** (las parejas de reliquias no se entendian): fuera el aviso de la tienda, el cobro por ronda y la reliquia Escalera real.
 
 **v0.9** – Roguelike por temas, arte generado coherente y Enciclopedia empaquetada:
-- **Rondas por tema con carretes gigantes:** cada ronda tiene un tema (capitales, monumentos, ciudades, paises, batallas, naturaleza...) y un banco de 100+ lugares. La ronda 1 son las capitales mas conocidas y la dificultad sube por actos (`js/adventure.js`, `poolFor`). Todo se muestra como "Ciudad, Pais".
+- **Rondas por tema con carretes gigantes:** cada ronda tiene un tema (capitales, monumentos, ciudades, paises, batallas, naturaleza...) y un carrete de 80 lugares. La ronda 1 son las capitales mas conocidas y la dificultad sube por actos (`js/adventure.js`, `poolFor`). Todo se muestra como "Ciudad, Pais".
 - **Banco de 1.167 lugares** con coordenadas verificadas y dificultad por fama (`data/places.js`), generado con `tools/build-places.mjs` desde Wikipedia/Wikidata.
 - **Enciclopedia completa y sin conexion:** textos en 6 idiomas, historia, foto y credito de cada tarjeta empaquetados en `data/wiki/` (`js/wiki.js`).
 - **Arte 100 % coherente:** ~200 iconos, logo, jefes, actos y banners generados con el mismo estilo pixel-art casino x geografia (`tools/gen_art.py` + `tools/keyout.py`; la clave de API vive solo en `.env.local`).
