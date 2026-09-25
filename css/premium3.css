@@ -1,0 +1,18 @@
+/* Atlas IQ v0.9 - premium (parte 3): ajustes finos de campamento, cartas y marcador. */
+.table { grid-template-rows: auto auto minmax(0, 1fr) auto auto; padding-top: clamp(8px, 1.6vh, 20px); gap: clamp(2px, .6vh, 8px); }
+.tb-title h2 { font-size: clamp(28px, 4.6vh, 58px); margin-top: 3px; } .tb-title .tag { font-size: 10px; padding: 3px 8px 2px; }
+.tb-coins { padding: 5px 18px 5px 8px; } .tb-coins .ic { width: clamp(30px, 4.2vh, 46px); height: clamp(30px, 4.2vh, 46px); } .tb-coins b { font-size: clamp(22px, 3.6vh, 38px); }
+.tb-note { font-size: clamp(14px, 2vh, 22px); }
+.table .offers { padding: clamp(6px, 1.6vh, 22px) 0 clamp(4px, 1vh, 12px); }
+.table .offer.pc { --w: min(23vw, 46vh * .78, 370px); height: min(100%, calc(var(--w) * 1.5)); padding: clamp(26px, 4vh, 40px) clamp(9px, 1vw, 16px) clamp(10px, 1.4vh, 16px); gap: clamp(2px, .6vh, 7px); }
+.table .offer.pc .of-ico { position: relative; display: block; flex: 1 1 0; min-height: 90px; height: auto; margin: 0 2px; overflow: hidden; }
+.table .offer.pc .of-ico .ic { position: absolute; left: 50%; top: 50%; width: 84%; height: 84%; max-height: none; transform: translate(-50%, -50%); object-fit: contain; transition: transform .35s var(--spring); }
+.table .offer.pc:hover .of-ico .ic { transform: translate(-50%, -50%) scale(1.12) rotate(-4deg); }
+.table .offer.pc .of-n { font-size: clamp(18px, 2.6vh, 28px); } .table .offer.pc p { font-size: clamp(12px, 1.7vh, 16px); line-height: 1.15; } .table .offer.pc .buy { font-size: clamp(15px, 2.1vh, 20px); padding: clamp(5px, .8vh, 9px) 8px; margin-top: 2px; }
+.table .offer.pc .of-r { font-size: clamp(9px, 1.15vh, 11px); }
+.table .ix.br { bottom: clamp(44px, 6vh, 58px); }
+.table.chest .offer.pc { --w: min(25vw, 50vh * .78, 400px); }
+.tb-actions { padding-bottom: clamp(4px, .8vh, 10px); } .tb-actions .chipbtn { font-size: clamp(13px, 1.8vh, 17px); padding: clamp(7px, 1.1vh, 11px) 20px; } .hand-tag { padding: 7px 14px 6px; }
+.tray-row { min-height: clamp(46px, 6.6vh, 64px); } .table .inv-perk, .table .inv-empty { width: clamp(40px, 5.4vh, 58px); height: clamp(50px, 6.8vh, 72px); } .tb-tray { padding-top: clamp(8px, 1.2vh, 14px); padding-bottom: clamp(8px, 1.4vh, 16px); }
+.tb-tray .go-next { font-size: clamp(15px, 2.2vh, 20px); padding: clamp(10px, 1.6vh, 16px) 22px; }
+#dlg.tablewrap, #dlg.home { position: absolute; inset: 0; width: auto; height: auto; }

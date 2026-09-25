@@ -147,10 +147,8 @@ window.AIQ = window.AIQ || {};
   I.felt = c(24, 24, 20, "L") + c(24, 24, 15, "l", 1.6) + l("M24 4v40M4 24h40M9 14q15 8 30 0M9 34q15-8 30 0", "w", 1.2, 'opacity=".4"') + `<g transform="translate(15 15) scale(.4)">${I.s_compass}</g>`;
 
   /* ficha-"ciega" (blind) con un icono dentro: pequena=azul, grande=naranja, jefe=roja */
-  A.blind = (kind, inner) => {
-    const main = { small: "B", big: "o", boss: "R" }[kind] || "R", ring = { small: "b", big: "#ffc28f", boss: "#ff8f86" }[kind] || "b";
-    return `<svg class="ic blindchip" viewBox="0 0 48 48" aria-hidden="true">${c(24, 24, 22, main) + notches() + c(24, 24, 15, ring, 2) + c(24, 24, 12.4, "#2b2340", 1.6)}<g transform="translate(11.5 11.5) scale(.52)">${I[inner] || ""}</g></svg>`;
-  };
+  A.blind = (kind, inner) => `<span class="ic blindchip">${A.icon("blank_" + kind, "bc-base")}${A.icon(inner, "bc-in")}</span>`;
+
 
   /* ============================== interfaz ============================== */
   const gear = () => { let d = ""; const n = 8; for (let i = 0; i < n; i++) { const a0 = (i / n) * Math.PI * 2, w = 0.2, pt = (a, r) => (24 + Math.cos(a) * r).toFixed(1) + " " + (24 + Math.sin(a) * r).toFixed(1); d += (i ? "L" : "M") + pt(a0 - w, 15) + "L" + pt(a0 - w * 0.6, 21) + "L" + pt(a0 + w * 0.6, 21) + "L" + pt(a0 + w, 15) + "L" + pt(a0 + Math.PI / n - w, 15) + "L" + pt(a0 + Math.PI / n + w, 15); } return d + "Z"; };
@@ -199,10 +197,15 @@ window.AIQ = window.AIQ || {};
 
   A._g = { K, C, col, p, q, l, t, c, e, h, dot, star };
   A.ICONS = I;
+  /* Los iconos son ilustraciones pixel-art generadas con un unico libro de estilo (tools/gen_art.py) en assets/icons/.
+     Si falta alguno, se pinta el dibujo vectorial antiguo como respaldo. */
+  const ALIAS = { a_globe: "globe", a_cal: "t_event", a_boots: "boots", a_flag: "t_country", a_bolt: "flash", a_night: "a_moon", roulette_r: "roulette_r" };
   A.icon = (id, cls = "") => {
-    const b = I[id]; if (!b) return "";
-    return `<svg class="ic ic-${id} ${cls}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${b}</svg>`;
+    id = ALIAS[id] || id;
+    return `<img class="ic ic-${id} ${cls}" src="assets/icons/${id}.webp" alt="" draggable="false" decoding="async" onerror="AIQ._icErr(this)">`;
   };
+  A._icErr = im => { const id = (im.className.match(/ic-([\w]+)/) || [])[1], b = I[id]; if (!b) { im.style.visibility = "hidden"; return; } const w = document.createElement("span"); w.innerHTML = `<svg class="${im.className}" viewBox="0 0 48 48" aria-hidden="true">${b}</svg>`; im.replaceWith(w.firstChild); };
+
   /* pinta los iconos declarados en el HTML: <i data-ic="u_plus"></i> */
   A.iconize = (root = document) => root.querySelectorAll("[data-ic]").forEach(el => { if (!el.firstChild) el.innerHTML = A.icon(el.dataset.ic); });
   /* logro -> icono */
@@ -215,21 +218,12 @@ window.AIQ = window.AIQ || {};
     daily_1: "t_event", daily_7: "t_event", night: "a_moon", marathon: "boots",
   };
   /* insignia de logro: marco por categoria + icono dentro */
-  const FRAME = {
-    round: c(24, 24, 22, "r") + notches() + c(24, 24, 16, "#ff8f86", 2) + c(24, 24, 13, "#2b2340", 1.4),
-    shield: p("M24 2l19 6v14c0 12-8 20-19 24C13 42 5 34 5 22V8Z", "b") + p("M24 7l14 4.5V22c0 9-6 15-14 19-8-4-14-10-14-19V11.5Z", "#a9d4ff", "opacity=\".8\""),
-    hex: p("M24 2l19 11v22L24 46 5 35V13Z", "r") + p("M24 7l14.6 8.5v17L24 41 9.4 32.5v-17Z", "#ffb0a8", "opacity=\".8\""),
-    book: p("M7 6h34a3 3 0 0 1 3 3v30a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3Z", "p") + p("M11 10h26a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2Z", "#dbb1ff", "opacity=\".85\""),
-    cal: p("M6 8h36a3 3 0 0 1 3 3v29a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3Z", "t") + p("M6 8h36a3 3 0 0 1 3 3v6H3v-6a3 3 0 0 1 3-3Z", "T") + p("M9 21h30v18H9Z", "#a5ecd6", "opacity=\".9\""),
-  };
-  const ACH_FRAME = { q: "round", level: "round", classic: "shield", codex: "book", adv: "hex", daily: "cal" };
+  const ACH_FRAME = { q: "blank_boss", level: "blank_boss", classic: "blank_small", codex: "blank_teal", adv: "blank_big", daily: "blank_gold" };
   A.badge = (achId, cls = "") => {
-    const a = A.ACH.find(x => x.id === achId), ic = I[A.ACH_ICON[achId]] || I.a_medal, fr = FRAME[ACH_FRAME[a && a.ev] || "round"];
-    return `<svg class="ic badge ${cls}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${fr}<g transform="translate(10.5 10.5) scale(.56)">${ic}</g></svg>`;
+    const a = A.ACH.find(x => x.id === achId);
+    return `<span class="ic badge ${cls}">${A.icon(ACH_FRAME[a && a.ev] || "blank_boss", "bd-base")}${A.icon(A.ACH_ICON[achId] || "a_medal", "bd-in")}</span>`;
   };
   /* iconos como imagen CSS (--ic-nombre) para decorar con ::before/::after */
-  A.iconVars = () => { const st = document.documentElement.style;
-    const tile = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><g opacity=".9"><g transform="translate(6 6) scale(.9) rotate(-12 24 24)">${I.s_compass}</g><g transform="translate(66 12) scale(.8) rotate(10 24 24)">${I.s_pin}</g><g transform="translate(12 68) scale(.8) rotate(8 24 24)">${I.s_palm}</g><g transform="translate(64 64) scale(.9) rotate(-8 24 24)">${I.s_peak}</g></g></svg>`;
-    st.setProperty("--ic-suits", `url("data:image/svg+xml,${encodeURIComponent(tile)}")`); for (const k of ["spark", "heart", "coin"]) { const id = { spark: "a_spark", heart: "heart", coin: "coin" }[k]; st.setProperty("--ic-" + k, `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">${I[id]}</svg>`)}")`); } };
+  A.iconVars = () => {};
   A.iconVars(); A.iconize();
 })(window.AIQ);

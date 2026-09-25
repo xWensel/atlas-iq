@@ -79,12 +79,23 @@ window.AIQ = window.AIQ || {};
       if (!cur) { E[e.id] = e; order.push(e.id); return e; }
       if (cur.type === "place" && e.type !== "place") cur.type = e.type;
       if (e.rarity < cur.rarity) cur.rarity = e.rarity;
-      if (!cur.name.es && e.name.es) cur.name.es = e.name.es;
+      for (const k of Object.keys(e.name || {})) if (!cur.name[k] && e.name[k]) cur.name[k] = e.name[k];
       if (!cur.fact.en && e.fact && e.fact.en) cur.fact = e.fact;
       if (cur.lat == null && e.lat != null) { cur.lat = e.lat; cur.lon = e.lon; }
       if (!cur.country && e.country) cur.country = e.country;
       return cur;
     };
+    /* 0) banco de lugares empaquetado (data/places.js): capitales, ciudades, monumentos, naturaleza, historia y paises */
+    if (A.PLACES && A.PLACES.length) {
+      const neBy = {}; A.PLACES.forEach(r => { if (r[1] === "country") neBy[r[6].en] = r[0].slice(2); });
+      A.PLACES.forEach(([id, kind, tier, lat, lon, qc, names]) => {
+        const cnEn = qc && A.PCOUNTRY && A.PCOUNTRY[qc] && A.PCOUNTRY[qc].en, ne = (cnEn && (neBy[cnEn] || (world.byName[cnEn] ? cnEn : null))) || null;
+        const type = kind === "history" ? (/^(battle|siege|fall of|.*\bwar\b|bombing|attack)/i.test(names.en) ? "battle" : "event")
+          : kind === "nature" ? (/\b(sea|ocean|gulf|bay)\b/i.test(names.en) ? "water" : /\b(strait|channel|canal|cape|drake|bosporus)\b/i.test(names.en) ? "strait" : "nature") : kind;
+        const rar = Math.min(3, tier + (kind === "history" || kind === "nature" ? 1 : 0));
+        add({ id, type, name: { ...names }, wiki: names.en, lat: kind === "country" ? null : lat, lon: kind === "country" ? null : lon, country: ne, fact: { en: "", es: "" }, rarity: rar, src: "places", nogeo: kind === "country" });
+      });
+    }
     const wikiFor = (id, title) => WIKI_OVERRIDE[id] || String(title).replace(/\(.*?\)/g, "").replace(/\s+-\s+\d{3,4}\b/, "").split(",")[0].trim();
 
     // 1) modo Extendido (mundo)
@@ -269,6 +280,7 @@ window.AIQ = window.AIQ || {};
   async function loadContent(e, lang, force) {
     const key = lang + ":" + e.id;
     if (!force && contentMem[key]) return contentMem[key];
+    if (!force) { const pk = await A.wiki.get(e.id, lang); if (pk) return (contentMem[key] = pk); }
     const c = !force && (await idb.get(key)); if (c && Date.now() - c.t < 30 * 864e5) return (contentMem[key] = c);
     const enTitle = await findTitle(e); if (!enTitle) return (contentMem[key] = { none: true, t: Date.now(), lang });
     let title = enTitle, wl = "en";
@@ -383,7 +395,7 @@ window.AIQ = window.AIQ || {};
     try {
       const rec = await loadContent(E[id], A.lang); if (rec.none) return;
       b.querySelector(".cx-nm").textContent = nameOf(E[id], rec);
-      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.onload = () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }; im.src = rec.img.thumb; }
+      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.onload = () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }; im.src = rec.img.thumb; }
     } catch (x) { /* sin conexion: se queda el icono */ }
   }
   function tiltMove(el, ev, deg) {
@@ -483,6 +495,7 @@ window.AIQ = window.AIQ || {};
     init(w, m) { world = w; map = m; load(); build(); },
     open, close, isOpen, stats, entry: id => E[id], has: id => !!E[id],
     unlocked: () => order.filter(isUnlocked), total: () => order.length,
+    isUnlocked: id => !!store.unlocked[id],
     _load: (id, lang) => loadContent(E[id], lang || A.lang),
     ids: () => order.slice(),
     byType,

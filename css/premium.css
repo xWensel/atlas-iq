@@ -1,0 +1,59 @@
+/* Atlas IQ v0.9 - capa PREMIUM: pixel art de estudio unico, casino x geografia, pantallas que usan toda la pantalla.
+   Se carga la ultima y manda sobre lo anterior. */
+
+/* ---------- imagenes: pixel art nitido, sombra de pegatina ---------- */
+img.ic { display: block; object-fit: contain; image-rendering: auto; filter: drop-shadow(0 2px 0 rgba(15, 8, 30, .55)); user-select: none; -webkit-user-drag: none; }
+.ic.sm { width: 22px; height: 22px; display: inline-block; vertical-align: middle; margin-right: 6px; } .ic.cn { display: inline-block; width: 1.25em; height: 1.25em; vertical-align: -.28em; margin-right: .25em; }
+.ic.blindchip { position: relative; display: block; } .ic.blindchip .bc-base { position: absolute; inset: 0; width: 100%; height: 100%; } .ic.blindchip .bc-in { position: absolute; left: 22%; top: 22%; width: 56%; height: 56%; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .5)); }
+.ic.badge { position: relative; display: block; width: 100%; height: 100%; } .ic.badge .bd-base { position: absolute; inset: 0; width: 100%; height: 100%; } .ic.badge .bd-in { position: absolute; left: 24%; top: 24%; width: 52%; height: 52%; }
+.ach:not(.got) .ic { filter: grayscale(1) brightness(.55); }
+
+/* ---------- pantalla de inicio: cuatro cartas sobre el mapa ---------- */
+#layer:has(#dlg.home) { pointer-events: auto; background: radial-gradient(ellipse at 50% 40%, rgba(8, 20, 26, .15), rgba(8, 4, 20, .78) 78%); }
+#dlg.home { place-self: stretch; width: 100%; height: 100%; transform: none; overflow-y: auto; overflow-x: hidden; filter: none; }
+.hh { min-height: 100%; display: grid; grid-template-rows: auto auto 1fr auto; padding: clamp(14px, 2.4vh, 30px) clamp(16px, 4vw, 64px) clamp(14px, 2.4vh, 26px); gap: clamp(6px, 1.4vh, 16px); }
+.hh-top { position: relative; display: flex; justify-content: center; align-items: flex-start; }
+.hh-logo { width: min(64vw, 470px); max-height: 26vh; width: auto; height: auto; max-width: min(64vw, 470px); filter: drop-shadow(0 8px 0 rgba(8, 4, 20, .6)) drop-shadow(0 0 30px rgba(248, 180, 73, .3)); animation: logo-in .9s var(--spring) both; }
+@keyframes logo-in { from { opacity: 0; transform: translateY(-30px) scale(.85) rotate(-3deg); } }
+.hh-top h1 { font-family: var(--serif); font-size: clamp(56px, 8vw, 110px); }
+.hh-top .menu-tools { position: absolute; right: 0; top: 0; }
+.hh-tag { margin: 0; text-align: center; font-family: var(--serif); font-size: clamp(20px, 2.4vw, 32px); color: var(--brass-lt); text-shadow: 0 3px 0 rgba(8, 4, 20, .7); }
+.hh-cards { display: flex; justify-content: center; align-items: center; gap: clamp(10px, 1.8vw, 30px); padding: clamp(10px, 2vh, 28px) 0; perspective: 1400px; }
+.mcard { --rot: 0deg; --rc: #c9c0d8; position: relative; display: flex; flex-direction: column; gap: 8px; width: clamp(180px, 20.5vw, 310px); aspect-ratio: 5 / 7.4; padding: 12px; text-align: left; color: #191325; cursor: pointer; border: 0; border-radius: 18px;
+  background: #f6efdc; box-shadow: 0 0 0 3px #191325, inset 0 0 0 5px var(--rc), inset 0 0 0 7px #191325, 0 18px 0 3px rgba(0, 0, 0, .45), 0 30px 60px rgba(0, 0, 0, .5);
+  transform: rotate(var(--rot)); transition: transform .35s var(--spring), box-shadow .3s; animation: deal .7s var(--spring) both; }
+.mcard:nth-child(1) { --rot: -4deg; animation-delay: .05s; --rc: #4fb6a0; } .mcard:nth-child(2) { --rot: -1.2deg; animation-delay: .12s; } .mcard:nth-child(3) { --rot: 1.4deg; animation-delay: .19s; --rc: #c78bf0; } .mcard:nth-child(4) { --rot: 4deg; animation-delay: .26s; --rc: #f8b449; }
+.mcard.hero { --rc: #ffd06b; width: clamp(210px, 24vw, 360px); transform: rotate(var(--rot)) translateY(-16px) scale(1.04); z-index: 2; }
+@keyframes deal { from { opacity: 0; transform: translateY(160px) rotate(24deg) scale(.7); } }
+.mcard:hover { transform: rotate(0deg) translateY(-24px) scale(1.07); z-index: 5; box-shadow: 0 0 0 3px #191325, inset 0 0 0 5px #ffd06b, inset 0 0 0 7px #191325, 0 26px 0 3px rgba(0, 0, 0, .45), 0 0 60px rgba(255, 208, 107, .55); }
+.mcard.hero:hover { transform: rotate(0deg) translateY(-34px) scale(1.09); }
+.mcard .ix { position: absolute; z-index: 3; } .mcard .ix.tl { left: 14px; top: 14px; } .mcard .ix.br { right: 14px; bottom: 14px; } .mcard .ix b { font-size: 26px; color: #191325; text-shadow: 0 0 4px #f6efdc, 0 0 4px #f6efdc; } .mcard[data-suit="red"] .ix b { color: #c2372e; } .mcard .ix .ic { width: 22px; height: 22px; filter: none; }
+.mc-win { flex: 1 1 auto; min-height: 0; margin: 4px 2px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 3px #191325; position: relative; } .mc-win .pic { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; } .mc-win .pic-frame, .mc-win .marq { display: none; }
+.mc-name { font-family: var(--serif); font-weight: 900; font-size: clamp(24px, 2.4vw, 36px); line-height: 1; padding: 0 30px 0 2px; color: #191325; }
+.mc-desc { font-size: clamp(13px, 1.05vw, 16px); line-height: 1.2; color: #3c3358; min-height: 3.6em; padding-right: 26px; }
+.mc-stat { align-self: flex-start; font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #f6efdc; background: #191325; padding: 5px 9px 4px; }
+.mc-ribbon { position: absolute; z-index: 4; top: -12px; left: 50%; transform: translateX(-50%) rotate(-2deg); font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #fff; background: var(--red); padding: 6px 12px 5px; box-shadow: 0 4px 0 rgba(0, 0, 0, .45), 0 0 0 2px #191325; white-space: nowrap; }
+.mcard.hero .marq { border-radius: 18px; }
+.hh-bottom { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; }
+.hh-ver { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: rgba(242, 233, 214, .45); }
+.chipbtn { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #ffe08a; background: #191325; padding: 10px 18px 9px; border-radius: 999px; cursor: pointer;
+  box-shadow: inset 0 0 0 2px #ffe08a, 0 6px 0 rgba(0, 0, 0, .45); transition: transform .2s var(--spring), background .2s; } .chipbtn:hover { transform: translateY(-3px) scale(1.04); background: #2b2340; } .chipbtn em { font-style: normal; color: #fff; opacity: .8; } .chipbtn.big { font-size: 15px; padding: 12px 22px 11px; }
+.chipbtn.no { animation: nope .35s; }
+
+/* ---------- sub-pantallas: usan todo el ancho, con el mapa visible ---------- */
+#dlg.menu { place-self: stretch center; width: min(1240px, 100vw); transform: none; background: linear-gradient(180deg, rgba(14, 9, 30, .96), rgba(14, 9, 30, .9)); box-shadow: 0 0 80px rgba(0, 0, 0, .6); border-left: 3px solid rgba(248, 180, 73, .35); border-right: 3px solid rgba(248, 180, 73, .35); pointer-events: auto; }
+.menu-in.hub { padding: clamp(16px, 3vh, 34px) clamp(18px, 3.4vw, 54px); }
+.hub .camps { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; } .hub .decks { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.hub .deck { padding: 16px 14px; gap: 6px; border-radius: 14px; } .hub .dk-ic .ic { width: 68px; height: 68px; } .hub .deck b { font-size: 22px; } .hub .deck i { font-size: 14px; }
+.hub .ach-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; } .hub .ach { grid-template-columns: 56px 1fr; padding: 10px 12px; } .hub .ach-i { width: 52px; height: 52px; }
+.hub .prof-grid { grid-template-columns: repeat(6, 1fr); } .hub h2.hub-h { font-size: clamp(44px, 5vw, 72px); }
+.hub .adv-stats { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) {
+  .hh-cards { flex-wrap: wrap; } .mcard { width: clamp(150px, 44vw, 250px); } .mcard.hero { width: clamp(160px, 46vw, 260px); transform: rotate(var(--rot)); } .hh-top .menu-tools { position: static; margin-top: 8px; }
+  .hh-top { flex-direction: column; align-items: center; } #dlg.menu { width: 100vw; border: 0; } .hub .decks { grid-template-columns: 1fr 1fr; } .hub .prof-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.hh-logo { width: auto; max-width: min(70vw, 520px); height: min(21vh, 210px); object-fit: contain; }
+.hh-tag { font-size: clamp(18px, 2.2vh + 8px, 30px); }
+.mcard { width: min(20.5vw, 31vh * .7 * 1.36, 310px); } .mcard.hero { width: min(24vw, 36vh * .7 * 1.36, 360px); }
+.hh { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+.hh-cards { padding: clamp(18px, 3.5vh, 40px) 0 clamp(8px, 2vh, 24px); }

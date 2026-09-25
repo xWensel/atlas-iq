@@ -1,5 +1,13 @@
 # Atlas IQ
 
+**v0.9** – Roguelike por temas, arte generado coherente y Enciclopedia empaquetada:
+- **Rondas por tema con carretes gigantes:** cada ronda tiene un tema (capitales, monumentos, ciudades, paises, batallas, naturaleza...) y un banco de 100+ lugares. La ronda 1 son las capitales mas conocidas y la dificultad sube por actos (`js/adventure.js`, `poolFor`). Todo se muestra como "Ciudad, Pais".
+- **Banco de 1.167 lugares** con coordenadas verificadas y dificultad por fama (`data/places.js`), generado con `tools/build-places.mjs` desde Wikipedia/Wikidata.
+- **Enciclopedia completa y sin conexion:** textos en 6 idiomas, historia, foto y credito de cada tarjeta empaquetados en `data/wiki/` (`js/wiki.js`).
+- **Arte 100 % coherente:** ~200 iconos, logo, jefes, actos y banners generados con el mismo estilo pixel-art casino x geografia (`tools/gen_art.py` + `tools/keyout.py`; la clave de API vive solo en `.env.local`).
+- **Tienda "Campamento"** sobre el mapa mundial: 3 ofertas con tirada (roll), reliquias con mano de poker por valor/palo, 79 reliquias con efectos que interactuan con la partida.
+- Pantallas nuevas a pantalla completa (menu, ajustes de Aventura, Clasico, Competitivo, Perfil).
+
 **v0.8** – Casino x Geografia (la mezcla fiel):
 - **Fichas-globo:** el doblon es una ficha de casino con un globo grabado; fichas de colores, pilas y "ciegas" (blinds) para cada ronda y jefe que caen y giran al empezar.
 - **Palos geograficos:** chincheta, rosa de los vientos, cumbre y palmera en lugar de corazones/picas/rombos/treboles. Las reliquias son cartas de poker (el numero de la carta es su precio) y las herramientas forman la mano en abanico, como en Balatro.

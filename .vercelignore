@@ -1,2 +1,4 @@
 dev
 .env*
+assets/raw
+tools

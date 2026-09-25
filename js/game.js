@@ -31,7 +31,7 @@
   const fmtKm = d => (d < 10 ? d.toFixed(1) : A.fmt(d)) + " km";
 
   /* ------------------------------------------------------------ arranque */
-  load();
+  load(); A.wiki.loadShort(A.lang);
   const world = A.geo.buildWorld();
   const map = A.createMap($("map"), world, onPick);
   A.codex.init(world, map);
@@ -75,7 +75,7 @@
   /* ------------------------------------------------------------ utilidades de interfaz */
   function dialog(html, cls) {
     const d = $("dlg"); d.className = cls; d.innerHTML = html;
-    document.body.classList.toggle("vd-on", cls === "verdict");
+    document.body.classList.toggle("vd-on", cls === "verdict" || cls === "tablewrap");
     $("layer").classList.remove("hidden");
     requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add("in")));
     const b = d.querySelector("[data-primary]"); if (b) setTimeout(() => b.focus({ preventScroll: true }), 60);
@@ -179,7 +179,7 @@
   function refreshLangUIs() { if ($("skinGrid")) skinChips($("skinGrid")); for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
   function setLang(code) {
     if (code === A.lang || !A.STR[code]) return;
-    A.lang = code; save(); A.sfx.ui(); applyLang(); refreshLangUIs();
+    A.lang = code; save(); A.sfx.ui(); A.wiki.loadShort(code); applyLang(); refreshLangUIs();
     if (S.phase === "title" && !S.booting) renderMenu();
     else if (S.phase === "reveal") { const o = q(); $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}` : A.tx(o.fact); }
     if (S.camp) updateHud();
@@ -399,20 +399,20 @@
     const totEl = $("totNum"); odoNow(totEl, 0); requestAnimationFrame(() => odoSet(totEl, total, { ms: 1100, delay: 700, tick: total > 0 }));
     $("nextBtn").onclick = () => { last ? finishLevel() : (S.qi++, nextQuestion()); };
 
-    $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}${A.tx(o.fact) ? " — " + A.tx(o.fact) : ""}` : A.tx(o.fact);
+    $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}${A.tx(o.fact) ? " — " + A.tx(o.fact) : ""}` : A.tx(o.fact) || A.factOf(o);
     $("plate").classList.remove("hurry");
     updateHud();
   }
 
   /* ------------------------------------------------------------ veredictos */
-  function verdict({ kind, level, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art }) {
+  function verdict({ kind, level, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art, lines }) {
     const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : `<svg><use href="#rose"/></svg>`}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
     dialog(`<div class="vd">
       <div class="v-main">
         <span class="tag">${A.t("v.level", { n: pad2(level) })}</span>
-        <h2>${title}</h2><p>${text}</p>
+        <h2>${title}</h2><p>${text}</p>${lines && lines.length ? `<ul class="v-lines">${lines.map((l, i) => `<li style="animation-delay:${0.5 + i * 0.12}s"><span>${l[0]}</span><i></i><b>${l[1]}</b></li>`).join("")}</ul>` : ""}
         <div class="v-stats">${stats.map((s, i) => `<div><span>${s[0]}</span><span class="odo" id="vs${i}"></span></div>`).join("")}</div>
-        <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? '<span class="ar">${A.icon("u_next", "sm")}</span>' : ""}</button>`).join("")}</div>
+        <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? `<span class="ar">${A.icon("u_next", "sm")}</span>` : ""}</button>`).join("")}</div>
       </div>
       <div class="v-side">${art ? `<div class="v-art">${A.pic(art)}</div>` : ""}<div class="stamp ${kind}"><div>${stamp}<b>${stampSub}</b></div></div>${idc}</div>
     </div>`, "verdict");
