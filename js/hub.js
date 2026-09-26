@@ -7,16 +7,9 @@ window.AIQ = window.AIQ || {};
   const T = A.T, $ = id => document.getElementById(id), C = () => A.core;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     const BOOK = () => A.icon("m_codex");
-  const tools = () => `<div class="menu-tools">
-      <button class="menu-gear" id="menuCodex" aria-label="${A.t("tip.codex")}" data-tip="tip.codex" data-key="C">${A.icon("m_codex")}</button>
-      <button class="menu-gear txt" id="menuLang" aria-label="${A.t("tip.lang")}" data-tip="tip.lang">${A.lang.toUpperCase()}</button>
-      <button class="menu-gear" id="menuFs" aria-label="${A.t("tip.fs")}" data-tip="tip.fs" data-key="F">${A.icon("u_fs")}</button>
-      <button class="menu-gear" id="menuGear" aria-label="${A.t("tip.set")}" data-tip="tip.set">${A.icon("u_set")}</button></div>`;
-  const wireTools = () => {
-    const c = C();
-    $("menuGear").onclick = () => c.openSettings(!c.S.settingsOpen); $("menuCodex").onclick = () => A.codex.open();
-    $("menuLang").onclick = e => c.openLangPop(e.currentTarget); $("menuFs").onclick = c.toggleFs;
-  };
+  /* solo el engranaje en la esquina: idioma, pantalla completa y el resto viven en Ajustes */
+  const tools = () => `<div class="menu-tools"><button class="menu-gear" id="menuGear" aria-label="${A.t("tip.set")}" data-tip="tip.set">${A.icon("u_set")}</button></div>`;
+  const wireTools = () => { const c = C(); $("menuGear").onclick = () => c.openSettings(!c.S.settingsOpen); };
   const top = (back) => `<div class="menu-top">${back ? `<button class="hub-back" id="hubBack">${A.icon("u_back", "sm")}${T("Menú", "Menu")}</button>` : `<img class="menu-rose" src="assets/icons/logo_mark.webp" alt="" draggable="false">`}${tools()}</div>`;
   const shell = (inner, back) => `<div class="menu-in hub">${top(back)}${inner}<p class="menu-foot">Geolite · v${A.VERSION}</p></div>`;
 
@@ -36,7 +29,10 @@ window.AIQ = window.AIQ || {};
       </div>
       <div class="hh-bottom">
       ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${T("Acto", "Act")} ${sm.act} · ${T("Ronda", "Round")} ${sm.round} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
-        <button class="chipbtn big" id="codexBtn" type="button">${A.icon("m_codex", "sm")}<span>${A.t("codex.title")}</span><em>${A.codexStats().u}/${A.codexStats().t}</em></button>
+        <button class="codex-shelf" id="codexBtn" type="button" ${A.ttAttr(A.t("codex.title"), A.tip6("Fichas de lugares, historia y datos clave: se descubren acertando cerca.|Cards for places, history and key facts: found by pinning close.|Fiches de lieux, d'histoire et de faits clés : on les découvre en visant juste.|Fichas de lugares, história e dados-chave: descobertas ao acertar perto.|Karten zu Orten, Geschichte und Kernfakten: entdeckt durch genaue Treffer.|Schede di luoghi, storia e dati chiave: si scoprono colpendo vicino."))}>
+          <span class="cs-ic">${A.icon("m_codex")}</span>
+          <span class="cs-t"><b>${A.t("codex.title")}</b><i>${A.fmt(A.codexStats().u)} / ${A.fmt(A.codexStats().t)}</i><u><s style="width:${(100 * A.codexStats().u / Math.max(1, A.codexStats().t)).toFixed(1)}%"></s></u></span>
+          <span class="cs-ar">${A.icon("u_next", "sm")}</span></button>
         <button class="chipbtn big" id="profBtn" type="button">${A.icon("m_prof", "sm")}<span>${T("Perfil", "Profile")}</span><em>${A.ach.count()}/${A.ach.total()}</em></button>
         <span class="hh-ver">Geolite · v${A.VERSION}</span>
       </div></div>`, "home");

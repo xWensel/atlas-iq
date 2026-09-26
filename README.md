@@ -2,6 +2,11 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.17.0** - Menu principal limpio y notas mas caracteristicas.
+- **Portada:** solo el engranaje arriba a la derecha; el idioma y el modo de pantalla (Ventana / Pantalla completa, y "Sin bordes" si el cliente de escritorio lo ofrece con `window.geoliteHost`) viven en Ajustes > General. La Enciclopedia pasa a ser un estante con libro y barra de progreso, mas discreto que los modos.
+- **Notas de campo menos repetitivas:** en vez de la primera frase generica ("X es la capital de Y..."), cada nota elige la frase mas caracteristica del articulo (fechas, superlativos, records, fundacion, patrimonio...) con una puntuacion por idioma (`tools/build-short.py`).
+- **Revision de perks, retos y herramientas:** comprobados uno a uno (parametros con y sin perk, hooks de pistas/monedas/vidas y las 7 herramientas). Corregido: el Espejo de mano no anulaba el reto Espejo del mapa; las Gafas de buceo eran casi imperceptibles (-55 %) y ahora quitan un 80 % del desenfoque del mapa y del puntero; el Ratón gaming anulaba tambien el temblor por error.
+
 **v0.16.3** - Mapa mudo (reto Fronteras fuera): ahora solo desaparecen las fronteras interiores y los colores por pais; las costas siempre se ven. Logo: el globo queda solo con oceano (sin manchas).
 
 **v0.16.2** - Fuera el reflejo blanco del globo del logo y los indices de baraja (K, A, Q) de las cartas de modo del menu.

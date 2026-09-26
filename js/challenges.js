@@ -158,13 +158,13 @@ window.AIQ = window.AIQ || {};
     case "drift": return { px: [22, 36, 54][i] * fx.quakeMul * h };
     case "spin": return { amp: [0.28, 0.45, 0.7][i] * fx.quakeMul * h };
     case "decoys": return { n: [4, 7, 11][i] };
-    case "tremble": return { px: [7, 13, 21][i] * fx.shakeMul * fx.lagMul * h };
+    case "tremble": return { px: [7, 13, 21][i] * fx.shakeMul * h };
     case "blink": return { period: [0.55, 0.42, 0.3][i], duty: 0.45 };
     case "ghost": return { every: [5.5, 4.2, 3.2][i], off: [0.9, 1.4, 2.0][i] };
     case "cblur": return { px: [3, 5, 8][i] * fx.blurMul * h };
     case "lag": return { tau: [140, 240, 380][i] * fx.lagMul * h };
     case "cmirror": return { both: c.lv >= 3 };
-    case "dizzy": return { r: [14, 22, 32][i] * fx.lagMul * fx.shakeMul * h };
+    case "dizzy": return { r: [14, 22, 32][i] * fx.shakeMul * h };
     default: return {};
   } };
   const has = id => S.list.some(c => c.id === id);
@@ -293,7 +293,7 @@ window.AIQ = window.AIQ || {};
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
     if (has("noborders")) { spec.lineA = 0; any = true; }
     const fl = get("flip"); if (fl) { spec.orient = { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 }; any = true; }
-    if (has("mirrorx")) { spec.orient = { rot: 0, mx: 1 }; any = true; }
+    if (has("mirrorx") && !S.fx.unmirror) { spec.orient = { rot: 0, mx: 1 }; any = true; }
     const sp = get("spin"); if (sp) { spec.spin = { amp: par(sp).amp, speed: 0.55 }; any = true; }
     const mo = get("mosaic"); if (mo) { spec.mosaic = par(mo).res; any = true; }
     const qk = get("quake"); if (qk) { spec.quake = par(qk).px; any = true; }

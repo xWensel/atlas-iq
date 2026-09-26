@@ -145,7 +145,7 @@
       const sw = f.querySelector(".sw");
       if (sw) { const on = k === "music" ? A.audio.musicOn : A.audio.sfxOn; sw.setAttribute("aria-checked", on); f.classList.toggle("off", !on); }
     }
-    segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs();
+    segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs(); if (A.syncWin) A.syncWin();
     const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast };
     for (const k in st) { const el = document.querySelector('.sw[data-sw="' + k + '"]'); if (el) el.setAttribute("aria-checked", !!st[k]); }
     const sg = document.querySelector('.sw[data-sw="songs"]'); if (sg) sg.closest(".row-sw").classList.toggle("off", !A.audio.musicOn);
@@ -232,7 +232,18 @@
       S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.tour = true; if (A.tour) A.tour.reset(); S.songToast = true; A.cursor.set(true); A.tt.enable(true);
       save(); A.sfx.card(); syncSettings(); rs.textContent = A.t("set.reset.done"); setTimeout(syncSettings, 2200);
     }; }
-  $("setFs").onclick = () => { toggleFs(); A.sfx.ui(); };
+  /* modo de pantalla: Ventana / Pantalla completa (y "Sin bordes" si el cliente de escritorio lo ofrece: window.geoliteHost) */
+  { const seg = document.querySelector('[data-seg="win"]'), host = window.geoliteHost;
+    if (host && host.setWindowMode) { const b = document.createElement("button"); b.dataset.v = "border"; b.dataset.i = "win.border"; seg.insertBefore(b, seg.querySelector("i")); seg.classList.add("s3"); }
+    const cur = () => (host && host.windowMode ? host.windowMode() : document.fullscreenElement ? "full" : "window");
+    seg.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return; const v = b.dataset.v; A.sfx.ui();
+      if (host && host.setWindowMode) host.setWindowMode(v);
+      else if (v === "full" && !document.fullscreenElement) toggleFs(); else if (v === "window" && document.fullscreenElement) toggleFs();
+      setTimeout(() => segSet(seg, cur()), 120);
+    });
+    document.addEventListener("fullscreenchange", () => segSet(seg, cur()));
+    A.syncWin = () => segSet(seg, cur()); }
   document.querySelector('[data-seg="gfx"]').addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b || b.dataset.v === S.quality) return;
     S.quality = b.dataset.v; save(); A.sfx.ui(); map.setQuality(S.quality); syncSettings();
