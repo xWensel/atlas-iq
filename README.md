@@ -1,5 +1,7 @@
 # Atlas IQ
 
+**v0.14.1** - El pais, parte de la pregunta desde el principio. Todas las rondas (capitales, batallas, ciudades...) muestran el lugar y, debajo, su pais en grande (o su continente si no tiene). Las dificultades lo van quitando: el nuevo reto **Sin pais** (jefe "Sin pasaporte") lo oculta, y los retos de texto (letras temblorosas, borradas, cambiadas, espejo, runas, anagrama, marquesina, Babel...) afectan tambien al pais, no solo al nombre.
+
 **v0.14** - Tutorial guiado y movil.
 - **Tutorial del crupier** (`js/tour.js`, `css/tour.css`): la primera vez, un foco ilumina la placa, el mapa, el reloj, doblones y provisiones, herramientas y objetivo (con el tiempo detenido); y en el primer Campamento explica cartas, retos de la proxima ronda y reliquias. Se puede saltar (boton o Esc), se recuerda en el perfil y se reactiva en Ajustes > General.
 - **Movil / tablet:** el ticket de resultado es ahora una hoja inferior compacta (el resto del HUD se aparta y se ve donde cayo tu pin); cabecera del Campamento sin solapes; se quita el aviso obsoleto de "textos en ingles" del modo Clasico.

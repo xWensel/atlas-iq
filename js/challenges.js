@@ -33,6 +33,7 @@ window.AIQ = window.AIQ || {};
   def("dance", "text", "ch_dance", "Baile de letras|Dancing letters|Lettres qui dansent|Letras dançantes|Tanzende Buchstaben|Lettere che ballano", "Las letras saltan arriba y abajo.|The letters bounce up and down.|Les lettres sautent de haut en bas.|As letras pulam para cima e para baixo.|Die Buchstaben hüpfen auf und ab.|Le lettere saltellano su e giù.", ["steadyhand", "spectacles"]);
   def("riddle", "text", "ch_riddle", "Adivinanza|Riddle|Devinette|Adivinha|Rätsel|Indovinello", "En vez del nombre, una pista con el nombre tapado.|A clue with the name blanked out replaces the name.|Un indice au nom masqué remplace le nom.|Uma pista com o nome tapado substitui o nome.|Statt des Namens ein Hinweis mit verdecktem Namen.|Al posto del nome, un indizio con il nome coperto.");
   def("babel", "text", "ch_babel", "Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele", "El nombre aparece en otro idioma.|The name appears in another language.|Le nom apparaît dans une autre langue.|O nome aparece em outro idioma.|Der Name erscheint in einer anderen Sprache.|Il nome appare in un'altra lingua.");
+  def("nocountry", "text", "t_country", "Sin país|No country|Sans pays|Sem país|Ohne Land|Senza paese", "El país del lugar desaparece: solo te queda el nombre.|The place's country disappears: only the name is left.|Le pays du lieu disparaît : il ne reste que le nom.|O país do lugar desaparece: só resta o nome.|Das Land des Ortes verschwindet: nur der Name bleibt.|Il paese del luogo sparisce: resta solo il nome.", ["atlasbook"]);
   /* --- mapa --- */
   def("blur", "map", "ch_blur", "Mapa borroso|Blurry map|Carte floue|Mapa desfocado|Verschwommene Karte|Mappa sfocata", "El mapa está desenfocado.|The map is out of focus.|La carte est floue.|O mapa está fora de foco.|Die Karte ist unscharf.|La mappa è sfocata.", ["lens", "divingmask"]);
   def("dark", "map", "ch_dark", "Apagón|Blackout|Panne de courant|Apagão|Stromausfall|Blackout", "El casino se queda a oscuras: solo ves cerca del puntero.|The casino goes dark: you only see near your pointer.|Le casino s'éteint : tu ne vois qu'autour du pointeur.|O cassino fica às escuras: só se vê perto do ponteiro.|Das Casino wird dunkel: du siehst nur um den Zeiger.|Il casinò si spegne: vedi solo vicino al puntatore.", ["miner"]);
@@ -78,7 +79,7 @@ window.AIQ = window.AIQ || {};
   const MILD_TEXT = ["shaky", "missing", "swap", "upside", "babel", "dance"], MILD_MAP = ["blur", "dark", "noborders", "clouds", "mirrorx", "negative", "rain"];
   const BOSS = [
     [["El Apagón|The Blackout|La panne|O Apagão|Der Stromausfall|Il Blackout", ["dark", "flicker"]], ["Ronda ciega|Blind round|Manche aveugle|Rodada cega|Blinde Runde|Round cieco", ["blur", "missing"]], ["Un solo continente|One continent|Un seul continent|Um só continente|Ein Kontinent|Un solo continente", ["pangea", "swap"]], ["Mareo de casino|Casino dizziness|Vertige de casino|Tontura de cassino|Casino-Schwindel|Capogiro da casinò", ["dizzy", "shaky"]]],
-    [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme", ["shuffle", "wrongborders"]], ["Mala visión|Bad eyesight|Mauvaise vue|Vista turva|Schlechte Sicht|Vista offuscata", ["flip", "anagram"]], ["Noche cerrada|Dead of night|Nuit noire|Noite fechada|Tiefste Nacht|Notte fonda", ["dark", "shaky", "wind"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala", ["quake", "decoys"]]],
+    [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme", ["shuffle", "wrongborders"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto", ["nocountry", "blur"]], ["Mala visión|Bad eyesight|Mauvaise vue|Vista turva|Schlechte Sicht|Vista offuscata", ["flip", "anagram"]], ["Noche cerrada|Dead of night|Nuit noire|Noite fechada|Tiefste Nacht|Notte fonda", ["dark", "shaky", "wind"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala", ["quake", "decoys"]]],
     [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato", ["shuffle", "dark", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta", ["lightning", "rain", "tremble"]], ["Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele", ["babel", "runes", "mosaic"]]],
   ].map(a => a.map(c => ({ n: L6(c[0]), ids: c[1] })));
   const ACT1 = [["text", "map"], ["ptr", "map"], ["text", "ptr"]], ACT2 = [["text", "map", "ptr"], ["map", "ptr", "rule"], ["text", "map", "map"]];
@@ -218,15 +219,26 @@ window.AIQ = window.AIQ || {};
     for (const w of [...words].sort((a, b) => b.length - a.length)) t = t.replace(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "▮".repeat(Math.min(6, w.length)));
     return t.length > 130 ? t.slice(0, 127) + "…" : t;
   }
+  /* el nombre y el pais de debajo sufren los mismos retos de texto (el pais tambien tiembla, se borra, se cambia...) */
   function decorate(o) {
-    const el = $("askName"); if (!el || !o) return; clearText();
-    const fx = S.fx, tx = S.list.filter(c => D[c.id].kind === "text");
-    let text = A.tx(o.name);
-    if (S.suspended || !tx.length) { el.textContent = text; return; }
-    const rnd = A.rng(`${S.seed}:t:${S.q}:${text}`);
+    const el = $("askName"), sub = $("askSub"); if (!el || !o) return; clearText();
+    const tx = S.list.filter(c => D[c.id].kind === "text"), nameTxt = A.tx(o.name), subTxt = A.tx(o.sub);
+    if (S.suspended || !tx.length) { el.textContent = nameTxt; if (sub) sub.textContent = subTxt; return; }
+    let alt = null;                                                   // Torre de Babel: los dos textos salen en el mismo otro idioma
+    if (has("babel") && !S.fx.noBabel) { const alts = ["es", "en", "fr", "pt", "de", "it"].filter(l => l !== A.lang && o.name && o.name[l] && o.name[l] !== nameTxt); if (alts.length) alt = alts[Math.floor(A.rng(`${S.seed}:t:${S.q}:${nameTxt}`)() * alts.length)]; }
+    deco(el, o, o.name, alt, false);
+    if (sub) {
+      if (has("nocountry") && subTxt) { sub.textContent = "▮▮▮▮▮▮"; sub.classList.add("ch-nocountry"); }
+      else if (subTxt) deco(sub, o, o.sub, alt, true); else sub.textContent = "";
+    }
+  }
+  function deco(el, o, obj, alt, isSub) {
+    const fx = S.fx;
+    let text = A.tx(obj);
+    const rnd = A.rng(`${S.seed}:t${isSub ? "s" : ""}:${S.q}:${text}`);
     let riddle = false;
-    if (has("riddle")) { const r = riddleText(o); if (r) { text = r; riddle = true; } }
-    if (has("babel") && !fx.noBabel && !riddle) { const cur = A.lang, alts = ["es", "en", "fr", "pt", "de", "it"].filter(l => l !== cur && o.name && o.name[l] && o.name[l] !== A.tx(o.name)); if (alts.length) text = o.name[alts[Math.floor(rnd() * alts.length)]]; }
+    if (!isSub && has("riddle")) { const r = riddleText(o); if (r) { text = r; riddle = true; } }
+    if (alt && !riddle && obj[alt]) text = obj[alt];
     let chars = [...text]; const orig = chars.slice(), isL = i => isLetter(chars[i] || " ");
     const letters = chars.map((c, i) => (isLetter(c) ? i : -1)).filter(i => i >= 0), fixed = new Set(), hidden = new Set(), dots = new Set(), runes = new Set();
     if (!riddle) {
@@ -262,11 +274,11 @@ window.AIQ = window.AIQ || {};
     const hid = [...hidden, ...dots];
     if (hid.length && fx.missingRate > 0) hid.forEach((k, j) => later(() => { const b = el.querySelector(`.lt[data-i="${k}"]`); if (b) { restore(b, b.dataset.g); say("chip", 1 + j * 0.2); } }, 900 + (j * 1000) / fx.missingRate));
     if ((fixed.size || runes.size) && (fx.unswapMs || fx.decodeMs)) later(() => { el.querySelectorAll(".lt").forEach(b => { const i = +b.dataset.i; if (b.textContent !== orig[i] && !b.classList.contains("gap")) restore(b, orig[i]); }); say("chip", 2); }, Math.min(fx.unswapMs || 1e9, fx.decodeMs || 1e9));
-    if (riddle && fx.riddleMs) later(() => { el.classList.remove("ch-riddle"); el.textContent = A.tx(o.name); el.classList.add("fixed"); say("chip", 2); }, fx.riddleMs);
+    if (riddle && fx.riddleMs) later(() => { el.classList.remove("ch-riddle"); el.textContent = A.tx(obj); el.classList.add("fixed"); say("chip", 2); }, fx.riddleMs);
     const mem = get("memory");
     if (mem) later(() => { el.classList.add(fx.keepName ? "ch-dim" : "ch-fade"); }, par(mem).ms);
   }
-  function clearText() { const el = $("askName"); if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-scroll", "fixed"); }
+  function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-scroll", "ch-nocountry", "fixed"); } }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
   function mapSpec(map, o) {
@@ -354,7 +366,8 @@ window.AIQ = window.AIQ || {};
       if (map && map.clearDistort) { map.clearDistort(ms); if (map.setDecoys) map.setDecoys([]); }
       $("app").classList.remove("ch-negative");
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
-      const el = $("askName"); if (el) { el.classList.remove("ch-fade", "ch-dim", "ch-riddle"); el.querySelectorAll(".gap,.dot,.rune,.faint").forEach(b => { b.classList.remove("gap", "dot", "rune", "faint"); b.textContent = b.dataset.g || b.textContent; }); }
+      for (const id of ["askName", "askSub"]) { const el = $(id); if (el) { el.classList.remove("ch-fade", "ch-dim", "ch-riddle", "ch-nocountry"); el.querySelectorAll(".gap,.dot,.rune,.faint").forEach(b => { b.classList.remove("gap", "dot", "rune", "faint"); b.textContent = b.dataset.g || b.textContent; }); } }
+      const o = A.core && A.core.S.qs[A.core.S.qi], sb = $("askSub"); if (o && sb && o.sub && sb.textContent.includes("▮")) sb.textContent = A.tx(o.sub);       // al responder, el pais vuelve
     },
     suspend() { S.suspended = true; this.reveal(500); const o = A.core && A.core.S.qs[A.core.S.qi]; if (o) decorate(o); if (A.pointer && A.pointer.mods) A.pointer.mods(); },
     upright() { const map = S.map; if (map && map.setOrient) map.setOrient(false, 900); },

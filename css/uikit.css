@@ -128,3 +128,9 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
   body.tk-on #lvlText { display: none; }
 }
 @media (max-width: 480px) { .tb-title h2 { font-size: 26px; white-space: nowrap; } .tb-title .tag { font-size: 9px; } }
+/* el pais bajo el nombre: bien visible en todas las preguntas (antes era una linea diminuta) */
+#askSub, html[data-skin="casino"] #askSub { font-family: var(--serif); font-style: normal; font-weight: 800; font-size: clamp(19px, 2.1vw, 28px); letter-spacing: .01em; color: #5b3d99; margin-top: 3px; line-height: 1.1; }
+html[data-skin="casino"] #askSub { font-family: inherit; }
+#askSub::before { content: "◈"; font-size: .6em; margin-right: .5em; vertical-align: .18em; opacity: .7; }
+#askSub:empty::before { content: none; }
+@media (max-width: 900px) { #askSub, html[data-skin="casino"] #askSub { font-size: clamp(17px, 4.6vw, 22px); } }
