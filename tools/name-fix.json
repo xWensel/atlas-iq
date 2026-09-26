@@ -1,0 +1,332 @@
+{
+ "brussels": {
+  "es": "Bruselas",
+  "fr": "Bruxelles",
+  "pt": "Bruxelas",
+  "de": "Brüssel",
+  "it": "Bruxelles"
+ },
+ "andorra-la-vella": {
+  "es": "Andorra la Vella"
+ },
+ "yaren": {
+  "es": "Yaren",
+  "fr": "Yaren",
+  "pt": "Yaren",
+  "de": "Yaren",
+  "it": "Yaren"
+ },
+ "djibouti": {
+  "es": "Yibuti",
+  "en": "Djibouti",
+  "fr": "Djibouti",
+  "pt": "Djibuti",
+  "de": "Dschibuti",
+  "it": "Gibuti"
+ },
+ "st-george-s": {
+  "es": "Saint George's",
+  "en": "St. George's"
+ },
+ "mumbai": {
+  "es": "Bombay (Mumbai)"
+ },
+ "wroc-aw": {
+  "es": "Wrocław"
+ },
+ "poznan": {
+  "es": "Poznań"
+ },
+ "odz": {
+  "es": "Łódź",
+  "en": "Łódź"
+ },
+ "bariloche": {
+  "es": "Bariloche"
+ },
+ "nassau": {
+  "es": "Nassau"
+ },
+ "bujumbura": {
+  "es": "Bujumbura"
+ },
+ "mbabane": {
+  "es": "Mbabane"
+ },
+ "n-djamena": {
+  "es": "N'Djamena"
+ },
+ "nouakchott": {
+  "es": "Nouakchott"
+ },
+ "ouagadougou": {
+  "es": "Ouagadougou"
+ },
+ "vientiane": {
+  "es": "Vientiane"
+ },
+ "naypyidaw": {
+  "es": "Naypyidaw"
+ },
+ "phnom-penh": {
+  "es": "Phnom Penh"
+ },
+ "thimphu": {
+  "es": "Thimphu"
+ },
+ "ashgabat": {
+  "es": "Ashgabat"
+ },
+ "bishkek": {
+  "es": "Bishkek"
+ },
+ "dushanbe": {
+  "es": "Dushanbe"
+ },
+ "nuku-alofa": {
+  "es": "Nuku'alofa"
+ },
+ "port-moresby": {
+  "es": "Port Moresby"
+ },
+ "lilongwe": {
+  "es": "Lilongwe"
+ },
+ "mogadishu": {
+  "es": "Mogadiscio"
+ },
+ "yamoussoukro": {
+  "es": "Yamusukro"
+ },
+ "abuja": {
+  "es": "Abuya"
+ },
+ "kathmandu": {
+  "es": "Katmandú"
+ },
+ "sagrada-familia": {
+  "es": "Sagrada Familia"
+ },
+ "giza-pyramid-complex": {
+  "es": "Pirámides de Guiza",
+  "en": "Pyramids of Giza"
+ },
+ "great-wall-of-china": {
+  "es": "Gran Muralla China"
+ },
+ "konark-sun-temple": {
+  "es": "Templo del Sol de Konark"
+ },
+ "red-fort": {
+  "es": "Fuerte Rojo de Delhi"
+ },
+ "potala-palace": {
+  "es": "Palacio de Potala"
+ },
+ "terracotta-army": {
+  "es": "Ejército de terracota"
+ },
+ "notre-dame-de-paris": {
+  "es": "Notre-Dame de París"
+ },
+ "arc-de-triomphe": {
+  "es": "Arco del Triunfo"
+ },
+ "pantheon": {
+  "es": "Panteón de Agripa",
+  "en": "Pantheon (Rome)"
+ },
+ "mezquita-catedral-de-cordoba": {
+  "es": "Mezquita de Córdoba",
+  "en": "Mosque–Cathedral of Córdoba"
+ },
+ "ait-benhaddou": {
+  "es": "Ait Ben Haddou"
+ },
+ "jemaa-el-fnaa": {
+  "es": "Yamaa el Fna"
+ },
+ "hobbiton-movie-set": {
+  "es": "Hobbiton",
+  "en": "Hobbiton"
+ },
+ "walt-disney-world": {
+  "es": "Walt Disney World",
+  "en": "Walt Disney World"
+ },
+ "palenque": {
+  "es": "Palenque"
+ },
+ "zocalo": {
+  "es": "Zócalo de Ciudad de México",
+  "en": "Zócalo"
+ },
+ "sydney-harbour-bridge": {
+  "es": "Sydney Harbour Bridge",
+  "en": "Sydney Harbour Bridge"
+ },
+ "louvre": {
+  "es": "Louvre",
+  "en": "Louvre"
+ },
+ "sphinx": {
+  "es": "Gran Esfinge de Guiza",
+  "en": "Great Sphinx of Giza"
+ },
+ "golden-temple": {
+  "es": "Templo Dorado de Amritsar",
+  "en": "Golden Temple"
+ },
+ "battle-of-passchendaele": {
+  "es": "Batalla de Passchendaele"
+ },
+ "dunkirk-evacuation": {
+  "es": "Evacuación de Dunkerque"
+ },
+ "battle-of-blenheim": {
+  "es": "Batalla de Blenheim"
+ },
+ "bay-of-pigs-invasion": {
+  "es": "Invasión de Bahía de Cochinos"
+ },
+ "battle-of-karbala": {
+  "es": "Batalla de Karbala"
+ },
+ "battle-of-actium": {
+  "es": "Batalla de Actium"
+ },
+ "battle-of-ia-drang": {
+  "es": "Batalla de Ia Drang"
+ },
+ "atomic-bombing-of-hiroshima": {
+  "es": "Bombardeo atómico de Hiroshima",
+  "en": "Atomic bombing of Hiroshima"
+ },
+ "tiananmen-square-protests-of-1989": {
+  "es": "Protestas de Tiananmén de 1989",
+  "en": "Tiananmen Square protests of 1989"
+ },
+ "september-11-attacks": {
+  "es": "Atentados del 11 de septiembre",
+  "en": "September 11 attacks"
+ },
+ "suez-crisis": {
+  "es": "Crisis de Suez"
+ },
+ "battle-of-cajamarca": {
+  "es": "Batalla de Cajamarca"
+ },
+ "fall-of-tenochtitlan": {
+  "es": "Caída de Tenochtitlan"
+ },
+ "siege-of-vienna": {
+  "es": "Sitio de Viena (1683)",
+  "en": "Siege of Vienna (1683)"
+ },
+ "battle-of-hattin": {
+  "es": "Batalla de Hattin"
+ },
+ "siege-of-acre": {
+  "es": "Sitio de Acre (1291)",
+  "en": "Siege of Acre (1291)"
+ },
+ "voyages-of-christopher-columbus": {
+  "es": "Viajes de Cristóbal Colón",
+  "en": "Voyages of Christopher Columbus",
+  "fr": "Voyages de Christophe Colomb",
+  "pt": "Viagens de Cristóvão Colombo",
+  "de": "Reisen des Christoph Kolumbus",
+  "it": "Viaggi di Cristoforo Colombo"
+ },
+ "fall-of-rome": {
+  "es": "Caída de Roma (476)",
+  "en": "Fall of Rome (476)"
+ },
+ "wright-brothers": {
+  "es": "Primer vuelo de los hermanos Wright",
+  "en": "Wright brothers' first flight"
+ },
+ "serengeti": {
+  "es": "Serengeti"
+ },
+ "mount-kailash": {
+  "es": "Monte Kailash"
+ },
+ "kilauea": {
+  "es": "Kilauea",
+  "en": "Kilauea"
+ },
+ "pico-de-orizaba": {
+  "es": "Pico de Orizaba"
+ },
+ "cotopaxi": {
+  "es": "Cotopaxi"
+ },
+ "chimborazo": {
+  "es": "Chimborazo"
+ },
+ "ngorongoro-conservation-area": {
+  "es": "Cráter del Ngorongoro",
+  "en": "Ngorongoro Crater"
+ },
+ "zhangjiajie-national-forest-park": {
+  "es": "Zhangjiajie",
+  "en": "Zhangjiajie"
+ },
+ "halong-bay": {
+  "es": "Bahía de Ha Long"
+ },
+ "mount-olympus": {
+  "es": "Monte Olimpo"
+ },
+ "hindenburg-disaster": {
+  "es": "Desastre del Hindenburg"
+ },
+ "trinity": {
+  "es": "Prueba nuclear Trinity",
+  "en": "Trinity nuclear test"
+ },
+ "c:China": {
+  "es": "China",
+  "en": "China",
+  "fr": "Chine",
+  "pt": "China",
+  "de": "China",
+  "it": "Cina"
+ },
+ "c:Myanmar": {
+  "es": "Myanmar"
+ },
+ "c:eSwatini": {
+  "es": "Esuatini",
+  "en": "Eswatini"
+ },
+ "kuwait-city": {
+  "es": "Ciudad de Kuwait",
+  "en": "Kuwait City"
+ },
+ "luxembourg-city": {
+  "es": "Ciudad de Luxemburgo",
+  "en": "Luxembourg City"
+ },
+ "phuket": {
+  "es": "Phuket",
+  "en": "Phuket"
+ },
+ "siege-of-baghdad": {
+  "es": "Sitio de Bagdad (1258)",
+  "en": "Siege of Baghdad (1258)"
+ },
+ "siege-of-jerusalem": {
+  "es": "Sitio de Jerusalén (1099)",
+  "en": "Siege of Jerusalem (1099)"
+ },
+ "spanish-armada": {
+  "es": "Armada Invencible",
+  "en": "Spanish Armada"
+ },
+ "guadalcanal-campaign": {
+  "es": "Campaña de Guadalcanal",
+  "en": "Guadalcanal campaign"
+ }
+}

@@ -25,19 +25,28 @@ window.AIQ = window.AIQ || {};
 
   /* construye el SVG del logo dentro de `host`. animated: cada letra con retardo propio (--i) */
   A.buildLogo = (host, { animated = false, className = "vr-logo" } = {}) => {
-    const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
-    svg.setAttribute("viewBox", "-6 -6 1012 626"); svg.setAttribute("class", className); svg.setAttribute("aria-label", "Vault Raiders"); svg.setAttribute("role", "img");
-    const g = document.createElementNS(NS, "g"); g.setAttribute("fill", FILL); g.setAttribute("stroke", LINE); g.setAttribute("stroke-width", "4"); g.setAttribute("stroke-linejoin", "round"); g.setAttribute("fill-rule", "evenodd");
+    const NS = "http://www.w3.org/2000/svg", el = (n, a = {}) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
+    const svg = el("svg", { viewBox: "-6 -6 1012 626", class: className, "aria-label": "Vault Raiders", role: "img" });
+    const g = el("g", { fill: animated ? "url(#vrFill)" : FILL, stroke: LINE, "stroke-width": "4", "stroke-linejoin": "round", "fill-rule": "evenodd" });
+    if (animated) {                                                  // degradado metalico + un brillo suave que solo recorre las letras (recortado a su forma)
+      const defs = el("defs"), fill = el("linearGradient", { id: "vrFill", x1: "0", y1: "0", x2: "0", y2: "1" });
+      [["0", "#fdf7ff"], [".5", "#e6cdf6"], ["1", "#c39cdf"]].forEach(([o, c]) => fill.appendChild(el("stop", { offset: o, "stop-color": c })));
+      const shine = el("linearGradient", { id: "vrShine", x1: "0", y1: "0", x2: "1", y2: "0" });
+      [["0", "#ffd6ff", "0"], [".38", "#ffc978", ".7"], [".5", "#fff", "1"], [".62", "#ffc978", ".7"], ["1", "#ffd6ff", "0"]].forEach(([o, c, a]) => shine.appendChild(el("stop", { offset: o, "stop-color": c, "stop-opacity": a })));
+      const clip = el("clipPath", { id: "vrClip" }); A.VR_LETTERS.forEach(([, d]) => clip.appendChild(el("path", { d, "clip-rule": "evenodd" })));
+      defs.append(fill, shine, clip); svg.appendChild(defs);
+    }
     A.VR_LETTERS.forEach(([size, d], i) => {
-      const p = document.createElementNS(NS, "path"); p.setAttribute("d", d); p.setAttribute("class", "vr-l vr-" + size);
-      if (animated) p.style.setProperty("--i", i);
-      // origen de la transformacion en el centro de cada letra (para el rebote)
+      const p = el("path", { d, class: "vr-l vr-" + size });
+      if (animated) p.style.setProperty("--i", size === "big" ? i : i - 5);
       g.appendChild(p);
     });
-    svg.appendChild(g); host.appendChild(svg);
+    svg.appendChild(g);
+    if (animated) { const sg = el("g", { "clip-path": "url(#vrClip)" }); sg.appendChild(el("rect", { x: "0", y: "-20", width: "230", height: "660", fill: "url(#vrShine)", class: "vr-shine" })); svg.appendChild(sg); }
+    host.appendChild(svg);
     // si el archivo original esta disponible, sustituye el dibujo (se comprueba una sola vez)
     A._vrProbe = A._vrProbe || new Promise(res => { const i = new Image(); i.onload = () => res(i.src); i.onerror = () => res(null); i.src = "assets/vault-raiders.png"; });
-    A._vrProbe.then(src => { if (!src || !svg.isConnected) return; const im = document.createElement("img"); im.src = src; im.alt = "Vault Raiders"; im.className = className + " vr-img"; svg.replaceWith(im); });
+    A._vrProbe.then(src => { if (!src || !svg.isConnected) return; const im = document.createElement("img"); im.src = src; im.alt = "Vault Raiders"; im.className = className + " vr-img"; svg.replaceWith(im); host.style.setProperty("--vr-url", `url(${src})`); host.classList.add("has-png"); });
     return svg;
   };
 })(window.AIQ);

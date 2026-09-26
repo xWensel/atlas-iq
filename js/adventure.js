@@ -74,25 +74,49 @@ window.AIQ = window.AIQ || {};
     return POOLS;
   }
   const ROUND_POOL = 80;                                             // lugares distintos por ronda: de ahi salen las preguntas de cada ronda
-  const byFame = (a, b) => (a.fame || 0) - (b.fame || 0);
-  /* carrete de una ronda: exactamente ~80 lugares de su tema, ordenados de mas a menos famoso. El banco de cada tema y nivel (~100) se completa con el
-     vecino mas cercano en dificultad y cada acto usa una ventana de 80 mas dificil que la anterior: la ronda 1 son las capitales que todo el mundo sabe. */
-  const poolFor = (def, act) => {
-    const P = pools(); let list;
-    if (def.topic === "mixed") {
-      list = [].concat(...Object.keys(P).filter(k => !k.startsWith("clue")).filter(k => +k.split("|")[1] >= def.tier).map(k => P[k])).sort(byFame);
-      const step = list.length / ROUND_POOL; return Array.from({ length: ROUND_POOL }, (_, i) => list[Math.floor(i * step)]);   // muestra repartida de todos los temas
+  const CAP = { 1: 99, 2: 12, 3: 12, 4: 99, 5: 99, 6: 10, 7: 12, 8: 8, 9: 8, 10: 8, 11: 10, 12: 6 };   // maximo de lugares del mismo pais por ronda (ronda 1..12)
+  const ROUND_KIND = ["capital", "landmark", "city", "country", "capital", "history", "nature", "city", "city", "landmark", "history", "mixed"];
+  const byDiff = (a, b) => (a.tier - b.tier) || ((a.fame || 0) - (b.fame || 0));   // de mas facil a mas dificil dentro de un tipo
+  const nk = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const nameKeys = q => [nk(q.name && q.name.en), nk(q.name && q.name.es)].filter(Boolean);
+  /* Reparto de lugares entre las 12 rondas: cada lugar cae en UNA sola ronda (sin repetidos), la primera ronda de cada tema se queda con lo mas conocido,
+     las siguientes con muestras repartidas del resto por dificultad, y el Jackpot con una mezcla de lo que sobra. Un maximo de lugares por pais mantiene variedad. */
+  let ASSIGN = null;
+  function assign() {
+    if (ASSIGN) return ASSIGN;
+    const P = pools(), out = Array.from({ length: 12 }, () => []), usedName = new Set(), left = [];
+    const kindList = k => [].concat(...[0, 1, 2].map(t => P[k + "|" + t] || [])).sort(byDiff);
+    const ctry = q => (q.t === "c" ? q.cid[0] : (q.sub && q.sub.en) || "");
+    const spread = arr => { const n = arr.length, first = new Set(); if (n <= ROUND_POOL) return arr; for (let i = 0; i < ROUND_POOL; i++) first.add(Math.floor(i * n / ROUND_POOL)); return arr.filter((_, j) => first.has(j)).concat(arr.filter((_, j) => !first.has(j))); };   // primero un muestreo uniforme, luego el resto (de reserva)
+    const pick = (cands, rnd) => {                                                                   // coge hasta 80 respetando el tope por pais y sin repetir nombres
+      const cnt = {}, got = [], cap = CAP[rnd + 1];
+      for (const q of cands) {
+        if (got.length >= ROUND_POOL) break; const nm = nameKeys(q), c = ctry(q);
+        if (nm.some(k => usedName.has(k)) || (c && (cnt[c] || 0) >= cap)) continue;
+        nm.forEach(k => usedName.add(k)); if (c) cnt[c] = (cnt[c] || 0) + 1; got.push(q);
+      }
+      return got;
+    };
+    for (const kind of ["capital", "landmark", "city", "country", "history", "nature"]) {
+      const rounds = ROUND_KIND.map((k, i) => (k === kind ? i : -1)).filter(i => i >= 0);
+      let rest = kindList(kind);
+      rounds.forEach((r, idx) => {
+        let cands;
+        if (idx === 0) cands = rest;                                                                   // la primera ronda: lo mas facil
+        else { const per = Math.ceil(rest.length / (rounds.length - idx)); cands = spread(rest.slice(0, per)); }   // las demas: muestra repartida del tramo siguiente
+        const got = pick(cands, r).sort(byDiff); out[r] = got;
+        const taken = new Set(got.map(q => q.cid[0])); rest = rest.filter(q => !taken.has(q.cid[0]));
+      });
+      rest.forEach(q => left.push(q));
     }
-    list = (P[def.topic + "|" + def.tier] || []).slice().sort(byFame);
-    if (list.length < ROUND_POOL + 20) {
-      const lo = (P[def.topic + "|" + (def.tier - 1)] || []).slice().sort(byFame).reverse(), hi = (P[def.topic + "|" + (def.tier + 1)] || []).slice().sort(byFame);
-      const first = def.tier === 0 ? hi : lo, second = def.tier === 0 ? lo : hi;                // el nivel 0 se completa con lo mas facil del 1; el resto, con lo mas dificil del anterior
-      list = list.concat(first, second).slice(0, Math.max(ROUND_POOL + 20, list.length));
-    }
-    if (list.length < ROUND_POOL) list = [].concat(...Object.values(P)).sort(byFame);
-    const off = Math.round(Math.max(0, list.length - ROUND_POOL) * [0, 0.5, 1][Math.min(2, act || 0)]);
-    return list.slice(off, off + ROUND_POOL);
-  };
+    const groups = {}; left.filter(q => !nameKeys(q).some(k => usedName.has(k))).sort(byDiff).forEach(q => (groups[q.topic] = groups[q.topic] || []).push(q));
+    const lists = Object.values(groups).map(spread), mixed = [];                                   // el Jackpot reparte a partes iguales entre temas
+    for (let i = 0; mixed.length < ROUND_POOL * 3 && lists.some(l => i < l.length); i++) lists.forEach(l => { if (i < l.length) mixed.push(l[i]); });
+    out[11] = pick(mixed, 11);
+    return (ASSIGN = out);
+  }
+  /* carrete de una ronda (0-11); la Leyenda (12+) repite las rondas 5-12 */
+  const poolFor = r => assign()[r < 12 ? r : 4 + ((r - 4) % 8)];
   const CONT = { af: L("África", "Africa"), na: L("Norteamérica", "North America"), sa: L("Sudamérica", "South America"), as: L("Asia", "Asia"), eu: L("Europa", "Europe"), oc: L("Oceanía", "Oceania") };
   const centre = o => { const f = C().world.byName[o.key], big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a)); return [(big.bbox[1] + big.bbox[3]) / 2, (big.bbox[0] + big.bbox[2]) / 2]; };
   const latlon = o => (o.t === "c" ? centre(o) : [o.lat, o.lon]);
@@ -125,8 +149,8 @@ window.AIQ = window.AIQ || {};
   let run = null;
   A.adv = { get run() { return run; }, hasSave() { try { return !!localStorage.getItem(RUNKEY); } catch (e) { return false; } } };
   A.adv.poolStats = () => Object.fromEntries(Object.entries(pools()).map(([k, v]) => [k, v.length]));
-  A.adv.roundPlaces = (r, act) => poolFor(roundDefOf(r), act == null ? Math.floor(r / 4) : act);
-  A.adv.roundPool = (r, act) => poolFor(roundDefOf(r), act == null ? Math.floor(r / 4) : act).length;
+  A.adv.roundPlaces = r => poolFor(r);
+  A.adv.roundPool = r => poolFor(r).length;
   const persist = () => { try { if (run) localStorage.setItem(RUNKEY, JSON.stringify(run)); else localStorage.removeItem(RUNKEY); } catch (e) { /* sin almacenamiento */ } };
 
   const ascFx = a => ({ target: 1 + 0.1 * a, secs: -a, lives: a >= 3 ? -1 : 0, price: 1 + 0.1 * a, boss2: a >= 4 });
@@ -190,7 +214,7 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------- ronda ---------------- */
   function pickQuestions(n) {
-    const def = rdef(), list = poolFor(def, run.act), rr = A.rng(`${run.seed}:q:${roundNo()}:${run.attempt}`), used = new Set(run.used);
+    const def = rdef(), list = poolFor(roundNo()), rr = A.rng(`${run.seed}:q:${roundNo()}:${run.attempt}`), used = new Set(run.used);
     let cand = list.filter(q => !used.has(q.cid[0]));
     if (cand.length < n) { run.used = []; cand = list.slice(); }
     const out = rr.shuffle(cand).slice(0, n);

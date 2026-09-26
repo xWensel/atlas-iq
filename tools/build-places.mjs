@@ -138,7 +138,7 @@ async function assemble(recs) {
   }
   const CFIX = fs.existsSync(path.join(ROOT, "tools", "country-fix.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "country-fix.json"), "utf8")) : {};   // id -> nombre Natural Earth ("" = sin pais: mares y oceanos)
   const cqid = ne => { const r = recs.find(x => x.id === "c:" + ne && x.qid); return r ? r.qid : null; };
-  for (const r of recs) if (r.ok && r.id in CFIX && r.qid) { const q = CFIX[r.id] ? cqid(CFIX[r.id]) : null; if (q) { P17[r.qid] = q; r.forceQ = q; } else { r.noCountry = true; } }
+  for (const r of recs) if (r.ok && r.id in CFIX) { const q = CFIX[r.id] ? cqid(CFIX[r.id]) : null; if (q) { r.pkey = r.qid || "f:" + r.id; P17[r.pkey] = q; } else { r.noCountry = true; } }
   const cq = [...new Set(Object.values(P17))], CN = {};
   for (let i = 0; i < cq.length; i += 40) {
     const j = await jget(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${cq.slice(i, i + 40).join("|")}&props=labels&languages=${LANGS.join("|")}&format=json`);
@@ -146,12 +146,16 @@ async function assemble(recs) {
   }
   const tidy = t => String(t || "").replace(/\(\s*[,;:\s]*\)/g, "").replace(/\(\s*[,;:]\s*/g, "(").replace(/\s+([,.;:])/g, "$1").replace(/[ 	]{2,}/g, " ");
   const fameOf = r => (ORD[r.id] != null ? ORD[r.id] : 9999);
+  const NFIX = fs.existsSync(path.join(ROOT, "tools", "name-fix.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "name-fix.json"), "utf8")) : {};      // id -> nombres corregidos por idioma
+  const DROP = new Set(fs.existsSync(path.join(ROOT, "tools", "drop-places.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "drop-places.json"), "utf8")) : []);   // lugares duplicados que no entran en el banco de preguntas
+  const CLAB = fs.existsSync(path.join(ROOT, "tools", "country-labels.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "country-labels.json"), "utf8")) : {};
+  for (const q of Object.keys(CLAB)) CN[q] = Object.assign(CN[q] || {}, CLAB[q]);
   const places = [], wiki = Object.fromEntries(LANGS.map(l => [l, {}])), img = {};
   for (const r of recs) {
     if (!r.ok) continue;
-    const names = Object.fromEntries(LANGS.map(l => [l, clean((r.w[l] || r.w.en).t)]));
-    if (r.extra) { /* solo contenido */ }
-    else if (r.kind !== "country") places.push([r.id, r.kind, r.tier, r.lat, r.lon, (r.noCountry ? null : P17[r.qid] || null), names, fameOf(r)]);
+    const names = Object.fromEntries(LANGS.map(l => [l, clean((r.w[l] || r.w.en).t)])); if (NFIX[r.id]) Object.assign(names, NFIX[r.id]);
+    if (r.extra || DROP.has(r.id)) { /* solo contenido */ }
+    else if (r.kind !== "country") places.push([r.id, r.kind, r.tier, r.lat, r.lon, (r.noCountry ? null : P17[r.pkey || r.qid] || null), names, fameOf(r)]);
     else if (!r.extra) places.push([r.id, "country", r.tier, r.lat == null ? null : r.lat, r.lon == null ? null : r.lon, null, names, fameOf(r)]);
     for (const l of LANGS) if (r.w[l]) wiki[l][r.id] = [r.w[l].t, r.w[l].d, tidy(r.w[l].x), tidy(r.w[l].h)];
     if (r.img) img[r.id] = [r.img.s, r.img.w, r.img.h, r.img.c ? [r.img.c.a, r.img.c.l, r.img.c.p] : null];

@@ -1,5 +1,11 @@
 # Atlas IQ
 
+**v0.9.4** – Rondas sin repetidos, nombres y paises corregidos, nueva entrada:
+- **Reparto de lugares:** cada lugar aparece en una sola ronda (80 por ronda); maximo de lugares del mismo pais por ronda (la ronda de maravillas dificiles ya no es casi toda de EE. UU.); el Jackpot mezcla a partes iguales lo que sobra. Lista completa en `docs/rondas-aventura.md`.
+- **+50 sucesos historicos** (batallas espanolas, guerras clasicas...) para llegar a 80 en las dos rondas de Historia.
+- **Paises actuales** (nada de imperios o reinos historicos), mares y lugares compartidos sin pais, y nombres internacionales corregidos (`tools/name-fix.json`, `tools/country-fix.json`, `tools/drop-places.json`, `tools/country-labels.json`).
+- **Entrada:** pantalla de idioma con el logo de Atlas IQ y animacion de estudio nueva: el logo entra con calma, dos golpes graves, un brillo dorado recorre solo las letras y se va.
+
 **v0.9.2** – Cada ronda de la Aventura usa un carrete de 80 lugares (ventana mas dificil en cada acto; el jackpot muestrea todos los temas).
 
 **v0.9.1** – Guardar y salir, un solo aspecto:

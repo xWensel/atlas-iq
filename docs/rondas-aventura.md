@@ -1,8 +1,8 @@
 # Aventura: los 80 lugares de cada ronda
 
-Cada ronda saca sus 5 preguntas de esta lista (sin repetir dentro de la partida). El orden es de mas facil a mas dificil dentro de la ronda. La Leyenda (rondas 13+) reutiliza las rondas 5 a 12.
+Cada ronda saca sus 5 preguntas de esta lista (sin repetir dentro de la partida). Ningun lugar aparece en dos rondas. Dentro de cada ronda el orden va de mas facil a mas dificil. La Leyenda (rondas 13+) reutiliza las rondas 5 a 12.
 
-Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel) trae ademas el id interno y el nombre en ingles.
+Se muestra como "Lugar, Pais" (paises actuales; mares, oceanos y lugares compartidos van sin pais). El archivo `rondas-aventura.tsv` (abre con Excel) trae ademas el id interno y el nombre en ingles.
 
 
 ## Ronda 1 · Acto I · Capitales del mundo (fáciles)
@@ -16,7 +16,7 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 5 | Berlín | Alemania | `berlin` |
 | 6 | Washington D. C. | Estados Unidos | `washington` |
 | 7 | Moscú | Rusia | `moscow` |
-| 8 | Pekín | República Popular China | `beijing` |
+| 8 | Pekín | China | `beijing` |
 | 9 | Tokio | Japón | `tokyo` |
 | 10 | El Cairo | Egipto | `cairo` |
 | 11 | Ottawa | Canadá | `ottawa` |
@@ -29,7 +29,7 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 18 | Atenas | Grecia | `athens` |
 | 19 | Viena | Austria | `vienna` |
 | 20 | Ámsterdam | Países Bajos | `amsterdam` |
-| 21 | Región de Bruselas-Capital | Bélgica | `brussels` |
+| 21 | Bruselas | Bélgica | `brussels` |
 | 22 | Berna | Suiza | `bern` |
 | 23 | Estocolmo | Suecia | `stockholm` |
 | 24 | Oslo | Noruega | `oslo` |
@@ -46,7 +46,7 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 35 | Ankara | Turquía | `ankara` |
 | 36 | Teherán | Irán | `tehran` |
 | 37 | Bagdad | Irak | `baghdad` |
-| 38 | Riad | Arabia Saudí | `riyadh` |
+| 38 | Riad | Arabia Saudita | `riyadh` |
 | 39 | Jerusalén | Israel | `jerusalem` |
 | 40 | Kabul | Afganistán | `kabul` |
 | 41 | Islamabad | Pakistán | `islamabad` |
@@ -99,21 +99,21 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 3 | Coliseo | Italia | `colosseum` |
 | 4 | Big Ben | Reino Unido | `big-ben` |
 | 5 | Taj Mahal | India | `taj-mahal` |
-| 6 | Gran Muralla china | República Popular China | `great-wall-of-china` |
-| 7 | Necrópolis de Guiza | Egipto | `giza-pyramid-complex` |
+| 6 | Gran Muralla China | China | `great-wall-of-china` |
+| 7 | Pirámides de Guiza | Egipto | `giza-pyramid-complex` |
 | 8 | Machu Picchu | Perú | `machu-picchu` |
 | 9 | Cristo Redentor | Brasil | `christ-the-redeemer` |
 | 10 | Ópera de Sídney | Australia | `sydney-opera-house` |
 | 11 | Puente Golden Gate | Estados Unidos | `golden-gate-bridge` |
 | 12 | Burj Khalifa | Emiratos Árabes Unidos | `burj-khalifa` |
 | 13 | Acrópolis de Atenas | Grecia | `acropolis-of-athens` |
-| 14 | Templo Expiatorio de la Sagrada Familia | España | `sagrada-familia` |
+| 14 | Sagrada Familia | España | `sagrada-familia` |
 | 15 | Angkor Wat | Camboya | `angkor-wat` |
 | 16 | Stonehenge | Reino Unido | `stonehenge` |
 | 17 | Torre de Pisa | Italia | `leaning-tower-of-pisa` |
 | 18 | Puerta de Brandeburgo | Alemania | `brandenburg-gate` |
-| 19 | Catedral de Notre Dame de París | Francia | `notre-dame-de-paris` |
-| 20 | Museo del Louvre | Francia | `louvre` |
+| 19 | Notre-Dame de París | Francia | `notre-dame-de-paris` |
+| 20 | Louvre | Francia | `louvre` |
 | 21 | Palacio de Buckingham | Reino Unido | `buckingham-palace` |
 | 22 | Puente de la Torre | Reino Unido | `tower-bridge` |
 | 23 | Empire State Building | Estados Unidos | `empire-state-building` |
@@ -129,9 +129,9 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 33 | Neuschwanstein | Alemania | `neuschwanstein-castle` |
 | 34 | Palacio de Versalles | Francia | `palace-of-versailles` |
 | 35 | Monte Saint-Michel | Francia | `mont-saint-michel` |
-| 36 | Ciudad Prohibida | República Popular China | `forbidden-city` |
-| 37 | Guerreros de terracota | República Popular China | `terracotta-army` |
-| 38 | Potala | República Popular China | `potala-palace` |
+| 36 | Ciudad Prohibida | China | `forbidden-city` |
+| 37 | Ejército de terracota | China | `terracotta-army` |
+| 38 | Palacio de Potala | China | `potala-palace` |
 | 39 | Borobudur | Indonesia | `borobudur` |
 | 40 | Chichén Itzá | México | `chichen-itza` |
 | 41 | Teotihuacán | México | `teotihuacan` |
@@ -146,7 +146,7 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 50 | Parque Güell | España | `park-guell` |
 | 51 | Isla de Alcatraz | Estados Unidos | `alcatraz-island` |
 | 52 | Presa Hoover | Estados Unidos | `hoover-dam` |
-| 53 | Arco de Triunfo de París | Francia | `arc-de-triomphe` |
+| 53 | Arco del Triunfo | Francia | `arc-de-triomphe` |
 | 54 | Basílica del Sagrado Corazón | Francia | `sacre-c-ur` |
 | 55 | Fontana di Trevi | Italia | `trevi-fountain` |
 | 56 | Basílica de San Pedro | Ciudad del Vaticano | `st-peter-s-basilica` |
@@ -158,7 +158,7 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 62 | Puente Carlos | República Checa | `charles-bridge` |
 | 63 | Palacio de Schönbrunn | Austria | `schonbrunn-palace` |
 | 64 | Torre de Belém | Portugal | `belem-tower` |
-| 65 | Mezquita-catedral de Córdoba | España | `mezquita-catedral-de-cordoba` |
+| 65 | Mezquita de Córdoba | España | `mezquita-catedral-de-cordoba` |
 | 66 | Museo Guggenheim Bilbao | España | `guggenheim-museum-bilbao` |
 | 67 | Meteora | Grecia | `meteora` |
 | 68 | Éfeso | Turquía | `ephesus` |
@@ -168,9 +168,9 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 72 | Persépolis | Irán | `persepolis` |
 | 73 | Ellora | India | `ellora-caves` |
 | 74 | Hampi | India | `hampi` |
-| 75 | Templo de Suria | India | `konark-sun-temple` |
-| 76 | Templo Dorado | India | `golden-temple` |
-| 77 | Fuerte rojo de Delhi | India | `red-fort` |
+| 75 | Templo del Sol de Konark | India | `konark-sun-temple` |
+| 76 | Templo Dorado de Amritsar | India | `golden-temple` |
+| 77 | Fuerte Rojo de Delhi | India | `red-fort` |
 | 78 | Puerta de la India | India | `gateway-of-india` |
 | 79 | Templo del loto | India | `lotus-temple` |
 | 80 | Palacio Real de Mysore | India | `mysore-palace` |
@@ -185,9 +185,9 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 4 | Toronto | Canadá | `toronto` |
 | 5 | Sídney | Australia | `sydney` |
 | 6 | Melbourne | Australia | `melbourne` |
-| 7 | Bombay | India | `mumbai` |
-| 8 | Shanghái | República Popular China | `shanghai` |
-| 9 | Hong Kong | República Popular China | `hong-kong` |
+| 7 | Bombay (Mumbai) | India | `mumbai` |
+| 8 | Shanghái | China | `shanghai` |
+| 9 | Hong Kong | China | `hong-kong` |
 | 10 | Estambul | Turquía | `istanbul` |
 | 11 | Dubái | Emiratos Árabes Unidos | `dubai` |
 | 12 | Río de Janeiro | Brasil | `rio-de-janeiro` |
@@ -195,70 +195,70 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 14 | Lagos | Nigeria | `lagos` |
 | 15 | Johannesburgo | Sudáfrica | `johannesburg` |
 | 16 | Ciudad del Cabo | Sudáfrica | `cape-town` |
-| 17 | Casablanca | Marruecos | `casablanca` |
-| 18 | Marrakech | Marruecos | `marrakesh` |
-| 19 | Barcelona | España | `barcelona` |
-| 20 | Milán | Italia | `milan` |
-| 21 | Venecia | Italia | `venice` |
-| 22 | Florencia | Italia | `florence` |
-| 23 | Múnich | Alemania | `munich` |
-| 24 | Hamburgo | Alemania | `hamburg` |
-| 25 | Fráncfort del Meno | Alemania | `frankfurt` |
-| 26 | Zúrich | Suiza | `zurich` |
-| 27 | Ginebra | Suiza | `geneva` |
-| 28 | Edimburgo | Reino Unido | `edinburgh` |
-| 29 | Mánchester | Reino Unido | `manchester` |
-| 30 | Liverpool | Reino Unido | `liverpool` |
-| 31 | Glasgow | Reino Unido | `glasgow` |
-| 32 | Nápoles | Italia | `naples` |
-| 33 | Sevilla | España | `seville` |
-| 34 | Valencia | España | `valencia` |
-| 35 | Lyon | Francia | `lyon` |
-| 36 | Marsella | Francia | `marseille` |
-| 37 | Niza | Francia | `nice` |
-| 38 | San Petersburgo | Rusia | `saint-petersburg` |
-| 39 | Kioto | Japón | `kyoto` |
-| 40 | Osaka | Japón | `osaka` |
-| 41 | Busan | Corea del Sur | `busan` |
-| 42 | Taipéi | República de China | `taipei` |
-| 43 | Calcuta | India | `kolkata` |
-| 44 | Bangalore | India | `bangalore` |
-| 45 | Karachi | Pakistán | `karachi` |
-| 46 | Lahore | Pakistán | `lahore` |
-| 47 | Ciudad Ho Chi Minh | Vietnam | `ho-chi-minh-city` |
-| 48 | Las Vegas | Estados Unidos | `las-vegas` |
-| 49 | San Francisco | Estados Unidos | `san-francisco` |
-| 50 | Boston | Estados Unidos | `boston` |
-| 51 | Miami | Estados Unidos | `miami` |
-| 52 | Seattle | Estados Unidos | `seattle` |
-| 53 | Houston | Estados Unidos | `houston` |
-| 54 | Dallas | Estados Unidos | `dallas` |
-| 55 | Filadelfia | Estados Unidos | `philadelphia` |
-| 56 | Atlanta | Estados Unidos | `atlanta` |
-| 57 | Nueva Orleans | Estados Unidos | `new-orleans` |
-| 58 | Vancouver | Canadá | `vancouver` |
-| 59 | Montreal | Canadá | `montreal` |
-| 60 | Cartagena de Indias | Colombia | `cartagena` |
-| 61 | Quebec | Canadá | `quebec-city` |
-| 62 | Medellín | Colombia | `medellin` |
-| 63 | Cusco | Perú | `cusco` |
-| 64 | Salvador | Brasil | `salvador` |
-| 65 | Guadalajara | México | `guadalajara` |
-| 66 | Cancún | México | `cancun` |
-| 67 | Auckland | Nueva Zelanda | `auckland` |
-| 68 | Perth | Australia | `perth` |
-| 69 | Brisbane | Australia | `brisbane` |
-| 70 | Cracovia | Polonia | `krakow` |
-| 71 | Gdansk | Polonia | `gdansk` |
-| 72 | Oporto | Portugal | `porto` |
-| 73 | Burdeos | Francia | `bordeaux` |
-| 74 | Toulouse | Francia | `toulouse` |
-| 75 | Dubrovnik | Croacia | `dubrovnik` |
-| 76 | Split | Croacia | `split` |
-| 77 | Salzburgo | Austria | `salzburg` |
-| 78 | Innsbruck | Austria | `innsbruck` |
-| 79 | Brujas | Bélgica | `bruges` |
-| 80 | Amberes | Bélgica | `antwerp` |
+| 17 | Marrakech | Marruecos | `marrakesh` |
+| 18 | Barcelona | España | `barcelona` |
+| 19 | Milán | Italia | `milan` |
+| 20 | Venecia | Italia | `venice` |
+| 21 | Florencia | Italia | `florence` |
+| 22 | Múnich | Alemania | `munich` |
+| 23 | Hamburgo | Alemania | `hamburg` |
+| 24 | Fráncfort del Meno | Alemania | `frankfurt` |
+| 25 | Zúrich | Suiza | `zurich` |
+| 26 | Ginebra | Suiza | `geneva` |
+| 27 | Edimburgo | Reino Unido | `edinburgh` |
+| 28 | Mánchester | Reino Unido | `manchester` |
+| 29 | Liverpool | Reino Unido | `liverpool` |
+| 30 | Glasgow | Reino Unido | `glasgow` |
+| 31 | Nápoles | Italia | `naples` |
+| 32 | Sevilla | España | `seville` |
+| 33 | Valencia | España | `valencia` |
+| 34 | Lyon | Francia | `lyon` |
+| 35 | Marsella | Francia | `marseille` |
+| 36 | Niza | Francia | `nice` |
+| 37 | San Petersburgo | Rusia | `saint-petersburg` |
+| 38 | Kioto | Japón | `kyoto` |
+| 39 | Osaka | Japón | `osaka` |
+| 40 | Busan | Corea del Sur | `busan` |
+| 41 | Taipéi | Taiwán | `taipei` |
+| 42 | Calcuta | India | `kolkata` |
+| 43 | Bangalore | India | `bangalore` |
+| 44 | Karachi | Pakistán | `karachi` |
+| 45 | Lahore | Pakistán | `lahore` |
+| 46 | Ciudad Ho Chi Minh | Vietnam | `ho-chi-minh-city` |
+| 47 | Las Vegas | Estados Unidos | `las-vegas` |
+| 48 | San Francisco | Estados Unidos | `san-francisco` |
+| 49 | Boston | Estados Unidos | `boston` |
+| 50 | Miami | Estados Unidos | `miami` |
+| 51 | Seattle | Estados Unidos | `seattle` |
+| 52 | Houston | Estados Unidos | `houston` |
+| 53 | Dallas | Estados Unidos | `dallas` |
+| 54 | Filadelfia | Estados Unidos | `philadelphia` |
+| 55 | Atlanta | Estados Unidos | `atlanta` |
+| 56 | Vancouver | Canadá | `vancouver` |
+| 57 | Montreal | Canadá | `montreal` |
+| 58 | Cartagena de Indias | Colombia | `cartagena` |
+| 59 | Quebec | Canadá | `quebec-city` |
+| 60 | Medellín | Colombia | `medellin` |
+| 61 | Cusco | Perú | `cusco` |
+| 62 | Salvador | Brasil | `salvador` |
+| 63 | Guadalajara | México | `guadalajara` |
+| 64 | Cancún | México | `cancun` |
+| 65 | Auckland | Nueva Zelanda | `auckland` |
+| 66 | Perth | Australia | `perth` |
+| 67 | Brisbane | Australia | `brisbane` |
+| 68 | Cracovia | Polonia | `krakow` |
+| 69 | Gdansk | Polonia | `gdansk` |
+| 70 | Oporto | Portugal | `porto` |
+| 71 | Burdeos | Francia | `bordeaux` |
+| 72 | Toulouse | Francia | `toulouse` |
+| 73 | Dubrovnik | Croacia | `dubrovnik` |
+| 74 | Split | Croacia | `split` |
+| 75 | Salzburgo | Austria | `salzburg` |
+| 76 | Innsbruck | Austria | `innsbruck` |
+| 77 | Brujas | Bélgica | `bruges` |
+| 78 | Amberes | Bélgica | `antwerp` |
+| 79 | Róterdam | Países Bajos | `rotterdam` |
+| 80 | Bergen | Noruega | `bergen` |
 
 ## Ronda 4 · Acto I (jefe) · Países (haz clic dentro)
 
@@ -321,7 +321,7 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 55 | Bangladés | — | `c:Bangladesh` |
 | 56 | Sri Lanka | — | `c:Sri Lanka` |
 | 57 | Nepal | — | `c:Nepal` |
-| 58 | República Popular China | — | `c:China` |
+| 58 | China | — | `c:China` |
 | 59 | Mongolia | — | `c:Mongolia` |
 | 60 | Japón | — | `c:Japan` |
 | 61 | Corea del Sur | — | `c:South Korea` |
@@ -330,697 +330,697 @@ Se muestra como "Lugar, Pais". El archivo `rondas-aventura.tsv` (abre con Excel)
 | 64 | Tailandia | — | `c:Thailand` |
 | 65 | Camboya | — | `c:Cambodia` |
 | 66 | Laos | — | `c:Laos` |
-| 67 | Birmania | — | `c:Myanmar` |
+| 67 | Myanmar | — | `c:Myanmar` |
 | 68 | Malasia | — | `c:Malaysia` |
-| 69 | Singapur | — | `c:Singapore` |
-| 70 | Indonesia | — | `c:Indonesia` |
-| 71 | Filipinas | — | `c:Philippines` |
-| 72 | Australia | — | `c:Australia` |
-| 73 | Nueva Zelanda | — | `c:New Zealand` |
-| 74 | Papúa Nueva Guinea | — | `c:Papua New Guinea` |
-| 75 | Ecuador | — | `c:Ecuador` |
-| 76 | Bolivia | — | `c:Bolivia` |
-| 77 | Paraguay | — | `c:Paraguay` |
-| 78 | Uruguay | — | `c:Uruguay` |
-| 79 | Panamá | — | `c:Panama` |
-| 80 | Costa Rica | — | `c:Costa Rica` |
+| 69 | Indonesia | — | `c:Indonesia` |
+| 70 | Filipinas | — | `c:Philippines` |
+| 71 | Australia | — | `c:Australia` |
+| 72 | Nueva Zelanda | — | `c:New Zealand` |
+| 73 | Papúa Nueva Guinea | — | `c:Papua New Guinea` |
+| 74 | Ecuador | — | `c:Ecuador` |
+| 75 | Bolivia | — | `c:Bolivia` |
+| 76 | Paraguay | — | `c:Paraguay` |
+| 77 | Uruguay | — | `c:Uruguay` |
+| 78 | Panamá | — | `c:Panama` |
+| 79 | Costa Rica | — | `c:Costa Rica` |
+| 80 | Jamaica | — | `c:Jamaica` |
 
 ## Ronda 5 · Acto II · Capitales del mundo (difíciles)
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Andorra la Vieja | Andorra | `andorra-la-vella` |
-| 2 | Ciudad del Vaticano | Ciudad del Vaticano | `vatican-city` |
-| 3 | Biskek | Kirguistán | `bishkek` |
-| 4 | Dusambé | Tayikistán | `dushanbe` |
-| 5 | Asjabad | Turkmenistán | `ashgabat` |
-| 6 | Naipyidó | Birmania | `naypyidaw` |
-| 7 | Vientián | Laos | `vientiane` |
-| 8 | Nom Pen | Camboya | `phnom-penh` |
-| 9 | Bandar Seri Begawan | Brunéi | `bandar-seri-begawan` |
-| 10 | Dili | Timor Oriental | `dili` |
-| 11 | Timbu | Bután | `thimphu` |
-| 12 | Malé | Maldivas | `male` |
-| 13 | Puerto Moresby | Papúa Nueva Guinea | `port-moresby` |
-| 14 | Suva | Fiyi | `suva` |
-| 15 | Apia | Samoa | `apia` |
-| 16 | Nukualofa | Tonga | `nuku-alofa` |
-| 17 | Port Vila | Vanuatu | `port-vila` |
-| 18 | Honiara | Islas Salomón | `honiara` |
-| 19 | Tarawa Sur | Kiribati | `south-tarawa` |
-| 20 | Funafuti | Tuvalu | `funafuti` |
-| 21 | Majuro | Islas Marshall | `majuro` |
-| 22 | Palikir | Estados Federados de Micronesia | `palikir` |
-| 23 | Distrito de Yaren | Nauru | `yaren` |
-| 24 | Puerto Príncipe | Haití | `port-au-prince` |
-| 25 | Santo Domingo | República Dominicana | `santo-domingo` |
-| 26 | Nasáu | Bahamas | `nassau` |
-| 27 | Bridgetown | Barbados | `bridgetown` |
-| 28 | Puerto España | Trinidad y Tobago | `port-of-spain` |
-| 29 | Castries | Santa Lucía | `castries` |
-| 30 | Kingstown | San Vicente y las Granadinas | `kingstown` |
-| 31 | Saint George | Granada | `st-george-s` |
-| 32 | Roseau | Dominica | `roseau` |
-| 33 | Basseterre | San Cristóbal y Nieves | `basseterre` |
-| 34 | San Juan de Terranova | Canadá | `st-john-s` |
-| 35 | Belmopán | Belice | `belmopan` |
-| 36 | Ciudad de Guatemala | Guatemala | `guatemala-city` |
-| 37 | San Salvador | El Salvador | `san-salvador` |
-| 38 | Tegucigalpa | Honduras | `tegucigalpa` |
-| 39 | Managua | Nicaragua | `managua` |
-| 40 | Georgetown | Guyana | `georgetown-guyana` |
-| 41 | Paramaribo | Surinam | `paramaribo` |
-| 42 | Freetown | Sierra Leona | `freetown` |
-| 43 | Monrovia | Liberia | `monrovia` |
-| 44 | Conakri | Guinea | `conakry` |
-| 45 | Bisáu | Guinea-Bisáu | `bissau` |
-| 46 | Banjul | Gambia | `banjul` |
-| 47 | Nuakchot | Mauritania | `nouakchott` |
-| 48 | Bamako | Mali | `bamako` |
-| 49 | Uagadugú | Burkina Faso | `ouagadougou` |
-| 50 | Niamey | Níger | `niamey` |
-| 51 | Yamena | Chad | `n-djamena` |
-| 52 | Yaundé | Camerún | `yaounde` |
-| 53 | Libreville | Gabón | `libreville` |
-| 54 | Malabo | Guinea Ecuatorial | `malabo` |
-| 55 | Santo Tomé | Santo Tomé y Príncipe | `sao-tome` |
-| 56 | Brazzaville | Congo | `brazzaville` |
-| 57 | Bangui | República Centroafricana | `bangui` |
-| 58 | Kigali | Ruanda | `kigali` |
-| 59 | Buyumbura | Burundi | `bujumbura` |
-| 60 | Kampala | Uganda | `kampala` |
-| 61 | Dodoma | Tanzania | `dodoma` |
-| 62 | Lusaka | Zambia | `lusaka` |
-| 63 | Lilongüe | Malaui | `lilongwe` |
-| 64 | Harare | Zimbabue | `harare` |
-| 65 | Gaborone | Botsuana | `gaborone` |
-| 66 | Windhoek | Namibia | `windhoek` |
-| 67 | Maseru | Lesoto | `maseru` |
-| 68 | Babane | Suazilandia | `mbabane` |
-| 69 | Maputo | Mozambique | `maputo` |
-| 70 | Antananarivo | Madagascar | `antananarivo` |
-| 71 | Port Louis | Mauricio | `port-louis` |
-| 72 | Victoria | Seychelles | `victoria` |
-| 73 | Moroni | Comoras | `moroni` |
-| 74 | Ciudad de Yibuti | Yibuti | `djibouti` |
+| 1 | Kinsasa | República Democrática del Congo | `kinshasa` |
+| 2 | Amán | Jordania | `amman` |
+| 3 | Beirut | Líbano | `beirut` |
+| 4 | Doha | Catar | `doha` |
+| 5 | Abu Dabi | Emiratos Árabes Unidos | `abu-dhabi` |
+| 6 | Mascate | Omán | `muscat` |
+| 7 | Bakú | Azerbaiyán | `baku` |
+| 8 | Tiflis | Georgia | `tbilisi` |
+| 9 | Taskent | Uzbekistán | `tashkent` |
+| 10 | Astaná | Kazajistán | `astana` |
+| 11 | Riga | Letonia | `riga` |
+| 12 | Tallin | Estonia | `tallinn` |
+| 13 | Reikiavik | Islandia | `reykjavik` |
+| 14 | Nicosia | Chipre | `nicosia` |
+| 15 | Liubliana | Eslovenia | `ljubljana` |
+| 16 | Sarajevo | Bosnia y Herzegovina | `sarajevo` |
+| 17 | Skopie | Macedonia del Norte | `skopje` |
+| 18 | Podgorica | Montenegro | `podgorica` |
+| 19 | Chisináu | Moldavia | `chisinau` |
+| 20 | Vaduz | Liechtenstein | `vaduz` |
+| 21 | Ciudad de San Marino | San Marino | `city-of-san-marino` |
+| 22 | Andorra la Vella | Andorra | `andorra-la-vella` |
+| 23 | Ciudad del Vaticano | Ciudad del Vaticano | `vatican-city` |
+| 24 | Dushanbe | Tayikistán | `dushanbe` |
+| 25 | Ashgabat | Turkmenistán | `ashgabat` |
+| 26 | Vientiane | Laos | `vientiane` |
+| 27 | Phnom Penh | Camboya | `phnom-penh` |
+| 28 | Bandar Seri Begawan | Brunéi | `bandar-seri-begawan` |
+| 29 | Thimphu | Bután | `thimphu` |
+| 30 | Malé | Maldivas | `male` |
+| 31 | Suva | Fiyi | `suva` |
+| 32 | Apia | Samoa | `apia` |
+| 33 | Nuku'alofa | Tonga | `nuku-alofa` |
+| 34 | Honiara | Islas Salomón | `honiara` |
+| 35 | Tarawa Sur | Kiribati | `south-tarawa` |
+| 36 | Majuro | Islas Marshall | `majuro` |
+| 37 | Palikir | Estados Federados de Micronesia | `palikir` |
+| 38 | Yaren | Nauru | `yaren` |
+| 39 | Santo Domingo | República Dominicana | `santo-domingo` |
+| 40 | Nassau | Bahamas | `nassau` |
+| 41 | Puerto España | Trinidad y Tobago | `port-of-spain` |
+| 42 | Castries | Santa Lucía | `castries` |
+| 43 | Kingstown | San Vicente y las Granadinas | `kingstown` |
+| 44 | Roseau | Dominica | `roseau` |
+| 45 | Basseterre | San Cristóbal y Nieves | `basseterre` |
+| 46 | Belmopán | Belice | `belmopan` |
+| 47 | Ciudad de Guatemala | Guatemala | `guatemala-city` |
+| 48 | San Salvador | El Salvador | `san-salvador` |
+| 49 | Managua | Nicaragua | `managua` |
+| 50 | Georgetown | Guyana | `georgetown-guyana` |
+| 51 | Freetown | Sierra Leona | `freetown` |
+| 52 | Monrovia | Liberia | `monrovia` |
+| 53 | Conakri | Guinea | `conakry` |
+| 54 | Banjul | Gambia | `banjul` |
+| 55 | Nouakchott | Mauritania | `nouakchott` |
+| 56 | Ouagadougou | Burkina Faso | `ouagadougou` |
+| 57 | Niamey | Níger | `niamey` |
+| 58 | N'Djamena | Chad | `n-djamena` |
+| 59 | Libreville | Gabón | `libreville` |
+| 60 | Malabo | Guinea Ecuatorial | `malabo` |
+| 61 | Brazzaville | República del Congo | `brazzaville` |
+| 62 | Bangui | República Centroafricana | `bangui` |
+| 63 | Kigali | Ruanda | `kigali` |
+| 64 | Kampala | Uganda | `kampala` |
+| 65 | Dodoma | Tanzania | `dodoma` |
+| 66 | Lilongwe | Malaui | `lilongwe` |
+| 67 | Harare | Zimbabue | `harare` |
+| 68 | Gaborone | Botsuana | `gaborone` |
+| 69 | Maseru | Lesoto | `maseru` |
+| 70 | Mbabane | Esuatini | `mbabane` |
+| 71 | Antananarivo | Madagascar | `antananarivo` |
+| 72 | Port Louis | Mauricio | `port-louis` |
+| 73 | Victoria | Seychelles | `victoria` |
+| 74 | Yibuti | Yibuti | `djibouti` |
 | 75 | Asmara | Eritrea | `asmara` |
-| 76 | Mogadiscio | Somalia | `mogadishu` |
-| 77 | Yuba | Sudán del Sur | `juba` |
-| 78 | Lomé | Togo | `lome` |
-| 79 | Porto Novo | Benín | `porto-novo` |
-| 80 | Yamusukro | Costa de Marfil | `yamoussoukro` |
+| 76 | Yuba | Sudán del Sur | `juba` |
+| 77 | Lomé | Togo | `lome` |
+| 78 | Porto Novo | Benín | `porto-novo` |
+| 79 | Praia | Cabo Verde | `praia` |
+| 80 | Saná | Yemen | `sanaa` |
 
 ## Ronda 6 · Acto II · Batallas y sucesos famosos
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Batalla del Somme | Francia | `battle-of-the-somme` |
-| 2 | Batalla de Midway | Estados Unidos | `battle-of-midway` |
-| 3 | Ataque a Pearl Harbor | Estados Unidos | `attack-on-pearl-harbor` |
-| 4 | Batalla de Poitiers | Francia | `battle-of-tours` |
-| 5 | Batalla de Azincourt | Francia | `battle-of-agincourt` |
-| 6 | Batalla de Lepanto | Grecia | `battle-of-lepanto` |
-| 7 | Batalla de Culloden | Reino Unido | `battle-of-culloden` |
-| 8 | Batalla de Yorktown | Estados Unidos | `siege-of-yorktown` |
-| 9 | Batalla de Bunker Hill | Estados Unidos | `battle-of-bunker-hill` |
-| 10 | Batalla de El Álamo | Estados Unidos | `battle-of-the-alamo` |
-| 11 | Batalla de Little Bighorn | Estados Unidos | `battle-of-the-little-bighorn` |
-| 12 | Batalla de Rorke's Drift | Sudáfrica | `battle-of-rorke-s-drift` |
-| 13 | Batalla de Galípoli | Turquía | `gallipoli-campaign` |
-| 14 | Tercera batalla de Ypres | Bélgica | `battle-of-passchendaele` |
-| 15 | Segunda batalla de El Alamein | Egipto | `second-battle-of-el-alamein` |
-| 16 | Batalla de Kursk | Rusia | `battle-of-kursk` |
-| 17 | Operación Dinamo | Francia | `dunkirk-evacuation` |
-| 18 | Batalla de Iwo Jima | Japón | `battle-of-iwo-jima` |
-| 19 | Batalla de Okinawa | Japón | `battle-of-okinawa` |
-| 20 | Bombardeos atómicos de Hiroshima y Nagasaki | Japón | `atomic-bombing-of-hiroshima` |
-| 21 | Batalla de Dien Bien Phu | Vietnam | `battle-of-dien-bien-phu` |
-| 22 | Batalla de Incheon | Corea del Sur | `battle-of-inchon` |
-| 23 | Invasión de bahía de Cochinos | Cuba | `bay-of-pigs-invasion` |
-| 24 | Batalla de Kerbala | Irak | `battle-of-karbala` |
-| 25 | Batalla de Manzikert | Turquía | `battle-of-manzikert` |
-| 26 | Caída de Constantinopla | Turquía | `fall-of-constantinople` |
-| 27 | Batalla de Cannas | Italia | `battle-of-cannae` |
-| 28 | Batalla de Zama | Túnez | `battle-of-zama` |
-| 29 | Batalla de Accio | Grecia | `battle-of-actium` |
-| 30 | Batalla de Gaugamela | Irak | `battle-of-gaugamela` |
-| 31 | Batalla de Salamina | Grecia | `battle-of-salamis` |
-| 32 | Batalla de Platea | Grecia | `battle-of-plataea` |
-| 33 | Batalla de Crécy | Francia | `battle-of-crecy` |
-| 34 | Batalla de Bannockburn | Reino Unido | `battle-of-bannockburn` |
-| 35 | Batalla de Bosworth | Reino Unido | `battle-of-bosworth-field` |
-| 36 | Batalla de Naseby | Reino Unido | `battle-of-naseby` |
-| 37 | Batalla de Höchstädt | Alemania | `battle-of-blenheim` |
-| 38 | Batalla de Leipzig | Alemania | `battle-of-leipzig` |
-| 39 | Batalla de Borodinó | Rusia | `battle-of-borodino` |
-| 40 | Batalla de Sedán | Francia | `battle-of-sedan` |
-| 41 | Batalla de Solferino | Italia | `battle-of-solferino` |
-| 42 | Batalla de Balaclava | Ucrania | `battle-of-balaclava` |
-| 43 | Batalla de Isandlwana | Sudáfrica | `battle-of-isandlwana` |
-| 44 | Batalla de Omdurmán | Sudán | `battle-of-omdurman` |
-| 45 | Batalla de Adua | Etiopía | `battle-of-adwa` |
-| 46 | Batalla de Tsushima | Japón | `battle-of-tsushima` |
-| 47 | Batalla de Tannenberg | Polonia | `battle-of-tannenberg` |
-| 48 | Batalla de Jutlandia | — | `battle-of-jutland` |
-| 49 | Primera batalla del Marne | Francia | `first-battle-of-the-marne` |
-| 50 | Batalla de Inglaterra | Reino Unido | `battle-of-britain` |
-| 51 | Batalla de Berlín | Alemania | `battle-of-berlin` |
-| 52 | Batalla del golfo de Leyte | Filipinas | `battle-of-leyte-gulf` |
-| 53 | Batalla de las Ardenas | Bélgica | `battle-of-the-bulge` |
-| 54 | Sitio de Leningrado | Rusia | `siege-of-leningrad` |
-| 55 | Batalla de Montecassino | Italia | `battle-of-monte-cassino` |
-| 56 | Batalla del valle de Ia Drang | Vietnam | `battle-of-ia-drang` |
-| 57 | Ofensiva del Tet | Vietnam | `tet-offensive` |
-| 58 | Sitio de Khe Sanh | — | `battle-of-khe-sanh` |
-| 59 | Guerra de los Seis Días | Egipto | `six-day-war` |
-| 60 | Guerra de Yom Kipur | Egipto | `yom-kippur-war` |
-| 61 | Guerra de las Malvinas | Reino Unido | `falklands-war` |
-| 62 | Guerra del Golfo | Kuwait | `gulf-war` |
-| 63 | Batalla de Puebla | México | `battle-of-puebla` |
-| 64 | Batalla de Boyacá | Colombia | `battle-of-boyaca` |
-| 65 | Batalla de Ayacucho | Perú | `battle-of-ayacucho` |
-| 66 | Batalla de Carabobo | Venezuela | `battle-of-carabobo` |
-| 67 | Batalla de Maipú | Chile | `battle-of-maipu` |
-| 68 | Batalla de Chacabuco | Chile | `battle-of-chacabuco` |
-| 69 | Toma de la Bastilla | Francia | `storming-of-the-bastille` |
-| 70 | Caída del Muro de Berlín | Alemania Oriental | `fall-of-the-berlin-wall` |
-| 71 | Carta Magna | Reino Unido | `signing-of-the-magna-carta` |
-| 72 | Motín del té | Estados Unidos | `boston-tea-party` |
-| 73 | Atentado de Sarajevo | Bosnia y Herzegovina | `assassination-of-archduke-franz-ferdinand` |
-| 74 | Hundimiento del RMS Titanic | — | `sinking-of-the-titanic` |
-| 75 | Accidente de Chernóbil | Ucrania | `chernobyl-disaster` |
-| 76 | Apolo 11 | Estados Unidos | `apollo-11` |
-| 77 | Hermanos Wright | Estados Unidos | `wright-brothers` |
-| 78 | Accidente del Hindenburg | Estados Unidos | `hindenburg-disaster` |
-| 79 | Gran incendio de Londres | Reino Unido | `great-fire-of-london` |
-| 80 | Voyages of Christopher Columbus | Bahamas | `voyages-of-christopher-columbus` |
+| 1 | Batalla de Waterloo | Bélgica | `battle-of-waterloo` |
+| 2 | Batalla de Hastings | Reino Unido | `battle-of-hastings` |
+| 3 | Batalla de Maratón | Grecia | `battle-of-marathon` |
+| 4 | Batalla de las Termópilas | Grecia | `battle-of-thermopylae` |
+| 5 | Batalla de Gettysburg | Estados Unidos | `battle-of-gettysburg` |
+| 6 | Batalla de Stalingrado | Rusia | `battle-of-stalingrad` |
+| 7 | Batalla de Normandía | Francia | `normandy-landings` |
+| 8 | Batalla de Trafalgar | España | `battle-of-trafalgar` |
+| 9 | Batalla de Austerlitz | República Checa | `battle-of-austerlitz` |
+| 10 | Batalla de Verdún | Francia | `battle-of-verdun` |
+| 11 | Batalla del Somme | Francia | `battle-of-the-somme` |
+| 12 | Batalla de Midway | Estados Unidos | `battle-of-midway` |
+| 13 | Ataque a Pearl Harbor | Estados Unidos | `attack-on-pearl-harbor` |
+| 14 | Batalla de Poitiers | Francia | `battle-of-tours` |
+| 15 | Batalla de Azincourt | Francia | `battle-of-agincourt` |
+| 16 | Batalla de Lepanto | Grecia | `battle-of-lepanto` |
+| 17 | Batalla de Culloden | Reino Unido | `battle-of-culloden` |
+| 18 | Batalla de Yorktown | Estados Unidos | `siege-of-yorktown` |
+| 19 | Batalla de Bunker Hill | Estados Unidos | `battle-of-bunker-hill` |
+| 20 | Batalla de El Álamo | Estados Unidos | `battle-of-the-alamo` |
+| 21 | Batalla de Little Bighorn | Estados Unidos | `battle-of-the-little-bighorn` |
+| 22 | Batalla de Rorke's Drift | Sudáfrica | `battle-of-rorke-s-drift` |
+| 23 | Batalla de Galípoli | Turquía | `gallipoli-campaign` |
+| 24 | Batalla de Passchendaele | Bélgica | `battle-of-passchendaele` |
+| 25 | Segunda batalla de El Alamein | Egipto | `second-battle-of-el-alamein` |
+| 26 | Batalla de Kursk | Rusia | `battle-of-kursk` |
+| 27 | Evacuación de Dunkerque | Francia | `dunkirk-evacuation` |
+| 28 | Batalla de Iwo Jima | Japón | `battle-of-iwo-jima` |
+| 29 | Batalla de Okinawa | Japón | `battle-of-okinawa` |
+| 30 | Bombardeo atómico de Hiroshima | Japón | `atomic-bombing-of-hiroshima` |
+| 31 | Batalla de Dien Bien Phu | Vietnam | `battle-of-dien-bien-phu` |
+| 32 | Batalla de Incheon | Corea del Sur | `battle-of-inchon` |
+| 33 | Invasión de Bahía de Cochinos | Cuba | `bay-of-pigs-invasion` |
+| 34 | Batalla de Karbala | Irak | `battle-of-karbala` |
+| 35 | Batalla de Manzikert | Turquía | `battle-of-manzikert` |
+| 36 | Caída de Constantinopla | Turquía | `fall-of-constantinople` |
+| 37 | Batalla de Cannas | Italia | `battle-of-cannae` |
+| 38 | Batalla de Zama | Túnez | `battle-of-zama` |
+| 39 | Batalla de Actium | Grecia | `battle-of-actium` |
+| 40 | Batalla de Gaugamela | Irak | `battle-of-gaugamela` |
+| 41 | Batalla de Salamina | Grecia | `battle-of-salamis` |
+| 42 | Batalla de Platea | Grecia | `battle-of-plataea` |
+| 43 | Batalla de Crécy | Francia | `battle-of-crecy` |
+| 44 | Batalla de Bannockburn | Reino Unido | `battle-of-bannockburn` |
+| 45 | Batalla de Bosworth | Reino Unido | `battle-of-bosworth-field` |
+| 46 | Batalla de Naseby | Reino Unido | `battle-of-naseby` |
+| 47 | Batalla de Blenheim | Alemania | `battle-of-blenheim` |
+| 48 | Batalla de Leipzig | Alemania | `battle-of-leipzig` |
+| 49 | Batalla de Borodinó | Rusia | `battle-of-borodino` |
+| 50 | Batalla de Sedán | Francia | `battle-of-sedan` |
+| 51 | Batalla de Solferino | Italia | `battle-of-solferino` |
+| 52 | Batalla de Balaclava | Ucrania | `battle-of-balaclava` |
+| 53 | Batalla de Isandlwana | Sudáfrica | `battle-of-isandlwana` |
+| 54 | Batalla de Omdurmán | Sudán | `battle-of-omdurman` |
+| 55 | Batalla de Adua | Etiopía | `battle-of-adwa` |
+| 56 | Batalla de Tsushima | Japón | `battle-of-tsushima` |
+| 57 | Batalla de Jutlandia | — | `battle-of-jutland` |
+| 58 | Batalla de Tannenberg | Polonia | `battle-of-tannenberg` |
+| 59 | Primera batalla del Marne | Francia | `first-battle-of-the-marne` |
+| 60 | Batalla de Inglaterra | Reino Unido | `battle-of-britain` |
+| 61 | Batalla de Berlín | Alemania | `battle-of-berlin` |
+| 62 | Batalla del golfo de Leyte | Filipinas | `battle-of-leyte-gulf` |
+| 63 | Batalla de las Ardenas | Bélgica | `battle-of-the-bulge` |
+| 64 | Sitio de Leningrado | Rusia | `siege-of-leningrad` |
+| 65 | Batalla de Ia Drang | Vietnam | `battle-of-ia-drang` |
+| 66 | Batalla de Montecassino | Italia | `battle-of-monte-cassino` |
+| 67 | Ofensiva del Tet | Vietnam | `tet-offensive` |
+| 68 | Sitio de Khe Sanh | Vietnam | `battle-of-khe-sanh` |
+| 69 | Guerra de los Seis Días | — | `six-day-war` |
+| 70 | Guerra de Yom Kipur | — | `yom-kippur-war` |
+| 71 | Guerra de las Malvinas | — | `falklands-war` |
+| 72 | Guerra del Golfo | Kuwait | `gulf-war` |
+| 73 | Batalla de Puebla | México | `battle-of-puebla` |
+| 74 | Batalla de Ayacucho | Perú | `battle-of-ayacucho` |
+| 75 | Batalla de Boyacá | Colombia | `battle-of-boyaca` |
+| 76 | Batalla de Carabobo | Venezuela | `battle-of-carabobo` |
+| 77 | Batalla de Maipú | Chile | `battle-of-maipu` |
+| 78 | Batalla de Chacabuco | Chile | `battle-of-chacabuco` |
+| 79 | Toma de la Bastilla | Francia | `storming-of-the-bastille` |
+| 80 | Caída del Muro de Berlín | Alemania | `fall-of-the-berlin-wall` |
 
 ## Ronda 7 · Acto II · Maravillas de la naturaleza
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Etna | Italia | `mount-etna` |
-| 2 | Krakatoa | Indonesia | `krakatoa` |
-| 3 | Monte Santa Helena | Estados Unidos | `mount-st-helens` |
-| 4 | Kīlauea | Estados Unidos | `kilauea` |
-| 5 | Uluru | Australia | `uluru` |
-| 6 | Gran Cañón | Estados Unidos | `grand-canyon` |
-| 7 | Cataratas del Niágara | Estados Unidos | `niagara-falls` |
-| 8 | Cataratas Victoria | Zambia | `victoria-falls` |
-| 9 | Salto Ángel | Venezuela | `angel-falls` |
-| 10 | Sahara | Argelia | `sahara` |
-| 11 | Desierto de Gobi | República Popular China | `gobi-desert` |
-| 12 | Desierto de Atacama | Chile | `atacama-desert` |
-| 13 | Gran Barrera de Coral | Australia | `great-barrier-reef` |
-| 14 | Mar Muerto | Jordania | `dead-sea` |
-| 15 | Lago Victoria | Tanzania | `lake-victoria` |
-| 16 | Lago Titicaca | Perú | `lake-titicaca` |
-| 17 | Lago Superior | Canadá | `lake-superior` |
-| 18 | Lago Lemán | Suiza | `lake-geneva` |
-| 19 | Lago de Como | Italia | `lake-como` |
-| 20 | Islas Galápagos | Ecuador | `galapagos-islands` |
-| 21 | Madagascar | Madagascar | `madagascar` |
-| 22 | Islandia | Islandia | `iceland` |
-| 23 | Groenlandia | Groenlandia | `greenland` |
-| 24 | Hawái | Estados Unidos | `hawaii` |
-| 25 | Bora Bora | Francia | `bora-bora` |
-| 26 | Maldivas | Maldivas | `maldives` |
-| 27 | Santorini | Grecia | `santorini` |
-| 28 | Costa Amalfitana | Italia | `amalfi-coast` |
-| 29 | Fiordo de Geiranger | Noruega | `geirangerfjord` |
-| 30 | Bahía de Ha-Long | Vietnam | `halong-bay` |
-| 31 | Parque forestal nacional de Zhangjiajie | República Popular China | `zhangjiajie-national-forest-park` |
-| 32 | Parque nacional de Yosemite | Estados Unidos | `yosemite-national-park` |
-| 33 | Parque nacional de Yellowstone | Estados Unidos | `yellowstone-national-park` |
-| 34 | Serengueti | Kenia | `serengeti` |
-| 35 | Delta del Okavango | Botsuana | `okavango-delta` |
-| 36 | Zona de conservación de Ngorongoro | Tanzania | `ngorongoro-conservation-area` |
-| 37 | Monte Kenia | Kenia | `mount-kenya` |
-| 38 | Peñón de Gibraltar | Reino Unido | `rock-of-gibraltar` |
-| 39 | Estrecho de Gibraltar | España | `strait-of-gibraltar` |
-| 40 | Bósforo | Turquía | `bosporus` |
-| 41 | Canal de Suez | Egipto | `suez-canal` |
-| 42 | Canal de Panamá | Panamá | `panama-canal` |
-| 43 | Cabo de Hornos | Chile | `cape-horn` |
-| 44 | Cabo de Buena Esperanza | Sudáfrica | `cape-of-good-hope` |
-| 45 | Estrecho de Malaca | Indonesia | `strait-of-malacca` |
-| 46 | Canal de la Mancha | Reino Unido | `english-channel` |
-| 47 | Pasaje de Drake | Chile | `drake-passage` |
-| 48 | Estrecho de Bering | Estados Unidos | `bering-strait` |
-| 49 | Delta del Nilo | Egipto | `nile-delta` |
-| 50 | Delta del Danubio | Rumania | `danube-delta` |
-| 51 | Kalahari | Botsuana | `kalahari-desert` |
-| 52 | Desierto de Mojave | Estados Unidos | `mojave-desert` |
-| 53 | Valle de la Muerte | Estados Unidos | `death-valley` |
-| 54 | Olimpo | Grecia | `mount-olympus` |
-| 55 | Monte Sinaí | Egipto | `mount-sinai` |
-| 56 | Monte Ararat | Turquía | `mount-ararat` |
-| 57 | Monte Kailāsh | República Popular China | `mount-kailash` |
-| 58 | Annapurna | Nepal | `annapurna` |
-| 59 | Lhotse | Nepal | `lhotse` |
-| 60 | Kanchenjunga | India | `kangchenjunga` |
-| 61 | Makalu | Nepal | `makalu` |
-| 62 | Monte Cook | Nueva Zelanda | `aoraki-mount-cook` |
-| 63 | Nanga Parbat | Pakistán | `nanga-parbat` |
-| 64 | Monte Kosciuszko | Australia | `mount-kosciuszko` |
-| 65 | Macizo Vinson | — | `vinson-massif` |
-| 66 | Citlaltépetl | México | `pico-de-orizaba` |
-| 67 | Popocatépetl | México | `popocatepetl` |
-| 68 | Volcán Cotopaxi | Ecuador | `cotopaxi` |
-| 69 | Volcán Chimborazo | Ecuador | `chimborazo` |
-| 70 | Mauna Kea | Estados Unidos | `mauna-kea` |
-| 71 | Monte Erebus | — | `mount-erebus` |
-| 72 | Mar Mediterráneo | España | `mediterranean-sea` |
-| 73 | Mar Caribe | México | `caribbean-sea` |
-| 74 | Mar Báltico | Suecia | `baltic-sea` |
-| 75 | Mar Negro | Bulgaria | `black-sea` |
-| 76 | Mar Rojo | Egipto | `red-sea` |
-| 77 | Mar Caspio | Irán | `caspian-sea` |
-| 78 | Océano Ártico | — | `arctic-ocean` |
-| 79 | Mar del Japón | Rusia | `sea-of-japan` |
-| 80 | Océano Índico | — | `indian-ocean` |
+| 1 | Monte Everest | — | `mount-everest` |
+| 2 | K2 | — | `k2` |
+| 3 | Kilimanjaro | Tanzania | `mount-kilimanjaro` |
+| 4 | Mont Blanc | — | `mont-blanc` |
+| 5 | Cervino | — | `matterhorn` |
+| 6 | Monte Fuji | Japón | `mount-fuji` |
+| 7 | Denali | Estados Unidos | `denali` |
+| 8 | Aconcagua | Argentina | `aconcagua` |
+| 9 | Monte Elbrús | Rusia | `mount-elbrus` |
+| 10 | Monte Vesubio | Italia | `mount-vesuvius` |
+| 11 | Etna | Italia | `mount-etna` |
+| 12 | Krakatoa | Indonesia | `krakatoa` |
+| 13 | Monte Santa Helena | Estados Unidos | `mount-st-helens` |
+| 14 | Kilauea | Estados Unidos | `kilauea` |
+| 15 | Uluru | Australia | `uluru` |
+| 16 | Gran Cañón | Estados Unidos | `grand-canyon` |
+| 17 | Cataratas del Niágara | — | `niagara-falls` |
+| 18 | Cataratas Victoria | — | `victoria-falls` |
+| 19 | Salto Ángel | Venezuela | `angel-falls` |
+| 20 | Sahara | — | `sahara` |
+| 21 | Desierto de Gobi | — | `gobi-desert` |
+| 22 | Desierto de Atacama | Chile | `atacama-desert` |
+| 23 | Gran Barrera de Coral | Australia | `great-barrier-reef` |
+| 24 | Mar Muerto | — | `dead-sea` |
+| 25 | Lago Victoria | — | `lake-victoria` |
+| 26 | Lago Titicaca | — | `lake-titicaca` |
+| 27 | Lago Superior | — | `lake-superior` |
+| 28 | Lago Lemán | — | `lake-geneva` |
+| 29 | Lago de Como | Italia | `lake-como` |
+| 30 | Islas Galápagos | Ecuador | `galapagos-islands` |
+| 31 | Hawái | Estados Unidos | `hawaii` |
+| 32 | Bora Bora | Francia | `bora-bora` |
+| 33 | Santorini | Grecia | `santorini` |
+| 34 | Costa Amalfitana | Italia | `amalfi-coast` |
+| 35 | Fiordo de Geiranger | Noruega | `geirangerfjord` |
+| 36 | Bahía de Ha Long | Vietnam | `halong-bay` |
+| 37 | Zhangjiajie | China | `zhangjiajie-national-forest-park` |
+| 38 | Parque nacional de Yosemite | Estados Unidos | `yosemite-national-park` |
+| 39 | Parque nacional de Yellowstone | Estados Unidos | `yellowstone-national-park` |
+| 40 | Delta del Okavango | Botsuana | `okavango-delta` |
+| 41 | Cráter del Ngorongoro | Tanzania | `ngorongoro-conservation-area` |
+| 42 | Monte Kenia | Kenia | `mount-kenya` |
+| 43 | Peñón de Gibraltar | Reino Unido | `rock-of-gibraltar` |
+| 44 | Estrecho de Gibraltar | — | `strait-of-gibraltar` |
+| 45 | Bósforo | Turquía | `bosporus` |
+| 46 | Canal de Suez | Egipto | `suez-canal` |
+| 47 | Canal de Panamá | Panamá | `panama-canal` |
+| 48 | Cabo de Hornos | Chile | `cape-horn` |
+| 49 | Cabo de Buena Esperanza | Sudáfrica | `cape-of-good-hope` |
+| 50 | Estrecho de Malaca | — | `strait-of-malacca` |
+| 51 | Canal de la Mancha | — | `english-channel` |
+| 52 | Pasaje de Drake | — | `drake-passage` |
+| 53 | Estrecho de Bering | — | `bering-strait` |
+| 54 | Delta del Nilo | Egipto | `nile-delta` |
+| 55 | Delta del Danubio | Rumania | `danube-delta` |
+| 56 | Kalahari | — | `kalahari-desert` |
+| 57 | Desierto de Mojave | Estados Unidos | `mojave-desert` |
+| 58 | Valle de la Muerte | Estados Unidos | `death-valley` |
+| 59 | Monte Olimpo | Grecia | `mount-olympus` |
+| 60 | Monte Sinaí | Egipto | `mount-sinai` |
+| 61 | Monte Ararat | Turquía | `mount-ararat` |
+| 62 | Monte Kailash | China | `mount-kailash` |
+| 63 | Annapurna | Nepal | `annapurna` |
+| 64 | Lhotse | — | `lhotse` |
+| 65 | Kanchenjunga | — | `kangchenjunga` |
+| 66 | Makalu | — | `makalu` |
+| 67 | Nanga Parbat | Pakistán | `nanga-parbat` |
+| 68 | Monte Cook | Nueva Zelanda | `aoraki-mount-cook` |
+| 69 | Monte Kosciuszko | Australia | `mount-kosciuszko` |
+| 70 | Macizo Vinson | — | `vinson-massif` |
+| 71 | Pico de Orizaba | México | `pico-de-orizaba` |
+| 72 | Popocatépetl | México | `popocatepetl` |
+| 73 | Cotopaxi | Ecuador | `cotopaxi` |
+| 74 | Chimborazo | Ecuador | `chimborazo` |
+| 75 | Mauna Kea | Estados Unidos | `mauna-kea` |
+| 76 | Monte Erebus | — | `mount-erebus` |
+| 77 | Mar Mediterráneo | — | `mediterranean-sea` |
+| 78 | Mar Caribe | — | `caribbean-sea` |
+| 79 | Mar Báltico | — | `baltic-sea` |
+| 80 | Mar Negro | — | `black-sea` |
 
 ## Ronda 8 · Acto II (jefe) · Ciudades importantes
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Incheon | Corea del Sur | `incheon` |
-| 2 | Mombasa | Kenia | `mombasa` |
-| 3 | Zanzíbar | Tanzania | `zanzibar-city` |
-| 4 | Dar es-Salam | Tanzania | `dar-es-salaam` |
-| 5 | Durban | Sudáfrica | `durban` |
-| 6 | Puerto Elizabeth | Sudáfrica | `port-elizabeth` |
-| 7 | Asuán | Egipto | `aswan` |
-| 8 | Fez | Marruecos | `fez` |
-| 9 | Tánger | Marruecos | `tangier` |
-| 10 | Orán | Argelia | `oran` |
-| 11 | Cartago | Túnez | `carthage` |
-| 12 | Tombuctú | Mali | `timbuktu` |
-| 13 | Kumasi | Ghana | `kumasi` |
-| 14 | Abiyán | Costa de Marfil | `abidjan` |
-| 15 | Duala | Camerún | `douala` |
-| 16 | Lubumbashi | República Democrática del Congo | `lubumbashi` |
-| 17 | Benguela | Angola | `benguela` |
-| 18 | Guiza | Egipto | `giza` |
-| 19 | Haifa | Israel | `haifa` |
-| 20 | Alepo | Siria | `aleppo` |
-| 21 | Petra | Jordania | `petra` |
-| 22 | Basora | Irak | `basra` |
-| 23 | Mosul | Irak | `mosul` |
-| 24 | Isfahán | Irán | `isfahan` |
-| 25 | Shiraz | Irán | `shiraz` |
-| 26 | Mashhad | Irán | `mashhad` |
-| 27 | Tabriz | Irán | `tabriz` |
-| 28 | Samarcanda | Uzbekistán | `samarkand` |
-| 29 | Bujará | Uzbekistán | `bukhara` |
-| 30 | Almaty | Kazajistán | `almaty` |
-| 31 | Novosibirsk | Rusia | `novosibirsk` |
-| 32 | Vladivostok | Rusia | `vladivostok` |
-| 33 | Ekaterimburgo | Rusia | `yekaterinburg` |
-| 34 | Kazán | Rusia | `kazan` |
-| 35 | Sochi | Rusia | `sochi` |
-| 36 | Múrmansk | Rusia | `murmansk` |
-| 37 | Kaliningrado | Rusia | `kaliningrad` |
-| 38 | Breslavia | Polonia | `wroc-aw` |
-| 39 | Poznan | Polonia | `poznan` |
-| 40 | Lodz | Polonia | `odz` |
-| 41 | Brno | República Checa | `brno` |
-| 42 | Ostrava | República Checa | `ostrava` |
-| 43 | Košice | Eslovaquia | `kosice` |
-| 44 | Graz | Austria | `graz` |
-| 45 | Linz | Austria | `linz` |
-| 46 | Basilea | Suiza | `basel` |
-| 47 | Lausana | Suiza | `lausanne` |
-| 48 | Lugano | Suiza | `lugano` |
-| 49 | Turín | Italia | `turin` |
-| 50 | Bolonia | Italia | `bologna` |
-| 51 | Génova | Italia | `genoa` |
-| 52 | Verona | Italia | `verona` |
-| 53 | Pisa | Italia | `pisa` |
-| 54 | Palermo | Italia | `palermo` |
-| 55 | Catania | Italia | `catania` |
-| 56 | Cagliari | Italia | `cagliari` |
-| 57 | Bari | Italia | `bari` |
-| 58 | Bilbao | España | `bilbao` |
-| 59 | Granada | España | `granada` |
-| 60 | Málaga | España | `malaga` |
-| 61 | Zaragoza | España | `zaragoza` |
-| 62 | Palma de Mallorca | España | `palma-de-mallorca` |
-| 63 | Toledo | España | `toledo` |
-| 64 | Salamanca | España | `salamanca` |
-| 65 | Santiago de Compostela | España | `santiago-de-compostela` |
-| 66 | Faro | Portugal | `faro` |
-| 67 | Coímbra | Portugal | `coimbra` |
-| 68 | Madeira | Portugal | `madeira` |
-| 69 | Ponta Delgada | Portugal | `ponta-delgada` |
-| 70 | Cork | Irlanda | `cork` |
-| 71 | Galway | Irlanda | `galway` |
-| 72 | Belfast | Reino Unido | `belfast` |
-| 73 | Cardiff | Reino Unido | `cardiff` |
-| 74 | Aberdeen | Reino Unido | `aberdeen` |
-| 75 | Bristol | Reino Unido | `bristol` |
-| 76 | Birmingham | Reino Unido | `birmingham` |
-| 77 | Leeds | Reino Unido | `leeds` |
-| 78 | Sheffield | Reino Unido | `sheffield` |
-| 79 | Newcastle upon Tyne | Reino Unido | `newcastle-upon-tyne` |
-| 80 | Nottingham | Reino Unido | `nottingham` |
+| 1 | Nueva Orleans | Estados Unidos | `new-orleans` |
+| 2 | Gotemburgo | Suecia | `gothenburg` |
+| 3 | Odesa | Ucrania | `odesa` |
+| 4 | Salónica | Grecia | `thessaloniki` |
+| 5 | Alejandría | Egipto | `alexandria` |
+| 6 | Tel Aviv | Israel | `tel-aviv` |
+| 7 | La Meca | Arabia Saudita | `mecca` |
+| 8 | Yeda | Arabia Saudita | `jeddah` |
+| 9 | Shenzhen | China | `shenzhen` |
+| 10 | Cantón | China | `guangzhou` |
+| 11 | Xi'an | China | `xi-an` |
+| 12 | Hangzhou | China | `hangzhou` |
+| 13 | Nagoya | Japón | `nagoya` |
+| 14 | Sapporo | Japón | `sapporo` |
+| 15 | Chennai | India | `chennai` |
+| 16 | Hyderabad | India | `hyderabad` |
+| 17 | Agra | India | `agra` |
+| 18 | Jaipur | India | `jaipur` |
+| 19 | Goa | India | `goa` |
+| 20 | Cochín | India | `kochi` |
+| 21 | Phuket | Tailandia | `phuket` |
+| 22 | Pattaya | Tailandia | `pattaya` |
+| 23 | Denpasar | Indonesia | `denpasar` |
+| 24 | Bandung | Indonesia | `bandung` |
+| 25 | Cebú | Filipinas | `cebu-city` |
+| 26 | Rangún | Myanmar | `yangon` |
+| 27 | Mandalay | Myanmar | `mandalay` |
+| 28 | Đà Nẵng | Vietnam | `da-nang` |
+| 29 | Incheon | Corea del Sur | `incheon` |
+| 30 | Zanzíbar | Tanzania | `zanzibar-city` |
+| 31 | Dar es-Salam | Tanzania | `dar-es-salaam` |
+| 32 | Durban | Sudáfrica | `durban` |
+| 33 | Asuán | Egipto | `aswan` |
+| 34 | Fez | Marruecos | `fez` |
+| 35 | Orán | Argelia | `oran` |
+| 36 | Cartago | Túnez | `carthage` |
+| 37 | Kumasi | Ghana | `kumasi` |
+| 38 | Abiyán | Costa de Marfil | `abidjan` |
+| 39 | Lubumbashi | República Democrática del Congo | `lubumbashi` |
+| 40 | Benguela | Angola | `benguela` |
+| 41 | Haifa | Israel | `haifa` |
+| 42 | Alepo | Siria | `aleppo` |
+| 43 | Petra | Jordania | `petra` |
+| 44 | Mosul | Irak | `mosul` |
+| 45 | Isfahán | Irán | `isfahan` |
+| 46 | Mashhad | Irán | `mashhad` |
+| 47 | Tabriz | Irán | `tabriz` |
+| 48 | Bujará | Uzbekistán | `bukhara` |
+| 49 | Almaty | Kazajistán | `almaty` |
+| 50 | Vladivostok | Rusia | `vladivostok` |
+| 51 | Ekaterimburgo | Rusia | `yekaterinburg` |
+| 52 | Kazán | Rusia | `kazan` |
+| 53 | Múrmansk | Rusia | `murmansk` |
+| 54 | Kaliningrado | Rusia | `kaliningrad` |
+| 55 | Poznań | Polonia | `poznan` |
+| 56 | Łódź | Polonia | `odz` |
+| 57 | Ostrava | República Checa | `ostrava` |
+| 58 | Košice | Eslovaquia | `kosice` |
+| 59 | Linz | Austria | `linz` |
+| 60 | Basilea | Suiza | `basel` |
+| 61 | Lugano | Suiza | `lugano` |
+| 62 | Turín | Italia | `turin` |
+| 63 | Bolonia | Italia | `bologna` |
+| 64 | Verona | Italia | `verona` |
+| 65 | Pisa | Italia | `pisa` |
+| 66 | Catania | Italia | `catania` |
+| 67 | Cagliari | Italia | `cagliari` |
+| 68 | Bilbao | España | `bilbao` |
+| 69 | Granada | España | `granada` |
+| 70 | Zaragoza | España | `zaragoza` |
+| 71 | Palma de Mallorca | España | `palma-de-mallorca` |
+| 72 | Toledo | España | `toledo` |
+| 73 | Santiago de Compostela | España | `santiago-de-compostela` |
+| 74 | Faro | Portugal | `faro` |
+| 75 | Madeira | Portugal | `madeira` |
+| 76 | Ponta Delgada | Portugal | `ponta-delgada` |
+| 77 | Galway | Irlanda | `galway` |
+| 78 | Belfast | Reino Unido | `belfast` |
+| 79 | Aberdeen | Reino Unido | `aberdeen` |
+| 80 | Bristol | Reino Unido | `bristol` |
 
 ## Ronda 9 · Acto III · Ciudades difíciles
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Utrecht | Países Bajos | `utrecht` |
-| 2 | La Haya | Países Bajos | `the-hague` |
-| 3 | Groninga | Países Bajos | `groningen` |
-| 4 | Aarhus | Dinamarca | `aarhus` |
-| 5 | Odense | Dinamarca | `odense` |
-| 6 | Malmö | Suecia | `malmo` |
-| 7 | Upsala | Suecia | `uppsala` |
-| 8 | Tromsø | Noruega | `troms` |
-| 9 | Trondheim | Noruega | `trondheim` |
-| 10 | Stavanger | Noruega | `stavanger` |
-| 11 | Tampere | Finlandia | `tampere` |
-| 12 | Turku | Finlandia | `turku` |
-| 13 | Rovaniemi | Finlandia | `rovaniemi` |
-| 14 | Akureyri | Islandia | `akureyri` |
-| 15 | Tórshavn | Dinamarca | `torshavn` |
-| 16 | Nuuk | Groenlandia | `nuuk` |
-| 17 | Anchorage | Estados Unidos | `anchorage` |
-| 18 | Honolulu | Estados Unidos | `honolulu` |
-| 19 | Denver | Estados Unidos | `denver` |
-| 20 | Phoenix | Estados Unidos | `phoenix` |
-| 21 | San Diego | Estados Unidos | `san-diego` |
-| 22 | Portland | Estados Unidos | `portland` |
-| 23 | Austin | Estados Unidos | `austin` |
-| 24 | Nashville | Estados Unidos | `nashville` |
-| 25 | Detroit | Estados Unidos | `detroit` |
-| 26 | Minneapolis | Estados Unidos | `minneapolis` |
-| 27 | Albuquerque | Estados Unidos | `albuquerque` |
-| 28 | Salt Lake City | Estados Unidos | `salt-lake-city` |
-| 29 | Santa Fe | Estados Unidos | `santa-fe` |
-| 30 | Charleston | Estados Unidos | `charleston` |
-| 31 | Savannah | Estados Unidos | `savannah` |
-| 32 | Memphis | Estados Unidos | `memphis` |
-| 33 | Pittsburgh | Estados Unidos | `pittsburgh` |
-| 34 | Cleveland | Estados Unidos | `cleveland` |
-| 35 | Baltimore | Estados Unidos | `baltimore` |
-| 36 | Búfalo | Estados Unidos | `buffalo` |
-| 37 | Calgary | Canadá | `calgary` |
-| 38 | Edmonton | Canadá | `edmonton` |
-| 39 | Winnipeg | Canadá | `winnipeg` |
-| 40 | Halifax | Canadá | `halifax` |
-| 41 | Whitehorse | Canadá | `whitehorse` |
-| 42 | Monterrey | México | `monterrey` |
-| 43 | Tijuana | México | `tijuana` |
-| 44 | Puebla | México | `puebla` |
-| 45 | Oaxaca | México | `oaxaca` |
-| 46 | Guanajuato | México | `guanajuato` |
-| 47 | San Juan | Estados Unidos | `san-juan` |
-| 48 | Cali | Colombia | `cali` |
-| 49 | Barranquilla | Colombia | `barranquilla` |
-| 50 | Guayaquil | Ecuador | `guayaquil` |
-| 51 | Arequipa | Perú | `arequipa` |
-| 52 | Trujillo | Perú | `trujillo` |
-| 53 | Potosí | Bolivia | `potosi` |
-| 54 | Sucre | Bolivia | `sucre` |
-| 55 | Santa Cruz de la Sierra | Bolivia | `santa-cruz-de-la-sierra` |
-| 56 | Córdoba | Argentina | `cordoba` |
-| 57 | Mendoza | Argentina | `mendoza` |
-| 58 | Rosario | Argentina | `rosario` |
-| 59 | Ushuaia | Argentina | `ushuaia` |
-| 60 | San Carlos de Bariloche | Argentina | `bariloche` |
-| 61 | Valparaíso | Chile | `valparaiso` |
-| 62 | Punta Arenas | Chile | `punta-arenas` |
-| 63 | Curitiba | Brasil | `curitiba` |
-| 64 | Recife | Brasil | `recife` |
-| 65 | Fortaleza | Brasil | `fortaleza` |
-| 66 | Manaos | Brasil | `manaus` |
-| 67 | Belém | Brasil | `belem` |
-| 68 | Porto Alegre | Brasil | `porto-alegre` |
-| 69 | Belo Horizonte | Brasil | `belo-horizonte` |
-| 70 | Florianópolis | Brasil | `florianopolis` |
-| 71 | Adelaida | Australia | `adelaide` |
-| 72 | Darwin | Australia | `darwin` |
-| 73 | Hobart | Australia | `hobart` |
-| 74 | Alice Springs | Australia | `alice-springs` |
-| 75 | Cairns | Australia | `cairns` |
-| 76 | Christchurch | Nueva Zelanda | `christchurch` |
-| 77 | Queenstown | Nueva Zelanda | `queenstown` |
-| 78 | Dunedin | Nueva Zelanda | `dunedin` |
-| 79 | Numea | Francia | `noumea` |
-| 80 | Papeete | Francia | `papeete` |
+| 1 | Luxor | Egipto | `luxor` |
+| 2 | Medina | Arabia Saudita | `medina` |
+| 3 | Chengdu | China | `chengdu` |
+| 4 | Macao | China | `macau` |
+| 5 | Hiroshima | Japón | `hiroshima` |
+| 6 | Ahmedabad | India | `ahmedabad` |
+| 7 | Benarés | India | `varanasi` |
+| 8 | Chiang Mai | Tailandia | `chiang-mai` |
+| 9 | Surabaya | Indonesia | `surabaya` |
+| 10 | Siem Riep | Camboya | `siem-reap` |
+| 11 | Puerto Elizabeth | Sudáfrica | `port-elizabeth` |
+| 12 | Tombuctú | Mali | `timbuktu` |
+| 13 | Duala | Camerún | `douala` |
+| 14 | Basora | Irak | `basra` |
+| 15 | Samarcanda | Uzbekistán | `samarkand` |
+| 16 | Sochi | Rusia | `sochi` |
+| 17 | Brno | República Checa | `brno` |
+| 18 | Lausana | Suiza | `lausanne` |
+| 19 | Palermo | Italia | `palermo` |
+| 20 | Málaga | España | `malaga` |
+| 21 | Coímbra | Portugal | `coimbra` |
+| 22 | Cork | Irlanda | `cork` |
+| 23 | Birmingham | Reino Unido | `birmingham` |
+| 24 | Sheffield | Reino Unido | `sheffield` |
+| 25 | Nottingham | Reino Unido | `nottingham` |
+| 26 | Cambridge | Reino Unido | `cambridge` |
+| 27 | York | Reino Unido | `york` |
+| 28 | Brighton | Reino Unido | `brighton` |
+| 29 | Portsmouth | Reino Unido | `portsmouth` |
+| 30 | Inverness | Reino Unido | `inverness` |
+| 31 | Lille | Francia | `lille` |
+| 32 | Estrasburgo | Francia | `strasbourg` |
+| 33 | Reims | Francia | `reims` |
+| 34 | Aviñón | Francia | `avignon` |
+| 35 | Grenoble | Francia | `grenoble` |
+| 36 | Colonia | Alemania | `cologne` |
+| 37 | Stuttgart | Alemania | `stuttgart` |
+| 38 | Leipzig | Alemania | `leipzig` |
+| 39 | Bremen | Alemania | `bremen` |
+| 40 | Hannover | Alemania | `hanover` |
+| 41 | Rothenburg ob der Tauber | Alemania | `rothenburg-ob-der-tauber` |
+| 42 | Utrecht | Países Bajos | `utrecht` |
+| 43 | Groninga | Países Bajos | `groningen` |
+| 44 | Odense | Dinamarca | `odense` |
+| 45 | Upsala | Suecia | `uppsala` |
+| 46 | Trondheim | Noruega | `trondheim` |
+| 47 | Tampere | Finlandia | `tampere` |
+| 48 | Rovaniemi | Finlandia | `rovaniemi` |
+| 49 | Akureyri | Islandia | `akureyri` |
+| 50 | Nuuk | Groenlandia | `nuuk` |
+| 51 | Honolulu | Estados Unidos | `honolulu` |
+| 52 | Phoenix | Estados Unidos | `phoenix` |
+| 53 | Portland | Estados Unidos | `portland` |
+| 54 | Nashville | Estados Unidos | `nashville` |
+| 55 | Minneapolis | Estados Unidos | `minneapolis` |
+| 56 | Salt Lake City | Estados Unidos | `salt-lake-city` |
+| 57 | Charleston | Estados Unidos | `charleston` |
+| 58 | Savannah | Estados Unidos | `savannah` |
+| 59 | Calgary | Canadá | `calgary` |
+| 60 | Winnipeg | Canadá | `winnipeg` |
+| 61 | Whitehorse | Canadá | `whitehorse` |
+| 62 | Tijuana | México | `tijuana` |
+| 63 | Oaxaca | México | `oaxaca` |
+| 64 | Cali | Colombia | `cali` |
+| 65 | Guayaquil | Ecuador | `guayaquil` |
+| 66 | Trujillo | Perú | `trujillo` |
+| 67 | Sucre | Bolivia | `sucre` |
+| 68 | Córdoba | Argentina | `cordoba` |
+| 69 | Rosario | Argentina | `rosario` |
+| 70 | Bariloche | Argentina | `bariloche` |
+| 71 | Punta Arenas | Chile | `punta-arenas` |
+| 72 | Recife | Brasil | `recife` |
+| 73 | Fortaleza | Brasil | `fortaleza` |
+| 74 | Belém | Brasil | `belem` |
+| 75 | Belo Horizonte | Brasil | `belo-horizonte` |
+| 76 | Adelaida | Australia | `adelaide` |
+| 77 | Hobart | Australia | `hobart` |
+| 78 | Cairns | Australia | `cairns` |
+| 79 | Queenstown | Nueva Zelanda | `queenstown` |
+| 80 | Numea | Francia | `noumea` |
 
 ## Ronda 10 · Acto III · Maravillas del mundo (difíciles)
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Montaña de la Mesa | Sudáfrica | `table-mountain` |
-| 2 | Abu Simbel | Egipto | `abu-simbel-temples` |
-| 3 | Karnak | Egipto | `karnak` |
-| 4 | Valle de los Reyes | Egipto | `valley-of-the-kings` |
-| 5 | Gran Mezquita de Djenné | Mali | `great-mosque-of-djenne` |
-| 6 | Isla Robben | Sudáfrica | `robben-island` |
-| 7 | Gran Zimbabue | Zimbabue | `great-zimbabwe` |
-| 8 | Lalibela | Etiopía | `lalibela` |
-| 9 | Plaza de Yamaa el Fna | Marruecos | `jemaa-el-fnaa` |
-| 10 | Mezquita Hassan II | Marruecos | `hassan-ii-mosque` |
-| 11 | Ksar de Ait Ben Hadu | Marruecos | `ait-benhaddou` |
-| 12 | Tikal | Guatemala | `tikal` |
-| 13 | Copacabana | Brasil | `copacabana` |
-| 14 | Pan de Azúcar | Brasil | `sugarloaf-mountain` |
-| 15 | Líneas de Nazca | Perú | `nazca-lines` |
-| 16 | Sacsayhuamán | Perú | `sacsayhuaman` |
-| 17 | Puente de la bahía de Sídney | Australia | `sydney-harbour-bridge` |
-| 18 | Hobbiton Movie Set | Nueva Zelanda | `hobbiton-movie-set` |
-| 19 | Puente de Brooklyn | Estados Unidos | `brooklyn-bridge` |
-| 20 | Edificio Chrysler | Estados Unidos | `chrysler-building` |
-| 21 | Grand Central Terminal | Estados Unidos | `grand-central-terminal` |
-| 22 | Monumento a Lincoln | Estados Unidos | `lincoln-memorial` |
-| 23 | Monumento a Washington | Estados Unidos | `washington-monument` |
-| 24 | Capitolio de los Estados Unidos | Estados Unidos | `united-states-capitol` |
-| 25 | Lincoln Center | Estados Unidos | `lincoln-center` |
-| 26 | Fenway Park | Estados Unidos | `fenway-park` |
-| 27 | Wrigley Field | Estados Unidos | `wrigley-field` |
-| 28 | Cloud Gate | Estados Unidos | `cloud-gate` |
-| 29 | Torre Willis | Estados Unidos | `willis-tower` |
-| 30 | Arco Gateway | Estados Unidos | `gateway-arch` |
-| 31 | Graceland | Estados Unidos | `graceland` |
-| 32 | Misión de El Álamo | Estados Unidos | `alamo-mission` |
-| 33 | Castillo de la Cenicienta | Estados Unidos | `cinderella-castle` |
-| 34 | Walt Disney World Resort | Estados Unidos | `walt-disney-world` |
-| 35 | Universal Studios Hollywood | Estados Unidos | `universal-studios-hollywood` |
-| 36 | Observatorio Griffith | Estados Unidos | `griffith-observatory` |
-| 37 | Castillo Hearst | Estados Unidos | `hearst-castle` |
-| 38 | Biltmore Estate | Estados Unidos | `biltmore-estate` |
-| 39 | Mount Vernon | Estados Unidos | `mount-vernon` |
-| 40 | Independence Hall | Estados Unidos | `independence-hall` |
-| 41 | Campana de la Libertad | Estados Unidos | `liberty-bell` |
-| 42 | Fort Knox | Estados Unidos | `fort-knox` |
-| 43 | Área 51 | Estados Unidos | `area-51` |
-| 44 | Roswell | Estados Unidos | `roswell` |
-| 45 | Kitty Hawk | Estados Unidos | `kitty-hawk` |
-| 46 | Château Frontenac | Canadá | `chateau-frontenac` |
-| 47 | Parliament Hill | Canadá | `parliament-hill` |
-| 48 | Casa Loma | Canadá | `casa-loma` |
-| 49 | Lago Louise | Canadá | `lake-louise` |
-| 50 | Banff | Canadá | `banff` |
-| 51 | Niagara-on-the-Lake | Canadá | `niagara-on-the-lake` |
-| 52 | Palacio de Bellas Artes | México | `palacio-de-bellas-artes` |
-| 53 | Plaza de la Constitución | México | `zocalo` |
-| 54 | Tulum | México | `tulum` |
-| 55 | Uxmal | México | `uxmal` |
-| 56 | Zona arqueológica de Palenque | México | `palenque` |
-| 57 | Monte Albán | México | `monte-alban` |
-| 58 | Cartagena de Indias | Colombia | `cartagena-s-walled-city` |
-| 59 | Fuerte rojo de Delhi | India | `red-fort` |
-| 60 | Templo Dorado | India | `golden-temple` |
-| 61 | Templo de Suria | India | `konark-sun-temple` |
-| 62 | Hampi | India | `hampi` |
-| 63 | Ellora | India | `ellora-caves` |
-| 64 | Persépolis | Irán | `persepolis` |
-| 65 | Göbekli Tepe | Turquía | `gobekli-tepe` |
-| 66 | Capadocia | Turquía | `cappadocia` |
-| 67 | Pamukkale | Turquía | `pamukkale` |
-| 68 | Éfeso | Turquía | `ephesus` |
-| 69 | Meteora | Grecia | `meteora` |
-| 70 | Museo Guggenheim Bilbao | España | `guggenheim-museum-bilbao` |
-| 71 | Mezquita-catedral de Córdoba | España | `mezquita-catedral-de-cordoba` |
-| 72 | Torre de Belém | Portugal | `belem-tower` |
-| 73 | Palacio de Schönbrunn | Austria | `schonbrunn-palace` |
-| 74 | Puente Carlos | República Checa | `charles-bridge` |
-| 75 | Castillo de Praga | República Checa | `prague-castle` |
-| 76 | Catedral de Colonia | Alemania | `cologne-cathedral` |
-| 77 | Panteón de Agripa | Italia | `pantheon` |
-| 78 | Pompeya | Italia | `pompeii` |
-| 79 | Catedral de Milán | Italia | `milan-cathedral` |
-| 80 | Basílica de San Pedro | Ciudad del Vaticano | `st-peter-s-basilica` |
+| 1 | Sigiriya | Sri Lanka | `sigiriya` |
+| 2 | Bagan | Myanmar | `bagan` |
+| 3 | Shwedagon | Myanmar | `shwedagon-pagoda` |
+| 4 | Templo del Cielo | China | `temple-of-heaven` |
+| 5 | Palacio de Verano | China | `summer-palace` |
+| 6 | Shibuya Crossing | Japón | `shibuya-crossing` |
+| 7 | Torre de Tokio | Japón | `tokyo-tower` |
+| 8 | Tokyo Skytree | Japón | `tokyo-skytree` |
+| 9 | Castillo de Himeji | Japón | `himeji-castle` |
+| 10 | Kinkaku-ji | Japón | `kinkaku-ji` |
+| 11 | Fushimi Inari-taisha | Japón | `fushimi-inari-taisha` |
+| 12 | Santuario Itsukushima | Japón | `itsukushima-shrine` |
+| 13 | Gyeongbokgung | Corea del Sur | `gyeongbokgung` |
+| 14 | Marina Bay Sands | Singapur | `marina-bay-sands` |
+| 15 | Merlión | Singapur | `merlion` |
+| 16 | Wat Arun | Tailandia | `wat-arun` |
+| 17 | Gran Palacio de Bangkok | Tailandia | `grand-palace` |
+| 18 | Montaña de la Mesa | Sudáfrica | `table-mountain` |
+| 19 | Abu Simbel | Egipto | `abu-simbel-temples` |
+| 20 | Karnak | Egipto | `karnak` |
+| 21 | Valle de los Reyes | Egipto | `valley-of-the-kings` |
+| 22 | Gran Mezquita de Djenné | Mali | `great-mosque-of-djenne` |
+| 23 | Isla Robben | Sudáfrica | `robben-island` |
+| 24 | Gran Zimbabue | Zimbabue | `great-zimbabwe` |
+| 25 | Lalibela | Etiopía | `lalibela` |
+| 26 | Yamaa el Fna | Marruecos | `jemaa-el-fnaa` |
+| 27 | Ait Ben Haddou | Marruecos | `ait-benhaddou` |
+| 28 | Copacabana | Brasil | `copacabana` |
+| 29 | Pan de Azúcar | Brasil | `sugarloaf-mountain` |
+| 30 | Sacsayhuamán | Perú | `sacsayhuaman` |
+| 31 | Hobbiton | Nueva Zelanda | `hobbiton-movie-set` |
+| 32 | Puente de Brooklyn | Estados Unidos | `brooklyn-bridge` |
+| 33 | Grand Central Terminal | Estados Unidos | `grand-central-terminal` |
+| 34 | Monumento a Washington | Estados Unidos | `washington-monument` |
+| 35 | Lincoln Center | Estados Unidos | `lincoln-center` |
+| 36 | Fenway Park | Estados Unidos | `fenway-park` |
+| 37 | Cloud Gate | Estados Unidos | `cloud-gate` |
+| 38 | Arco Gateway | Estados Unidos | `gateway-arch` |
+| 39 | Graceland | Estados Unidos | `graceland` |
+| 40 | Parliament Hill | Canadá | `parliament-hill` |
+| 41 | Lago Louise | Canadá | `lake-louise` |
+| 42 | Banff | Canadá | `banff` |
+| 43 | Palacio de Bellas Artes | México | `palacio-de-bellas-artes` |
+| 44 | Tulum | México | `tulum` |
+| 45 | Uxmal | México | `uxmal` |
+| 46 | Monte Albán | México | `monte-alban` |
+| 47 | Centro histórico de Salvador de Bahía | Brasil | `pelourinho` |
+| 48 | Cataratas del Iguazú | Argentina | `iguazu-falls` |
+| 49 | Glaciar Perito Moreno | Argentina | `perito-moreno-glacier` |
+| 50 | Isla de Pascua | Chile | `easter-island` |
+| 51 | La Boca | Argentina | `la-boca` |
+| 52 | Palacio Barolo | Argentina | `palacio-barolo` |
+| 53 | Casapueblo | Uruguay | `casapueblo` |
+| 54 | Plaza de Mayo | Argentina | `plaza-de-mayo` |
+| 55 | Castillo de Chapultepec | México | `chapultepec-castle` |
+| 56 | Catedral de Brasilia | Brasil | `cathedral-of-brasilia` |
+| 57 | Museo de Arte Contemporáneo de Niterói | Brasil | `oscar-niemeyer-s-niteroi-museum` |
+| 58 | London Eye | Reino Unido | `london-eye` |
+| 59 | Catedral de San Pablo | Reino Unido | `st-paul-s-cathedral` |
+| 60 | Museo Británico | Reino Unido | `british-museum` |
+| 61 | Castillo de Windsor | Reino Unido | `windsor-castle` |
+| 62 | Castillo de Edimburgo | Reino Unido | `edinburgh-castle` |
+| 63 | Calzada del Gigante | Reino Unido | `giant-s-causeway` |
+| 64 | Castillo de Blarney | Irlanda | `blarney-castle` |
+| 65 | Roca de Cashel | Irlanda | `rock-of-cashel` |
+| 66 | Castillo de Bran | Rumania | `bran-castle` |
+| 67 | Palacio del Parlamento Rumano | Rumania | `palace-of-the-parliament` |
+| 68 | Monasterio de Rila | Bulgaria | `rila-monastery` |
+| 69 | Museo del Hermitage | Rusia | `hermitage-museum` |
+| 70 | Plaza Roja | Rusia | `red-square` |
+| 71 | Mausoleo de Lenin | Rusia | `lenin-s-mausoleum` |
+| 72 | Monasterio de Novodévichi | Rusia | `novodevichy-convent` |
+| 73 | Lago Baikal | Rusia | `lake-baikal` |
+| 74 | La Rambla | España | `la-rambla` |
+| 75 | Camp Nou | España | `camp-nou` |
+| 76 | Museo del Prado | España | `prado-museum` |
+| 77 | Plaza Mayor de Madrid | España | `plaza-mayor` |
+| 78 | Real Monasterio de San Lorenzo de El Escorial | España | `el-escorial` |
+| 79 | Acueducto de Segovia | España | `roman-aqueduct-of-segovia` |
+| 80 | Ciudad de las Artes y las Ciencias | España | `ciudad-de-las-artes-y-las-ciencias` |
 
 ## Ronda 11 · Acto III · Historia (difícil)
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Guerra de las Malvinas | Reino Unido | `falklands-war` |
-| 2 | Guerra del Golfo | Kuwait | `gulf-war` |
-| 3 | Batalla de Puebla | México | `battle-of-puebla` |
-| 4 | Batalla de Boyacá | Colombia | `battle-of-boyaca` |
-| 5 | Batalla de Ayacucho | Perú | `battle-of-ayacucho` |
-| 6 | Batalla de Carabobo | Venezuela | `battle-of-carabobo` |
-| 7 | Batalla de Maipú | Chile | `battle-of-maipu` |
-| 8 | Batalla de Chacabuco | Chile | `battle-of-chacabuco` |
-| 9 | Toma de la Bastilla | Francia | `storming-of-the-bastille` |
-| 10 | Caída del Muro de Berlín | Alemania Oriental | `fall-of-the-berlin-wall` |
-| 11 | Carta Magna | Reino Unido | `signing-of-the-magna-carta` |
-| 12 | Motín del té | Estados Unidos | `boston-tea-party` |
-| 13 | Atentado de Sarajevo | Bosnia y Herzegovina | `assassination-of-archduke-franz-ferdinand` |
-| 14 | Hundimiento del RMS Titanic | — | `sinking-of-the-titanic` |
-| 15 | Accidente de Chernóbil | Ucrania | `chernobyl-disaster` |
-| 16 | Apolo 11 | Estados Unidos | `apollo-11` |
-| 17 | Hermanos Wright | Estados Unidos | `wright-brothers` |
-| 18 | Accidente del Hindenburg | Estados Unidos | `hindenburg-disaster` |
-| 19 | Gran incendio de Londres | Reino Unido | `great-fire-of-london` |
-| 20 | Voyages of Christopher Columbus | Bahamas | `voyages-of-christopher-columbus` |
-| 21 | Erupción del Krakatoa de 1883 | Indias Orientales Neerlandesas | `1883-eruption-of-krakatoa` |
-| 22 | Prueba Trinity | Estados Unidos | `trinity` |
-| 23 | Crisis de los misiles de Cuba | Cuba | `cuban-missile-crisis` |
-| 24 | Protestas y masacre de la plaza de Tiananmén de 1989 | República Popular China | `tiananmen-square-protests-of-1989` |
-| 25 | Conferencia de Yalta | Ucrania | `yalta-conference` |
-| 26 | Conferencia de Potsdam | Alemania | `potsdam-conference` |
-| 27 | Tratado de Versalles | Francia | `treaty-of-versailles` |
-| 28 | Congreso de Viena | Austria | `congress-of-vienna` |
-| 29 | Declaración de Independencia de los Estados Unidos | Estados Unidos | `united-states-declaration-of-independence` |
-| 30 | Discurso de Gettysburg | Estados Unidos | `gettysburg-address` |
-| 31 | Guerra del Sinaí | Egipto | `suez-crisis` |
-| 32 | Partición de la India | India | `partition-of-india` |
-| 33 | Festival de Woodstock | Estados Unidos | `woodstock` |
-| 34 | Live Aid | Estados Unidos | `live-aid` |
-| 35 | Atentados del 11 de septiembre de 2001 | Estados Unidos | `september-11-attacks` |
-| 36 | Terremoto de Lisboa de 1755 | Portugal | `1755-lisbon-earthquake` |
-| 37 | Erupción del Vesubio en 79 | Italia | `eruption-of-mount-vesuvius-in-79-ad` |
-| 38 | Revolución de Octubre | Rusia | `storming-of-the-winter-palace` |
-| 39 | Larga Marcha | República Popular China | `long-march` |
-| 40 | Marcha de la sal | India | `salt-march` |
-| 41 | Levantamiento de los bóxers | República Popular China | `boxer-rebellion` |
-| 42 | Rebelión Taiping | República Popular China | `taiping-rebellion` |
-| 43 | Restauración Meiji | Japón | `meiji-restoration` |
-| 44 | Guerras del Opio | República Popular China | `opium-wars` |
-| 45 | Conferencia de Berlín | Alemania | `berlin-conference` |
-| 46 | Reparto de África | — | `scramble-for-africa` |
-| 47 | Caída de Saigón | Vietnam | `fall-of-saigon` |
-| 48 | Revolución cubana | Cuba | `cuban-revolution` |
-| 49 | Revolución mexicana | México | `mexican-revolution` |
-| 50 | Revolución rusa | Rusia | `russian-revolution` |
-| 51 | Revolución francesa | Francia | `french-revolution` |
-| 52 | Revolución Gloriosa | Reino Unido | `glorious-revolution` |
-| 53 | Guerra civil española | España | `spanish-civil-war` |
-| 54 | Bombardeo de Guernica | Segunda República Española en guerra | `bombing-of-guernica` |
-| 55 | Juicios de Núremberg | Alemania | `nuremberg-trials` |
-| 56 | Captura de Atahualpa | Perú | `battle-of-cajamarca` |
-| 57 | Sitio de Tenochtitlan | México | `fall-of-tenochtitlan` |
-| 58 | Batalla de Kahlenberg | Austria | `siege-of-vienna` |
-| 59 | Batalla de Poitiers | Francia | `battle-of-poitiers` |
-| 60 | Batalla de Qadesh | Siria | `battle-of-kadesh` |
-| 61 | Batalla de Megido | Israel | `battle-of-megiddo` |
-| 62 | Caída del Imperio romano de Occidente | Italia | `fall-of-rome` |
-| 63 | Saqueo de Roma | Italia | `sack-of-rome` |
-| 64 | Batalla del bosque de Teutoburgo | Alemania | `battle-of-teutoburg-forest` |
-| 65 | Batalla de los Cuernos de Hattin | Israel | `battle-of-hattin` |
-| 66 | Caída de Acre | Israel | `siege-of-acre` |
-| 67 | Batalla de Sedán | Francia | `battle-of-sedan` |
-| 68 | Batalla de Borodinó | Rusia | `battle-of-borodino` |
-| 69 | Batalla de Leipzig | Alemania | `battle-of-leipzig` |
-| 70 | Batalla de Höchstädt | Alemania | `battle-of-blenheim` |
-| 71 | Batalla de Naseby | Reino Unido | `battle-of-naseby` |
-| 72 | Batalla de Bosworth | Reino Unido | `battle-of-bosworth-field` |
-| 73 | Batalla de Bannockburn | Reino Unido | `battle-of-bannockburn` |
-| 74 | Batalla de Crécy | Francia | `battle-of-crecy` |
-| 75 | Batalla de Platea | Grecia | `battle-of-plataea` |
-| 76 | Batalla de Salamina | Grecia | `battle-of-salamis` |
-| 77 | Batalla de Gaugamela | Irak | `battle-of-gaugamela` |
-| 78 | Batalla de Accio | Grecia | `battle-of-actium` |
-| 79 | Batalla de Zama | Túnez | `battle-of-zama` |
-| 80 | Batalla de Cannas | Italia | `battle-of-cannae` |
+| 1 | Carta Magna | Reino Unido | `signing-of-the-magna-carta` |
+| 2 | Atentado de Sarajevo | Bosnia y Herzegovina | `assassination-of-archduke-franz-ferdinand` |
+| 3 | Motín del té | Estados Unidos | `boston-tea-party` |
+| 4 | Hundimiento del RMS Titanic | — | `sinking-of-the-titanic` |
+| 5 | Accidente de Chernóbil | Ucrania | `chernobyl-disaster` |
+| 6 | Apolo 11 | Estados Unidos | `apollo-11` |
+| 7 | Primer vuelo de los hermanos Wright | Estados Unidos | `wright-brothers` |
+| 8 | Desastre del Hindenburg | Estados Unidos | `hindenburg-disaster` |
+| 9 | Gran incendio de Londres | Reino Unido | `great-fire-of-london` |
+| 10 | Viajes de Cristóbal Colón | Bahamas | `voyages-of-christopher-columbus` |
+| 11 | Erupción del Krakatoa de 1883 | Indonesia | `1883-eruption-of-krakatoa` |
+| 12 | Prueba nuclear Trinity | Estados Unidos | `trinity` |
+| 13 | Crisis de los misiles de Cuba | Cuba | `cuban-missile-crisis` |
+| 14 | Protestas de Tiananmén de 1989 | China | `tiananmen-square-protests-of-1989` |
+| 15 | Conferencia de Yalta | Ucrania | `yalta-conference` |
+| 16 | Conferencia de Potsdam | Alemania | `potsdam-conference` |
+| 17 | Tratado de Versalles | Francia | `treaty-of-versailles` |
+| 18 | Congreso de Viena | Austria | `congress-of-vienna` |
+| 19 | Discurso de Gettysburg | Estados Unidos | `gettysburg-address` |
+| 20 | Crisis de Suez | Egipto | `suez-crisis` |
+| 21 | Partición de la India | India | `partition-of-india` |
+| 22 | Live Aid | Estados Unidos | `live-aid` |
+| 23 | Festival de Woodstock | Estados Unidos | `woodstock` |
+| 24 | Terremoto de Lisboa de 1755 | Portugal | `1755-lisbon-earthquake` |
+| 25 | Erupción del Vesubio en 79 | Italia | `eruption-of-mount-vesuvius-in-79-ad` |
+| 26 | Larga Marcha | China | `long-march` |
+| 27 | Marcha de la sal | India | `salt-march` |
+| 28 | Levantamiento de los bóxers | China | `boxer-rebellion` |
+| 29 | Restauración Meiji | Japón | `meiji-restoration` |
+| 30 | Rebelión Taiping | China | `taiping-rebellion` |
+| 31 | Guerras del Opio | China | `opium-wars` |
+| 32 | Reparto de África | — | `scramble-for-africa` |
+| 33 | Revolución cubana | Cuba | `cuban-revolution` |
+| 34 | Caída de Saigón | Vietnam | `fall-of-saigon` |
+| 35 | Revolución mexicana | México | `mexican-revolution` |
+| 36 | Revolución francesa | Francia | `french-revolution` |
+| 37 | Revolución Gloriosa | Reino Unido | `glorious-revolution` |
+| 38 | Guerra civil española | España | `spanish-civil-war` |
+| 39 | Bombardeo de Guernica | España | `bombing-of-guernica` |
+| 40 | Juicios de Núremberg | Alemania | `nuremberg-trials` |
+| 41 | Caída de Tenochtitlan | México | `fall-of-tenochtitlan` |
+| 42 | Sitio de Viena (1683) | Austria | `siege-of-vienna` |
+| 43 | Batalla de Qadesh | Siria | `battle-of-kadesh` |
+| 44 | Caída de Roma (476) | Italia | `fall-of-rome` |
+| 45 | Saqueo de Roma | Italia | `sack-of-rome` |
+| 46 | Batalla de Hattin | Israel | `battle-of-hattin` |
+| 47 | Sitio de Acre (1291) | Israel | `siege-of-acre` |
+| 48 | Batalla de Poltava | Ucrania | `battle-of-poltava` |
+| 49 | Batalla de la cresta de Vimy | Francia | `battle-of-vimy-ridge` |
+| 50 | Sitio de Malta | Malta | `siege-of-malta` |
+| 51 | Batalla del mar del Coral | — | `battle-of-the-coral-sea` |
+| 52 | Campaña de Guadalcanal | Islas Salomón | `guadalcanal-campaign` |
+| 53 | Batalla de Saipán | Estados Unidos | `battle-of-saipan` |
+| 54 | Sitio de Sebastopol | Ucrania | `siege-of-sevastopol` |
+| 55 | Sitio de Sarajevo | Bosnia y Herzegovina | `siege-of-sarajevo` |
+| 56 | Genocidio de Ruanda | Ruanda | `rwandan-genocide` |
+| 57 | Masacre de Srebrenica | Bosnia y Herzegovina | `srebrenica-massacre` |
+| 58 | Matanza de Sharpeville | Sudáfrica | `sharpeville-massacre` |
+| 59 | Batalla de Antietam | Estados Unidos | `battle-of-antietam` |
+| 60 | Batalla de Valmy | Francia | `battle-of-valmy` |
+| 61 | Batalla de Vitoria | España | `battle-of-vitoria` |
+| 62 | Asedio de Numancia | España | `siege-of-numantia` |
+| 63 | Batalla de Bailén | España | `battle-of-bailen` |
+| 64 | Armada Invencible | Francia | `spanish-armada` |
+| 65 | Batalla de Pavía | Italia | `battle-of-pavia` |
+| 66 | Batalla del Ebro | España | `battle-of-the-ebro` |
+| 67 | Batalla de Navarino | Grecia | `battle-of-navarino` |
+| 68 | Batalla de Wagram | Austria | `battle-of-wagram` |
+| 69 | Batalla de Jena | Alemania | `battle-of-jena-auerstedt` |
+| 70 | Batalla de Rocroi | Francia | `battle-of-rocroi` |
+| 71 | Batalla de Mohács | Hungría | `battle-of-mohacs` |
+| 72 | Batalla de Alesia | Francia | `battle-of-alesia` |
+| 73 | Batalla de Carras | Turquía | `battle-of-carrhae` |
+| 74 | Batalla del Hidaspes | Pakistán | `battle-of-the-hydaspes` |
+| 75 | Batalla de los Acantilados Rojos | China | `battle-of-red-cliffs` |
+| 76 | Batalla del Talas | Kazajistán | `battle-of-talas` |
+| 77 | Batalla de Panipat | India | `battle-of-panipat` |
+| 78 | Batalla de Sekigahara | Japón | `battle-of-sekigahara` |
+| 79 | Sitio de Bagdad (1258) | Irak | `siege-of-baghdad` |
+| 80 | Sitio de Jerusalén (1099) | Israel | `siege-of-jerusalem` |
 
 ## Ronda 12 · Acto III (jefe) · ¡Jackpot! De todo un poco
 
 | # | Lugar | País | id |
 |--:|---|---|---|
-| 1 | Batalla de Solferino | Italia | `battle-of-solferino` |
-| 2 | Brighton | Reino Unido | `brighton` |
-| 3 | Desierto de Mojave | Estados Unidos | `mojave-desert` |
-| 4 | Ipanema | Brasil | `ipanema` |
-| 5 | Lituania | — | `c:Lithuania` |
-| 6 | Batalla de Tsushima | Japón | `battle-of-tsushima` |
-| 7 | Estrasburgo | Francia | `strasbourg` |
-| 8 | Mónaco | Mónaco | `monaco` |
-| 9 | Eslovenia | — | `c:Slovenia` |
-| 10 | Incheon | Corea del Sur | `incheon` |
-| 11 | Torre de Tokio | Japón | `tokyo-tower` |
-| 12 | Biskek | Kirguistán | `bishkek` |
-| 13 | Sitio de Leningrado | Rusia | `siege-of-leningrad` |
-| 14 | Düsseldorf | Alemania | `dusseldorf` |
-| 15 | Volcán Chimborazo | Ecuador | `chimborazo` |
-| 16 | Cementerio de la Recoleta | Argentina | `recoleta-cemetery` |
-| 17 | Turkmenistán | — | `c:Turkmenistan` |
-| 18 | Bremen | Alemania | `bremen` |
-| 19 | Merlión | Singapur | `merlion` |
-| 20 | Casapueblo | Uruguay | `casapueblo` |
-| 21 | Puerto Moresby | Papúa Nueva Guinea | `port-moresby` |
-| 22 | Duala | Camerún | `douala` |
-| 23 | Abu Simbel | Egipto | `abu-simbel-temples` |
-| 24 | Port Vila | Vanuatu | `port-vila` |
-| 25 | Batalla de Maipú | Chile | `battle-of-maipu` |
-| 26 | Upsala | Suecia | `uppsala` |
-| 27 | Bahía de Hudson | Canadá | `hudson-bay` |
-| 28 | Mar de los Sargazos | — | `sargasso-sea` |
-| 29 | Kosovo | — | `c:Kosovo` |
-| 30 | Rovaniemi | Finlandia | `rovaniemi` |
-| 31 | Mezquita Hassan II | Marruecos | `hassan-ii-mosque` |
-| 32 | Nasáu | Bahamas | `nassau` |
-| 33 | Accidente de Chernóbil | Ucrania | `chernobyl-disaster` |
-| 34 | Honolulu | Estados Unidos | `honolulu` |
-| 35 | Pan de Azúcar | Brasil | `sugarloaf-mountain` |
-| 36 | Guyana | — | `c:Guyana` |
-| 37 | Voyages of Christopher Columbus | Bahamas | `voyages-of-christopher-columbus` |
-| 38 | Puente de la bahía de Sídney | Australia | `sydney-harbour-bridge` |
-| 39 | Pinatubo | Filipinas | `mount-pinatubo` |
-| 40 | Ciudad de Guatemala | Guatemala | `guatemala-city` |
-| 41 | Albuquerque | Estados Unidos | `albuquerque` |
-| 42 | Santa Fe | Estados Unidos | `santa-fe` |
-| 43 | Lago Tanganica | Tanzania | `lake-tanganyika` |
-| 44 | Roca de Cashel | Irlanda | `rock-of-cashel` |
-| 45 | Zambia | — | `c:Zambia` |
-| 46 | Declaración de Independencia de los Estados Unidos | Estados Unidos | `united-states-declaration-of-independence` |
-| 47 | Lincoln Center | Estados Unidos | `lincoln-center` |
-| 48 | Bisáu | Guinea-Bisáu | `bissau` |
-| 49 | Suazilandia | — | `c:eSwatini` |
-| 50 | Winnipeg | Canadá | `winnipeg` |
-| 51 | Torre Willis | Estados Unidos | `willis-tower` |
-| 52 | Niamey | Níger | `niamey` |
-| 53 | Erupción del Vesubio en 79 | Italia | `eruption-of-mount-vesuvius-in-79-ad` |
-| 54 | Pisa | Italia | `pisa` |
-| 55 | Cascada Sutherland | Nueva Zelanda | `sutherland-falls` |
-| 56 | Malabo | Guinea Ecuatorial | `malabo` |
-| 57 | Chad | — | `c:Chad` |
-| 58 | Guayaquil | Ecuador | `guayaquil` |
-| 59 | Cañón del Antílope | Estados Unidos | `antelope-canyon` |
-| 60 | Transiberiano | Rusia | `trans-siberian-railway` |
-| 61 | Sucre | Bolivia | `sucre` |
-| 62 | Palma de Mallorca | España | `palma-de-mallorca` |
-| 63 | Campana de la Libertad | Estados Unidos | `liberty-bell` |
-| 64 | Casa Batlló | España | `casa-batllo` |
-| 65 | Revolución rusa | Rusia | `russian-revolution` |
-| 66 | Roswell | Estados Unidos | `roswell` |
-| 67 | Kitty Hawk | Estados Unidos | `kitty-hawk` |
-| 68 | Babane | Suazilandia | `mbabane` |
-| 69 | Yibuti | — | `c:Djibouti` |
-| 70 | Manaos | Brasil | `manaus` |
-| 71 | Lago Louise | Canadá | `lake-louise` |
-| 72 | Moroni | Comoras | `moroni` |
-| 73 | Batalla de Kahlenberg | Austria | `siege-of-vienna` |
-| 74 | Adelaida | Australia | `adelaide` |
-| 75 | Leeds | Reino Unido | `leeds` |
-| 76 | Vanuatu | — | `c:Vanuatu` |
-| 77 | Christchurch | Nueva Zelanda | `christchurch` |
-| 78 | Oxford | Reino Unido | `oxford` |
-| 79 | Chipre | Chipre | `cyprus` |
-| 80 | Saná | Yemen | `sanaa` |
+| 1 | Haití | — | `c:Haiti` |
+| 2 | Damasco | Siria | `damascus` |
+| 3 | Dávao | Filipinas | `davao-city` |
+| 4 | Mar Caspio | — | `caspian-sea` |
+| 5 | Declaración de Independencia de los Estados Unidos | Estados Unidos | `united-states-declaration-of-independence` |
+| 6 | Mezquita Hassan II | Marruecos | `hassan-ii-mosque` |
+| 7 | República Dominicana | — | `c:Dominican Rep.` |
+| 8 | Ciudad de Kuwait | Kuwait | `kuwait-city` |
+| 9 | Mombasa | Kenia | `mombasa` |
+| 10 | Mar Rojo | — | `red-sea` |
+| 11 | Atentados del 11 de septiembre | Estados Unidos | `september-11-attacks` |
+| 12 | Tikal | Guatemala | `tikal` |
+| 13 | República Checa | — | `c:Czechia` |
+| 14 | Ereván | Armenia | `yerevan` |
+| 15 | Tánger | Marruecos | `tangier` |
+| 16 | Mar del Japón | — | `sea-of-japan` |
+| 17 | Conferencia de Berlín | Alemania | `berlin-conference` |
+| 18 | Líneas de Nazca | Perú | `nazca-lines` |
+| 19 | Rumania | — | `c:Romania` |
+| 20 | Vilna | Lituania | `vilnius` |
+| 21 | Guiza | Egipto | `giza` |
+| 22 | Océano Ártico | — | `arctic-ocean` |
+| 23 | Revolución rusa | Rusia | `russian-revolution` |
+| 24 | Sydney Harbour Bridge | Australia | `sydney-harbour-bridge` |
+| 25 | Bulgaria | — | `c:Bulgaria` |
+| 26 | La Valeta | Malta | `valletta` |
+| 27 | Shiraz | Irán | `shiraz` |
+| 28 | Océano Índico | — | `indian-ocean` |
+| 29 | Batalla de Cajamarca | Perú | `battle-of-cajamarca` |
+| 30 | Edificio Chrysler | Estados Unidos | `chrysler-building` |
+| 31 | Serbia | — | `c:Serbia` |
+| 32 | Bratislava | Eslovaquia | `bratislava` |
+| 33 | Novosibirsk | Rusia | `novosibirsk` |
+| 34 | Océano Pacífico | — | `pacific-ocean` |
+| 35 | Batalla de Megido | Israel | `battle-of-megiddo` |
+| 36 | Monumento a Lincoln | Estados Unidos | `lincoln-memorial` |
+| 37 | Kazajistán | — | `c:Kazakhstan` |
+| 38 | Tirana | Albania | `tirana` |
+| 39 | Wrocław | Polonia | `wroc-aw` |
+| 40 | Océano Atlántico | — | `atlantic-ocean` |
+| 41 | Batalla del bosque de Teutoburgo | Alemania | `battle-of-teutoburg-forest` |
+| 42 | Capitolio de los Estados Unidos | Estados Unidos | `united-states-capitol` |
+| 43 | Uzbekistán | — | `c:Uzbekistan` |
+| 44 | Ciudad de Luxemburgo | Luxemburgo | `luxembourg-city` |
+| 45 | Graz | Austria | `graz` |
+| 46 | Océano Austral | — | `southern-ocean` |
+| 47 | Batalla de Arnhem | Países Bajos | `battle-of-arnhem` |
+| 48 | Wrigley Field | Estados Unidos | `wrigley-field` |
+| 49 | Somalia | — | `c:Somalia` |
+| 50 | Bishkek | Kirguistán | `bishkek` |
+| 51 | Génova | Italia | `genoa` |
+| 52 | Golfo de Bengala | — | `bay-of-bengal` |
+| 53 | Batalla de Kohima | India | `battle-of-kohima` |
+| 54 | Angola | — | `c:Angola` |
+| 55 | Naypyidaw | Myanmar | `naypyidaw` |
+| 56 | Bari | Italia | `bari` |
+| 57 | Golfo de México | — | `gulf-of-mexico` |
+| 58 | Masacre de Soweto | Sudáfrica | `soweto-uprising` |
+| 59 | Mozambique | — | `c:Mozambique` |
+| 60 | Dili | Timor Oriental | `dili` |
+| 61 | Salamanca | España | `salamanca` |
+| 62 | Golfo Pérsico | — | `persian-gulf` |
+| 63 | Camerún | — | `c:Cameroon` |
+| 64 | Port Moresby | Papúa Nueva Guinea | `port-moresby` |
+| 65 | Cardiff | Reino Unido | `cardiff` |
+| 66 | Bahía de Hudson | Canadá | `hudson-bay` |
+| 67 | Costa de Marfil | — | `c:Côte d'Ivoire` |
+| 68 | Port Vila | Vanuatu | `port-vila` |
+| 69 | Leeds | Reino Unido | `leeds` |
+| 70 | Mar de los Sargazos | — | `sargasso-sea` |
+| 71 | Omán | — | `c:Oman` |
+| 72 | Funafuti | Tuvalu | `funafuti` |
+| 73 | Newcastle upon Tyne | Reino Unido | `newcastle-upon-tyne` |
+| 74 | Mar del Norte | — | `north-sea` |
+| 75 | Kuwait | — | `c:Kuwait` |
+| 76 | Puerto Príncipe | Haití | `port-au-prince` |
+| 77 | Oxford | Reino Unido | `oxford` |
+| 78 | Mar Adriático | — | `adriatic-sea` |
+| 79 | Catar | — | `c:Qatar` |
+| 80 | Bridgetown | Barbados | `bridgetown` |

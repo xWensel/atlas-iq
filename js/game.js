@@ -549,25 +549,12 @@
 
   /* ------------------------------------------------------------ entrada + intro del estudio */
   function requestFs() { const el = document.documentElement; try { (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el); } catch (e) { /* denegado */ } }
-  function buildStudioBits() {
-    const ticks = document.querySelector(".d-ticks");
-    if (!ticks.children.length) for (let i = 0; i < 36; i++) {
-      const a = (i * 10 * Math.PI) / 180, r1 = 66, r2 = i % 3 === 0 ? 75 : 70, l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      l.setAttribute("x1", Math.sin(a) * r1); l.setAttribute("y1", -Math.cos(a) * r1); l.setAttribute("x2", Math.sin(a) * r2); l.setAttribute("y2", -Math.cos(a) * r2); ticks.appendChild(l);
-    }
-    const sp = $("stSparks"); sp.innerHTML = ""; const cols = ["#f7b4ff", "#ffd98a", "#ffffff", "#d9a8ff"];
-    for (let i = 0; i < 34; i++) {
-      const el = document.createElement("i"), ang = Math.random() * Math.PI * 2, dist = 120 + Math.random() * Math.min(innerWidth, innerHeight) * 0.45;
-      el.style.setProperty("--x", Math.cos(ang) * dist + "px"); el.style.setProperty("--y", Math.sin(ang) * dist * 0.75 + "px");
-      el.style.setProperty("--s", 5 + Math.random() * 9 + "px"); el.style.setProperty("--c", cols[i % cols.length]); el.style.setProperty("--d", 1.35 + Math.random() * 0.6 + "s"); sp.appendChild(el);
-    }
-  }
   function playStudio(done) {
-    const st = $("studio"); st.classList.remove("hidden"); $("stLogo").innerHTML = ""; A.buildLogo($("stLogo"), { animated: true }); buildStudioBits();
-    A.sfx.vault(); st.classList.add("shake");
+    const st = $("studio"); st.classList.remove("hidden"); $("stLogo").innerHTML = ""; A.buildLogo($("stLogo"), { animated: true }); $("stLogo").classList.remove("has-png");
+    A.sfx.studio();
     let ended = false;
     const end = fast => { if (ended) return; ended = true; st.classList.add("leave"); setTimeout(done, fast ? 320 : 540); };
-    const timer = A._holdStudio ? 0 : setTimeout(() => end(false), S.reduce ? 1800 : 4700);
+    const timer = A._holdStudio ? 0 : setTimeout(() => end(false), S.reduce ? 1500 : 3500);
     const skip = () => { clearTimeout(timer); end(true); };
     st.addEventListener("pointerdown", skip, { once: true });
     addEventListener("keydown", function k(e) { if (["Enter", " ", "Escape"].includes(e.key)) { skip(); removeEventListener("keydown", k); } });
@@ -577,7 +564,7 @@
     A.audio.unlock(true); showTitle();
   }
   function runBoot() {
-    const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden"); A.buildLogo($("gateLogo"));
+    const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden");
     langChips($("gateLangs"), setLang);
     const fsBtn = $("gateFs"); fsBtn.setAttribute("aria-checked", S.fsGate);
     fsBtn.onclick = e => { e.stopPropagation(); S.fsGate = !S.fsGate; fsBtn.setAttribute("aria-checked", S.fsGate); save(); };
