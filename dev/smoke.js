@@ -2,7 +2,7 @@
  * Uso (consola, con ?skipboot):  await smoke("fr")  ->  { errors, missing: [textos en ingles/espanol que se colaron], keys: [claves A.t sin traducir] } */
 window.smoke = async function (lang = "fr") {
   const A = window.AIQ, C = A.core, S = C.S, D = A._debug, wait = ms => new Promise(r => setTimeout(r, ms));
-  const errors = [], missing = new Set(), keys = new Set();
+  const errors = [], checks = [], missing = new Set(), keys = new Set();
   const onErr = e => errors.push(String(e.message || e.reason || e)); addEventListener("error", onErr); addEventListener("unhandledrejection", onErr);
   const txOrig = A.tx, tOrig = A.t, TRI = { fr: 0, pt: 1, de: 2, it: 3 };
   A.tx = v => { if (v && typeof v === "object" && !v[lang] && TRI[lang] != null && !(v.en && A.TR[v.en])) missing.add((v.en || v.es || "").slice(0, 90)); return txOrig(v); };
@@ -27,7 +27,7 @@ window.smoke = async function (lang = "fr") {
   await step("adventure", async () => {
     C.prepareRun(); A.adv.begin({ deck: "explorer", seed: "smoke-" + lang }); await wait(500); S.skipIntro && S.skipIntro(); await wait(900);
     for (let i = 0; i < 12 && S.phase !== "shop" && S.phase !== "levelEnd"; i++) {
-      if (S.phase === "asking") { const o = S.qs[S.qi]; const f = o.t === "c" && D.world.byName[o.key]; D.reveal(f ? { lon: (f.polys[0].bbox[0] + f.polys[0].bbox[2]) / 2, lat: (f.polys[0].bbox[1] + f.polys[0].bbox[3]) / 2 } : { lon: o.lon, lat: o.lat }, 5); await wait(300); }
+      if (S.phase === "asking") { const o = S.qs[S.qi]; if (o.t !== "c" && !checks.length) { const sub = (document.getElementById("askSub") || {}).textContent || ""; checks.push("askSub=" + sub); if (!sub.trim()) errors.push("regresion: la placa de la pregunta no muestra el pais"); } const f = o.t === "c" && D.world.byName[o.key]; D.reveal(f ? { lon: (f.polys[0].bbox[0] + f.polys[0].bbox[2]) / 2, lat: (f.polys[0].bbox[1] + f.polys[0].bbox[3]) / 2 } : { lon: o.lon, lat: o.lat }, 5); await wait(300); }
       const b = document.querySelector("#layer:not(.hidden) [data-primary]"); if (b) b.click(); await wait(900);
       if (S.phase === "intro") { S.skipIntro && S.skipIntro(); await wait(900); }
     }
@@ -35,6 +35,7 @@ window.smoke = async function (lang = "fr") {
   await step("shop", async () => { const b = document.querySelector("#layer:not(.hidden) [data-primary]"); if (b) b.click(); await wait(900); });
   await step("run menu", async () => { C.runMenu(); await wait(300); });
   await step("leave", async () => { A.adv.leave(); C.showHub("home"); await wait(400); });
+  if (!A.PCOUNTRY || Object.keys(A.PCOUNTRY).length < 200) errors.push("regresion: falta A.PCOUNTRY");
   A.tx = txOrig; A.t = tOrig; removeEventListener("error", onErr); removeEventListener("unhandledrejection", onErr);
-  return { errors, missing: [...missing], keys: [...keys] };
+  return { errors, checks, missing: [...missing], keys: [...keys] };
 };

@@ -234,11 +234,10 @@ void main(){
     float tri=fract(fr.x/(3.0*u_dpr)); col*=0.965+0.035*vec3(step(tri,0.34),step(0.34,tri)*step(tri,0.67),step(0.67,tri));   // mascara RGB
     if(u_lite<0.5){ vec3 bl=vec3(0.0); for(int i=0;i<6;i++){ float a=float(i)*1.0472; bl+=texture(u_scene,suv+vec2(cos(a),sin(a))*3.5*u_dpr/u_res).rgb; } bl/=6.0;
     col+=max(bl-0.72,0.0)*0.55; }                                 // resplandor de fosforo
-    col*=1.0+0.03*sin(u_time*40.0);                             // parpadeo minimo
-  }
+    }
   vec2 q2=uv-0.5; float v=1.0-u_vig*smoothstep(0.30,0.95,length(q2*vec2(1.05,1.0))+min(abs(zvA)*0.01,0.04));
   col*=v*u_tint;
-  col+=(hash(frag+fract(u_time)*61.0)-0.5)*u_grain;
+  col+=(hash(frag+fract(floor(u_time*8.0)*0.137)*61.0)-0.5)*u_grain;   // grano a ~8 fps: cine, no vibracion
   o=vec4(col*inside,1.0);
 }`;
 
@@ -279,7 +278,7 @@ void main(){
       this.anim = null; this.drift = null;
       this.marks = this._emptyMarks(); this.probes = []; this.pickEnabled = false; this.mouse = null;
       this.quality = "auto"; this.rs = 1; this.frameEma = 0; this.baseDt = 1e9; this.lastT = 0; this.calm = 0;
-      this.rsCap = 1; this.cdpr = 1; this.idleMs = 40; this.lite = false; this.slow = 0; this.rafEma = 0; this._rawT = 0; this._capInit = false; this._capQ = ""; this._lastDraw = 0;
+      this.rsCap = 1; this.cdpr = 1; this.idleMs = 40; this.lite = false; this.slow = 0; this.rafEma = 0; this._rawT = 0; this._win = []; this._degAt = 0; this._capInit = false; this._capQ = ""; this._lastDraw = 0;
       this.fxOn = true; this.zv = 0; this.lastLz = null; this.pv = [0, 0]; this.zc = null; this.lastView = { cx: 0, cy: 0, s: 0 };
       this.dirty = this.fxDirty = true; this.pointers = new Map(); this.samples = [];
       this.dist = { spec: null, k: 0, kk: 0, kl: 0, ko: 0, from: 0, to: 0, lfrom: 0, lto: 0, ofrom: 0, oto: 0, t0: 0, ms: 0, ct: 6 }; this.lens = null; this.hideReticle = false;
@@ -704,31 +703,25 @@ void main(){
     }
 
     /* ---------- bucle: fisica de camara, velocidades y dibujo ---------- */
-    _adapt(now, dt) {
-      const moving = !!(this.anim || this.drift || this.tv || this.pointers.size || this.inertia);
-      this.baseDt = Math.max(6, Math.min(this.baseDt, dt * 1000));
-      /* vigilante global: si los fotogramas tardan bastante mas que el minimo visto de forma sostenida (GPU o CPU justas), se baja la resolucion del lienzo y luego los efectos */
+    /* Vigilante de rendimiento. Solo mira la MEDIANA de los intervalos entre fotogramas en ventanas de ~3 s y baja la calidad si hay dos ventanas seguidas por debajo de ~27 fps.
+       (Antes comparaba con el intervalo minimo visto: en pantallas con algo de irregularidad, lo normal parecia "lento" y la resolucion subia y bajaba: parpadeo.) */
+    _adapt(now) {
       const raw = now - (this._rawT || now); this._rawT = now;
-      if (raw > 0 && raw < 100 && this.quality === "auto") {
-        this.rafEma = this.rafEma ? this.rafEma * 0.93 + raw * 0.07 : raw;
-        if (this.rafEma > Math.max(this.baseDt * 1.45, this.baseDt + 7)) this.slow++; else this.slow = Math.max(0, this.slow - 2);
-        if (this.slow > 60) { this.slow = 0; this.rafEma = 0; this._degrade(); }
-      }
-      if (!moving) { if (this.rs < 1 && ++this.calm > 20) { this.rs = 1; this.calm = 0; this.dirty = true; } this.frameEma = this.baseDt; return; }
-      this.calm = 0; this.frameEma = this.frameEma * 0.85 + dt * 1000 * 0.15;
-      if (this.quality !== "auto") return;
-      if (this.frameEma > Math.max(this.baseDt * 1.5, this.baseDt + 2.5) && this.rs > 0.65) { this.rs = Math.max(0.65, this.rs - 0.1); this.frameEma = this.baseDt; this.dirty = true; }
+      if (this.quality !== "auto" || raw <= 0 || raw >= 250 || document.hidden) return;
+      const W = this._win; W.push(raw); if (W.length < 180) return;
+      const s = W.slice().sort((a, b) => a - b), med = s[90]; W.length = 0;
+      if (med > 37) { if (++this.slow >= 2 && now - this._degAt > 6000) { this.slow = 0; this._degAt = now; this._degrade(); } } else this.slow = 0;
     }
     _degrade() {
-      if (this.rsCap > 0.55) this.rsCap = Math.max(0.55, +(this.rsCap - 0.15).toFixed(2));
-      else if (this.idleMs < 100) this.idleMs = Math.min(100, this.idleMs + 30);
+      if (this.rsCap > 0.7) this.rsCap = Math.max(0.7, +(this.rsCap - 0.15).toFixed(2));
+      else if (this.idleMs < 66) this.idleMs = 66;
       else return;
-      this.rs = 1; this.baseDt = 1e9; this.resize(true);
+      this.resize(true);
     }
     _frame(now) {
       if (this.lost) return;
       const dt = this.lastT ? Math.min(0.05, (now - this.lastT) / 1000) : 0.016; this.lastT = now;
-      this._adapt(now, dt); this._stepDistort(now); this._stepMotion(now, dt);
+      this._adapt(now); this._stepDistort(now); this._stepMotion(now, dt);
       if (this.anim) {
         const a = this.anim, k = Math.min(1, (now - a.t0) / a.ms), e = easeIO(k), dip = 1 - a.dip * Math.sin(Math.PI * e);
         this.view = { cx: a.from.cx + (a.to.cx - a.from.cx) * e, cy: a.from.cy + (a.to.cy - a.from.cy) * e, s: Math.max(this.minS, a.from.s * Math.pow(a.to.s / a.from.s, e) * dip) };
