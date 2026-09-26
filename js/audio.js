@@ -336,28 +336,25 @@ window.AIQ = window.AIQ || {};
     ["Ambos marcan", "Both Teams to Score", "Les deux équipes marquent", "Ambas marcam", "Beide Teams treffen", "Entrambe segnano"],
     ["Más de 2,5 goles", "Over 2.5 Goals", "Plus de 2,5 buts", "Mais de 2,5 gols", "Über 2,5 Tore", "Over 2,5 gol"],
     ["Todo al rojo", "All on Red", "Tout sur le rouge", "Tudo no vermelho", "Alles auf Rot", "Tutto sul rosso"],
-    ["Pleno al 17", "Straight Up on 17", "Plein au 17", "Pleno no 17", "Plein auf die 17", "Pieno sul 17"],
+    ["Huérfanos", "Orphans", "Orphelins", "Órfãos", "Waisen", "Orfani"],
     ["All-in", "All In", "Tapis !", "All-in", "All-in", "All-in"],
     ["Combinada", "Parlay", "Pari combiné", "Múltipla", "Kombiwette", "Multipla"],
     ["Sube la apuesta", "Raise the Stakes", "Je relance", "Aumenta a aposta", "Einsatz erhöhen", "Rilancio"],
   ];
-  const PLAYLIST_KEY = "atlasiq.track";
   const ROT = 88;                                            // segundos por cancion (aprox.: se cambia al terminar una vuelta de acordes)
   const SK = { bpm: 86, sw: 0.3 };                           // tempo y swing del lounge (los fija setSkin)
-  let cur = -1, tstep = 0, trkT0 = 0, forceNext = false, recent = [], hist = [], mel = { deg: 4, pat: null };
-  function useTrack(i, t, announce, back) {
-    if (!back && cur >= 0 && cur !== i) { hist.push(cur); if (hist.length > 20) hist.shift(); }
+  let cur = -1, tstep = 0, trkT0 = 0, forceNext = false, mel = { deg: 4, pat: null };
+  function useTrack(i, t, announce) {
     const T = TRK[i]; cur = i; tstep = 0; trkT0 = t; forceNext = false; mel.deg = 4; mel.pat = null;
     if (T.bpm) { BPM = T.bpm; SW = T.sw; } else { BPM = SK.bpm; SW = SK.sw; }
     STEP = 60 / BPM / 4;
-    recent.push(i); if (recent.length > 4) recent.shift();
-    try { localStorage.setItem(PLAYLIST_KEY, String(i)); } catch (e) { /* sin almacenamiento */ }
     if (announce && A.music.onChange) { const ms = Math.max(0, (t - ctx.currentTime) * 1000); setTimeout(() => A.music.onChange(i), ms); }
   }
   function transition(t) {
     noise(t, 1.1, { hp: 2500, vol: 0.035, sweepTo: 9000, type: "highpass", bus: musBus }); thump(t, { vol: 0.2, f0: 90, f1: 40, dur: 0.3, bus: musBus }); bell(84, t, { vol: 0.05, dur: 1.4, bus: musBus, rev: 0.6 });
   }
-  function pickNext() { const opts = TRK.map((_, i) => i).filter(i => !recent.includes(i)); return opts[Math.floor(Math.random() * opts.length)]; }
+  const nextIdx = () => (cur + 1) % TRK.length;                          // las canciones van siempre en orden: 1, 2, 3... y vuelta a la 1
+  const prevIdx = () => (cur - 1 + TRK.length) % TRK.length;
   function lead(T, st, t, c) {
     if (!T.lead) return;
     if (st === 0) mel.pat = Math.random() < (mode === 0 ? 0.3 : mode === 1 ? 0.72 : 0.85) ? T.rh[Math.floor(Math.random() * T.rh.length)] : null;
@@ -380,18 +377,17 @@ window.AIQ = window.AIQ || {};
   function schedule() {
     while (nextT < ctx.currentTime + 0.3) {
       const T = TRK[cur], cyc = T.spb * T.prog.length;
-      if (tstep > 0 && ((forceNext && tstep % T.spb === 0) || (tstep % cyc === 0 && nextT - trkT0 > ROT))) { useTrack(pickNext(), nextT, true); transition(nextT); }
+      if (tstep > 0 && ((forceNext && tstep % T.spb === 0) || (tstep % cyc === 0 && nextT - trkT0 > ROT))) { useTrack(nextIdx(), nextT, true); transition(nextT); }
       playStep(tstep, nextT); nextT += STEP; tstep++;
     }
   }
   A.music = {
     start() {
       if (!A.audio.musicOn || timer || !init()) return; nextT = ctx.currentTime + 0.08;
-      let first = cur; if (first < 0) { first = 0; try { const sv = localStorage.getItem(PLAYLIST_KEY); if (sv != null && sv !== "") first = (parseInt(sv, 10) + 1) % TRK.length; } catch (e) { /* sin almacenamiento */ } }
-      useTrack(first, nextT, false); timer = setInterval(schedule, 60);
+      useTrack(cur < 0 ? 0 : cur, nextT, false); timer = setInterval(schedule, 60);
     },
-    next() { if (!timer) return; useTrack(pickNext(), nextT, true); transition(nextT); },
-    prev() { if (!timer) return; const i = hist.length ? hist.pop() : (cur - 1 + TRK.length) % TRK.length; useTrack(i, nextT, true, true); transition(nextT); },
+    next() { if (!timer) return; useTrack(nextIdx(), nextT, true); transition(nextT); },
+    prev() { if (!timer) return; useTrack(prevIdx(), nextT, true); transition(nextT); },
     index() { return cur; },
     count() { return TRK.length; },
     title(i = cur) { const n = NAMES[i]; if (!n) return ""; const k = ["es", "en", "fr", "pt", "de", "it"].indexOf(A.lang); return n[k < 0 ? 1 : k]; },

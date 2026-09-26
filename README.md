@@ -1,5 +1,7 @@
 # Atlas IQ
 
+**v0.11.2** - Las canciones van en orden (1, 2, 3... y vuelta a la 1), tanto con las flechas como en la rotación automática. El juego siempre arranca con la primera, la original. "Pleno al 17" pasa a llamarse *Huérfanos* (una apuesta de ruleta).
+
 **v0.11.1** - Navegador de canciones y Ajustes renovados:
 - **Navegador de canciones** (`js/jukebox.js`): al cambiar de canción aparece un aviso discreto con flechas (anterior / siguiente, o las teclas ← →). Las 9 canciones tienen nombres de apuestas traducidos a los 6 idiomas (*Ambos marcan*, *Todo al rojo*, *All-in*, *Doble o nada*, *Combinada*...). Con la música desactivada no aparece nunca. El mismo control vive en Ajustes > Sonido.
 - **Ajustes en 4 pestañas** (General, Sonido, Imagen, Datos), con la descripción de cada opción: idioma, pantalla completa, intro; volúmenes y aviso de canción; gráficos, reducir movimiento, puntero de casino y ayudas emergentes (ambos se pueden apagar); restablecer Enciclopedia y **restablecer ajustes**. La pestaña se recuerda.
