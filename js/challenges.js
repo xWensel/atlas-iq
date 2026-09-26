@@ -96,6 +96,10 @@ window.AIQ = window.AIQ || {};
         combo = A.rng(`${seed}:boss:${act}`).pick(BOSS[a]);
         list = combo.ids.map((id, i) => ({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) }));
         if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPC, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
+        if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia
+          const fam = new Set(list.map(x => famOf(x.id))), pool = [...TEXT, ...MAPC, ...PTR].filter(id => !fam.has(famOf(id)));
+          if (pool.length) list.push({ id: A.rng(`${seed}:boss2:${act}`).pick(pool), lv });
+        }
         return { list, boss, combo };
       }
       const used = [];

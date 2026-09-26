@@ -2,6 +2,11 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.18.0** - Jefes y ascensiones claros.
+- **Campamento:** la ronda siguiente es ahora una tarjeta (roja y con el nombre del jefe cuando toca jefe) con cada truco explicado: icono, nombre, nivel, que hace, si ya tienes una reliquia que lo frena (o cual te ayudaria) y boton de sobornar con su precio.
+- **Ascensiones (ahora la lista dice lo que hacen de verdad):** 1 objetivos +10 %, -1 s, tienda +10 %; 2 +20 %, -2 s y, desde el acto 2, un reto de regla (viento, tormenta o silencio) en cada ronda; 3 +30 %, -3 s, retos un nivel mas fuertes y una provision menos; 4 +40 %, -4 s y los jefes traen un poder extra (antes anunciado pero sin implementar); 5 +50 %, -5 s.
+- La seleccion de baraja tampoco lleva indices A K Q J.
+
 **v0.17.0** - Menu principal limpio y notas mas caracteristicas.
 - **Portada:** solo el engranaje arriba a la derecha; el idioma y el modo de pantalla (Ventana / Pantalla completa, y "Sin bordes" si el cliente de escritorio lo ofrece con `window.geoliteHost`) viven en Ajustes > General. La Enciclopedia pasa a ser un estante con libro y barra de progreso, mas discreto que los modos.
 - **Notas de campo menos repetitivas:** en vez de la primera frase generica ("X es la capital de Y..."), cada nota elige la frase mas caracteristica del articulo (fechas, superlativos, records, fundacion, patrimonio...) con una puntuacion por idioma (`tools/build-short.py`).

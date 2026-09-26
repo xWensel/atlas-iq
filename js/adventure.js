@@ -510,14 +510,26 @@ window.AIQ = window.AIQ || {};
     if (!run.stock || run.stockKey !== key) { run.stock = offers(chest); run.stockKey = key; run.bought = []; if (run.shopKey !== `${roundNo()}:${chest}`) { run.shopKey = `${roundNo()}:${chest}`; run.rerolls = 0; run.freeUsed = 0; } }
     persist(); renderShop(chest);
   }
-  /* banda "proxima ronda": los retos que vienen (con la Mirilla, tambien la siguiente) */
+  /* "proxima ronda" del Campamento: una tarjeta por ronda con cada truco explicado (que hace, cuanto pesa y que reliquia lo frena).
+     El jefe del acto es una tarjeta grande con su nombre y numero de poderes; con la Mirilla tambien se ve la ronda siguiente. */
+  const counterInfo = id => {
+    const list = A.CHAL[id].counters || [], own = list.filter(p => owned(p));
+    if (own.length) return `<em class="nx-have">${A.T("Lo frenas con", "You counter it with")}: ${own.map(p => A.tx(A.RELICS[p].n)).join(", ")}</em>`;
+    if (list.length) return `<em class="nx-hint">${A.T("Te ayuda", "Helped by")}: ${list.map(p => A.tx(A.RELICS[p].n)).join(", ")}</em>`;
+    return `<em class="nx-none">${A.T("Sin reliquia directa: Interruptor o soborno", "No direct relic: Master switch or a bribe")}</em>`;
+  };
   const nextHtml = () => {
     const r = roundNo(), rows = [r]; if (has("spy")) rows.push(r + 1);
     const html = rows.map((rr, k) => {
-      const cf = chalFor(rr), t = cf.boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + ((rr % 4) + 1), done = (run.bribed && run.bribed[rr]) || [];
-      const chips = cf.list.map(c => k === 0 ? `<button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda", "Bribe the dealer: removes this challenge from the next round")}">${A.chal.chip(c, true)}<span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button>` : A.chal.chip(c, true)).join("")
-        + done.map(id => `<span class="ch-chip sm done" data-tt="${A.T("Sobornado", "Bribed")}"><b>${A.tx(A.CHAL[id].n)}</b></span>`).join("");
-      return `<div class="tb-next-row${k ? " far" : ""}"><span class="tb-next-h">${k ? A.T("Después", "Then") : A.T("Próxima ronda", "Next round")} · ${t}${cf.boss && cf.combo ? " · " + A.tx(cf.combo.n) : ""}</span>${chips || `<span class="tb-next-none">${A.T("Sin trucos", "No tricks")}</span>`}${k === 0 && cf.list.length ? `<button class="chipbtn ch-reroll" id="chalReroll" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar retos", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : ""}</div>`;
+      const cf = chalFor(rr), n = cf.list.length, done = (run.bribed && run.bribed[rr]) || [], main = k === 0;
+      const title = cf.boss ? A.T("JEFE DEL ACTO", "ACT BOSS") : A.T("Ronda", "Round") + " " + ((rr % 4) + 1);
+      const head = `<div class="nx-head">${ic(cf.boss ? "skull" : "dice")}<span class="nx-t">${main ? A.T("Próxima ronda", "Next round") + " · " : A.T("Después", "Then") + " · "}${title}</span>${cf.boss && cf.combo ? `<b class="nx-name">${A.tx(cf.combo.n)}</b>` : ""}<span class="nx-n">${n ? n + " " + (n === 1 ? A.T("truco", "trick") : A.T("trucos", "tricks")) : A.T("Sin trucos", "No tricks")}</span>${main && n ? `<button class="chipbtn ch-reroll" id="chalReroll" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : ""}</div>`;
+      if (!main) return `<div class="nx-card far${cf.boss ? " boss" : ""}">${head}<div class="nx-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div></div>`;
+      const lis = cf.list.map(c => { const d = A.CHAL[c.id];
+        return `<li class="nx-row k-${d.kind}"><span class="nx-ic">${ic(d.ico)}</span><div class="nx-body"><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><p>${A.tx(d.d)}</p>${counterInfo(c.id)}</div>
+          <button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este truco de la próxima ronda", "Bribe the dealer: removes this trick from the next round")}">${A.T("Sobornar", "Bribe")} <span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button></li>`; }).join("")
+        + done.map(id => `<li class="nx-row done"><span class="nx-ic">${ic(A.CHAL[id].ico)}</span><div class="nx-body"><b>${A.tx(A.CHAL[id].n)}</b><em class="nx-have">${A.T("Sobornado", "Bribed")}</em></div></li>`).join("");
+      return `<div class="nx-card${cf.boss ? " boss" : ""}">${head}${lis ? `<ul class="nx-list">${lis}</ul>` : `<p class="nx-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
     }).join("");
     return `<div class="tb-next">${html}</div>`;
   };

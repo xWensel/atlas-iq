@@ -245,3 +245,7 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 .cs-t u { display: block; height: 7px; border-radius: 4px; background: rgba(255, 255, 255, .14); text-decoration: none; overflow: hidden; } .cs-t u s { display: block; height: 100%; background: linear-gradient(90deg, #39b592, #ffe08a); text-decoration: none; min-width: 3px; }
 .cs-ar { opacity: .7; } .codex-shelf:hover .cs-ar { opacity: 1; transform: translateX(3px); }
 @media (max-height: 520px) and (orientation: landscape) { .codex-shelf { width: min(300px, 46vw); padding: 6px 12px 6px 8px; gap: 10px; } .cs-ic { width: 38px; height: 38px; } .cs-ic .ic { width: 30px; height: 30px; } .cs-t b { font-size: 16px; } }
+
+/* seleccion de baraja sin indices A K Q J */
+.dcard { padding: 12px 12px 12px; } .deckrow { padding-top: 6px; }
+@media (max-width: 1000px) { .dcard { padding: 8px; } }
