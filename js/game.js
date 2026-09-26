@@ -207,6 +207,7 @@
     sw.addEventListener("click", () => { if (sw.dataset.sw === "motion") { S.reduce = !S.reduce; applyMotion(); } else S.intro = !S.intro; A.sfx.flip(true); save(); syncSettings(); });
   }
   $("setFs").onclick = () => { toggleFs(); A.sfx.ui(); };
+  $("setNext").onclick = () => { A.audio.unlock(); A.music.next(); A.sfx.ui(); };
   document.querySelector('[data-seg="gfx"]').addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b || b.dataset.v === S.quality) return;
     S.quality = b.dataset.v; save(); A.sfx.ui(); map.setQuality(S.quality); syncSettings();
@@ -215,21 +216,7 @@
   $("setClose").onclick = () => openSettings(false);
   document.addEventListener("pointerdown", e => { if (S.settingsOpen && !e.target.closest("#setSh, #setBtn, .menu-gear, #langPop")) openSettings(false); }, true);
 
-  /* ------------------------------------------------------------ tooltips propios */
-  let tipT = 0;
-  document.addEventListener("mouseover", e => {
-    const el = e.target.closest && e.target.closest("[data-tip]"), tip = $("tip");
-    clearTimeout(tipT);
-    if (!el) { tip.classList.add("hidden"); return; }
-    tipT = setTimeout(() => {
-      tip.innerHTML = `<span>${A.t(el.dataset.tip)}</span>${el.dataset.key ? `<kbd>${el.dataset.key}</kbd>` : ""}`;
-      tip.classList.remove("hidden");
-      const r = el.getBoundingClientRect(), w = tip.offsetWidth;
-      tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px";
-      tip.style.top = (r.top > 60 ? r.top - tip.offsetHeight - 10 : r.bottom + 10) + "px";
-    }, 320);
-  });
-  document.addEventListener("pointerdown", () => { clearTimeout(tipT); $("tip").classList.add("hidden"); }, true);
+  /* los tooltips (data-tt / data-tip / title) los pinta js/uikit.js */
   /* sonido suave al pasar por controles */
   let lastHover = null;
   document.addEventListener("mouseover", e => {

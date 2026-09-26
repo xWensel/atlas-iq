@@ -6,7 +6,8 @@
 window.AIQ = window.AIQ || {};
 (function (A) {
   const $ = id => document.getElementById(id);
-  const P = A.pointer = { st: { tool: null, fx: {}, noCountry: false, windFn: null }, x: -99, y: -99, on: false, press: 0 };
+  const P = A.pointer = { st: { tool: null, fx: {}, noCountry: false, windFn: null, distFn: null }, x: -99, y: -99, rx: -99, ry: -99, m: null, on: false, press: 0 };
+  let sx = 0, sy = 0, jx = 0, jy = 0, tj = 0, lastNow = 0, hotCol = null, hotAt = 0, hotKm = 1e9;
   let map = null, root, cv, c, tag, mag, mctx, guideX, guideY, ghost, raf = 0, mask = null, lastLL = null, lastLand = null, lastTick = 0, lastHov = 0, lastName = "", pulse = 0;
 
   /* mascara de tierra (equirrectangular, 720x360) para saber si el puntero esta sobre mar o tierra sin coste */
@@ -36,7 +37,7 @@ window.AIQ = window.AIQ || {};
     const t = now / 1000, st = P.st, land = lastLand, tool = st.tool, cx = 32, cy = 32;
     c.clearRect(0, 0, 64, 64);
     const R = 19 - (P.press > 0 ? 3 * Math.min(1, P.press / 100) : 0) + (tool ? Math.sin(t * 6) * 0.6 : 0);
-    const ring = tool === "sonar" || tool === "compass" ? CYAN : land ? GOLD : TEAL;
+    const ring = hotCol || (tool === "sonar" || tool === "compass" ? CYAN : land ? GOLD : TEAL);
     circle(cx, cy, Math.round(R) + 1, INK); circle(cx, cy, Math.round(R) - 2, INK);                     // borde oscuro
     circle(cx, cy, Math.round(R), ring); circle(cx, cy, Math.round(R) - 1, ring);
     for (let k = 0; k < 3; k++) { const a0 = t * 0.9 + (k * Math.PI * 2) / 3; arc(cx, cy, Math.round(R), a0, a0 + 0.5, WHITE); arc(cx, cy, Math.round(R) - 1, a0, a0 + 0.5, WHITE); }   // segmentos que giran
@@ -65,11 +66,12 @@ window.AIQ = window.AIQ || {};
   function frame(now) {
     raf = requestAnimationFrame(frame); if (!P.on) return;
     if (P.press > 0) P.press = Math.max(0, P.press - 16);
-    draw(now);
+    eff(now); apply(now); draw(now);
     const fx = P.st.fx || {};
     // lat/lon bajo el puntero (a ~30 Hz) -> tierra/mar, coordenadas, pais
     if (now - lastHov > 33) {
       lastHov = now; const ll = map.screenToLonLat(P.x, P.y); lastLL = ll; const l = landAt(ll[0], ll[1]);
+      if (fx.thermo && P.st.distFn) { const km = P.st.distFn(ll[0], ll[1]); if (km != null) { const col = hotColor(km); if (col !== hotCol && now - hotAt > 260) { hotCol = col; hotAt = now; } } } else hotCol = null;
       if (lastLand !== null && l !== lastLand && now - lastTick > 120) { lastTick = now; A.sfx.ptrEdge && A.sfx.ptrEdge(l); }
       lastLand = l;
       let txt = "";
@@ -97,10 +99,34 @@ window.AIQ = window.AIQ || {};
     const fx = P.st.fx || {}; mag.classList.toggle("on", on && !!fx.mag); guideX.classList.toggle("on", on && !!fx.guides); guideY.classList.toggle("on", on && !!fx.guides);
     if (!on) { const app = $("app"); if (app) { /* deja la ultima posicion */ } if (map) map.setLens && map.setLens(null); }
   }
-  function place(x, y) {
-    P.x = x; P.y = y; root.style.transform = `translate(${x}px,${y}px)`; A.chal && A.chal.pointer && A.chal.pointer(x, y);
-    if (map && A.chal) { const r = A.chal.lensRadius ? A.chal.lensRadius() : 0; map.setLens(r > 0 ? { x, y, r } : null); }
+  /* posicion EFECTIVA del puntero: la del raton mas los retos (temblor, retraso, invertido, mareo). El clic usa esta misma posicion. */
+  function eff(now) {
+    const dt = Math.min(0.05, Math.max(0.001, (now - (lastNow || now)) / 1000)); lastNow = now;
+    let x = P.rx, y = P.ry; const m = P.m, W = map.W, H = map.H;
+    if (m && m.cmirror) { x = W - x; if (m.cmirror.both) y = H - y; }
+    if (m && m.lag) { const a = 1 - Math.exp(-dt * 1000 / Math.max(1, m.lag.tau)); sx += (x - sx) * a; sy += (y - sy) * a; x = sx; y = sy; } else { sx = x; sy = y; }
+    if (m && m.dizzy) { const t = now / 1000; x += Math.cos(t * 3.4) * m.dizzy.r; y += Math.sin(t * 3.4) * m.dizzy.r; }
+    if (m && m.tremble) { if (now - tj > 45) { tj = now; jx = (Math.random() - 0.5) * 2 * m.tremble.px; jy = (Math.random() - 0.5) * 2 * m.tremble.px; } x += jx; y += jy; }
+    P.x = clampN(x, 0, W); P.y = clampN(y, 0, H);
   }
+  function apply(now) {
+    const x = P.x, y = P.y, fx = P.st.fx || {}, m = P.m; root.style.transform = `translate(${x}px,${y}px)`;
+    if (A.chal && A.chal.pointer) A.chal.pointer(x, y);
+    if (map && A.chal) { const r = A.chal.lensRadius ? A.chal.lensRadius() : 0; map.setLens(r > 0 ? { x, y, r } : null); }
+    let a = 1;
+    if (m) {
+      if (m.blink && !fx.noBlink) a = (((now / 1000) / m.blink.period) % 1) < m.blink.duty ? 1 : 0;
+      if (m.ghost) { const cyc = m.ghost.every + m.ghost.off; if ((now / 1000) % cyc > m.ghost.every) a = 0; }
+    }
+    if (a === 0 && fx.beacon) a = 0.28;
+    cv.style.opacity = a; tag.style.opacity = a;
+    cv.style.filter = m && m.cblur ? `blur(${m.cblur.px}px) drop-shadow(0 3px 0 rgba(0,0,0,.45))` : "";
+  }
+  P.mods = () => { P.m = A.chal && A.chal.ptrMods ? A.chal.ptrMods() : null; };
+  P.effective = () => (P.on ? [P.x, P.y] : null);
+  /* termometro: azul (lejos) -> rojo (cerca), por franjas */
+  const HOT = [[6000, "#3b6bff"], [3000, "#35a7ff"], [1500, "#3fe0c8"], [700, "#7be04a"], [350, "#f2e03a"], [150, "#ffa53a"], [0, "#ff3b3b"]];
+  const hotColor = km => { for (const [k, c] of HOT) if (km >= k) return c; return HOT[HOT.length - 1][1]; };
 
   P.init = m => {
     if (!m.screenToLonLat) return;                                   // respaldo 2D sin WebGL: se queda el cursor normal
@@ -112,9 +138,9 @@ window.AIQ = window.AIQ || {};
     const app = $("app"); app.append(guideX, guideY, mag, root);
     cv = root.querySelector(".ptr-cv"); c = cv.getContext("2d"); tag = root.querySelector(".ptr-tag"); ghost = root.querySelector(".ptr-ghost"); mctx = mag.getContext("2d");
     window.addEventListener("pointermove", e => {
-      if (e.pointerType === "touch") { if (map.pickEnabled && e.target === map.cv) { const r = map.cv.getBoundingClientRect(); place(e.clientX - r.left, e.clientY - r.top); } return show(false); }   // en tactil solo se mueven las capas (linterna, lupa)
+      if (e.pointerType === "touch") { if (map.pickEnabled && e.target === map.cv) { const r = map.cv.getBoundingClientRect(); P.rx = e.clientX - r.left; P.ry = e.clientY - r.top; P.x = P.rx; P.y = P.ry; if (A.chal && A.chal.pointer) A.chal.pointer(P.x, P.y); } return show(false); }   // en tactil solo se mueven las capas (linterna, lupa)
       const ok = map.pickEnabled && e.target === map.cv; if (!ok) return show(false);
-      const r = map.cv.getBoundingClientRect(); place(e.clientX - r.left, e.clientY - r.top); show(true);
+      const r = map.cv.getBoundingClientRect(); P.rx = e.clientX - r.left; P.ry = e.clientY - r.top; if (!P.on) { sx = P.rx; sy = P.ry; } show(true); const t = performance.now(); eff(t); apply(t);
     }, { passive: true });
     window.addEventListener("pointerdown", e => { if (P.on && e.target === map.cv) P.press = 100; }, true);
     document.addEventListener("pointerleave", () => show(false));

@@ -169,8 +169,9 @@ window.AIQ = window.AIQ || {};
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades) */
   const chalFor = r => {
-    const plan = A.chal.plan(run.seed, r, run.asc), boss = r % 4 === 3;
+    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc), boss = r % 4 === 3;
     let list = A.adv._force ? A.adv._force.map(id => ({ id, lv: 2 })) : plan.list.slice();
+    const bribed = (run.bribed && run.bribed[r]) || []; if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento
     const skip = sumFlag("skipFirst"); if (skip) list = list.slice(skip);
     if (boss) { let ign = sumFlag("ignoreBoss"); list = list.filter(() => (ign > 0 ? (ign--, false) : true)); }
     list = list.filter(c => !perkList().some(p => (p.immune || []).includes(c.id)));
@@ -271,7 +272,7 @@ window.AIQ = window.AIQ || {};
     D.enable(true); D.dock(host); const seq = [];
     const first = run.act === 0 && run.round === 0 && !run.qTotal;
     seq.push(Lv.boss ? { line: D.line("boss"), mood: "boss" } : !list.length ? { line: D.line(first ? "hello" : "calm"), mood: "sly" } : { line: D.line("deal"), mood: "sly" });
-    list.slice(0, Lv.boss ? 3 : 2).forEach(c => seq.push({ line: D.line(c.id), mood: c.id === "dark" || c.id === "flicker" ? "sly" : "sly" }));
+    list.slice(0, Lv.boss ? 3 : 2).forEach(c => { const ln = D.line(c.id); if (ln) seq.push({ line: ln, mood: "sly" }); });
     const counters = list.some(c => (A.CHAL[c.id].counters || []).some(id => owned(id)));
     if (counters) seq.push({ line: D.line("counter"), mood: "angry" });
     D.sequence(seq); return seq.reduce((n, it) => n + A.tx(it.line).length * 40 + 900, 0);
@@ -335,7 +336,7 @@ window.AIQ = window.AIQ || {};
     clearTimers(); hints.length = 0; run.qTools = 0; run.probes = []; run.tool = null; run.windOff = false; const S = C().S; S.tool = null; renderBars();
     const o = S.qs[S.qi]; if (!o) return;
     const fx = A.chal.fx(perkList()); A.chal.question(o, run.qi);
-    A.pointer.set({ tool: null, fx, noCountry: o.t === "c", windFn: run.wind ? windGhost : null });
+    A.pointer.set({ tool: null, fx, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; return oo.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[oo.key]) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
     const api = {
       fact: o2 => { const txt = A.tx(o2.fact) || (A.factOf && A.factOf(o2)) || ""; if (txt) noteH(txt, "journal"); },
       note: noteH, continent: o2 => continentName(o2), hemisphere, initial: initialHint, country: revealCountry, addTime: s => { S.limit += s; },
@@ -412,7 +413,7 @@ window.AIQ = window.AIQ || {};
     if (!run || !C().S.camp || C().S.camp.mode !== "adventure" || ["title", "levelEnd", "shop"].includes(C().S.phase)) { bar.classList.add("hidden"); tb.classList.add("hidden"); return; }
     const info = actInfo(run.act), silenced = (run.boss || []).includes("silence"), hand = handInfo();
     bar.classList.remove("hidden");
-    bar.innerHTML = `<div class="ab-top"><span class="ab-act">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts">${hearts()}</span></div>
+    bar.innerHTML = `<div class="ab-top"><span class="ab-act" data-tf="abact">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins" data-tf="abcoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts" data-tf="abhearts">${hearts()}</span></div>
       <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}</span>`).join("")}</div>
       ${hand ? `<div class="ab-hand">${ic("cards", "sm")}${A.tx(hand.name)} <b>+${hand.coins}</b></div>` : ""}
       ${(run.chal || []).length ? `<div class="ab-chal">${run.chal.map(c => A.chal.chip(c, true)).join("")}</div>` : ""}
@@ -511,16 +512,34 @@ window.AIQ = window.AIQ || {};
   /* banda "proxima ronda": los retos que vienen (con la Mirilla, tambien la siguiente) */
   const nextHtml = () => {
     const r = roundNo(), rows = [r]; if (has("spy")) rows.push(r + 1);
-    const html = rows.map((rr, k) => { const cf = chalFor(rr), t = cf.boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + ((rr % 4) + 1); return `<div class="tb-next-row${k ? " far" : ""}"><span class="tb-next-h">${k ? A.T("Después", "Then") : A.T("Próxima ronda", "Next round")} · ${t}${cf.boss && cf.combo ? " · " + A.tx(cf.combo.n) : ""}</span>${cf.list.length ? cf.list.map(c => A.chal.chip(c, true)).join("") : `<span class="tb-next-none">${A.T("Sin trucos", "No tricks")}</span>`}</div>`; }).join("");
+    const html = rows.map((rr, k) => {
+      const cf = chalFor(rr), t = cf.boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + ((rr % 4) + 1), done = (run.bribed && run.bribed[rr]) || [];
+      const chips = cf.list.map(c => k === 0 ? `<button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda", "Bribe the dealer: removes this challenge from the next round")}">${A.chal.chip(c, true)}<span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button>` : A.chal.chip(c, true)).join("")
+        + done.map(id => `<span class="ch-chip sm done" data-tt="${A.T("Sobornado", "Bribed")}"><b>${A.tx(A.CHAL[id].n)}</b></span>`).join("");
+      return `<div class="tb-next-row${k ? " far" : ""}"><span class="tb-next-h">${k ? A.T("Después", "Then") : A.T("Próxima ronda", "Next round")} · ${t}${cf.boss && cf.combo ? " · " + A.tx(cf.combo.n) : ""}</span>${chips || `<span class="tb-next-none">${A.T("Sin trucos", "No tricks")}</span>`}${k === 0 && cf.list.length ? `<button class="chipbtn ch-reroll" id="chalReroll" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar retos", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : ""}</div>`;
+    }).join("");
     return `<div class="tb-next">${html}</div>`;
   };
-  const routeHtml = () => { let h = ""; const cur = roundNo(); for (let i = Math.max(0, cur - 3); i < Math.max(0, cur - 3) + 12; i++) h += `<i class="${i < cur ? "done" : i === cur ? "cur" : ""}${i % 4 === 3 ? " boss" : ""}">${i % 4 === 3 ? ic("skull") : ""}</i>`; return h; };
+  const bribePrice = (c, boss) => { const d = A.CHAL[c.id]; return Math.max(2, Math.round((2 + (c.lv || 1) + (d.kind === "map" ? 1 : 0)) * (boss ? 2 : 1) * ascFx(run.asc).price)); };
+  const chalRerollCost = () => 4 + 2 * ((run.salt && run.salt[roundNo()]) || 0);
+  function bribe(id) {
+    const r = roundNo(), cf = chalFor(r), c = cf.list.find(x => x.id === id); if (!c) return; const cost = bribePrice(c, cf.boss);
+    if (run.coins < cost) { A.sfx.deny(); flash(A.T("No te alcanzan los doblones.", "Not enough doubloons.")); return; }
+    run.coins -= cost; run.bribed = run.bribed || {}; (run.bribed[r] = run.bribed[r] || []).push(id); A.sfx.buy(); persist();
+    A.dealer.enable(true); A.dealer.say(A.dealer.line("bribe"), { mood: "angry", hold: 1800 }); renderShop(run.phase === "chest");
+  }
+  function rerollChal() {
+    const r = roundNo(), cost = chalRerollCost(); if (run.coins < cost) { A.sfx.deny(); flash(A.T("No te alcanzan los doblones.", "Not enough doubloons.")); return; }
+    run.coins -= cost; run.salt = run.salt || {}; run.salt[r] = (run.salt[r] || 0) + 1; if (run.bribed) run.bribed[r] = []; A.sfx.reroll(); persist();
+    A.dealer.enable(true); A.dealer.say(A.dealer.line("reroll"), { mood: "laugh", hold: 1800 }); renderShop(run.phase === "chest");
+  }
+  const routeHtml = () => { let h = ""; const cur = roundNo(); for (let i = Math.max(0, cur - 3); i < Math.max(0, cur - 3) + 12; i++) h += `<i class="${i < cur ? "done" : i === cur ? "cur" : ""}${i % 4 === 3 ? " boss" : ""}" ${A.roundTip(i)}>${i % 4 === 3 ? ic("skull") : ""}</i>`; return h; };
   const rerollCost = () => { const sx = shopCtx(); return run.freeUsed < sx.freeReroll ? 0 : 3 + run.rerolls; };
   function cardHtml(s, i, chest) {
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : price(p.cost), ctr = chalFor(roundNo()).list.find(ch => (A.CHAL[ch.id].counters || []).includes(p.id));
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}${ctr ? " counter" : ""}" data-i="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ctr ? `<span class="of-ctr" title="${A.tx(A.CHAL[ctr.id].n)}">${ic(A.CHAL[ctr.id].ico)}<em>${A.T("Ayuda contra", "Helps against")} ${A.tx(A.CHAL[ctr.id].n)}</em></span>` : ""}${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`;
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}${ctr ? " counter" : ""}" data-i="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ctr ? `<span class="of-ctr" ${A.ttAttr(A.tx(A.CHAL[ctr.id].n), A.tx(A.CHAL[ctr.id].d))}>${ic(A.CHAL[ctr.id].ico)}<em>${A.T("Ayuda contra", "Helps against")} ${A.tx(A.CHAL[ctr.id].n)}</em></span>` : ""}${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`;
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], c = price(t.cost), have = run.tools[s.id];
@@ -541,13 +560,15 @@ window.AIQ = window.AIQ || {};
       <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Rolear", "Roll")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
         </div>
       <footer class="tb-tray"><div class="tray-col"><h4>${A.T("Reliquias", "Relics")} ${run.perks.length}/${slots}</h4><div class="tray-row">${relicSlots}</div></div>
-        <div class="tray-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" title="${A.tx(TOOLS[id].n)}">${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
+        <div class="tray-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" ${A.kitTip("tool", id)}>${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
         <div class="tray-col"><h4>${A.T("Provisiones", "Provisions")}</h4><div class="tray-row hearts">${hearts()}</div></div>
         <button class="btn-ink go-next" id="goRound" data-primary><span>${chest ? A.T("Continuar sin elegir", "Continue without picking") : A.T("Siguiente ronda", "Next round")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
     document.querySelectorAll(".offer").forEach(el => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); });
     document.querySelectorAll(".inv-perk").forEach(b => (b.onclick = () => { if (chest) return; sell(b.dataset.sell); }));
     if ($("rerollBtn")) $("rerollBtn").onclick = () => { const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll(); openShop(false); };
     $("shopMenu").onclick = () => C().runMenu();
+    document.querySelectorAll(".ch-buy").forEach(b => (b.onclick = () => bribe(b.dataset.id)));
+    if ($("chalReroll")) $("chalReroll").onclick = rerollChal;
     $("goRound").onclick = () => { run.stock = null; persist(); chest ? openShop(false) : startRound(); };
     A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
   }

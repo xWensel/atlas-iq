@@ -351,14 +351,14 @@ void main(){
     }
     _target(name, w, h, filter) {
       const gl = this.gl; let t = this.T[name];
-      if (t && t.w === w && t.h === h) return t;
+      if (t && t.w === w && t.h === h && t.filter === (filter || gl.LINEAR)) return t;
       if (t) { gl.deleteTexture(t.tex); gl.deleteFramebuffer(t.fbo); }
       const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter || gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter || gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       const fbo = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
-      return (this.T[name] = { tex, fbo, w, h });
+      return (this.T[name] = { tex, fbo, w, h, filter: filter || gl.LINEAR });
     }
 
     /* ---------- tamano / camara ---------- */
@@ -430,8 +430,8 @@ void main(){
       if (animate === false && f === 1) return;
       this.tv = t;
     }
-    _toWorld(px, py, v = this.view) { [px, py] = this._outToScene(px, py); return [v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s]; }
-    toScreen(x, y, v = this.view) { return this._sceneToOut(this.W / 2 + (x - v.cx) * v.s, this.H / 2 - (y - v.cy) * v.s); }
+    _toWorld(px, py, v = this.viewJ || this.view) { [px, py] = this._outToScene(px, py); return [v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s]; }
+    toScreen(x, y, v = this.viewJ || this.view) { return this._sceneToOut(this.W / 2 + (x - v.cx) * v.s, this.H / 2 - (y - v.cy) * v.s); }
     lonLatToScreen(lon, lat) { let [x, y] = project(lon, lat); [x, y] = this._dispFwd(x, y, this._ctOf(lon, lat)); return this.toScreen(x, y); }
 
     /* ---------- continentes, deformaciones y orientacion (retos) ---------- */
@@ -445,6 +445,10 @@ void main(){
         const [x, y] = project(lo, clamp(la, -85, 85)), w = (big.bbox[2] - big.bbox[0]) * (big.bbox[3] - big.bbox[1]) + 1; acc[f.ct][0] += x * w; acc[f.ct][1] += y * w; acc[f.ct][2] += w;
       }
       this.contCen = acc.map(a => (a[2] ? [a[0] / a[2], a[1] / a[2]] : [0, 0])); this.contCen.push([0, 0]);
+      // caja envolvente de cada continente (coordenadas proyectadas) para colocarlos sin que se pisen
+      this.contBox = [0, 1, 2, 3, 4, 5, 6].map(() => ({ x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 }));
+      for (const f of this.world.features) { const b = this.contBox[f.ct]; for (const poly of f.polys) { for (const [lo, la] of [[poly.bbox[0], poly.bbox[1]], [poly.bbox[2], poly.bbox[3]]]) { const [x, y] = project(lo, clamp(la, -84, 84)); b.x0 = Math.min(b.x0, x); b.x1 = Math.max(b.x1, x); b.y0 = Math.min(b.y0, y); b.y1 = Math.max(b.y1, y); } } }
+      this.contBox.forEach(b => { b.cx = (b.x0 + b.x1) / 2; b.cy = (b.y0 + b.y1) / 2; b.hw = (b.x1 - b.x0) / 2; b.hh = (b.y1 - b.y0) / 2; });
     }
     /* continente al que pertenece el pais que contiene el punto (el mismo con el que se dibuja y se desplaza); si es mar, el pais mas cercano o la heuristica */
     _ctOf(lon, lat) {
@@ -461,7 +465,9 @@ void main(){
       const k = sp ? (d.kk || 0) : 0;
       for (let c = 0; c < 8; c++) { e.sh[c * 2] = sp && sp.shift[c] ? sp.shift[c][0] * k : 0; e.sh[c * 2 + 1] = sp && sp.shift[c] ? sp.shift[c][1] * k : 0; e.rot[c] = sp && sp.rot ? (sp.rot[c] || 0) * k : 0; const cc = this.contCen[c] || [0, 0]; e.cen[c * 2] = cc[0]; e.cen[c * 2 + 1] = cc[1]; }
       e.wob = sp ? (sp.wob || 0) * k : 0; e.lineA = sp && sp.lineA != null ? 1 + (sp.lineA - 1) * d.kl : 1;
-      const ko = sp ? (d.ko || 0) : 0; e.oa = sp && sp.orient ? sp.orient.rot * ko : 0; e.mx = sp && sp.orient ? (sp.orient.mx || 0) * ko : 0; e.on = !!(sp && sp.orient && (Math.abs(e.oa) > 1e-4 || e.mx > 1e-4));
+      const ko = sp ? (d.ko || 0) : 0; e.oa = sp && sp.orient ? sp.orient.rot * ko : 0; e.mx = sp && sp.orient ? (sp.orient.mx || 0) * ko : 0;
+      if (sp && sp.spin) e.oa += sp.spin.amp * Math.sin(performance.now() / 1000 * sp.spin.speed) * k;
+      e.on = !!(sp && (sp.spin || sp.orient) && (Math.abs(e.oa) > 1e-4 || e.mx > 1e-4));
       return e;
     }
     _orient() { const e = this._eff(), sx = 1 - 2 * e.mx; return { c: Math.cos(e.oa), s: Math.sin(e.oa), sx: Math.abs(sx) < 0.02 ? 0.02 : sx, on: e.on }; }
@@ -484,7 +490,30 @@ void main(){
       if (d.ct < 6) return cand(d.ct);
       return [x, y];
     }
-    /* spec: {shift:[[dx,dy]x7], rot:[x7], wob, lineA, orient:{rot,mx}, ct}. Se anima de "normal" a la deformacion. */
+    /* Coloca los continentes segun un tipo (pangea | shuffle | spread) SIN que se pisen (siempre se ven todas las fronteras).
+       k: fuerza 0..1; rr: generador aleatorio con shuffle(). Devuelve shift[7] (en unidades del mapa). */
+    layout(kind, k, rr) {
+      const B = this.contBox.slice(0, 6), home = B.map(b => [b.cx, b.cy]), anchor = [0.05, 0.3], tg = [];
+      const ord = kind === "shuffle" ? rr.shuffle([0, 1, 2, 3, 4, 5]) : null, perm = []; if (ord) ord.forEach((c, i) => { perm[c] = ord[(i + 1) % 6]; });
+      for (let c = 0; c < 6; c++) {
+        const h = home[c];
+        if (kind === "pangea") tg[c] = [h[0] + (anchor[0] - h[0]) * k, h[1] + (anchor[1] - h[1]) * k];
+        else if (kind === "spread") tg[c] = [h[0] + (h[0] - anchor[0]) * k * 0.45, h[1] + (h[1] - anchor[1]) * k * 0.45];
+        else tg[c] = [h[0] + (home[perm[c]][0] - h[0]) * k, h[1] + (home[perm[c]][1] - h[1]) * k];
+      }
+      const pos = tg.map(t => t.slice()), pad = 0.9;
+      for (let it = 0; it < 90; it++) {
+        for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+          const hx = Math.abs(home[j][0] - home[i][0]), hy = Math.abs(home[j][1] - home[i][1]);
+          const reqX = Math.min((B[i].hw + B[j].hw) * pad, hx), reqY = Math.min((B[i].hh + B[j].hh) * pad, hy);   // los que ya se solapaban de origen no pueden acercarse mas
+          const dx = pos[j][0] - pos[i][0], dy = pos[j][1] - pos[i][1], ox = reqX - Math.abs(dx), oy = reqY - Math.abs(dy);
+          if (ox > 0 && oy > 0) { if (ox < oy) { const sg = dx >= 0 ? 1 : -1; pos[i][0] -= sg * ox / 2; pos[j][0] += sg * ox / 2; } else { const sg = dy >= 0 ? 1 : -1; pos[i][1] -= sg * oy / 2; pos[j][1] += sg * oy / 2; } }
+        }
+        for (let c = 0; c < 6; c++) { pos[c][0] += (tg[c][0] - pos[c][0]) * 0.012; pos[c][1] += (tg[c][1] - pos[c][1]) * 0.012; pos[c][0] = clamp(pos[c][0], BX0 * 1.05 + B[c].hw, BX1 * 1.05 - B[c].hw); pos[c][1] = clamp(pos[c][1], BY0 + B[c].hh, BY1 - B[c].hh); }
+      }
+      return [...pos.map((p, c) => [p[0] - home[c][0], p[1] - home[c][1]]), [0, 0]];
+    }
+    /* spec: {shift:[[dx,dy]x7], rot:[x7], wob, lineA, orient:{rot,mx}, spin:{amp,speed}, mosaic, quake, pan:{vx,vy}, ct}. Se anima de "normal" a la deformacion. */
     setDistort(spec, ms = 900) {
       const d = this.dist, now = performance.now();
       d.spec = spec; d.ct = spec && spec.ct != null ? spec.ct : 6; d.t0 = now; d.ms = ms;
@@ -510,6 +539,18 @@ void main(){
     screenToLonLat(px, py) { let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); return unproject(x, y); }
     /* lupa de fronteras verdaderas (Sello de aduana / Teodolito): {x,y,r} en px CSS o null */
     setLens(l) { this.lens = l; this.dirty = true; }
+    setDecoys(list) { this.decoys = list || []; this.fxDirty = true; }
+    /* terremoto (la camara efectiva tiembla; los clics usan esa misma vista) y deriva (el mapa se desliza solo) */
+    _stepMotion(now, dt) {
+      const sp = this.dist.spec, k = sp ? Math.min(1, this.dist.kk || 0) : 0;
+      if (sp && sp.pan && k > 0.05 && !this.pointers.size) {
+        const P = sp.pan, t = now / 1000; this.view.cx += P.vx * Math.cos(t * 0.35) * dt / this.view.s * k; this.view.cy += P.vy * Math.sin(t * 0.27 + 1) * dt / this.view.s * k; this._clamp(this.view); this.dirty = this.fxDirty = true;
+      }
+      if (sp && sp.quake && k > 0.05) {
+        if (now - (this._qT || 0) > 55) { this._qT = now; const a = sp.quake * k / this.view.s; this._qj = [(Math.random() - 0.5) * 2 * a, (Math.random() - 0.5) * 2 * a]; }
+        const j = this._qj || [0, 0]; this.viewJ = { cx: this.view.cx + j[0], cy: this.view.cy + j[1], s: this.view.s }; this.dirty = this.fxDirty = true;
+      } else if (this.viewJ) this.viewJ = null;
+    }
     distorted() { return !!(this.dist.spec && this.dist.k > 0.01); }
     /* uniformes de deformacion para un programa */
     _setDist(p) {
@@ -571,6 +612,7 @@ void main(){
     _pinchState() { const [a, b] = [...this.pointers.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; }
     _tap(px, py) {
       if (!this.pickEnabled) return;
+      const ef = A.pointer && A.pointer.effective && A.pointer.effective(); if (ef) { px = ef[0]; py = ef[1]; }     // el puntero puede tener retos (temblor, retraso, invertido...)
       let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); const [lon, lat] = unproject(x, y);
       if (lon < -180 || lon > 180 || lat > 90 || lat < -90) return;
       this.onPick(lon, lat);
@@ -588,7 +630,7 @@ void main(){
     _frame(now) {
       if (this.lost) return;
       const dt = this.lastT ? Math.min(0.05, (now - this.lastT) / 1000) : 0.016; this.lastT = now;
-      this._adapt(now, dt); this._stepDistort(now);
+      this._adapt(now, dt); this._stepDistort(now); this._stepMotion(now, dt);
       if (this.anim) {
         const a = this.anim, k = Math.min(1, (now - a.t0) / a.ms), e = easeIO(k), dip = 1 - a.dip * Math.sin(Math.PI * e);
         this.view = { cx: a.from.cx + (a.to.cx - a.from.cx) * e, cy: a.from.cy + (a.to.cy - a.from.cy) * e, s: Math.max(this.minS, a.from.s * Math.pow(a.to.s / a.from.s, e) * dip) };
@@ -639,12 +681,14 @@ void main(){
       return { a, b, t };
     }
     _drawGL(now) {
-      const gl = this.gl, v = this.view, W = this.W, H = this.H, dpr = this.dpr, ms = this.ms, P = this.P, st = this.sk;
-      const sw = Math.max(2, Math.round(W * dpr * this.rs)), sh = Math.max(2, Math.round(H * dpr * this.rs));
+      const gl = this.gl, v = this.viewJ || this.view, W = this.W, H = this.H, dpr = this.dpr, ms = this.ms, P = this.P, st = this.sk;
+      const mos = this.dist.spec && this.dist.spec.mosaic ? Math.min(1, 1 - (1 - this.dist.spec.mosaic) * Math.min(1, this.dist.kk || 0)) : 1;   // pixeles gordos: menos resolucion del lienzo
+      const RS = Math.min(this.rs, mos);
+      const sw = Math.max(2, Math.round(W * dpr * RS)), sh = Math.max(2, Math.round(H * dpr * RS));
       const scale = t => v.s * (t / W);                                  // px por unidad en un objetivo de ancho t
       const silW = Math.max(2, Math.round(W / 3)), silH = Math.max(2, Math.round(H / 3));
       const sil = this._target("sil", silW, silH), bA = this._target("bA", silW, silH), bN = this._target("bN", silW, silH), bW = this._target("bW", silW, silH);
-      const scene = this._target("scene", sw, sh);
+      const scene = this._target("scene", sw, sh, mos < 0.999 ? gl.NEAREST : gl.LINEAR);
       gl.disable(gl.BLEND); gl.disable(gl.DEPTH_TEST);
 
       // 1) silueta de tierra a baja resolucion
@@ -668,7 +712,7 @@ void main(){
       gl.useProgram(P.ocean); gl.bindVertexArray(this.vaoEmpty);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.ocean.u.u_blurN, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, bW.tex); gl.uniform1i(P.ocean.u.u_blurW, 1);
-      this._u(P.ocean, "u_center", v.cx, v.cy); this._u(P.ocean, "u_scale", sc); this._u(P.ocean, "u_res", sw, sh); this._u(P.ocean, "u_dpr", dpr * this.rs);
+      this._u(P.ocean, "u_center", v.cx, v.cy); this._u(P.ocean, "u_scale", sc); this._u(P.ocean, "u_res", sw, sh); this._u(P.ocean, "u_dpr", dpr * RS);
       this._u(P.ocean, "u_oTop", ...ms.oTop); this._u(P.ocean, "u_oBot", ...ms.oBot); this._u(P.ocean, "u_shallow", ...ms.shallow); this._u(P.ocean, "u_grid", ...ms.grid); this._u(P.ocean, "u_tropic", ...ms.tropic);
       this._u(P.ocean, "u_gp", gp.a, gp.b, gp.t, st.gridA);
       this._u(P.ocean, "u_time", this.fxOn === false ? 0 : now / 1000); gl.uniform1i(P.ocean.u.u_style, st.style || 0);
@@ -679,12 +723,12 @@ void main(){
       if (st.shadow) {                                               // sombra dura de "pegatina" bajo la tierra
         gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.solid); this._setDist(P.solid);
         this._u(P.solid, "u_center", v.cx, v.cy); this._u(P.solid, "u_scale", sc); this._u(P.solid, "u_res", sw, sh);
-        this._u(P.solid, "u_off", st.shadow.off[0] * dpr * this.rs, st.shadow.off[1] * dpr * this.rs); this._u(P.solid, "u_col", ...st.shadow.col);
+        this._u(P.solid, "u_off", st.shadow.off[0] * dpr * RS, st.shadow.off[1] * dpr * RS); this._u(P.solid, "u_col", ...st.shadow.col);
         gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0); gl.disable(gl.BLEND);
       }
       gl.useProgram(P.land); this._setDist(P.land); this._u(P.land, "u_off", 0, 0);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.land.u.u_blurN, 0);
-      gl.uniform1i(P.land.u.u_style, st.style || 0); this._u(P.land, "u_dpr", dpr * this.rs);
+      gl.uniform1i(P.land.u.u_style, st.style || 0); this._u(P.land, "u_dpr", dpr * RS);
       this._u(P.land, "u_center", v.cx, v.cy); this._u(P.land, "u_scale", sc); this._u(P.land, "u_res", sw, sh); this._u(P.land, "u_fx", st.ao, st.grain, 0, 0);
       const pal = new Float32Array(24); ms.pal.forEach((c, i) => pal.set(c, i * 3)); gl.uniform3fv(P.land.u.u_pal, pal);
       gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
@@ -694,7 +738,7 @@ void main(){
       if (hl) {
         const k = Math.min(1, (now - this.marks.t0) / 500);
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.hatch); this._setDist(P.hatch); this._u(P.hatch, "u_off", 0, 0);
-        this._u(P.hatch, "u_center", v.cx, v.cy); this._u(P.hatch, "u_scale", sc); this._u(P.hatch, "u_res", sw, sh); this._u(P.hatch, "u_col", ...ms.hl); this._u(P.hatch, "u_dpr", dpr * this.rs); this._u(P.hatch, "u_alpha", k);
+        this._u(P.hatch, "u_center", v.cx, v.cy); this._u(P.hatch, "u_scale", sc); this._u(P.hatch, "u_res", sw, sh); this._u(P.hatch, "u_col", ...ms.hl); this._u(P.hatch, "u_dpr", dpr * RS); this._u(P.hatch, "u_alpha", k);
         gl.drawElements(gl.TRIANGLES, hl.gl.n, gl.UNSIGNED_INT, hl.gl.i0 * 4);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       }
@@ -702,15 +746,15 @@ void main(){
       gl.useProgram(P.line); gl.bindVertexArray(this.vaoLine); this._setDist(P.line);
       { const e = this._eff(); this._u(P.line, "u_wob", e.wob); this._u(P.line, "u_wt", now / 1400); this._u(P.line, "u_lineA", e.lineA); }
       this._u(P.line, "u_center", v.cx, v.cy); this._u(P.line, "u_scale", sc); this._u(P.line, "u_res", sw, sh);
-      const lw = clamp(st.lineW + Math.log2(v.s / this.minS) * 0.06, st.lineW, st.lineW * 1.7) * dpr * this.rs;
+      const lw = clamp(st.lineW + Math.log2(v.s / this.minS) * 0.06, st.lineW, st.lineW * 1.7) * dpr * RS;
       if (st.lineOff && (st.lineOff[0] || st.lineOff[1])) {           // desregistro (impresion): segunda capa desplazada
-        this._u(P.line, "u_width", lw); this._u(P.line, "u_off", st.lineOff[0] * dpr * this.rs, st.lineOff[1] * dpr * this.rs); this._u(P.line, "u_col", ...st.lineOffCol);
+        this._u(P.line, "u_width", lw); this._u(P.line, "u_off", st.lineOff[0] * dpr * RS, st.lineOff[1] * dpr * RS); this._u(P.line, "u_col", ...st.lineOffCol);
         gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
       }
       this._u(P.line, "u_width", lw); this._u(P.line, "u_off", 0, 0); this._u(P.line, "u_col", ...st.line);
       const lensOn = this.lens && this.lens.r > 0 && this.dist.spec && (this._eff().wob > 0.002 || this._eff().lineA < 0.98);
       if (lensOn) {                                                     // fuera de la lupa: fronteras deformadas; dentro: las verdaderas
-        const [lx, ly] = this._outToScene(this.lens.x, this.lens.y), k = dpr * this.rs, e = this._eff();
+        const [lx, ly] = this._outToScene(this.lens.x, this.lens.y), k = dpr * RS, e = this._eff();
         this._u(P.line, "u_lens", lx * k, (H - ly) * k, this.lens.r * k);
         this._u(P.line, "u_lmode", 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
         this._u(P.line, "u_wob", 0); this._u(P.line, "u_lineA", 1); this._u(P.line, "u_lmode", 2); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
@@ -718,8 +762,8 @@ void main(){
       } else { this._u(P.line, "u_lmode", 0); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount); }
       if (hl && hl.gl.sn) {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.segBuf); gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, hl.gl.s0 * 16);
-        this._u(P.line, "u_width", 3.2 * dpr * this.rs); this._u(P.line, "u_col", ...ms.hl, 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, hl.gl.sn);
-        this._u(P.line, "u_width", 1.1 * dpr * this.rs); this._u(P.line, "u_col", ...hex(st.paper), 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, hl.gl.sn);
+        this._u(P.line, "u_width", 3.2 * dpr * RS); this._u(P.line, "u_col", ...ms.hl, 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, hl.gl.sn);
+        this._u(P.line, "u_width", 1.1 * dpr * RS); this._u(P.line, "u_col", ...hex(st.paper), 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, hl.gl.sn);
         gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, 0);
       }
       gl.disable(gl.BLEND);
@@ -782,6 +826,7 @@ void main(){
           c.lineWidth = 7; c.strokeStyle = sk.ink; c.strokeText(m.pop, G[0], y); c.fillStyle = sk.paper; c.fillText(m.pop, G[0], y); c.restore();
         }
       }
+      if (this.decoys && this.decoys.length) for (const d of this.decoys) { const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.a == null ? 0.9 : d.a; this._pin(c, q[0], q[1], sk.red, sk.paper, 2000, 1); c.restore(); }
       if (this.pickEnabled && this.mouse && !this.pointers.size && !this.hideReticle) this._reticle(c, this.mouse.x, this.mouse.y);
     }
     _drawProbes(c, now) {

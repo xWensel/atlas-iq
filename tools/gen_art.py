@@ -137,6 +137,30 @@ icons({
  "dealer_shock": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves, shocked wide open eyes and small open mouth with a sweat drop, facing front",
 })
 
+# ---------------------------------------------------------------- v0.11: mas retos (texto, mapa, puntero) y sus perks
+icons({
+ "ch_upside": "an upside down letter Q flipped with a curved rotation arrow", "ch_runes": "a stone tablet with strange glowing runes and symbols",
+ "ch_scroll": "a casino marquee ticker sign with sliding letter tiles and arrows", "ch_novowels": "letter tiles B R K with dots where vowels should be",
+ "ch_anagram": "scrambled letter tiles tumbling out of a shaker cup", "ch_dance": "cartoon letters dancing with musical notes and motion lines",
+ "ch_riddle": "a sphinx face with a question mark scroll riddle", "ch_babel": "a colorful tower of babel made of speech bubbles in different colors",
+ "ch_spread": "continent puzzle pieces exploding apart with small stars", "ch_spin": "a spinning roulette globe with motion arrows",
+ "ch_mirrorx": "a globe split down the middle mirrored left and right", "ch_tilt": "tilted crooked continent puzzle pieces leaning at angles",
+ "ch_myopia": "a comically thick round eyeglasses lens blurring a small map", "ch_mosaic": "a globe made of big chunky pixel squares",
+ "ch_negative": "an inverted color negative globe with swapped colors", "ch_quake": "a cracked ground with a shaking small map and seismic waves",
+ "ch_drift": "a small map sliding away on a conveyor belt with arrows", "ch_decoys": "several identical red map pins with one real golden pin among them",
+ "ch_lightning": "a bright yellow lightning bolt striking a dark cloud", "ch_rain": "a rain cloud with pixel rain streaks over a map",
+ "ch_blindspot": "a black circular hole in the middle of a map with a crosshair", "ch_tremble": "a shaking crosshair cursor with vibration lines",
+ "ch_blink": "a crosshair cursor blinking on and off with small sparkles", "ch_ghost": "a faint transparent ghost crosshair cursor fading away",
+ "ch_cblur": "a blurry smeared crosshair cursor", "ch_lag": "a crosshair cursor with a stretched trailing snail slime trail",
+ "ch_cmirror": "a crosshair cursor with an arrow pointing the opposite way", "ch_dizzy": "a crosshair cursor spinning with dizzy stars and swirls",
+ "thermo": "a glowing thermometer with a gradient from blue to red", "translator": "a phrasebook with two speech bubbles and a globe",
+ "detective": "a detective magnifying glass with a fedora hat", "decoder": "a golden decoder ring with symbols", "handbrake": "a red handbrake lever on a golden plate",
+ "hdglasses": "high definition sunglasses with a sparkle and HD shape", "polarized": "polarized sunglasses with rainbow shine",
+ "shockabsorber": "a heavy coil spring shock absorber in gold", "trapdetector": "a metal detector with a red warning light",
+ "lightningrod": "a golden lightning rod on a rooftop", "umbrella": "a colorful open umbrella with raindrops", "graduated": "thick round graduated eyeglasses with a sparkle",
+ "gamer": "a gaming mouse with glowing teal lights", "beacon": "a golden lighthouse beacon with light rays", "leadweight": "a heavy lead weight ball with a chain",
+})
+
 # ---------------------------------------------------------------- ESCENAS (wide 16:9 salvo indicacion)
 S = {}
 def scene(id, desc, w=1024, h=576): S[id] = (desc, w, h)

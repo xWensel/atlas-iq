@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/premium3.css">
 <link rel="stylesheet" href="css/premium4.css">
 <link rel="stylesheet" href="css/challenges.css">
+<link rel="stylesheet" href="css/uikit.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -45,19 +46,19 @@
     </div></div>
 
     <div class="sh plate-sh"><section id="plate" class="cut paper hidden">
-      <div class="plate-top"><span id="askNo"></span><span id="askKind" class="tag"></span></div>
+      <div class="plate-top"><span id="askNo"></span><span id="askKind" class="tag" data-tf="kind"></span></div>
       <h2 id="askName"></h2>
       <p id="askSub"></p>
-      <div class="clock"><div class="ruler"><i id="timeFill"></i></div><b id="timeTxt">10.0</b></div>
-      <div id="pips"></div>
+      <div class="clock" data-tf="clock"><div class="ruler"><i id="timeFill"></i></div><b id="timeTxt">10.0</b></div>
+      <div id="pips" data-tf="pips"></div>
     </section></div>
 
     <div class="sh ledger-sh" id="ledgerSh"><section class="cut paper ledger" id="ledger">
       <div class="lg-label" data-i="score.level"></div>
-      <div class="lg-num odo" id="scLevel">0</div>
-      <div class="gauge"><i id="scBar"></i><em id="scMark"></em></div>
-      <div class="lg-row"><span><span data-i="score.need"></span> <b id="scNeed">0</b></span><span><span data-i="score.total"></span> <b id="scTotal">0</b></span></div>
-      <div id="streakChip" class="hidden"></div>
+      <div class="lg-num odo" id="scLevel" data-tf="level">0</div>
+      <div class="gauge" data-tf="need"><i id="scBar"></i><em id="scMark"></em></div>
+      <div class="lg-row"><span data-tf="need"><span data-i="score.need"></span> <b id="scNeed">0</b></span><span data-tf="total"><span data-i="score.total"></span> <b id="scTotal">0</b></span></div>
+      <div id="streakChip" class="hidden" data-tf="streak"></div>
     </section></div>
   </header>
 
@@ -89,6 +90,7 @@
     <div class="set-sec"><h3 data-i="set.sound"></h3>
       <div class="fader" data-k="master"><label data-i="vol.master"></label><output>85</output><input type="range" min="0" max="100" value="85" aria-label="Volumen general"><div class="ftrack"></div></div>
       <div class="fader" data-k="music"><label data-i="vol.music"></label><button class="sw" data-sw="music" role="switch" aria-checked="true" aria-label="Música"><i></i></button><output>70</output><input type="range" min="0" max="100" value="70" aria-label="Volumen de la música"><div class="ftrack"></div></div>
+      <button class="row-btn" id="setNext" type="button"><span data-i="set.nextsong"></span><kbd>♪</kbd></button>
       <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
     </div>
 
@@ -168,6 +170,8 @@
 <script src="js/challenges.js"></script>
 <script src="js/dealer.js"></script>
 <script src="js/pointer.js"></script>
+<script src="js/uikit.js"></script>
+<script src="js/tips.js"></script>
 <script src="js/adventure.js"></script>
 <script src="js/hub.js"></script>
 <script src="js/wiki.js"></script>

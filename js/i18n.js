@@ -107,6 +107,7 @@ window.AIQ = window.AIQ || {};
     "gfx.high": ["Alto", "High", "Élevé", "Alto", "Hoch", "Alta"],
     "gfx.saver": ["Ahorro", "Saver", "Économie", "Economia", "Sparen", "Risparmio"],
     "set.gfx.d": ["Auto baja el detalle solo al mover el mapa si tu equipo va justo. Ahorro reduce siempre la resolución.", "Auto lowers detail only while moving the map if your device struggles. Saver always reduces resolution.", "Auto réduit le détail uniquement pendant les déplacements si ton appareil peine. Économie réduit toujours la résolution.", "O modo Auto reduz o detalhe só ao mover o mapa se o seu aparelho estiver no limite. Economia sempre reduz a resolução.", "Auto senkt das Detail nur während der Kartenbewegung, wenn dein Gerät kämpft. Sparen reduziert die Auflösung immer.", "Auto riduce il dettaglio solo mentre muovi la mappa se il dispositivo fatica. Risparmio riduce sempre la risoluzione."],
+    "set.nextsong": ["Siguiente canción", "Next song", "Chanson suivante", "Próxima música", "Nächster Song", "Canzone successiva"],
     "key.fs": ["Pantalla completa", "Fullscreen", "Plein écran", "Tela cheia", "Vollbild", "Schermo intero"],
     "key.pause": ["Pausa", "Pause", "Pause", "Pausa", "Pause", "Pausa"],
     "key.sfx": ["Efectos", "Effects", "Effets", "Efeitos", "Effekte", "Effetti"],

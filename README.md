@@ -1,5 +1,13 @@
 # Atlas IQ
 
+**v0.11** - Mas trucos del crupier, puntero y tooltips de casino, y una banda sonora de 9 canciones:
+- **45 retos** (antes 12): texto (letras que bailan, runas, anagrama, sin vocales, marquesina, adivinanza, Torre de Babel...), mapa (mosaico, negativo, rayos, lluvia, miopia, punto ciego, terremoto, deriva, ruleta, espejo horizontal, mundo del reves, pangea, continentes barajados, chinchetas trampa...) y **retos del puntero** (temblor, parpadeo, fantasma, desenfoque, retraso, invertido, mareo). Los desplazamientos de continentes ya no se amontonan: las fronteras siguen siempre visibles. La *tinta borrada* ahora se nota de verdad.
+- **72 perks** (antes 57): nuevos contra retos de texto, mapa y puntero, mas el **Termometro** (el puntero pasa de azul a rojo al acercarte).
+- **Campamento:** puedes **sobornar** un reto de la proxima ronda o **barajar** los retos pagando doblones.
+- **Puntero de casino en toda la aplicacion** (`js/uikit.js`): flecha, mano, texto, agarrar, prohibido, espera, lupa... en pixel art. Solo en dispositivos con raton.
+- **Tooltips propios** (`js/uikit.js`, `js/tips.js`) en lugar del `title` de Windows: HUD, herramientas y reliquias, rutas, ascensiones, logros, perfil y enciclopedia.
+- **Musica:** 9 canciones de casino (lounge, ragtime, bossa, samba, blues, vals, funk, big band, mambo) que rotan cada ~90 s con un cambio de disco, y boton *Siguiente cancion* en Ajustes.
+
 **v0.10** – El crupier cambia las reglas: retos, perks y puntero:
 - **Los perks ya no tocan la puntuacion.** Fuera todos los multiplicadores y bonus de fichas: la puntuacion es tu precision. Los perks (57) ayudan a vencer retos, mejoran el puntero, dan pistas, tiempo, doblones o supervivencia (`js/relics.js`).
 - **Retos por ronda y jefes** (`js/challenges.js`): letras temblorosas, tinta borrada, letras cambiadas, espejo, memoria de pez; y en el mapa: borroso, apagon (con linterna), luces parpadeantes, fronteras falsas, mapa mudo, Pangea, continentes cambiados, mundo del reves, humo, vendaval, tormenta, silencio. Suben por actos; cada jefe trae una combinacion. El Campamento anuncia la proxima ronda y marca los perks que ayudan.

@@ -385,6 +385,8 @@ window.AIQ = window.AIQ || {};
     b.innerHTML = `<span class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}</span>
       ${ixs(e)}<span class="cx-nm">${un ? nameOf(e, rec) : "· · ·"}</span>
       <span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span><span class="cx-no">${fmtNo(e.no)}</span>${un && !store.seen[id] ? `<span class="cx-new">${A.t("codex.new")}</span>` : ""}`;
+    b.setAttribute("data-tt", un ? nameOf(e, rec) + "\n" + typeLabel(e.type)
+      : A.tip6("Sin descubrir|Undiscovered|Non découvert|Não descoberto|Unentdeckt|Non scoperto") + "\n" + typeLabel(e.type) + " · " + A.tip6("se descubre al situarlo bien en una partida|found by placing it well in a game|à découvrir en le plaçant bien en partie|descoberto ao posicioná-lo bem numa partida|wird entdeckt, wenn du ihn gut platzierst|si scopre piazzandolo bene in partita"));
     b.onclick = () => openDetail(id);
     b.addEventListener("pointermove", ev => tiltMove(b, ev, 7)); b.addEventListener("pointerleave", () => tiltReset(b));
     if (un) io.observe(b);
