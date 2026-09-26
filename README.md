@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.19.1** - Botiquin y Corazon de explorador ya no se pisan: el Botiquin (5 doblones, comun) recupera 1 provision al empezar cada acto (sin subir el maximo); el Corazon (8, raro) sube para siempre en 1 el maximo de provisiones y la repone al comprarlo.
+
 **v0.19.0** - 5 canciones nuevas y cartas sin indices.
 - **Musica (14 canciones):** mismo motor y estilo casino, ahora tambien **lo-fi** ("Retirar ganancias / Cash Out"), **reggae** one-drop ("Banca al dia / Bankroll"), **reggaeton** con dembow y bajo ("Apuesta en vivo / Live Bet"), **flamenco** con rasgueos, palmas y cajon en cadencia andaluza ("Pleno al quince / Straight Up") y **deep house** ("Handicap asiatico"). Titulos en los 6 idiomas; rotan solas con las demas y aparecen en el selector de canciones.
 - **Cartas sin numeracion:** fuera los indices (A, K, Q, J, numeros y palos en las esquinas) de las cartas de la tienda, herramientas, vidas y Enciclopedia; se mantiene el formato carta.
