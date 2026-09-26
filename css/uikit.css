@@ -115,3 +115,16 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
   .tb-head { grid-template-columns: minmax(0, 1fr) auto; } .tb-head .route { display: none; } .tb-right { gap: 8px; } .tb-coins { padding: 4px 12px 4px 6px; } .tb-coins b { font-size: 22px; } .tb-coins .ic { width: 28px; height: 28px; }
   .tb-next-row { max-width: 100%; } .tb-tray { grid-template-columns: 1fr 1fr; margin: 0 -14px; padding-left: 14px; padding-right: 14px; } .tb-tray .go-next { grid-column: 1 / -1; min-width: 0; width: 100%; }
 }
+/* movil y tablet: el ticket es una hoja inferior sobre el pie de pagina; mientras se ve, el resto del HUD de partida se aparta */
+@media (max-width: 900px) {
+  body.tk-on #advBar, body.tk-on #toolBar, body.tk-on .rail-sh { display: none; }
+  #dlg.side { place-self: end center; margin: 0 0 calc(var(--note-top, 90px) + 8px); max-height: calc(100vh - 226px - var(--note-top, 90px)); overflow-y: auto; scrollbar-width: none; }
+  #dlg.side::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 700px) {
+  /* ticket compacto: deja ver el mapa (donde cayo tu pin y donde estaba el lugar) */
+  #dlg.side .tk-band, #dlg.side .tk-perf, #dlg.side .tk-cx { display: none; }
+  #dlg.side .tk-title { font-size: 20px; margin-top: 10px; } #dlg.side .tk-km { font-size: 34px; margin-top: 0; } #dlg.side .tk-total { margin: 4px 0 6px; } #dlg.side .tk-total .odo { font-size: 30px; }
+  body.tk-on #lvlText { display: none; }
+}
+@media (max-width: 480px) { .tb-title h2 { font-size: 26px; white-space: nowrap; } .tb-title .tag { font-size: 9px; } }

@@ -1,5 +1,9 @@
 # Atlas IQ
 
+**v0.14** - Tutorial guiado y movil.
+- **Tutorial del crupier** (`js/tour.js`, `css/tour.css`): la primera vez, un foco ilumina la placa, el mapa, el reloj, doblones y provisiones, herramientas y objetivo (con el tiempo detenido); y en el primer Campamento explica cartas, retos de la proxima ronda y reliquias. Se puede saltar (boton o Esc), se recuerda en el perfil y se reactiva en Ajustes > General.
+- **Movil / tablet:** el ticket de resultado es ahora una hoja inferior compacta (el resto del HUD se aparta y se ve donde cayo tu pin); cabecera del Campamento sin solapes; se quita el aviso obsoleto de "textos en ingles" del modo Clasico.
+
 **v0.13.1** - Menu simplificado: tres modos. Se retira el modo **Extendido** y el **Competitivo** se convierte en **Reto diario** (una Aventura con semilla comun para todos, con su clasificacion local; global si el servidor tiene la API activada). Home: Clasico, Aventura y Reto diario.
 
 **v0.13** - Reliquias claras y el pais siempre a la vista.

@@ -64,7 +64,7 @@ window.AIQ = window.AIQ || {};
     let picker = "";
     if (pr.unlocked > 1) { for (let i = 0; i < cur.levels.length; i++) picker += `<button class="lv${i === S.startLevel ? " sel" : ""}" data-lv="${i}" ${i >= pr.unlocked ? "disabled" : ""}>${i + 1}</button>`; picker = `<div class="picker"><span>${A.t("title.from")}</span><div class="lrail">${picker}</div></div>`; }
     c.dialog(scr(T("Clásico", "Classic"), `
-      <p class="mode-d">${A.t("mode." + mode + ".d")}${mode === "classic" && A.t("mode.classic.note") ? `<small>${A.t("mode.classic.note")}</small>` : ""}</p>
+      <p class="mode-d">${A.t("mode." + mode + ".d")}</p>
       <div class="camps">${list}</div>
       <div class="camp-foot">${picker}${startBtn("goBtn", A.t("go.label"), A.t("go.sub", { n: S.startLevel + 1, name: A.tx(cur.title) }), true)}</div>`, "s-camps"), "tablewrap");
     wireTools(); $("hubBack").onclick = () => screen("home");

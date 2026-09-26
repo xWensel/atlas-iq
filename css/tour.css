@@ -1,0 +1,18 @@
+/* Atlas IQ - tutorial guiado (v0.14): un foco ilumina la parte de la pantalla y una tarjeta del crupier la explica */
+.tour { position: fixed; inset: 0; z-index: 9000; opacity: 0; transition: opacity .2s ease; pointer-events: auto; cursor: default; }
+.tour.on { opacity: 1; }
+.tour.hidden { display: none; }
+.tour-hole { position: fixed; border-radius: 14px; pointer-events: none; box-shadow: 0 0 0 200vmax rgba(8, 6, 16, .74), 0 0 0 3px #ffd06b, 0 0 26px 4px rgba(255, 208, 107, .55); transition: left .28s ease, top .28s ease, width .28s ease, height .28s ease; animation: tour-pulse 1.6s ease-in-out infinite; }
+@keyframes tour-pulse { 50% { box-shadow: 0 0 0 200vmax rgba(8, 6, 16, .74), 0 0 0 3px #ffe9a8, 0 0 38px 8px rgba(255, 208, 107, .75); } }
+.tour-card { position: fixed; z-index: 1; display: flex; gap: 12px; width: min(440px, calc(100vw - 20px)); padding: 14px 16px 12px; background: #f6efdc; color: #191325; border-radius: 14px; box-shadow: 0 0 0 3px #191325, inset 0 0 0 3px #ffd06b, 0 12px 0 rgba(0, 0, 0, .4); transition: left .28s ease, top .28s ease; }
+.tour-face { width: 64px; height: 64px; flex: none; image-rendering: pixelated; align-self: flex-start; }
+.tour-body { display: grid; gap: 10px; min-width: 0; }
+.tour-txt { margin: 0; font-family: var(--serif, Georgia, serif); font-weight: 700; font-size: 15px; line-height: 1.35; }
+.tour-nav { display: flex; align-items: center; gap: 10px; }
+.tour-skip { border: 0; background: none; padding: 4px 2px; font-family: var(--mono, monospace); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #6b5f80; cursor: pointer; text-decoration: underline; }
+.tour-skip:hover { color: #191325; }
+.tour-dots { display: flex; gap: 5px; margin-left: auto; }
+.tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: #c9c0d8; } .tour-dots i.on { background: #fe5f55; }
+.tour-next { padding: 8px 16px; font-size: 13px; }
+@media (max-width: 700px) { .tour-face { width: 48px; height: 48px; } .tour-txt { font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) { .tour-hole, .tour-card { transition: none; animation: none; } }

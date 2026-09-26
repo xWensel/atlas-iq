@@ -344,6 +344,7 @@ window.AIQ = window.AIQ || {};
       later: (sec, fn) => { const left = S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000, delay = (left - sec) * 1000; if (delay > 0) timers.push(setTimeout(() => { if (S.phase === "asking" && !S.paused) fn(); }, delay)); },
     };
     perkList().forEach(p => p.open && p.open(api, o, run));
+    if (run.qTotal === 0 && A.tour) A.tour.maybe("q");
   };
   const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat), p = m.lonLatToScreen(a.lon, a.lat); return [p[0] - px, p[1] - py]; };
   A.adv.decorate = o => A.chal.decorate(o);
@@ -571,6 +572,7 @@ window.AIQ = window.AIQ || {};
     if ($("chalReroll")) $("chalReroll").onclick = rerollChal;
     $("goRound").onclick = () => { run.stock = null; persist(); chest ? openShop(false) : startRound(); };
     A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
+    if (A.tour) A.tour.maybe("camp");
   }
   const shake = el => { el.classList.remove("no"); void el.offsetWidth; el.classList.add("no"); };
   function buy(el, chest) {

@@ -16,14 +16,14 @@
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || "{}");
       A.lang = d.lang && A.STR[d.lang] ? d.lang : A.detectLang();
-      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.cursor = d.cursor !== false; S.tips = d.tips !== false; S.songToast = d.songToast !== false; S.setTab = d.setTab || "general"; S.fsGate = d.fsGate !== false; S.skin = "casino";
+      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.cursor = d.cursor !== false; S.tips = d.tips !== false; S.tour = d.tour !== false; S.songToast = d.songToast !== false; S.setTab = d.setTab || "general"; S.fsGate = d.fsGate !== false; S.skin = "casino";
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
     } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate, skin: S.skin, cursor: S.cursor, tips: S.tips, songToast: S.songToast, setTab: S.setTab })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
@@ -77,12 +77,12 @@
   /* ------------------------------------------------------------ utilidades de interfaz */
   function dialog(html, cls) {
     const d = $("dlg"); d.className = cls; d.innerHTML = html;
-    document.body.classList.toggle("vd-on", cls === "verdict" || cls === "tablewrap");
+    document.body.classList.toggle("vd-on", cls === "verdict" || cls === "tablewrap"); document.body.classList.toggle("tk-on", cls === "side");
     $("layer").classList.remove("hidden");
     requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add("in")));
     const b = d.querySelector("[data-primary]"); if (b) setTimeout(() => b.focus({ preventScroll: true }), 60);
   }
-  function closeDialog() { $("layer").classList.add("hidden"); $("dlg").classList.remove("in"); document.body.classList.remove("vd-on"); }
+  function closeDialog() { $("layer").classList.add("hidden"); $("dlg").classList.remove("in"); document.body.classList.remove("vd-on", "tk-on"); }
   /* control segmentado con indicador deslizante */
   function segSet(seg, value) {
     const btns = [...seg.querySelectorAll("button")], idx = Math.max(0, btns.findIndex(b => b.dataset.v === value));
@@ -145,7 +145,7 @@
       if (sw) { const on = k === "music" ? A.audio.musicOn : A.audio.sfxOn; sw.setAttribute("aria-checked", on); f.classList.toggle("off", !on); }
     }
     segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs();
-    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, songs: S.songToast };
+    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast };
     for (const k in st) { const el = document.querySelector('.sw[data-sw="' + k + '"]'); if (el) el.setAttribute("aria-checked", !!st[k]); }
     const sg = document.querySelector('.sw[data-sw="songs"]'); if (sg) sg.closest(".row-sw").classList.toggle("off", !A.audio.musicOn);
     $("rowCursor").classList.toggle("hidden", !A.cursor.available);
@@ -211,7 +211,7 @@
   function applyMotion() { document.documentElement.classList.toggle("reduce-motion", S.reduce); map.fxOn = !S.reduce; }
   const TOG = {
     motion: () => { S.reduce = !S.reduce; applyMotion(); }, intro: () => { S.intro = !S.intro; },
-    cursor: () => { S.cursor = !S.cursor; A.cursor.set(S.cursor); }, tips: () => { S.tips = !S.tips; A.tt.enable(S.tips); },
+    cursor: () => { S.cursor = !S.cursor; A.cursor.set(S.cursor); }, tips: () => { S.tips = !S.tips; A.tt.enable(S.tips); }, tour: () => { S.tour = !S.tour; if (S.tour && A.tour) A.tour.reset(); },
     songs: () => { S.songToast = !S.songToast; if (!S.songToast && A.jukebox) A.jukebox.hide(); },
   };
   for (const sw of document.querySelectorAll(".sw[data-sw]")) if (TOG[sw.dataset.sw]) sw.addEventListener("click", () => { TOG[sw.dataset.sw](); A.sfx.flip(true); save(); syncSettings(); });
@@ -228,7 +228,7 @@
       if (!rs.classList.contains("armed")) { rs.classList.add("armed"); rs.textContent = A.t("set.reset.ask"); A.sfx.ui(); clearTimeout(tm); tm = setTimeout(() => { rs.classList.remove("armed"); syncSettings(); }, 4000); return; }
       clearTimeout(tm); rs.classList.remove("armed");
       A.audio.setVol("master", 0.85); A.audio.setVol("music", 0.7); A.audio.setVol("sfx", 0.9); A.audio.sfxOn = true; A.audio.setMusic(true); A.audio.unlock();
-      S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.songToast = true; A.cursor.set(true); A.tt.enable(true);
+      S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.tour = true; if (A.tour) A.tour.reset(); S.songToast = true; A.cursor.set(true); A.tt.enable(true);
       save(); A.sfx.card(); syncSettings(); rs.textContent = A.t("set.reset.done"); setTimeout(syncSettings, 2200);
     }; }
   $("setFs").onclick = () => { toggleFs(); A.sfx.ui(); };
