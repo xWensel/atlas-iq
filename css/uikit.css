@@ -104,8 +104,8 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
 .hh:has(.hh-resume) .hh-cards { padding: clamp(12px, 2.6vh, 32px) 0 clamp(4px, 1.2vh, 16px); }
 @media (min-width: 901px) and (max-width: 1100px) { #dlg.side { max-height: calc(100vh - 198px - var(--note-top, 90px)); } }   /* el pie ocupa todo el ancho: el ticket termina encima */
 /* notas de campo: como mucho 3 lineas (2 en pantallas medianas) para no empujar el ticket ni las cartas */
-#factText:not(:empty) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
-@media (max-width: 1100px) { #factText:not(:empty) { -webkit-line-clamp: 2; line-clamp: 2; font-size: 15px; } }
+#factText:not(:empty) { max-height: 30vh; overflow-y: auto; scrollbar-width: thin; }   /* el texto entero, sin puntos suspensivos: si es muy largo, se desplaza */
+@media (max-width: 1100px) { #factText:not(:empty) { font-size: 15px; max-height: 26vh; } }
 /* Campamento en movil o pantallas muy bajas: se desplaza en vez de cortar cartas y botones */
 @media (max-width: 700px), (max-height: 600px) {
   #dlg.tablewrap { overflow-y: auto; overflow-x: hidden; }
@@ -134,3 +134,10 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 #askSub::before { content: "◈"; font-size: .6em; margin-right: .5em; vertical-align: .18em; opacity: .7; }
 #askSub:empty::before { content: none; }
 @media (max-width: 900px) { #askSub, html[data-skin="casino"] #askSub { font-size: clamp(17px, 4.6vw, 22px); } }
+
+/* huecos de respuesta: una casilla por letra, palabras separadas */
+.blk, .lt.blk { display: inline-block; width: .4em; height: .78em; margin: 0 .17em; vertical-align: -.04em; border-bottom: .14em solid currentColor; -webkit-text-fill-color: transparent; overflow: hidden; }
+.wg { display: inline-block; width: .55em; }
+.wd { display: inline-block; white-space: nowrap; }
+#askName.ch-long, #askSub.ch-long { font-size: .42em; }
+#askSub .blk { opacity: .85; }

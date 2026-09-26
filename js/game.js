@@ -120,7 +120,8 @@
   function setPrompt() {
     const o = q(); if (!o) return;
     $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : o.kind || lv().kind));
-    $("askName").textContent = A.tx(o.name); $("askSub").textContent = A.tx(o.sub);
+    if (o.clue && o.answer && !(o.sub && (o.sub.en || o.sub.es))) o.sub = A.blankObj(o.answer);        // descripcion: debajo, la casilla de cada letra
+    $("askName").textContent = A.tx(o.name); A.renderBlanks($("askSub"), A.tx(o.sub));
     if (S.run && A.adv.decorate) A.adv.decorate(o);
     $("plate").classList.toggle("clue", !!o.clue);
   }

@@ -1,5 +1,9 @@
 # Atlas IQ
 
+**v0.14.2** - Pistas completas, sin puntos suspensivos.
+- **Notas de campo enteras:** las notas (Cuaderno, Almanaque, Adivinanza) se cortaban a 240 caracteres a mitad de frase y el pie las recortaba con "…". Se han regenerado (`data/wiki/*-s.json`) con descripcion + primera frase COMPLETA (sin partir en abreviaturas), se limpian pronunciaciones y parentesis anidados, y el pie ya no recorta: si es muy largo, se desplaza.
+- **Huecos de la respuesta:** en las preguntas de descripcion/apodo, bajo la pista aparece una casilla por cada letra, con las palabras separadas y el recuento, p. ej. `▁▁▁ ▁▁▁▁▁▁▁ (3, 7)`. En el reto Adivinanza, el nombre tapado dentro del texto tiene exactamente tantas casillas como letras (antes tope de 6) y el texto ya no se recorta a 130 caracteres ni parte las palabras a mitad.
+
 **v0.14.1** - El pais, parte de la pregunta desde el principio. Todas las rondas (capitales, batallas, ciudades...) muestran el lugar y, debajo, su pais en grande (o su continente si no tiene). Las dificultades lo van quitando: el nuevo reto **Sin pais** (jefe "Sin pasaporte") lo oculta, y los retos de texto (letras temblorosas, borradas, cambiadas, espejo, runas, anagrama, marquesina, Babel...) afectan tambien al pais, no solo al nombre.
 
 **v0.14** - Tutorial guiado y movil.

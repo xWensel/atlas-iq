@@ -1,7 +1,7 @@
 /* Atlas IQ - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.14.1";
+  A.VERSION = "0.14.2";
   A.lang = "es";
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
@@ -15,6 +15,18 @@ window.AIQ = window.AIQ || {};
   const TRI = { fr: 0, pt: 1, de: 2, it: 3 };
   const trOf = en => { const t = A.TR && A.TR[en], i = TRI[A.lang]; return t && i != null ? t[i] : undefined; };
   A.tx = v => (v && typeof v === "object" ? v[A.lang] || (v.en && trOf(v.en)) || (A.lang === "es" ? v.es : v.en) || v.en || v.es || "" : v || "");
+  /* respuesta oculta: cada letra es un hueco, las palabras quedan separadas y al final va el recuento "(3, 7)" */
+  A.blanks = (text, count) => {
+    const t = String(text || "").trim(); if (!t) return "";
+    const p = t.replace(/[\p{L}\p{N}]/gu, "▮"), n = t.split(/[\s\-\/]+/).map(w => [...w].filter(c => /[\p{L}\p{N}]/u.test(c)).length).filter(Boolean);
+    return p + (count !== false && n.length ? " (" + n.join(", ") + ")" : "");
+  };
+  A.blankObj = ans => { const o = {}; for (const k in ans) o[k] = A.blanks(ans[k]); return o; };
+  /* pinta un texto con huecos ▮ como casillas (y sin ellos, como texto normal) */
+  A.renderBlanks = (el, text) => {
+    if (!text.includes("▮")) { el.textContent = text; return; }
+    el.innerHTML = [...text].map((c, i, a) => (c === "▮" ? '<b class="blk">▮</b>' : c === " " && a[i - 1] === "▮" && a[i + 1] === "▮" ? '<i class="wg"></i>' : c === " " ? " " : c)).join("");
+  };
   A.L = (es, en) => ({ es, en });                                    // texto perezoso: se resuelve al pintar (sigue el idioma activo)
   A.T = (es, en) => A.tx({ es, en });                                // texto inmediato
   A.tf = (es, en, params) => A.T(es, en).replace(/\{(\w+)\}/g, (m, k) => (params && params[k] != null ? params[k] : m));

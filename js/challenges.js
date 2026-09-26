@@ -216,19 +216,19 @@ window.AIQ = window.AIQ || {};
     let t = ""; try { t = (A.tx(o.fact) || (A.factOf && A.factOf(o)) || "").trim(); } catch (e) { t = ""; }
     if (!t || t.length < 12) return null;
     const words = new Set(); [...Object.values(o.name || {})].forEach(n => String(n).split(/[\s,()'’-]+/).forEach(w => { if (w.length >= 3) words.add(w); }));
-    for (const w of [...words].sort((a, b) => b.length - a.length)) t = t.replace(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "▮".repeat(Math.min(6, w.length)));
-    return t.length > 130 ? t.slice(0, 127) + "…" : t;
+    for (const w of [...words].sort((a, b) => b.length - a.length)) t = t.replace(new RegExp("(?<![\\p{L}\\p{N}])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?![\\p{L}\\p{N}])", "giu"), m => "▮".repeat([...m].length));   // un hueco por letra, sin recortar el texto
+    return t;
   }
   /* el nombre y el pais de debajo sufren los mismos retos de texto (el pais tambien tiembla, se borra, se cambia...) */
   function decorate(o) {
     const el = $("askName"), sub = $("askSub"); if (!el || !o) return; clearText();
     const tx = S.list.filter(c => D[c.id].kind === "text"), nameTxt = A.tx(o.name), subTxt = A.tx(o.sub);
-    if (S.suspended || !tx.length) { el.textContent = nameTxt; if (sub) sub.textContent = subTxt; return; }
+    if (S.suspended || !tx.length) { el.textContent = nameTxt; if (sub) A.renderBlanks(sub, subTxt); return; }
     let alt = null;                                                   // Torre de Babel: los dos textos salen en el mismo otro idioma
     if (has("babel") && !S.fx.noBabel) { const alts = ["es", "en", "fr", "pt", "de", "it"].filter(l => l !== A.lang && o.name && o.name[l] && o.name[l] !== nameTxt); if (alts.length) alt = alts[Math.floor(A.rng(`${S.seed}:t:${S.q}:${nameTxt}`)() * alts.length)]; }
     deco(el, o, o.name, alt, false);
     if (sub) {
-      if (has("nocountry") && subTxt) { sub.textContent = "▮▮▮▮▮▮"; sub.classList.add("ch-nocountry"); }
+      if (has("nocountry") && subTxt && !o.clue) { sub.textContent = "▮▮▮▮▮▮"; sub.classList.add("ch-nocountry"); }
       else if (subTxt) deco(sub, o, o.sub, alt, true); else sub.textContent = "";
     }
   }
@@ -237,7 +237,7 @@ window.AIQ = window.AIQ || {};
     let text = A.tx(obj);
     const rnd = A.rng(`${S.seed}:t${isSub ? "s" : ""}:${S.q}:${text}`);
     let riddle = false;
-    if (!isSub && has("riddle")) { const r = riddleText(o); if (r) { text = r; riddle = true; } }
+    if (!isSub && !o.clue && has("riddle")) { const r = riddleText(o); if (r) { text = r; riddle = true; } }
     if (alt && !riddle && obj[alt]) text = obj[alt];
     let chars = [...text]; const orig = chars.slice(), isL = i => isLetter(chars[i] || " ");
     const letters = chars.map((c, i) => (isLetter(c) ? i : -1)).filter(i => i >= 0), fixed = new Set(), hidden = new Set(), dots = new Set(), runes = new Set();
@@ -255,20 +255,23 @@ window.AIQ = window.AIQ || {};
       if (ms && letters.length >= 3) { const p = par(ms), n = clamp(Math.round(letters.length * p.frac), 2, Math.max(2, Math.floor(letters.length * 0.7))), pool = rnd.shuffle ? rnd.shuffle(letters.slice()) : letters.slice(); for (const k of pool) { if (hidden.size >= n) break; hidden.add(k); } }
     }
     const sh = get("shaky"), amp = sh ? par(sh).amp : 0, dn = get("dance"), damp = dn ? par(dn).amp : 0;
-    el.innerHTML = chars.map((ch, i) => {
-      if (ch === " ") return " ";
-      const c = ["lt"]; let glyph = ch;
+    const parts = chars.map((ch, i) => {
+      if (ch === " ") return chars[i - 1] === "▮" && chars[i + 1] === "▮" ? '<i class="wg"></i>' : " ";
+      const c = ["lt"]; let glyph = ch; if (ch === "▮") c.push("blk");
       if (hidden.has(i)) c.push("gap"); else if (dots.has(i)) { c.push("dot"); glyph = "·"; } else if (get("missing") && rnd() < 0.5) c.push("faint");
       if (runes.has(i)) c.push("rune");
       const dur = (0.07 + rnd() * 0.09).toFixed(3), del = (-rnd() * 0.3).toFixed(3), ax = ((rnd() - 0.5) * 2 * amp).toFixed(2), ay = ((rnd() - 0.5) * 2 * amp).toFixed(2), ar = ((rnd() - 0.5) * amp * 1.6).toFixed(2);
       const st = (amp ? `--dur:${dur}s;--del:${del}s;--ax:${ax}px;--ay:${ay}px;--ar:${ar}deg;` : "") + (damp ? `--dy:${(damp * (0.6 + rnd() * 0.8)).toFixed(2)}em;--di:${i};` : "");
       return `<b class="${c.join(" ")}" data-i="${i}" data-g="${ch}" style="${st}"${amp ? ' data-sh="1"' : ""}${damp ? ' data-dn="1"' : ""}>${glyph}</b>`;
-    }).join("");
+    });
+    let html = "", word = "";                                        // cada palabra en un bloque que no se parte (si no, las letras sueltas saltan de linea)
+    parts.forEach(pt => { if (pt === " " || pt.startsWith("<i")) { html += (word ? `<span class="wd">${word}</span>` : "") + pt; word = ""; } else word += pt; });
+    el.innerHTML = html + (word ? `<span class="wd">${word}</span>` : "");
     if (amp) el.classList.add("ch-shaky");
     if (damp) el.classList.add("ch-dance");
     if (has("mirror") && !fx.unmirror) el.classList.add("ch-mirror");
     if (has("upside") && !fx.unmirror) el.classList.add("ch-upside");
-    if (riddle) el.classList.add("ch-riddle");
+    if (riddle) { el.classList.add("ch-riddle"); if (text.length > 190) el.classList.add("ch-long"); }
     if (has("scroll") && !fx.noMarquee) { el.innerHTML = `<span class="ch-marq">${el.innerHTML}</span>`; el.classList.add("ch-scroll"); }
     const restore = (b, g) => { b.classList.remove("gap", "dot", "faint", "rune"); b.classList.add("fix"); b.textContent = g; };
     const hid = [...hidden, ...dots];
@@ -278,7 +281,7 @@ window.AIQ = window.AIQ || {};
     const mem = get("memory");
     if (mem) later(() => { el.classList.add(fx.keepName ? "ch-dim" : "ch-fade"); }, par(mem).ms);
   }
-  function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-scroll", "ch-nocountry", "fixed"); } }
+  function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
   function mapSpec(map, o) {
@@ -367,7 +370,7 @@ window.AIQ = window.AIQ || {};
       $("app").classList.remove("ch-negative");
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
       for (const id of ["askName", "askSub"]) { const el = $(id); if (el) { el.classList.remove("ch-fade", "ch-dim", "ch-riddle", "ch-nocountry"); el.querySelectorAll(".gap,.dot,.rune,.faint").forEach(b => { b.classList.remove("gap", "dot", "rune", "faint"); b.textContent = b.dataset.g || b.textContent; }); } }
-      const o = A.core && A.core.S.qs[A.core.S.qi], sb = $("askSub"); if (o && sb && o.sub && sb.textContent.includes("▮")) sb.textContent = A.tx(o.sub);       // al responder, el pais vuelve
+      const o = A.core && A.core.S.qs[A.core.S.qi], sb = $("askSub"); if (o && sb && o.sub && !o.clue && sb.textContent.includes("▮")) A.renderBlanks(sb, A.tx(o.sub));       // al responder, el pais vuelve
     },
     suspend() { S.suspended = true; this.reveal(500); const o = A.core && A.core.S.qs[A.core.S.qi]; if (o) decorate(o); if (A.pointer && A.pointer.mods) A.pointer.mods(); },
     upright() { const map = S.map; if (map && map.setOrient) map.setOrient(false, 900); },

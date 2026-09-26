@@ -28,15 +28,26 @@ window.AIQ = window.AIQ || {};
      y nunca termina a media frase (los extractos vienen cortados a ~240 caracteres) */
   const cutLast = (t, min = 30) => { const re = /[.!?…](?=\s)/g; let m, p = -1; while ((m = re.exec(t))) { const w = t.slice(Math.max(0, m.index - 3), m.index); if (!/(^|\s)\S{1,2}$/.test(w)) p = m.index; } return p > min ? t.slice(0, p + 1) : t; };
   const badParen = t => /[^\u0000-\u024F\u1E00-\u1EFF\u2000-\u206F\u20A0-\u20CF°–—’‘“”«»·…]/.test(t) || /roman|pron|AFI|IPA|API|escuchar|listen|écouter|ouvir|anhören|ascolta|lit\.|literal|wörtlich|amtlich|[;:[]/i.test(t) || t.length > 70;
+  /* quita los parentesis (incluso anidados) con pronunciaciones, otros alfabetos o listas de idiomas; deja los utiles y el ultimo sin cerrar */
+  const stripParens = s => {
+    let out = "", depth = 0, start = -1;
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (c === "(") { if (!depth) start = i; depth++; }
+      else if (c === ")" && depth) { depth--; if (!depth) { const t = s.slice(start + 1, i); if (badParen(t) || /\/[^\/]{2,}\//.test(t)) out = out.replace(/\s+$/, ""); else out += s.slice(start, i + 1); } }
+      else if (!depth) out += c;
+    }
+    return depth ? out + s.slice(start) : out;
+  };
   A.cleanFact = raw => {
     let s = String(raw || "").replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/\s+/g, " ").trim(); if (!s) return "";
     const truncated = !/[.!?…»”)]$/.test(s) || /(^|\s)\S{1,2}\.$/.test(s);
-    for (let k = 0; k < 6; k++) { const n = s.replace(/\s*\(([^()]*)\)/g, (m, t) => (badParen(t) ? "" : m)); if (n === s) break; s = n; }
+    s = stripParens(s).replace(/\s*\[[^\]]{1,90}\]/g, "").replace(/\s*\/[^\/]*[ɐ-˿̀-ͯ]+[^\/]*\//g, "").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/\.\.(?!\.)/g, ".");
     let d = 0, first = -1; for (let i = 0; i < s.length; i++) { if (s[i] === "(") { if (!d) first = i; d++; } else if (s[i] === ")" && d) d--; }
     if (d > 0 && first > -1) s = s.slice(0, first);                                                   // parentesis sin cerrar (texto cortado)
     s = s.replace(/\s+([,.;:])/g, "$1").replace(/,\s*\./g, ".").replace(/\s{2,}/g, " ").replace(/[,;:\s]+$/, "").trim();
-    if (truncated || d > 0) { const c = cutLast(s + " ", 12).trim(), tail = s.length - c.length; s = c !== s && tail < 60 ? c : s.replace(/\s+\S*$/, "") + "…"; }   // si la frase cortada aun aporta, se deja con puntos suspensivos
-    if (s.length > 230) { const c = cutLast(s.slice(0, 230) + " ").trim(); s = c.length < s.length && /[.!?…]$/.test(c) ? c : s.slice(0, 228).replace(/\s+\S*$/, "") + "…"; }
+    if (truncated || d > 0) { const c = cutLast(s + " ", 12).trim(), tail = s.length - c.length; s = c !== s && tail < 60 ? c : s.replace(/\s+\S*$/, "").replace(/[,;:\s]+$/, "") + "."; }   // nunca puntos suspensivos: si aun aporta se deja, cerrada con punto
+    if (s.length > 440) { const c = cutLast(s.slice(0, 440) + " ").trim(); s = c.length < s.length && /[.!?…]$/.test(c) ? c : s.slice(0, 438).replace(/\s+\S*$/, "").replace(/[,;:\s]+$/, "") + "."; }
     if (s && !/[.!?…»”)]$/.test(s)) s += ".";
     return s;
   };

@@ -215,7 +215,7 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------- ronda ---------------- */
   /* el pais siempre a la vista: si el lugar no tiene pais (mares, desiertos, cordilleras...), se muestra su continente */
-  const withSub = q => { if (q.t === "p" && !(q.sub && (q.sub.en || q.sub.es))) { const c = CONT[continentOf(q)]; if (c) q.sub = { es: c.es, en: c.en }; } return q; };
+  const withSub = q => { if (q.t === "p" && !q.clue && !(q.sub && (q.sub.en || q.sub.es))) { const c = CONT[continentOf(q)]; if (c) q.sub = { es: c.es, en: c.en }; } return q; };
   function pickQuestions(n) {
     const def = rdef(), list = poolFor(roundNo()), rr = A.rng(`${run.seed}:q:${roundNo()}:${run.attempt}`), used = new Set(run.used);
     let cand = list.filter(q => !used.has(q.cid[0]));
