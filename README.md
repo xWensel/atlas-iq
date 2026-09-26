@@ -1,5 +1,7 @@
 # Atlas IQ
 
+**v0.13.1** - Menu simplificado: tres modos. Se retira el modo **Extendido** y el **Competitivo** se convierte en **Reto diario** (una Aventura con semilla comun para todos, con su clasificacion local; global si el servidor tiene la API activada). Home: Clasico, Aventura y Reto diario.
+
 **v0.13** - Reliquias claras y el pais siempre a la vista.
 - **Pais como mecanica general:** en la placa de cada pregunta ves siempre el pais del lugar; si no tiene (desiertos, mares, cordilleras) ves su continente. El **Pasaporte** ilumina ese pais en el mapa; el **Atlas de bolsillo** lo ilumina solo a mitad de tiempo en cada pregunta y el **Oraculo** (legendario) desde el primer segundo.
 - **Poda de reliquias: de 72 a 33.** Fuera todo lo que sobraba, se solapaba o no se entendia (GPS, reticulo, mira telescopica, termometro, comodin, casa de empenos, jackpot, prismaticos, sextante de hemisferio, inicial, y 25 mas). Quedan solo las que se entienden de un vistazo: ayudas contra retos (texto, mapa, puntero), pistas (continente, pais, nota de campo, sonar afinado), tiempo, doblones, y supervivencia. Cada reto sin ayuda directa se resuelve con el Interruptor, el Talisman, la Llave maestra o sobornando al crupier.

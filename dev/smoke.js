@@ -10,12 +10,12 @@ window.smoke = async function (lang = "fr") {
   D.setLang(lang);
   const step = async (name, fn, ms = 350) => { try { await fn(); } catch (e) { errors.push(name + ": " + e.message); } await wait(ms); };
   // menus
-  for (const s of ["home", "classic", "extended", "adventure", "compete", "profile"]) await step("hub " + s, () => A.hub.screen(s));
+  for (const s of ["home", "classic", "adventure", "daily", "profile"]) await step("hub " + s, () => A.hub.screen(s));
   await step("codex", () => { A.codex.open(); }, 600); await step("codex close", () => A.codex.close());
   for (const t of ["general", "sound", "video", "data"]) await step("settings " + t, () => { C.openSettings(true); document.querySelector(`[data-seg=settab] [data-v=${t}]`).click(); });
   await step("settings close", () => C.openSettings(false));
   // clasico y extendido: un nivel con dos respuestas
-  for (const mode of ["classic", "extended"]) {
+  for (const mode of ["classic"]) {
     for (const camp of A.CAMPAIGNS.filter(x => x.mode === mode).slice(0, 3)) {
       await step(mode + " " + camp.id, async () => {
         S.mode = mode; S.campId = camp.id; S.startLevel = 0; C.newRun(); await wait(400); S.skipIntro && S.skipIntro(); await wait(700);

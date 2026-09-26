@@ -1,13 +1,12 @@
 /*
- * Atlas IQ - pantalla principal (v0.6): elige modo (Aventura, Clasico, Competitivo, Extendido), Enciclopedia y Perfil.
+ * Atlas IQ - pantalla principal (v0.6): elige modo (Clasico, Aventura, Reto diario), Enciclopedia y Perfil.
  * Se apoya en A.core (lo publica game.js).
  */
 window.AIQ = window.AIQ || {};
 (function (A) {
   const T = A.T, $ = id => document.getElementById(id), C = () => A.core;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const ICO = { adventure: "m_adv", classic: "m_classic", compete: "m_compete", extended: "m_ext", profile: "m_prof" };
-  const BOOK = () => A.icon("m_codex");
+    const BOOK = () => A.icon("m_codex");
   const tools = () => `<div class="menu-tools">
       <button class="menu-gear" id="menuCodex" aria-label="${A.t("tip.codex")}" data-tip="tip.codex" data-key="C">${A.icon("m_codex")}</button>
       <button class="menu-gear txt" id="menuLang" aria-label="${A.t("tip.lang")}" data-tip="tip.lang">${A.lang.toUpperCase()}</button>
@@ -24,7 +23,7 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ pantalla principal */
   function home() {
     const c = C(), P = A.profile.get(), adv = P.adv, today = A.rank.boards.daily(), done = P.daily[today], saved = A.adv.hasSave(), sm = saved && A.adv.summary();
-    /* cada modo es una carta de la baraja real: A (aventura), K (clasico), Q (competitivo), J (extendido) */
+    /* cada modo es una carta de la baraja real: A (aventura), K (clasico), Q (reto diario) */
     const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}">
       ${id === "adventure" ? '<i class="marq"></i>' : ""}<span class="ix tl"><b>${rank}</b>${A.icon(suit)}</span><span class="ix br"><b>${rank}</b>${A.icon(suit)}</span>
       ${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-desc">${desc}</span><span class="mc-stat">${meta}</span></button>`;
@@ -34,8 +33,7 @@ window.AIQ = window.AIQ || {};
       <div class="hh-cards">
         ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Las preguntas y la puntuación exactas del juego original: seis partidas.", "The original game's exact questions and scoring: six campaigns."), T("Pulido y sin trampas", "Untouched"))}
         ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: el crupier cambia las reglas. Mapa a oscuras, del revés, letras que tiemblan… y perks para vencerlo.", "Roguelike: the dealer changes the rules. Dark maps, upside-down worlds, shaky letters… and perks to beat him."), saved ? T("▶ Partida guardada", "▶ Saved run") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
-        ${mc("compete", "Q", "s_compass", "card_compete", T("Competitivo", "Competitive"), T("Reto diario con la misma semilla para todos y clasificaciones.", "A daily challenge with a shared seed, plus leaderboards."), done ? T("Hoy: ", "Today: ") + A.fmt(done.score) : T("Reto de hoy pendiente", "Today's challenge is waiting"))}
-        ${mc("extended", "J", "s_pin", "card_ext", T("Extendido", "Extended"), T("Vuelta al mundo Atlas, Historia y pistas: contenido nuevo y la racha multiplica tus puntos.", "Atlas World Tour, History & Clues: new content, and streaks multiply your points."), T("Contenido nuevo", "New content"))}
+        ${mc("daily", "Q", "s_compass", "card_compete", T("Reto diario", "Daily challenge"), T("La misma expedición para todos, una vez al día. Compara tu puntuación.", "The same expedition for everyone, once a day. Compare your score."), done ? T("Hoy: ", "Today: ") + A.fmt(done.score) : T("El de hoy te espera", "Today's is waiting"))}
       </div>
       <div class="hh-bottom">
       ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${T("Acto", "Act")} ${sm.act} · ${T("Ronda", "Round")} ${sm.round} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
@@ -52,7 +50,7 @@ window.AIQ = window.AIQ || {};
   const scr = (title, inner, cls = "") => `<div class="scr ${cls}"><header class="scr-head"><button class="hub-back" id="hubBack">${A.icon("u_back", "sm")}${T("Menú", "Menu")}</button><h2>${title}</h2>${tools()}</header><div class="scr-body">${inner}</div></div>`;
   const startBtn = (id, big, small, primary) => `<button class="startbtn" id="${id}" ${primary ? "data-primary" : ""}><span class="sb-ic">${A.icon("chip_r")}</span><span class="sb-t"><b>${big}</b><i>${small}</i></span><span class="sb-ar">${A.icon("u_next", "sm")}</span></button>`;
 
-  /* ------------------------------------------------------------------ Clasico / Extendido: campanas */
+  /* ------------------------------------------------------------------ Clasico: campanas */
   function campaigns(mode) {
     const c = C(), S = c.S; S.mode = mode; const camps = A.CAMPAIGNS.filter(x => x.mode === mode);
     if (!camps.find(x => x.id === S.campId)) { S.campId = camps[0].id; S.startLevel = 0; }
@@ -65,7 +63,7 @@ window.AIQ = window.AIQ || {};
     }).join("");
     let picker = "";
     if (pr.unlocked > 1) { for (let i = 0; i < cur.levels.length; i++) picker += `<button class="lv${i === S.startLevel ? " sel" : ""}" data-lv="${i}" ${i >= pr.unlocked ? "disabled" : ""}>${i + 1}</button>`; picker = `<div class="picker"><span>${A.t("title.from")}</span><div class="lrail">${picker}</div></div>`; }
-    c.dialog(scr(mode === "classic" ? T("Clásico", "Classic") : T("Extendido", "Extended"), `
+    c.dialog(scr(T("Clásico", "Classic"), `
       <p class="mode-d">${A.t("mode." + mode + ".d")}${mode === "classic" && A.t("mode.classic.note") ? `<small>${A.t("mode.classic.note")}</small>` : ""}</p>
       <div class="camps">${list}</div>
       <div class="camp-foot">${picker}${startBtn("goBtn", A.t("go.label"), A.t("go.sub", { n: S.startLevel + 1, name: A.tx(cur.title) }), true)}</div>`, "s-camps"), "tablewrap");
@@ -120,23 +118,20 @@ window.AIQ = window.AIQ || {};
   }
   function enterRun(fn) { const c = C(); c.S.ranked = null; c.prepareRun(); fn(); }
 
-  /* ------------------------------------------------------------------ Competitivo */
+  /* ------------------------------------------------------------------ Reto diario (una Aventura con semilla comun) */
   let board = null;
-  const CLASSIC_BOARDS = () => A.CAMPAIGNS.filter(x => x.mode === "classic").map(x => ({ id: "classic-" + x.id, title: T("Clásico · ", "Classic · ") + A.tx(x.title), camp: x.id }));
-  function compete() {
+  function daily() {
     const c = C(), P = A.profile.get(), day = A.rank.boards.daily(), done = P.daily[day];
-    const boards = [{ id: day, title: T("Reto diario", "Daily challenge") }, { id: "adv-all", title: T("Aventura · histórico", "Adventure · all time") }, ...CLASSIC_BOARDS()];
+    const boards = [{ id: day, title: T("Reto de hoy", "Today's challenge") }, { id: "adv-all", title: T("Aventura · histórico", "Adventure · all time") }];
     if (!board || !boards.find(b => b.id === board)) board = day;
     const dstr = String(A.rank.ymd()).replace(/(\d{4})(\d\d)(\d\d)/, "$3/$2/$1");
-    c.dialog(scr(T("Competitivo", "Competitive"), `<div class="cp-grid">
+    c.dialog(scr(T("Reto diario", "Daily challenge"), `<div class="cp-grid">
       <section class="cp-main">
-        <p class="mode-d">${T("Tus puntos se comparan con los de los demás. Todos juegan el mismo reto diario.", "Your points are compared with everyone else's. Everyone plays the same daily challenge.")}</p>
+        <p class="mode-d">${T("Todos juegan la misma expedición hoy: mismas preguntas, mismos retos, mismas ofertas. Gana quien la juegue mejor.", "Everyone plays the same expedition today: same questions, same challenges, same offers. Best play wins.")}</p>
         <label class="nick"><span>${T("Tu nombre en la clasificación", "Your leaderboard name")}</span><input id="nickIn" maxlength="16" value="${esc(P.name)}" placeholder="${T("Aventurero", "Adventurer")}"></label>
         <div class="daily"><div class="dy-art">${A.pic("card_compete")}</div><div class="dy-body"><span class="tag">${T("Reto diario", "Daily challenge")} · ${dstr}</span><b>${T("Aventura con semilla común", "Adventure with a shared seed")}</b>
           <i>${T("Baraja Explorador, Ascensión 1. Un intento puntúa; después puedes practicar.", "Explorer deck, Ascension 1. One attempt counts; then you can practise.")}</i>
           <div>${done ? `<span class="daily-done">${T("Hoy: ", "Today: ")} <b>${A.fmt(done.score)}</b></span><button class="btn-line" id="dailyGo">${T("Practicar (no puntúa)", "Practise (unranked)")}</button>` : startBtn("dailyGo", T("Jugar el reto de hoy", "Play today's challenge"), T("Todos, la misma semilla", "Everyone, the same seed"), true)}</div></div></div>
-        <div class="daily rk"><div class="dy-body"><span class="tag">${T("Clásico clasificado", "Ranked Classic")}</span><b>${T("Una campaña original de principio a fin", "An original campaign start to finish")}</b>
-          <div class="rk-camps">${A.CAMPAIGNS.filter(x => x.mode === "classic").map(x => `<button class="chipbtn" data-rk="${x.id}">${A.tx(x.title)}</button>`).join("")}</div></div></div>
       </section>
       <aside class="cp-board"><h4 class="hub-sub">${T("Clasificación", "Leaderboard")}</h4>
         <select id="boardSel" class="board-sel">${boards.map(b => `<option value="${b.id}" ${b.id === board ? "selected" : ""}>${b.title}</option>`).join("")}</select>
@@ -144,8 +139,7 @@ window.AIQ = window.AIQ || {};
     wireTools(); $("hubBack").onclick = () => screen("home");
     $("nickIn").onchange = e => A.profile.setName(e.target.value);
     $("boardSel").onchange = e => { board = e.target.value; loadBoard(); };
-    $("dailyGo").onclick = () => { A.profile.setName($("nickIn").value); A.sfx.depart(); enterRun(() => A.adv.begin({ deck: "explorer", asc: 1, seed: day, ranked: !done, board: day })); };
-    document.querySelectorAll("[data-rk]").forEach(b => (b.onclick = () => { A.profile.setName($("nickIn").value); A.sfx.depart(); const S = c.S; S.mode = "classic"; S.campId = b.dataset.rk; S.startLevel = 0; S.ranked = b.dataset.rk; c.newRun(); }));
+    $("dailyGo").onclick = () => { A.profile.setName($("nickIn").value); A.sfx.depart(); if (A.adv.hasSave()) A.adv.abandon(); enterRun(() => A.adv.begin({ deck: "explorer", asc: 1, seed: day, ranked: !done, board: day })); };
     loadBoard();
   }
   async function loadBoard() {
@@ -175,8 +169,8 @@ window.AIQ = window.AIQ || {};
   }
 
   function screen(id) {
-    C().S.hub = id; C().S.mode = id === "extended" ? "extended" : C().S.mode;
-    ({ home, classic: () => campaigns("classic"), extended: () => campaigns("extended"), adventure, compete, profile }[id] || home)();
+    C().S.hub = id;
+    ({ home, classic: () => campaigns("classic"), adventure, daily, profile }[id] || home)();
     C().refreshSkinBits && C().refreshSkinBits();
   }
   A.hub = { render: id => screen(id || "home"), screen };
