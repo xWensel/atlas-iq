@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.22.1** - Pangea rehecha: ajuste conjunto por descenso de coordenadas con solape cero entre continentes (Sudamerica gira 40 grados y se encaja en Africa, Norteamerica se cierra contra Europa sin cubrir Islandia ni el Reino Unido, Asia se curva contra Europa y Arabia, Oceania al sur); el reto arranca al 90/95/100 % y no deja solapes apreciables.
+
 **v0.22.0** - Pixel art nitido, legibilidad, viento y HUD.
 - **Arte:** los 248 iconos y las 38 escenas se han reconvertido desde sus originales a pixel art nitido (`tools/pixelize_all.py`: rejilla nativa 64 px para iconos, 128 para el crupier y tipos, 256 de ancho para escenas; paleta limitada sin degradados ni dither; alfa de 1 bit sin halos; ampliacion por vecino mas cercano) y se muestran sin suavizado en los tamanos grandes.
 - **Letra:** tamanos minimos mas grandes (etiquetas Silkscreen desde 12 px, textos Jersey desde 15 px), sin suavizado de fuente; la placa de la pregunta no se ha tocado.

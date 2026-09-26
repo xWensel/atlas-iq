@@ -149,7 +149,7 @@ window.AIQ = window.AIQ || {};
     case "flicker": return { iv: [[5.5, 8.5], [3.8, 6], [2.5, 4.2]][i], len: [250, 450, 700][i] * fx.blackoutMul * h };
     case "lightning": return { iv: [[4.5, 7], [3.2, 5.2], [2.2, 4]][i] };
     case "wrongborders": return { amp: [0.014, 0.024, 0.038][i] * h };
-    case "pangea": return { k: [0.75, 0.9, 1][i] * fx.plateMul * h };
+    case "pangea": return { k: [0.9, 0.95, 1][i] * fx.plateMul * h };
     case "shuffle": return { k: [0.6, 0.85, 1][i] * fx.plateMul * h };
     case "spread": return { k: [0.5, 0.8, 1][i] * fx.plateMul * h };
     case "tilt": return { k: [0.4, 0.65, 0.9][i] * fx.plateMul * h };
@@ -290,8 +290,8 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ mapa: deformaciones */
   /* Pangea (unidades del mapa; indices 0 Africa, 1 Norteamerica, 2 Sudamerica, 3 Asia, 4 Europa, 5 Oceania, 6 Antartida). Ajuste de contacto calculado con las mascaras reales:
      Africa, Europa y la Antartida quedan quietas; Sudamerica gira y se encaja en la costa de Africa, Norteamerica se cierra contra Europa y el noroeste africano,
-     Asia se pega a Europa y a Arabia y Oceania a la Antartida. Rotaciones en radianes (positivas = antihorario). */
-  const PANGEA = { shift: [[0, 0], [0.529, -0.152], [0.871, -0.443], [0.383, 0.143], [0, 0], [-1.124, -0.699], [0, 0]], rot: [0, 5, 35, -7, 0, 20, 0].map(d => d * Math.PI / 180) };
+     Asia se curva contra Europa y Arabia y Oceania se coloca al sur. Ajuste final por descenso de coordenadas con solape cero entre continentes (salvo los contactos que ya existen en el mapa real). Rotaciones en radianes (positivas = antihorario). */
+  const PANGEA = { shift: [[0, 0], [0.559, 0.448], [0.811, -0.413], [-0.007, -0.097], [0, 0], [-1.154, -0.309], [0, 0]], rot: [0, 5, 40, -22, 0, 40, 0].map(d => d * Math.PI / 180) };
   function mapSpec(map, o) {
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}`);
