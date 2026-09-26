@@ -21,7 +21,7 @@ window.AIQ = window.AIQ || {};
   /* cada tarjeta lleva indice de carta de poker: rango por rareza (5, 8, K, A) y palo geografico por tipo */
   const TYPE_SUIT = { city: "s_pin", capital: "s_compass", country: "s_compass", landmark: "s_peak", nature: "s_peak", water: "s_palm", strait: "s_palm", battle: "s_peak", event: "s_pin", history: "s_peak", person: "s_compass", curiosity: "s_palm", place: "s_pin" };
   const RANK = ["5", "8", "K", "A"], SUIT_RED = { s_pin: 1, s_compass: 1 };
-  const ixs = e => { const su = TYPE_SUIT[e.type] || "s_pin", red = SUIT_RED[su] ? " red" : ""; return `<span class="ix tl${red}"><b>${RANK[e.rarity]}</b>${A.icon(su)}</span><span class="ix br${red}"><b>${RANK[e.rarity]}</b>${A.icon(su)}</span>`; };
+  const ixs = () => "";                                              // las tarjetas ya no llevan indices de baraja
   const iconSvg = t => A.icon(TYPE_IC[t] || "t_place", "cx-ic");
 
   const continent = (lat, lon) => {

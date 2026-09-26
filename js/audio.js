@@ -197,7 +197,7 @@ window.AIQ = window.AIQ || {};
     if (rnd() < 0.14) crackle(t);
   }
 
-  /* ------------------------------------------------------------------ 9 canciones de casino: mismo estilo, ritmos y melodias distintos */
+  /* ------------------------------------------------------------------ 14 canciones de casino: mismo estilo, ritmos y melodias distintos */
   /*  Rotan solas cada ~90 s (al acabar una vuelta completa de acordes) con un pequeno "cambio de disco". La 0 es el lounge de siempre. */
   function organ(m, t, dur, vol = 0.02) {
     const f = mtof(m), g = ctx.createGain(), tr = ctx.createGain(), lp = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), lg = ctx.createGain();
@@ -331,6 +331,68 @@ window.AIQ = window.AIQ || {};
         } else if (st % 4 === 0) shaker(t, 0.7);
       },
     },
+    { /* 9: lo-fi de madrugada: piano polvoriento, bombo flojo y crepitar de vinilo */
+      name: "Cash Out", bpm: 74, sw: 0.22, spb: 16, tonic: 62, scale: [0, 3, 5, 7, 10], rh: [[0, 6, 10], [0, 3, 8, 12], [2, 6, 12], [0, 4, 8, 11]],
+      lead: (n, t, d, v) => epiano(n, t, { vol: v * 0.9, dur: Math.min(1.1, d + 0.25), mod: 1, idx: 1.2, rev: 0.55 }),
+      prog: [Ch(38, [53, 57, 60, 64]), Ch(43, [53, 59, 64, 69]), Ch(36, [52, 55, 59, 62]), Ch(45, [55, 60, 64, 67]), Ch(34, [53, 57, 62, 65]), Ch(43, [55, 58, 62, 65]), Ch(45, [55, 61, 64, 70]), Ch(38, [53, 57, 60, 64])],
+      play(st, bar, t, c, nx, m, r) {
+        if (st === 0) upright(c.r, t, 0.5, 0.2); if (st === 10 && (m >= 1 || r() < 0.5)) upright(c.r + (r() < 0.5 ? 7 : 0), t, 0.3, 0.14);
+        if (st === 2 || (st === 9 && (m >= 1 || r() < 0.4))) stab(c.v, t, 0.9, 0.036, EP);
+        if (st === 0 && bar % 2 === 0) pad(c.v.map(n => n - 12), t, STEP * 30, 0.02);
+        if (m >= 1) { if (st === 0 || (st === 7 && r() < 0.5) || (st === 10 && r() < 0.7)) kick(t, st === 0 ? 0.55 : 0.35); if (st === 4 || st === 12) rim(t, 0.5); if (st % 2 === 0) hat(t, 0.5, false); }
+        else if (st === 4 || st === 12) brush(t, 0.4);
+        if (r() < 0.35) crackle(t);
+      },
+    },
+    { /* 10: reggae, one-drop: bombo y aro en el tercer tiempo, guitarra en el contratiempo */
+      name: "Banca al Día", bpm: 76, sw: 0.06, spb: 16, tonic: 69, scale: [0, 3, 5, 7, 10], rh: [[0, 6, 8, 12], [2, 6, 10, 14], [0, 3, 8, 11], [0, 8, 10, 14]],
+      lead: (n, t, d, v) => flute(n, t, Math.min(d, 0.7), v * 1.05),
+      prog: [Ch(33, [57, 60, 64]), Ch(38, [57, 62, 65]), Ch(33, [57, 60, 64]), Ch(40, [56, 59, 64]), Ch(33, [57, 60, 64]), Ch(41, [57, 60, 65]), Ch(43, [55, 59, 62]), Ch(40, [56, 59, 62, 64])],
+      play(st, bar, t, c, nx, m, r) {
+        const B = [[0, 0, 0.28, 0.25], [3, 0, 0.14, 0.15], [6, 7, 0.22, 0.2], [8, 0, 0.3, 0.22], [11, 3, 0.14, 0.15], [14, 5, 0.16, 0.16]];
+        for (const [s0, iv, d, v] of B) if (s0 === st && (m >= 1 || s0 % 8 === 0)) upright(c.r + iv, t, d, v);
+        if (has([2, 6, 10, 14], st)) stab(c.v, t, 0.08, m >= 1 ? 0.042 : 0.03, EPC);
+        if (m >= 1) { if (st === 8) { kick(t, 0.8); rim(t, 1); } if (st % 2 === 0) hat(t, st % 4 === 0 ? 0.9 : 0.5, st === 14); if (has([3, 7, 11, 15], st)) organ(c.v[0] + 12, t, STEP * 1.5, 0.014); }
+        else if (st === 8) rim(t, 0.6);
+      },
+    },
+    { /* 11: reggaeton, dembow con bajo 808 */
+      name: "Apuesta en Vivo", bpm: 92, sw: 0, spb: 16, tonic: 69, scale: [0, 3, 5, 7, 10], rh: [[0, 3, 6, 10, 12], [0, 3, 8, 11, 14], [2, 6, 10, 14], [0, 3, 6, 8, 12]],
+      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.5, dur: Math.min(d, 0.4), bright: 5, bus: musBus, rev: 0.25, wave: "sawtooth" }),
+      prog: [Ch(33, [57, 60, 64]), Ch(41, [57, 60, 65]), Ch(36, [55, 60, 64]), Ch(43, [55, 59, 62]), Ch(33, [57, 60, 64]), Ch(41, [57, 60, 65]), Ch(38, [57, 62, 65]), Ch(40, [56, 59, 64])],
+      play(st, bar, t, c, nx, m, r) {
+        if (st === 0) upright(c.r, t, 0.5, 0.27); if (st === 6 && (m >= 1 || r() < 0.5)) upright(c.r, t, 0.26, 0.2); if (st === 10 && m >= 1) upright(c.r + (r() < 0.5 ? 7 : 12), t, 0.2, 0.17); if (st === 14 && m >= 1 && r() < 0.6) upright(nx.r, t, 0.16, 0.15);
+        if (has([3, 6, 11, 14], st) && (m >= 1 || st === 3)) stab(c.v, t, 0.1, 0.03, PL);
+        if (m >= 1) { if (has([0, 4, 8, 12], st)) kick(t, st === 0 ? 1 : 0.85); if (has([3, 6, 11, 14], st)) snare(t, st === 3 || st === 11 ? 0.8 : 0.55); if (st % 2 === 0) shaker(t, st % 4 === 0 ? 0.9 : 0.5); if (st === 15 && r() < 0.4) hat(t, 0.8, true); }
+        else { if (st === 0 || st === 8) kick(t, 0.7); if (st === 3 || st === 11) rim(t, 0.6); }
+      },
+    },
+    { /* 12: flamenco, rumba flamenca con rasgueos, palmas y cajon (cadencia andaluza) */
+      name: "Pleno al Quince", bpm: 108, sw: 0, spb: 16, tonic: 69, scale: [0, 1, 4, 5, 7, 8, 10], rh: [[0, 2, 3, 6, 8, 11], [0, 3, 6, 8, 10, 14], [2, 3, 6, 10, 12], [0, 4, 6, 8, 12, 14]],
+      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.6, dur: Math.min(d, 0.45), bright: 6.5, bus: musBus, rev: 0.3, wave: "sawtooth" }),
+      prog: [Ch(33, [57, 60, 64, 69]), Ch(43, [55, 59, 62, 67]), Ch(41, [57, 60, 65, 69]), Ch(40, [56, 59, 64, 68]), Ch(33, [57, 60, 64, 69]), Ch(43, [55, 59, 62, 67]), Ch(41, [57, 60, 65, 69]), Ch(40, [56, 59, 64, 68])],
+      play(st, bar, t, c, nx, m, r) {
+        if (st === 0) upright(c.r, t, 0.3, 0.16); if (st === 8) upright(c.r + 7, t, 0.25, 0.13);
+        // rasgueo de la guitarra (acordes rapidos de arriba a abajo)
+        const RS = m >= 1 ? [0, 3, 6, 10, 12, 14] : [0, 6, 12];
+        if (RS.includes(st)) c.v.slice().reverse().forEach((n, i) => pluck(n + 12, t + i * 0.014, { vol: 0.05 * (st === 0 ? 1.2 : 0.9), dur: 0.22, bright: 5, bus: musBus, rev: 0.2, wave: "sawtooth" }));
+        if (m >= 1) { if (has([0, 8], st)) kick(t, 0.5); if (has([4, 12], st)) snare(t, 0.55); if (has([2, 6, 10, 14], st)) rim(t, 1.15); if (st % 2 === 1 && r() < 0.3) rim(t, 0.6); }
+        else if (has([4, 12], st)) rim(t, 0.8);
+      },
+    },
+    { /* 13: deep house, bombo a negras, contratiempo abierto y acordes calidos */
+      name: "Handicap Asiático", bpm: 122, sw: 0.02, spb: 16, tonic: 62, scale: [0, 3, 5, 7, 10], rh: [[0, 6, 10], [3, 8, 11, 14], [0, 4, 10], [2, 6, 12]],
+      lead: (n, t, d, v) => epiano(n, t, { vol: v * 0.85, dur: Math.min(0.9, d + 0.2), mod: 2, idx: 1.6, rev: 0.5 }),
+      prog: [Ch(38, [53, 57, 60, 64]), Ch(38, [53, 57, 60, 64]), Ch(43, [55, 58, 62, 65]), Ch(43, [55, 58, 62, 65]), Ch(34, [53, 57, 62, 65]), Ch(34, [53, 57, 62, 65]), Ch(36, [55, 58, 64, 67]), Ch(33, [55, 61, 64, 67])],
+      play(st, bar, t, c, nx, m, r) {
+        if (has([2, 6, 10, 14], st) && (m >= 1 || st === 2 || st === 10)) upright(c.r + (st === 14 && r() < 0.4 ? 7 : 0), t, 0.2, 0.22);
+        if (st === 0 && m >= 1) pad(c.v, t, STEP * 15, 0.028);
+        if (has(m >= 1 ? [3, 6, 10, 13] : [3, 10], st)) stab(c.v, t, 0.24, 0.032, EPC);
+        if (has([0, 4, 8, 12], st)) kick(t, m >= 1 ? 1 : 0.6);
+        if (m >= 1) { if (has([2, 6, 10, 14], st)) hat(t, 1, true); if (st === 4 || st === 12) snare(t, 0.35); if (st % 2 === 1) shaker(t, 0.55); }
+        else if (has([2, 6, 10, 14], st)) hat(t, 0.6, true);
+      },
+    },
   ];
   /* titulos de las canciones: terminos de apuestas [es, en, fr, pt, de, it] */
   const NAMES = [
@@ -343,6 +405,11 @@ window.AIQ = window.AIQ || {};
     ["All-in", "All In", "Tapis !", "All-in", "All-in", "All-in"],
     ["Combinada", "Parlay", "Pari combiné", "Múltipla", "Kombiwette", "Multipla"],
     ["Sube la apuesta", "Raise the Stakes", "Je relance", "Aumenta a aposta", "Einsatz erhöhen", "Rilancio"],
+    ["Retirar ganancias", "Cash Out", "Encaisser", "Retirar ganhos", "Auszahlen", "Incassa"],
+    ["Banca al día", "Bankroll", "Bankroll", "Banca em dia", "Bankroll", "Bankroll"],
+    ["Apuesta en vivo", "Live Bet", "Pari en direct", "Aposta ao vivo", "Live-Wette", "Scommessa live"],
+    ["Pleno al quince", "Straight Up", "Plein au quinze", "Pleno ao quinze", "Volltreffer", "Pieno al quindici"],
+    ["Hándicap asiático", "Asian Handicap", "Handicap asiatique", "Handicap asiático", "Asiatisches Handicap", "Handicap asiatico"],
   ];
   const ROT = 88;                                            // segundos por cancion (aprox.: se cambia al terminar una vuelta de acordes)
   const SK = { bpm: 86, sw: 0.3 };                           // tempo y swing del lounge (los fija setSkin)

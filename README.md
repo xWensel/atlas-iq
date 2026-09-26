@@ -2,6 +2,10 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.19.0** - 5 canciones nuevas y cartas sin indices.
+- **Musica (14 canciones):** mismo motor y estilo casino, ahora tambien **lo-fi** ("Retirar ganancias / Cash Out"), **reggae** one-drop ("Banca al dia / Bankroll"), **reggaeton** con dembow y bajo ("Apuesta en vivo / Live Bet"), **flamenco** con rasgueos, palmas y cajon en cadencia andaluza ("Pleno al quince / Straight Up") y **deep house** ("Handicap asiatico"). Titulos en los 6 idiomas; rotan solas con las demas y aparecen en el selector de canciones.
+- **Cartas sin numeracion:** fuera los indices (A, K, Q, J, numeros y palos en las esquinas) de las cartas de la tienda, herramientas, vidas y Enciclopedia; se mantiene el formato carta.
+
 **v0.18.0** - Jefes y ascensiones claros.
 - **Campamento:** la ronda siguiente es ahora una tarjeta (roja y con el nombre del jefe cuando toca jefe) con cada truco explicado: icono, nombre, nivel, que hace, si ya tienes una reliquia que lo frena (o cual te ayudaria) y boton de sobornar con su precio.
 - **Ascensiones (ahora la lista dice lo que hacen de verdad):** 1 objetivos +10 %, -1 s, tienda +10 %; 2 +20 %, -2 s y, desde el acto 2, un reto de regla (viento, tormenta o silencio) en cada ronda; 3 +30 %, -3 s, retos un nivel mas fuertes y una provision menos; 4 +40 %, -4 s y los jefes traen un poder extra (antes anunciado pero sin implementar); 5 +50 %, -5 s.

@@ -12,7 +12,7 @@ window.AIQ = window.AIQ || {};
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const L6 = s => { const [es, en, fr, pt, de, it] = s.split("|"); return { es, en, fr, pt, de, it }; };
   const suitRed = s => s === "s_pin" || s === "s_compass" || s === "heart";
-  const ixs = (rank, suit) => `<span class="ix tl"><b>${rank}</b>${ic(suit)}</span><span class="ix br"><b>${rank}</b>${ic(suit)}</span>`;
+  const ixs = () => "";                                              // las cartas ya no llevan indices (A K Q J, numeros ni palos)
   const R_NAMES = [L6("Común|Common|Commune|Comum|Gewöhnlich|Comune"), L6("Poco común|Uncommon|Peu commune|Incomum|Ungewöhnlich|Non comune"), L6("Rara|Rare|Rare|Rara|Selten|Rara"), L6("Legendaria|Legendary|Légendaire|Lendária|Legendär|Leggendaria")];
 
   /* ------------------------------------------------------------------ actos */
@@ -420,7 +420,7 @@ window.AIQ = window.AIQ || {};
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${run.wind.km} km</span></div>` : ""}`;
     const ids = Object.keys(run.tools);
     tb.classList.toggle("hidden", !ids.length || C().S.phase !== "asking");
-    tb.innerHTML = ids.map((id, i) => { const t = run.tools[id], on = C().S.tool === id, off = t.left <= 0 || silenced; return `<button class="tool pc-hand${on ? " on" : ""}${off ? " off" : ""}" data-tool="${id}" style="--r:${((i - (ids.length - 1) / 2) * 6).toFixed(1)}deg" title="${A.tx(TOOLS[id].n)} — ${A.tx(TOOLS[id].d)}"><span class="ix tl"><b>A</b>${ic("s_palm")}</span><span class="tl-ico felt">${ic(TOOLS[id].ico)}</span><b>${A.tx(TOOLS[id].n)}</b><span class="tl-pips">${Array.from({ length: toolMax(id) }, (_, k) => `<i class="${k < t.left ? "on" : ""}"></i>`).join("")}</span><kbd>${i + 1}</kbd></button>`; }).join("");
+    tb.innerHTML = ids.map((id, i) => { const t = run.tools[id], on = C().S.tool === id, off = t.left <= 0 || silenced; return `<button class="tool pc-hand${on ? " on" : ""}${off ? " off" : ""}" data-tool="${id}" style="--r:${((i - (ids.length - 1) / 2) * 6).toFixed(1)}deg" title="${A.tx(TOOLS[id].n)} — ${A.tx(TOOLS[id].d)}"><span class="tl-ico felt">${ic(TOOLS[id].ico)}</span><b>${A.tx(TOOLS[id].n)}</b><span class="tl-pips">${Array.from({ length: toolMax(id) }, (_, k) => `<i class="${k < t.left ? "on" : ""}"></i>`).join("")}</span><kbd>${i + 1}</kbd></button>`; }).join("");
     tb.querySelectorAll(".tool").forEach(b => (b.onclick = () => A.adv.useTool(b.dataset.tool)));
     if (A.pointer) A.pointer.set({ tool: C().S.tool });
   }

@@ -532,7 +532,7 @@ window.AIQ = window.AIQ || {};
     "Lights up the place's country on the map (for a country, tells you the continent).": ["Illumine le pays du lieu sur la carte (pour un pays, indique le continent).", "Ilumina no mapa o país do lugar (num país, diz o continente).", "Beleuchtet das Land des Ortes auf der Karte (bei einem Land: nennt den Kontinent).", "Illumina sulla mappa il paese del luogo (per un paese, dice il continente)."],
     "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.": ["Encyclopédie : à moins de 300 km tu débloques le lieu, à moins de 150 km son histoire et à moins de 75 km son fait clé.", "Enciclopédia: a menos de 300 km você desbloqueia o lugar, a menos de 150 km a história e a menos de 75 km o dado-chave.", "Enzyklopädie: unter 300 km schaltest du den Ort frei, unter 150 km seine Geschichte und unter 75 km seinen Kernfakt.", "Enciclopedia: a meno di 300 km sblocchi il luogo, a meno di 150 km la sua storia e a meno di 75 km il dato chiave."],
     "You counter it with": ["Tu le contres avec", "Você o barra com", "Du kontern es mit", "Lo freni con"],
-    "Helped by": ["Aide : ", "Ajuda: ", "Hilfe: ", "Aiuto: "],
+    "Helped by": ["Aide", "Ajuda", "Hilfe", "Aiuto"],
     "No direct relic: Master switch or a bribe": ["Pas de relique directe : Interrupteur ou pot-de-vin", "Sem relíquia direta: Interruptor ou suborno", "Kein direktes Relikt: Hauptschalter oder Bestechung", "Nessuna reliquia diretta: Interruttore o corruzione"],
     "ACT BOSS": ["BOSS DE L'ACTE", "CHEFE DO ATO", "AKT-BOSS", "BOSS DELL'ATTO"],
     "trick": ["tour", "truque", "Trick", "trucco"],
