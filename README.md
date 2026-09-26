@@ -1,5 +1,7 @@
 # Atlas IQ
 
+**v0.11.3** - Melodías con sentido: la melodía ya no son notas al azar, sino frases de 4 compases (motivo, respuesta, repetición y cadencia con silencio); los tiempos fuertes caen en notas del acorde y los ritmos se apoyan en el pulso. El lounge original ya no mete notas falsas. La rotación automática sigue siendo al azar; las flechas van siempre en orden.
+
 **v0.11.2** - Las canciones van en orden (1, 2, 3... y vuelta a la 1), tanto con las flechas como en la rotación automática. El juego siempre arranca con la primera, la original. "Pleno al 17" pasa a llamarse *Huérfanos* (una apuesta de ruleta).
 
 **v0.11.1** - Navegador de canciones y Ajustes renovados:

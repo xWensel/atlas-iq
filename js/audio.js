@@ -127,7 +127,7 @@ window.AIQ = window.AIQ || {};
     [[2, 4], [3, 3], [6, 2], [10, 0]], [[0, 5], [2, 4], [4, 2], [7, 3]], [[6, 3], [7, 4], [10, 5], [14, 4]],
     [[2, 2], [4, 3], [5, 4], [8, 6]], [[3, 6], [6, 5], [9, 3], [12, 2]], [[0, 4], [3, 2], [8, 3], [11, 0]],
   ];
-  let timer = null, nextT = 0, mode = 0, wob = null, curLick = null;
+  let timer = null, nextT = 0, mode = 0, wob = null, curLick = null, lickMem = [null, null];
 
   function wobble() {
     if (wob) return wob;
@@ -178,9 +178,12 @@ window.AIQ = window.AIQ || {};
     if (st === 9 && (full ? rnd() < 0.8 : rnd() < 0.35)) comp(0.75, 0.55);
     if (full && st === 13 && rnd() < 0.4) comp(0.55, 0.4);
     // melodia por licks (blues-pentatonica)
-    if (st === 0) curLick = rnd() < (mode === 0 ? 0.16 : mode === 1 ? 0.6 : 0.75) ? LICKS[Math.floor(rnd() * LICKS.length)] : null;
+    if (st === 0) {                                                       // frase de 4 compases: A, B, A, B (repite lo que suena bien)
+      const ph = bar % 4;
+      if (ph >= 2) curLick = lickMem[ph - 2]; else curLick = lickMem[ph] = rnd() < (mode === 0 ? 0.3 : mode === 1 ? 0.7 : 0.8) ? LICKS[Math.floor(rnd() * LICKS.length)] : null;
+    }
     if (curLick) for (const [ls, deg] of curLick) if (ls === st) {
-      const n = ch.tonic + 24 + PENTA_MIN[deg] + (rnd() < 0.1 ? -1 : 0);
+      const n = ch.tonic + 24 + PENTA_MIN[deg];
       epiano(n, t, { vol: 0.07, dur: 0.8, mod: EPMOD * 2, idx: EPIDX * 0.6, rev: 0.55 });
     }
     // bateria
@@ -237,7 +240,7 @@ window.AIQ = window.AIQ || {};
   const TRK = [
     { name: "Lounge Nocturno", spb: 16, prog: PROG },
     { /* 1: ragtime de salon, piano tipo taberna */
-      name: "Ragtime Roulette", bpm: 112, sw: 0.08, spb: 16, tonic: 72, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8, 11, 14], [2, 4, 7, 10, 12], [0, 2, 4, 8, 10, 12, 14], [3, 6, 9, 12, 15]],
+      name: "Ragtime Roulette", bpm: 112, sw: 0.08, spb: 16, tonic: 72, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8, 11, 14], [0, 2, 4, 6, 8, 10, 12, 14], [0, 3, 6, 10, 12], [0, 4, 6, 8, 12, 14]],
       lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.5, dur: Math.min(d, 0.5), bright: 5, bus: musBus, rev: 0.25 }),
       prog: [Ch(36, [60, 64, 67]), Ch(33, [55, 61, 64, 69]), Ch(38, [57, 60, 66, 69]), Ch(43, [59, 62, 65, 67]), Ch(36, [60, 64, 67]), Ch(41, [57, 60, 65]), Ch(36, [55, 60, 64, 67]), Ch(43, [59, 62, 65, 67])],
       play(st, bar, t, c, nx, m, r) {
@@ -248,7 +251,7 @@ window.AIQ = window.AIQ || {};
       },
     },
     { /* 2: bossa nova de bar de hotel */
-      name: "Bossa de Medianoche", bpm: 96, sw: 0, spb: 16, tonic: 67, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 10], [2, 5, 8, 12, 14], [0, 4, 7, 10, 12], [3, 6, 9, 13]],
+      name: "Bossa de Medianoche", bpm: 96, sw: 0, spb: 16, tonic: 67, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8], [0, 6, 8, 12], [2, 6, 8, 12, 14], [0, 3, 6, 10, 12]],
       lead: (n, t, d, v) => flute(n, t, d, v * 1.1),
       prog: [Ch(33, [55, 59, 60, 64], 3), Ch(38, [54, 57, 60, 64]), Ch(43, [59, 62, 66, 69]), Ch(36, [55, 59, 64, 66]), Ch(42, [57, 60, 64, 66], 3), Ch(35, [57, 60, 63, 66]), Ch(40, [55, 59, 62, 66], 3), Ch(40, [56, 59, 62, 66])],
       play(st, bar, t, c, nx, m, r) {
@@ -259,7 +262,7 @@ window.AIQ = window.AIQ || {};
       },
     },
     { /* 3: samba, marimba y agitador */
-      name: "Samba del Crupier", bpm: 100, sw: 0, spb: 16, tonic: 74, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8, 11], [2, 6, 10, 14], [0, 2, 4, 7, 10, 12], [3, 6, 9, 12, 14]],
+      name: "Samba del Crupier", bpm: 100, sw: 0, spb: 16, tonic: 74, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8, 11, 14], [0, 2, 4, 6, 8, 10], [0, 3, 6, 9, 12], [2, 4, 8, 10, 12, 14]],
       lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.7, dur: Math.min(d, 0.55), bright: 6, bus: musBus, rev: 0.35, wave: "sine" }),
       prog: [Ch(40, [55, 59, 62, 64], 3), Ch(45, [55, 61, 64, 66]), Ch(38, [57, 61, 64, 66]), Ch(35, [57, 62, 66], 3), Ch(40, [55, 59, 62, 64], 3), Ch(45, [55, 58, 61, 64]), Ch(38, [57, 61, 64, 66]), Ch(38, [57, 61, 64, 66])],
       play(st, bar, t, c, nx, m, r) {
@@ -270,7 +273,7 @@ window.AIQ = window.AIQ || {};
       },
     },
     { /* 4: blues en shuffle de 12 compases */
-      name: "Blues del Tapete", bpm: 108, sw: 0.33, spb: 16, tonic: 65, scale: [0, 3, 5, 6, 7, 10], rh: [[2, 4, 6, 8], [0, 3, 6, 10, 14], [4, 7, 10, 12], [0, 2, 6, 8, 12], [3, 6, 9, 12]],
+      name: "Blues del Tapete", bpm: 108, sw: 0.33, spb: 16, tonic: 65, scale: [0, 3, 5, 6, 7, 10], rh: [[0, 4, 8, 12], [0, 2, 4, 8], [0, 4, 6, 8, 10, 12], [2, 4, 6, 8]],
       lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.6, dur: Math.min(d, 0.7), bright: 3.6, bus: musBus, rev: 0.3, wave: "sawtooth" }),
       prog: (() => { const F = Ch(41, [57, 60, 63, 65]), B = Ch(34, [56, 58, 62, 65]), C = Ch(36, [55, 58, 64, 67]); return [F, F, F, F, B, B, F, F, C, B, F, C]; })(),
       play(st, bar, t, c, nx, m, r) {
@@ -281,7 +284,7 @@ window.AIQ = window.AIQ || {};
       },
     },
     { /* 5: vals de casino, caja de musica y cuerdas */
-      name: "Vals Real", bpm: 138, sw: 0, spb: 12, tonic: 69, scale: [0, 2, 3, 5, 7, 8, 11], rh: [[0, 4, 8], [0, 6, 8, 10], [0, 3, 4, 8], [4, 6, 8], [0, 2, 4, 6, 8, 10]],
+      name: "Vals Real", bpm: 138, sw: 0, spb: 12, tonic: 69, scale: [0, 2, 3, 5, 7, 8, 11], rh: [[0, 4, 8], [0, 4, 6, 8], [0, 6, 8, 10], [0, 2, 4, 8]],
       lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.3, dur: Math.min(1, d + 0.3), bright: 9, bus: musBus, rev: 0.6, wave: "sine" }),
       prog: [Ch(33, [57, 60, 64], 3), Ch(40, [56, 59, 62]), Ch(33, [57, 60, 64], 3), Ch(38, [57, 62, 65], 3), Ch(43, [59, 62, 65]), Ch(36, [55, 60, 64]), Ch(40, [56, 59, 62]), Ch(33, [57, 60, 64], 3)],
       play(st, bar, t, c, nx, m, r) {
@@ -291,7 +294,7 @@ window.AIQ = window.AIQ || {};
       },
     },
     { /* 6: funk de sala VIP */
-      name: "Funk Jackpot", bpm: 104, sw: 0.05, spb: 16, tonic: 64, scale: [0, 3, 5, 7, 10], rh: [[2, 3, 7, 10], [0, 6, 7, 10, 14], [3, 7, 11, 14], [2, 6, 10, 13]],
+      name: "Funk Jackpot", bpm: 104, sw: 0.05, spb: 16, tonic: 64, scale: [0, 3, 5, 7, 10], rh: [[0, 3, 6, 10], [2, 3, 7, 10, 11], [0, 6, 7, 10, 14], [3, 7, 11, 14]],
       lead: (n, t, d, v) => brass(n, t, Math.min(d, 0.32), v * 0.9),
       prog: [Ch(40, [55, 59, 62, 66], 3), Ch(45, [55, 61, 64, 66]), Ch(40, [55, 59, 62, 66], 3), Ch(35, [57, 62, 63, 66]), Ch(36, [55, 59, 62, 64]), Ch(35, [57, 62, 66], 3), Ch(40, [55, 59, 62, 66], 3), Ch(45, [55, 61, 64, 66])],
       play(st, bar, t, c, nx, m, r) {
@@ -303,7 +306,7 @@ window.AIQ = window.AIQ || {};
       },
     },
     { /* 7: big band, swing rapido con metales */
-      name: "Big Band All-In", bpm: 132, sw: 0.3, spb: 16, tonic: 70, scale: [0, 2, 4, 7, 9], rh: [[2, 6, 8], [0, 3, 6, 10, 12], [3, 6, 11, 14], [0, 2, 4, 7]],
+      name: "Big Band All-In", bpm: 132, sw: 0.3, spb: 16, tonic: 70, scale: [0, 2, 4, 7, 9], rh: [[0, 4, 6, 8, 12], [2, 6, 8, 12, 14], [0, 3, 6, 10, 12], [0, 2, 4, 8]],
       lead: (n, t, d, v) => brass(n, t, Math.min(d, 0.6), v),
       prog: [Ch(34, [57, 62, 65, 69]), Ch(31, [58, 62, 65, 67], 3), Ch(36, [55, 58, 63, 67], 3), Ch(41, [57, 60, 63, 65]), Ch(38, [57, 60, 62, 65], 3), Ch(43, [59, 62, 65, 67]), Ch(36, [55, 58, 63, 67], 3), Ch(41, [57, 60, 63, 65])],
       play(st, bar, t, c, nx, m, r) {
@@ -314,7 +317,7 @@ window.AIQ = window.AIQ || {};
       },
     },
     { /* 8: mambo, clave, congas y cencerro */
-      name: "Mambo Royale", bpm: 116, sw: 0, spb: 16, tonic: 72, scale: [0, 3, 5, 7, 10], rh: [[2, 6, 10], [0, 3, 6, 8, 12], [4, 7, 10, 14], [0, 6, 9, 12]],
+      name: "Mambo Royale", bpm: 116, sw: 0, spb: 16, tonic: 72, scale: [0, 3, 5, 7, 10], rh: [[0, 3, 6, 10], [0, 6, 8, 12], [2, 6, 10, 14], [0, 4, 7, 10, 12]],
       lead: (n, t, d, v) => brass(n, t, Math.min(d, 0.4), v * 0.95),
       prog: [Ch(36, [55, 58, 63, 67], 3), Ch(41, [57, 60, 63, 65]), Ch(34, [57, 62, 65, 69]), Ch(39, [55, 58, 62, 67]), Ch(45, [57, 60, 63, 67], 3), Ch(38, [57, 60, 63, 66]), Ch(43, [59, 62, 65, 68]), Ch(36, [55, 58, 62, 63], 3)],
       play(st, bar, t, c, nx, m, r) {
@@ -343,9 +346,9 @@ window.AIQ = window.AIQ || {};
   ];
   const ROT = 88;                                            // segundos por cancion (aprox.: se cambia al terminar una vuelta de acordes)
   const SK = { bpm: 86, sw: 0.3 };                           // tempo y swing del lounge (los fija setSkin)
-  let cur = -1, tstep = 0, trkT0 = 0, forceNext = false, mel = { deg: 4, pat: null };
+  let cur = -1, tstep = 0, trkT0 = 0, forceNext = false, mel = { on: false, A: null, B: null, C: null };
   function useTrack(i, t, announce) {
-    const T = TRK[i]; cur = i; tstep = 0; trkT0 = t; forceNext = false; mel.deg = 4; mel.pat = null;
+    const T = TRK[i]; cur = i; recent.push(i); if (recent.length > 4) recent.shift(); tstep = 0; trkT0 = t; forceNext = false; mel.A = null;
     if (T.bpm) { BPM = T.bpm; SW = T.sw; } else { BPM = SK.bpm; SW = SK.sw; }
     STEP = 60 / BPM / 4;
     if (announce && A.music.onChange) { const ms = Math.max(0, (t - ctx.currentTime) * 1000); setTimeout(() => A.music.onChange(i), ms); }
@@ -353,17 +356,38 @@ window.AIQ = window.AIQ || {};
   function transition(t) {
     noise(t, 1.1, { hp: 2500, vol: 0.035, sweepTo: 9000, type: "highpass", bus: musBus }); thump(t, { vol: 0.2, f0: 90, f1: 40, dur: 0.3, bus: musBus }); bell(84, t, { vol: 0.05, dur: 1.4, bus: musBus, rev: 0.6 });
   }
+  const recent = [];
+  const autoIdx = () => { const opts = TRK.map((_, i) => i).filter(i => !recent.includes(i)); return opts[Math.floor(Math.random() * opts.length)]; };   // rotacion automatica: al azar
   const nextIdx = () => (cur + 1) % TRK.length;                          // las canciones van siempre en orden: 1, 2, 3... y vuelta a la 1
   const prevIdx = () => (cur - 1 + TRK.length) % TRK.length;
+  /* Melodia por FRASES de 4 compases: motivo A, respuesta B (misma rima, contorno espejo que resuelve), A otra vez y una cadencia corta con silencio.
+   * Los tiempos fuertes se ajustan a notas del acorde; los debiles se mueven por la escala (grados contiguos). Asi suena a tema, no a notas al azar. */
+  const CONTOURS = [[0, 1, 2, 1], [0, 2, 1, 0], [0, 0, 1, 2], [2, 1, 0, 1], [0, 1, 0, -1], [0, -1, 0, 1], [1, 2, 1, 0]];
+  const ri = n => Math.floor(Math.random() * n);
+  function snap(n, c, tol) { let bd = 99, bn = n; for (const cv of c.v) { const x = cv + 12 * Math.round((n - cv) / 12); if (Math.abs(x - n) < bd) { bd = Math.abs(x - n); bn = x; } } return bd <= tol ? bn : n; }
+  function newPhrase(T) {
+    const L = T.scale.length, lim = L + 2, cl = d => Math.max(0, Math.min(lim, d));
+    const rh = T.rh[ri(T.rh.length)], ct = CONTOURS[ri(CONTOURS.length)], d0 = 1 + ri(L - 1), last = rh.length - 1;
+    mel.on = Math.random() < (mode === 0 ? 0.6 : 0.92);
+    mel.A = rh.map((s0, i) => ({ s: s0, d: cl(d0 + ct[i % ct.length]) }));
+    mel.B = rh.map((s0, i) => ({ s: s0, d: cl(i === last ? d0 : d0 - ct[i % ct.length]) }));
+    mel.C = rh.slice(0, Math.min(3, rh.length)).map((s0, i, arr) => ({ s: s0, d: cl(d0 + (arr.length - 1 - i)) })); mel.C.cad = true;
+    mel.skipC = Math.random() < 0.35;
+  }
   function lead(T, st, t, c) {
     if (!T.lead) return;
-    if (st === 0) mel.pat = Math.random() < (mode === 0 ? 0.3 : mode === 1 ? 0.72 : 0.85) ? T.rh[Math.floor(Math.random() * T.rh.length)] : null;
-    const pat = mel.pat; if (!pat) return; const i = pat.indexOf(st); if (i < 0) return;
-    const S = T.scale, L = S.length; let d = mel.deg + [-2, -1, -1, 0, 1, 1, 2][Math.floor(Math.random() * 7)]; d = Math.max(0, Math.min(L * 2 - 1, d)); mel.deg = d;
+    const spb = T.spb, ph = Math.floor(tstep / spb) % 4;
+    if (st === 0 && (ph === 0 || !mel.A)) newPhrase(T);
+    if (!mel.on || !mel.A) return;
+    if (mode === 0 && (ph === 1 || ph === 3)) return;                     // en el menu: solo A ... A, mas espacio
+    const arr = ph === 0 || ph === 2 ? mel.A : ph === 1 ? mel.B : (mel.skipC ? null : mel.C); if (!arr) return;
+    const i = arr.findIndex(x => x.s === st); if (i < 0) return;
+    const S = T.scale, L = S.length, d = arr[i].d;
     let n = T.tonic + S[d % L] + 12 * Math.floor(d / L);
-    if (i === pat.length - 1) { let bd = 99, bn = n; for (const cv of c.v) { const x = cv + 12 * Math.round((n - cv) / 12); if (Math.abs(x - n) < bd) { bd = Math.abs(x - n); bn = x; } } n = bn; }   // la ultima nota cae en una nota del acorde
-    const nxt = pat[i + 1] != null ? pat[i + 1] : T.spb + 2, dur = Math.max(0.14, Math.min(1.3, (nxt - st) * STEP * 1.05));
-    T.lead(n, t, dur, 0.06 + (mode === 2 ? 0.01 : 0));
+    const strong = st === 0 || st === (spb >> 1) || i === 0;
+    if (arr.cad && i === arr.length - 1) n = snap(n, c, 6); else if (strong) n = snap(n, c, 2);
+    const nxt = arr[i + 1] ? arr[i + 1].s : Math.min(spb, st + 8), dur = Math.max(0.16, Math.min(1.1, (nxt - st) * STEP * 1.0));
+    T.lead(n, t, dur, (strong ? 0.07 : 0.058) + (mode === 2 ? 0.008 : 0));
   }
   function playStep(s, t0) {
     const T = TRK[cur]; if (!T.play) return stepLounge(s, t0);
@@ -377,7 +401,7 @@ window.AIQ = window.AIQ || {};
   function schedule() {
     while (nextT < ctx.currentTime + 0.3) {
       const T = TRK[cur], cyc = T.spb * T.prog.length;
-      if (tstep > 0 && ((forceNext && tstep % T.spb === 0) || (tstep % cyc === 0 && nextT - trkT0 > ROT))) { useTrack(nextIdx(), nextT, true); transition(nextT); }
+      if (tstep > 0 && ((forceNext && tstep % T.spb === 0) || (tstep % cyc === 0 && nextT - trkT0 > ROT))) { useTrack(autoIdx(), nextT, true); transition(nextT); }
       playStep(tstep, nextT); nextT += STEP; tstep++;
     }
   }
@@ -389,6 +413,7 @@ window.AIQ = window.AIQ || {};
     next() { if (!timer) return; useTrack(nextIdx(), nextT, true); transition(nextT); },
     prev() { if (!timer) return; useTrack(prevIdx(), nextT, true); transition(nextT); },
     index() { return cur; },
+    _trk: () => TRK,   // dev
     count() { return TRK.length; },
     title(i = cur) { const n = NAMES[i]; if (!n) return ""; const k = ["es", "en", "fr", "pt", "de", "it"].indexOf(A.lang); return n[k < 0 ? 1 : k]; },
     go(i) { if (timer && TRK[i]) { useTrack(i, nextT, true); transition(nextT); } },   // dev: salta a una cancion
