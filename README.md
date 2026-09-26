@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.16.3** - Mapa mudo (reto Fronteras fuera): ahora solo desaparecen las fronteras interiores y los colores por pais; las costas siempre se ven. Logo: el globo queda solo con oceano (sin manchas).
+
 **v0.16.2** - Fuera el reflejo blanco del globo del logo y los indices de baraja (K, A, Q) de las cartas de modo del menu.
 
 **v0.16.1** - Logo y escudo en pixel art de verdad: `tools/pixelize.py` baja la ilustracion generada a una rejilla nativa (200 px el logo, 64 y 32 px el escudo), limita la paleta (sin degradados ni dither) y amplia por vecino mas cercano; los logos se muestran a escalas enteras (1x, 2x, 3x) con `image-rendering: pixelated`. Iconos de la app regenerados igual.

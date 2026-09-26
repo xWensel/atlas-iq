@@ -95,7 +95,7 @@ layout(location=0) in vec2 a_q; layout(location=1) in vec4 a_seg; layout(locatio
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform float u_width; uniform vec2 u_off;
 uniform float u_wob; uniform float u_wt;
 ${DISTORT}
-out float v_d; out float v_hw;
+out float v_d; out float v_hw; out float v_brd;
 vec2 wob(vec2 p){ return u_wob*vec2(sin(p.y*9.0+p.x*3.7+u_wt), cos(p.x*8.0-p.y*4.3+u_wt*1.3)) + u_wob*0.5*vec2(sin(p.y*23.0+u_wt*0.7), cos(p.x*19.0-u_wt*0.9)); }
 void main(){
   vec2 p0=(xf(a_seg.xy+wob(a_seg.xy)*a_brd,a_sct)-u_center)*u_scale+u_off, p1=(xf(a_seg.zw+wob(a_seg.zw)*a_brd,a_sct)-u_center)*u_scale+u_off;   // solo las fronteras interiores bailan: las costas quedan fijas
@@ -103,12 +103,12 @@ void main(){
   vec2 nrm=vec2(-dir.y,dir.x);
   float hw=u_width*0.5+1.0;
   vec2 p=mix(p0,p1,a_q.x)+dir*(a_q.x*2.0-1.0)*hw+nrm*a_q.y*hw;
-  v_d=a_q.y*hw; v_hw=u_width*0.5;
+  v_d=a_q.y*hw; v_hw=u_width*0.5; v_brd=a_brd;
   gl_Position=vec4(p/(0.5*u_res),0.0,1.0);
 }`;
   const FS_LINE = `#version 300 es
-precision highp float; in float v_d; in float v_hw; uniform vec4 u_col; uniform float u_lineA; uniform vec3 u_lens; uniform float u_lmode; out vec4 o;
-void main(){ float a=clamp(v_hw-abs(v_d)+0.5,0.0,1.0); float m=1.0; if(u_lmode>0.5){ float inl=1.0-smoothstep(u_lens.z-6.0,u_lens.z,length(gl_FragCoord.xy-u_lens.xy)); m=u_lmode<1.5?1.0-inl:inl; } o=vec4(u_col.rgb,u_col.a*a*u_lineA*m); }`;
+precision highp float; in float v_d; in float v_hw; in float v_brd; uniform vec4 u_col; uniform float u_lineA; uniform vec3 u_lens; uniform float u_lmode; out vec4 o;
+void main(){ float a=clamp(v_hw-abs(v_d)+0.5,0.0,1.0); float m=1.0; if(u_lmode>0.5){ float inl=1.0-smoothstep(u_lens.z-6.0,u_lens.z,length(gl_FragCoord.xy-u_lens.xy)); m=u_lmode<1.5?1.0-inl:inl; } o=vec4(u_col.rgb,u_col.a*a*mix(1.0,u_lineA,v_brd)*m); }`;   // Mapa mudo: solo desaparecen las fronteras interiores (a_brd=1); las costas siempre se ven
 
   const VS_FULL = `#version 300 es
 void main(){ vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2)); gl_Position=vec4(p*2.0-1.0,0.0,1.0); }`;
