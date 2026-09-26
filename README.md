@@ -1,5 +1,10 @@
 # Atlas IQ
 
+**v0.13** - Reliquias claras y el pais siempre a la vista.
+- **Pais como mecanica general:** en la placa de cada pregunta ves siempre el pais del lugar; si no tiene (desiertos, mares, cordilleras) ves su continente. El **Pasaporte** ilumina ese pais en el mapa; el **Atlas de bolsillo** lo ilumina solo a mitad de tiempo en cada pregunta y el **Oraculo** (legendario) desde el primer segundo.
+- **Poda de reliquias: de 72 a 33.** Fuera todo lo que sobraba, se solapaba o no se entendia (GPS, reticulo, mira telescopica, termometro, comodin, casa de empenos, jackpot, prismaticos, sextante de hemisferio, inicial, y 25 mas). Quedan solo las que se entienden de un vistazo: ayudas contra retos (texto, mapa, puntero), pistas (continente, pais, nota de campo, sonar afinado), tiempo, doblones, y supervivencia. Cada reto sin ayuda directa se resuelve con el Interruptor, el Talisman, la Llave maestra o sobornando al crupier.
+- **Herramientas:** el Astrolabio se retira (muy especifico); el Pasaporte ahora dice claramente "ilumina el pais en el mapa". Las partidas guardadas con piezas retiradas se convierten en doblones.
+
 **v0.12.1** - Correccion urgente. (1) **Parpadeo:** el vigilante de rendimiento comparaba cada fotograma con el mas rapido visto y, con la variacion normal de un navegador cualquiera, creia ir lento: bajaba la resolucion una y otra vez (cada cambio vacia el lienzo = parpadeo) y frenaba el redibujado en reposo (tirones). Ahora mide la mediana de 3 s, baja como mucho hasta 0,7 y nunca por picos sueltos; ademas se quito el centelleo del filtro CRT. (2) **Pais que faltaba:** la v0.12.0 borro por error la tabla de paises de los lugares (`A.PCOUNTRY`), asi que la placa de la pregunta y el codex no decian el pais. Restaurada, y `dev/smoke.js` ahora falla si vuelve a faltar.
 
 **v0.12** - Revision completa: fallos, traducciones, maquetacion y limpieza.

@@ -126,10 +126,9 @@ window.AIQ = window.AIQ || {};
   const TOOLS = {
     sonar: { ico: "sonar", uses: 2, cost: 5, r: 1, n: L("Sonar", "Sonar"), d: L("Toca un punto del mapa: te dice a cuántos km está el objetivo (±6 %) y dibuja el anillo. Con tres sondas, triangulas.", "Tap a point: tells you how far the target is (±6%) and draws the ring. Three probes triangulate."), kind: "probe" },
     compass: { ico: "compass", uses: 3, cost: 4, r: 0, n: L("Brújula", "Compass"), d: L("Toca un punto: una flecha señala el rumbo (8 direcciones) hacia el objetivo.", "Tap a point: an arrow shows the heading (8 directions) to the target."), kind: "probe" },
-    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pasaporte", "Passport"), d: L("Revela el país del lugar (o el continente, si es un país).", "Reveals the place's country (or the continent for a country)."), kind: "instant" },
+    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pasaporte", "Passport"), d: L("Ilumina en el mapa el país del lugar (en un país, te dice el continente).", "Lights up the place's country on the map (for a country, tells you the continent)."), kind: "instant" },
     journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Cuaderno", "Field journal"), d: L("Lee la nota de campo del lugar antes de responder.", "Read the place's field note before answering."), kind: "instant" },
     hourglass: { ico: "hourglass", uses: 2, cost: 4, r: 0, n: L("Reloj de arena", "Hourglass"), d: L("+6 segundos en la pregunta actual.", "+6 seconds on the current question."), kind: "instant" },
-    astrolabe: { ico: "astrolabe", uses: 1, cost: 6, r: 1, n: L("Astrolabio", "Astrolabe"), d: L("Endereza el mapa: sirve contra el Mundo del revés en esta pregunta.", "Turns the map upright: beats the Upside-down world for this question."), kind: "instant" },
     interruptor: { ico: "interruptor", uses: 1, cost: 8, r: 2, n: L("Interruptor", "Master switch"), d: L("Apaga todos los retos durante esta pregunta.", "Switches every challenge off for this question."), kind: "instant" },
     swapcard: { ico: "swapcard", uses: 1, cost: 6, r: 1, n: L("Carta de cambio", "Swap card"), d: L("Cambia esta pregunta por otro lugar de la ronda.", "Swaps this question for another place from the round."), kind: "instant" },
   };
@@ -154,18 +153,14 @@ window.AIQ = window.AIQ || {};
   const roundNo = () => run.act * 4 + run.round;
   const rdef = () => roundDefOf(roundNo());
   const isBoss = () => run.round === 3;
-  const perkList = () => {                                           // el Comodin cartografo copia la reliquia de su derecha
-    const R = A.RELICS, out = [];
-    run.perks.forEach((id, i) => { const p = R[id]; if (!p) return; out.push(p); if (p.copy && run.perks[i + 1] && R[run.perks[i + 1]] && !R[run.perks[i + 1]].copy) out.push({ ...R[run.perks[i + 1]], copyOf: true }); });
-    return out;
-  };
+  const perkList = () => run.perks.map(id => A.RELICS[id]).filter(Boolean);
   const has = flag => perkList().some(p => p[flag]);
   const sumFlag = flag => perkList().reduce((n, p) => n + (p[flag] || 0), 0);
   const owned = id => run.perks.includes(id);
   const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = 7000 * Math.min(0.95, 0.3 + 0.05 * r) * (isBoss() ? 1.08 : 1) * ascFx(run.asc).target; return Math.round((base * t.target) / 50) * 50; };
   const shopCtx = () => { const x = { price: 0, freeReroll: 0, slots: 3 }; perkList().forEach(p => p.shop && p.shop(x, run)); return x; };
   const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price) + shopCtx().price);
-  const sellValue = id => Math.floor(A.RELICS[id].cost * (has("sellAll") ? 1 : 0.5));
+  const sellValue = id => Math.floor(A.RELICS[id].cost * 0.5);
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades) */
   const chalFor = r => {
@@ -177,7 +172,6 @@ window.AIQ = window.AIQ || {};
     list = list.filter(c => !perkList().some(p => (p.immune || []).includes(c.id)));
     return { list, combo: plan.combo, boss };
   };
-  const omen = () => has("omen");
 
   A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null } = {}) {
     const d = DECKS[deck] || DECKS.explorer;
@@ -191,9 +185,16 @@ window.AIQ = window.AIQ || {};
     persist(); A.ach.emit("adv", { kind: "start" }); A.profile.get().adv.runs++; A.profile.save();
     startRound();
   };
+  /* v0.13: partidas guardadas con reliquias o herramientas que ya no existen: se quitan y se devuelve su valor en doblones */
+  function migrate(r) {
+    const gone = r.perks.filter(id => !A.RELICS[id]); if (gone.length) { r.perks = r.perks.filter(id => A.RELICS[id]); r.coins += gone.length * 4; }
+    const dead = Object.keys(r.tools).filter(id => !TOOLS[id]); dead.forEach(id => { delete r.tools[id]; r.coins += 3; });
+    if ((r.stock || []).some(s => (s.k === "perk" && !A.RELICS[s.id]) || (s.k === "tool" && !TOOLS[s.id]))) { r.stock = null; r.stockKey = null; }
+  }
   A.adv.resume = function () {
     try { run = JSON.parse(localStorage.getItem(RUNKEY)); } catch (e) { run = null; }
     if (!run) return false;
+    migrate(run);
     if (run.phase === "shop" || run.phase === "chest") openShop(run.phase === "chest");
     else if (run.phase === "verdict") afterVerdict(!!run.vBoss);                            // la ronda ya estaba superada y cobrada: seguimos al campamento
     else if (run.phase === "win") openShop(true);                                             // ya habias ganado: sigues hacia la Leyenda
@@ -208,21 +209,23 @@ window.AIQ = window.AIQ || {};
   A.adv.summary = () => { try { const r = run || JSON.parse(localStorage.getItem(RUNKEY)); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives } : null; } catch (e) { return null; } };
   A.adv.active = () => !!run;
 
-  function toolMax(id) { const t = run.tools[id]; if (!t) return 0; const plus = perkList().reduce((n, p) => n + (p.toolBonus || 0) + ((p.toolPlus && p.toolPlus[id]) || 0), 0); return t.max + plus; }
+  function toolMax(id) { const t = run.tools[id]; if (!t) return 0; const plus = perkList().reduce((n, p) => n + (p.toolBonus || 0), 0); return t.max + plus; }
   function addTool(id) { const t = run.tools[id]; if (t) t.max++; else run.tools[id] = { max: TOOLS[id].uses, left: TOOLS[id].uses }; }
   function refillTools() { for (const id in run.tools) run.tools[id].left = toolMax(id); }
 
   /* ---------------- ronda ---------------- */
+  /* el pais siempre a la vista: si el lugar no tiene pais (mares, desiertos, cordilleras...), se muestra su continente */
+  const withSub = q => { if (q.t === "p" && !(q.sub && (q.sub.en || q.sub.es))) { const c = CONT[continentOf(q)]; if (c) q.sub = { es: c.es, en: c.en }; } return q; };
   function pickQuestions(n) {
     const def = rdef(), list = poolFor(roundNo()), rr = A.rng(`${run.seed}:q:${roundNo()}:${run.attempt}`), used = new Set(run.used);
     let cand = list.filter(q => !used.has(q.cid[0]));
     if (cand.length < n) { run.used = []; cand = list.slice(); }
     const out = rr.shuffle(cand).slice(0, n);
     run.curQ = out.map(q => q.cid[0]); run.used = run.used.concat(run.curQ);
-    return out.map(q => ({ ...q }));
+    return out.map(q => withSub({ ...q }));
   }
   function roundLevel() {
-    const r = roundNo(), boss = isBoss(), def = rdef(), cf = chalFor(r), halve = boss && omen() ? 0.5 : 1;
+    const r = roundNo(), boss = isBoss(), def = rdef(), cf = chalFor(r), halve = 1;
     const ctx = { seconds: clamp(Math.round(26 - 1.0 * r + ascFx(run.asc).secs), 10, 28), target: 1 };
     perkList().forEach(p => p.round && p.round(ctx, run));
     ctx.seconds = Math.max(6, ctx.seconds);
@@ -280,7 +283,7 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------- puntuacion de una pregunta ---------------- */
   A.adv.score = function (o, km, left, noSide) {
-    const Lv = C().S.camp.levels[0], limit = C().S.limit || Lv.seconds, halve = omen() ? 0.5 : 1, boss = run.boss || [], S = C().S;
+    const Lv = C().S.camp.levels[0], limit = C().S.limit || Lv.seconds, halve = 1, boss = run.boss || [], S = C().S;
     const r = roundNo(), c = {
       o, km, left, limit, kind: o.kind || (o.clue ? "clue" : "place"), topic: o.topic || "mixed", cont: continentOf(o), coins: 0, lines: [], xmult: 1, mult: 1, streakStep: 0.2, luck: false,
       scale: clamp(1500 * Math.pow(0.94, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1),
@@ -307,7 +310,6 @@ window.AIQ = window.AIQ || {};
     clearTimers();
     run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) run.stats.bulls++; run.stats.best = Math.max(run.stats.best, res.total);
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
-    if (res.dist >= 750 && has("recycle")) { const id = Object.keys(run.tools).find(k => run.tools[k].left < toolMax(k)); if (id) run.tools[id].left++; }
     run.streak = res.streak || 0; run.qi++; run.qTools = 0; persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
     const kind = res.km == null ? "timeout" : res.dist >= 960 ? "bull" : res.dist < 400 ? "miss" : res.streak >= 3 ? "streak" : res.dist >= 750 ? "good" : null;
     clearTimeout(reactT); if (kind) reactT = setTimeout(() => A.dealer.react(kind), 1300);
@@ -316,8 +318,6 @@ window.AIQ = window.AIQ || {};
   /* ---------------- pistas gratis de reliquias ---------------- */
   let timers = [];
   const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
-  const hemisphere = o => { const [la, lo] = latlon(o); return A.T(la >= 0 ? "Hemisferio norte" : "Hemisferio sur", la >= 0 ? "Northern hemisphere" : "Southern hemisphere") + " · " + A.T(lo >= 0 ? "este" : "oeste", lo >= 0 ? "east" : "west"); };
-  const initialHint = o => { const nm = A.tx(o.name).trim(); return A.tf("Empieza por «{l}»", "Starts with “{l}”", { l: nm[0] || "?" }); };
   let NE_BY_EN = null;                                               // nombre ingles (Wikipedia/Wikidata) -> nombre del mapa (Natural Earth)
   const neOf = nameEn => {
     const W = C().world.byName; if (!nameEn) return null; if (W[nameEn]) return nameEn;
@@ -339,7 +339,8 @@ window.AIQ = window.AIQ || {};
     A.pointer.set({ tool: null, fx, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; return oo.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[oo.key]) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
     const api = {
       fact: o2 => { const txt = A.tx(o2.fact) || (A.factOf && A.factOf(o2)) || ""; if (txt) noteH(txt, "journal"); },
-      note: noteH, continent: o2 => continentName(o2), hemisphere, initial: initialHint, country: revealCountry, addTime: s => { S.limit += s; },
+      note: noteH, continent: o2 => continentName(o2), country: revealCountry, addTime: s => { S.limit += s; },
+      laterHalf: fn => api.later(S.limit / 2, fn),
       later: (sec, fn) => { const left = S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000, delay = (left - sec) * 1000; if (delay > 0) timers.push(setTimeout(() => { if (S.phase === "asking" && !S.paused) fn(); }, delay)); },
     };
     perkList().forEach(p => p.open && p.open(api, o, run));
@@ -369,7 +370,6 @@ window.AIQ = window.AIQ || {};
     t.left--; run.qTools++; run.rTools++; A.sfx.buy();
     const o = C().S.qs[S.qi];
     if (id === "hourglass") { S.limit += 6; noteH(A.T("+6 segundos", "+6 seconds")); }
-    else if (id === "astrolabe") { A.chal.upright(); A.sfx.flip(true); noteH(A.T("Mapa enderezado", "Map upright")); }
     else if (id === "interruptor") { A.chal.suspend(); run.windOff = true; A.sfx.restore(); noteH(A.T("Retos apagados en esta pregunta", "Challenges off for this question")); A.dealer.react("counter"); }
     else if (id === "swapcard") { if (!swapQuestion()) { t.left++; run.qTools--; run.rTools--; A.sfx.deny(); return; } }
     else if (id === "journal") { const txt = o.clue ? A.tf("Empieza por «{l}» y está en {c}.", "Starts with “{l}” and lies in {c}.", { l: A.tx(o.answer).trim()[0], c: continentName(o) }) : (A.tx(o.fact) || (A.factOf && A.factOf(o)) || A.T("Sin notas para este lugar.", "No notes for this place.")); noteH(txt, "journal"); }
@@ -380,7 +380,7 @@ window.AIQ = window.AIQ || {};
   function swapQuestion() {
     const S = C().S, list = poolFor(roundNo()), used = new Set(run.used), cand = list.filter(q => !used.has(q.cid[0]));
     if (!cand.length) { noteH(A.T("No quedan lugares para cambiar.", "No places left to swap.")); return false; }
-    const q = { ...A.rng(`${run.seed}:swap:${roundNo()}:${S.qi}:${run.qTotal}`).pick(cand) };
+    const q = withSub({ ...A.rng(`${run.seed}:swap:${roundNo()}:${S.qi}:${run.qTotal}`).pick(cand) });
     if (run.curQ) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]); S.qs[S.qi] = q;
     C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; A.adv.onQuestion(); A.sfx.card(); return true;
   }
