@@ -1,5 +1,9 @@
 # Atlas IQ
 
+**v0.11.1** - Navegador de canciones y Ajustes renovados:
+- **Navegador de canciones** (`js/jukebox.js`): al cambiar de canción aparece un aviso discreto con flechas (anterior / siguiente, o las teclas ← →). Las 9 canciones tienen nombres de apuestas traducidos a los 6 idiomas (*Ambos marcan*, *Todo al rojo*, *All-in*, *Doble o nada*, *Combinada*...). Con la música desactivada no aparece nunca. El mismo control vive en Ajustes > Sonido.
+- **Ajustes en 4 pestañas** (General, Sonido, Imagen, Datos), con la descripción de cada opción: idioma, pantalla completa, intro; volúmenes y aviso de canción; gráficos, reducir movimiento, puntero de casino y ayudas emergentes (ambos se pueden apagar); restablecer Enciclopedia y **restablecer ajustes**. La pestaña se recuerda.
+
 **v0.11** - Mas trucos del crupier, puntero y tooltips de casino, y una banda sonora de 9 canciones:
 - **45 retos** (antes 12): texto (letras que bailan, runas, anagrama, sin vocales, marquesina, adivinanza, Torre de Babel...), mapa (mosaico, negativo, rayos, lluvia, miopia, punto ciego, terremoto, deriva, ruleta, espejo horizontal, mundo del reves, pangea, continentes barajados, chinchetas trampa...) y **retos del puntero** (temblor, parpadeo, fantasma, desenfoque, retraso, invertido, mareo). Los desplazamientos de continentes ya no se amontonan: las fronteras siguen siempre visibles. La *tinta borrada* ahora se nota de verdad.
 - **72 perks** (antes 57): nuevos contra retos de texto, mapa y puntero, mas el **Termometro** (el puntero pasa de azul a rojo al acercarte).

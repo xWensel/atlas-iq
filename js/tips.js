@@ -21,6 +21,10 @@
     const o = kind === "tool" ? A.ADV.TOOLS[id] : A.RELICS[id]; return o ? A.ttAttr(A.tx(o.n), A.tx(o.d)) : "";
   };
   Object.assign(A.tips, {
+    songprev: tip("Canción anterior|Previous song|Morceau précédent|Música anterior|Vorheriger Song|Brano precedente",
+      "Atajo: flecha izquierda.|Shortcut: left arrow.|Raccourci : flèche gauche.|Atalho: seta esquerda.|Kürzel: Pfeil links.|Scorciatoia: freccia sinistra."),
+    songnext: tip("Canción siguiente|Next song|Morceau suivant|Próxima música|Nächster Song|Brano successivo",
+      "Atajo: flecha derecha.|Shortcut: right arrow.|Raccourci : flèche droite.|Atalho: seta direita.|Kürzel: Pfeil rechts.|Scorciatoia: freccia destra."),
     level: tip("Puntos de la ronda|Round score|Points de la manche|Pontos da rodada|Rundenpunkte|Punti del round",
       "Tu precisión acumulada en esta ronda: cuanto más cerca del lugar, más puntos.|Your precision so far this round: the closer to the place, the more points.|Ta précision cumulée sur cette manche : plus tu es près du lieu, plus tu gagnes.|Sua precisão acumulada nesta rodada: quanto mais perto do lugar, mais pontos.|Deine bisherige Genauigkeit in dieser Runde: je näher am Ort, desto mehr Punkte.|La tua precisione finora in questo round: più sei vicino al luogo, più punti."),
     need: tip("Objetivo de la ronda|Round target|Objectif de la manche|Meta da rodada|Rundenziel|Obiettivo del round",

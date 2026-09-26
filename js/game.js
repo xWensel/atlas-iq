@@ -9,20 +9,21 @@
     phase: "title", limit: 10, t0: 0, pausedAcc: 0, pauseAt: 0, paused: false, lastTick: -1, tense: false, startLevel: 0, prog: {},
     quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, fsGate: true, booting: true, skin: "casino",
     hub: "home", ranked: null, run: null, tool: null, hits: 0,
+    cursor: true, tips: true, songToast: true, setTab: "general",
   };
   const prog = id => (S.prog[id] = S.prog[id] || { unlocked: 1, best: 0, bestIq: 0 });
   function load() {
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || "{}");
       A.lang = d.lang && A.STR[d.lang] ? d.lang : A.detectLang();
-      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.fsGate = d.fsGate !== false; S.skin = "casino";
+      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.cursor = d.cursor !== false; S.tips = d.tips !== false; S.songToast = d.songToast !== false; S.setTab = d.setTab || "general"; S.fsGate = d.fsGate !== false; S.skin = "casino";
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
     } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate, skin: S.skin })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate, skin: S.skin, cursor: S.cursor, tips: S.tips, songToast: S.songToast, setTab: S.setTab })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
@@ -38,6 +39,7 @@
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
   map.animateTo(map.home(), 0);
+  A.cursor.set(S.cursor); A.tt.enable(S.tips);
 
   /* ------------------------------------------------------------ odometro mecanico */
   const DIGITS = [..."0123456789"].map(d => `<i>${d}</i>`).join("");
@@ -143,10 +145,14 @@
       if (sw) { const on = k === "music" ? A.audio.musicOn : A.audio.sfxOn; sw.setAttribute("aria-checked", on); f.classList.toggle("off", !on); }
     }
     segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs();
-    const sm = document.querySelector('.sw[data-sw="motion"]'), si = document.querySelector('.sw[data-sw="intro"]');
-    if (sm) sm.setAttribute("aria-checked", S.reduce); if (si) si.setAttribute("aria-checked", S.intro);
+    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, songs: S.songToast };
+    for (const k in st) { const el = document.querySelector('.sw[data-sw="' + k + '"]'); if (el) el.setAttribute("aria-checked", !!st[k]); }
+    const sg = document.querySelector('.sw[data-sw="songs"]'); if (sg) sg.closest(".row-sw").classList.toggle("off", !A.audio.musicOn);
+    $("rowCursor").classList.toggle("hidden", !A.cursor.available);
+    setTab(S.setTab, true); if (A.jukebox) A.jukebox.sync();
+    const rs = $("resetSet"); if (rs && !rs.classList.contains("armed")) rs.textContent = A.t("set.reset"); $("resetSetNote").textContent = A.t("set.reset.d");
     const rc = $("resetCodex"); if (rc && !rc.classList.contains("armed")) rc.textContent = A.T("Restablecer Enciclopedia", "Reset Encyclopedia");
-    $("dataH").textContent = A.T("Datos", "Data"); $("resetCodexNote").textContent = A.T("Borra todas las tarjetas desbloqueadas. Tu perfil, logros y récords no cambian.", "Deletes every unlocked card. Your profile, achievements and records stay.");
+    $("resetCodexNote").textContent = A.T("Borra todas las tarjetas desbloqueadas. Tu perfil, logros y récords no cambian.", "Deletes every unlocked card. Your profile, achievements and records stay.");
   }
   /* restablecer la Enciclopedia: hay que pulsar dos veces (la primera arma el boton) */
   { const rc = $("resetCodex"); let tm = 0;
@@ -158,7 +164,7 @@
     S.settingsOpen = on; const sh = $("setSh");
     sh.classList.toggle("hidden", !on); sh.classList.toggle("on-menu", S.phase === "title");
     $("setBtn").setAttribute("aria-expanded", on);
-    if (on) { syncSettings(); A.sfx.ui(); }
+    if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); }
   }
   let blipT = 0;
   for (const f of document.querySelectorAll(".fader")) {
@@ -173,7 +179,7 @@
     if (sw) sw.addEventListener("click", () => { toggleSwitch(k); });
   }
   function toggleSwitch(k) {
-    if (k === "music") { A.audio.setMusic(!A.audio.musicOn); if (A.audio.musicOn) A.audio.unlock(); A.sfx.flip(A.audio.musicOn); }
+    if (k === "music") { A.audio.setMusic(!A.audio.musicOn); if (A.audio.musicOn) A.audio.unlock(); else if (A.jukebox) A.jukebox.hide(); A.sfx.flip(A.audio.musicOn); }
     else { const willOn = !A.audio.sfxOn; if (!willOn) A.sfx.flip(false); A.audio.sfxOn = willOn; if (willOn) A.sfx.flip(true); }
     save(); syncSettings();
   }
@@ -203,11 +209,29 @@
   }
   document.addEventListener("pointerdown", e => { if (!e.target.closest("#langPop, #menuLang")) $("langPop").classList.add("hidden"); }, true);
   function applyMotion() { document.documentElement.classList.toggle("reduce-motion", S.reduce); map.fxOn = !S.reduce; }
-  for (const sw of document.querySelectorAll(".sw[data-sw='motion'], .sw[data-sw='intro']")) {
-    sw.addEventListener("click", () => { if (sw.dataset.sw === "motion") { S.reduce = !S.reduce; applyMotion(); } else S.intro = !S.intro; A.sfx.flip(true); save(); syncSettings(); });
+  const TOG = {
+    motion: () => { S.reduce = !S.reduce; applyMotion(); }, intro: () => { S.intro = !S.intro; },
+    cursor: () => { S.cursor = !S.cursor; A.cursor.set(S.cursor); }, tips: () => { S.tips = !S.tips; A.tt.enable(S.tips); },
+    songs: () => { S.songToast = !S.songToast; if (!S.songToast && A.jukebox) A.jukebox.hide(); },
+  };
+  for (const sw of document.querySelectorAll(".sw[data-sw]")) if (TOG[sw.dataset.sw]) sw.addEventListener("click", () => { TOG[sw.dataset.sw](); A.sfx.flip(true); save(); syncSettings(); });
+  /* pestanas de Ajustes */
+  function setTab(t, silent) {
+    S.setTab = t; segSet(document.querySelector('[data-seg="settab"]'), t);
+    document.querySelectorAll(".set-pane").forEach(p => p.classList.toggle("hidden", p.dataset.pane !== t));
+    if (!silent) { save(); A.sfx.ui(); }
   }
+  document.querySelector('[data-seg="settab"]').addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.dataset.v !== S.setTab) { setTab(b.dataset.v); if (A.jukebox) A.jukebox.sync(); } });
+  /* restablecer ajustes: doble pulsacion */
+  { const rs = $("resetSet"); let tm = 0;
+    rs.onclick = () => {
+      if (!rs.classList.contains("armed")) { rs.classList.add("armed"); rs.textContent = A.t("set.reset.ask"); A.sfx.ui(); clearTimeout(tm); tm = setTimeout(() => { rs.classList.remove("armed"); syncSettings(); }, 4000); return; }
+      clearTimeout(tm); rs.classList.remove("armed");
+      A.audio.setVol("master", 0.85); A.audio.setVol("music", 0.7); A.audio.setVol("sfx", 0.9); A.audio.sfxOn = true; A.audio.setMusic(true); A.audio.unlock();
+      S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.songToast = true; A.cursor.set(true); A.tt.enable(true);
+      save(); A.sfx.card(); syncSettings(); rs.textContent = A.t("set.reset.done"); setTimeout(syncSettings, 2200);
+    }; }
   $("setFs").onclick = () => { toggleFs(); A.sfx.ui(); };
-  $("setNext").onclick = () => { A.audio.unlock(); A.music.next(); A.sfx.ui(); };
   document.querySelector('[data-seg="gfx"]').addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b || b.dataset.v === S.quality) return;
     S.quality = b.dataset.v; save(); A.sfx.ui(); map.setQuality(S.quality); syncSettings();

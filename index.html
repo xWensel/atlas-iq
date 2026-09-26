@@ -83,36 +83,58 @@
     <p id="factText"></p>
   </footer></div>
 
-  <!-- panel de ajustes -->
+  <!-- panel de ajustes: cuatro pestanas cortas -->
   <div class="sh set-sh hidden" id="setSh"><section id="settings" class="cut ink" role="dialog" aria-label="Ajustes">
     <div class="set-head"><span data-i="set.title"></span><button id="setClose" aria-label="Cerrar"><i class="uic" data-ic="u_close"></i></button></div>
+    <div class="seg s4 set-tabs" data-seg="settab"><button type="button" data-v="general" data-i="set.tab.general"></button><button type="button" data-v="sound" data-i="set.tab.sound"></button><button type="button" data-v="video" data-i="set.tab.video"></button><button type="button" data-v="data" data-i="set.tab.data"></button><i></i></div>
 
-    <div class="set-sec"><h3 data-i="set.sound"></h3>
-      <div class="fader" data-k="master"><label data-i="vol.master"></label><output>85</output><input type="range" min="0" max="100" value="85" aria-label="Volumen general"><div class="ftrack"></div></div>
-      <div class="fader" data-k="music"><label data-i="vol.music"></label><button class="sw" data-sw="music" role="switch" aria-checked="true" aria-label="Música"><i></i></button><output>70</output><input type="range" min="0" max="100" value="70" aria-label="Volumen de la música"><div class="ftrack"></div></div>
-      <button class="row-btn" id="setNext" type="button"><span data-i="set.nextsong"></span><kbd>♪</kbd></button>
-      <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
+    <div class="set-pane" data-pane="general">
+      <div class="set-sec"><h3 data-i="set.lang"></h3>
+        <div class="langgrid" id="langGrid"></div>
+        <p class="set-note" data-i="set.lang.note"></p>
+      </div>
+      <div class="set-sec">
+        <button class="row-btn" id="setFs" type="button"><span data-i="key.fs"></span><kbd>F</kbd></button>
+        <div class="row-sw"><div class="rs-t"><label data-i="set.intro"></label></div><button class="sw" data-sw="intro" role="switch" aria-checked="true" aria-label="Intro del estudio"><i></i></button></div>
+      </div>
     </div>
 
-    <div class="set-sec"><h3 data-i="set.lang"></h3>
-      <div class="langgrid" id="langGrid"></div>
-      <p class="set-note" data-i="set.lang.note"></p>
+    <div class="set-pane hidden" data-pane="sound">
+      <div class="set-sec">
+        <div class="fader" data-k="master"><label data-i="vol.master"></label><output>85</output><input type="range" min="0" max="100" value="85" aria-label="Volumen general"><div class="ftrack"></div></div>
+        <div class="fader" data-k="music"><label data-i="vol.music"></label><button class="sw" data-sw="music" role="switch" aria-checked="true" aria-label="Música"><i></i></button><output>70</output><input type="range" min="0" max="100" value="70" aria-label="Volumen de la música"><div class="ftrack"></div></div>
+        <div class="np np-set" id="setSong"><button type="button" class="np-b" data-d="-1" data-tf="songprev"><i class="np-tri l"></i></button><span class="np-t"><i class="np-note">&#9834;</i><b data-np-t></b><em data-np-n></em></span><button type="button" class="np-b" data-d="1" data-tf="songnext"><i class="np-tri r"></i></button></div>
+        <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
+      </div>
+      <div class="set-sec">
+        <div class="row-sw"><div class="rs-t"><label data-i="set.songs"></label><small data-i="set.songs.d"></small></div><button class="sw" data-sw="songs" role="switch" aria-checked="true" aria-label="Aviso de canciones"><i></i></button></div>
+      </div>
     </div>
-    <div class="set-sec"><h3 data-i="set.view"></h3>
-      <button class="row-btn" id="setFs" type="button"><span data-i="key.fs"></span><kbd>F</kbd></button>
-      <div class="row-sw"><label data-i="set.motion"></label><button class="sw" data-sw="motion" role="switch" aria-checked="false" aria-label="Reducir movimiento"><i></i></button></div>
-      <p class="set-note" data-i="set.motion.d"></p>
-      <div class="row-sw"><label data-i="set.intro"></label><button class="sw" data-sw="intro" role="switch" aria-checked="true" aria-label="Intro del estudio"><i></i></button></div>
+
+    <div class="set-pane hidden" data-pane="video">
+      <div class="set-sec"><h3 data-i="set.gfx"></h3>
+        <div class="seg s3" data-seg="gfx"><button data-v="auto" data-i="gfx.auto"></button><button data-v="high" data-i="gfx.high"></button><button data-v="saver" data-i="gfx.saver"></button><i></i></div>
+        <p class="set-note" data-i="set.gfx.d"></p>
+      </div>
+      <div class="set-sec">
+        <div class="row-sw"><div class="rs-t"><label data-i="set.motion"></label><small data-i="set.motion.d"></small></div><button class="sw" data-sw="motion" role="switch" aria-checked="false" aria-label="Reducir movimiento"><i></i></button></div>
+        <div class="row-sw" id="rowCursor"><div class="rs-t"><label data-i="set.cursor"></label><small data-i="set.cursor.d"></small></div><button class="sw" data-sw="cursor" role="switch" aria-checked="true" aria-label="Puntero de casino"><i></i></button></div>
+        <div class="row-sw"><div class="rs-t"><label data-i="set.tips"></label><small data-i="set.tips.d"></small></div><button class="sw" data-sw="tips" role="switch" aria-checked="true" aria-label="Ayudas emergentes"><i></i></button></div>
+      </div>
     </div>
-    <div class="set-sec"><h3 data-i="set.gfx"></h3>
-      <div class="seg s3" data-seg="gfx"><button data-v="auto" data-i="gfx.auto"></button><button data-v="high" data-i="gfx.high"></button><button data-v="saver" data-i="gfx.saver"></button><i></i></div>
-      <p class="set-note" data-i="set.gfx.d"></p>
+
+    <div class="set-pane hidden" data-pane="data">
+      <div class="set-sec">
+        <button class="row-btn danger" id="resetCodex" type="button"></button>
+        <p class="set-note" id="resetCodexNote"></p>
+      </div>
+      <div class="set-sec">
+        <button class="row-btn danger" id="resetSet" type="button"></button>
+        <p class="set-note" id="resetSetNote"></p>
+      </div>
     </div>
-    <div class="set-sec"><h3 id="dataH"></h3>
-      <button class="row-btn danger" id="resetCodex" type="button"></button>
-      <p class="set-note" id="resetCodexNote"></p>
-    </div>
-    <div class="set-keys"><span><kbd>F</kbd> <em data-i="key.fs"></em></span><span><kbd>P</kbd> <em data-i="key.pause"></em></span><span><kbd>M</kbd> <em data-i="key.sfx"></em></span><span><kbd>N</kbd> <em data-i="key.mus"></em></span></div>
+
+    <div class="set-keys"><span><kbd>F</kbd> <em data-i="key.fs"></em></span><span><kbd>P</kbd> <em data-i="key.pause"></em></span><span><kbd>M</kbd> <em data-i="key.sfx"></em></span><span><kbd>N</kbd> <em data-i="key.mus"></em></span><span><kbd>&larr;</kbd><kbd>&rarr;</kbd> <em data-i="key.song"></em></span></div>
   </section></div>
 
 
@@ -172,6 +194,7 @@
 <script src="js/pointer.js"></script>
 <script src="js/uikit.js"></script>
 <script src="js/tips.js"></script>
+<script src="js/jukebox.js"></script>
 <script src="js/adventure.js"></script>
 <script src="js/hub.js"></script>
 <script src="js/wiki.js"></script>

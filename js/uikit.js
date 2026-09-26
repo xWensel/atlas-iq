@@ -53,14 +53,17 @@
     return `url("${cv.toDataURL("image/png")}") ${(hx + 1) * CELL} ${(hy + 1) * CELL}`;
   }
   const KEY = { auto: "def", default: "def", pointer: "ptr", text: "txt", grab: "grab", grabbing: "grabbing", "not-allowed": "no", wait: "wait", progress: "wait", help: "help", crosshair: "cross", "zoom-in": "zin", "zoom-out": "zout", move: "grab", "all-scroll": "grab" };
-  A.cursor = { on: false };
+  A.cursor = { on: false, available: false, set() {} };
 
   function initCursor() {
     let fine = false, off = false;
-    try { fine = matchMedia("(pointer:fine)").matches && matchMedia("(hover:hover)").matches; off = localStorage.getItem("atlasiq.cursor") === "off"; } catch (e) { /* sin matchMedia */ }
-    if (!fine || off) return;
+    try { fine = matchMedia("(pointer:fine)").matches && matchMedia("(hover:hover)").matches; } catch (e) { /* sin matchMedia */ }
+    if (!fine) return;
     const root = document.documentElement, fb = { def: "default", ptr: "pointer", txt: "text", grab: "grab", grabbing: "grabbing", no: "not-allowed", wait: "wait", cross: "crosshair", zin: "zoom-in", zout: "zoom-out", help: "help" };
-    Object.keys(SPR).forEach(k => root.style.setProperty("--c-" + k, `${sprite(k)}, ${fb[k]}`));
+    const sp = {}; Object.keys(SPR).forEach(k => { sp[k] = `${sprite(k)}, ${fb[k]}`; });
+    A.cursor.available = true;
+    A.cursor.set = on => { A.cursor.on = !!on; Object.keys(SPR).forEach(k => root.style.setProperty("--c-" + k, on ? sp[k] : fb[k])); };
+    A.cursor.set(true);
     const st = document.createElement("style"); st.id = "gcurCss";
     st.textContent = `html.gcur { cursor: var(--c-def); }
 :where(html.gcur) :where(a[href], button, summary, select, label[for], [role=button], [role=switch], input[type=button], input[type=submit], input[type=checkbox], input[type=radio], input[type=range], input[type=color], input[type=file]) { cursor: var(--c-ptr); }
@@ -77,10 +80,10 @@
     };
     const sweep = () => { for (const sh of document.styleSheets) { try { if (sh.ownerNode && sh.ownerNode.id === "gcurCss") continue; fix(sh.cssRules); } catch (e) { /* hoja externa */ } } };
     sweep(); window.addEventListener("load", sweep); setTimeout(sweep, 1200);
-    root.classList.add("gcur"); A.cursor.on = true;
+    root.classList.add("gcur");
     /* destello pixel-art al pulsar (no sobre el mapa: ahi ya esta la mira) */
     document.addEventListener("pointerdown", e => {
-      if (e.pointerType !== "mouse" || e.button !== 0 || (e.target && e.target.tagName === "CANVAS")) return;
+      if (!A.cursor.on || e.pointerType !== "mouse" || e.button !== 0 || (e.target && e.target.tagName === "CANVAS")) return;
       const b = document.createElement("div"); b.className = "gc-burst"; b.style.left = e.clientX + "px"; b.style.top = e.clientY + "px";
       for (let i = 0; i < 6; i++) { const p = document.createElement("i"), a = (i / 6) * Math.PI * 2 + Math.random() * 0.5; p.style.setProperty("--dx", Math.cos(a) * 18 + "px"); p.style.setProperty("--dy", Math.sin(a) * 18 + "px"); p.className = i % 2 ? "g" : ""; b.appendChild(p); }
       document.body.appendChild(b); setTimeout(() => b.remove(), 520);
@@ -88,7 +91,7 @@
   }
 
   /* ------------------------------------------------------------------ tooltips */
-  let tip, cur = null, timer = 0, shown = false, mx = 0, my = 0, lastHide = 0;
+  let tipsOn = true, tip, cur = null, timer = 0, shown = false, mx = 0, my = 0, lastHide = 0;
   const find = t => {
     for (let e = t; e && e.nodeType === 1 && e !== document.documentElement; e = e.parentElement) {
       if (e.hasAttribute("data-th") || e.hasAttribute("data-tt") || e.hasAttribute("data-tip") || e.hasAttribute("data-tf")) return e;
@@ -112,7 +115,7 @@
   }
   function hide() { clearTimeout(timer); if (shown) { shown = false; lastHide = Date.now(); tip.classList.remove("on"); } }
   function show() {
-    if (!cur || !cur.isConnected) return; const h = html(cur); if (!h) return;
+    if (!tipsOn || !cur || !cur.isConnected) return; const h = html(cur); if (!h) return;
     tip.innerHTML = h; shown = true; tip.classList.add("on"); place();
   }
   function arm(el) {
@@ -120,7 +123,7 @@
     timer = setTimeout(show, Date.now() - lastHide < 350 ? 0 : 340);
   }
   A.tips = A.tips || {};
-  A.tt = { hide, refresh: () => { if (cur && shown) show(); } };
+  A.tt = { enable: on => { tipsOn = !!on; if (!tipsOn) hide(); }, hide, refresh: () => { if (cur && shown) show(); } };
 
   function initTips() {
     tip = document.createElement("div"); tip.id = "tt"; tip.className = "tt"; tip.setAttribute("role", "tooltip"); document.body.appendChild(tip);
