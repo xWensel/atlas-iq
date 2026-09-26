@@ -223,3 +223,7 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 @media (min-width: 1500px) and (min-height: 900px) { .hh-logo, .gate-logo img, #splash img { width: 600px !important; } }
 .brand-rose { width: 32px; height: 32px; } .menu-rose { width: 64px; height: 64px; }
 .gate-logo { width: auto !important; display: flex; justify-content: center; }
+
+/* cartas de modo sin indices de baraja (K / A / Q): texto a todo el ancho */
+.mcard .mc-name { padding: 0 2px; } .mcard .mc-desc { padding: 0; }
+@media (max-height: 520px) and (orientation: landscape) { .mcard .mc-name, .mcard .mc-desc { padding: 0; } }

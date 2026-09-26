@@ -23,10 +23,9 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ pantalla principal */
   function home() {
     const c = C(), P = A.profile.get(), adv = P.adv, today = A.rank.boards.daily(), done = P.daily[today], saved = A.adv.hasSave(), sm = saved && A.adv.summary();
-    /* cada modo es una carta de la baraja real: A (aventura), K (clasico), Q (reto diario) */
+    /* cada modo es una carta (sin indices de baraja: el marco y la ilustracion bastan) */
     const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}">
-      ${id === "adventure" ? '<i class="marq"></i>' : ""}<span class="ix tl"><b>${rank}</b>${A.icon(suit)}</span><span class="ix br"><b>${rank}</b>${A.icon(suit)}</span>
-      ${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-desc">${desc}</span><span class="mc-stat">${meta}</span></button>`;
+      ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-desc">${desc}</span><span class="mc-stat">${meta}</span></button>`;
     c.dialog(`<div class="hh">
       <div class="hh-top"><img class="hh-logo" src="assets/gen/logo.webp" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
       <p class="hh-tag">${A.t("title.tag")}</p>
