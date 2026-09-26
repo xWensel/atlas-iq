@@ -68,15 +68,15 @@ window.AIQ = window.AIQ || {};
     });
     g.connect(bus); send(g, rev); env(g, t, 0.004, vol, dur);
   }
+  let noiseBuf = null;
   function noise(t, dur, o = {}) {
     const { hp = 0, lp = 20000, vol = 0.05, bus = sfxBus, sweepTo, q = 0.7, type } = o;
-    const n = Math.floor(ctx.sampleRate * (dur + 0.05)), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
-    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
-    const s = ctx.createBufferSource(); s.buffer = buf;
+    if (!noiseBuf) { const nn = ctx.sampleRate * 2, d0 = (noiseBuf = ctx.createBuffer(1, nn, ctx.sampleRate)).getChannelData(0); for (let i = 0; i < nn; i++) d0[i] = Math.random() * 2 - 1; }   // un solo buffer de ruido reutilizado
+    const s = ctx.createBufferSource(); s.buffer = noiseBuf;
     const f1 = ctx.createBiquadFilter(); f1.type = type || (hp ? "highpass" : "lowpass"); f1.frequency.value = hp || lp; f1.Q.value = q;
     if (sweepTo) f1.frequency.exponentialRampToValueAtTime(sweepTo, t + dur);
     const g = ctx.createGain(); s.connect(f1).connect(g).connect(bus); env(g, t, 0.004, vol, dur);
-    s.start(t); s.stop(t + dur + 0.05);
+    s.start(t, Math.random() * (noiseBuf.duration - dur - 0.2)); s.stop(t + dur + 0.05);
   }
   function thump(t, o = {}) {
     const { vol = 0.3, f0 = 130, f1 = 42, dur = 0.16, bus = sfxBus } = o;

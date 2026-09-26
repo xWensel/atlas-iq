@@ -7,7 +7,7 @@ window.AIQ = window.AIQ || {};
 (function (A) {
   const $ = id => document.getElementById(id);
   const P = A.pointer = { st: { tool: null, fx: {}, noCountry: false, windFn: null, distFn: null }, x: -99, y: -99, rx: -99, ry: -99, m: null, on: false, press: 0 };
-  let sx = 0, sy = 0, jx = 0, jy = 0, tj = 0, lastNow = 0, hotCol = null, hotAt = 0, hotKm = 1e9;
+  let lastDraw = 0, sx = 0, sy = 0, jx = 0, jy = 0, tj = 0, lastNow = 0, hotCol = null, hotAt = 0, hotKm = 1e9;
   let map = null, root, cv, c, tag, mag, mctx, guideX, guideY, ghost, raf = 0, mask = null, lastLL = null, lastLand = null, lastTick = 0, lastHov = 0, lastName = "", pulse = 0;
 
   /* mascara de tierra (equirrectangular, 720x360) para saber si el puntero esta sobre mar o tierra sin coste */
@@ -66,7 +66,7 @@ window.AIQ = window.AIQ || {};
   function frame(now) {
     raf = requestAnimationFrame(frame); if (!P.on) return;
     if (P.press > 0) P.press = Math.max(0, P.press - 16);
-    eff(now); apply(now); draw(now);
+    eff(now); apply(now); if (now - lastDraw > 30 || P.press > 0) { lastDraw = now; draw(now); }
     const fx = P.st.fx || {};
     // lat/lon bajo el puntero (a ~30 Hz) -> tierra/mar, coordenadas, pais
     if (now - lastHov > 33) {

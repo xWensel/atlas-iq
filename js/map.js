@@ -130,7 +130,7 @@ void main(){
   const FS_OCEAN = `#version 300 es
 precision highp float;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform float u_dpr; uniform float u_time; uniform int u_style;
-uniform sampler2D u_blurN; uniform sampler2D u_blurW;
+uniform sampler2D u_blurN; uniform sampler2D u_blurW; uniform sampler2D u_swirl;
 uniform vec3 u_oTop; uniform vec3 u_oBot; uniform vec3 u_shallow; uniform vec3 u_grid; uniform vec3 u_tropic;
 uniform vec3 u_sw1; uniform vec3 u_sw2; uniform vec3 u_sw3;
 uniform vec4 u_gp; // stepA, stepB, tB, gridAlpha
@@ -149,25 +149,6 @@ float gridLevel(float stp, vec2 wp, float lonDeg, float latDeg, float pxPerDeg){
   float b=lineAlpha(dLat)*(0.45+0.55*majLat);
   return max(a,b);
 }
-/* remolino de pintura (inspirado en los fondos de los juegos de cartas): giro + deformacion iterada */
-vec3 swirl(vec2 frag){
-  float t=u_time;
-  vec2 uv=(frag-0.5*u_res)/u_res.y*2.4;
-  float len=length(uv);
-  float ang=atan(uv.y,uv.x)+(1.9+0.3*sin(t*0.13))*len-t*0.32;
-  vec2 u=vec2(len*cos(ang),len*sin(ang))-vec2(1.0);
-  vec2 u2=u;
-  for(int i=0;i<5;i++){
-    u2+=vec2(sin(u2.y*1.25+t*0.35+float(i)),cos(u2.x*1.05-t*0.28+float(i)*1.7))*0.55;
-    u+=0.42*vec2(cos(u2.y+t*0.21),sin(u2.x-t*0.24));
-    u-=cos(u.x+u.y)-sin(u.x*0.711-u.y);
-  }
-  float p=clamp(length(u)*0.32,0.0,1.0);
-  float band=0.5+0.5*sin(p*9.42+t*0.45);
-  vec3 col=mix(u_sw1,u_sw2,smoothstep(0.15,0.85,band));
-  col=mix(col,u_sw3,smoothstep(0.55,1.0,p)*0.55);
-  return col;
-}
 void main(){
   vec2 frag=gl_FragCoord.xy; vec2 uv=frag/u_res;
   vec2 wp=u_center+(frag-0.5*u_res)/u_scale;
@@ -178,7 +159,7 @@ void main(){
   ocean+=0.06*exp(-r*r*3.0);
   float w=texture(u_blurW,uv).r; float n=texture(u_blurN,uv).r;
   float shal=clamp(smoothstep(0.03,0.42,w)*0.70+smoothstep(0.02,0.5,n)*0.30,0.0,1.0);
-  if(u_style==1){ ocean=swirl(frag); ocean=mix(ocean,u_shallow,shal*0.55); }
+  if(u_style==1){ ocean=texture(u_swirl,uv).rgb; ocean=mix(ocean,u_shallow,shal*0.55); }
   else if(u_style==3){
     float dots=step(length(fract(frag/(6.0*u_dpr))-0.5),0.5*smoothstep(0.04,0.6,w)*1.1);
     ocean=mix(ocean,u_shallow,dots);
@@ -200,11 +181,36 @@ void main(){
   o=vec4(ocean,1.0);
 }`;
 
+  /* fondo animado (remolino): se pinta a baja resolucion y ~24 fps en su propia textura; el oceano solo la lee */
+  const FS_SWIRL = `#version 300 es
+precision highp float;
+uniform vec2 u_res; uniform float u_time; uniform vec3 u_sw1; uniform vec3 u_sw2; uniform vec3 u_sw3; out vec4 o;
+/* remolino de pintura (inspirado en los fondos de los juegos de cartas): giro + deformacion iterada */
+vec3 swirl(vec2 frag){
+  float t=u_time;
+  vec2 uv=(frag-0.5*u_res)/u_res.y*2.4;
+  float len=length(uv);
+  float ang=atan(uv.y,uv.x)+(1.9+0.3*sin(t*0.13))*len-t*0.32;
+  vec2 u=vec2(len*cos(ang),len*sin(ang))-vec2(1.0);
+  vec2 u2=u;
+  for(int i=0;i<5;i++){
+    u2+=vec2(sin(u2.y*1.25+t*0.35+float(i)),cos(u2.x*1.05-t*0.28+float(i)*1.7))*0.55;
+    u+=0.42*vec2(cos(u2.y+t*0.21),sin(u2.x-t*0.24));
+    u-=cos(u.x+u.y)-sin(u.x*0.711-u.y);
+  }
+  float p=clamp(length(u)*0.32,0.0,1.0);
+  float band=0.5+0.5*sin(p*9.42+t*0.45);
+  vec3 col=mix(u_sw1,u_sw2,smoothstep(0.15,0.85,band));
+  col=mix(col,u_sw3,smoothstep(0.55,1.0,p)*0.55);
+  return col;
+}
+void main(){ o=vec4(swirl(gl_FragCoord.xy),1.0); }`;
+
   /* post-proceso: efecto de zoom sensorial + (casino) monitor CRT + viñeta y grano */
   const FS_POST = `#version 300 es
 precision highp float;
 uniform sampler2D u_scene; uniform vec2 u_res; uniform vec2 u_zc; uniform float u_zv; uniform vec2 u_pv; uniform float u_vig; uniform float u_grain; uniform vec3 u_tint; uniform float u_time;
-uniform float u_crt; uniform float u_dpr; uniform vec4 u_ori;
+uniform float u_crt; uniform float u_dpr; uniform vec4 u_ori; uniform float u_lite;
 out vec4 o;
 ${NOISE}
 void main(){
@@ -219,25 +225,24 @@ void main(){
   vec2 off=toC*zvA*0.06+u_pv*0.014;
   float lenPx=length(off);
   if(lenPx>40.0) off*=40.0/lenPx;
-  vec3 col=vec3(0.0);
-  const int N=12;
-  for(int i=0;i<N;i++){
-    float t=float(i)/float(N-1)-0.5;
-    vec2 p=suv+off*t/u_res;
-    col+=texture(u_scene,p).rgb;
+  vec3 col;
+  if(lenPx<0.6){ col=texture(u_scene,suv).rgb; }
+  else {
+    col=vec3(0.0); const int N=12;
+    for(int i=0;i<N;i++){ float t=float(i)/float(N-1)-0.5; col+=texture(u_scene,suv+off*t/u_res).rgb; }
+    col/=float(N);
   }
-  col/=float(N);
-  float ca=min(lenPx,40.0)*0.0009+u_crt*0.0011;
-  vec2 dir=normalize(toC+vec2(0.0001));
-  vec2 cav=dir*ca*u_res.y/u_res*0.5;
-  col.r=mix(col.r,texture(u_scene,suv+cav).r,step(0.0005,ca));
-  col.b=mix(col.b,texture(u_scene,suv-cav).b,step(0.0005,ca));
+  float ca=min(lenPx,40.0)*0.0009+u_crt*0.0011*(1.0-u_lite);
+  if(ca>0.0005){
+    vec2 dir=normalize(toC+vec2(0.0001)); vec2 cav=dir*ca*u_res.y/u_res*0.5;
+    col.r=texture(u_scene,suv+cav).r; col.b=texture(u_scene,suv-cav).b;
+  }
   if(u_crt>0.5){
     float sl=0.5+0.5*sin(fr.y*3.14159265/(1.5*u_dpr));
     col*=0.90+0.10*sl;                                          // lineas de barrido
     float tri=fract(fr.x/(3.0*u_dpr)); col*=0.965+0.035*vec3(step(tri,0.34),step(0.34,tri)*step(tri,0.67),step(0.67,tri));   // mascara RGB
-    vec3 bl=vec3(0.0); for(int i=0;i<6;i++){ float a=float(i)*1.0472; bl+=texture(u_scene,suv+vec2(cos(a),sin(a))*3.5*u_dpr/u_res).rgb; } bl/=6.0;
-    col+=max(bl-0.72,0.0)*0.55;                                 // resplandor de fosforo
+    if(u_lite<0.5){ vec3 bl=vec3(0.0); for(int i=0;i<6;i++){ float a=float(i)*1.0472; bl+=texture(u_scene,suv+vec2(cos(a),sin(a))*3.5*u_dpr/u_res).rgb; } bl/=6.0;
+    col+=max(bl-0.72,0.0)*0.55; }                                 // resplandor de fosforo
     col*=1.0+0.03*sin(u_time*40.0);                             // parpadeo minimo
   }
   vec2 q2=uv-0.5; float v=1.0-u_vig*smoothstep(0.30,0.95,length(q2*vec2(1.05,1.0))+min(abs(zvA)*0.02,0.08));
@@ -261,7 +266,7 @@ void main(){
   function buildPrograms(gl) {
     return {
       sil: compile(gl, VS_FILL, FS_SIL), solid: compile(gl, VS_FILL, FS_SOLID), land: compile(gl, VS_FILL, FS_LAND), hatch: compile(gl, VS_FILL, FS_HATCH),
-      line: compile(gl, VS_LINE, FS_LINE), blur: compile(gl, VS_FULL, FS_BLUR), ocean: compile(gl, VS_FULL, FS_OCEAN), post: compile(gl, VS_FULL, FS_POST),
+      line: compile(gl, VS_LINE, FS_LINE), blur: compile(gl, VS_FULL, FS_BLUR), ocean: compile(gl, VS_FULL, FS_OCEAN), post: compile(gl, VS_FULL, FS_POST), swirl: compile(gl, VS_FULL, FS_SWIRL),
     };
   }
 
@@ -283,6 +288,7 @@ void main(){
       this.anim = null; this.drift = null;
       this.marks = this._emptyMarks(); this.probes = []; this.pickEnabled = false; this.mouse = null;
       this.quality = "auto"; this.rs = 1; this.frameEma = 0; this.baseDt = 1e9; this.lastT = 0; this.calm = 0;
+      this.rsCap = 1; this.cdpr = 1; this.idleMs = 40; this.lite = false; this.slow = 0; this.rafEma = 0; this._rawT = 0; this._capInit = false; this._capQ = ""; this._lastDraw = 0;
       this.fxOn = true; this.zv = 0; this.lastLz = null; this.pv = [0, 0]; this.zc = null; this.lastView = { cx: 0, cy: 0, s: 0 };
       this.dirty = this.fxDirty = true; this.pointers = new Map(); this.samples = [];
       this.dist = { spec: null, k: 0, kk: 0, kl: 0, ko: 0, from: 0, to: 0, lfrom: 0, lto: 0, ofrom: 0, oto: 0, t0: 0, ms: 0, ct: 6 }; this.lens = null; this.hideReticle = false;
@@ -303,7 +309,7 @@ void main(){
         pal: st.land.map(hex), line: st.line, hl: hex(st.hl || "#e0492b"),
       };
     }
-    setStyle(st) { this.sk = st; this.ms = this._prepStyle(st); this.dirty = this.fxDirty = true; }
+    setStyle(st) { this.sk = st; this.ms = this._prepStyle(st); if (this.T && this.T.swirl) this.T.swirl.ok = false; this._silKey = null; this.dirty = this.fxDirty = true; }
     setAnchor(px, py) { this.zc = [px, py]; }
 
     /* ---------- GL: programas, geometria y buffers ---------- */
@@ -368,17 +374,27 @@ void main(){
     /* sondas de la Aventura: [{lon,lat,km?,bearing?,label}] -> anillo de distancia y flecha de rumbo, siempre nitidos (vector 2D) */
     setProbes(list) { this.probes = list.map(p => ({ ...p, t0: performance.now() })); this.fxDirty = this.dirty = true; this._probeAnim = performance.now() + 1400; }
     setPick(on) { this.pickEnabled = on; this.fxDirty = true; for (const c of [this.cv, this.fx]) c.classList.toggle("aiming", on); }
-    setQuality(q) { this.quality = q; this.rs = 1; this.resize(true); }
+    setQuality(q) { this.quality = q; this.rs = 1; this._capInit = false; this.idleMs = 40; this.slow = 0; this.resize(true); }
 
     resize(force) {
       const r = this.cv.getBoundingClientRect(), raw = window.devicePixelRatio || 1;
-      this.dpr = this.quality === "saver" ? Math.min(1, raw) : Math.min(3, raw);
+      this.dpr = this.quality === "saver" ? Math.min(1, raw) : this.quality === "high" ? Math.min(3, raw) : Math.min(2, raw);
       const W = Math.max(1, r.width), H = Math.max(1, r.height);
-      if (force || Math.abs(W - (this.W || 0)) > 0.5 || Math.abs(H - (this.H || 0)) > 0.5 || this._lastDpr !== this.dpr) {
-        this.cv.width = Math.round(W * this.dpr); this.cv.height = Math.round(H * this.dpr);
+      /* el lienzo GL se dibuja a una fraccion (rsCap) de la resolucion nativa segun la pantalla y el equipo; se ajusta solo si va justo */
+      if (!this._capInit || this._capQ !== this.quality) {
+        this._capInit = true; this._capQ = this.quality; this.rsCap = 1;
+        if (this.quality === "auto") {
+          const px = W * H * this.dpr * this.dpr, nv = navigator, weak = (nv.hardwareConcurrency || 8) <= 4 || (nv.deviceMemory || 8) <= 4 || /Android|iPhone|iPad|Mobile/i.test(nv.userAgent || "");
+          this.rsCap = px > 8e6 ? 0.65 : px > 4.2e6 ? 0.8 : 1; if (weak) { this.rsCap = Math.min(this.rsCap, 0.8); this.idleMs = 50; }
+        }
+      }
+      this.lite = this.quality === "saver" || this.rsCap <= 0.8; if (this.quality === "saver") this.idleMs = Math.max(this.idleMs, 66);
+      this.cdpr = this.dpr * this.rsCap;
+      if (force || Math.abs(W - (this.W || 0)) > 0.5 || Math.abs(H - (this.H || 0)) > 0.5 || this._lastDpr !== this.cdpr) {
+        this.cv.width = Math.round(W * this.cdpr); this.cv.height = Math.round(H * this.cdpr);
         this.fx.width = Math.round(W * this.dpr); this.fx.height = Math.round(H * this.dpr);
       }
-      this._lastDpr = this.dpr; this.W = W; this.H = H;
+      this._lastDpr = this.cdpr; this.W = W; this.H = H;
       this.minS = Math.max(W / (BX1 - BX0), H / (BY1 - BY0));
       this.maxS = this.minS * 70;
       this.view.s = clamp(this.view.s, this.minS, this.maxS); this._clamp(this.view);
@@ -538,7 +554,11 @@ void main(){
     /* punto de pantalla (px CSS del lienzo) -> lon/lat reales, teniendo en cuenta orientacion y continentes movidos */
     screenToLonLat(px, py) { let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); return unproject(x, y); }
     /* lupa de fronteras verdaderas (Sello de aduana / Teodolito): {x,y,r} en px CSS o null */
-    setLens(l) { this.lens = l; this.dirty = true; }
+    setLens(l) {                                                        // la lupa solo obliga a repintar si hay deformacion del mapa y cambia de sitio
+      const o = this.lens; if (!o && !l) return;
+      if (o && l && o.x === l.x && o.y === l.y && o.r === l.r) return;
+      this.lens = l; if (this.dist.spec) this.dirty = true;
+    }
     setDecoys(list) { this.decoys = list || []; this.fxDirty = true; }
     /* terremoto (la camara efectiva tiembla; los clics usan esa misma vista) y deriva (el mapa se desliza solo) */
     _stepMotion(now, dt) {
@@ -621,11 +641,24 @@ void main(){
     /* ---------- bucle: fisica de camara, velocidades y dibujo ---------- */
     _adapt(now, dt) {
       const moving = !!(this.anim || this.drift || this.tv || this.pointers.size || this.inertia);
-      if (dt * 1000 < this.baseDt) this.baseDt = dt * 1000;
+      this.baseDt = Math.max(6, Math.min(this.baseDt, dt * 1000));
+      /* vigilante global: si los fotogramas tardan bastante mas que el minimo visto de forma sostenida (GPU o CPU justas), se baja la resolucion del lienzo y luego los efectos */
+      const raw = now - (this._rawT || now); this._rawT = now;
+      if (raw > 0 && raw < 100 && this.quality === "auto") {
+        this.rafEma = this.rafEma ? this.rafEma * 0.93 + raw * 0.07 : raw;
+        if (this.rafEma > Math.max(this.baseDt * 1.45, this.baseDt + 7)) this.slow++; else this.slow = Math.max(0, this.slow - 2);
+        if (this.slow > 60) { this.slow = 0; this.rafEma = 0; this._degrade(); }
+      }
       if (!moving) { if (this.rs < 1 && ++this.calm > 20) { this.rs = 1; this.calm = 0; this.dirty = true; } this.frameEma = this.baseDt; return; }
       this.calm = 0; this.frameEma = this.frameEma * 0.85 + dt * 1000 * 0.15;
       if (this.quality !== "auto") return;
       if (this.frameEma > Math.max(this.baseDt * 1.5, this.baseDt + 2.5) && this.rs > 0.65) { this.rs = Math.max(0.65, this.rs - 0.1); this.frameEma = this.baseDt; this.dirty = true; }
+    }
+    _degrade() {
+      if (this.rsCap > 0.55) this.rsCap = Math.max(0.55, +(this.rsCap - 0.15).toFixed(2));
+      else if (this.idleMs < 100) this.idleMs = Math.min(100, this.idleMs + 30);
+      else return;
+      this.rs = 1; this.baseDt = 1e9; this.resize(true);
     }
     _frame(now) {
       if (this.lost) return;
@@ -660,9 +693,9 @@ void main(){
       if (this.onMotion) this.onMotion(this.zv, Math.hypot(this.pv[0], this.pv[1]));
 
       const m = this.marks;
-      if (m.guess || m.answer || (this.pickEnabled && this.mouse)) this.fxDirty = true;
+      if (m.guess || m.answer || (this.pickEnabled && this.mouse && !this.hideReticle)) this.fxDirty = true;
       if (m.highlight && now - m.t0 < 700) this.dirty = true;
-      if (this.sk.animated && this.fxOn !== false && !this.pointers.size) this.dirty = true;
+      if (this.sk.animated && this.fxOn !== false && !this.pointers.size && now - this._lastDraw >= this.idleMs) this.dirty = true;   // fondo animado: ~25 fps en reposo
       if (this.dirty) { this.dirty = false; this._drawGL(now); if (this.onView) this.onView(this.view); }
       if (this.fxDirty) { this.fxDirty = false; this._drawFx(now); }
     }
@@ -681,7 +714,7 @@ void main(){
       return { a, b, t };
     }
     _drawGL(now) {
-      const gl = this.gl, v = this.viewJ || this.view, W = this.W, H = this.H, dpr = this.dpr, ms = this.ms, P = this.P, st = this.sk;
+      const gl = this.gl, v = this.viewJ || this.view, W = this.W, H = this.H, dpr = this.cdpr, ms = this.ms, P = this.P, st = this.sk; this._lastDraw = now;
       const mos = this.dist.spec && this.dist.spec.mosaic ? Math.min(1, 1 - (1 - this.dist.spec.mosaic) * Math.min(1, this.dist.kk || 0)) : 1;   // pixeles gordos: menos resolucion del lienzo
       const RS = Math.min(this.rs, mos);
       const sw = Math.max(2, Math.round(W * dpr * RS)), sh = Math.max(2, Math.round(H * dpr * RS));
@@ -691,7 +724,24 @@ void main(){
       const scene = this._target("scene", sw, sh, mos < 0.999 ? gl.NEAREST : gl.LINEAR);
       gl.disable(gl.BLEND); gl.disable(gl.DEPTH_TEST);
 
-      // 1) silueta de tierra a baja resolucion
+      // 0) fondo animado (remolino) a baja resolucion, ~24 fps
+      let swT = null;
+      if (st.style === 1) {
+        swT = this._target("swirl", Math.max(2, Math.round(W / 4)), Math.max(2, Math.round(H / 4)));
+        const fxo = this.fxOn !== false;
+        if (!swT.ok || swT.fx !== fxo || (fxo && now - swT.at >= 41)) {
+          swT.ok = true; swT.fx = fxo; swT.at = now;
+          gl.bindFramebuffer(gl.FRAMEBUFFER, swT.fbo); gl.viewport(0, 0, swT.w, swT.h); gl.useProgram(P.swirl); gl.bindVertexArray(this.vaoEmpty);
+          this._u(P.swirl, "u_res", swT.w, swT.h); this._u(P.swirl, "u_time", fxo ? now / 1000 : 0);
+          this._u(P.swirl, "u_sw1", ...ms.sw[0]); this._u(P.swirl, "u_sw2", ...ms.sw[1]); this._u(P.swirl, "u_sw3", ...ms.sw[2]);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+        }
+      }
+
+      // 1) silueta de tierra a baja resolucion (solo se repite si la vista o las deformaciones cambian)
+      const e0 = this._eff(), key = [v.cx, v.cy, v.s, silW, silH, ...e0.sh, ...e0.rot, ...e0.cen];
+      const same = this._silKey && this._silTex === bW.tex && this._silKey.length === key.length && this._silKey.every((x, i) => x === key[i]);
+      if (!same) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, sil.fbo); gl.viewport(0, 0, silW, silH); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
       gl.useProgram(P.sil); this._setDist(P.sil); this._u(P.sil, "u_off", 0, 0); this._u(P.sil, "u_center", v.cx, v.cy); this._u(P.sil, "u_scale", scale(silW)); this._u(P.sil, "u_res", silW, silH);
       gl.bindVertexArray(this.vaoFill); gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
@@ -705,6 +755,8 @@ void main(){
       gl.activeTexture(gl.TEXTURE0); gl.uniform1i(P.blur.u.u_tex, 0);
       blur(sil, bA, 1, 0); blur(bA, bN, 0, 1);       // estrecho
       blur(bN, bA, 3.2, 0); blur(bA, bW, 0, 3.2);    // ancho
+      this._silKey = key; this._silTex = bW.tex;
+      }
 
       // 3) escena: oceano + reticula, tierra, fronteras, resalte
       gl.bindFramebuffer(gl.FRAMEBUFFER, scene.fbo); gl.viewport(0, 0, sw, sh);
@@ -712,6 +764,7 @@ void main(){
       gl.useProgram(P.ocean); gl.bindVertexArray(this.vaoEmpty);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.ocean.u.u_blurN, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, bW.tex); gl.uniform1i(P.ocean.u.u_blurW, 1);
+      if (swT) { gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, swT.tex); gl.uniform1i(P.ocean.u.u_swirl, 2); }
       this._u(P.ocean, "u_center", v.cx, v.cy); this._u(P.ocean, "u_scale", sc); this._u(P.ocean, "u_res", sw, sh); this._u(P.ocean, "u_dpr", dpr * RS);
       this._u(P.ocean, "u_oTop", ...ms.oTop); this._u(P.ocean, "u_oBot", ...ms.oBot); this._u(P.ocean, "u_shallow", ...ms.shallow); this._u(P.ocean, "u_grid", ...ms.grid); this._u(P.ocean, "u_tropic", ...ms.tropic);
       this._u(P.ocean, "u_gp", gp.a, gp.b, gp.t, st.gridA);
@@ -730,7 +783,7 @@ void main(){
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.land.u.u_blurN, 0);
       gl.uniform1i(P.land.u.u_style, st.style || 0); this._u(P.land, "u_dpr", dpr * RS);
       this._u(P.land, "u_center", v.cx, v.cy); this._u(P.land, "u_scale", sc); this._u(P.land, "u_res", sw, sh); this._u(P.land, "u_fx", st.ao, st.grain, 0, 0);
-      const pal = new Float32Array(24); ms.pal.forEach((c, i) => pal.set(c, i * 3)); gl.uniform3fv(P.land.u.u_pal, pal);
+      if (this._palFor !== ms) { this._palFor = ms; this._pal = new Float32Array(24); ms.pal.forEach((c, i) => this._pal.set(c, i * 3)); } gl.uniform3fv(P.land.u.u_pal, this._pal);
       gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
 
       gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -777,7 +830,7 @@ void main(){
       const fxk = this.fxOn === false ? 0 : 1;
       this._u(P.post, "u_zv", this.zv * fxk); this._u(P.post, "u_pv", this.pv[0] * dpr * 0.06 * fxk, -this.pv[1] * dpr * 0.06 * fxk);
       { const o = this._orient(); this._u(P.post, "u_ori", o.c, o.s, o.sx, o.on ? 1 : 0); }
-      this._u(P.post, "u_crt", st.crt ? 1 : 0); this._u(P.post, "u_dpr", dpr);
+      this._u(P.post, "u_crt", st.crt ? 1 : 0); this._u(P.post, "u_lite", this.lite ? 1 : 0); this._u(P.post, "u_dpr", dpr);
       this._u(P.post, "u_vig", st.vignette); this._u(P.post, "u_grain", st.postGrain); this._u(P.post, "u_tint", ...st.tint); this._u(P.post, "u_time", now / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }

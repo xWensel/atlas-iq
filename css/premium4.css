@@ -55,7 +55,7 @@
 }
 
 /* perfil: logros legibles sobre el mapa (fondo solido, bloqueados apagados pero visibles) */
-.s-prof .ach { background: rgba(16, 11, 28, .9); opacity: 1; filter: none; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .1); backdrop-filter: blur(3px); }
+.s-prof .ach { background: rgba(16, 11, 28, .9); opacity: 1; filter: none; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .1); }
 .s-prof .ach:not(.got) b, .s-prof .ach:not(.got) i { color: rgba(242, 233, 214, .5); }
 .s-prof .ach.got { background: linear-gradient(135deg, rgba(90, 60, 14, .92), rgba(28, 18, 40, .94) 70%); box-shadow: inset 0 0 0 2px var(--brass), 0 0 18px rgba(248, 180, 73, .18); }
 .s-prof .ach.got b { color: #ffe9b0; }

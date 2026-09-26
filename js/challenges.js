@@ -202,7 +202,10 @@ window.AIQ = window.AIQ || {};
   }
   function fxStop() { cancelAnimationFrame(Smoke.raf); const cv = layer("clouds"); if (cv) { cv.classList.remove("on"); cv.getContext("2d").clearRect(0, 0, 256, 144); } }
 
-  A.chal.pointer = (x, y) => { S.px.x = x; S.px.y = y; const app = $("app"); if (!app) return; app.style.setProperty("--px", x + "px"); app.style.setProperty("--py", y + "px"); };
+  A.chal.pointer = (x, y) => {                                        // solo si cambia, y solo dentro de #chOv (no fuerza recalcular estilos de toda la app)
+    const ov = $("chOv"); if (S.px.x === x && S.px.y === y && (!ov || ov._pxSet)) return;
+    S.px.x = x; S.px.y = y; if (!ov) return; ov._pxSet = true; ov.style.setProperty("--px", x + "px"); ov.style.setProperty("--py", y + "px");
+  };
 
   /* ------------------------------------------------------------------ texto del nombre */
   const isLetter = ch => /\p{L}/u.test(ch);

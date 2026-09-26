@@ -578,6 +578,7 @@
   }
   function runBoot() {
     const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden");
+    { const sp = $("splash"); if (sp) { sp.classList.add("out"); setTimeout(() => sp.remove(), 500); } }
     langChips($("gateLangs"), setLang);
     const fsBtn = $("gateFs"); fsBtn.setAttribute("aria-checked", S.fsGate);
     fsBtn.onclick = e => { e.stopPropagation(); S.fsGate = !S.fsGate; fsBtn.setAttribute("aria-checked", S.fsGate); save(); };
