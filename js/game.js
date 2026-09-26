@@ -424,7 +424,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
 
   /* ------------------------------------------------------------ veredictos */
   function verdict({ kind, level, tag, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art, lines }) {
-    const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : A.icon("logo_mark")}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
+    const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : `<img class="ic" src="assets/icons/logo_mark.png" alt="">`}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
     dialog(`<div class="vd">
       <div class="v-main">
         <span class="tag">${tag || A.t("v.level", { n: pad2(level) })}</span>

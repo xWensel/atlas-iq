@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#191325">
 <title>Geolite</title>
-<link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="preload" as="image" href="assets/gen/logo.webp">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<meta name="description" content="Geolite: ¿sabes dónde queda? Haz clic lo más cerca posible del lugar que te piden. Roguelike de geografía con estética casino pixel art.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Geolite"><meta property="og:title" content="Geolite · ¿Sabes dónde queda?">
+<meta property="og:description" content="Roguelike de geografía: haz clic lo más cerca posible del lugar que te piden. Casino pixel art, 6 idiomas.">
+<meta property="og:image" content="https://geolite-game.vercel.app/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:url" content="https://geolite-game.vercel.app/">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Geolite · ¿Sabes dónde queda?"><meta name="twitter:image" content="https://geolite-game.vercel.app/assets/og.png">
+<link rel="preload" as="image" href="assets/logo.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="css/style.css">
@@ -29,7 +36,7 @@
 </style>
 </head>
 <body>
-<div id="splash" aria-hidden="true"><div><img src="assets/gen/logo.webp" alt=""><i></i></div></div>
+<div id="splash" aria-hidden="true"><div><img src="assets/logo.png" alt=""><i></i></div></div>
 <script>setTimeout(function(){var e=document.getElementById("splash");if(e)e.remove()},20000)</script>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
 </svg>
@@ -41,7 +48,7 @@
 
   <header id="hud">
     <div class="sh brand-sh"><div class="cut ink brand">
-      <img class="brand-rose" src="assets/icons/logo_mark_s.webp" alt="" draggable="false">
+      <img class="brand-rose" src="assets/icons/logo_mark_s.png" alt="" draggable="false">
       <div class="brand-txt"><b>Geo</b><i>LITE</i></div>
     </div></div>
 
@@ -144,7 +151,7 @@
   <div id="boot" class="hidden">
     <div class="gate" id="gate">
       <div class="gate-glow"></div>
-      <div class="gate-logo" id="gateLogo"><img src="assets/gen/logo.webp" alt="Geolite"></div>
+      <div class="gate-logo" id="gateLogo"><img src="assets/logo.png" alt="Geolite"></div>
       <div class="gate-opts">
         <div class="gate-langs" id="gateLangs"></div>
         <button class="gate-fs" id="gateFs" type="button" role="switch" aria-checked="true"><i class="uic" data-ic="u_fs"></i><span data-i="boot.fs"></span><i class="sw-mini"></i></button>

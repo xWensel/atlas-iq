@@ -253,3 +253,8 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 /* cartas sin indices (A K Q J, numeros ni palos) en ninguna parte: se libera el hueco de las esquinas */
 .ix { display: none !important; }
 .tool.pc-hand { padding-top: 10px; } .table .offer.pc { padding-top: clamp(16px, 2.6vh, 26px); }
+
+/* titulos de cancion completos (antes se cortaban con "..." en Ajustes) */
+.np-t { flex-wrap: wrap; row-gap: 2px; min-height: 30px; align-content: center; }
+.np-t b { white-space: normal; overflow: visible; text-overflow: clip; text-align: center; line-height: 1.15; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.np-set .np-t b { font-size: 12px; letter-spacing: .03em; }

@@ -1,7 +1,7 @@
 /* Geolite - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.19.1";
+  A.VERSION = "0.20.0";
   A.lang = "es";
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
@@ -45,7 +45,7 @@ window.AIQ = window.AIQ || {};
     const W = 1200, H = 630, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     const c = cv.getContext("2d"), GOLD = "#f8b449", INK = "#191325", RED = "#fe5f55", PAPER = "#f3eddc", FELT = "#17553a";
     try { await Promise.all([document.fonts.load("400 40px 'Jersey 15'"), document.fonts.load("700 20px Silkscreen")]); } catch (e) { /* sin fuentes */ }
-    const logo = await loadImg("assets/gen/logo.webp");
+    const logo = await loadImg("assets/logo.png");
     const rr = (x, y, w, h, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
     // fondo y tapete
     const g = c.createRadialGradient(W / 2, H * 0.45, 60, W / 2, H / 2, W * 0.7); g.addColorStop(0, "#2a1650"); g.addColorStop(1, "#0c0818"); c.fillStyle = g; c.fillRect(0, 0, W, H);
