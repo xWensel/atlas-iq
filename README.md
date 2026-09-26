@@ -1,5 +1,10 @@
 # Atlas IQ
 
+**v0.11.5** - Mapa y fronteras: los continentes ya no se pisan nunca.
+- **Continentes que no se pisan:** Pangea, Continentes cambiados, Big bang y Continentes torcidos colocan cada continente con mascaras de tierra reales (no cajas): uno a uno, lo mas cerca posible de su destino y en el hueco libre mas cercano. Si no caben, se encogen (Pangea encoge mas: sus fronteras se aprietan para encajar). Comprobado con `dev/layouttest.js` (dibuja los poligonos reales): 0 solapes en 40 disposiciones, en menos de 100 ms, y el clic se traduce a coordenadas reales con error 0.
+- **Fronteras que no se rompen:** en *Fronteras falsas* solo bailan las fronteras interiores (las costas se quedan pegadas a la tierra).
+- **Mapa mudo:** sin fronteras y con todos los paises del mismo color (ya no se adivinan por el color); solo queda la silueta de la tierra. La lupa (Sello de aduana / Teodolito) enseña colores y fronteras verdaderos dentro de su circulo.
+
 **v0.11.4** - Rendimiento: el juego iba pesado en equipos justos y ahora se adapta.
 - **Mapa:** la silueta y los desenfoques solo se recalculan si la vista cambia (antes, 5 pasadas por fotograma); el remolino del océano se pinta aparte a baja resolución y ~24 fps; el postproceso hace 1 lectura de textura en reposo (antes 12+); el fondo animado se repinta a ~25 fps en reposo; la lupa y las variables CSS del puntero ya no fuerzan repintar el mapa en cada fotograma; la capa 2D no se redibuja sin motivo.
 - **Resolución automática:** el lienzo GL se dibuja a una fracción de la resolución nativa según la pantalla (4K/retina) y el equipo, y un vigilante baja resolución y efectos solo si los fotogramas van lentos de forma sostenida. Modo *Ahorro* = sin brillo CRT, 1x y menos fps en reposo.

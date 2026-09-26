@@ -41,8 +41,8 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ shaders */
   /* deformaciones de los retos: cada continente puede girar sobre su centro y desplazarse (Pangea, continentes cambiados de sitio...) */
   const DISTORT = `
-uniform vec2 u_dsh[8]; uniform float u_drot[8]; uniform vec2 u_dcen[8];
-vec2 xf(vec2 a, float ct){ int c=int(ct+0.5); vec2 cen=u_dcen[c]; vec2 d=a-cen; float ca=cos(u_drot[c]), sa=sin(u_drot[c]); return cen+vec2(ca*d.x-sa*d.y, sa*d.x+ca*d.y)+u_dsh[c]; }`;
+uniform vec2 u_dsh[8]; uniform float u_drot[8]; uniform vec2 u_dcen[8]; uniform float u_dsc[8];
+vec2 xf(vec2 a, float ct){ int c=int(ct+0.5); vec2 cen=u_dcen[c]; vec2 d=a-cen; float ca=cos(u_drot[c]), sa=sin(u_drot[c]); return cen+u_dsc[c]*vec2(ca*d.x-sa*d.y, sa*d.x+ca*d.y)+u_dsh[c]; }`;
   const VS_FILL = `#version 300 es
 layout(location=0) in vec2 a_pos; layout(location=1) in float a_ci; layout(location=2) in float a_ct;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform vec2 u_off;
@@ -63,11 +63,13 @@ float hash(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fr
 precision highp float;
 flat in float v_ci;
 uniform vec3 u_pal[8]; uniform vec2 u_res; uniform sampler2D u_blurN; uniform vec4 u_fx; uniform int u_style; uniform float u_dpr;
+uniform float u_flat; uniform vec3 u_flatc; uniform vec3 u_lens;   // mapa mudo: todos los paises del mismo color (salvo dentro de la lupa)
 out vec4 o;
 ${NOISE}
 void main(){
   vec3 c=u_pal[int(v_ci+0.5)];
   vec2 uv=gl_FragCoord.xy/u_res; vec2 f=gl_FragCoord.xy;
+  if(u_flat>0.001){ float fl=u_flat; if(u_lens.z>0.5){ fl*=smoothstep(u_lens.z-6.0,u_lens.z,length(f-u_lens.xy)); } c=mix(c,u_flatc,fl); }
   float n=texture(u_blurN,uv).r;
   float ao=smoothstep(0.60,0.97,n);
   c*=mix(1.0-u_fx.x,1.0,ao);
@@ -96,14 +98,14 @@ void main(){
 }`;
 
   const VS_LINE = `#version 300 es
-layout(location=0) in vec2 a_q; layout(location=1) in vec4 a_seg; layout(location=2) in float a_sct;
+layout(location=0) in vec2 a_q; layout(location=1) in vec4 a_seg; layout(location=2) in float a_sct; layout(location=3) in float a_brd;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform float u_width; uniform vec2 u_off;
 uniform float u_wob; uniform float u_wt;
 ${DISTORT}
 out float v_d; out float v_hw;
 vec2 wob(vec2 p){ return u_wob*vec2(sin(p.y*9.0+p.x*3.7+u_wt), cos(p.x*8.0-p.y*4.3+u_wt*1.3)) + u_wob*0.5*vec2(sin(p.y*23.0+u_wt*0.7), cos(p.x*19.0-u_wt*0.9)); }
 void main(){
-  vec2 p0=(xf(a_seg.xy+wob(a_seg.xy),a_sct)-u_center)*u_scale+u_off, p1=(xf(a_seg.zw+wob(a_seg.zw),a_sct)-u_center)*u_scale+u_off;
+  vec2 p0=(xf(a_seg.xy+wob(a_seg.xy)*a_brd,a_sct)-u_center)*u_scale+u_off, p1=(xf(a_seg.zw+wob(a_seg.zw)*a_brd,a_sct)-u_center)*u_scale+u_off;   // solo las fronteras interiores bailan: las costas quedan fijas
   vec2 dir=p1-p0; float len=length(dir); dir=len>0.0001?dir/len:vec2(1.0,0.0);
   vec2 nrm=vec2(-dir.y,dir.x);
   float hw=u_width*0.5+1.0;
@@ -339,6 +341,7 @@ void main(){
         f.gl.n = idx.length - f.gl.i0; f.gl.sn = segs.length / 4 - f.gl.s0;
       }
       this.idxCount = idx.length; this.segCount = segs.length / 4;
+      if (!this.masks) this._buildMasks(pos, ct, idx);
       const buf = (target, data, usage = gl.STATIC_DRAW) => { const b = gl.createBuffer(); gl.bindBuffer(target, b); gl.bufferData(target, data, usage); return b; };
       // VAO de rellenos
       this.vaoFill = gl.createVertexArray(); gl.bindVertexArray(this.vaoFill);
@@ -350,10 +353,22 @@ void main(){
       this.vaoLine = gl.createVertexArray(); gl.bindVertexArray(this.vaoLine);
       buf(gl.ARRAY_BUFFER, new Float32Array([0, -1, 0, 1, 1, -1, 1, 1])); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
       this.segBuf = buf(gl.ARRAY_BUFFER, new Float32Array(segs)); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(1, 1);
-      buf(gl.ARRAY_BUFFER, new Uint8Array(sct)); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 1, gl.UNSIGNED_BYTE, false, 0, 0); gl.vertexAttribDivisor(2, 1);
+      this.sctBuf = buf(gl.ARRAY_BUFFER, new Uint8Array(sct)); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 1, gl.UNSIGNED_BYTE, false, 0, 0); gl.vertexAttribDivisor(2, 1);
+      this.brdBuf = buf(gl.ARRAY_BUFFER, this._borderFlags(segs)); gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 1, gl.UNSIGNED_BYTE, false, 0, 0); gl.vertexAttribDivisor(3, 1);
       gl.bindVertexArray(null);
       this.vaoEmpty = gl.createVertexArray();
       this.T = {}; // objetivos de render
+    }
+    /* 1 = frontera entre dos paises (el segmento aparece dos veces), 0 = costa (una sola vez). Las costas no se deforman nunca. */
+    _borderFlags(segs) {
+      const n = segs.length / 4, cnt = new Map(), key = new Uint32Array(n), q = v => Math.round(v * 3000);
+      for (let i = 0; i < n; i++) {
+        let ax = q(segs[i * 4]), ay = q(segs[i * 4 + 1]), bx = q(segs[i * 4 + 2]), by = q(segs[i * 4 + 3]);
+        if (ax > bx || (ax === bx && ay > by)) { [ax, bx] = [bx, ax]; [ay, by] = [by, ay]; }
+        const h = (Math.imul(ax, 73856093) ^ Math.imul(ay, 19349663) ^ Math.imul(bx, 83492791) ^ Math.imul(by, 2654435761)) >>> 0;
+        key[i] = h; cnt.set(h, (cnt.get(h) || 0) + 1);
+      }
+      const out = new Uint8Array(n); for (let i = 0; i < n; i++) out[i] = cnt.get(key[i]) > 1 ? 1 : 0; return out;
     }
     _target(name, w, h, filter) {
       const gl = this.gl; let t = this.T[name];
@@ -477,9 +492,9 @@ void main(){
     }
     /* valores efectivos (mezcla entre "sin deformar" y el reto segun k) */
     _eff() {
-      const d = this.dist, sp = d.spec, e = d.eff = d.eff || { sh: new Float32Array(16), rot: new Float32Array(8), cen: new Float32Array(16), wob: 0, lineA: 1, oa: 0, mx: 0, on: false };
+      const d = this.dist, sp = d.spec, e = d.eff = d.eff || { sh: new Float32Array(16), rot: new Float32Array(8), sc: new Float32Array(8).fill(1), cen: new Float32Array(16), wob: 0, lineA: 1, oa: 0, mx: 0, on: false };
       const k = sp ? (d.kk || 0) : 0;
-      for (let c = 0; c < 8; c++) { e.sh[c * 2] = sp && sp.shift[c] ? sp.shift[c][0] * k : 0; e.sh[c * 2 + 1] = sp && sp.shift[c] ? sp.shift[c][1] * k : 0; e.rot[c] = sp && sp.rot ? (sp.rot[c] || 0) * k : 0; const cc = this.contCen[c] || [0, 0]; e.cen[c * 2] = cc[0]; e.cen[c * 2 + 1] = cc[1]; }
+      for (let c = 0; c < 8; c++) { e.sh[c * 2] = sp && sp.shift[c] ? sp.shift[c][0] * k : 0; e.sh[c * 2 + 1] = sp && sp.shift[c] ? sp.shift[c][1] * k : 0; e.rot[c] = sp && sp.rot ? (sp.rot[c] || 0) * k : 0; e.sc[c] = sp && sp.scale && sp.scale[c] != null ? 1 + (sp.scale[c] - 1) * k : 1; const cc = this.contCen[c] || [0, 0]; e.cen[c * 2] = cc[0]; e.cen[c * 2 + 1] = cc[1]; }
       e.wob = sp ? (sp.wob || 0) * k : 0; e.lineA = sp && sp.lineA != null ? 1 + (sp.lineA - 1) * d.kl : 1;
       const ko = sp ? (d.ko || 0) : 0; e.oa = sp && sp.orient ? sp.orient.rot * ko : 0; e.mx = sp && sp.orient ? (sp.orient.mx || 0) * ko : 0;
       if (sp && sp.spin) e.oa += sp.spin.amp * Math.sin(performance.now() / 1000 * sp.spin.speed) * k;
@@ -491,44 +506,104 @@ void main(){
     _sceneToOut(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = (x - this.W / 2) / o.sx, cy = y - this.H / 2; return [o.c * cx + o.s * cy + this.W / 2, -o.s * cx + o.c * cy + this.H / 2]; }
     _dispFwd(x, y, ct) {
       const e = this._eff(); if (!this.dist.spec) return [x, y];
-      const c = ct == null ? 6 : ct, cx = this.contCen[c][0], cy = this.contCen[c][1], dx = x - cx, dy = y - cy, a = e.rot[c], ca = Math.cos(a), sa = Math.sin(a);
-      return [cx + ca * dx - sa * dy + e.sh[c * 2], cy + sa * dx + ca * dy + e.sh[c * 2 + 1]];
+      const c = ct == null ? 6 : ct, cx = this.contCen[c][0], cy = this.contCen[c][1], dx = x - cx, dy = y - cy, a = e.rot[c], ca = Math.cos(a), sa = Math.sin(a), sc = e.sc[c];
+      return [cx + sc * (ca * dx - sa * dy) + e.sh[c * 2], cy + sc * (sa * dx + ca * dy) + e.sh[c * 2 + 1]];
     }
     _nearCont(c, lon, lat, km) { for (const f of this.contFeat[c] || []) if (A.geo.distToFeature(lon, lat, f) < km) return true; return false; }
     _inCont(c, lon, lat) { for (const f of this.contFeat[c] || []) if (A.geo.inFeature(lon, lat, f)) return true; return false; }
     /* punto tocado en el mapa deformado -> coordenada real (se prefiere el continente de la pregunta si hay solape) */
     _undisp(x, y) {
       const d = this.dist; if (!d.spec) return [x, y]; const e = this._eff();
-      if (!e.sh.some(v => Math.abs(v) > 1e-4) && !e.rot.some(v => Math.abs(v) > 1e-4)) return [x, y];
+      if (!e.sh.some(v => Math.abs(v) > 1e-4) && !e.rot.some(v => Math.abs(v) > 1e-4) && !e.sc.some(v => Math.abs(v - 1) > 1e-4)) return [x, y];
       const order = [d.ct, 0, 1, 2, 3, 4, 5].filter((c, i, a) => c != null && c < 6 && a.indexOf(c) === i);
-      const cand = c => { const cx = this.contCen[c][0], cy = this.contCen[c][1], vx = x - e.sh[c * 2] - cx, vy = y - e.sh[c * 2 + 1] - cy, a = -e.rot[c], ca = Math.cos(a), sa = Math.sin(a); return [cx + ca * vx - sa * vy, cy + sa * vx + ca * vy]; };
+      const cand = c => { const cx = this.contCen[c][0], cy = this.contCen[c][1], sc = e.sc[c] || 1, vx = (x - e.sh[c * 2] - cx) / sc, vy = (y - e.sh[c * 2 + 1] - cy) / sc, a = -e.rot[c], ca = Math.cos(a), sa = Math.sin(a); return [cx + ca * vx - sa * vy, cy + sa * vx + ca * vy]; };
       for (const c of order) { const [x0, y0] = cand(c), [lo, la] = unproject(x0, y0); if (c === d.ct ? this._nearCont(c, lo, la, 260) : this._inCont(c, lo, la)) return [x0, y0]; }
       if (d.ct < 6) return cand(d.ct);
       return [x, y];
     }
-    /* Coloca los continentes segun un tipo (pangea | shuffle | spread) SIN que se pisen (siempre se ven todas las fronteras).
-       k: fuerza 0..1; rr: generador aleatorio con shuffle(). Devuelve shift[7] (en unidades del mapa). */
-    layout(kind, k, rr) {
-      const B = this.contBox.slice(0, 6), home = B.map(b => [b.cx, b.cy]), anchor = [0.05, 0.3], tg = [];
+    /* Mascaras de tierra por continente (rejilla gruesa en coordenadas del mapa): sirven para comprobar SOLAPES REALES entre continentes, no cajas. */
+    _buildMasks(pos, ctv, idx) {
+      const CS = 0.06, NX = Math.ceil((BX1 - BX0) / CS), NY = Math.ceil((BY1 - BY0) / CS), m0 = [0, 1, 2, 3, 4, 5, 6].map(() => new Uint8Array(NX * NY));
+      const cell = (x, y) => [Math.floor((x - BX0) / CS), Math.floor((y - BY0) / CS)];
+      const cov = new Uint8Array(NX * NY), miss = [];
+      for (let t = 0; t < idx.length; t += 3) {
+        const ia = idx[t], ib = idx[t + 1], ic = idx[t + 2], c = ctv[ia], M = m0[c];
+        const ax = pos[ia * 2], ay = pos[ia * 2 + 1], bx = pos[ib * 2], by = pos[ib * 2 + 1], cx = pos[ic * 2], cy = pos[ic * 2 + 1];
+        const x0 = Math.min(ax, bx, cx), x1 = Math.max(ax, bx, cx), y0 = Math.min(ay, by, cy), y1 = Math.max(ay, by, cy);
+        if (x1 < BX0 || x0 > BX1 || y1 < BY0 || y0 > BY1) continue;
+        const i0 = Math.max(0, Math.floor((x0 - BX0) / CS)), i1 = Math.min(NX - 1, Math.floor((x1 - BX0) / CS)), j0 = Math.max(0, Math.floor((y0 - BY0) / CS)), j1 = Math.min(NY - 1, Math.floor((y1 - BY0) / CS));
+        const den = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy); let hit = false;
+        if (Math.abs(den) > 1e-12) for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+          const px = BX0 + (i + 0.5) * CS, py = BY0 + (j + 0.5) * CS, w1 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / den, w2 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / den;
+          if (w1 >= 0 && w2 >= 0 && w1 + w2 <= 1) { M[j * NX + i] = 1; cov[j * NX + i] = 1; hit = true; }
+        }
+        if (!hit) miss.push(c, (ax + bx + cx) / 3, (ay + by + cy) / 3);
+      }
+      for (let q = 0; q < miss.length; q += 3) { const [ci, cj] = cell(miss[q + 1], miss[q + 2]); if (ci >= 0 && ci < NX && cj >= 0 && cj < NY && !cov[cj * NX + ci]) m0[miss[q]][cj * NX + ci] = 1; }   // islas menores que una celda (solo si esa celda esta libre: las astillas de frontera no cuentan)
+      const m1 = m0.map(M => { const D = new Uint8Array(NX * NY); for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) if (M[j * NX + i]) for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ii = i + di, jj = j + dj; if (ii >= 0 && ii < NX && jj >= 0 && jj < NY) D[jj * NX + ii] = 1; } return D; });
+      const cells = m0.map(M => { const L = []; for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) if (M[j * NX + i]) L.push(BX0 + (i + 0.5) * CS, BY0 + (j + 0.5) * CS); return Float32Array.from(L); });
+      const mass = cells.map(L => { let sx = 0, sy = 0; const n = L.length / 2 || 1; for (let i = 0; i < L.length; i += 2) { sx += L[i]; sy += L[i + 1]; } return [sx / n, sy / n]; });
+      const sd = cells.map((L, i) => { let vx = 0, vy = 0; const n = L.length / 2 || 1; for (let q = 0; q < L.length; q += 2) { vx += (L[q] - mass[i][0]) ** 2; vy += (L[q + 1] - mass[i][1]) ** 2; } return [Math.sqrt(vx / n), Math.sqrt(vy / n)]; });   // extension tipica (ignora las islas lejanas del antimeridiano)
+      const ext = cells.map((L, i) => { const xs = [], ys = []; for (let q = 0; q < L.length; q += 2) { xs.push(L[q] - mass[i][0]); ys.push(L[q + 1] - mass[i][1]); } xs.sort((u, v) => u - v); ys.sort((u, v) => u - v); const n = xs.length || 1, at = (arr, f) => arr[Math.min(n - 1, Math.max(0, Math.floor(n * f)))] || 0; return [at(xs, 0.05), at(xs, 0.95), at(ys, 0.005), at(ys, 0.995)]; });   // extension robusta (ignora islas lejanas)
+      const cellsS = cells.map(L => { const o = []; for (let q = 0; q < L.length; q += 2) { const ix = Math.round((L[q] - BX0) / CS - 0.5), iy = Math.round((L[q + 1] - BY0) / CS - 0.5); if (!(ix & 1) && !(iy & 1)) o.push(L[q], L[q + 1]); } return Float32Array.from(o); });   // 1 de cada 4 celdas: busqueda rapida
+      this.masks = { CS, NX, NY, m0, m1, cells, cellsS, mass, sd, ext };
+    }
+    /* ¿Algun trozo del continente i (con su transformacion) cae dentro del continente j (con la suya)? gap=1: j se engorda una celda (deja hueco). */
+    _hits(i, j, T, gap, coarse) {
+      const K = this.masks, Li = coarse ? K.cellsS[i] : K.cells[i], Mj = gap ? K.m1[j] : K.m0[j], CS = K.CS, NX = K.NX, NY = K.NY, ci = this.contCen[i], cj = this.contCen[j], ti = T[i], tj = T[j];
+      for (let q = 0; q < Li.length; q += 2) {
+        const dx = Li[q] - ci[0], dy = Li[q + 1] - ci[1];
+        const wx = ci[0] + ti.s * (ti.c * dx - ti.n * dy) + ti.x, wy = ci[1] + ti.s * (ti.n * dx + ti.c * dy) + ti.y;
+        const vx = (wx - tj.x - cj[0]) / tj.s, vy = (wy - tj.y - cj[1]) / tj.s, ux = cj[0] + tj.c * vx + tj.n * vy, uy = cj[1] - tj.n * vx + tj.c * vy;
+        const ix = Math.floor((ux - BX0) / CS), iy = Math.floor((uy - BY0) / CS);
+        if (ix >= 0 && ix < NX && iy >= 0 && iy < NY && Mj[iy * NX + ix]) return true;
+      }
+      return false;
+    }
+    _clash(i, placed, T, gap, coarse) { for (const j of placed) if (this._hits(i, j, T, gap, coarse) || this._hits(j, i, T, gap, coarse)) return true; return false; }
+    /* Coloca los continentes segun un tipo (pangea | shuffle | spread | hold) SIN que se pisen NUNCA.
+       Se van colocando de uno en uno; cada continente va lo mas cerca posible de su destino y, si ahi hay otro (comprobado con las mascaras de tierra reales), se busca el hueco libre mas cercano.
+       En Pangea se encogen un poco para encajar. Si algo no cabe, todo se encoge hasta que quepa. k: fuerza 0..1; rr: generador aleatorio con shuffle(); rot: giro final de cada continente (tilt).
+       Devuelve { shift: [[dx,dy] x7], scale: [x7], ok } en unidades del mapa. */
+    layout(kind, k, rr, rot) {
       const ord = kind === "shuffle" ? rr.shuffle([0, 1, 2, 3, 4, 5]) : null, perm = []; if (ord) ord.forEach((c, i) => { perm[c] = ord[(i + 1) % 6]; });
+      const base = { pangea: 1 - 0.26 * k, shuffle: 1 - 0.16 * k, spread: 1 - 0.16 * k, hold: 0.9 }[kind] || 1;   // los continentes no caben a tamano real sin pisarse: se encogen segun el reto
+      return this._layout(kind, k, perm, rot, base);
+    }
+    _layout(kind, k, perm, rot, base) {
+      const K = this.masks, home = K.mass, anchor = [0.05, 0.3], tg = [], R = rot || [0, 0, 0, 0, 0, 0, 0];
       for (let c = 0; c < 6; c++) {
         const h = home[c];
         if (kind === "pangea") tg[c] = [h[0] + (anchor[0] - h[0]) * k, h[1] + (anchor[1] - h[1]) * k];
         else if (kind === "spread") tg[c] = [h[0] + (h[0] - anchor[0]) * k * 0.45, h[1] + (h[1] - anchor[1]) * k * 0.45];
-        else tg[c] = [h[0] + (home[perm[c]][0] - h[0]) * k, h[1] + (home[perm[c]][1] - h[1]) * k];
+        else if (kind === "shuffle") tg[c] = [h[0] + (home[perm[c]][0] - h[0]) * k, h[1] + (home[perm[c]][1] - h[1]) * k];
+        else tg[c] = h.slice();
       }
-      const pos = tg.map(t => t.slice()), pad = 0.9;
-      for (let it = 0; it < 90; it++) {
-        for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
-          const hx = Math.abs(home[j][0] - home[i][0]), hy = Math.abs(home[j][1] - home[i][1]);
-          const reqX = Math.min((B[i].hw + B[j].hw) * pad, hx), reqY = Math.min((B[i].hh + B[j].hh) * pad, hy);   // los que ya se solapaban de origen no pueden acercarse mas
-          const dx = pos[j][0] - pos[i][0], dy = pos[j][1] - pos[i][1], ox = reqX - Math.abs(dx), oy = reqY - Math.abs(dy);
-          if (ox > 0 && oy > 0) { if (ox < oy) { const sg = dx >= 0 ? 1 : -1; pos[i][0] -= sg * ox / 2; pos[j][0] += sg * ox / 2; } else { const sg = dy >= 0 ? 1 : -1; pos[i][1] -= sg * oy / 2; pos[j][1] += sg * oy / 2; } }
+      if (!this._offs) { const o = [], st = 0.06, RMAX = 3.0, n = Math.round(RMAX / st); for (let a = -n; a <= n; a++) for (let b = -n; b <= n; b++) { const d = Math.hypot(a, b) * st; if (d <= RMAX) o.push([a * st, b * st, d]); } o.sort((p, q) => p[2] - q[2]); this._offs = o; }
+      const order = [0, 1, 2, 3, 4, 5].sort((a, b) => kind === "pangea" ? Math.hypot(tg[a][0] - anchor[0], tg[a][1] - anchor[1]) - Math.hypot(tg[b][0] - anchor[0], tg[b][1] - anchor[1]) : K.cells[b].length - K.cells[a].length);
+      const gap = 1, order2 = order.slice().reverse();
+      const attempt = (S0, ord) => {
+        const T = [0, 1, 2, 3, 4, 5, 6].map(c => ({ x: 0, y: 0, s: c === 6 ? 1 : S0, c: Math.cos(R[c] || 0), n: Math.sin(R[c] || 0) })), placed = [6];
+        for (const c of ord) {
+          const E = K.ext[c], big = R[c] ? Math.max(Math.abs(E[0]), E[1], Math.abs(E[2]), E[3]) * 0.75 : 0, ex0 = big ? -big : E[0], ex1 = big || E[1], ey0 = big ? -big : E[2], ey1 = big || E[3], t = T[c];
+          const lx = BX0 - 0.4 - ex0 * S0, hx = BX1 + 0.4 - ex1 * S0, ly = BY0 + 0.18 - ey0 * S0, hy = BY1 - 0.05 - ey1 * S0;   // el continente (sin islas sueltas) queda dentro del mundo y lejos de la Antartida
+          let found = false;
+          for (const [ox, oy] of this._offs) {
+            t.x = tg[c][0] - home[c][0] + ox; t.y = tg[c][1] - home[c][1] + oy;
+            const m = this._massAt(c, T, K.mass); if (m[0] < lx || m[0] > hx || m[1] < ly || m[1] > hy) continue;
+            if (!this._clash(c, placed, T, gap, true) && !this._clash(c, placed, T, gap, false)) { found = true; break; }
+          }
+          if (!found) { this._layFail = c; return null; }
+          placed.push(c);
         }
-        for (let c = 0; c < 6; c++) { pos[c][0] += (tg[c][0] - pos[c][0]) * 0.012; pos[c][1] += (tg[c][1] - pos[c][1]) * 0.012; pos[c][0] = clamp(pos[c][0], BX0 * 1.05 + B[c].hw, BX1 * 1.05 - B[c].hw); pos[c][1] = clamp(pos[c][1], BY0 + B[c].hh, BY1 - B[c].hh); }
-      }
-      return [...pos.map((p, c) => [p[0] - home[c][0], p[1] - home[c][1]]), [0, 0]];
+        return T;
+      };
+      let S0 = base, T = attempt(S0, order) || attempt(S0, order2);
+      for (let tries = 0; !T && tries < 12; tries++) { S0 *= 0.95; T = attempt(S0, order) || attempt(S0, order2); }
+      if (!T) return { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), scale: [1, 1, 1, 1, 1, 1, 1], ok: false };
+      return { shift: T.map(t => [t.x, t.y]), scale: T.map(t => t.s), ok: true };
     }
+    _massAt(c, T, mass) { const t = T[c], cc = this.contCen[c], dx = mass[c][0] - cc[0], dy = mass[c][1] - cc[1]; return [cc[0] + t.s * (t.c * dx - t.n * dy) + t.x, cc[1] + t.s * (t.n * dx + t.c * dy) + t.y]; }
     /* spec: {shift:[[dx,dy]x7], rot:[x7], wob, lineA, orient:{rot,mx}, spin:{amp,speed}, mosaic, quake, pan:{vx,vy}, ct}. Se anima de "normal" a la deformacion. */
     setDistort(spec, ms = 900) {
       const d = this.dist, now = performance.now();
@@ -578,6 +653,7 @@ void main(){
       if (p.u.u_dsh !== undefined) gl.uniform2fv(p.u.u_dsh, e.sh);
       if (p.u.u_drot !== undefined) gl.uniform1fv(p.u.u_drot, e.rot);
       if (p.u.u_dcen !== undefined) gl.uniform2fv(p.u.u_dcen, e.cen);
+      if (p.u.u_dsc !== undefined) gl.uniform1fv(p.u.u_dsc, e.sc);
     }
     zoomLevel() { return this.view.s / this.minS; }
 
@@ -706,6 +782,11 @@ void main(){
       const n = v.length;
       if (n === 1) gl.uniform1f(loc, v[0]); else if (n === 2) gl.uniform2f(loc, v[0], v[1]); else if (n === 3) gl.uniform3f(loc, v[0], v[1], v[2]); else gl.uniform4f(loc, v[0], v[1], v[2], v[3]);
     }
+    /* lupa (Sello de aduana / Teodolito) en pixeles del objetivo de dibujo: [x, y, radio] (radio 0 = sin lupa) */
+    _lensU(k, H, e) {
+      if (!(this.lens && this.lens.r > 0 && this.dist.spec && (e.wob > 0.002 || e.lineA < 0.98))) return [0, 0, 0];
+      const [lx, ly] = this._outToScene(this.lens.x, this.lens.y); return [lx * k, (H - ly) * k, this.lens.r * k];
+    }
     _gridParams() {
       const STEPS = [0.25, 0.5, 1, 2, 5, 10, 15, 30], pxDeg = this.view.s * D2R, MIN = 84;
       let i = STEPS.findIndex(s => s * pxDeg >= MIN); if (i < 0) i = STEPS.length - 1;
@@ -739,7 +820,7 @@ void main(){
       }
 
       // 1) silueta de tierra a baja resolucion (solo se repite si la vista o las deformaciones cambian)
-      const e0 = this._eff(), key = [v.cx, v.cy, v.s, silW, silH, ...e0.sh, ...e0.rot, ...e0.cen];
+      const e0 = this._eff(), key = [v.cx, v.cy, v.s, silW, silH, ...e0.sh, ...e0.rot, ...e0.sc, ...e0.cen];
       const same = this._silKey && this._silTex === bW.tex && this._silKey.length === key.length && this._silKey.every((x, i) => x === key[i]);
       if (!same) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, sil.fbo); gl.viewport(0, 0, silW, silH); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -782,6 +863,7 @@ void main(){
       gl.useProgram(P.land); this._setDist(P.land); this._u(P.land, "u_off", 0, 0);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.land.u.u_blurN, 0);
       gl.uniform1i(P.land.u.u_style, st.style || 0); this._u(P.land, "u_dpr", dpr * RS);
+      { const ef = this._eff(), fl = Math.max(0, 1 - ef.lineA), lu = this._lensU(dpr * RS, H, ef); this._u(P.land, "u_flat", fl); this._u(P.land, "u_flatc", ...ms.pal[0]); this._u(P.land, "u_lens", lu[0], lu[1], lu[2]); }
       this._u(P.land, "u_center", v.cx, v.cy); this._u(P.land, "u_scale", sc); this._u(P.land, "u_res", sw, sh); this._u(P.land, "u_fx", st.ao, st.grain, 0, 0);
       if (this._palFor !== ms) { this._palFor = ms; this._pal = new Float32Array(24); ms.pal.forEach((c, i) => this._pal.set(c, i * 3)); } gl.uniform3fv(P.land.u.u_pal, this._pal);
       gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
@@ -815,9 +897,13 @@ void main(){
       } else { this._u(P.line, "u_lmode", 0); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount); }
       if (hl && hl.gl.sn) {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.segBuf); gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, hl.gl.s0 * 16);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.sctBuf); gl.vertexAttribPointer(2, 1, gl.UNSIGNED_BYTE, false, 0, hl.gl.s0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.brdBuf); gl.vertexAttribPointer(3, 1, gl.UNSIGNED_BYTE, false, 0, hl.gl.s0);   // ct y borde de los segmentos del resaltado
         this._u(P.line, "u_width", 3.2 * dpr * RS); this._u(P.line, "u_col", ...ms.hl, 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, hl.gl.sn);
         this._u(P.line, "u_width", 1.1 * dpr * RS); this._u(P.line, "u_col", ...hex(st.paper), 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, hl.gl.sn);
-        gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.segBuf); gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.sctBuf); gl.vertexAttribPointer(2, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.brdBuf); gl.vertexAttribPointer(3, 1, gl.UNSIGNED_BYTE, false, 0, 0);
       }
       gl.disable(gl.BLEND);
 

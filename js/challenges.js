@@ -273,8 +273,8 @@ window.AIQ = window.AIQ || {};
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}`);
     const lay = ["pangea", "shuffle", "spread"].map(id => get(id)).find(Boolean);
-    if (lay) { spec.shift = map.layout(lay.id, par(lay).k, rr); any = true; }
     const tl = get("tilt"); if (tl) { const k = par(tl).k; for (let c = 0; c < 6; c++) spec.rot[c] = (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * k; any = true; }
+    if (lay || tl) { const L = map.layout(lay ? lay.id : "hold", lay ? par(lay).k : 1, rr, spec.rot); spec.shift = L.shift; spec.scale = L.scale; any = true; }   // los continentes nunca se pisan
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
     if (has("noborders")) { spec.lineA = 0; any = true; }
     const fl = get("flip"); if (fl) { spec.orient = { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 }; any = true; }
