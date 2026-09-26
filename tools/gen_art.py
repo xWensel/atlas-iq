@@ -233,8 +233,13 @@ def job(kind, id, seed_extra):
 def post(kind, id):
     raw = RAW / f"{id}.jpg"
     if not raw.exists(): return
-    if kind == "icon": keyout(raw, ICONS / f"{id}.webp", 512 if id.startswith("dealer_") else 256)
-    elif kind == "logo": keyout(raw, GEN / "logo.webp", 640, square=False)
+    if kind == "icon" and id == "logo_mark":                       # marca: pixel art de verdad (rejilla nativa 64 y 32, paleta corta)
+        from pixelize import pixelize
+        tmp = RAW / "_k_mark.png"; keyout(raw, tmp, 512); pixelize(tmp, ICONS / "logo_mark.webp", 64, 24, 4); pixelize(tmp, ICONS / "logo_mark_s.webp", 32, 18, 2); tmp.unlink()
+    elif kind == "icon": keyout(raw, ICONS / f"{id}.webp", 512 if id.startswith("dealer_") else 256)
+    elif kind == "logo":                                            # logo: rejilla nativa 200 px, 32 colores, x3
+        from pixelize import pixelize
+        tmp = RAW / "_k_logo.png"; keyout(raw, tmp, 1024, square=False); pixelize(tmp, GEN / "logo.webp", 200, 32, 3); tmp.unlink()
     else:
         im = Image.open(raw).convert("RGB"); w, h = im.size
         if w > 1280: im = im.resize((1280, round(h * 1280 / w)), Image.LANCZOS)
