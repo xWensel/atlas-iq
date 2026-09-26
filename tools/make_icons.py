@@ -17,43 +17,42 @@ A = ROOT / "assets"; (A / "desktop").mkdir(exist_ok=True)
 
 def up(im, k): return im.resize((im.width * k, im.height * k), Image.NEAREST)
 
-# ---- fuentes en pixel nativo: el escudo (64) y el logo (200) salen de los WebP ya pixelizados (x4 y x3)
-mark4 = Image.open(ROOT / "tools" / "brand" / "logo_mark.webp").convert("RGBA")            # 256 = 64 x4
-mark = mark4.resize((64, 64), Image.NEAREST)                                   # 64 nativos
-mark_s = Image.open(ROOT / "tools" / "brand" / "logo_mark_s.webp").convert("RGBA").resize((32, 32), Image.NEAREST)   # 32 nativos
-logo3 = Image.open(ROOT / "tools" / "brand" / "logo.webp").convert("RGBA")                    # 600 = 200 x3
-logo = logo3.resize((logo3.width // 3, logo3.height // 3), Image.NEAREST)      # 200 nativos
+# ---- fuentes en pixel nativo: el logo (200) sale del WebP pixelizado y el escudo es LA TIERRA con la carta y la ficha (tools/make_emblem.py, 48 nativos)
+sys.path.insert(0, str(ROOT / "tools"))
+from pixelize import pixelize
+import make_emblem                                                              # (re)genera tools/brand/emblem48.png
+emb = Image.open(ROOT / "tools" / "brand" / "emblem48.png").convert("RGBA")       # 48 nativos, transparente
+logo3 = Image.open(ROOT / "tools" / "brand" / "logo.webp").convert("RGBA")        # 600 = 200 x3
+logo = logo3.resize((logo3.width // 3, logo3.height // 3), Image.NEAREST)
 
-# ---- PNG del logo y del escudo
-logo3.save(A / "logo.png"); mark4.save(A / "icons" / "logo_mark.png"); up(mark_s, 2).save(A / "icons" / "logo_mark_s.png")
+def small(n):
+    """version de n px nativos del escudo (para tamanos pequenos: pestana, HUD, iconos de 16-32 px)"""
+    tmp = ROOT / "tools" / "brand" / f"_e{n}.png"; up(emb, 4).save(tmp)
+    pixelize(tmp, tmp, n, 22, 1, alpha_cut=110); im = Image.open(tmp).convert("RGBA"); tmp.unlink(); return im
 
-def tile(native, size, pad, rounded=True, src=None):
-    """escudo sobre fondo morado de pixel art (con halo escalonado), a `native` px y ampliado a `size`"""
-    src = src or mark
-    bg = Image.new("RGBA", (native, native), (25, 19, 37, 255)); d = ImageDraw.Draw(bg)
-    for i, c in enumerate([(44, 32, 72), (54, 40, 88), (64, 48, 104)]):
-        r = int(native * (0.5 - i * 0.07)); d.ellipse((native / 2 - r, native / 2 - r, native / 2 + r, native / 2 + r), fill=c + (255,))
-    s = max(8, int(native * (1 - 2 * pad))); t = src.resize((s, s), Image.NEAREST); bg.alpha_composite(t, ((native - s) // 2, (native - s) // 2))
-    out = bg.resize((size, size), Image.NEAREST)
-    if rounded:
-        m = Image.new("L", (size, size), 0); ImageDraw.Draw(m).rounded_rectangle((0, 0, size - 1, size - 1), radius=int(size * 0.2), fill=255)
-        o = Image.new("RGBA", (size, size), (0, 0, 0, 0)); o.paste(out, (0, 0), m); out = o
-    return out
+def fit(size, pad=0.04, src=None, bg=None):
+    """escudo a escala entera dentro de un lienzo size x size (transparente, o con fondo `bg` si el sistema lo exige: iOS / maskable)"""
+    src = src or emb; k = max(1, int(size * (1 - 2 * pad)) // src.width)
+    out = Image.new("RGBA", (size, size), bg or (0, 0, 0, 0)); t = up(src, k)
+    out.alpha_composite(t, ((size - t.width) // 2, (size - t.height) // 2)); return out
+
+# ---- PNG del logo y del escudo (sin cuadrado: la marca ES la Tierra)
+logo3.save(A / "logo.png"); up(emb, 8).save(A / "icons" / "logo_mark.png"); small(32).save(A / "icons" / "logo_mark_s.png")
 
 # ---- navegador
-for n in (16, 32, 48):
-    src = mark_s if n <= 32 else mark
-    tile(32 if n <= 32 else 64, n, 0.04, rounded=False, src=src).save(A / f"favicon-{n}.png")
-ico = [tile(32, 16, 0.04, False, mark_s), tile(32, 32, 0.04, False, mark_s), tile(64, 48, 0.04, False)]
+s16, s32 = small(16), small(32)
+s16.save(A / "favicon-16.png"); s32.save(A / "favicon-32.png"); emb.save(A / "favicon-48.png")
+ico = [fit(16, 0, s16), fit(32, 0, s32), fit(48, 0)]
 ico[2].save(ROOT / "favicon.ico", sizes=[(16, 16), (32, 32), (48, 48)], append_images=[ico[0], ico[1]])
-tile(64, 180, 0.10, False).save(A / "apple-touch-icon.png")
-tile(64, 192, 0.10).save(A / "icon-192.png"); tile(64, 512, 0.10).save(A / "icon-512.png"); tile(64, 512, 0.22, False).save(A / "icon-maskable-512.png")
+DARK = (25, 19, 37, 255)
+fit(180, 0.06, bg=DARK).save(A / "apple-touch-icon.png")                            # iOS pide fondo opaco
+fit(192, 0.05).save(A / "icon-192.png"); fit(512, 0.05).save(A / "icon-512.png"); fit(512, 0.2, bg=DARK).save(A / "icon-maskable-512.png")
 
-# ---- escritorio (Windows / Steam / Electron)
+# ---- escritorio (Windows / Steam / Electron): transparentes
 sizes = [16, 24, 32, 48, 64, 128, 256]
-imgs = [tile(32 if s <= 32 else 64, s, 0.06, True, mark_s if s <= 32 else mark) for s in sizes]
-imgs[-1].save(A / "desktop" / "icon.ico", sizes=[(s, s) for s in sizes], append_images=imgs[:-1])
-for s in (256, 512, 1024): tile(64, s, 0.08).save(A / "desktop" / f"icon-{s}.png")
+imgs = [fit(sz, 0, small(sz) if sz <= 32 else None) if sz < 48 else fit(sz, 0.04) for sz in sizes]
+imgs[-1].save(A / "desktop" / "icon.ico", sizes=[(sz, sz) for sz in sizes], append_images=imgs[:-1])
+for sz in (256, 512, 1024): fit(sz, 0.04).save(A / "desktop" / f"icon-{sz}.png")
 
 # ---- Open Graph 1200x630: el logo a 5x sobre el fondo del juego
 W, H = 1200, 630

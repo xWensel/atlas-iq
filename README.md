@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.20.1** - El escudo ya no es un cuadrado: es la Tierra del logo (la O de GEOLITE) con la carta y la ficha encima, en pixel art de 48 px nativos (`tools/make_emblem.py`), con fondo transparente en favicon, iconos de app y de escritorio (solo iOS y el icono adaptable llevan fondo porque el sistema lo exige). Todas las marcas nacen de el.
+
 **v0.20.0** - Logo en PNG en todas partes y titulos de cancion completos.
 - **Marca en PNG** (`tools/make_icons.py`, pixel a pixel con vecino mas cercano): `assets/logo.png` (logo con letras), `assets/icons/logo_mark.png` (escudo), `favicon.ico` (16/32/48) + `assets/favicon-*.png` (pestana del navegador), `apple-touch-icon.png`, iconos PWA (192/512/maskable), `assets/desktop/icon.ico` (16-256, Windows) e `icon-256/512/1024.png` (escritorio, Steam, Electron) y `assets/og.png` (1200x630) con las etiquetas Open Graph / Twitter para compartir el enlace (Vercel, WhatsApp, Discord...). Los originales pixelizados viven en `tools/brand/`.
 - **Musica:** los titulos largos ("Retirar ganancias", "Hándicap asiático"...) ya se leen enteros en Ajustes > Sonido.

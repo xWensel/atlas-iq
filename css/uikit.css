@@ -258,3 +258,5 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 .np-t { flex-wrap: wrap; row-gap: 2px; min-height: 30px; align-content: center; }
 .np-t b { white-space: normal; overflow: visible; text-overflow: clip; text-align: center; line-height: 1.15; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .np-set .np-t b { font-size: 12px; letter-spacing: .03em; }
+/* escudo = la Tierra con la carta y la ficha (48 px nativos): tamanos que son multiplos enteros */
+.brand-rose { width: 32px; height: 32px; } .menu-rose { width: 96px; height: 96px; } .idcard img.ic { width: 48px; height: 48px; }
