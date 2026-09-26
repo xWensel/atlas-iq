@@ -164,3 +164,48 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
   #dlg.side .tk-title { font-size: 18px; margin-top: 8px; } #dlg.side .tk-km { font-size: 30px; margin-top: 0; } #dlg.side .tk-total { margin: 2px 0 4px; } #dlg.side .tk-total .odo { font-size: 26px; } #dlg.side .btn-ink { padding-top: 8px; padding-bottom: 8px; }
   body.tk-on .rail-sh { display: none; }
 }
+
+/* menu principal en movil horizontal: logo pequeno, tres cartas en fila sin ilustracion y botones debajo */
+@media (max-height: 520px) and (orientation: landscape) {
+  .hh-top { flex-direction: row; justify-content: center; }
+  .hh-logo { height: min(16vh, 64px); }
+  .hh-top .menu-tools { position: absolute; right: 0; top: 0; margin: 0; }
+  .hh-tag { display: none; }
+  .hh-cards { flex-wrap: nowrap; gap: 12px; padding: 14px 6px 8px; }
+  .mcard, .mcard.hero { flex: 1 1 0; width: auto; max-width: 250px; min-width: 0; aspect-ratio: auto; padding: 8px 10px 10px; gap: 4px; transform: none !important; animation: none; }
+  .mcard.hero { --rc: #ffd06b; }
+  .mcard:hover { transform: translateY(-4px) !important; }
+  .mcard .mc-win { display: none; }
+  .mcard .ix.tl { left: 8px; top: 8px; } .mcard .ix.br { display: none; } .mcard .ix b { font-size: 18px; } .mcard .ix .ic { width: 15px; height: 15px; }
+  .mc-name { font-size: 20px; padding: 0 0 0 30px; }
+  .mc-desc { font-size: 12px; min-height: 0; padding: 0 0 0 22px; }
+  .mc-stat { font-size: 9px; padding: 3px 7px 2px; }
+  .mc-ribbon { top: -9px; font-size: 9px; padding: 3px 8px 2px; }
+  .hh-bottom { gap: 8px; } .chipbtn.big { font-size: 12px; padding: 8px 14px 7px; }
+  .hh-resume { padding: 6px 10px; gap: 10px; } .hh-resume .hr-ic { display: none; } .hh-resume .hr-t i { display: none; } .hh-resume .btn-ink, .hh-resume .btn-line { padding: 8px 14px; font-size: 13px; }
+}
+
+/* Campamento en movil horizontal: las tres cartas en una fila (se desplaza si hace falta) */
+@media (max-height: 520px) and (orientation: landscape) {
+  .table { padding-top: 8px; gap: 4px; }
+  .table .offers { flex-wrap: nowrap; gap: 8px; padding: 6px 0; }
+  .table .offer.pc, .table.chest .offer.pc { --w: min(29vw, 200px); height: auto; padding: 26px 8px 8px; transform: none !important; animation: none; }
+  .table .offer.pc .of-ico { min-height: 44px; max-height: 70px; flex: none; height: 62px; }
+  .table .offer.pc .of-n { font-size: 16px; } .table .offer.pc p { font-size: 11px; } .table .offer.pc .buy { font-size: 14px; padding: 4px 8px; }
+  .table .offer.pc .of-r { font-size: 9px; } .table .ix b { font-size: 16px; } .table .ix.br { display: none; }
+  .tb-note { font-size: 12px; } .tb-tray { grid-template-columns: 2fr 1fr auto; } .tb-tray .go-next { grid-column: auto; width: auto; padding: 8px 16px; font-size: 14px; }
+}
+
+/* veredicto en movil horizontal: todo (y el boton) cabe sin desplazarse */
+@media (max-height: 520px) and (orientation: landscape) {
+  .vd { padding: 10px 24px; gap: 14px; align-content: center; }
+  .v-main { gap: 5px; } .v-main h2 { font-size: 34px; } .v-main > p { font-size: 13px; }
+  .v-stats { margin: 0; } .v-stats .odo { font-size: 30px; }
+  .v-art { width: min(100%, 34vh); } .v-side .stamp { width: min(20vw, 22vh); height: min(20vw, 22vh); font-size: 8px; padding: 6px; }
+  .v-dealer { min-height: 0; } .dealer.inline .dl-face { width: 48px; height: 48px; } .dealer.inline .dl-bubble { margin-bottom: 14px; font-size: 11px; max-width: 46vw; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .vd { padding-top: 6px; padding-bottom: 6px; align-content: start; } .v-main h2 { font-size: 28px; } .v-main { gap: 3px; }
+  .v-stats .odo { font-size: 24px; } .v-main .btn-ink, .v-main .btn-line { padding-top: 9px; padding-bottom: 9px; font-size: 14px; }
+  .v-main dl, .v-main .v-rows { gap: 2px; }
+}

@@ -354,9 +354,9 @@
     } else {
       sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
       S.streak = guess && sc.dist / sc.distMax >= 0.6 ? S.streak + 1 : 0;
-      /* FICHAS x MULT (solo modo Extendido; el Clasico mantiene la puntuacion exacta del original) */
+      /* el Clasico mantiene la puntuacion exacta del original */
       chips = sc.dist + sc.time;
-      mult = S.camp.mode === "extended" && S.streak >= 2 ? Math.min(2, 1 + 0.2 * (S.streak - 1)) : 1;
+      mult = 1;
       total = Math.round(chips * mult);
     }
     const ratio = sc.dist / sc.distMax;

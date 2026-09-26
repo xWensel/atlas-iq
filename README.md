@@ -1,5 +1,7 @@
 # Atlas IQ
 
+**v0.14.4** - Revision de lo pendiente: menu principal, Campamento y veredicto ya caben en movil horizontal; se quita el aviso obsoleto de Ajustes ("preguntas del modo Extendido...") y restos del modo Extendido en el codigo.
+
 **v0.14.3** - Movil en horizontal: HUD compacto (placa mas pequena arriba, marcas y zoom a los lados, herramientas reducidas, nota solo cuando hay texto y ticket de resultado a la derecha) para que el mapa se vea entero.
 
 **v0.14.2** - Pistas completas, sin puntos suspensivos.
