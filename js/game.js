@@ -262,12 +262,15 @@
 
   /* ------------------------------------------------------------ menu principal */
   function showTitle(screen) {
-    S.phase = "title"; S.camp = null; S.run = null; S.tool = null; S.ranked = null; A.adv.hideBars(); map.setStyle(A.MAPSTYLES[S.skin] || A.MAPSTYLES.casino); map.setPick(false); map.clearMarks(); map.setHome({ lat: 0, lon: 0, zoom: 1 });
+    document.body.classList.add("title-on"); S.phase = "title"; S.camp = null; S.run = null; S.tool = null; S.ranked = null; A.adv.hideBars(); map.setStyle(A.MAPSTYLES[S.skin] || A.MAPSTYLES.casino); map.setPick(false); map.clearMarks(); map.setHome({ lat: 0, lon: 0, zoom: 1 });
     $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("veil").classList.add("hidden"); $("intro").classList.add("hidden");
     chrome(false); $("factText").textContent = ""; A.music.mode(0); map.startDrift(); openSettings(false);
     renderMenu(screen);
   }
   function renderMenu(screen) { A.hub.screen(screen || S.hub || "home"); }
+  /* altura ocupada por el pie de pagina: las cartas de herramienta se colocan justo encima */
+  { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
+    if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
   /* ------------------------------------------------------------ partida */
   function prepareRun() { S.run = null; S.tool = null; openSettings(false); A.audio.unlock(); A.music.mode(1); A.profile.get().stats.plays++; A.profile.save(); }
@@ -278,7 +281,7 @@
     startLevel_(S.startLevel);
   }
   function startLevel_(idx) {
-    S.level = idx; S.qs = lv().questions(); S.qi = 0; S.levelScore = 0; S.streak = 0; S.hits = 0; S.phase = "intro";
+    document.body.classList.remove("title-on"); S.level = idx; S.qs = lv().questions(); S.qi = 0; S.levelScore = 0; S.streak = 0; S.hits = 0; S.phase = "intro";
     closeDialog(); $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("streakChip").classList.add("hidden");
     chrome(true); $("factText").textContent = ""; odoNow($("scLevel"), 0); updateHud();
     showIntro(nextQuestion);
@@ -390,10 +393,11 @@
         <div style="--i:1"><dt>${A.t("res.speed")}</dt><i></i><dd>+${A.fmt(sc.time)}</dd></div>
       </dl>
       ${adv && adv.lines.length ? `<div class="tk-perks">${adv.lines.map(l => `<div><span>${A.icon(l[0])}</span><i>${l[1]}</i><b>${l[2]}</b></div>`).join("")}</div>` : ""}
-      ${mult > 1 ? `<div class="tk-mult"><div class="c"><span>${A.t("res.chips")}</span><b>${A.fmt(chips)}</b></div><i>×</i><div class="m"><span>${A.t("res.mult")} · ${A.t("res.streak")} ${S.streak}</span><b>${mult.toFixed(1)}</b></div></div>` : ""}
+      ${mult > 1 ? `<div class="tk-mult"><div class="c"><span>${A.t("res.chips")}</span><b>${A.fmt(chips)}</b></div><div class="m"><span>${A.t("res.streak")} ${S.streak}</span><b>×${mult.toFixed(1)}</b></div></div>` : ""}
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
       ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${A.T("doblones", "doubloons")}</div>` : ""}
-      ${guess ? `<div class="tk-cx l${cxr.level}" title="≤100 km · ≤50 km · ≤40 km"><span>${A.t("codex.title")}</span><i><u></u><u></u><u></u></i><b>${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;100 km"}</b></div>` : ""}
+      ${guess ? `<div class="tk-cx l${cxr.level}" data-tt="${A.t("codex.title")}
+${A.T("Desbloquea esta ficha: sitúala a menos de 100 km (cuanto más cerca, más fichas relacionadas).", "Unlock this card: pin it within 100 km (the closer, the more related cards).")}"><span>${A.t("codex.title")}</span><i><u></u><u></u><u></u></i><b>${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;100 km"}</b></div>` : ""}
       <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });
@@ -407,13 +411,14 @@
   }
 
   /* ------------------------------------------------------------ veredictos */
-  function verdict({ kind, level, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art, lines }) {
+  function verdict({ kind, level, tag, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art, lines }) {
     const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : `<svg><use href="#rose"/></svg>`}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
     dialog(`<div class="vd">
       <div class="v-main">
-        <span class="tag">${A.t("v.level", { n: pad2(level) })}</span>
+        <span class="tag">${tag || A.t("v.level", { n: pad2(level) })}</span>
         <h2>${title}</h2><p>${text}</p>${lines && lines.length ? `<ul class="v-lines">${lines.map((l, i) => `<li style="animation-delay:${0.5 + i * 0.12}s"><span>${l[0]}</span><i></i><b>${l[1]}</b></li>`).join("")}</ul>` : ""}
         <div class="v-stats">${stats.map((s, i) => `<div><span>${s[0]}</span><span class="odo" id="vs${i}"></span></div>`).join("")}</div>
+        <div class="v-dealer" id="vdDealer"></div>
         <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? `<span class="ar">${A.icon("u_next", "sm")}</span>` : ""}</button>`).join("")}</div>
       </div>
       <div class="v-side">${art ? `<div class="v-art">${A.pic(art)}</div>` : ""}<div class="stamp ${kind}"><div>${stamp}<b>${stampSub}</b></div></div>${idc}</div>
@@ -421,6 +426,7 @@
     stats.forEach((s, i) => { const el = $("vs" + i); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, s[1], { ms: 1300, delay: 700 + i * 120, tick: i === 0 && s[1] > 0 })); });
     if (iq != null) { const el = $("iqNum"); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, iq, { ms: 1400, delay: 1000 })); }
     buttons.forEach(b => ($(b.id).onclick = b.onclick));
+    if (A.dealer && A.dealer.on) A.dealer.anchor($("vdDealer"));                // el crupier habla dentro del veredicto, sin tapar botones
   }
 
   function finishLevel() {
@@ -463,8 +469,8 @@
         else { await navigator.clipboard.writeText(text + " " + url); const sp = $("shareBtn").querySelector("span"); sp.textContent = A.t("share.copied"); setTimeout(() => (sp.textContent = A.t("share")), 1600); }
       } catch (e) { /* cancelado */ }
     } });
-    btns.push({ id: "badgeBtn", cls: "btn-line", label: A.t("btn.badge"), onclick: () => {
-      const cv = A.makeBadge(iq, tierName, `${A.tx(S.camp.title)} · ${A.fmt(shown)} ${A.t("pts")} · ${S.completed}/${S.camp.levels.length}`);
+    btns.push({ id: "badgeBtn", cls: "btn-line", label: A.t("btn.badge"), onclick: async () => {
+      const cv = await A.makeBadge(iq, tierName, `${A.tx(S.camp.title)} · ${A.fmt(shown)} ${A.t("pts")} · ${S.completed}/${S.camp.levels.length}`);
       const a = document.createElement("a"); a.download = `atlas-iq-${iq}.png`; a.href = cv.toDataURL("image/png"); a.click();
     } });
     verdict({
@@ -578,7 +584,6 @@
   }
   function runBoot() {
     const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden");
-    { const sp = $("splash"); if (sp) { sp.classList.add("out"); setTimeout(() => sp.remove(), 500); } }
     langChips($("gateLangs"), setLang);
     const fsBtn = $("gateFs"); fsBtn.setAttribute("aria-checked", S.fsGate);
     fsBtn.onclick = e => { e.stopPropagation(); S.fsGate = !S.fsGate; fsBtn.setAttribute("aria-checked", S.fsGate); save(); };
@@ -595,8 +600,11 @@
   A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, refreshPrompt: () => { setPrompt(); }, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
 
   applyLang(); syncSettings();
-  const start = () => { if (/[?&]skipboot/.test(location.search)) { S.booting = false; showTitle(); } else runBoot(); };
-  if (document.fonts && document.fonts.load) Promise.race([Promise.all([document.fonts.load("800 40px Fraunces"), document.fonts.load("400 20px 'Jersey 15'"), document.fonts.load("500 12px 'DM Mono'"), document.fonts.load("500 16px 'Bricolage Grotesque'")]), new Promise(r => setTimeout(r, 1200))]).then(start, start);
+  const start = () => {
+    { const sp = $("splash"); if (sp) { sp.classList.add("out"); setTimeout(() => sp.remove(), 500); } }   // pantalla de carga fuera en cualquier caso
+    if (/[?&]skipboot/.test(location.search)) { S.booting = false; showTitle(); } else runBoot();
+  };
+  if (document.fonts && document.fonts.load) Promise.race([Promise.all([document.fonts.load("400 20px 'Jersey 15'"), document.fonts.load("400 12px Silkscreen"), document.fonts.load("700 12px Silkscreen")]), new Promise(r => setTimeout(r, 1200))]).then(start, start);
   else start();
 
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});

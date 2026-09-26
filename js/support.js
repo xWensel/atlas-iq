@@ -1,7 +1,7 @@
 /* Atlas IQ - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.11.5";
+  A.VERSION = "0.12.0";
   A.lang = "es";
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
@@ -27,44 +27,39 @@ window.AIQ = window.AIQ || {};
     return Math.max(60, Math.min(200, 60 + Math.round(140 * (0.35 * Math.min(1, eff) + 0.65 * prog))));
   };
 
-  /* ------------------------------------------------------------ insignia PNG (estilo pasaporte) */
-  A.makeBadge = (iq, tierName, subtitle) => {
-    const W = 900, H = 500, cv = document.createElement("canvas");
-    cv.width = W; cv.height = H;
-    const c = cv.getContext("2d");
-    const INK = "#14232b", PAPER = "#f2e9d6", RED = "#d9432a", BRASS = "#b98a35";
-    c.fillStyle = PAPER; c.fillRect(0, 0, W, H);
-    // trama de puntos
-    c.fillStyle = "rgba(20,35,43,.07)";
-    for (let x = 18; x < W; x += 22) for (let y = 18; y < H; y += 22) { c.beginPath(); c.arc(x, y, 1.3, 0, 7); c.fill(); }
-    c.strokeStyle = INK; c.lineWidth = 3; c.strokeRect(22, 22, W - 44, H - 44);
-    c.lineWidth = 1; c.strokeRect(32, 32, W - 64, H - 64);
-    // rosa de los vientos
-    const cx = 230, cy = 250;
-    c.save(); c.translate(cx, cy);
-    c.strokeStyle = INK; c.lineWidth = 2; c.beginPath(); c.arc(0, 0, 118, 0, 7); c.stroke();
-    c.beginPath(); c.arc(0, 0, 104, 0, 7); c.stroke();
-    for (let i = 0; i < 16; i++) {
-      const a = (i * Math.PI) / 8, long = i % 4 === 0, mid = i % 2 === 0, r = long ? 118 : mid ? 84 : 62, w = long ? 15 : 8;
-      c.fillStyle = long ? (i === 0 ? RED : INK) : mid ? BRASS : INK;
-      c.beginPath(); c.moveTo(Math.sin(a) * r, -Math.cos(a) * r);
-      c.lineTo(Math.sin(a + 0.28) * w, -Math.cos(a + 0.28) * w); c.lineTo(0, 0); c.lineTo(Math.sin(a - 0.28) * w, -Math.cos(a - 0.28) * w);
-      c.closePath(); c.fill();
-    }
-    c.fillStyle = PAPER; c.beginPath(); c.arc(0, 0, 9, 0, 7); c.fill(); c.strokeStyle = INK; c.stroke();
-    c.restore();
+  /* ------------------------------------------------------------ insignia PNG (estilo casino, en el idioma del jugador) */
+  const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+  A.makeBadge = async (iq, tierName, subtitle) => {
+    const W = 1200, H = 630, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const c = cv.getContext("2d"), GOLD = "#f8b449", INK = "#191325", RED = "#fe5f55", PAPER = "#f3eddc", FELT = "#17553a";
+    try { await Promise.all([document.fonts.load("400 40px 'Jersey 15'"), document.fonts.load("700 20px Silkscreen")]); } catch (e) { /* sin fuentes */ }
+    const logo = await loadImg("assets/gen/logo.webp");
+    const rr = (x, y, w, h, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
+    // fondo y tapete
+    const g = c.createRadialGradient(W / 2, H * 0.45, 60, W / 2, H / 2, W * 0.7); g.addColorStop(0, "#2a1650"); g.addColorStop(1, "#0c0818"); c.fillStyle = g; c.fillRect(0, 0, W, H);
+    rr(34, 34, W - 68, H - 68, 28); c.fillStyle = FELT; c.fill(); c.lineWidth = 8; c.strokeStyle = INK; c.stroke();
+    rr(48, 48, W - 96, H - 96, 20); c.lineWidth = 4; c.strokeStyle = GOLD; c.stroke();
+    c.save(); rr(48, 48, W - 96, H - 96, 20); c.clip(); c.globalAlpha = 0.07; c.fillStyle = "#fff"; for (let x = 0; x < W; x += 18) for (let y = 0; y < H; y += 18) if (((x + y) / 18) % 2 === 0) c.fillRect(x, y, 9, 9); c.restore();
+    // ficha de casino con el IQ
+    const cx = 290, cy = 330, R = 190;
+    c.fillStyle = "rgba(0,0,0,.35)"; c.beginPath(); c.arc(cx + 8, cy + 12, R, 0, 7); c.fill();
+    c.fillStyle = RED; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill(); c.lineWidth = 8; c.strokeStyle = INK; c.stroke();
+    c.fillStyle = PAPER; for (let i = 0; i < 8; i++) { c.save(); c.translate(cx, cy); c.rotate(i * Math.PI / 4); c.fillRect(-22, -R + 6, 44, 46); c.restore(); }
+    c.fillStyle = "#fff4f0"; c.beginPath(); c.arc(cx, cy, R * 0.66, 0, 7); c.fill(); c.lineWidth = 6; c.strokeStyle = INK; c.stroke();
+    c.setLineDash([12, 10]); c.lineWidth = 4; c.strokeStyle = RED; c.beginPath(); c.arc(cx, cy, R * 0.58, 0, 7); c.stroke(); c.setLineDash([]);
+    c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = INK;
+    c.font = "700 26px Silkscreen, monospace"; c.fillText("IQ", cx, cy - 70);
+    c.font = "400 150px 'Jersey 15', sans-serif"; c.fillText(String(iq), cx, cy + 16);
     // textos
-    c.fillStyle = INK; c.textAlign = "left";
-    c.font = "500 20px 'DM Mono', monospace"; c.fillText("ATLAS IQ · CARNET DE EXPEDICIÓN", 400, 100);
-    c.font = "900 190px 'Fraunces', Georgia, serif"; c.fillText(String(iq), 392, 285);
-    c.font = "italic 700 44px 'Fraunces', Georgia, serif"; c.fillStyle = RED; c.fillText(tierName, 400, 345);
-    c.font = "500 22px 'DM Mono', monospace"; c.fillStyle = INK; c.fillText(subtitle, 400, 395);
-    c.fillStyle = "rgba(20,35,43,.55)"; c.font = "500 16px 'DM Mono', monospace";
-    c.fillText(new Date().toLocaleDateString(locOf(), { year: "numeric", month: "long", day: "numeric" }).toUpperCase(), 400, 430);
-    // sello
-    c.save(); c.translate(760, 150); c.rotate(-0.22); c.strokeStyle = RED; c.fillStyle = RED; c.lineWidth = 5;
-    c.beginPath(); c.arc(0, 0, 62, 0, 7); c.stroke(); c.lineWidth = 2; c.beginPath(); c.arc(0, 0, 54, 0, 7); c.stroke();
-    c.font = "800 22px 'DM Mono', monospace"; c.textAlign = "center"; c.fillText("ATLAS", 0, -6); c.fillText("IQ", 0, 20); c.restore();
+    c.textAlign = "left"; c.textBaseline = "alphabetic";
+    if (logo) { const lw = 300, lh = lw * (logo.height / logo.width); c.drawImage(logo, 540, 70, lw, lh); }
+    const x0 = 540;
+    c.font = "700 22px Silkscreen, monospace"; c.fillStyle = GOLD; c.fillText(A.t("badge.head").toUpperCase(), x0, 318);
+    c.font = "400 78px 'Jersey 15', sans-serif"; c.fillStyle = "#000"; c.fillText(tierName, x0 + 4, 402); c.fillStyle = PAPER; c.fillText(tierName, x0, 398);
+    c.font = "400 34px 'Jersey 15', sans-serif"; c.fillStyle = "#ffe08a"; c.fillText(subtitle, x0, 452, W - x0 - 80);
+    c.font = "700 18px Silkscreen, monospace"; c.fillStyle = "rgba(243,237,220,.7)";
+    c.fillText(new Date().toLocaleDateString(locOf(), { year: "numeric", month: "long", day: "numeric" }).toUpperCase(), x0, 500);
+    c.fillText(location.host || "atlas-iq", x0, 540);
     return cv;
   };
 })(window.AIQ);

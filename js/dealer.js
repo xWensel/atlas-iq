@@ -92,7 +92,7 @@ window.AIQ = window.AIQ || {};
   D.say = (line, o = {}) => {
     if (!D.on) return; ensure(); clear();
     const mood = o.mood || "sly", text = typeof line === "string" ? line : A.tx(line), src = FACE[mood] || "dealer_neutral";
-    face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : ""); txt.textContent = ""; bubble.classList.add("on");
+    face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (el.closest("#vdDealer") ? " inline" : ""); txt.textContent = ""; bubble.classList.add("on");
     if (mood === "laugh") A.sfx.laugh && A.sfx.laugh();
     let i = 0; const chars = [...text], step = mood === "laugh" ? 44 : 34;
     const tick = () => {
@@ -105,6 +105,8 @@ window.AIQ = window.AIQ || {};
   D.enable = on => { D.on = !!on; if (!on) { clear(); D.dock(null); if (el) el.classList.add("hidden"); } else { ensure(); el.classList.remove("hidden"); } };
   /* pasa el retrato a un contenedor grande (pantalla de intro) o lo devuelve a la esquina */
   D.dock = host => { ensure(); D.host = host || null; if (host) host.appendChild(el); else $("app").appendChild(el); el.classList.toggle("big", !!host); };
+  /* lo coloca dentro de un hueco de la pantalla (veredicto) sin bloquear sus reacciones */
+  D.anchor = host => { if (!host) return; ensure(); host.appendChild(el); el.classList.add("inline"); };
   /* secuencia de frases: [{line, mood}] */
   D.sequence = (items, done) => { let k = 0; const next = () => { if (k >= items.length) return done && done(); const it = items[k++]; D.say(it.line, { mood: it.mood, hold: 0, done: () => later(next, it.gap || 700) }); }; next(); };
   D.line = (key, i) => { const a = LINES[key]; return a ? (i == null ? rand(a) : a[i % a.length]) : null; };

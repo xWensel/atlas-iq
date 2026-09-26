@@ -75,13 +75,6 @@ void main(){
   c*=mix(1.0-u_fx.x,1.0,ao);
   if(u_style==1){                                   // casino: cara de carta con brillo suave
     c*=1.0+0.05*uv.y; c=mix(c,vec3(1.0),0.05*smoothstep(0.6,1.0,n));
-  } else if(u_style==2){                            // plano: rayado diagonal de dibujo tecnico
-    float h=step(0.5,fract((f.x-f.y)/(6.5*u_dpr))); c=mix(c,vec3(0.74,0.86,1.0),h*0.20);
-    float h2=step(0.5,fract((f.x+f.y)/(26.0*u_dpr))); c=mix(c,vec3(0.86,0.93,1.0),h2*0.05);
-  } else if(u_style==3){                            // riso: trama de semitono en las costas y grano de tinta
-    vec2 g=f/(4.5*u_dpr); float d=length(fract(g)-0.5);
-    float dots=step(d,0.5*(1.0-ao)*1.05); c=mix(c,c*0.74,dots*0.85);
-    c*=0.94+0.12*hash(floor(f/(2.0*u_dpr)));
   }
   c+=(hash(f)-0.5)*u_fx.y;
   o=vec4(c,1.0);
@@ -128,7 +121,7 @@ void main(){
   o=vec4(s,s,s,1.0);
 }`;
 
-  /* oceano: degradado + aguas someras + reticula con LOD; casino = remolino animado, riso = semitono */
+  /* oceano: degradado + aguas someras + reticula con LOD; casino = remolino animado */
   const FS_OCEAN = `#version 300 es
 precision highp float;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform float u_dpr; uniform float u_time; uniform int u_style;
@@ -162,11 +155,7 @@ void main(){
   float w=texture(u_blurW,uv).r; float n=texture(u_blurN,uv).r;
   float shal=clamp(smoothstep(0.03,0.42,w)*0.70+smoothstep(0.02,0.5,n)*0.30,0.0,1.0);
   if(u_style==1){ ocean=texture(u_swirl,uv).rgb; ocean=mix(ocean,u_shallow,shal*0.55); }
-  else if(u_style==3){
-    float dots=step(length(fract(frag/(6.0*u_dpr))-0.5),0.5*smoothstep(0.04,0.6,w)*1.1);
-    ocean=mix(ocean,u_shallow,dots);
-    ocean=mix(ocean,ocean*0.9,step(0.5,hash(floor(frag/(3.0*u_dpr))))*0.10);
-  } else ocean=mix(ocean,u_shallow,shal);
+  else ocean=mix(ocean,u_shallow,shal);
   // reticula con dos niveles de detalle fundidos
   float ga=gridLevel(u_gp.x,wp,lonDeg,latDeg,pxPerDeg);
   float gb=gridLevel(u_gp.y,wp,lonDeg,latDeg,pxPerDeg)*u_gp.z;
@@ -224,9 +213,9 @@ void main(){
   vec2 fr=uv*u_res;
   vec2 toC=(u_zc-fr);
   float zvA=clamp(u_zv,-4.0,4.0);
-  vec2 off=toC*zvA*0.06+u_pv*0.014;
+  vec2 off=toC*zvA*0.018+u_pv*0.004;                            // estela de movimiento sutil (antes era tan fuerte que parecia lag)
   float lenPx=length(off);
-  if(lenPx>40.0) off*=40.0/lenPx;
+  if(lenPx>12.0*u_dpr) off*=12.0*u_dpr/lenPx;
   vec3 col;
   if(lenPx<0.6){ col=texture(u_scene,suv).rgb; }
   else {
@@ -234,7 +223,7 @@ void main(){
     for(int i=0;i<N;i++){ float t=float(i)/float(N-1)-0.5; col+=texture(u_scene,suv+off*t/u_res).rgb; }
     col/=float(N);
   }
-  float ca=min(lenPx,40.0)*0.0009+u_crt*0.0011*(1.0-u_lite);
+  float ca=min(lenPx,12.0)*0.00035+u_crt*0.0011*(1.0-u_lite);
   if(ca>0.0005){
     vec2 dir=normalize(toC+vec2(0.0001)); vec2 cav=dir*ca*u_res.y/u_res*0.5;
     col.r=texture(u_scene,suv+cav).r; col.b=texture(u_scene,suv-cav).b;
@@ -247,7 +236,7 @@ void main(){
     col+=max(bl-0.72,0.0)*0.55; }                                 // resplandor de fosforo
     col*=1.0+0.03*sin(u_time*40.0);                             // parpadeo minimo
   }
-  vec2 q2=uv-0.5; float v=1.0-u_vig*smoothstep(0.30,0.95,length(q2*vec2(1.05,1.0))+min(abs(zvA)*0.02,0.08));
+  vec2 q2=uv-0.5; float v=1.0-u_vig*smoothstep(0.30,0.95,length(q2*vec2(1.05,1.0))+min(abs(zvA)*0.01,0.04));
   col*=v*u_tint;
   col+=(hash(frag+fract(u_time)*61.0)-0.5)*u_grain;
   o=vec4(col*inside,1.0);
@@ -294,7 +283,7 @@ void main(){
       this.fxOn = true; this.zv = 0; this.lastLz = null; this.pv = [0, 0]; this.zc = null; this.lastView = { cx: 0, cy: 0, s: 0 };
       this.dirty = this.fxDirty = true; this.pointers = new Map(); this.samples = [];
       this.dist = { spec: null, k: 0, kk: 0, kl: 0, ko: 0, from: 0, to: 0, lfrom: 0, lto: 0, ofrom: 0, oto: 0, t0: 0, ms: 0, ct: 6 }; this.lens = null; this.hideReticle = false;
-      this.sk = A.MAPSTYLES.expedicion; this.ms = this._prepStyle(this.sk);
+      this.sk = A.MAPSTYLES.casino || A.MAPSTYLES.expedicion; this.ms = this._prepStyle(this.sk);
       this._initGL(); this._bind(); this.resize(true);
       canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); this.lost = true; });
       canvas.addEventListener("webglcontextrestored", () => { this.lost = false; this._initGL(); this.resize(true); });
@@ -924,7 +913,7 @@ void main(){
     /* ---------- capa 2D: retícula (etiquetas), chinchetas, linea, etiquetas y cursor ---------- */
     _drawGridLabels(c) {
       const { W, H } = this, gp = this._gridParams();
-      c.font = "500 10px 'DM Mono', monospace"; c.textBaseline = "top";
+      c.font = `400 10px ${this._fm()}`; c.textBaseline = "top";
       const [wx0, wyTop] = this._toWorld(0, 0), [wx1, wyBot] = this._toWorld(W, H);
       const latTop = unproject(0, wyTop)[1], latBot = unproject(0, wyBot)[1];
       const draw = (step, alpha) => {

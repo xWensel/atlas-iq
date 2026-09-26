@@ -178,7 +178,6 @@ window.AIQ = window.AIQ || {};
     return { list, combo: plan.combo, boss };
   };
   const omen = () => has("omen");
-  const handInfo = () => null;                                       // la mano de poker esta desactivada: sus parejas no se entendian (v0.9)
 
   A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null } = {}) {
     const d = DECKS[deck] || DECKS.explorer;
@@ -303,6 +302,7 @@ window.AIQ = window.AIQ || {};
     c.sc = { dist, time, distMax: 1000, timeMax: 400 };
     return c;
   };
+  let reactT = 0;                                                     // reaccion pendiente del crupier a la ultima respuesta
   A.adv.afterQuestion = function (res) {
     clearTimers();
     run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) run.stats.bulls++; run.stats.best = Math.max(run.stats.best, res.total);
@@ -310,7 +310,7 @@ window.AIQ = window.AIQ || {};
     if (res.dist >= 750 && has("recycle")) { const id = Object.keys(run.tools).find(k => run.tools[k].left < toolMax(k)); if (id) run.tools[id].left++; }
     run.streak = res.streak || 0; run.qi++; run.qTools = 0; persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
     const kind = res.km == null ? "timeout" : res.dist >= 960 ? "bull" : res.dist < 400 ? "miss" : res.streak >= 3 ? "streak" : res.dist >= 750 ? "good" : null;
-    if (kind) setTimeout(() => A.dealer.react(kind), 1300);
+    clearTimeout(reactT); if (kind) reactT = setTimeout(() => A.dealer.react(kind), 1300);
   };
 
   /* ---------------- pistas gratis de reliquias ---------------- */
@@ -411,11 +411,10 @@ window.AIQ = window.AIQ || {};
   function renderBars() {
     ensureBars(); const bar = $("advBar"), tb = $("toolBar");
     if (!run || !C().S.camp || C().S.camp.mode !== "adventure" || ["title", "levelEnd", "shop"].includes(C().S.phase)) { bar.classList.add("hidden"); tb.classList.add("hidden"); return; }
-    const info = actInfo(run.act), silenced = (run.boss || []).includes("silence"), hand = handInfo();
+    const info = actInfo(run.act), silenced = (run.boss || []).includes("silence");
     bar.classList.remove("hidden");
     bar.innerHTML = `<div class="ab-top"><span class="ab-act" data-tf="abact">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins" data-tf="abcoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts" data-tf="abhearts">${hearts()}</span></div>
       <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}</span>`).join("")}</div>
-      ${hand ? `<div class="ab-hand">${ic("cards", "sm")}${A.tx(hand.name)} <b>+${hand.coins}</b></div>` : ""}
       ${(run.chal || []).length ? `<div class="ab-chal">${run.chal.map(c => A.chal.chip(c, true)).join("")}</div>` : ""}
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${run.wind.km} km</span></div>` : ""}`;
     const ids = Object.keys(run.tools);
@@ -433,14 +432,13 @@ window.AIQ = window.AIQ || {};
   /* ---------------- fin de ronda ---------------- */
   A.adv.roundEnd = function () {
     const S = C().S, Lv = S.camp.levels[0], pass = S.levelScore >= Lv.advance, boss = isBoss();
-    S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); A.chal.end(); C().map.setStyle(mapStyleFor());
+    S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); clearTimeout(reactT); A.chal.end(); C().map.setStyle(mapStyleFor());
     if (pass) {
       run.score += S.levelScore; run.cleared++; S.runTotal = run.score;
       const x = { coins: 3 + (boss ? 4 : 0) }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + x.coins]];
       const cap = has("interest") ? 6 : 3, interest = Math.min(cap, Math.floor(run.coins / 5));
       if (interest) { x.coins += interest; lines.push([A.T("Interés (1 por cada 5)", "Interest (1 per 5)"), "+" + interest]); }
       perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins]); } } });
-      const hand = handInfo(); if (hand) { x.coins += hand.coins; lines.push([A.T("Mano de póker: ", "Poker hand: ") + A.tx(hand.name), "+" + hand.coins]); }
       const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins)]);
       run.coins += got; run.stats.coinsEarned += got;
       A.ach.emit("adv", { kind: "clear", tools: run.rTools }); if (boss) { A.ach.emit("adv", { kind: "boss" }); A.profile.get().adv.boss++; }
@@ -450,12 +448,13 @@ window.AIQ = window.AIQ || {};
       A.profile.get().adv.bestRound = Math.max(A.profile.get().adv.bestRound, roundNo() + 1);
       run.phase = "verdict"; run.vBoss = boss; persist(); A.profile.save();
       C().verdict({
-        kind: "ok", level: roundNo() + 1, title: boss ? A.T("¡Jefe derrotado!", "Boss defeated!") : A.T("Ronda superada", "Round cleared"),
+        kind: "ok", level: roundNo() + 1, tag: `${A.tx(actInfo(run.act).n)} · ${boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + (run.round + 1)}`, title: boss ? A.T("¡Jefe derrotado!", "Boss defeated!") : A.T("Ronda superada", "Round cleared"),
         text: `${A.fmt(S.levelScore)} / ${A.fmt(Lv.advance)}`, lines,
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]],
         stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : "win",
         buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => afterVerdict(boss) }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
       });
+      setTimeout(() => A.dealer.react("roundWin"), 700);                    // el crupier protesta (antes estas frases nunca se decian)
     } else {
       const shielded = has("shieldAct") && run.shieldAct !== run.act;
       if (shielded) run.shieldAct = run.act; else { run.lives--; run.livesLostAct++; }
@@ -463,11 +462,12 @@ window.AIQ = window.AIQ || {};
       A.sfx.stamp(); setTimeout(A.sfx.lose, 300);
       if (run.lives <= 0) return endRun(false);
       C().verdict({
-        kind: "", level: roundNo() + 1, title: A.T("No llegaste al objetivo", "Target missed"),
+        kind: "", level: roundNo() + 1, tag: `${A.tx(actInfo(run.act).n)} · ${boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + (run.round + 1)}`, title: A.T("No llegaste al objetivo", "Target missed"),
         text: (shielded ? A.T("¡El Escudo te salva: no pierdes provisión! ", "The Shield saves you: no provision lost! ") : "") + A.tf("Te quedaste en {s} de {a}. Te quedan {n} provisiones.", "You scored {s} of {a}. You have {n} provisions left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives }),
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), Lv.advance]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives), art: "lose",
         buttons: [{ id: "rtBtn", cls: "btn-ink", label: A.T("Reintentar con lugares nuevos", "Retry with new places"), arrow: true, primary: true, onclick: () => openShop(false) }, { id: "abBtn", cls: "btn-line", label: A.T("Abandonar", "Abandon"), onclick: () => endRun(false) }],
       });
+      setTimeout(() => A.dealer.react("roundFail"), 700);
     }
   };
   function afterVerdict(boss) { if (boss && run.act + 1 === 3 && !run.won) return winScreen(); nextStep(boss); }
@@ -479,14 +479,14 @@ window.AIQ = window.AIQ || {};
     run.won = true; run.act++; run.round = 0; run.attempt = 0; run.phase = "win"; persist(); A.sfx.victory();
     A.profile.get().adv.wins++; A.profile.save();
     C().verdict({
-      kind: "win", level: 12, title: A.T("¡Terra Incognita conquistada!", "Terra Incognita conquered!"),
+      kind: "win", level: 12, tag: A.T("Tres actos completados", "Three acts completed"), title: A.T("¡Terra Incognita conquistada!", "Terra Incognita conquered!"),
       text: A.T("Has completado los tres actos. Puedes cobrar tu gloria ahora o seguir hacia la Leyenda: rondas infinitas cada vez más duras, con el mismo marcador.", "You've completed all three acts. Cash out your glory now, or push on into Legend: endless, ever-harder rounds on the same scoreboard."),
       stats: [[A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("VICTORIA", "VICTORY"), stampSub: A.icon("u_star", "st"), art: "win",
       buttons: [{ id: "legBtn", cls: "btn-ink", label: A.T("Seguir a la Leyenda", "Push into Legend"), arrow: true, primary: true, onclick: () => openShop(true) }, { id: "endBtn", cls: "btn-line", label: A.T("Cobrar y terminar", "Cash out"), onclick: () => endRun(true) }],
     });
   }
 
-  /* ---------------- campamento: tres cartas y a rolear ---------------- */
+  /* ---------------- campamento: tres cartas (se pueden cambiar pagando) ---------------- */
   function offers(chest) {
     const rr = A.rng(`${run.seed}:shop:${roundNo()}:${run.shopN}:${chest ? 1 : 0}`), R = A.RELICS, out = [];
     const relics = Object.keys(R).filter(id => !owned(id) && (chest ? true : R[id].r < 3));
@@ -548,16 +548,16 @@ window.AIQ = window.AIQ || {};
     return `<div class="offer pc life${bought ? " sold" : ""}" data-i="${i}" data-suit="red">${ixs("♥", "heart")}<span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico felt">${ic("heart")}</div><b class="of-n">+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${bought || run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${price(6)}</button></div>`;
   }
   function renderShop(chest) {
-    const slots = 5, info = actInfo(run.act), hand = handInfo(), rc = rerollCost();
+    const slots = 5, info = actInfo(run.act), rc = rerollCost();
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b>${chest ? "" : `<em>${A.T("vender", "sell")} ${sellValue(id)}</em>`}</button>` : `<span class="inv-empty"></span>`; }).join("");
     C().dialog(`<div class="table${chest ? " chest" : ""}">
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
         <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
       ${nextHtml()}
-      ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${A.T("Tres cartas sobre la mesa. ¿Compras o rolas?", "Three cards on the table. Buy, or roll?")}</p>`}
+      ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${A.T("Tres cartas sobre la mesa. ¿Compras una o pides otras?", "Three cards on the table. Buy one, or ask for new ones?")}</p>`}
       <section class="offers">${cards}</section>
-      <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Rolear", "Roll")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
+      <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Cambiar cartas", "New cards")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
         </div>
       <footer class="tb-tray"><div class="tray-col"><h4>${A.T("Reliquias", "Relics")} ${run.perks.length}/${slots}</h4><div class="tray-row">${relicSlots}</div></div>
         <div class="tray-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" ${A.kitTip("tool", id)}>${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
@@ -596,7 +596,7 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------- fin de la expedicion ---------------- */
   function endRun(win) {
-    const P = A.profile.get(), bonus = run.cleared * 1000 + run.coins * 20 + (run.won ? 2500 : 0), final = run.score + bonus, wasRanked = run.ranked, board = run.board;
+    const P = A.profile.get(), bonus = run.cleared * 1000 + (run.won ? 2500 : 0), final = run.score + bonus, wasRanked = run.ranked, board = run.board;
     P.adv.bestScore = Math.max(P.adv.bestScore, final); P.adv.coins += run.stats.coinsEarned;
     if (win && run.won) P.adv.asc = Math.max(P.adv.asc, Math.min(5, run.asc + 1));
     A.profile.save();
@@ -606,8 +606,9 @@ window.AIQ = window.AIQ || {};
     const r = run; run = null; persist(); C().S.run = null; A.chal.end(); A.dealer.enable(true); setTimeout(() => A.dealer.react(win ? "runWin" : "runLose"), 900);
     A.sfx.stamp(); setTimeout(win ? A.sfx.victory : A.sfx.lose, 300);
     C().verdict({
-      kind: win ? "win" : "", level: r.cleared, title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
-      text: A.tf("Superaste {r} rondas y llegaste al {act}. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and reached {act}. Points: {p} + bonus {b}.", { r: r.cleared, act: A.tx(actInfo(r.act).n), p: A.fmt(r.score), b: A.fmt(bonus) }) + (rec ? A.T(" ¡Nuevo récord personal!", " New personal best!") : ""),
+      kind: win ? "win" : "", level: r.cleared, tag: A.T("Expedición", "Expedition"), title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
+      text: (r.won ? A.tf("Superaste {r} rondas y conquistaste los tres actos. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and conquered all three acts. Points: {p} + bonus {b}.", { r: r.cleared, p: A.fmt(r.score), b: A.fmt(bonus) })
+        : A.tf("Superaste {r} rondas y llegaste al {act}. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and reached {act}. Points: {p} + bonus {b}.", { r: r.cleared, act: A.tx(actInfo(r.act).n), p: A.fmt(r.score), b: A.fmt(bonus) })) + (rec ? A.T(" ¡Nuevo récord personal!", " New personal best!") : ""),
       stats: [[A.T("Puntuación final", "Final score"), final], [A.T("Rondas superadas", "Rounds cleared"), r.cleared], [A.T("Doblones ganados", "Doubloons earned"), r.stats.coinsEarned]],
       stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
       buttons: [{ id: "nrBtn", cls: "btn-ink", label: A.T("Otra expedición", "Another expedition"), arrow: true, primary: true, onclick: () => C().showHub("adventure") }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],

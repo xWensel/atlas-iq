@@ -109,7 +109,9 @@
  },
  "giza-pyramid-complex": {
   "es": "Pirámides de Guiza",
-  "en": "Pyramids of Giza"
+  "en": "Pyramids of Giza",
+  "pt": "Pirâmides de Gizé",
+  "it": "Piramidi di Giza"
  },
  "great-wall-of-china": {
   "es": "Gran Muralla China"
@@ -217,7 +219,8 @@
   "es": "Batalla de Cajamarca"
  },
  "fall-of-tenochtitlan": {
-  "es": "Caída de Tenochtitlan"
+  "es": "Caída de Tenochtitlan",
+  "de": "Eroberung Tenochtitlans"
  },
  "siege-of-vienna": {
   "es": "Sitio de Viena (1683)",
@@ -328,5 +331,23 @@
  "guadalcanal-campaign": {
   "es": "Campaña de Guadalcanal",
   "en": "Guadalcanal campaign"
+ },
+ "tokyo": {
+  "de": "Tokio"
+ },
+ "bali": {
+  "es": "Bali"
+ },
+ "1883-eruption-of-krakatoa": {
+  "de": "Ausbruch des Krakatau (1883)"
+ },
+ "battle-of-arnhem": {
+  "it": "Battaglia di Arnhem"
+ },
+ "battle-of-puebla": {
+  "it": "Battaglia di Puebla"
+ },
+ "fall-of-saigon": {
+  "de": "Fall von Saigon"
  }
 }

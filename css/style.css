@@ -181,12 +181,6 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 .go::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(241,215,154,.22) 50%, transparent 65%); transform: translateX(-130%); }
 .go:hover::after { transform: translateX(130%); transition: transform .9s ease; }
 .go:hover { --edge: var(--brass-lt); transform: translateY(-2px); } .go:active { transform: translateY(2px) scale(.99); }
-.go-dial { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; position: relative; background: radial-gradient(circle at 35% 30%, #2a4048, #0c1a21); box-shadow: 0 0 0 2px var(--brass), 0 0 0 5px var(--ink-deep), 0 0 0 6px rgba(200,150,62,.5), inset 0 2px 8px rgba(0,0,0,.6); }
-.go-dial svg { width: 46px; height: 46px; color: var(--paper); --rose-hole: var(--ink-deep); transform: rotate(var(--rot)); transition: transform .35s var(--spring); }
-.go:hover .go-dial svg { transition: transform .08s linear; }
-.go-txt { display: grid; gap: 3px; } .go-txt b { font-family: var(--serif); font-variation-settings: var(--disp); font-style: italic; font-weight: 800; font-size: 26px; letter-spacing: -.01em; line-height: 1; }
-.go-txt i { font-family: var(--mono); font-style: normal; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--brass); }
-.go-ar { font-family: var(--mono); font-size: 26px; color: var(--brass); transition: transform .3s var(--spring); } .go:hover .go-ar { transform: translateX(7px); }
 
 /* ------------------------------------------------ capas de pantalla */
 #layer { position: absolute; inset: 0; display: grid; pointer-events: none; z-index: 4; }
@@ -262,8 +256,6 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 .menu-gear svg:not(.ic) { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .menu-in h1 { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: clamp(60px, 9vw, 96px); line-height: .9; letter-spacing: -.035em; display: flex; align-items: flex-start; gap: 10px; margin-top: 6px; }
 .menu-in h1 em { font-family: var(--mono); font-style: normal; font-weight: 500; font-size: 16px; letter-spacing: .16em; background: var(--red); padding: 5px 8px 4px; margin-top: 10px; transform: rotate(-4deg); }
-.tagline { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 26px; margin-top: 10px; color: var(--brass); }
-.lede { font-size: 15px; line-height: 1.5; color: rgba(242,233,214,.72); margin: 8px 0 18px; max-width: 44ch; }
 .mode-d { font-size: 13.5px; color: rgba(242,233,214,.62); margin: 10px 2px 14px; line-height: 1.45; } .mode-d small { display: block; margin-top: 4px; color: var(--brass); font-size: 12.5px; }
 .camps { display: grid; gap: 8px; margin-bottom: 16px; }
 .camp { --c: 12px; --edge: rgba(242,233,214,.22); --fill: #121f27; display: grid; grid-template-columns: 108px 1fr; gap: 14px; align-items: center; text-align: left; padding: 10px 14px 10px 10px; transition: transform .22s var(--spring); animation: rise .45s ease both; }

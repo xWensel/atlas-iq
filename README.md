@@ -1,5 +1,15 @@
 # Atlas IQ
 
+**v0.12** - Revision completa: fallos, traducciones, maquetacion y limpieza.
+- **Traducciones:** el modo Clasico (536 preguntas, 53 niveles, 122 datos curiosos) estaba solo en ingles incluso en espanol: ahora esta en los 6 idiomas (`data/classic-tr.js`), con las erratas del original corregidas ("Colisseum", "New Dehli", "Kinshasha"...) y datos anticuados actualizados. El modo Extendido y 23 textos de interfaz ya tienen frances, portugues, aleman e italiano (`js/i18n5.js`). Nombres corregidos en la base de lugares (Tokio en aleman, Piramides de Guiza...).
+- **Fallos corregidos:** el bloque "Puntos x Racha" del ticket salia sin estilo ("Fichas819 × Mult · Racha 21.2"); con `?skipboot` la pantalla de carga no se quitaba; las frases del crupier al ganar/perder ronda nunca se decian; el crupier tapaba el boton del veredicto; el aviso de tarjeta nueva tapaba el texto; la sacudida de racha no tenia estilo.
+- **Maquetacion:** comprobada en 390x844, 1024x768, 1280x720, 1366x768 y 1920x1080: el veredicto y la portada caben sin desplazarse, el ticket ya no tapa el marcador, las cartas de herramienta quedan siempre sobre el pie, el Campamento se adapta a pantallas medianas y moviles, y las notas de campo se limitan a 3 lineas.
+- **Notas de campo limpias:** fuera transliteraciones, pronunciaciones y parentesis en otros alfabetos de los extractos de Wikipedia, y nunca acaban a media frase.
+- **Mas fluido:** el desenfoque y la aberracion de color al mover la camara eran tan fuertes que parecia lag (ahora son sutiles); ya no se descargan ~180 KB de fuentes del aspecto antiguo al arrancar.
+- **Puntuacion:** los doblones sobrantes ya no suman puntos al final de la expedicion (la puntuacion es solo precision, como se pidio para las reliquias).
+- **Limpieza:** las 4 hojas `premium*.css` son una sola; fuera 93 reglas CSS de pantallas que ya no existen, el codigo de la mano de poker, los estilos de mapa "plano" y "riso" y textos duplicados. La insignia descargable pasa al estilo casino y se traduce ("Rolear" pasa a "Cambiar cartas").
+- Herramientas de desarrollo: `dev/smoke.js` (recorre todos los modos en un idioma y lista errores y textos sin traducir) y `dev/overlap.js` (solapes entre paneles).
+
 **v0.11.5** - Mapa y fronteras: los continentes ya no se pisan nunca.
 - **Continentes que no se pisan:** Pangea, Continentes cambiados, Big bang y Continentes torcidos colocan cada continente con mascaras de tierra reales (no cajas): uno a uno, lo mas cerca posible de su destino y en el hueco libre mas cercano. Si no caben, se encogen (Pangea encoge mas: sus fronteras se aprietan para encajar). Comprobado con `dev/layouttest.js` (dibuja los poligonos reales): 0 solapes en 40 disposiciones, en menos de 100 ms, y el clic se traduce a coordenadas reales con error 0.
 - **Fronteras que no se rompen:** en *Fronteras falsas* solo bailan las fronteras interiores (las costas se quedan pegadas a la tierra).
