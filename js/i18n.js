@@ -1,4 +1,4 @@
-/* Atlas IQ - textos de la interfaz en 6 idiomas. */
+/* Geolite - textos de la interfaz en 6 idiomas. */
 window.AIQ = window.AIQ || {};
 (function (A) {
   A.LANGS = [
@@ -76,7 +76,7 @@ window.AIQ = window.AIQ || {};
     "lc.p": ["{s} pts. Necesitabas {a}.", "{s} pts. You needed {a}.", "{s} pts. Il t'en fallait {a}.", "{s} pts. Você precisava de {a}.", "{s} Pkt. Du brauchtest {a}.", "{s} pt. Ne servivano {a}."],
     "lf.p": ["Necesitabas {a} pts y conseguiste {s}.", "You needed {a} pts and scored {s}.", "Il te fallait {a} pts et tu en as fait {s}.", "Você precisava de {a} pts e fez {s}.", "Du brauchtest {a} Pkt. und hast {s} erreicht.", "Servivano {a} pt e ne hai fatti {s}."],
     "win.p": ["Completaste todos los niveles con {s} pts.", "You cleared every level with {s} pts.", "Tu as terminé tous les niveaux avec {s} pts.", "Você concluiu todos os níveis com {s} pts.", "Du hast alle Level mit {s} Pkt. geschafft.", "Hai superato tutti i livelli con {s} pt."],
-    "iq.label": ["Tu Atlas IQ", "Your Atlas IQ", "Ton Atlas IQ", "Seu Atlas IQ", "Dein Atlas IQ", "Il tuo Atlas IQ"],
+    "iq.label": ["Tu Geo IQ", "Your Geo IQ", "Ton Géo IQ", "Seu Geo IQ", "Dein Geo-IQ", "Il tuo Geo IQ"],
     "pts": ["pts", "pts", "pts", "pts", "Pkt.", "pt"],
     "pause.h": ["En pausa", "Paused", "En pause", "Em pausa", "Pausiert", "In pausa"],
     "pause.p": ["El mapa se oculta mientras dura la pausa.", "The map is hidden while the game is paused.", "La carte est masquée pendant la pause.", "O mapa fica oculto durante a pausa.", "Die Karte ist während der Pause ausgeblendet.", "La mappa è nascosta durante la pausa."],
@@ -149,7 +149,7 @@ window.AIQ = window.AIQ || {};
     "boot.fs": ["Pantalla completa", "Fullscreen", "Plein écran", "Tela cheia", "Vollbild", "Schermo intero"],
     "share": ["Compartir", "Share", "Partager", "Compartilhar", "Teilen", "Condividi"],
     "share.copied": ["Copiado", "Copied", "Copié", "Copiado", "Kopiert", "Copiato"],
-    "share.text": ["He sacado {iq} de Atlas IQ ({tier}) con {s} pts. ¿Sabes dónde queda?", "I scored {iq} on Atlas IQ ({tier}) with {s} pts. Do you know where it is?", "J'ai obtenu {iq} à Atlas IQ ({tier}) avec {s} pts. Tu sais où c'est ?", "Tirei {iq} no Atlas IQ ({tier}) com {s} pts. Você sabe onde fica?", "Ich habe {iq} bei Atlas IQ ({tier}) mit {s} Pkt. erreicht. Weißt du, wo das liegt?", "Ho fatto {iq} su Atlas IQ ({tier}) con {s} pt. Sai dov'è?"],
+    "share.text": ["He sacado {iq} de IQ en Geolite ({tier}) con {s} pts. ¿Sabes dónde queda?", "I scored {iq} on Geolite ({tier}) with {s} pts. Do you know where it is?", "J'ai obtenu {iq} à Geolite ({tier}) avec {s} pts. Tu sais où c'est ?", "Tirei {iq} no Geolite ({tier}) com {s} pts. Você sabe onde fica?", "Ich habe {iq} bei Geolite ({tier}) mit {s} Pkt. erreicht. Weißt du, wo das liegt?", "Ho fatto {iq} su Geolite ({tier}) con {s} pt. Sai dov'è?"],
     "codex.title": ["Enciclopedia", "Encyclopedia", "Encyclopédie", "Enciclopédia", "Enzyklopädie", "Enciclopedia"],
     "codex.progress": ["{a} / {b} tarjetas", "{a} / {b} cards", "{a} / {b} cartes", "{a} / {b} cartas", "{a} / {b} Karten", "{a} / {b} carte"],
     "codex.search": ["Buscar…", "Search…", "Rechercher…", "Buscar…", "Suchen…", "Cerca…"],

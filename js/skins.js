@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - skins. Cada uno cambia TODO: mapa (shader), paleta de interfaz, tipografia, formas, sonido.
+ * Geolite - skins. Cada uno cambia TODO: mapa (shader), paleta de interfaz, tipografia, formas, sonido.
  * Solo queda el aspecto Casino (el de Expedicion se retiro en v0.9).
  *   casino      mesa de cartas + monitor CRT (estilo "Balatro") Pixelify Sans + Silkscreen
  */

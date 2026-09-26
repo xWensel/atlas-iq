@@ -1,4 +1,10 @@
-# Atlas IQ
+# Geolite
+
+> Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
+
+**v0.15** - Nuevo nombre y arte unificado.
+- **Geolite:** nombre, textos en los 6 idiomas, manifiesto, titulo, herramientas y documentos actualizados. Logo nuevo en pixel art casino (letras doradas con bombillas de marquesina y la O convertida en globo) y escudo del juego (globo con anillo de bombillas y chincheta) para la marca del HUD, el menu y los iconos de la app (favicon, PWA, iOS).
+- **Revision completa del arte:** fuera el favicon y la rosa de los vientos vectoriales, el respaldo vectorial de iconos y escenas (~70 KB de dibujos antiguos), las tipografias del aspecto antiguo (Fraunces, Bricolage, DM Mono) y los iconos y escena de piezas ya retiradas (reliquias podadas, modo Extendido). Todo lo que se ve es ahora pixel art casino generado con el mismo libro de estilo (`tools/gen_art.py`).
 
 **v0.14.4** - Revision de lo pendiente: menu principal, Campamento y veredicto ya caben en movil horizontal; se quita el aviso obsoleto de Ajustes ("preguntas del modo Extendido...") y restos del modo Extendido en el codigo.
 
@@ -71,7 +77,7 @@
 - **Reparto de lugares:** cada lugar aparece en una sola ronda (80 por ronda); maximo de lugares del mismo pais por ronda (la ronda de maravillas dificiles ya no es casi toda de EE. UU.); el Jackpot mezcla a partes iguales lo que sobra. Lista completa en `docs/rondas-aventura.md`.
 - **+50 sucesos historicos** (batallas espanolas, guerras clasicas...) para llegar a 80 en las dos rondas de Historia.
 - **Paises actuales** (nada de imperios o reinos historicos), mares y lugares compartidos sin pais, y nombres internacionales corregidos (`tools/name-fix.json`, `tools/country-fix.json`, `tools/drop-places.json`, `tools/country-labels.json`).
-- **Entrada:** pantalla de idioma con el logo de Atlas IQ y animacion de estudio nueva: el logo entra con calma, dos golpes graves, un brillo dorado recorre solo las letras y se va.
+- **Entrada:** pantalla de idioma con el logo de Geolite y animacion de estudio nueva: el logo entra con calma, dos golpes graves, un brillo dorado recorre solo las letras y se va.
 
 **v0.9.2** – Cada ronda de la Aventura usa un carrete de 80 lugares (ventana mas dificil en cada acto; el jackpot muestrea todos los temas).
 

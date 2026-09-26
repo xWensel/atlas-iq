@@ -1,7 +1,7 @@
-/* Atlas IQ - textos ES/EN, calculo de IQ e insignia. */
+/* Geolite - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.14.4";
+  A.VERSION = "0.15.0";
   A.lang = "es";
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
@@ -71,7 +71,7 @@ window.AIQ = window.AIQ || {};
     c.font = "400 34px 'Jersey 15', sans-serif"; c.fillStyle = "#ffe08a"; c.fillText(subtitle, x0, 452, W - x0 - 80);
     c.font = "700 18px Silkscreen, monospace"; c.fillStyle = "rgba(243,237,220,.7)";
     c.fillText(new Date().toLocaleDateString(locOf(), { year: "numeric", month: "long", day: "numeric" }).toUpperCase(), x0, 500);
-    c.fillText(location.host || "atlas-iq", x0, 540);
+    c.fillText(location.host || "geolite", x0, 540);
     return cv;
   };
 })(window.AIQ);

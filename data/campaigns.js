@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - campañas. Une los dos modos bajo la misma estructura:
+ * Geolite - campañas. Une los dos modos bajo la misma estructura:
  *   CLASICO   -> preguntas, orden, tiempos y puntuacion exactos del juego original.
  *   EXTENDIDO -> contenido propio (12 niveles del mundo + historia y pistas).
  */

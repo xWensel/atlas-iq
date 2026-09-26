@@ -1,4 +1,4 @@
-/* Atlas IQ - traducciones (v0.12): modo Extendido (vuelta al mundo, historia y pistas) y textos de interfaz que faltaban.
+/* Geolite - traducciones (v0.12): modo Extendido (vuelta al mundo, historia y pistas) y textos de interfaz que faltaban.
  * Se suman a A.TR (js/i18n2.js). Clave = texto en ingles; valor = [fr, pt, de, it]. Los nombres de lugares salen de data/places.js. */
 window.AIQ = window.AIQ || {};
 (function (A) {

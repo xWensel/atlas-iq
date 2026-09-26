@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - pantalla principal (v0.6): elige modo (Clasico, Aventura, Reto diario), Enciclopedia y Perfil.
+ * Geolite - pantalla principal (v0.6): elige modo (Clasico, Aventura, Reto diario), Enciclopedia y Perfil.
  * Se apoya en A.core (lo publica game.js).
  */
 window.AIQ = window.AIQ || {};
@@ -17,8 +17,8 @@ window.AIQ = window.AIQ || {};
     $("menuGear").onclick = () => c.openSettings(!c.S.settingsOpen); $("menuCodex").onclick = () => A.codex.open();
     $("menuLang").onclick = e => c.openLangPop(e.currentTarget); $("menuFs").onclick = c.toggleFs;
   };
-  const top = (back) => `<div class="menu-top">${back ? `<button class="hub-back" id="hubBack">${A.icon("u_back", "sm")}${T("Menú", "Menu")}</button>` : `<svg class="menu-rose"><use href="#rose"/></svg>`}${tools()}</div>`;
-  const shell = (inner, back) => `<div class="menu-in hub">${top(back)}${inner}<p class="menu-foot">Atlas IQ · v${A.VERSION}</p></div>`;
+  const top = (back) => `<div class="menu-top">${back ? `<button class="hub-back" id="hubBack">${A.icon("u_back", "sm")}${T("Menú", "Menu")}</button>` : `<img class="menu-rose" src="assets/icons/logo_mark.webp" alt="" draggable="false">`}${tools()}</div>`;
+  const shell = (inner, back) => `<div class="menu-in hub">${top(back)}${inner}<p class="menu-foot">Geolite · v${A.VERSION}</p></div>`;
 
   /* ------------------------------------------------------------------ pantalla principal */
   function home() {
@@ -28,7 +28,7 @@ window.AIQ = window.AIQ || {};
       ${id === "adventure" ? '<i class="marq"></i>' : ""}<span class="ix tl"><b>${rank}</b>${A.icon(suit)}</span><span class="ix br"><b>${rank}</b>${A.icon(suit)}</span>
       ${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-desc">${desc}</span><span class="mc-stat">${meta}</span></button>`;
     c.dialog(`<div class="hh">
-      <div class="hh-top"><img class="hh-logo" src="assets/gen/logo.webp" alt="Atlas IQ" onerror="this.outerHTML='<h1>Atlas<em>IQ</em></h1>'">${tools()}</div>
+      <div class="hh-top"><img class="hh-logo" src="assets/gen/logo.webp" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
       <p class="hh-tag">${A.t("title.tag")}</p>
       <div class="hh-cards">
         ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Las preguntas y la puntuación exactas del juego original: seis partidas.", "The original game's exact questions and scoring: six campaigns."), T("Pulido y sin trampas", "Untouched"))}
@@ -39,7 +39,7 @@ window.AIQ = window.AIQ || {};
       ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${T("Acto", "Act")} ${sm.act} · ${T("Ronda", "Round")} ${sm.round} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
         <button class="chipbtn big" id="codexBtn" type="button">${A.icon("m_codex", "sm")}<span>${A.t("codex.title")}</span><em>${A.codexStats().u}/${A.codexStats().t}</em></button>
         <button class="chipbtn big" id="profBtn" type="button">${A.icon("m_prof", "sm")}<span>${T("Perfil", "Profile")}</span><em>${A.ach.count()}/${A.ach.total()}</em></button>
-        <span class="hh-ver">Atlas IQ · v${A.VERSION}</span>
+        <span class="hh-ver">Geolite · v${A.VERSION}</span>
       </div></div>`, "home");
     wireTools(); $("codexBtn").onclick = () => A.codex.open(); $("profBtn").onclick = () => screen("profile");
     document.querySelectorAll(".mcard").forEach(b => (b.onclick = () => { A.sfx.card(); screen(b.dataset.mode); }));

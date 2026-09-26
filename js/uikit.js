@@ -1,4 +1,4 @@
-/* Atlas IQ · uikit: puntero de casino para TODA la aplicacion + tooltips propios (sustituyen al `title` de Windows).
+/* Geolite · uikit: puntero de casino para TODA la aplicacion + tooltips propios (sustituyen al `title` de Windows).
  *  - Puntero: sprites pixel-art generados en un canvas y aplicados como `cursor: url(...)`. Se reescriben las hojas de estilo para
  *    que grab/pointer/not-allowed... usen la version de casino. Solo en dispositivos con raton (pointer:fine).
  *  - Tooltips: cualquier elemento con `data-tt="Titulo\nDescripcion"` (o `data-th="<html>"`, o el viejo `title`) muestra una tarjeta

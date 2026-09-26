@@ -1,4 +1,4 @@
-/* Atlas IQ - traducciones (v0.10): retos, crupier, herramientas nuevas y tienda. Se suman a A.TR (js/i18n2.js). [fr, pt, de, it] */
+/* Geolite - traducciones (v0.10): retos, crupier, herramientas nuevas y tienda. Se suman a A.TR (js/i18n2.js). [fr, pt, de, it] */
 window.AIQ = window.AIQ || {};
 (function (A) {
   Object.assign(A.TR = A.TR || {}, {

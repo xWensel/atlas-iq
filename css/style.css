@@ -1,21 +1,16 @@
 /* ==========================================================================
-   Atlas IQ v0.2 - "cuaderno de expedicion"
+   Geolite v0.2 - "cuaderno de expedicion"
    Lenguaje visual propio: esquinas cortadas (nada de rectangulos redondeados), papel e instrumentos,
-   odometros mecanicos, faders y palancas de consola. Tipografia: Fraunces / Bricolage Grotesque / DM Mono.
+   odometros mecanicos, faders y palancas de consola. Tipografia: Jersey 15 / Pixelify Sans / Silkscreen (skins.css).
    ========================================================================== */
-@font-face { font-family: "Fraunces"; src: url("../fonts/fraunces-latin-full-normal.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
-@font-face { font-family: "Fraunces"; src: url("../fonts/fraunces-latin-full-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
-@font-face { font-family: "Bricolage Grotesque"; src: url("../fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
-@font-face { font-family: "DM Mono"; src: url("../fonts/dm-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "DM Mono"; src: url("../fonts/dm-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 
 :root {
   --ink: #14232b; --ink-2: #2a4048; --ink-deep: #0c1a21;
   --paper: #f2e9d6; --paper-2: #e6d9bd; --paper-3: #d9c9a6;
   --red: #e0492b; --red-deep: #9b2a14; --brass: #c8963e; --brass-lt: #f1d79a; --teal: #2e8f8c; --green: #3f9b62;
-  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --sans: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --mono: "DM Mono", ui-monospace, Consolas, monospace;
+  --serif: "Jersey 15", "Pixelify Sans", sans-serif;
+  --sans: "Jersey 15", "Pixelify Sans", system-ui, sans-serif;
+  --mono: "Silkscreen", "Jersey 15", monospace;
   --disp: "opsz" 144, "SOFT" 60, "WONK" 1;
   --spring: cubic-bezier(.2, 1.15, .3, 1);
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");

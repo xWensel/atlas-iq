@@ -1,4 +1,4 @@
-/* Atlas IQ - Enciclopedia. Usa los tokens del aspecto activo (--ink, --paper, --red, --serif, --mono...) para cambiar entera con cada skin. */
+/* Geolite - Enciclopedia. Usa los tokens del aspecto activo (--ink, --paper, --red, --serif, --mono...) para cambiar entera con cada skin. */
 #codex { --cxc: 14px; --cxrad: 0; --foil: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.45) 45%, transparent 70%);
   position: absolute; inset: 0; z-index: 12; display: flex; color: var(--paper); outline: none;
   background: radial-gradient(ellipse at 30% 0%, color-mix(in srgb, var(--ink) 92%, #fff 8%), var(--ink-deep) 75%); animation: cx-in .35s var(--spring) both; }

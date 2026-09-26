@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - Enciclopedia geografica: datos curados.
+ * Geolite - Enciclopedia geografica: datos curados.
  * Los LUGARES se generan solos a partir de las preguntas del juego (ver js/codex.js).
  * Aqui van las tarjetas que se desbloquean "en cadena": personajes, sucesos y curiosidades.
  *   [id, tipo, titulo de Wikipedia (en), nombre en espanol, lat, lon, [lugares que la desbloquean]]

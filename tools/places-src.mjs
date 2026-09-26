@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - listas de lugares para el banco de preguntas (solo desarrollo).
+ * Geolite - listas de lugares para el banco de preguntas (solo desarrollo).
  * Cada lista va de MAS FACIL a MAS DIFICIL. Se escriben con el titulo de Wikipedia en ingles; las coordenadas, nombres en 6 idiomas y
  * el pais se resuelven en tools/build-places.mjs (Wikipedia + Wikidata), asi que no se teclea ninguna coordenada a mano.
  * Formato: "Titulo"  |  "Titulo|Lugar"  (para sucesos sin coordenadas propias: se usan las de Lugar).

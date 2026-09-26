@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - identidad sonora.
+ * Geolite - identidad sonora.
  * Todo se sintetiza en el navegador (sin archivos de audio).
  *  - Firma: motivo de tres notas ascendentes (sol-do-re) que suena al empezar, al superar niveles y en la victoria.
  *  - Escala pentatonica de Do mayor: cualquier nota que suene "encaja", asi nada choca.
@@ -9,7 +9,7 @@
 window.AIQ = window.AIQ || {};
 (function (A) {
   const PENTA = [0, 2, 4, 7, 9];
-  const MOTIF = [67, 72, 74];                       // sol-do-re: la "firma" de Atlas IQ
+  const MOTIF = [67, 72, 74];                       // sol-do-re: la "firma" de Geolite
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   const scaleNote = (i, base = 60) => base + 12 * Math.floor(i / 5) + PENTA[((i % 5) + 5) % 5];
 

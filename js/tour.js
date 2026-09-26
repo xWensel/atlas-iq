@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - TUTORIAL GUIADO (v0.14). El crupier te enseña la mesa la primera vez: un foco ilumina cada parte de la pantalla y una tarjeta
+ * Geolite - TUTORIAL GUIADO (v0.14). El crupier te enseña la mesa la primera vez: un foco ilumina cada parte de la pantalla y una tarjeta
  * explica para que sirve. Se puede saltar en cualquier momento, se recuerda en el perfil (P.tour) y se reactiva en Ajustes > General.
  *   A.tour.maybe("q" | "camp")   lo llaman la Aventura (primera pregunta) y el Campamento (primera visita)
  */

@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - visor del mapa 2D (RESPALDO para equipos sin WebGL2).
+ * Geolite - visor del mapa 2D (RESPALDO para equipos sin WebGL2).
  *
  *  Capas (canvas apilados):
  *    #map  base     oceano + retícula + TEXTURAS pre-generadas (resplandor y tierra) + capa nítida

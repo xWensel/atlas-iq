@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - catalogo de PERKS de la Aventura (v0.10). Ninguno multiplica ni suma puntos: la puntuacion es solo tu precision.
+ * Geolite - catalogo de PERKS de la Aventura (v0.10). Ninguno multiplica ni suma puntos: la puntuacion es solo tu precision.
  * Los perks ayudan a resolver los RETOS del crupier (letras temblorosas, mapa borroso, apagon, fronteras falsas, continentes movidos...),
  * mejoran tu puntero, dan pistas, tiempo, supervivencia o doblones. Cada perk es una carta de poker con palo geografico.
  *

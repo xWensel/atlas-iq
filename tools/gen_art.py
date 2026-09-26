@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Atlas IQ - estudio grafico unico (solo desarrollo). Genera TODO el arte con el mismo modelo y el mismo libro de estilo,
+Geolite - estudio grafico unico (solo desarrollo). Genera TODO el arte con el mismo modelo y el mismo libro de estilo,
 para que iconos, banners, cartas y logos parezcan hechos por el mismo estudio: pixel art "casino x geografia" estilo Balatro.
 
   python tools/gen_art.py                 genera lo que falte (iconos, escenas, logos) y lo post-procesa
@@ -58,7 +58,9 @@ icons({
  "deck_explorer": "a golden compass rose star", "deck_historian": "a broken ancient greek column with a scroll", "deck_navigator": "a wooden ship steering wheel", "deck_blind": "dark round sunglasses with a strap",
  # modos
  "m_adv": "a brown explorer fedora hat with a red band and a feather", "m_classic": "a vintage desk globe on a brass stand", "m_compete": "a golden trophy cup with a red star",
- "m_ext": "a fan of three playing cards with map pictures", "m_prof": "an explorer id card with a portrait", "m_codex": "a thick blue encyclopedia book with a globe emblem and a red ribbon",
+ "m_prof": "an explorer id card with a portrait", "m_codex": "a thick blue encyclopedia book with a globe emblem and a red ribbon",
+ # marca del juego (escudo cuadrado: HUD, iconos de la app)
+ "logo_mark": "a round glowing blue and green world globe with a golden orbit ring around it, a small red map pin and casino marquee light bulbs on the ring, emblem",
  # palos y casino
  "s_pin": "a glossy red map pin", "s_compass": "a red four-point compass rose star", "s_peak": "a dark purple mountain peak with a white snowcap", "s_palm": "a dark purple palm tree on a tiny island",
  "dice": "a white six-sided die with red pips and a tiny compass on one face", "joker": "a purple jester hat with golden bells and a small globe", "cards": "a fan of three white playing cards with red pins",
@@ -192,7 +194,6 @@ scene("topic_mixed", "a chaotic jackpot of world landmarks, cards, chips, dice a
 scene("card_adv", "an explorer adventurer with a fedora standing on a hill of green felt, a road of poker chips leading to a sunrise, compass in hand", 640, 800)
 scene("card_classic", "a classic vintage globe and open atlas on a wooden desk with a brass compass and an old lamp, nostalgic warm light", 640, 800)
 scene("card_compete", "a golden trophy on a podium surrounded by poker chips, spotlights and a cheering crowd silhouettes, confetti", 640, 800)
-scene("card_ext", "a fan of playing cards each showing a different world place, a magnifying glass and a globe, casino neon", 640, 800)
 # tipos (respaldo Enciclopedia, cuadradas)
 for t, d in [("city", "a dense old city skyline at dusk with lit windows"), ("capital", "a grand capital building with a golden dome and flags"), ("country", "a tall flagpole with a big red waving flag over a landscape"),
              ("landmark", "a majestic ancient temple with columns"), ("nature", "snowy mountain peaks with a sun and a forest"), ("water", "a deep blue ocean with big waves and a small island"),
@@ -201,7 +202,7 @@ for t, d in [("city", "a dense old city skyline at dusk with lit windows"), ("ca
              ("curiosity", "a glowing lightbulb with sparkles and a magnifying glass"), ("place", "a big red map pin on a folded map")]:
     scene("type_" + t, d + ", vivid colors, filling the entire square frame edge to edge with no border, no card, no table", 640, 640)
 # logo
-LOGO = ("logo", "game title logo that reads ATLAS IQ in big chunky golden pixel lettering, the letter A shaped like a globe on legs, marquee light bulbs around the letters, a playing card and a red poker chip decoration, thick dark purple outline, glossy", 1024, 640)
+LOGO = ("logo", "game title logo that reads exactly GEOLITE in big chunky golden pixel capital lettering, the letter O is a glowing blue and green world globe, glowing casino marquee light bulbs around the letters, a playing card and a red poker chip decoration, thick dark purple outline, glossy", 1024, 640)
 
 def seed_for(id, extra=0):
     return int(hashlib.md5(id.encode()).hexdigest()[:6], 16) % 100000 + extra
@@ -210,7 +211,7 @@ def fetch(prompt, w, h, seed, tries=4):
     url = f"https://gen.pollinations.ai/image/{urllib.parse.quote(prompt)}?model={MODEL}&width={w}&height={h}&seed={seed}&nologo=true&private=true"
     for i in range(tries):
         try:
-            req = urllib.request.Request(url, headers={"Authorization": "Bearer " + KEY, "User-Agent": "atlas-iq-art/1.0"})
+            req = urllib.request.Request(url, headers={"Authorization": "Bearer " + KEY, "User-Agent": "geolite-art/1.0"})
             with urllib.request.urlopen(req, timeout=120) as r:
                 data = r.read()
                 if data[:3] in (b"\xff\xd8\xff", b"\x89PN") or data[:4] == b"RIFF":

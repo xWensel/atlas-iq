@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - Modo Extendido: rondas propias de batallas, eventos y apodos (estilo de las rondas "pista" del original).
+ * Geolite - Modo Extendido: rondas propias de batallas, eventos y apodos (estilo de las rondas "pista" del original).
  * Entrada: [pistaEn, pistaEs, respuestaEn, respuestaEs, lat, lon, datoEn, datoEs]
  */
 window.AIQ = window.AIQ || {};

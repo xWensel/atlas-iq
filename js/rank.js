@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - reto diario (v0.6): semillas del reto diario, tablas de clasificacion y envio de puntuaciones.
+ * Geolite - reto diario (v0.6): semillas del reto diario, tablas de clasificacion y envio de puntuaciones.
  * Si el servidor tiene la API activada (/api/*, ver README), la clasificacion es GLOBAL; si no, es local en este equipo.
  */
 window.AIQ = window.AIQ || {};

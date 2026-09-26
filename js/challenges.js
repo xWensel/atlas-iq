@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - RETOS de la Aventura (v0.11). El crupier "toca la mesa": cada ronda trae retos que cambian
+ * Geolite - RETOS de la Aventura (v0.11). El crupier "toca la mesa": cada ronda trae retos que cambian
  *   - el NOMBRE del lugar (letras que tiemblan, faltan, se cambian, runas, anagramas, otro idioma, adivinanza...),
  *   - el MAPA (borroso, apagon, fronteras falsas, Pangea, continentes movidos, del reves, terremoto, deriva, lluvia, rayos...),
  *   - el PUNTERO (tiembla, parpadea, desaparece, se emborrona, va con retraso, se mueve al reves, marea...) y

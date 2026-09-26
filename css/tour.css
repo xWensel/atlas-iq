@@ -1,4 +1,4 @@
-/* Atlas IQ - tutorial guiado (v0.14): un foco ilumina la parte de la pantalla y una tarjeta del crupier la explica */
+/* Geolite - tutorial guiado (v0.14): un foco ilumina la parte de la pantalla y una tarjeta del crupier la explica */
 .tour { position: fixed; inset: 0; z-index: 9000; opacity: 0; transition: opacity .2s ease; pointer-events: auto; cursor: default; }
 .tour.on { opacity: 1; }
 .tour.hidden { display: none; }

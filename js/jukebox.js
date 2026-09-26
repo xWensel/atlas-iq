@@ -1,4 +1,4 @@
-/* Atlas IQ · jukebox: navegador de canciones. Un aviso discreto aparece al cambiar de cancion (con flechas para ir a la anterior o a la siguiente)
+/* Geolite · jukebox: navegador de canciones. Un aviso discreto aparece al cambiar de cancion (con flechas para ir a la anterior o a la siguiente)
  * y el mismo control vive en Ajustes > Sonido. Con la musica desactivada no aparece nunca. Teclas: <- / -> mientras el aviso esta visible. */
 (() => {
   "use strict";

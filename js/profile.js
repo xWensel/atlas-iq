@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - perfil del jugador (v0.6): estadisticas, records, progreso de la Aventura y logros.
+ * Geolite - perfil del jugador (v0.6): estadisticas, records, progreso de la Aventura y logros.
  * Todo vive en localStorage; la capa `A.steam` (si existe) recibe los logros para Steamworks.
  */
 window.AIQ = window.AIQ || {};

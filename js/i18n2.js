@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - traducciones del contenido nuevo (v0.6) a frances, portugues, aleman e italiano.
+ * Geolite - traducciones del contenido nuevo (v0.6) a frances, portugues, aleman e italiano.
  * Clave = texto en ingles; valor = [fr, pt, de, it]. Lo consulta A.tx / A.T (js/support.js). Sin entrada, se usa el ingles.
  * Marcadores {x} se sustituyen con A.tf().
  */

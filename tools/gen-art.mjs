@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - generador de ilustraciones (solo desarrollo, NO forma parte del juego).
+ * Geolite - generador de ilustraciones (solo desarrollo, NO forma parte del juego).
  * (Solo escenas e ilustraciones grandes: los iconos pequenos son vectoriales propios, js/icons.js, y quedan mas coherentes.)
  * Pide a Pollinations imagenes en un estilo unico (pixel art de carta roguelike, paleta Casino) y las guarda en assets/gen/.
  * La clave se lee de POLLINATIONS_KEY (fichero .env.local, ignorado por git y por Vercel). Nunca va en el codigo del juego.
@@ -50,7 +50,7 @@ const M = [
 ];
 
 if (process.argv.includes("--list")) { console.log(M.map(m => m.id).join("\n")); process.exit(0); }
-if (!KEY) { console.error("Falta POLLINATIONS_KEY (pon la clave en atlas-iq/.env.local)"); process.exit(1); }
+if (!KEY) { console.error("Falta POLLINATIONS_KEY (pon la clave en geolite/.env.local)"); process.exit(1); }
 fs.mkdirSync(OUT, { recursive: true });
 const only = process.argv.slice(2).filter(a => !a.startsWith("--"));
 const todo = M.filter(m => (!only.length || only.includes(m.id)) && (only.length || !fs.existsSync(path.join(OUT, m.id + ".jpg"))));

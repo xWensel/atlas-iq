@@ -1,4 +1,4 @@
-/* Atlas IQ v0.10 - retos, puntero y crupier (casino pixel art) */
+/* Geolite v0.10 - retos, puntero y crupier (casino pixel art) */
 
 /* ---------------------------------------------------------------- capas de retos sobre el mapa */
 #chOv { position: absolute; inset: 0; pointer-events: none; --dr: 180px; --da: .95; }

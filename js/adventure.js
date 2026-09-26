@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - AVENTURA (v0.9): el modo roguelike.
+ * Geolite - AVENTURA (v0.9): el modo roguelike.
  * Eres un aventurero que descifra lugares. Cada RONDA es un tema concreto con un banco enorme de lugares (100+ por tema) y una
  * puntuacion objetivo que sube; entre rondas hay campamento (3 cartas y rolear), y cada acto acaba con un jefe.
  * Todo sale de una semilla: partidas aleatorias, y el Reto diario comparte semilla para clasificar. Necesita A.core (game.js) y A.RELICS.

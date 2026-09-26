@@ -1,4 +1,4 @@
-/* Atlas IQ v0.6 - logica del juego, campañas y pantallas. */
+/* Geolite v0.6 - logica del juego, campañas y pantallas. */
 (function (A) {
   const $ = id => document.getElementById(id);
   const KEY = "atlasiq.v2";
@@ -413,7 +413,7 @@ ${A.T("Desbloquea esta ficha: sitúala a menos de 100 km (cuanto más cerca, má
 
   /* ------------------------------------------------------------ veredictos */
   function verdict({ kind, level, tag, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art, lines }) {
-    const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : `<svg><use href="#rose"/></svg>`}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
+    const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : A.icon("logo_mark")}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
     dialog(`<div class="vd">
       <div class="v-main">
         <span class="tag">${tag || A.t("v.level", { n: pad2(level) })}</span>
@@ -466,13 +466,13 @@ ${A.T("Desbloquea esta ficha: sitúala a menos de 100 km (cuanto más cerca, má
     btns.push({ id: "shareBtn", cls: "btn-line", label: A.t("share"), onclick: async () => {
       const text = A.t("share.text", { iq, tier: tierName, s: A.fmt(shown) }), url = location.href.split("#")[0];
       try {
-        if (navigator.share) await navigator.share({ title: "Atlas IQ", text, url });
+        if (navigator.share) await navigator.share({ title: "Geolite", text, url });
         else { await navigator.clipboard.writeText(text + " " + url); const sp = $("shareBtn").querySelector("span"); sp.textContent = A.t("share.copied"); setTimeout(() => (sp.textContent = A.t("share")), 1600); }
       } catch (e) { /* cancelado */ }
     } });
     btns.push({ id: "badgeBtn", cls: "btn-line", label: A.t("btn.badge"), onclick: async () => {
       const cv = await A.makeBadge(iq, tierName, `${A.tx(S.camp.title)} · ${A.fmt(shown)} ${A.t("pts")} · ${S.completed}/${S.camp.levels.length}`);
-      const a = document.createElement("a"); a.download = `atlas-iq-${iq}.png`; a.href = cv.toDataURL("image/png"); a.click();
+      const a = document.createElement("a"); a.download = `geolite-${iq}.png`; a.href = cv.toDataURL("image/png"); a.click();
     } });
     verdict({
       kind: win ? "win" : "", level: S.level + 1, title: win ? A.t("v.win") : A.t("v.no"),

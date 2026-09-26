@@ -1,4 +1,4 @@
-/* Atlas IQ · tips: textos de los tooltips del HUD (se calculan al pasar el puntero: siempre en el idioma y con los numeros actuales).
+/* Geolite · tips: textos de los tooltips del HUD (se calculan al pasar el puntero: siempre en el idioma y con los numeros actuales).
  *  Formato de idioma: "es|en|fr|pt|de|it". Uso: <el data-tf="clave"> -> A.tips.clave(el) devuelve "Titulo\nDescripcion". */
 (() => {
   "use strict";

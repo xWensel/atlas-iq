@@ -1,4 +1,4 @@
-/* Atlas IQ - geometria: proyeccion Miller, distancias y construccion del mundo. */
+/* Geolite - geometria: proyeccion Miller, distancias y construccion del mundo. */
 window.AIQ = window.AIQ || {};
 (function (A) {
   const D2R = Math.PI / 180;

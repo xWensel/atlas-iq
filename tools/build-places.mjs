@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - constructor del banco de lugares y de la Enciclopedia (solo desarrollo).
+ * Geolite - constructor del banco de lugares y de la Enciclopedia (solo desarrollo).
  *   node tools/build-places.mjs            resuelve lo que falte (reanudable: tools/cache/) y regenera data/places.js + data/wiki/*.json
  *   node tools/build-places.mjs --assemble solo ensambla desde la cache
  * Fuentes: listas de tools/places-src.mjs + entradas del juego (tools/codex-entries.json, volcado desde el navegador).
@@ -15,7 +15,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CACHE = path.join(ROOT, "tools", "cache"); fs.mkdirSync(CACHE, { recursive: true });
 const OUT_WIKI = path.join(ROOT, "data", "wiki"); fs.mkdirSync(OUT_WIKI, { recursive: true });
 const LANGS = ["en", "es", "fr", "pt", "de", "it"];
-const UA = { "User-Agent": "AtlasIQ-builder/1.0 (https://github.com/xWensel/atlas-iq; educational geography game; polite batch job)", "Api-User-Agent": "AtlasIQ-builder/1.0 (https://github.com/xWensel/atlas-iq)" };
+const UA = { "User-Agent": "Geolite-builder/1.0 (https://github.com/xWensel/geolite; educational geography game; polite batch job)", "Api-User-Agent": "Geolite-builder/1.0 (https://github.com/xWensel/geolite)" };
 
 /* ---- claves estables identicas a las del juego (A.ckey de data/codex.js) ---- */
 const ctx = { window: {} }; vm.createContext(ctx);

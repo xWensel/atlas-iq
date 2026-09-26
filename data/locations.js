@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - preguntas y niveles (contenido propio).
+ * Geolite - preguntas y niveles (contenido propio).
  * Punto:  P(en, es, paisEn, paisEs, lat, lon, datoEn, datoEs)
  * Pais:   C(nombreEnNaturalEarth, es, datoEn, datoEs)   -> se acierta haciendo clic DENTRO del pais
  */

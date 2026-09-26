@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - PUNTERO (v0.10). El puntero es la HERRAMIENTA del jugador: un retículo de pixel art que reacciona al mapa (mar / tierra), a la
+ * Geolite - PUNTERO (v0.10). El puntero es la HERRAMIENTA del jugador: un retículo de pixel art que reacciona al mapa (mar / tierra), a la
  * herramienta activa (sonar, brújula) y a las reliquias: linterna (haz de luz), lupa (fronteras verdaderas), coordenadas, guías, mira telescópica...
  * Todo va en DOM/canvas pequeño; las capas de retos (js/challenges.js) leen su posicion en --px / --py.
  */

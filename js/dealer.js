@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - EL CRUPIER (v0.10). El "jefe" de la mesa: un croupier de pixel art que habla con sonidos arcade (una silaba por letra),
+ * Geolite - EL CRUPIER (v0.10). El "jefe" de la mesa: un croupier de pixel art que habla con sonidos arcade (una silaba por letra),
  * anuncia los retos, se rie cuando fallas, se sorprende con una diana y protesta cuando lo esquivas con una reliquia.
  *   A.dealer.say(linea, {mood, hold})   A.dealer.react(tipo, datos)   A.dealer.intro(host, lineas)   A.dealer.enable(on)
  */

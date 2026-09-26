@@ -1,8 +1,8 @@
-# Atlas IQ en Steam - lista de pendientes
+# Geolite en Steam - lista de pendientes
 
 ## Bloqueantes
 - [ ] **Derechos del modo Clásico.** Reproduce preguntas y puntuación de Traveler IQ Challenge. Para vender: permiso escrito de sus autores, o quitar/rehacer el Clásico con contenido propio. Aventura, Extendido y Enciclopedia son propios.
-- [ ] Nombre "Atlas IQ": comprobar marcas registradas. No usar "Balatro" en la tienda ni copiar sus recursos.
+- [ ] Nombre "Geolite": comprobar marcas registradas. No usar "Balatro" en la tienda ni copiar sus recursos.
 - [ ] Atribución de Wikipedia (CC BY-SA 4.0) y de las fotos de Commons dentro del juego (ya se muestra por tarjeta; añadir pantalla de créditos).
 - [ ] Modo sin conexión: empaquetar textos y fotos de la Enciclopedia (con su licencia) en vez de pedirlos a Wikipedia en tiempo real.
 

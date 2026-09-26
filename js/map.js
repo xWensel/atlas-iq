@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - visor del mapa (v0.3, WebGL2).
+ * Geolite - visor del mapa (v0.3, WebGL2).
  *
  *  El mapa se dibuja SIEMPRE como vector puro en la GPU, en cada frame y a la resolucion real de la pantalla:
  *    - Los paises se trianguian una sola vez (earcut) y viven en buffers de la GPU.
@@ -983,7 +983,7 @@ void main(){
       }
       if (now < this._probeAnim || this.probes.some(p => p.km || p.bearing != null)) this.fxDirty = true;   // el borde discontinuo se anima
     }
-    _fd() { return getComputedStyle(document.documentElement).getPropertyValue("--serif") || "Fraunces, Georgia, serif"; }
+    _fd() { return getComputedStyle(document.documentElement).getPropertyValue("--serif") || "Jersey 15, sans-serif"; }
     _fm() { return getComputedStyle(document.documentElement).getPropertyValue("--mono") || "'DM Mono', monospace"; }
     _rgba(h, a) { const [r, g, b] = hex(h); return `rgba(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)},${a})`; }
     _line(c, m, G, Aa, age) {

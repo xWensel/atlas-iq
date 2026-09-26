@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - Enciclopedia geografica (v0.5).
+ * Geolite - Enciclopedia geografica (v0.5).
  *
  *  - Cada lugar del juego (ciudades, capitales, monumentos, maravillas, mares, estrechos, batallas, sucesos, apodos...) es una tarjeta.
  *    Empiezan BLOQUEADAS y se desbloquean al acertarlas. Un acierto puede desbloquear ademas el pais, personajes, sucesos y curiosidades.

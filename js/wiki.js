@@ -1,5 +1,5 @@
 /*
- * Atlas IQ - contenido de la Enciclopedia EMPAQUETADO (v0.9). Los textos (en 6 idiomas), las fotos y sus creditos se descargaron una vez
+ * Geolite - contenido de la Enciclopedia EMPAQUETADO (v0.9). Los textos (en 6 idiomas), las fotos y sus creditos se descargaron una vez
  * de Wikipedia/Wikimedia Commons con tools/build-places.mjs y viven en data/wiki/. Asi la Enciclopedia esta completa y funciona sin conexion.
  * Formato data/wiki/<idioma>.json: { id: [titulo, descripcion, texto, historia] }   data/wiki/img.json: { id: [origen, ancho, alto, [autor, licencia, pagina]] }
  */

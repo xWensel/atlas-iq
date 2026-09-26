@@ -1,4 +1,4 @@
-/* Atlas IQ - traducciones del modo Clasico. El juego original solo estaba en ingles: aqui van sus niveles, nombres y datos curiosos
+/* Geolite - traducciones del modo Clasico. El juego original solo estaba en ingles: aqui van sus niveles, nombres y datos curiosos
  * en 6 idiomas [en (corregido), es, fr, pt, de, it]. Los nombres que no aparecen se buscan en data/places.js y, si no, se dejan tal cual
  * (la mayoria de ciudades se llaman igual en todos los idiomas). Lo usa data/campaigns.js. */
 window.AIQ = window.AIQ || {};

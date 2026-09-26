@@ -1,5 +1,5 @@
 /* ==================================================================== premium.css */
-/* Atlas IQ v0.9 - capa PREMIUM: pixel art de estudio unico, casino x geografia, pantallas que usan toda la pantalla.
+/* Geolite v0.9 - capa PREMIUM: pixel art de estudio unico, casino x geografia, pantallas que usan toda la pantalla.
    Se carga la ultima y manda sobre lo anterior. */
 
 /* ---------- imagenes: pixel art nitido, sombra de pegatina ---------- */
@@ -59,7 +59,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .hh-cards { padding: clamp(18px, 3.5vh, 40px) 0 clamp(8px, 2vh, 24px); }
 
 /* ==================================================================== premium2.css */
-/* Atlas IQ v0.9 - premium (parte 2): campamento/cofre, intro de ronda, veredictos y marcador de partida. */
+/* Geolite v0.9 - premium (parte 2): campamento/cofre, intro de ronda, veredictos y marcador de partida. */
 
 /* ======================= CAMPAMENTO / COFRE: cartas flotando sobre el mapa ======================= */
 #layer:has(#dlg.tablewrap) { pointer-events: auto; background: radial-gradient(ellipse at 50% 42%, rgba(6, 16, 22, .28), rgba(8, 4, 20, .86) 86%); }
@@ -110,7 +110,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .v-lines li { display: flex; align-items: baseline; gap: 10px; font-family: var(--mono); font-size: 14px; letter-spacing: .06em; color: rgba(242, 233, 214, .85); animation: rise .4s both; } .v-lines li i { flex: 1; border-bottom: 2px dotted rgba(242, 233, 214, .3); transform: translateY(-4px); } .v-lines li b { color: #ffe08a; font-weight: 500; }
 
 /* ==================================================================== premium3.css */
-/* Atlas IQ v0.9 - premium (parte 3): ajustes finos de campamento, cartas y marcador. */
+/* Geolite v0.9 - premium (parte 3): ajustes finos de campamento, cartas y marcador. */
 .table { grid-template-rows: auto auto minmax(0, 1fr) auto auto; padding-top: clamp(8px, 1.6vh, 20px); gap: clamp(2px, .6vh, 8px); }
 .tb-title h2 { font-size: clamp(28px, 4.6vh, 58px); margin-top: 3px; } .tb-title .tag { font-size: 10px; padding: 3px 8px 2px; }
 .tb-coins { padding: 5px 18px 5px 8px; } .tb-coins .ic { width: clamp(30px, 4.2vh, 46px); height: clamp(30px, 4.2vh, 46px); } .tb-coins b { font-size: clamp(22px, 3.6vh, 38px); }
@@ -130,7 +130,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 #dlg.tablewrap, #dlg.home { position: absolute; inset: 0; width: auto; height: auto; }
 
 /* ==================================================================== premium4.css */
-/* Atlas IQ v0.9 - premium (parte 4): sub-pantallas a pantalla completa (Aventura, Clasico, Competitivo, Perfil). */
+/* Geolite v0.9 - premium (parte 4): sub-pantallas a pantalla completa (Aventura, Clasico, Competitivo, Perfil). */
 .scr { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); padding: clamp(12px, 2.4vh, 28px) clamp(16px, 4vw, 64px); gap: clamp(8px, 1.6vh, 18px); color: var(--paper); max-width: 1640px; margin: 0 auto; }
 .scr-head { position: relative; display: flex; align-items: center; gap: clamp(12px, 2vw, 28px); }
 .scr-head h2 { margin: 0; flex: 1; font-family: var(--serif); font-weight: 900; font-size: clamp(34px, 6vh, 72px); line-height: .95; text-shadow: 0 5px 0 rgba(8, 4, 20, .7); }
