@@ -11,15 +11,15 @@ window.AIQ = window.AIQ || {};
   const $ = id => document.getElementById(id);
   const STORE = "atlasiq.codex.v1";
   const RARITY = ["common", "uncommon", "rare", "legendary"];
-  const TYPES = ["city", "capital", "country", "landmark", "nature", "water", "strait", "battle", "event", "person", "curiosity", "place"];
-  const TYPE_KEY = { person: "type.person", curiosity: "type.curiosity" };
+  const TYPES = ["city", "capital", "country", "landmark", "nature", "water", "strait", "battle", "event", "history", "person", "curiosity", "place"];
+  const TYPE_KEY = { person: "type.person", curiosity: "type.curiosity", history: "type.history" };
   const typeLabel = t => A.t(TYPE_KEY[t] || "kind." + t);
   const CONT = { af: "cont.af", na: "cont.na", sa: "cont.sa", as: "cont.as", eu: "cont.eu", oc: "cont.oc", an: "cont.an", sea: "cont.sea" };
 
   /* iconos propios por tipo (js/icons.js) */
-  const TYPE_IC = { city: "t_city", capital: "t_capital", country: "t_country", landmark: "t_landmark", nature: "t_nature", water: "t_water", strait: "t_strait", battle: "t_battle", event: "t_event", person: "t_person", curiosity: "t_curio", place: "t_place" };
+  const TYPE_IC = { city: "t_city", capital: "t_capital", country: "t_country", landmark: "t_landmark", nature: "t_nature", water: "t_water", strait: "t_strait", battle: "t_battle", event: "t_event", history: "chronicler", person: "t_person", curiosity: "t_curio", place: "t_place" };
   /* cada tarjeta lleva indice de carta de poker: rango por rareza (5, 8, K, A) y palo geografico por tipo */
-  const TYPE_SUIT = { city: "s_pin", capital: "s_compass", country: "s_compass", landmark: "s_peak", nature: "s_peak", water: "s_palm", strait: "s_palm", battle: "s_peak", event: "s_pin", person: "s_compass", curiosity: "s_palm", place: "s_pin" };
+  const TYPE_SUIT = { city: "s_pin", capital: "s_compass", country: "s_compass", landmark: "s_peak", nature: "s_peak", water: "s_palm", strait: "s_palm", battle: "s_peak", event: "s_pin", history: "s_peak", person: "s_compass", curiosity: "s_palm", place: "s_pin" };
   const RANK = ["5", "8", "K", "A"], SUIT_RED = { s_pin: 1, s_compass: 1 };
   const ixs = e => { const su = TYPE_SUIT[e.type] || "s_pin", red = SUIT_RED[su] ? " red" : ""; return `<span class="ix tl${red}"><b>${RANK[e.rarity]}</b>${A.icon(su)}</span><span class="ix br${red}"><b>${RANK[e.rarity]}</b>${A.icon(su)}</span>`; };
   const iconSvg = t => A.icon(TYPE_IC[t] || "t_place", "cx-ic");
@@ -147,6 +147,12 @@ window.AIQ = window.AIQ || {};
       add({ id, type, name: { en: wiki, es }, wiki, lat, lon, country: null, fact: { en: "", es: "" }, rarity: type === "person" ? 2 : type === "event" ? 1 : 1, src: "curated", triggers: trig, nogeo: true });
       trig.forEach(t => (chain[t] = chain[t] || []).push(id));
     });
+    // 6) cada lugar del banco tiene 3 entradas: el lugar (<= 300 km), su historia (<= 150 km) y su dato clave (<= 75 km)
+    (A.PLACES || []).forEach(([id]) => {
+      const p = E[id]; if (!p) return;
+      add({ id: id + "~h", type: "history", name: p.name, wiki: p.wiki, lat: p.lat, lon: p.lon, country: p.country, fact: { en: "", es: "" }, rarity: 2, src: "tier", tier: 2, parent: id, nogeo: p.nogeo });
+      add({ id: id + "~k", type: "curiosity", name: p.name, wiki: p.wiki, lat: p.lat, lon: p.lon, country: p.country, fact: { en: "", es: "" }, rarity: 3, src: "tier", tier: 3, parent: id, nogeo: p.nogeo });
+    });
     // los personajes sin nada relacionado no existen; el resto se numera
     order.forEach((id, i) => { E[id].no = i + 1; });
   }
@@ -157,10 +163,10 @@ window.AIQ = window.AIQ || {};
     if (!E[id] || store.unlocked[id]) return false;
     store.unlocked[id] = { t: Date.now(), tier }; out.push(id); return true;
   }
-  /* Desbloqueo por PRECISION (km al objetivo; 0 = dentro del pais):
-       <= 100 km  el lugar (y su pais)      <= 50 km  sucesos y curiosidades relacionados      <= 40 km  personajes y todo lo demas
+  /* Desbloqueo por PRECISION (km al objetivo; 0 = dentro del pais). Cada lugar tiene 3 entradas:
+       <= 300 km  el lugar (generica, y su pais)      <= 150 km  su historia + sucesos relacionados      <= 75 km  su dato clave + personajes y curiosidades
      Las zonas enormes (mares, naturaleza, estrechos) tienen umbrales x2.  Devuelve { added: [ids], level: 0..3 }. */
-  const LIM = [100, 50, 40];
+  const LIM = [300, 150, 75];
   const SCALE = { water: 2, nature: 2, strait: 2 };
   A.codexUnlock = (q, km) => {
     const out = { added: [], level: 0 };
@@ -168,10 +174,12 @@ window.AIQ = window.AIQ || {};
     const first = E[q.cid[0]], sc = (first && SCALE[first.type]) || 1;
     const level = km <= LIM[2] * sc ? 3 : km <= LIM[1] * sc ? 2 : km <= LIM[0] * sc ? 1 : 0;
     out.level = level; if (!level) return out;
-    const lateral = x => (E[x].type === "event" || E[x].type === "curiosity" || E[x].type === "battle") ? 2 : 3;
+    const lateral = x => (E[x].type === "event" || E[x].type === "battle") ? 2 : 3;
     for (const cid of q.cid) {
       const e = E[cid]; if (!e) continue;
       unlockOne(cid, level, out.added);
+      if (level >= 2 && E[cid + "~h"]) unlockOne(cid + "~h", level, out.added);
+      if (level >= 3 && E[cid + "~k"]) unlockOne(cid + "~k", level, out.added);
       if (e.country && E["c:" + e.country]) unlockOne("c:" + e.country, level, out.added);
       for (const x of (chain[cid] || []).concat(e.country ? chain["c:" + e.country] || [] : [])) if (level >= lateral(x)) unlockOne(x, level, out.added);
     }
@@ -180,6 +188,7 @@ window.AIQ = window.AIQ || {};
   };
   const byType = () => { const cnt = {}; order.forEach(id => { const e = E[id], c = cnt[e.type] || (cnt[e.type] = [0, 0]); c[1]++; if (isUnlocked(id)) c[0]++; }); return cnt; };
   const emitStats = () => { if (A.ach) { const st = stats(); A.ach.emit("codex", { u: st.u, t: st.t, by: byType() }); } };
+  A.codexLimits = e => { const sc = (E[(e && e.parent) || (e && e.id)] && SCALE[E[(e && e.parent) || e.id].type]) || 1; return LIM.map(x => x * sc); };
   A.continent = continent;
 
   /* ================================================================== Wikipedia (con cache en IndexedDB) */
@@ -277,7 +286,9 @@ window.AIQ = window.AIQ || {};
     } catch (x) { return { history: "", historyTitle: "", full: "" }; }
   }
   const contentMem = {};
+  const memOf = id => contentMem[A.lang + ":" + ((E[id] && E[id].parent) || id)];
   async function loadContent(e, lang, force) {
+    if (e.parent) e = E[e.parent];
     const key = lang + ":" + e.id;
     if (!force && contentMem[key]) return contentMem[key];
     if (!force) { const pk = await A.wiki.get(e.id, lang); if (pk) return (contentMem[key] = pk); }
@@ -296,12 +307,12 @@ window.AIQ = window.AIQ || {};
     const rec = { t: Date.now(), lang: wl, title: s.title, desc: s.description || "", extract: s.extract || "", history: sec.history, historyTitle: sec.historyTitle, more: sec.full, url: s.content_urls && s.content_urls.desktop && s.content_urls.desktop.page, img, credit: cred };
     idb.set(key, rec); return (contentMem[key] = rec);
   }
-  function prefetch(ids) { ids.slice(0, 4).forEach(id => loadContent(E[id], A.lang).then(() => notify("content", id)).catch(() => {})); }
+  function prefetch(ids) { [...new Set(ids.map(id => E[id].parent || id))].slice(0, 4).forEach(id => loadContent(E[id], A.lang).then(() => notify("content", id)).catch(() => {})); }
   const notifiers = []; const notify = (k, id) => notifiers.forEach(f => f(k, id));
 
   /* ================================================================== interfaz */
   const ui = { built: false, filter: "all", sort: "recent", only: false, q: "", shown: 0, list: [], cur: null, tilt: null };
-  const nameOf = (e, rec) => (A.lang === "es" && e.name.es) || (rec && rec.title && rec.lang === A.lang ? rec.title : "") || (A.lang === "en" ? e.name.en : e.name.es || e.name.en);
+  const nameOf = (e, rec) => e.parent ? nameOf(E[e.parent], rec) + " · " + A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : (A.lang === "es" && e.name.es) || (rec && rec.title && rec.lang === A.lang ? rec.title : "") || (A.lang === "en" ? e.name.en : e.name.es || e.name.en);
   const rarDots = r => A.icon("g_" + r, "gem").repeat(r + 1);
   const contOf = e => A.t(CONT[continent(e.lat, e.lon)]);
   const fmtNo = n => "Nº " + String(n).padStart(3, "0");
@@ -357,10 +368,10 @@ window.AIQ = window.AIQ || {};
     const q = ui.q, list = order.filter(id => {
       const e = E[id]; if (ui.filter !== "all" && e.type !== ui.filter) return false;
       const un = isUnlocked(id); if (ui.only && !un) return false;
-      if (q) { if (!un) return false; const rec = contentMem[A.lang + ":" + id]; return (nameOf(e, rec) + " " + e.name.en + " " + (e.name.es || "")).toLowerCase().includes(q); }
+      if (q) { if (!un) return false; const rec = memOf(id); return (nameOf(e, rec) + " " + e.name.en + " " + (e.name.es || "")).toLowerCase().includes(q); }
       return true;
     });
-    const nm = id => nameOf(E[id], contentMem[A.lang + ":" + id]).toLowerCase();
+    const nm = id => nameOf(E[id], memOf(id)).toLowerCase();
     if (ui.sort === "az") list.sort((a, b) => (isUnlocked(b) - isUnlocked(a)) || nm(a).localeCompare(nm(b), A.lang));
     else if (ui.sort === "rarity") list.sort((a, b) => (isUnlocked(b) - isUnlocked(a)) || (E[b].rarity - E[a].rarity) || (E[a].no - E[b].no));
     else list.sort((a, b) => ((store.unlocked[b] ? store.unlocked[b].t : 0) - (store.unlocked[a] ? store.unlocked[a].t : 0)) || (E[a].no - E[b].no));
@@ -381,7 +392,7 @@ window.AIQ = window.AIQ || {};
   function cardEl(id) {
     const e = E[id], un = isUnlocked(id), b = document.createElement("button"); b.type = "button"; b.dataset.id = id;
     b.className = `cx-card r${e.rarity} ${un ? "open" : "locked"}${un && !store.seen[id] ? " fresh" : ""}`;
-    const rec = contentMem[A.lang + ":" + id];
+    const rec = memOf(id);
     b.innerHTML = `<span class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}</span>
       ${ixs(e)}<span class="cx-nm">${un ? nameOf(e, rec) : "· · ·"}</span>
       <span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span><span class="cx-no">${fmtNo(e.no)}</span>${un && !store.seen[id] ? `<span class="cx-new">${A.t("codex.new")}</span>` : ""}`;
@@ -409,6 +420,8 @@ window.AIQ = window.AIQ || {};
   /* ---------------- detalle ---------------- */
   function relatedOf(e) {
     const ids = new Set();
+    if (e.parent) { ids.add(e.parent); ids.add(e.parent + (e.tier === 2 ? "~k" : "~h")); }
+    else if (E[e.id + "~h"]) { ids.add(e.id + "~h"); ids.add(e.id + "~k"); }
     if (e.src === "curated") (e.triggers || []).forEach(t => { if (E[t]) ids.add(t); });
     (chain[e.id] || []).forEach(x => ids.add(x));
     if (e.country && E["c:" + e.country]) ids.add("c:" + e.country);
@@ -425,8 +438,8 @@ window.AIQ = window.AIQ || {};
     ui.cur = null; $("cxDetail").classList.add("hidden"); $("cxGrid").classList.remove("hidden"); $("cxFilters").classList.remove("hidden"); document.querySelector("#codex .cx-tools").classList.remove("hidden"); A.sfx.ui();
   }
   async function renderDetail(id) {
-    const e = E[id], un = isUnlocked(id), d = $("cxDetail"), rec = un ? contentMem[A.lang + ":" + id] : null;
-    const rel = relatedOf(e).map(x => { const o = E[x], u = isUnlocked(x); return `<button class="cx-rel ${u ? "" : "lk"}" data-id="${x}" type="button">${iconSvg(o.type)}<span>${u ? nameOf(o, contentMem[A.lang + ":" + x]) : "???"}</span></button>`; }).join("");
+    const e = E[id], un = isUnlocked(id), d = $("cxDetail"), rec = un ? memOf(id) : null;
+    const rel = relatedOf(e).map(x => { const o = E[x], u = isUnlocked(x); return `<button class="cx-rel ${u ? "" : "lk"}" data-id="${x}" type="button">${iconSvg(o.type)}<span>${u ? nameOf(o, memOf(x)) : "???"}</span></button>`; }).join("");
     const factLine = un ? A.tx(e.fact) : "";
     d.innerHTML = `
       <div class="cx-d-wrap">
@@ -440,7 +453,7 @@ window.AIQ = window.AIQ || {};
           <div class="cx-d-tags"><span class="tag">${typeLabel(e.type)}</span><span class="tag r">${A.t("rar." + RARITY[e.rarity])} ${rarDots(e.rarity)}</span>${e.lat != null ? `<span class="tag c">${A.icon("k_" + continent(e.lat, e.lon), "sm")}${contOf(e)}</span>` : ""}</div>
           <h2>${un ? nameOf(e, rec) : "???"}</h2>
           ${un && rec && rec.desc ? `<p class="cx-desc">${rec.desc}</p>` : ""}
-          ${un ? "" : `<p class="cx-hint">${e.src === "curated" ? A.t("codex.hint.chain") : A.t("codex.hint.place")}</p>`}
+          ${un ? "" : `<p class="cx-hint">${e.parent ? A.t("codex.hint.tier", { km: A.codexLimits(e)[e.tier - 1] }) : e.src === "curated" ? A.t("codex.hint.chain") : A.t("codex.hint.place")}</p>`}
           ${un && factLine ? `<blockquote class="cx-fact">${factLine}</blockquote>` : ""}
           ${un ? `<div class="cx-sec" id="cxText"><p class="cx-load">${A.t("codex.loading")}</p></div>` : ""}
           ${rel ? `<div class="cx-sec"><h3>${A.t("codex.related")}</h3><div class="cx-rels">${rel}</div></div>` : ""}
@@ -461,12 +474,25 @@ window.AIQ = window.AIQ || {};
     if (rec.none) { box().innerHTML = `<p class="cx-load">${A.t("codex.nodesc")}</p>`; return; }
     const par = t => String(t || "").split(/\n{2,}|\n/).filter(x => x.trim()).map(x => `<p>${x.replace(/</g, "&lt;")}</p>`).join("");
     const heroWanted = rec.img && !$("cxHero");
-    box().innerHTML = `<h3>${A.t("codex.about")}</h3>${par(rec.extract)}${rec.history ? `<h3>${A.t("codex.history")}</h3>${par(rec.history)}` : rec.more ? `<h3>${A.t("codex.history")}</h3>${par(rec.more)}` : ""}
+    const T = tiers(rec), body = e.parent ? (e.tier === 2 ? T.hist : T.key) : T.intro, head = e.parent ? A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : A.t("codex.about");
+    box().innerHTML = `<h3>${head}</h3>${par(body || rec.extract)}
       <p class="cx-src">${A.t("codex.license")} · <a href="${rec.url || "#"}" target="_blank" rel="noopener">${A.t("codex.wiki")} ↗</a></p>`;
     if (heroWanted) renderDetail(id);
   }
+  /* 3 textos a partir del articulo del lugar: generico (descripcion + inicio), historia y dato clave (el resto del texto de cabecera) */
+  const tierMem = {};
+  function tiers(rec) {
+    const k = rec.lang + ":" + rec.title; if (tierMem[k]) return tierMem[k];
+    const sents = A.sentences(A.cleanText(rec.extract)), hist = A.cleanText(rec.history).split(/\n+/).filter(x => x.trim());
+    let n = 0, len = 0; while (n < sents.length && (n < 2 || len < 200) && n < 3) len += sents[n++].length;
+    const intro = sents.slice(0, n).join(" "), rest = sents.slice(n);
+    let histP = hist, key = rest.join(" ");
+    if (key.length < 90 && hist.length > 1) { const h = Math.ceil(hist.length / 2); histP = hist.slice(0, h); key = (key ? key + "\n" : "") + hist.slice(h).join("\n"); }   // extractos muy cortos: la historia se reparte
+    if (!histP.length && rest.length > 2) { const h = Math.ceil(rest.length / 2); histP = [rest.slice(0, h).join(" ")]; key = rest.slice(h).join(" "); }
+    return (tierMem[k] = { intro: intro || A.cleanText(rec.extract), hist: histP.join("\n"), key });
+  }
   function lightbox(id) {
-    const rec = contentMem[A.lang + ":" + id], L = $("cxLight"); if (!rec || !rec.img) return;
+    const rec = memOf(id), L = $("cxLight"); if (!rec || !rec.img) return;
     L.innerHTML = `<img alt="" src="${rec.img.hd}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">${A.icon("u_close")}</button><p>${rec.credit ? (rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "") : ""}</p>`;
     L.classList.remove("hidden"); L.onclick = () => L.classList.add("hidden"); A.sfx.card();
   }
@@ -486,7 +512,7 @@ window.AIQ = window.AIQ || {};
     if (!ids.length) return;
     let el = $("cxToast"); if (!el) { el = document.createElement("button"); el.id = "cxToast"; el.type = "button"; el.className = "cx-toast hidden"; $("app").appendChild(el); }
     const e = E[ids[0]], more = ids.length - 1;
-    el.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, contentMem[A.lang + ":" + ids[0]])}</b>${more > 0 ? `<i>${A.t("codex.newmore", { n: more })}</i>` : ""}</span>`;
+    el.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, memOf(ids[0]))}</b>${more > 0 ? `<i>${A.t("codex.newmore", { n: more })}</i>` : ""}</span>`;
     el.onclick = () => { el.classList.add("hidden"); open(ids[0]); };
     el.classList.remove("hidden", "in"); void el.offsetWidth; el.classList.add("in"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.add("hidden"), 7000);
     loadContent(e, A.lang).then(rec => { if (rec && rec.img && el.isConnected) { const im = new Image(); im.onload = () => { const a = el.querySelector(".cx-art"); if (a) a.prepend(im); }; im.src = rec.img.thumb; im.alt = ""; } }).catch(() => {});

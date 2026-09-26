@@ -398,7 +398,7 @@
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
       ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${A.T("doblones", "doubloons")}</div>` : ""}
       ${guess ? `<div class="tk-cx l${cxr.level}" data-tt="${A.t("codex.title")}
-${A.T("Desbloquea esta ficha: sitúala a menos de 100 km (cuanto más cerca, más fichas relacionadas).", "Unlock this card: pin it within 100 km (the closer, the more related cards).")}"><span>${A.t("codex.title")}</span><i><u></u><u></u><u></u></i><b>${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;100 km"}</b></div>` : ""}
+${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km su historia y a menos de 75 km su dato clave.", "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.")}"><span>${A.t("codex.title")}</span><i><u></u><u></u><u></u></i><b>${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;300 km"}</b></div>` : ""}
       <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });

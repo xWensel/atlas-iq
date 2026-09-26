@@ -39,6 +39,24 @@ window.AIQ = window.AIQ || {};
     }
     return depth ? out + s.slice(start) : out;
   };
+  /* texto largo (Enciclopedia): quita pronunciaciones y parentesis raros, sin recortar nada */
+  A.cleanText = raw => {
+    let s = String(raw || "").replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/[ \t]+/g, " ");
+    s = stripParens(s).replace(/\s*\[[^\]]{1,90}\]/g, "").replace(/\s*\/[^\/\n]*[ɐ-˿̀-ͯ]+[^\/\n]*\//g, "").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/\.\.(?!\.)/g, ".");
+    return s.replace(/\s+([,.;:])/g, "$1").replace(/,\s*\./g, ".").replace(/[ \t]{2,}/g, " ").replace(/ *\n */g, "\n").trim();
+  };
+  /* frases completas (no parte en abreviaturas ni iniciales) */
+  const ABBR = new Set("a.c d.c a.m p.m st sta sto dr dra sr sra mr mrs ms mt vs etc no núm n.º fig cf ca c s ss pp p vol ed jr gen col cap prof pág av dept est ex approx inc ltd co corp u.s u.k e.g i.e mme mlle dott ing avv sig fr".split(" "));
+  A.sentences = raw => {
+    const t = String(raw || "").replace(/\s+/g, " ").trim(), out = []; let start = 0, m;
+    const re = /[.!?…]["»”)]?(?=\s+["«“¿¡(]?[A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÑÇÅØÆŒÐÞ0-9])/g;
+    while ((m = re.exec(t))) {
+      const w = (t.slice(start, m.index).match(/([\p{L}.]+)$/u) || [])[1] || "", tok = w.toLowerCase().replace(/\.$/, "");
+      if (tok.length <= 1 || ABBR.has(tok)) continue;
+      out.push(t.slice(start, m.index + m[0].length).trim()); start = m.index + m[0].length;
+    }
+    const rest = t.slice(start).trim(); if (rest) out.push(rest); return out;
+  };
   A.cleanFact = raw => {
     let s = String(raw || "").replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/\s+/g, " ").trim(); if (!s) return "";
     const truncated = !/[.!?…»”)]$/.test(s) || /(^|\s)\S{1,2}\.$/.test(s);

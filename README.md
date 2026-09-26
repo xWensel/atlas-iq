@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.16** - Enciclopedia por niveles de precision. Cada lugar del juego tiene ahora 3 entradas: a **menos de 300 km** se abre la generica (el lugar y su pais), a **menos de 150 km** su **Historia** (y sucesos relacionados) y a **menos de 75 km** su **Dato clave** (y personajes y curiosidades relacionados). Las zonas enormes (mares, naturaleza, estrechos) tienen los umbrales x2. Los textos salen de los articulos de Wikipedia ya empaquetados (descripcion + inicio, seccion de historia, resto del texto de cabecera), en los 6 idiomas; la Enciclopedia pasa de 1.793 a 4.307 entradas. El ticket de resultado muestra los tres niveles.
+
 **v0.15** - Nuevo nombre y arte unificado.
 - **Geolite:** nombre, textos en los 6 idiomas, manifiesto, titulo, herramientas y documentos actualizados. Logo nuevo en pixel art casino (letras doradas con bombillas de marquesina y la O convertida en globo) y escudo del juego (globo con anillo de bombillas y chincheta) para la marca del HUD, el menu y los iconos de la app (favicon, PWA, iOS).
 - **Revision completa del arte:** fuera el favicon y la rosa de los vientos vectoriales, el respaldo vectorial de iconos y escenas (~70 KB de dibujos antiguos), las tipografias del aspecto antiguo (Fraunces, Bricolage, DM Mono) y los iconos y escena de piezas ya retiradas (reliquias podadas, modo Extendido). Todo lo que se ve es ahora pixel art casino generado con el mismo libro de estilo (`tools/gen_art.py`).
