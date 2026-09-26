@@ -260,3 +260,43 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 .np-set .np-t b { font-size: 12px; letter-spacing: .03em; }
 /* escudo = la Tierra con la carta y la ficha (48 px nativos): tamanos que son multiplos enteros */
 .brand-rose { width: 32px; height: 32px; } .menu-rose { width: 96px; height: 96px; } .idcard img.ic { width: 48px; height: 48px; }
+
+/* pixel art nitido: los recursos grandes (escenas, cartas, iconos grandes, crupier) se amplian sin suavizar; los iconos pequenos se reducen desde un original nitido */
+.pic-img, .cx-ph, .cx-art img, .cx-bigcard img, .of-ico .ic, .tl-ico .ic, .dc-art .ic, .intro-num .ic, .nx-ic .ic, .sp-ic .ic, .dl-face, .ic.big, .mc-win img { image-rendering: pixelated; }
+
+/* ==== legibilidad (v0.22): tipografias pixel mas grandes y nitidas; la placa de la pregunta NO se toca ==== */
+html body { -webkit-font-smoothing: none; font-smooth: never; text-rendering: optimizeSpeed; }
+html body .brand-txt > i { font-size: 12.5px; } html body .mc-desc { font-size: 16px; line-height: 1.25; } html body .mc-stat { font-size: 12.5px; } html body .mc-ribbon { font-size: 12.5px; }
+html body .hr-t > b { font-size: 17px; } html body .hr-t > i { font-size: 15px; } html body .cs-t > i { font-size: 12.5px; } html body .hh-ver { font-size: 12.5px; }
+html body .tag { font-size: 12.5px; } html body #plate .tag { font-size: 10.5px; }
+html body .dc-d { font-size: 15px; } html body .dc-kit > em { font-size: 12.5px; } html body .rm-node > em { font-size: 12.5px; } html body .adv-stats > span { font-size: 12px; }
+html body .sb-t > i { font-size: 12.5px; } html body .mode-d { font-size: 17px; } html body .nick > span { font-size: 12.5px; } html body .dy-body > i { font-size: 17px; }
+html body .lb-src, html body .lb-empty { font-size: 12.5px; } html body .camp-d { font-size: 17px; } html body .camp-m > span { font-size: 12.5px; } html body .pf-cell > span { font-size: 12.5px; }
+html body .ach > i { font-size: 16px; } html body .ach-t > i { font-size: 16px; } html body .ach-t > em { font-size: 12.5px; }
+html body .cx-title > p { font-size: 13px; } html body .cx-chip, html body .cx-chip > span, html body .cx-chip > em { font-size: 12.5px; } html body .cx-nm { font-size: 17px; } html body .cx-mt > em { font-size: 12px; } html body .cx-new { font-size: 12px; }
+html body .cx-tt > em, html body .cx-tt > i { font-size: 12.5px; }
+html body .set-head > span { font-size: 13px; } html body .seg > button { font-size: 12.5px; } html body .set-sec > h3 { font-size: 12.5px; } html body .langgrid > button { font-size: 13px; } html body .set-note { font-size: 16px; line-height: 1.25; } html body .rs-t > small { font-size: 15px; line-height: 1.2; }
+html body .adv-chal-h { font-size: 12.5px; } html body .ab-act { font-size: 12.5px; } html body .ch-chip > b { font-size: 12.5px; } html body .ch-chip .ch-lv { font-size: 11px; }
+html body .tk-band > span { font-size: 12.5px; } html body .tk-from { font-size: 17px; } html body .tk-total > span { font-size: 13px; } html body .tk-cx > span, html body .tk-cx > b { font-size: 12.5px; }
+html body .nx-n, html body .nx-none, html body .nx-hint, html body .nx-have, html body .ch-buy { font-size: 12.5px; } html body .nx-body > p { font-size: 16px; }
+html body .tb-note { font-size: 17px; } html body .sp-t > i { font-size: 15px; } html body .of-r { font-size: 12px; } html body .offer > p, html body .table .offer.pc p { font-size: 16px; line-height: 1.2; } html body .tray-col > h4 { font-size: 12.5px; } html body .inv-perk > em { font-size: 12px; }
+html body .tour-txt { font-size: 17px; } html body .dl-bubble p { font-size: inherit; }
+
+/* ==== v0.22: columna izquierda (placa de la pregunta, marcador de partida y logros) para dejar libre el mapa ==== */
+#leftCol { position: absolute; z-index: 6; top: 14px; left: 14px; width: min(430px, 42vw); display: flex; flex-direction: column; gap: 10px; align-items: stretch; pointer-events: none; }
+#leftCol > * { pointer-events: auto; position: relative; left: auto; top: auto; right: auto; bottom: auto; transform: none; }
+#leftCol .plate-sh { width: 100%; } #leftCol #plate { min-width: 0; max-width: none; width: 100%; padding: 12px 20px 13px; }
+#leftCol .adv-bar { max-width: none; width: max-content; min-width: 210px; }
+#leftCol .ach-toast { width: 100%; padding: 8px 12px 8px 8px; gap: 10px; margin: 0; z-index: 8; }
+#leftCol .ach-toast.in { animation: ach-in-l .6s var(--spring) both; } @keyframes ach-in-l { from { transform: translateX(-130%); opacity: 0; } }
+#leftCol .ach-toast .ach-ico { transform: scale(.75); transform-origin: left center; margin-right: -10px; } #leftCol .ach-t i { display: none; }
+body:not(.title-on) .brand-sh { display: none; }
+@media (max-width: 900px) { #leftCol { top: 8px; left: 8px; width: calc(100vw - 92px); } body:not(.title-on) .brand-sh { display: none; } }
+@media (max-height: 520px) and (orientation: landscape) { #leftCol { top: 6px; left: 8px; width: min(46vw, 440px); gap: 6px; } #leftCol .adv-bar { min-width: 0; } }
+/* zoom a la derecha: la columna izquierda queda para la placa, el marcador y los logros */
+.rail-sh { left: auto; right: 14px; top: 46%; }
+@media (max-width: 900px) {
+  #leftCol .adv-bar { padding: 5px 8px 6px; gap: 3px; width: auto; min-width: 0; }
+  #leftCol .ab-chal { flex-direction: row; flex-wrap: wrap; gap: 4px; margin-top: 3px; } #leftCol .ab-chal .ch-chip { padding: 2px 7px 2px 4px; } #leftCol .ab-chal .ch-chip .ic { width: 16px; height: 16px; }
+  #leftCol .ab-wind { font-size: 11px; } #leftCol .ab-perk { width: 22px; height: 22px; } #leftCol .ab-perk .ic { width: 18px; height: 18px; }
+}

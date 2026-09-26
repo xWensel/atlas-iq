@@ -2,6 +2,16 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.22.0** - Pixel art nitido, legibilidad, viento y HUD.
+- **Arte:** los 248 iconos y las 38 escenas se han reconvertido desde sus originales a pixel art nitido (`tools/pixelize_all.py`: rejilla nativa 64 px para iconos, 128 para el crupier y tipos, 256 de ancho para escenas; paleta limitada sin degradados ni dither; alfa de 1 bit sin halos; ampliacion por vecino mas cercano) y se muestran sin suavizado en los tamanos grandes.
+- **Letra:** tamanos minimos mas grandes (etiquetas Silkscreen desde 12 px, textos Jersey desde 15 px), sin suavizado de fuente; la placa de la pregunta no se ha tocado.
+- **Vendaval:** el viento ahora EMPUJA el puntero (se ve moverse, con rachas) y una flecha animada pegada a el marca la direccion; el clic cae exactamente donde esta el puntero. La Veleta pasa a "el viento te empuja la mitad".
+- **HUD:** la placa de la pregunta, el marcador de la partida y los logros van en la columna de arriba a la izquierda (el mapa queda libre); el zoom pasa a la derecha y la marca de la esquina se oculta durante la partida.
+
+## Creditos
+- **Banda sonora:** creada por el autor del juego con AKAI; los audios se exportaron y se integraron en el motor de audio del juego.
+- **Arte:** ilustraciones generadas con IA a partir de un libro de estilo y post-procesadas a pixel art (ver `tools/`).
+
 **v0.21.0** - Pangea de verdad y economia con peso.
 - **Pangea:** el reto ya no es un barajado: los continentes se deslizan lentamente (2,6 s, sin rebote) hasta encajar como en el supercontinente: Africa, Europa y la Antartida quietas, Sudamerica gira y se pega a la costa africana, Norteamerica se cierra contra Europa, Asia se une a Europa y Arabia y Oceania a la Antartida. Colocacion calculada con las mascaras reales de tierra (maximizar contacto sin solapes grandes). Hay un pequeno solape residual entre Norteamerica/Groenlandia e Islandia.
 - **Atlas de bolsillo:** ahora ilumina el pais a 5 s del final (no a mitad de tiempo), cuesta 9 y es raro.

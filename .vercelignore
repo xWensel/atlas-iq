@@ -2,3 +2,4 @@ dev
 .env*
 assets/raw
 tools
+assets_stage

@@ -8,7 +8,7 @@ window.AIQ = window.AIQ || {};
   const $ = id => document.getElementById(id);
   const P = A.pointer = { st: { tool: null, fx: {}, noCountry: false, windFn: null, distFn: null }, x: -99, y: -99, rx: -99, ry: -99, m: null, on: false, press: 0 };
   let lastDraw = 0, sx = 0, sy = 0, jx = 0, jy = 0, tj = 0, lastNow = 0, hotCol = null, hotAt = 0, hotKm = 1e9;
-  let map = null, root, cv, c, tag, mag, mctx, guideX, guideY, ghost, raf = 0, mask = null, lastLL = null, lastLand = null, lastTick = 0, lastHov = 0, lastName = "", pulse = 0;
+  let map = null, root, cv, c, tag, windEl, mag, mctx, guideX, guideY, ghost, raf = 0, mask = null, lastLL = null, lastLand = null, lastTick = 0, lastHov = 0, lastName = "", pulse = 0;
 
   /* mascara de tierra (equirrectangular, 720x360) para saber si el puntero esta sobre mar o tierra sin coste */
   function buildMask() {
@@ -91,6 +91,7 @@ window.AIQ = window.AIQ || {};
       mag.style.transform = `translate(${mx}px,${my}px)`;
     }
     // fantasma del viento: donde caera realmente el pin
+    if (P.wind && (P.wind[0] || P.wind[1])) { windEl.classList.add("on"); windEl.style.transform = `rotate(${Math.atan2(P.wind[1], P.wind[0])}rad)`; } else windEl.classList.remove("on");
     if (fx.windPreview && P.st.windFn) { const o = P.st.windFn(P.x, P.y); if (o) { ghost.style.transform = `translate(${o[0] - 9}px,${o[1] - 9}px)`; ghost.classList.add("on"); } else ghost.classList.remove("on"); } else ghost.classList.remove("on");
   }
 
@@ -107,6 +108,8 @@ window.AIQ = window.AIQ || {};
     if (m && m.lag) { const a = 1 - Math.exp(-dt * 1000 / Math.max(1, m.lag.tau)); sx += (x - sx) * a; sy += (y - sy) * a; x = sx; y = sy; } else { sx = x; sy = y; }
     if (m && m.dizzy) { const t = now / 1000; x += Math.cos(t * 3.4) * m.dizzy.r; y += Math.sin(t * 3.4) * m.dizzy.r; }
     if (m && m.tremble) { if (now - tj > 45) { tj = now; jx = (Math.random() - 0.5) * 2 * m.tremble.px; jy = (Math.random() - 0.5) * 2 * m.tremble.px; } x += jx; y += jy; }
+    P.wind = null;
+    if (P.st.windFn) { const w = P.st.windFn(clampN(x, 0, W), clampN(y, 0, H)); if (w) { x += w[0]; y += w[1]; P.wind = w; } }               // Vendaval: el viento empuja el puntero
     P.x = clampN(x, 0, W); P.y = clampN(y, 0, H);
   }
   function apply(now) {
@@ -132,11 +135,11 @@ window.AIQ = window.AIQ || {};
     if (!m.screenToLonLat) return;                                   // respaldo 2D sin WebGL: se queda el cursor normal
     map = m; map.hideReticle = true; buildMask();
     root = document.createElement("div"); root.id = "ptr";
-    root.innerHTML = `<canvas class="ptr-cv" width="64" height="64"></canvas><div class="ptr-tag"></div><i class="ptr-ghost"></i>`;
+    root.innerHTML = `<canvas class="ptr-cv" width="64" height="64"></canvas><div class="ptr-tag"></div><i class="ptr-ghost"></i><i class="ptr-wind"><svg viewBox="0 0 64 16" aria-hidden="true"><path class="w1" d="M6 8H50"/><path class="w2" d="M42 2 L56 8 L42 14"/></svg></i>`;
     mag = document.createElement("canvas"); mag.id = "ptrMag"; mag.width = mag.height = 168;
     guideX = document.createElement("i"); guideX.className = "ptr-gx"; guideY = document.createElement("i"); guideY.className = "ptr-gy";
     const app = $("app"); app.append(guideX, guideY, mag, root);
-    cv = root.querySelector(".ptr-cv"); c = cv.getContext("2d"); tag = root.querySelector(".ptr-tag"); ghost = root.querySelector(".ptr-ghost"); mctx = mag.getContext("2d");
+    cv = root.querySelector(".ptr-cv"); c = cv.getContext("2d"); tag = root.querySelector(".ptr-tag"); ghost = root.querySelector(".ptr-ghost"); windEl = root.querySelector(".ptr-wind"); mctx = mag.getContext("2d");
     window.addEventListener("pointermove", e => {
       if (e.pointerType === "touch") { if (map.pickEnabled && e.target === map.cv) { const r = map.cv.getBoundingClientRect(); P.rx = e.clientX - r.left; P.ry = e.clientY - r.top; P.x = P.rx; P.y = P.ry; if (A.chal && A.chal.pointer) A.chal.pointer(P.x, P.y); } return show(false); }   // en tactil solo se mueven las capas (linterna, lupa)
       const ok = map.pickEnabled && e.target === map.cv; if (!ok) return show(false);

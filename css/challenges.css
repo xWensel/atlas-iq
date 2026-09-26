@@ -141,3 +141,8 @@ body.ptr-on #map { cursor: none; }
 .nx-row.done { opacity: .5; grid-template-columns: 40px 1fr; }
 .nx-clean { margin: 0; font-family: var(--mono); font-size: 12px; opacity: .7; } .nx-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 @media (max-width: 700px) { .nx-list { grid-template-columns: 1fr; } .nx-row { grid-template-columns: 34px 1fr; } .nx-row .ch-buy { grid-column: 1 / -1; justify-self: end; } .nx-name { font-size: 20px; } }
+
+/* Vendaval: flecha pegada al puntero, en la direccion en que el viento lo empuja */
+.ptr-wind { position: absolute; left: 0; top: 0; width: 92px; height: 22px; margin: -11px 0 0 10px; transform-origin: -10px 50%; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.ptr-wind.on { opacity: .95; } .ptr-wind svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 2px 0 rgba(25, 19, 37, .8)); }
+.ptr-wind path { fill: none; stroke: #bfe9ff; stroke-width: 3; stroke-linecap: square; } .ptr-wind .w1 { stroke-dasharray: 6 5; animation: wind-dash .6s linear infinite; } @keyframes wind-dash { to { stroke-dashoffset: -22; } }

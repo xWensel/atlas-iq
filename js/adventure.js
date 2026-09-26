@@ -349,12 +349,15 @@ window.AIQ = window.AIQ || {};
     perkList().forEach(p => p.open && p.open(api, o, run));
     if (run.qTotal === 0 && A.tour) A.tour.maybe("q");
   };
-  const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat), p = m.lonLatToScreen(a.lon, a.lat); return [p[0] - px, p[1] - py]; };
+  /* el viento EMPUJA el puntero: se ve moverse (racha lenta incluida) y el clic cae exactamente donde esta el puntero. Devuelve el desplazamiento en pantalla. */
+  const gust = () => 1 + 0.22 * Math.sin(performance.now() / 1000 * 1.9) + 0.08 * Math.sin(performance.now() / 1000 * 5.3);
+  const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat, gust()), p = m.lonLatToScreen(a.lon, a.lat); return [p[0] - px, p[1] - py]; };
   A.adv.decorate = o => A.chal.decorate(o);
   /* el viento desvia el clic */
-  A.adv.adjust = function (lon, lat) {
+  A.adv.adjust = function (lon, lat, mul = 1) {
     if (!run || !run.wind || run.windOff) return { lon, lat };
-    const D = Math.PI / 180, d = run.wind.km / 6371, la = lat * D, lo = lon * D, b = run.wind.brg * D;
+    const wm = (A.chal && A.chal.fxNow && A.chal.fxNow().windMul) || 1;                   // Veleta: el viento empuja la mitad
+    const D = Math.PI / 180, d = run.wind.km * wm * mul / 6371, la = lat * D, lo = lon * D, b = run.wind.brg * D;
     const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
     const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2));
     return { lon: ((lo2 / D + 540) % 360) - 180, lat: clamp(la2 / D, -85, 85) };
@@ -408,7 +411,7 @@ window.AIQ = window.AIQ || {};
   /* ---------------- barras de estado (durante la partida) ---------------- */
   function ensureBars() {
     let el = $("advBar"); if (el) return;
-    el = document.createElement("div"); el.id = "advBar"; el.className = "adv-bar hidden"; $("app").appendChild(el);
+    el = document.createElement("div"); el.id = "advBar"; el.className = "adv-bar hidden"; ($("leftCol") || $("app")).appendChild(el);
     const tb = document.createElement("div"); tb.id = "toolBar"; tb.className = "tool-bar hidden"; $("app").appendChild(tb);
   }
   function hearts() { let h = ""; for (let i = 0; i < run.maxLives; i++) h += `<i class="hp ${i < run.lives ? "on" : ""}">${ic("heart")}</i>`; return h; }

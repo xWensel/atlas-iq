@@ -34,6 +34,7 @@
   /* ------------------------------------------------------------ arranque */
   load(); A.wiki.loadShort(A.lang);
   const world = A.geo.buildWorld();
+  { const col = $("leftCol"), pl = document.querySelector(".plate-sh"); if (col && pl) col.appendChild(pl); }        // columna izquierda: placa, marcador de partida y logros (el mapa queda libre)
   const map = A.createMap($("map"), world, onPick);
   A.codex.init(world, map); A.pointer.init(map);
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
@@ -339,7 +340,7 @@
   function onPick(lon, lat) {
     if (S.phase !== "asking" || S.paused) return;
     if (S.run && S.tool) { pingFx(lastPtr.x, lastPtr.y, "probe"); A.adv.probe(lon, lat); return; }
-    if (S.run) ({ lon, lat } = A.adv.adjust(lon, lat));
+    if (S.run && !(A.pointer && A.pointer.effective && A.pointer.effective())) ({ lon, lat } = A.adv.adjust(lon, lat));   // con puntero propio, el viento ya lo ha movido
     pingFx(lastPtr.x, lastPtr.y); A.sfx.tap(); A.sfx.pin(S.streak);
     reveal({ lon, lat }, Math.max(0, S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000));
   }
