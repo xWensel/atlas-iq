@@ -10,7 +10,7 @@ window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6) {
     try {
       if (S.phase === "intro") { S.skipIntro && S.skipIntro(); }
       else if (S.phase === "asking") {
-        const o = S.qs[S.qi], err = errKm * (0.3 + Math.random() * 1.4);
+        const o = S.qs[S.qi], pen = 1 + 0.12 * (A.chal ? A.chal.active().length : 0), err = errKm * pen * (0.3 + Math.random() * 1.4);   // los retos empeoran la precision del bot
         if (o.t === "c") { const f = D.world.byName[o.key], b = f.polys.reduce((a, c) => ((c.bbox[2] - c.bbox[0]) > (a.bbox[2] - a.bbox[0]) ? c : a)).bbox; D.reveal({ lon: (b[0] + b[2]) / 2, lat: (b[1] + b[3]) / 2 }, S.limit * 0.6); }
         else { let g = dest(o.lat, o.lon, Math.random() * 360, err); D.reveal(g, S.limit * 0.6); }
       }

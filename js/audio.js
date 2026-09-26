@@ -95,6 +95,19 @@ window.AIQ = window.AIQ || {};
     g.connect(lp); lp.connect(bus); send(lp, 0.5);
   }
 
+
+  /* voz arcade del crupier: silabas cortas de onda cuadrada/diente de sierra, el tono cambia con el humor */
+  const VMOOD = {
+    sly: { b: 52, w: "square", pat: [0, 3, 5, 3, 7, 5], d: 0.06, v: 0.05, slide: 1 }, laugh: { b: 60, w: "square", pat: [7, 3], d: 0.08, v: 0.06, slide: -2 },
+    angry: { b: 40, w: "sawtooth", pat: [0, -2, 1, -3], d: 0.055, v: 0.055, slide: -1 }, shock: { b: 58, w: "square", pat: [0, 4, 8, 12], d: 0.05, v: 0.055, slide: 2 },
+    boss: { b: 34, w: "sawtooth", pat: [0, 0, -3, 2], d: 0.09, v: 0.075, slide: -1 },
+  };
+  function blip(t, n, m) {
+    const os = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+    os.type = m.w; os.frequency.setValueAtTime(mtof(n + 12), t); os.frequency.exponentialRampToValueAtTime(mtof(n + 12 + (m.slide || 0)), t + m.d);
+    lp.type = "lowpass"; lp.frequency.value = 2600; os.connect(lp).connect(g).connect(sfxBus); env(g, t, 0.004, m.v, m.d); os.start(t); os.stop(t + m.d + 0.05);
+  }
+
   /* ------------------------------------------------------------------ musica: jazz lo-fi con swing (estilo Balatro) */
   /*
    *  Piano electrico FM (Rhodes) haciendo stabs sincopados, contrabajo con notas de aproximacion, escobillas y charles con swing,
@@ -262,6 +275,17 @@ window.AIQ = window.AIQ || {};
       [91, 95, 98, 103].forEach((m, i) => bell(m, t + 1.72 + i * 0.06, { vol: 0.045, dur: 0.9, rev: 0.7 }));
       noise(t + 1.7, 0.7, { hp: 5000, vol: 0.035, sweepTo: 12000, type: "highpass" });
     }),
+    /* crupier: una silaba por letra (i = indice) y su risa */
+    voice: go((t, mood = "sly", i = 0) => { const m = VMOOD[mood] || VMOOD.sly; blip(t, m.b + m.pat[i % m.pat.length] + ((i * 7) % 3), m); }),
+    laugh: go(t => { for (let k = 0; k < 8; k++) blip(t + k * 0.095, 67 - k * 1.1 + (k % 2 ? 5 : 0), { w: "square", d: 0.075, v: 0.06, slide: -2 }); noise(t, 0.7, { hp: 2800, vol: 0.01 }); }),
+    /* el crupier toca la mesa: cada reto llega con un clic de palanca, un golpe grave y una caida electrica */
+    chal: go(t => { [0, 0.07, 0.14].forEach(d => noise(t + d, 0.03, { hp: 3200, vol: 0.09 })); thump(t + 0.18, { vol: 0.4, f0: 110, f1: 36, dur: 0.3 }); noise(t + 0.2, 0.5, { lp: 5000, sweepTo: 200, vol: 0.06, type: "bandpass", q: 1.2 }); bell(45, t + 0.22, { vol: 0.07, dur: 0.9, rev: 0.4 }); }),
+    dark: go(t => { noise(t, 0.6, { lp: 3000, sweepTo: 120, vol: 0.07, type: "bandpass", q: 0.9 }); thump(t + 0.5, { vol: 0.3, f0: 80, f1: 30, dur: 0.3 }); }),
+    buzz: go((t, i = 0) => { const os = ctx.createOscillator(), g = ctx.createGain(); os.type = "sawtooth"; os.frequency.value = 96 + i * 9; os.connect(g).connect(sfxBus); env(g, t, 0.004, 0.05, 0.07); os.start(t); os.stop(t + 0.12); noise(t, 0.05, { hp: 4000, vol: 0.07 }); }),
+    restore: go(t => { noise(t, 0.35, { hp: 500, sweepTo: 8000, vol: 0.05, type: "highpass" }); pluck(84, t + 0.2, { vol: 0.08, dur: 0.3, rev: 0.3 }); thump(t + 0.02, { vol: 0.2, f0: 120, f1: 60, dur: 0.12 }); }),
+    warn: go(t => { [0, 0.11].forEach(d => pluck(93, t + d, { vol: 0.08, dur: 0.1, bright: 4, rev: 0.1 })); }),
+    /* puntero: cruzar la costa */
+    ptrEdge: go((t, land) => { if (land) pluck(83, t, { vol: 0.035, dur: 0.1, bright: 3, rev: 0.1 }); else bell(96, t, { vol: 0.02, dur: 0.22, rev: 0.3 }); }),
     /* estudio: dos golpes graves (VAULT y raiders) y un brillo suave cuando pasa la luz */
     studio: go(t => {
       thump(t + 0.62, { vol: 0.62, f0: 110, f1: 34, dur: 0.55 }); noise(t + 0.62, 0.09, { lp: 1500, vol: 0.14 }); bell(45, t + 0.63, { vol: 0.09, dur: 1.3, rev: 0.5 });

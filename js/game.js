@@ -34,7 +34,7 @@
   load(); A.wiki.loadShort(A.lang);
   const world = A.geo.buildWorld();
   const map = A.createMap($("map"), world, onPick);
-  A.codex.init(world, map);
+  A.codex.init(world, map); A.pointer.init(map);
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
   map.animateTo(map.home(), 0);
@@ -119,6 +119,7 @@
     const o = q(); if (!o) return;
     $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : o.kind || lv().kind));
     $("askName").textContent = A.tx(o.name); $("askSub").textContent = A.tx(o.sub);
+    if (S.run && A.adv.decorate) A.adv.decorate(o);
     $("plate").classList.toggle("clue", !!o.clue);
   }
   function setTimer(left) {
@@ -279,9 +280,10 @@
       <span class="tag">${L.bonus ? A.t("intro.bonus") : A.t("kind." + L.kind)}</span><h2>${A.tx(L.name)}</h2>
       <p>${A.t("intro.q", { n: S.qs.length })} · ${A.t("intro.t", { s: L.seconds })}${L.advance > 1 ? " · " + A.t("intro.goal", { a: A.fmt(L.advance) }) : ""}</p></div></div>`;
     A.sfx.intro(); map.animateTo(map.home(), 1100);
-    let done = false;
-    const end = () => { if (done) return; done = true; el.onclick = null; el.classList.add("out"); setTimeout(() => { el.classList.add("hidden"); cb(); }, 430); };
-    S.skipIntro = end; el.onclick = end; setTimeout(end, S.run ? (L.boss ? 4200 : 3300) : 2600);
+    let done = false, ms = S.run ? (L.boss ? 4200 : 3300) : 2600;
+    if (S.run && A.adv.introReady) ms = Math.min(11000, Math.max(ms, 1200 + (A.adv.introReady(L) || 0)));
+    const end = () => { if (done) return; done = true; el.onclick = null; if (S.run && A.adv.introEnd) A.adv.introEnd(); el.classList.add("out"); setTimeout(() => { el.classList.add("hidden"); cb(); }, 430); };
+    S.skipIntro = end; el.onclick = end; setTimeout(end, ms);
   }
   function nextQuestion() {
     S.phase = "asking"; S.paused = false; S.tense = false; S.limit = lv().seconds; S.t0 = performance.now(); S.pausedAcc = 0; S.lastTick = -1; S.lastTimeStr = "";
@@ -318,7 +320,7 @@
   const padForDialog = () => (window.innerWidth > 900 ? { l: 60, r: 410, t: 170, b: 130 } : { l: 30, r: 30, t: 240, b: 410 });
 
   function reveal(guess, left) {
-    S.phase = "reveal"; map.setPick(false); S.tense = false; A.music.mode(1);
+    S.phase = "reveal"; map.setPick(false); S.tense = false; A.music.mode(1); if (S.run) A.chal.reveal();
     const o = q(), L = lv(), isC = o.t === "c";
     let km = null, ans = null, span = [], labelAt = null;
     if (isC) {
@@ -578,7 +580,7 @@
     (A._debug = A._debug || {}).enterBoot = enter;
   }
 
-  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
+  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, refreshPrompt: () => { setPrompt(); }, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
 
   applyLang(); syncSettings();
   const start = () => { if (/[?&]skipboot/.test(location.search)) { S.booting = false; showTitle(); } else runBoot(); };

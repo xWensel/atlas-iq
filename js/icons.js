@@ -199,7 +199,7 @@ window.AIQ = window.AIQ || {};
   A.ICONS = I;
   /* Los iconos son ilustraciones pixel-art generadas con un unico libro de estilo (tools/gen_art.py) en assets/icons/.
      Si falta alguno, se pinta el dibujo vectorial antiguo como respaldo. */
-  const ALIAS = { a_globe: "globe", a_cal: "t_event", a_boots: "boots", a_flag: "t_country", a_bolt: "flash", a_night: "a_moon", roulette_r: "roulette_r" };
+  const ALIAS = { steadyhand: "steady", a_globe: "globe", a_cal: "t_event", a_boots: "boots", a_flag: "t_country", a_bolt: "flash", a_night: "a_moon", roulette_r: "roulette_r" };
   A.icon = (id, cls = "") => {
     id = ALIAS[id] || id;
     return `<img class="ic ic-${id} ${cls}" src="assets/icons/${id}.webp" alt="" draggable="false" decoding="async" onerror="AIQ._icErr(this)">`;

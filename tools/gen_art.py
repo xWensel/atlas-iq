@@ -108,6 +108,35 @@ icons({
  "bottle": "a glass message bottle with a rolled map inside", "net": "a green fishing net with a golden fish", "torch": "a burning wooden torch", "totem": "a colorful carved wooden totem pole", "pyramid": "a golden pyramid with a glowing eye",
 })
 
+# ---------------------------------------------------------------- v0.10: perks contra retos, iconos de retos y el crupier
+icons({
+ "dictionary": "an open old dictionary book with a golden bookmark ribbon", "corrector": "a red proofreading pencil with a golden eraser and a tiny checkmark",
+ "handmirror": "an ornate golden hand mirror with violet glass", "sticky": "a yellow sticky note with a red pushpin and a curled corner",
+ "spectacles": "round golden reading glasses with violet lenses", "miner": "a miner helmet with a bright yellow headlamp beam",
+ "neon": "a glowing pink and cyan neon tube shaped like a small globe", "lens": "a cartographer brass magnifying glass with a wooden handle",
+ "divingmask": "a diving mask with teal glass and a red strap", "customs": "a customs rubber stamp with a red ink pad and a golden handle",
+ "theodolite": "a brass theodolite surveying instrument on a small tripod", "plates": "two cracked continent shaped puzzle pieces joined by a golden magnet",
+ "astrolabe": "an ornate golden astrolabe with a rotating ring and a small compass star", "generator": "a small red battery generator with a lightning bolt and a golden coil",
+ "weathervane": "a golden weathervane rooster on a compass cross", "fan": "a chunky desk fan with teal blades and a golden cage",
+ "interruptor": "a big red casino lever switch on a golden plate", "swapcard": "two playing cards swapping places with curved arrows",
+ "coords": "a golden map pin with a tiny latitude longitude grid", "crosshair": "a red laser sight crosshair inside a golden ring",
+ "magnifier": "a big round glass magnifying lens with golden frame and sparkle over a small map", "almanac": "an old almanac notebook with a golden star and a red ribbon",
+ "sonarplus": "a radar dish with concentric teal waves and a golden antenna", "compass16": "a golden compass with sixteen points and a red needle",
+ "spyhole": "a golden door peephole with a violet eye looking through", "markeddeck": "a fanned deck of playing cards with one card bent and marked by a red dot",
+ "masterkey": "a golden master key with a globe shaped bow and a red gem",
+ "ch_shaky": "a trembling cartoon letter A vibrating with motion lines", "ch_missing": "a short word made of letter tiles with two empty dark holes",
+ "ch_swap": "two letter tiles swapping places with curved arrows", "ch_mirror": "a letter R next to its mirror reflection on a glass panel",
+ "ch_memory": "a fading ghostly thought bubble with a question mark", "ch_blur": "a blurry out of focus eye surrounded by foggy circles",
+ "ch_dark": "a dark night cloud with a crescent moon and one small candle", "ch_flicker": "a broken flickering casino light bulb with sparks",
+ "ch_wrongborders": "a folded map with a crooked red wavy border line and a warning triangle", "ch_noborders": "a globe with erased dotted border lines and an eraser",
+ "ch_pangea": "one giant supercontinent glued together from puzzle pieces", "ch_shuffle": "continent puzzle pieces swapping places with circular arrows",
+ "ch_flip": "an upside down globe with a curved turning arrow", "ch_clouds": "puffy grey smoke clouds covering a small map",
+ "dealer_neutral": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves fanning playing cards, sly confident smile, facing front",
+ "dealer_laugh": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves, laughing loudly with mouth wide open and tears of joy, facing front",
+ "dealer_angry": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves, angry frowning with gritted teeth and slammed fists, facing front",
+ "dealer_shock": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves, shocked wide open eyes and small open mouth with a sweat drop, facing front",
+})
+
 # ---------------------------------------------------------------- ESCENAS (wide 16:9 salvo indicacion)
 S = {}
 def scene(id, desc, w=1024, h=576): S[id] = (desc, w, h)
@@ -179,7 +208,7 @@ def job(kind, id, seed_extra):
 def post(kind, id):
     raw = RAW / f"{id}.jpg"
     if not raw.exists(): return
-    if kind == "icon": keyout(raw, ICONS / f"{id}.webp", 256)
+    if kind == "icon": keyout(raw, ICONS / f"{id}.webp", 512 if id.startswith("dealer_") else 256)
     elif kind == "logo": keyout(raw, GEN / "logo.webp", 640, square=False)
     else:
         im = Image.open(raw).convert("RGB"); w, h = im.size

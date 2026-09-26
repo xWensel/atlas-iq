@@ -39,11 +39,16 @@ window.AIQ = window.AIQ || {};
   };
 
   /* ------------------------------------------------------------------ shaders */
+  /* deformaciones de los retos: cada continente puede girar sobre su centro y desplazarse (Pangea, continentes cambiados de sitio...) */
+  const DISTORT = `
+uniform vec2 u_dsh[8]; uniform float u_drot[8]; uniform vec2 u_dcen[8];
+vec2 xf(vec2 a, float ct){ int c=int(ct+0.5); vec2 cen=u_dcen[c]; vec2 d=a-cen; float ca=cos(u_drot[c]), sa=sin(u_drot[c]); return cen+vec2(ca*d.x-sa*d.y, sa*d.x+ca*d.y)+u_dsh[c]; }`;
   const VS_FILL = `#version 300 es
-layout(location=0) in vec2 a_pos; layout(location=1) in float a_ci;
+layout(location=0) in vec2 a_pos; layout(location=1) in float a_ci; layout(location=2) in float a_ct;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform vec2 u_off;
+${DISTORT}
 flat out float v_ci;
-void main(){ vec2 p=(a_pos-u_center)*u_scale+u_off; gl_Position=vec4(p/(0.5*u_res),0.0,1.0); v_ci=a_ci; }`;
+void main(){ vec2 p=(xf(a_pos,a_ct)-u_center)*u_scale+u_off; gl_Position=vec4(p/(0.5*u_res),0.0,1.0); v_ci=a_ci; }`;
 
   const FS_SIL = `#version 300 es
 precision mediump float; out vec4 o; void main(){ o=vec4(1.0); }`;
@@ -91,11 +96,14 @@ void main(){
 }`;
 
   const VS_LINE = `#version 300 es
-layout(location=0) in vec2 a_q; layout(location=1) in vec4 a_seg;
+layout(location=0) in vec2 a_q; layout(location=1) in vec4 a_seg; layout(location=2) in float a_sct;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform float u_width; uniform vec2 u_off;
+uniform float u_wob; uniform float u_wt;
+${DISTORT}
 out float v_d; out float v_hw;
+vec2 wob(vec2 p){ return u_wob*vec2(sin(p.y*9.0+p.x*3.7+u_wt), cos(p.x*8.0-p.y*4.3+u_wt*1.3)) + u_wob*0.5*vec2(sin(p.y*23.0+u_wt*0.7), cos(p.x*19.0-u_wt*0.9)); }
 void main(){
-  vec2 p0=(a_seg.xy-u_center)*u_scale+u_off, p1=(a_seg.zw-u_center)*u_scale+u_off;
+  vec2 p0=(xf(a_seg.xy+wob(a_seg.xy),a_sct)-u_center)*u_scale+u_off, p1=(xf(a_seg.zw+wob(a_seg.zw),a_sct)-u_center)*u_scale+u_off;
   vec2 dir=p1-p0; float len=length(dir); dir=len>0.0001?dir/len:vec2(1.0,0.0);
   vec2 nrm=vec2(-dir.y,dir.x);
   float hw=u_width*0.5+1.0;
@@ -104,8 +112,8 @@ void main(){
   gl_Position=vec4(p/(0.5*u_res),0.0,1.0);
 }`;
   const FS_LINE = `#version 300 es
-precision highp float; in float v_d; in float v_hw; uniform vec4 u_col; out vec4 o;
-void main(){ float a=clamp(v_hw-abs(v_d)+0.5,0.0,1.0); o=vec4(u_col.rgb,u_col.a*a); }`;
+precision highp float; in float v_d; in float v_hw; uniform vec4 u_col; uniform float u_lineA; uniform vec3 u_lens; uniform float u_lmode; out vec4 o;
+void main(){ float a=clamp(v_hw-abs(v_d)+0.5,0.0,1.0); float m=1.0; if(u_lmode>0.5){ float inl=1.0-smoothstep(u_lens.z-6.0,u_lens.z,length(gl_FragCoord.xy-u_lens.xy)); m=u_lmode<1.5?1.0-inl:inl; } o=vec4(u_col.rgb,u_col.a*a*u_lineA*m); }`;
 
   const VS_FULL = `#version 300 es
 void main(){ vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2)); gl_Position=vec4(p*2.0-1.0,0.0,1.0); }`;
@@ -196,13 +204,15 @@ void main(){
   const FS_POST = `#version 300 es
 precision highp float;
 uniform sampler2D u_scene; uniform vec2 u_res; uniform vec2 u_zc; uniform float u_zv; uniform vec2 u_pv; uniform float u_vig; uniform float u_grain; uniform vec3 u_tint; uniform float u_time;
-uniform float u_crt; uniform float u_dpr;
+uniform float u_crt; uniform float u_dpr; uniform vec4 u_ori;
 out vec4 o;
 ${NOISE}
 void main(){
   vec2 frag=gl_FragCoord.xy; vec2 uv=frag/u_res;
   if(u_crt>0.5){ vec2 q=uv*2.0-1.0; q*=1.0+dot(q,q)*0.045; uv=q*0.5+0.5; }
-  float inside=step(0.0,uv.x)*step(uv.x,1.0)*step(0.0,uv.y)*step(uv.y,1.0);
+  vec2 suv=uv;
+  if(u_ori.w>0.5){ vec2 c=vec2(uv.x*u_res.x,(1.0-uv.y)*u_res.y)-0.5*u_res; vec2 r=vec2(u_ori.x*c.x-u_ori.y*c.y, u_ori.y*c.x+u_ori.x*c.y); r.x*=u_ori.z; vec2 pp=r+0.5*u_res; suv=vec2(pp.x/u_res.x,1.0-pp.y/u_res.y); }
+  float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0);
   vec2 fr=uv*u_res;
   vec2 toC=(u_zc-fr);
   float zvA=clamp(u_zv,-4.0,4.0);
@@ -213,20 +223,20 @@ void main(){
   const int N=12;
   for(int i=0;i<N;i++){
     float t=float(i)/float(N-1)-0.5;
-    vec2 p=uv+off*t/u_res;
+    vec2 p=suv+off*t/u_res;
     col+=texture(u_scene,p).rgb;
   }
   col/=float(N);
   float ca=min(lenPx,40.0)*0.0009+u_crt*0.0011;
   vec2 dir=normalize(toC+vec2(0.0001));
   vec2 cav=dir*ca*u_res.y/u_res*0.5;
-  col.r=mix(col.r,texture(u_scene,uv+cav).r,step(0.0005,ca));
-  col.b=mix(col.b,texture(u_scene,uv-cav).b,step(0.0005,ca));
+  col.r=mix(col.r,texture(u_scene,suv+cav).r,step(0.0005,ca));
+  col.b=mix(col.b,texture(u_scene,suv-cav).b,step(0.0005,ca));
   if(u_crt>0.5){
     float sl=0.5+0.5*sin(fr.y*3.14159265/(1.5*u_dpr));
     col*=0.90+0.10*sl;                                          // lineas de barrido
     float tri=fract(fr.x/(3.0*u_dpr)); col*=0.965+0.035*vec3(step(tri,0.34),step(0.34,tri)*step(tri,0.67),step(0.67,tri));   // mascara RGB
-    vec3 bl=vec3(0.0); for(int i=0;i<6;i++){ float a=float(i)*1.0472; bl+=texture(u_scene,uv+vec2(cos(a),sin(a))*3.5*u_dpr/u_res).rgb; } bl/=6.0;
+    vec3 bl=vec3(0.0); for(int i=0;i<6;i++){ float a=float(i)*1.0472; bl+=texture(u_scene,suv+vec2(cos(a),sin(a))*3.5*u_dpr/u_res).rgb; } bl/=6.0;
     col+=max(bl-0.72,0.0)*0.55;                                 // resplandor de fosforo
     col*=1.0+0.03*sin(u_time*40.0);                             // parpadeo minimo
   }
@@ -275,6 +285,7 @@ void main(){
       this.quality = "auto"; this.rs = 1; this.frameEma = 0; this.baseDt = 1e9; this.lastT = 0; this.calm = 0;
       this.fxOn = true; this.zv = 0; this.lastLz = null; this.pv = [0, 0]; this.zc = null; this.lastView = { cx: 0, cy: 0, s: 0 };
       this.dirty = this.fxDirty = true; this.pointers = new Map(); this.samples = [];
+      this.dist = { spec: null, k: 0, kk: 0, kl: 0, ko: 0, from: 0, to: 0, lfrom: 0, lto: 0, ofrom: 0, oto: 0, t0: 0, ms: 0, ct: 6 }; this.lens = null; this.hideReticle = false;
       this.sk = A.MAPSTYLES.expedicion; this.ms = this._prepStyle(this.sk);
       this._initGL(); this._bind(); this.resize(true);
       canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); this.lost = true; });
@@ -299,7 +310,8 @@ void main(){
     _initGL() {
       const gl = this.gl; this.P = buildPrograms(gl);
       // geometria: triangulos (earcut) y segmentos de frontera
-      const pos = [], ci = [], idx = [], segs = [];
+      const pos = [], ci = [], ct = [], sct = [], idx = [], segs = [];
+      this._initContinents();
       for (const f of this.world.features) {
         f.gl = { i0: idx.length, n: 0, s0: segs.length / 4, sn: 0 };
         for (const poly of f.polys) {
@@ -311,10 +323,10 @@ void main(){
               off += ring.length;
             });
             const tri = earcutFn()(flat, holes, 2);
-            for (let i = 0; i < flat.length; i += 2) { pos.push(flat[i], flat[i + 1]); ci.push(f.ci); }
+            for (let i = 0; i < flat.length; i += 2) { pos.push(flat[i], flat[i + 1]); ci.push(f.ci); ct.push(f.ct); }
             for (let i = 0; i < tri.length; i++) idx.push(base + tri[i]);
             let o = 0;
-            for (const ring of poly.rings) { for (let i = 0; i < ring.length - 1; i++) segs.push(flat[(o + i) * 2], flat[(o + i) * 2 + 1], flat[(o + i + 1) * 2], flat[(o + i + 1) * 2 + 1]); o += ring.length; }
+            for (const ring of poly.rings) { for (let i = 0; i < ring.length - 1; i++) { segs.push(flat[(o + i) * 2], flat[(o + i) * 2 + 1], flat[(o + i + 1) * 2], flat[(o + i + 1) * 2 + 1]); sct.push(f.ct); } o += ring.length; }
           };
           copy(0); if (poly.bbox[2] > 180) copy(-TWO_PI); if (poly.bbox[0] < -180) copy(TWO_PI);
         }
@@ -326,11 +338,13 @@ void main(){
       this.vaoFill = gl.createVertexArray(); gl.bindVertexArray(this.vaoFill);
       buf(gl.ARRAY_BUFFER, new Float32Array(pos)); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
       buf(gl.ARRAY_BUFFER, new Uint8Array(ci)); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+      buf(gl.ARRAY_BUFFER, new Uint8Array(ct)); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 1, gl.UNSIGNED_BYTE, false, 0, 0);
       buf(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(idx));
       // VAO de lineas (instanciadas)
       this.vaoLine = gl.createVertexArray(); gl.bindVertexArray(this.vaoLine);
       buf(gl.ARRAY_BUFFER, new Float32Array([0, -1, 0, 1, 1, -1, 1, 1])); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
       this.segBuf = buf(gl.ARRAY_BUFFER, new Float32Array(segs)); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(1, 1);
+      buf(gl.ARRAY_BUFFER, new Uint8Array(sct)); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 1, gl.UNSIGNED_BYTE, false, 0, 0); gl.vertexAttribDivisor(2, 1);
       gl.bindVertexArray(null);
       this.vaoEmpty = gl.createVertexArray();
       this.T = {}; // objetivos de render
@@ -416,9 +430,94 @@ void main(){
       if (animate === false && f === 1) return;
       this.tv = t;
     }
-    _toWorld(px, py, v = this.view) { return [v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s]; }
-    toScreen(x, y, v = this.view) { return [this.W / 2 + (x - v.cx) * v.s, this.H / 2 - (y - v.cy) * v.s]; }
-    lonLatToScreen(lon, lat) { const [x, y] = project(lon, lat); return this.toScreen(x, y); }
+    _toWorld(px, py, v = this.view) { [px, py] = this._outToScene(px, py); return [v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s]; }
+    toScreen(x, y, v = this.view) { return this._sceneToOut(this.W / 2 + (x - v.cx) * v.s, this.H / 2 - (y - v.cy) * v.s); }
+    lonLatToScreen(lon, lat) { let [x, y] = project(lon, lat); [x, y] = this._dispFwd(x, y, this._ctOf(lon, lat)); return this.toScreen(x, y); }
+
+    /* ---------- continentes, deformaciones y orientacion (retos) ---------- */
+    _initContinents() {
+      const IDX = { af: 0, na: 1, sa: 2, as: 3, eu: 4, oc: 5 };
+      this.contFeat = [[], [], [], [], [], [], []]; const acc = [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0, 0]);
+      for (const f of this.world.features) {
+        const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a));
+        const lo = (big.bbox[0] + big.bbox[2]) / 2, la = (big.bbox[1] + big.bbox[3]) / 2;
+        const k = A.continent ? A.continent(la, lo) : null; f.ct = k in IDX ? IDX[k] : 6; this.contFeat[f.ct].push(f);
+        const [x, y] = project(lo, clamp(la, -85, 85)), w = (big.bbox[2] - big.bbox[0]) * (big.bbox[3] - big.bbox[1]) + 1; acc[f.ct][0] += x * w; acc[f.ct][1] += y * w; acc[f.ct][2] += w;
+      }
+      this.contCen = acc.map(a => (a[2] ? [a[0] / a[2], a[1] / a[2]] : [0, 0])); this.contCen.push([0, 0]);
+    }
+    /* continente al que pertenece el pais que contiene el punto (el mismo con el que se dibuja y se desplaza); si es mar, el pais mas cercano o la heuristica */
+    _ctOf(lon, lat) {
+      const key = lon.toFixed(2) + "," + lat.toFixed(2), C = this._ctCache = this._ctCache || new Map(); if (C.has(key)) return C.get(key);
+      let ct = null;
+      for (const f of this.world.features) { let near = false; for (const p of f.polys) if (lon >= p.bbox[0] - 0.5 && lon <= p.bbox[2] + 0.5 && lat >= p.bbox[1] - 0.5 && lat <= p.bbox[3] + 0.5) { near = true; break; } if (near && A.geo.inFeature(lon, lat, f)) { ct = f.ct; break; } }
+      if (ct === null) { let best = 150; for (const f of this.world.features) { const d = A.geo.distToFeature(lon, lat, f); if (d < best) { best = d; ct = f.ct; } } }
+      if (ct === null) { const IDX = { af: 0, na: 1, sa: 2, as: 3, eu: 4, oc: 5 }, k = A.continent ? A.continent(lat, lon) : null; ct = k in IDX ? IDX[k] : 6; }
+      if (C.size > 400) C.clear(); C.set(key, ct); return ct;
+    }
+    /* valores efectivos (mezcla entre "sin deformar" y el reto segun k) */
+    _eff() {
+      const d = this.dist, sp = d.spec, e = d.eff = d.eff || { sh: new Float32Array(16), rot: new Float32Array(8), cen: new Float32Array(16), wob: 0, lineA: 1, oa: 0, mx: 0, on: false };
+      const k = sp ? (d.kk || 0) : 0;
+      for (let c = 0; c < 8; c++) { e.sh[c * 2] = sp && sp.shift[c] ? sp.shift[c][0] * k : 0; e.sh[c * 2 + 1] = sp && sp.shift[c] ? sp.shift[c][1] * k : 0; e.rot[c] = sp && sp.rot ? (sp.rot[c] || 0) * k : 0; const cc = this.contCen[c] || [0, 0]; e.cen[c * 2] = cc[0]; e.cen[c * 2 + 1] = cc[1]; }
+      e.wob = sp ? (sp.wob || 0) * k : 0; e.lineA = sp && sp.lineA != null ? 1 + (sp.lineA - 1) * d.kl : 1;
+      const ko = sp ? (d.ko || 0) : 0; e.oa = sp && sp.orient ? sp.orient.rot * ko : 0; e.mx = sp && sp.orient ? (sp.orient.mx || 0) * ko : 0; e.on = !!(sp && sp.orient && (Math.abs(e.oa) > 1e-4 || e.mx > 1e-4));
+      return e;
+    }
+    _orient() { const e = this._eff(), sx = 1 - 2 * e.mx; return { c: Math.cos(e.oa), s: Math.sin(e.oa), sx: Math.abs(sx) < 0.02 ? 0.02 : sx, on: e.on }; }
+    _outToScene(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = x - this.W / 2, cy = y - this.H / 2; const rx = (o.c * cx - o.s * cy) * o.sx, ry = o.s * cx + o.c * cy; return [rx + this.W / 2, ry + this.H / 2]; }
+    _sceneToOut(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = (x - this.W / 2) / o.sx, cy = y - this.H / 2; return [o.c * cx + o.s * cy + this.W / 2, -o.s * cx + o.c * cy + this.H / 2]; }
+    _dispFwd(x, y, ct) {
+      const e = this._eff(); if (!this.dist.spec) return [x, y];
+      const c = ct == null ? 6 : ct, cx = this.contCen[c][0], cy = this.contCen[c][1], dx = x - cx, dy = y - cy, a = e.rot[c], ca = Math.cos(a), sa = Math.sin(a);
+      return [cx + ca * dx - sa * dy + e.sh[c * 2], cy + sa * dx + ca * dy + e.sh[c * 2 + 1]];
+    }
+    _nearCont(c, lon, lat, km) { for (const f of this.contFeat[c] || []) if (A.geo.distToFeature(lon, lat, f) < km) return true; return false; }
+    _inCont(c, lon, lat) { for (const f of this.contFeat[c] || []) if (A.geo.inFeature(lon, lat, f)) return true; return false; }
+    /* punto tocado en el mapa deformado -> coordenada real (se prefiere el continente de la pregunta si hay solape) */
+    _undisp(x, y) {
+      const d = this.dist; if (!d.spec) return [x, y]; const e = this._eff();
+      if (!e.sh.some(v => Math.abs(v) > 1e-4) && !e.rot.some(v => Math.abs(v) > 1e-4)) return [x, y];
+      const order = [d.ct, 0, 1, 2, 3, 4, 5].filter((c, i, a) => c != null && c < 6 && a.indexOf(c) === i);
+      const cand = c => { const cx = this.contCen[c][0], cy = this.contCen[c][1], vx = x - e.sh[c * 2] - cx, vy = y - e.sh[c * 2 + 1] - cy, a = -e.rot[c], ca = Math.cos(a), sa = Math.sin(a); return [cx + ca * vx - sa * vy, cy + sa * vx + ca * vy]; };
+      for (const c of order) { const [x0, y0] = cand(c), [lo, la] = unproject(x0, y0); if (c === d.ct ? this._nearCont(c, lo, la, 260) : this._inCont(c, lo, la)) return [x0, y0]; }
+      if (d.ct < 6) return cand(d.ct);
+      return [x, y];
+    }
+    /* spec: {shift:[[dx,dy]x7], rot:[x7], wob, lineA, orient:{rot,mx}, ct}. Se anima de "normal" a la deformacion. */
+    setDistort(spec, ms = 900) {
+      const d = this.dist, now = performance.now();
+      d.spec = spec; d.ct = spec && spec.ct != null ? spec.ct : 6; d.t0 = now; d.ms = ms;
+      d.from = d.k; d.to = 1; d.lfrom = d.kl; d.lto = 1; d.ofrom = d.ko; d.oto = spec && spec.orient ? 1 : 0; this.dirty = this.fxDirty = true;
+    }
+    /* cambia solo la orientacion (Astrolabio) sin tocar el resto */
+    setOrient(on, ms = 900) { const d = this.dist; if (!d.spec) return; d.t0 = performance.now(); d.ms = ms; d.from = d.k; d.to = d.k; d.lfrom = d.kl; d.lto = d.kl; d.ofrom = d.ko; d.oto = on ? 1 : 0; this.dirty = this.fxDirty = true; }
+    clearDistort(ms = 800) {
+      const d = this.dist; if (!d.spec) return;
+      d.t0 = performance.now(); d.ms = ms; d.from = d.k; d.to = 0; d.lfrom = d.kl; d.lto = 0; d.ofrom = d.ko; d.oto = 0; this.dirty = this.fxDirty = true;
+    }
+    _stepDistort(now) {
+      const d = this.dist; if (!d.spec && !d.k && !d.ko) return;
+      if (d.k !== d.to || d.kl !== d.lto || d.ko !== d.oto) {
+        const t = d.ms <= 0 ? 1 : Math.min(1, (now - d.t0) / d.ms), back = x => 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2);
+        d.k = d.from + (d.to - d.from) * (d.to > d.from ? back(t) : easeIO(t)); d.kk = d.k;
+        d.kl = d.lfrom + (d.lto - d.lfrom) * easeIO(t); d.ko = d.ofrom + (d.oto - d.ofrom) * easeIO(t);
+        if (t >= 1) { d.k = d.kk = d.to; d.kl = d.lto; d.ko = d.oto; if (d.to === 0 && d.oto === 0) { d.spec = null; d.ko = 0; } }
+        this.dirty = this.fxDirty = true;
+      } else d.kk = d.k;
+    }
+    /* punto de pantalla (px CSS del lienzo) -> lon/lat reales, teniendo en cuenta orientacion y continentes movidos */
+    screenToLonLat(px, py) { let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); return unproject(x, y); }
+    /* lupa de fronteras verdaderas (Sello de aduana / Teodolito): {x,y,r} en px CSS o null */
+    setLens(l) { this.lens = l; this.dirty = true; }
+    distorted() { return !!(this.dist.spec && this.dist.k > 0.01); }
+    /* uniformes de deformacion para un programa */
+    _setDist(p) {
+      const gl = this.gl, e = this._eff();
+      if (p.u.u_dsh !== undefined) gl.uniform2fv(p.u.u_dsh, e.sh);
+      if (p.u.u_drot !== undefined) gl.uniform1fv(p.u.u_drot, e.rot);
+      if (p.u.u_dcen !== undefined) gl.uniform2fv(p.u.u_dcen, e.cen);
+    }
     zoomLevel() { return this.view.s / this.minS; }
 
     /* ---------- interaccion ---------- */
@@ -432,7 +531,8 @@ void main(){
       cv.addEventListener("pointermove", e => {
         if (e.pointerType === "mouse") { const r = cv.getBoundingClientRect(); this.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; this.fxDirty = true; }
         const p = this.pointers.get(e.pointerId); if (!p) return;
-        const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+        let dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+        if (this._orient().on) { const [a0, b0] = this._outToScene(0, 0), [a1, b1] = this._outToScene(dx, dy); dx = a1 - a0; dy = b1 - b0; }
         if (Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > (e.pointerType === "touch" ? 10 : 5)) p.moved = true;
         if (this.pointers.size === 1 && p.moved) {
           this.anim = null; this.view.cx -= dx / this.view.s; this.view.cy += dy / this.view.s; this._clamp(this.view);
@@ -471,7 +571,7 @@ void main(){
     _pinchState() { const [a, b] = [...this.pointers.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; }
     _tap(px, py) {
       if (!this.pickEnabled) return;
-      const [x, y] = this._toWorld(px, py); const [lon, lat] = unproject(x, y);
+      let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); const [lon, lat] = unproject(x, y);
       if (lon < -180 || lon > 180 || lat > 90 || lat < -90) return;
       this.onPick(lon, lat);
     }
@@ -488,7 +588,7 @@ void main(){
     _frame(now) {
       if (this.lost) return;
       const dt = this.lastT ? Math.min(0.05, (now - this.lastT) / 1000) : 0.016; this.lastT = now;
-      this._adapt(now, dt);
+      this._adapt(now, dt); this._stepDistort(now);
       if (this.anim) {
         const a = this.anim, k = Math.min(1, (now - a.t0) / a.ms), e = easeIO(k), dip = 1 - a.dip * Math.sin(Math.PI * e);
         this.view = { cx: a.from.cx + (a.to.cx - a.from.cx) * e, cy: a.from.cy + (a.to.cy - a.from.cy) * e, s: Math.max(this.minS, a.from.s * Math.pow(a.to.s / a.from.s, e) * dip) };
@@ -549,7 +649,7 @@ void main(){
 
       // 1) silueta de tierra a baja resolucion
       gl.bindFramebuffer(gl.FRAMEBUFFER, sil.fbo); gl.viewport(0, 0, silW, silH); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.useProgram(P.sil); this._u(P.sil, "u_off", 0, 0); this._u(P.sil, "u_center", v.cx, v.cy); this._u(P.sil, "u_scale", scale(silW)); this._u(P.sil, "u_res", silW, silH);
+      gl.useProgram(P.sil); this._setDist(P.sil); this._u(P.sil, "u_off", 0, 0); this._u(P.sil, "u_center", v.cx, v.cy); this._u(P.sil, "u_scale", scale(silW)); this._u(P.sil, "u_res", silW, silH);
       gl.bindVertexArray(this.vaoFill); gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
 
       // 2) desenfoques (estrecho y ancho) en la GPU: ancho constante en pantalla
@@ -577,12 +677,12 @@ void main(){
 
       gl.bindVertexArray(this.vaoFill);
       if (st.shadow) {                                               // sombra dura de "pegatina" bajo la tierra
-        gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.solid);
+        gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.solid); this._setDist(P.solid);
         this._u(P.solid, "u_center", v.cx, v.cy); this._u(P.solid, "u_scale", sc); this._u(P.solid, "u_res", sw, sh);
         this._u(P.solid, "u_off", st.shadow.off[0] * dpr * this.rs, st.shadow.off[1] * dpr * this.rs); this._u(P.solid, "u_col", ...st.shadow.col);
         gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0); gl.disable(gl.BLEND);
       }
-      gl.useProgram(P.land); this._u(P.land, "u_off", 0, 0);
+      gl.useProgram(P.land); this._setDist(P.land); this._u(P.land, "u_off", 0, 0);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.land.u.u_blurN, 0);
       gl.uniform1i(P.land.u.u_style, st.style || 0); this._u(P.land, "u_dpr", dpr * this.rs);
       this._u(P.land, "u_center", v.cx, v.cy); this._u(P.land, "u_scale", sc); this._u(P.land, "u_res", sw, sh); this._u(P.land, "u_fx", st.ao, st.grain, 0, 0);
@@ -593,13 +693,14 @@ void main(){
       const hl = this.marks.highlight && this.world.byName[this.marks.highlight];
       if (hl) {
         const k = Math.min(1, (now - this.marks.t0) / 500);
-        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.hatch); this._u(P.hatch, "u_off", 0, 0);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(P.hatch); this._setDist(P.hatch); this._u(P.hatch, "u_off", 0, 0);
         this._u(P.hatch, "u_center", v.cx, v.cy); this._u(P.hatch, "u_scale", sc); this._u(P.hatch, "u_res", sw, sh); this._u(P.hatch, "u_col", ...ms.hl); this._u(P.hatch, "u_dpr", dpr * this.rs); this._u(P.hatch, "u_alpha", k);
         gl.drawElements(gl.TRIANGLES, hl.gl.n, gl.UNSIGNED_INT, hl.gl.i0 * 4);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       }
       // fronteras
-      gl.useProgram(P.line); gl.bindVertexArray(this.vaoLine);
+      gl.useProgram(P.line); gl.bindVertexArray(this.vaoLine); this._setDist(P.line);
+      { const e = this._eff(); this._u(P.line, "u_wob", e.wob); this._u(P.line, "u_wt", now / 1400); this._u(P.line, "u_lineA", e.lineA); }
       this._u(P.line, "u_center", v.cx, v.cy); this._u(P.line, "u_scale", sc); this._u(P.line, "u_res", sw, sh);
       const lw = clamp(st.lineW + Math.log2(v.s / this.minS) * 0.06, st.lineW, st.lineW * 1.7) * dpr * this.rs;
       if (st.lineOff && (st.lineOff[0] || st.lineOff[1])) {           // desregistro (impresion): segunda capa desplazada
@@ -607,7 +708,14 @@ void main(){
         gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
       }
       this._u(P.line, "u_width", lw); this._u(P.line, "u_off", 0, 0); this._u(P.line, "u_col", ...st.line);
-      gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
+      const lensOn = this.lens && this.lens.r > 0 && this.dist.spec && (this._eff().wob > 0.002 || this._eff().lineA < 0.98);
+      if (lensOn) {                                                     // fuera de la lupa: fronteras deformadas; dentro: las verdaderas
+        const [lx, ly] = this._outToScene(this.lens.x, this.lens.y), k = dpr * this.rs, e = this._eff();
+        this._u(P.line, "u_lens", lx * k, (H - ly) * k, this.lens.r * k);
+        this._u(P.line, "u_lmode", 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
+        this._u(P.line, "u_wob", 0); this._u(P.line, "u_lineA", 1); this._u(P.line, "u_lmode", 2); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
+        this._u(P.line, "u_lmode", 0); this._u(P.line, "u_wob", e.wob); this._u(P.line, "u_lineA", e.lineA);
+      } else { this._u(P.line, "u_lmode", 0); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount); }
       if (hl && hl.gl.sn) {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.segBuf); gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 16, hl.gl.s0 * 16);
         this._u(P.line, "u_width", 3.2 * dpr * this.rs); this._u(P.line, "u_col", ...ms.hl, 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, hl.gl.sn);
@@ -624,6 +732,7 @@ void main(){
       this._u(P.post, "u_res", this.cv.width, this.cv.height); this._u(P.post, "u_zc", zc[0] * dpr, (H - zc[1]) * dpr);
       const fxk = this.fxOn === false ? 0 : 1;
       this._u(P.post, "u_zv", this.zv * fxk); this._u(P.post, "u_pv", this.pv[0] * dpr * 0.06 * fxk, -this.pv[1] * dpr * 0.06 * fxk);
+      { const o = this._orient(); this._u(P.post, "u_ori", o.c, o.s, o.sx, o.on ? 1 : 0); }
       this._u(P.post, "u_crt", st.crt ? 1 : 0); this._u(P.post, "u_dpr", dpr);
       this._u(P.post, "u_vig", st.vignette); this._u(P.post, "u_grain", st.postGrain); this._u(P.post, "u_tint", ...st.tint); this._u(P.post, "u_time", now / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -648,7 +757,7 @@ void main(){
     _drawFx(now) {
       const { fctx: c, W, H, dpr } = this, m = this.marks, sk = this.sk;
       c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
-      this._drawGridLabels(c);
+      if (!this._orient().on) this._drawGridLabels(c);
       if (this.probes.length) this._drawProbes(c, now);
       const age = now - m.t0;
       if (m.guess || m.answer || m.labelAt) {
@@ -673,7 +782,7 @@ void main(){
           c.lineWidth = 7; c.strokeStyle = sk.ink; c.strokeText(m.pop, G[0], y); c.fillStyle = sk.paper; c.fillText(m.pop, G[0], y); c.restore();
         }
       }
-      if (this.pickEnabled && this.mouse && !this.pointers.size) this._reticle(c, this.mouse.x, this.mouse.y);
+      if (this.pickEnabled && this.mouse && !this.pointers.size && !this.hideReticle) this._reticle(c, this.mouse.x, this.mouse.y);
     }
     _drawProbes(c, now) {
       const sk = this.sk, D2R = Math.PI / 180;

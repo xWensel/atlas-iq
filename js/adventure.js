@@ -129,21 +129,18 @@ window.AIQ = window.AIQ || {};
     passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pasaporte", "Passport"), d: L("Revela el país del lugar (o el continente, si es un país).", "Reveals the place's country (or the continent for a country)."), kind: "instant" },
     journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Cuaderno", "Field journal"), d: L("Lee la nota de campo del lugar antes de responder.", "Read the place's field note before answering."), kind: "instant" },
     hourglass: { ico: "hourglass", uses: 2, cost: 4, r: 0, n: L("Reloj de arena", "Hourglass"), d: L("+6 segundos en la pregunta actual.", "+6 seconds on the current question."), kind: "instant" },
+    astrolabe: { ico: "astrolabe", uses: 1, cost: 6, r: 1, n: L("Astrolabio", "Astrolabe"), d: L("Endereza el mapa: sirve contra el Mundo del revés en esta pregunta.", "Turns the map upright: beats the Upside-down world for this question."), kind: "instant" },
+    interruptor: { ico: "interruptor", uses: 1, cost: 8, r: 2, n: L("Interruptor", "Master switch"), d: L("Apaga todos los retos durante esta pregunta.", "Switches every challenge off for this question."), kind: "instant" },
+    swapcard: { ico: "swapcard", uses: 1, cost: 6, r: 1, n: L("Carta de cambio", "Swap card"), d: L("Cambia esta pregunta por otro lugar de la ronda.", "Swaps this question for another place from the round."), kind: "instant" },
   };
-  const BOSSES = {
-    wind: { ico: "wind", art: "boss_wind", n: L("Vendaval", "Gale"), d: L("El viento desvía tu pin. Apunta compensando la flecha.", "The wind pushes your pin. Aim to compensate for the arrow.") },
-    clock: { ico: "storm", art: "boss_storm", n: L("Tormenta", "Storm"), d: L("Solo dispones del 55 % del tiempo.", "You only get 55% of the time.") },
-    strict: { ico: "strict", art: "boss_strict", n: L("Rigor", "Rigor"), d: L("La distancia castiga mucho más.", "Distance is punished far more.") },
-    silence: { ico: "silence", art: "boss_silence", n: L("Silencio", "Silence"), d: L("Tus herramientas no funcionan.", "Your tools don't work.") },
-    fog: { ico: "fog", art: "boss_fog", n: L("Niebla", "Fog"), d: L("Las fronteras desaparecen del mapa.", "Borders vanish from the map.") },
-  };
+  const BOSSES = {};                                                 // los jefes ahora son combinaciones de retos (js/challenges.js)
   const DECKS = {
     explorer: { ico: "deck_explorer", n: L("Explorador", "Explorer"), d: L("Un Sonar y 4 doblones. La baraja para aprender.", "A Sonar and 4 doubloons. The deck for learning."), tools: ["sonar"], perks: [], coins: 4, lives: 3, unlock: null },
-    historian: { ico: "deck_historian", n: L("Historiador", "Historian"), d: L("Cuaderno + Cronista. Brillas con batallas y sucesos.", "Field journal + Chronicler. You shine on battles and events."), tools: ["journal"], perks: ["chronicler"], coins: 3, lives: 3, unlock: "adv_act1" },
-    navigator: { ico: "deck_navigator", n: L("Navegante", "Navigator"), d: L("Brújula + Capitán Cook. Islas, mares y rumbos.", "Compass + Captain Cook. Islands, seas and headings."), tools: ["compass", "compass"], perks: ["cook"], coins: 3, lives: 3, unlock: "adv_boss" },
-    blind: { ico: "deck_blind", n: L("Aventurero ciego", "Blind adventurer"), d: L("Sin herramientas, con Ciego valiente y 4 provisiones.", "No tools, with Brave blind and 4 provisions."), tools: [], perks: ["blindperk"], coins: 6, lives: 4, unlock: "adv_win" },
+    historian: { ico: "deck_historian", n: L("Historiador", "Historian"), d: L("Cuaderno + Diccionario. Las letras borradas no te frenan.", "Field journal + Dictionary. Faded letters won't stop you."), tools: ["journal"], perks: ["dictionary"], coins: 3, lives: 3, unlock: "adv_act1" },
+    navigator: { ico: "deck_navigator", n: L("Navegante", "Navigator"), d: L("Dos brújulas y la Brújula de 16 rumbos. Nunca te pierdes.", "Two compasses and the 16-point compass. You never get lost."), tools: ["compass", "compass"], perks: ["compass16"], coins: 3, lives: 3, unlock: "adv_boss" },
+    blind: { ico: "deck_blind", n: L("Aventurero ciego", "Blind adventurer"), d: L("Sin herramientas, con la Linterna de minero y 4 provisiones.", "No tools, with the Miner's lamp and 4 provisions."), tools: [], perks: ["miner"], coins: 6, lives: 4, unlock: "adv_win" },
   };
-  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, roundDefOf };
+  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, roundDefOf, chalFor: r => chalFor(r) };
 
   /* ------------------------------------------------------------------ partida (run) */
   let run = null;
@@ -165,16 +162,19 @@ window.AIQ = window.AIQ || {};
   const has = flag => perkList().some(p => p[flag]);
   const sumFlag = flag => perkList().reduce((n, p) => n + (p[flag] || 0), 0);
   const owned = id => run.perks.includes(id);
-  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const base = 1800 * Math.pow(1.23, roundNo()) * (isBoss() ? 1.2 : 1) * ascFx(run.asc).target; return Math.round((base * t.target) / 50) * 50; };
+  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = 7000 * Math.min(0.95, 0.3 + 0.05 * r) * (isBoss() ? 1.08 : 1) * ascFx(run.asc).target; return Math.round((base * t.target) / 50) * 50; };
   const shopCtx = () => { const x = { price: 0, freeReroll: 0, slots: 3 }; perkList().forEach(p => p.shop && p.shop(x, run)); return x; };
   const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price) + shopCtx().price);
   const sellValue = id => Math.floor(A.RELICS[id].cost * (has("sellAll") ? 1 : 0.5));
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
-  const bossFor = act => {
-    const rr = A.rng(run.seed + ":boss"), order = rr.shuffle(Object.keys(BOSSES)), a = [order[act % order.length]];
-    if (ascFx(run.asc).boss2 && act >= 1) a.push(order[(act + 2) % order.length]);
-    let ign = sumFlag("ignoreBoss");
-    return a.filter(b => { if (perkList().some(p => (p.immune || []).includes(b))) return false; if (ign > 0) { ign--; return false; } return true; });
+  /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades) */
+  const chalFor = r => {
+    const plan = A.chal.plan(run.seed, r, run.asc), boss = r % 4 === 3;
+    let list = A.adv._force ? A.adv._force.map(id => ({ id, lv: 2 })) : plan.list.slice();
+    const skip = sumFlag("skipFirst"); if (skip) list = list.slice(skip);
+    if (boss) { let ign = sumFlag("ignoreBoss"); list = list.filter(() => (ign > 0 ? (ign--, false) : true)); }
+    list = list.filter(c => !perkList().some(p => (p.immune || []).includes(c.id)));
+    return { list, combo: plan.combo, boss };
   };
   const omen = () => has("omen");
   const handInfo = () => null;                                       // la mano de poker esta desactivada: sus parejas no se entendian (v0.9)
@@ -204,7 +204,7 @@ window.AIQ = window.AIQ || {};
   };
   A.adv.abandon = () => { run = null; persist(); };
   A.adv.save = () => persist();
-  A.adv.leave = () => { if (run) persist(); clearTimers(); run = null; };
+  A.adv.leave = () => { if (run) persist(); clearTimers(); A.chal.end(); A.dealer.enable(false); run = null; };
   A.adv.summary = () => { try { const r = run || JSON.parse(localStorage.getItem(RUNKEY)); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives } : null; } catch (e) { return null; } };
   A.adv.active = () => !!run;
 
@@ -222,13 +222,15 @@ window.AIQ = window.AIQ || {};
     return out.map(q => ({ ...q }));
   }
   function roundLevel() {
-    const r = roundNo(), boss = isBoss(), def = rdef(), bosses = boss ? (A.adv._force || bossFor(run.act)) : [], halve = omen() ? 0.5 : 1;
+    const r = roundNo(), boss = isBoss(), def = rdef(), cf = chalFor(r), halve = boss && omen() ? 0.5 : 1;
     const ctx = { seconds: clamp(Math.round(26 - 1.0 * r + ascFx(run.asc).secs), 10, 28), target: 1 };
     perkList().forEach(p => p.round && p.round(ctx, run));
     ctx.seconds = Math.max(6, ctx.seconds);
-    if (bosses.includes("clock")) ctx.seconds = Math.max(6, Math.round(ctx.seconds * (1 - 0.45 * halve)));
-    run.boss = bosses; run.wind = null;
-    if (bosses.includes("wind")) { const wr = A.rng(`${run.seed}:wind:${r}:${run.attempt}`); run.wind = { brg: Math.round(wr() * 360), km: Math.round((160 + 40 * run.act) * halve) }; }
+    run.chal = cf.list; run.chalName = cf.combo ? cf.combo.n : null; run.chalHalve = halve;
+    const rules = cf.list.map(c => (c.id === "storm" ? "clock" : c.id)).filter(id => ["wind", "clock", "silence"].includes(id));
+    if (rules.includes("clock")) ctx.seconds = Math.max(6, Math.round(ctx.seconds * (1 - 0.45 * halve)));
+    run.boss = rules; run.wind = null;
+    if (rules.includes("wind")) { const wr = A.rng(`${run.seed}:wind:${r}:${run.attempt}`); run.wind = { brg: Math.round(wr() * 360), km: Math.round((160 + 40 * run.act) * halve) }; }
     const qs = pickQuestions(run.qn), info = actInfo(run.act), tn = TOPIC_NAMES[def.topic][Math.min(def.tier, TOPIC_NAMES[def.topic].length - 1)];
     run.topic = def.topic; run.tier = def.tier;
     return {
@@ -242,28 +244,39 @@ window.AIQ = window.AIQ || {};
     if (!keep) { run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
     const Lv = roundLevel(), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
-    S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor(run.boss));
+    S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
+    A.dealer.enable(true); A.chal.begin(run.chal, A.chal.fx(perkList()), { seed: run.seed, round: roundNo(), halve: run.chalHalve });
     persist(); A.ach.emit("adv", { kind: "round", act: run.act }); C().startLevel(0);
     if (keep) { S.qi = run.qi; S.levelScore = run.roundScore; S.streak = run.streak || 0; S.hits = run.rGood; C().updateHud && C().updateHud(); }
     if (Lv.boss) setTimeout(() => A.sfx.boss(), 200);
   }
-  function mapStyleFor(bosses) {
-    const base = A.MAPSTYLES[A.skin] || A.MAPSTYLES.casino;
-    if ((bosses && bosses.includes("fog")) || (run && has("fog"))) return { ...base, line: [base.line[0], base.line[1], base.line[2], 0], lineW: 0 };
-    return base;
-  }
-  const DIRS8 = [["N", "N"], ["NE", "NE"], ["E", "E"], ["SE", "SE"], ["S", "S"], ["SW", "SO"], ["W", "O"], ["NW", "NO"]];
-  const dirName = brg => { const d = DIRS8[Math.round((((brg % 360) + 360) % 360) / 45) % 8]; return A.lang === "es" ? d[1] : d[0]; };
+  function mapStyleFor() { return A.MAPSTYLES[A.skin] || A.MAPSTYLES.casino; }
+  const DIRS16 = [["N", "N"], ["NNE", "NNE"], ["NE", "NE"], ["ENE", "ENE"], ["E", "E"], ["ESE", "ESE"], ["SE", "SE"], ["SSE", "SSE"], ["S", "S"], ["SSW", "SSO"], ["SW", "SO"], ["WSW", "OSO"], ["W", "O"], ["WNW", "ONO"], ["NW", "NO"], ["NNW", "NNO"]];
+  const dirName = brg => { const idx = Math.round((((brg % 360) + 360) % 360) / 22.5) % 16, d = has("compass16") ? DIRS16[idx] : DIRS16[Math.round(idx / 2) % 8 * 2]; return A.lang === "es" ? d[1] : d[0]; };
   A.adv.introHtml = Lv => {
-    const info = actInfo(run.act), b = run.boss || [], def = rdef();
-    const debuffs = b.map(id => `<div class="adv-debuff"><span>${ic(BOSSES[id].ico)}</span><div><b>${A.tx(BOSSES[id].n)}</b><i>${A.tx(BOSSES[id].d)}</i>${id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${run.wind.km} km</em>` : ""}</div></div>`).join("");
-    const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss && b[0] ? BOSSES[b[0]].ico : run.round === 0 ? "s_pin" : "s_compass";
-    return `<div class="intro-in adv"><div class="intro-left"><div class="intro-num blind">${A.blind(kind, inner)}</div><div class="intro-body">
+    const info = actInfo(run.act), def = rdef(), list = run.chal || [];
+    const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${run.wind.km} km</em>` : ""}</div></div>`; }).join("");
+    const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? "skull" : run.round === 0 ? "s_pin" : "s_compass";
+    return `<div class="intro-in adv${Lv.boss ? " is-boss" : ""}"><div class="intro-left"><div class="intro-num blind">${A.blind(kind, inner)}</div><div class="intro-body">
       <span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${A.tx(Lv.topicName)}</h2>
+      ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
       <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}</p>
-      <p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>${debuffs}</div></div>
-      <div class="intro-art">${A.pic(Lv.boss && b[0] ? BOSSES[b[0]].art : "topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}</div></div>`;
+      <p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
+      ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
+      <div class="intro-art">${A.pic("topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
   };
+  /* el crupier habla en la intro: saludo o reparto + una frase por reto (y protesta si ya llevas el perk que lo anula) */
+  A.adv.introReady = Lv => {
+    const host = $("introDealer"); if (!host || !run) return 0; const D = A.dealer, list = run.chal || [];
+    D.enable(true); D.dock(host); const seq = [];
+    const first = run.act === 0 && run.round === 0 && !run.qTotal;
+    seq.push(Lv.boss ? { line: D.line("boss"), mood: "boss" } : !list.length ? { line: D.line(first ? "hello" : "calm"), mood: "sly" } : { line: D.line("deal"), mood: "sly" });
+    list.slice(0, Lv.boss ? 3 : 2).forEach(c => seq.push({ line: D.line(c.id), mood: c.id === "dark" || c.id === "flicker" ? "sly" : "sly" }));
+    const counters = list.some(c => (A.CHAL[c.id].counters || []).some(id => owned(id)));
+    if (counters) seq.push({ line: D.line("counter"), mood: "angry" });
+    D.sequence(seq); return seq.reduce((n, it) => n + A.tx(it.line).length * 40 + 900, 0);
+  };
+  A.adv.introEnd = () => { A.dealer.dock(null); A.dealer.hide(); };
 
   /* ---------------- puntuacion de una pregunta ---------------- */
   A.adv.score = function (o, km, left, noSide) {
@@ -272,7 +285,6 @@ window.AIQ = window.AIQ || {};
       o, km, left, limit, kind: o.kind || (o.clue ? "clue" : "place"), topic: o.topic || "mixed", cont: continentOf(o), coins: 0, lines: [], xmult: 1, mult: 1, streakStep: 0.2, luck: false,
       scale: clamp(1500 * Math.pow(0.94, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1),
     };
-    if (boss.includes("strict")) c.scale *= 1 - 0.45 * halve;
     perkList().forEach(p => p.q && p.q(c, run));
     if (km != null) perkList().forEach(p => p.km && p.km(c, run));
     let dist = km == null ? 0 : Math.round(1000 * Math.exp(-c.km / c.scale));
@@ -296,6 +308,8 @@ window.AIQ = window.AIQ || {};
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
     if (res.dist >= 750 && has("recycle")) { const id = Object.keys(run.tools).find(k => run.tools[k].left < toolMax(k)); if (id) run.tools[id].left++; }
     run.streak = res.streak || 0; run.qi++; run.qTools = 0; persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
+    const kind = res.km == null ? "timeout" : res.dist >= 960 ? "bull" : res.dist < 400 ? "miss" : res.streak >= 3 ? "streak" : res.dist >= 750 ? "good" : null;
+    if (kind) setTimeout(() => A.dealer.react(kind), 1300);
   };
 
   /* ---------------- pistas gratis de reliquias ---------------- */
@@ -318,17 +332,22 @@ window.AIQ = window.AIQ || {};
   const hints = [];
   const noteH = (txt, icon) => { hints.push(txt); const el = $("factText"); el.textContent = hints.join("  ·  "); if (icon) el.insertAdjacentHTML("afterbegin", A.icon(icon, "sm")); };
   A.adv.onQuestion = function () {
-    clearTimers(); hints.length = 0; run.qTools = 0; run.probes = []; run.tool = null; const S = C().S; S.tool = null; renderBars();
+    clearTimers(); hints.length = 0; run.qTools = 0; run.probes = []; run.tool = null; run.windOff = false; const S = C().S; S.tool = null; renderBars();
     const o = S.qs[S.qi]; if (!o) return;
+    const fx = A.chal.fx(perkList()); A.chal.question(o, run.qi);
+    A.pointer.set({ tool: null, fx, noCountry: o.t === "c", windFn: run.wind ? windGhost : null });
     const api = {
+      fact: o2 => { const txt = A.tx(o2.fact) || (A.factOf && A.factOf(o2)) || ""; if (txt) noteH(txt, "journal"); },
       note: noteH, continent: o2 => continentName(o2), hemisphere, initial: initialHint, country: revealCountry, addTime: s => { S.limit += s; },
       later: (sec, fn) => { const left = S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000, delay = (left - sec) * 1000; if (delay > 0) timers.push(setTimeout(() => { if (S.phase === "asking" && !S.paused) fn(); }, delay)); },
     };
     perkList().forEach(p => p.open && p.open(api, o, run));
   };
+  const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat), p = m.lonLatToScreen(a.lon, a.lat); return [p[0] - px, p[1] - py]; };
+  A.adv.decorate = o => A.chal.decorate(o);
   /* el viento desvia el clic */
   A.adv.adjust = function (lon, lat) {
-    if (!run || !run.wind) return { lon, lat };
+    if (!run || !run.wind || run.windOff) return { lon, lat };
     const D = Math.PI / 180, d = run.wind.km / 6371, la = lat * D, lo = lon * D, b = run.wind.brg * D;
     const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
     const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2));
@@ -349,10 +368,21 @@ window.AIQ = window.AIQ || {};
     t.left--; run.qTools++; run.rTools++; A.sfx.buy();
     const o = C().S.qs[S.qi];
     if (id === "hourglass") { S.limit += 6; noteH(A.T("+6 segundos", "+6 seconds")); }
+    else if (id === "astrolabe") { A.chal.upright(); A.sfx.flip(true); noteH(A.T("Mapa enderezado", "Map upright")); }
+    else if (id === "interruptor") { A.chal.suspend(); run.windOff = true; A.sfx.restore(); noteH(A.T("Retos apagados en esta pregunta", "Challenges off for this question")); A.dealer.react("counter"); }
+    else if (id === "swapcard") { if (!swapQuestion()) { t.left++; run.qTools--; run.rTools--; A.sfx.deny(); return; } }
     else if (id === "journal") { const txt = o.clue ? A.tf("Empieza por «{l}» y está en {c}.", "Starts with “{l}” and lies in {c}.", { l: A.tx(o.answer).trim()[0], c: continentName(o) }) : (A.tx(o.fact) || (A.factOf && A.factOf(o)) || A.T("Sin notas para este lugar.", "No notes for this place.")); noteH(txt, "journal"); }
     else if (id === "passport") revealCountry(o);
     persist(); renderBars();
   };
+  /* Carta de cambio: otro lugar de la ronda en vez del actual */
+  function swapQuestion() {
+    const S = C().S, list = poolFor(roundNo()), used = new Set(run.used), cand = list.filter(q => !used.has(q.cid[0]));
+    if (!cand.length) { noteH(A.T("No quedan lugares para cambiar.", "No places left to swap.")); return false; }
+    const q = { ...A.rng(`${run.seed}:swap:${roundNo()}:${S.qi}:${run.qTotal}`).pick(cand) };
+    if (run.curQ) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]); S.qs[S.qi] = q;
+    C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; A.adv.onQuestion(); A.sfx.card(); return true;
+  }
   const continentName = o => A.tx(CONT[continentOf(o)] || L("el mar", "the sea"));
   const note = (txt, icon) => { const el = $("factText"); el.textContent = txt || ""; if (txt && icon) el.insertAdjacentHTML("afterbegin", A.icon(icon, "sm")); };
   A.adv.probe = function (lon, lat) {
@@ -361,11 +391,11 @@ window.AIQ = window.AIQ || {};
     const km = o.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[o.key]) : A.geo.haversine(lat, lon, o.lat, o.lon);
     const list = (run.probes = run.probes || []), P = { lon, lat };
     if (id === "sonar") {
-      const fz = (A.rng(run.seed + ":sn:" + roundNo() + ":" + S.qi + ":" + list.length)() - 0.5) * 0.12, shown = km * (1 + fz);
+      const fz = (A.rng(run.seed + ":sn:" + roundNo() + ":" + S.qi + ":" + list.length)() - 0.5) * (has("sonarErr") ? 0.04 : 0.12), shown = km * (1 + fz);
       P.km = Math.max(0, shown); P.label = km === 0 && o.t === "c" ? A.T("¡Dentro del país!", "Inside the country!") : "≈ " + A.fmt(Math.round(shown / (shown > 500 ? 50 : 10)) * (shown > 500 ? 50 : 10)) + " km";
       if (km === 0 && o.t === "c") P.km = 0;
       A.sfx.sonar(clamp(1 - km / 8000, 0, 1));
-    } else { const brg = bearing(lat, lon, latlon(o)), snap = Math.round(brg / 45) * 45; P.bearing = snap; P.label = dirName(snap); A.sfx.sonar(0.8); }
+    } else { const brg = bearing(lat, lon, latlon(o)), step = has("compass16") ? 22.5 : 45, snap = Math.round(brg / step) * step; P.bearing = snap; P.label = dirName(snap); A.sfx.sonar(0.8); }
     list.push(P); C().map.setProbes(list); persist(); note(hints.join("  ·  ")); renderBars();
   };
   function bearing(la1, lo1, p2) { const D = Math.PI / 180, la2 = p2[0] * D, dl = (p2[1] - lo1) * D, y = Math.sin(dl) * Math.cos(la2), x = Math.cos(la1 * D) * Math.sin(la2) - Math.sin(la1 * D) * Math.cos(la2) * Math.cos(dl); return (Math.atan2(y, x) / D + 360) % 360; }
@@ -385,12 +415,13 @@ window.AIQ = window.AIQ || {};
     bar.innerHTML = `<div class="ab-top"><span class="ab-act">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts">${hearts()}</span></div>
       <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}</span>`).join("")}</div>
       ${hand ? `<div class="ab-hand">${ic("cards", "sm")}${A.tx(hand.name)} <b>+${hand.coins}</b></div>` : ""}
-      ${(run.boss || []).length ? `<div class="ab-boss">${run.boss.map(b => `${ic(BOSSES[b].ico)}${A.tx(BOSSES[b].n)}`).join("")}</div>` : ""}
+      ${(run.chal || []).length ? `<div class="ab-chal">${run.chal.map(c => A.chal.chip(c, true)).join("")}</div>` : ""}
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${run.wind.km} km</span></div>` : ""}`;
     const ids = Object.keys(run.tools);
     tb.classList.toggle("hidden", !ids.length || C().S.phase !== "asking");
     tb.innerHTML = ids.map((id, i) => { const t = run.tools[id], on = C().S.tool === id, off = t.left <= 0 || silenced; return `<button class="tool pc-hand${on ? " on" : ""}${off ? " off" : ""}" data-tool="${id}" style="--r:${((i - (ids.length - 1) / 2) * 6).toFixed(1)}deg" title="${A.tx(TOOLS[id].n)} — ${A.tx(TOOLS[id].d)}"><span class="ix tl"><b>A</b>${ic("s_palm")}</span><span class="tl-ico felt">${ic(TOOLS[id].ico)}</span><b>${A.tx(TOOLS[id].n)}</b><span class="tl-pips">${Array.from({ length: toolMax(id) }, (_, k) => `<i class="${k < t.left ? "on" : ""}"></i>`).join("")}</span><kbd>${i + 1}</kbd></button>`; }).join("");
     tb.querySelectorAll(".tool").forEach(b => (b.onclick = () => A.adv.useTool(b.dataset.tool)));
+    if (A.pointer) A.pointer.set({ tool: C().S.tool });
   }
   A.adv.refresh = renderBars;
   A.adv.hideBars = () => { const a = $("advBar"), b = $("toolBar"); if (a) a.classList.add("hidden"); if (b) b.classList.add("hidden"); };
@@ -401,7 +432,7 @@ window.AIQ = window.AIQ || {};
   /* ---------------- fin de ronda ---------------- */
   A.adv.roundEnd = function () {
     const S = C().S, Lv = S.camp.levels[0], pass = S.levelScore >= Lv.advance, boss = isBoss();
-    S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); C().map.setStyle(mapStyleFor(null));
+    S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); A.chal.end(); C().map.setStyle(mapStyleFor());
     if (pass) {
       run.score += S.levelScore; run.cleared++; S.runTotal = run.score;
       const x = { coins: 3 + (boss ? 4 : 0) }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + x.coins]];
@@ -458,7 +489,8 @@ window.AIQ = window.AIQ || {};
   function offers(chest) {
     const rr = A.rng(`${run.seed}:shop:${roundNo()}:${run.shopN}:${chest ? 1 : 0}`), R = A.RELICS, out = [];
     const relics = Object.keys(R).filter(id => !owned(id) && (chest ? true : R[id].r < 3));
-    const wt = id => { const r = R[id].r; return chest ? [30, 35, 25, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]; };
+    const up = new Set(); chalFor(roundNo()).list.forEach(c => (A.CHAL[c.id].counters || []).forEach(id => up.add(id)));
+    const wt = id => { const r = R[id].r; return (chest ? [30, 35, 25, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1); };   // los perks que anulan los retos que vienen salen mas
     const bag = relics.slice();
     const draw = () => { const tot = bag.reduce((n, id) => n + wt(id), 0); let x = rr() * tot; for (let i = 0; i < bag.length; i++) { x -= wt(bag[i]); if (x <= 0) return bag.splice(i, 1)[0]; } return bag.pop(); };
     const slots = chest ? 3 : shopCtx().slots;
@@ -471,18 +503,24 @@ window.AIQ = window.AIQ || {};
     return out;
   }
   function openShop(chest) {
-    const S = C().S; S.phase = "shop"; A.adv.hideBars(); clearTimers(); run.phase = chest ? "chest" : "shop";
+    const S = C().S; S.phase = "shop"; A.adv.hideBars(); clearTimers(); A.chal.end(); A.dealer.hide(); run.phase = chest ? "chest" : "shop";
     const key = `${roundNo()}:${run.shopN}:${chest}`;
     if (!run.stock || run.stockKey !== key) { run.stock = offers(chest); run.stockKey = key; run.bought = []; if (run.shopKey !== `${roundNo()}:${chest}`) { run.shopKey = `${roundNo()}:${chest}`; run.rerolls = 0; run.freeUsed = 0; } }
     persist(); renderShop(chest);
   }
+  /* banda "proxima ronda": los retos que vienen (con la Mirilla, tambien la siguiente) */
+  const nextHtml = () => {
+    const r = roundNo(), rows = [r]; if (has("spy")) rows.push(r + 1);
+    const html = rows.map((rr, k) => { const cf = chalFor(rr), t = cf.boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + ((rr % 4) + 1); return `<div class="tb-next-row${k ? " far" : ""}"><span class="tb-next-h">${k ? A.T("Después", "Then") : A.T("Próxima ronda", "Next round")} · ${t}${cf.boss && cf.combo ? " · " + A.tx(cf.combo.n) : ""}</span>${cf.list.length ? cf.list.map(c => A.chal.chip(c, true)).join("") : `<span class="tb-next-none">${A.T("Sin trucos", "No tricks")}</span>`}</div>`; }).join("");
+    return `<div class="tb-next">${html}</div>`;
+  };
   const routeHtml = () => { let h = ""; const cur = roundNo(); for (let i = Math.max(0, cur - 3); i < Math.max(0, cur - 3) + 12; i++) h += `<i class="${i < cur ? "done" : i === cur ? "cur" : ""}${i % 4 === 3 ? " boss" : ""}">${i % 4 === 3 ? ic("skull") : ""}</i>`; return h; };
   const rerollCost = () => { const sx = shopCtx(); return run.freeUsed < sx.freeReroll ? 0 : 3 + run.rerolls; };
   function cardHtml(s, i, chest) {
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
-      const p = A.RELICS[s.id], c = chest ? 0 : price(p.cost);
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-i="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`;
+      const p = A.RELICS[s.id], c = chest ? 0 : price(p.cost), ctr = chalFor(roundNo()).list.find(ch => (A.CHAL[ch.id].counters || []).includes(p.id));
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}${ctr ? " counter" : ""}" data-i="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ctr ? `<span class="of-ctr" title="${A.tx(A.CHAL[ctr.id].n)}">${ic(A.CHAL[ctr.id].ico)}<em>${A.T("Ayuda contra", "Helps against")} ${A.tx(A.CHAL[ctr.id].n)}</em></span>` : ""}${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`;
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], c = price(t.cost), have = run.tools[s.id];
@@ -497,6 +535,7 @@ window.AIQ = window.AIQ || {};
     C().dialog(`<div class="table${chest ? " chest" : ""}">
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
         <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
+      ${nextHtml()}
       ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${A.T("Tres cartas sobre la mesa. ¿Compras o rolas?", "Three cards on the table. Buy, or roll?")}</p>`}
       <section class="offers">${cards}</section>
       <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Rolear", "Roll")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
@@ -543,7 +582,7 @@ window.AIQ = window.AIQ || {};
     const rec = A.profile.record("adv-all", final);
     A.rank.submit("adv-all", { score: final, extra: { deck: run.deck, asc: run.asc, r: run.cleared } });
     if (wasRanked && board) { P.daily[board] = { score: final, ts: Date.now() }; A.profile.save(); A.rank.submit(board, { score: final, extra: { deck: run.deck, r: run.cleared } }); A.ach.emit("daily", {}); }
-    const r = run; run = null; persist(); C().S.run = null;
+    const r = run; run = null; persist(); C().S.run = null; A.chal.end(); A.dealer.enable(true); setTimeout(() => A.dealer.react(win ? "runWin" : "runLose"), 900);
     A.sfx.stamp(); setTimeout(win ? A.sfx.victory : A.sfx.lose, 300);
     C().verdict({
       kind: win ? "win" : "", level: r.cleared, title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
@@ -552,7 +591,7 @@ window.AIQ = window.AIQ || {};
       stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
       buttons: [{ id: "nrBtn", cls: "btn-ink", label: A.T("Otra expedición", "Another expedition"), arrow: true, primary: true, onclick: () => C().showHub("adventure") }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],
     });
-    C().map.setStyle(mapStyleFor(null)); A.adv.hideBars();
+    C().map.setStyle(mapStyleFor()); A.adv.hideBars();
   }
   A.adv.endRun = endRun; A.adv.startRound = startRound; A.adv.openShop = openShop;
 })(window.AIQ);

@@ -1,5 +1,13 @@
 # Atlas IQ
 
+**v0.10** – El crupier cambia las reglas: retos, perks y puntero:
+- **Los perks ya no tocan la puntuacion.** Fuera todos los multiplicadores y bonus de fichas: la puntuacion es tu precision. Los perks (57) ayudan a vencer retos, mejoran el puntero, dan pistas, tiempo, doblones o supervivencia (`js/relics.js`).
+- **Retos por ronda y jefes** (`js/challenges.js`): letras temblorosas, tinta borrada, letras cambiadas, espejo, memoria de pez; y en el mapa: borroso, apagon (con linterna), luces parpadeantes, fronteras falsas, mapa mudo, Pangea, continentes cambiados, mundo del reves, humo, vendaval, tormenta, silencio. Suben por actos; cada jefe trae una combinacion. El Campamento anuncia la proxima ronda y marca los perks que ayudan.
+- **Mapa vivo** (`js/map.js`): cada continente se puede desplazar y girar en la GPU, el mapa se puede dar la vuelta (Sur arriba), las fronteras mienten con un vaiven, y todo se revierte con animacion al revelar. Los clics se traducen a coordenadas reales aunque el mapa este deformado.
+- **Puntero** (`js/pointer.js`): reticulo de pixel art que reacciona a mar/tierra y herramientas; con perks: haz de linterna, lupa de fronteras, coordenadas y pais, guias, mira telescopica y pin fantasma del viento.
+- **El Crupier** (`js/dealer.js`): jefe de mesa con voz arcade (una silaba por letra), anuncia los retos, se rie cuando fallas y protesta cuando lo esquivas.
+- Herramientas nuevas: Astrolabio, Interruptor, Carta de cambio. Objetivos de ronda como % del maximo posible. ~45 iconos nuevos.
+
 **v0.9.4** – Rondas sin repetidos, nombres y paises corregidos, nueva entrada:
 - **Reparto de lugares:** cada lugar aparece en una sola ronda (80 por ronda); maximo de lugares del mismo pais por ronda (la ronda de maravillas dificiles ya no es casi toda de EE. UU.); el Jackpot mezcla a partes iguales lo que sobra. Lista completa en `docs/rondas-aventura.md`.
 - **+50 sucesos historicos** (batallas espanolas, guerras clasicas...) para llegar a 80 en las dos rondas de Historia.

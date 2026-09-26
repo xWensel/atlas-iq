@@ -1,0 +1,94 @@
+/* Atlas IQ v0.10 - retos, puntero y crupier (casino pixel art) */
+
+/* ---------------------------------------------------------------- capas de retos sobre el mapa */
+#chOv { position: absolute; inset: 0; pointer-events: none; --dr: 180px; --da: .95; }
+#chOv > * { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity .55s ease; }
+#chOv > .on { opacity: 1; }
+.ch-blur { -webkit-backdrop-filter: blur(var(--bl, 6px)); backdrop-filter: blur(var(--bl, 6px));
+  -webkit-mask: radial-gradient(circle at var(--px, 50%) var(--py, 50%), transparent 0, transparent var(--lr, -60px), #000 calc(var(--lr, -60px) + 46px)); mask: radial-gradient(circle at var(--px, 50%) var(--py, 50%), transparent 0, transparent var(--lr, -60px), #000 calc(var(--lr, -60px) + 46px)); }
+.ch-dark { background: radial-gradient(circle at var(--px, 50%) var(--py, 50%), rgba(3, 1, 10, 0) 0, rgba(3, 1, 10, 0) calc(var(--dr) * .42), rgba(3, 1, 10, var(--da)) var(--dr)); }
+.ch-halo { mix-blend-mode: screen; background: radial-gradient(circle at var(--px, 50%) var(--py, 50%), rgba(255, 206, 110, .10), transparent calc(var(--dr) * 1.05)); }
+.ch-halo.warm { background: radial-gradient(circle at var(--px, 50%) var(--py, 50%), rgba(255, 214, 130, .24), rgba(255, 170, 60, .08) calc(var(--dr) * .6), transparent calc(var(--dr) * 1.15)); }
+.ch-halo.warn { background: rgba(255, 70, 50, .22); opacity: 1; transition: none; }
+.ch-clouds { image-rendering: pixelated; mix-blend-mode: normal; }
+.ch-clouds.on { opacity: .9; }
+.ch-flick { background: #05020c; transition: none !important; opacity: 0; }
+
+/* ---------------------------------------------------------------- nombre del lugar con retos */
+#askName .lt { display: inline-block; }
+#askName.ch-shaky .lt[data-sh] { animation: lt-shake var(--dur, .1s) steps(2, end) var(--del, 0s) infinite; }
+@keyframes lt-shake { 0% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(var(--ax), var(--ay)) rotate(var(--ar)); } 100% { transform: translate(calc(var(--ax) * -.7), calc(var(--ay) * .6)) rotate(calc(var(--ar) * -1)); } }
+#askName .lt.gap { color: transparent; position: relative; }
+#askName .lt.gap::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: .16em; height: .11em; background: #191325; opacity: .85; box-shadow: 0 0 0 1px rgba(255, 255, 255, .18); }
+#askName .lt.fix { animation: lt-fix .55s cubic-bezier(.2, 1.7, .4, 1) both; }
+@keyframes lt-fix { 0% { transform: scale(1.7); color: #f8b449; } 100% { transform: none; } }
+#askName.ch-mirror { display: block; transform: scaleX(-1); }
+#askName.ch-fade { opacity: .05; filter: blur(3px); transition: opacity .9s ease, filter .9s ease; }
+#askName.ch-dim { opacity: .5; transition: opacity .6s ease; }
+
+/* ---------------------------------------------------------------- puntero */
+#ptr { position: absolute; left: 0; top: 0; z-index: 40; pointer-events: none; display: none; will-change: transform; }
+#ptr.on { display: block; }
+.ptr-cv { position: absolute; left: -64px; top: -64px; width: 128px; height: 128px; image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 12px rgba(248, 180, 73, .25)); }
+.ptr-tag { position: absolute; left: 0; top: 44px; transform: translateX(-50%); white-space: pre; text-align: center; display: none; font-family: var(--mono); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: #ffe08a; background: rgba(25, 19, 37, .92); padding: 5px 9px; border: 2px solid #f8b449; box-shadow: 0 4px 0 rgba(0, 0, 0, .4); line-height: 1.35; }
+.ptr-tag.on { display: block; }
+.ptr-ghost { position: absolute; left: 0; top: 0; width: 18px; height: 18px; display: none; border: 3px dashed #fe5f55; box-sizing: border-box; transform-origin: center; background: rgba(254, 95, 85, .18); }
+.ptr-ghost.on { display: block; }
+#ptrMag { position: absolute; left: 0; top: 0; z-index: 39; width: 168px; height: 168px; border-radius: 50%; border: 4px solid #f8b449; box-shadow: 0 0 0 3px #191325, 0 14px 30px rgba(0, 0, 0, .55), inset 0 0 22px rgba(0, 0, 0, .35); display: none; pointer-events: none; }
+#ptrMag.on { display: block; }
+.ptr-gx, .ptr-gy { position: absolute; left: 0; top: 0; z-index: 38; pointer-events: none; display: none; }
+.ptr-gx { width: 1px; height: 100%; background: repeating-linear-gradient(to bottom, rgba(248, 180, 73, .55) 0 6px, transparent 6px 12px); }
+.ptr-gy { height: 1px; width: 100%; background: repeating-linear-gradient(to right, rgba(248, 180, 73, .55) 0 6px, transparent 6px 12px); }
+.ptr-gx.on, .ptr-gy.on { display: block; }
+body.ptr-on #map { cursor: none; }
+
+/* ---------------------------------------------------------------- fichas de reto */
+.ch-chip { display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px 4px 6px; border-radius: 999px; background: rgba(25, 19, 37, .92); color: #fdf5fd; font-family: var(--mono); font-weight: 700; font-size: 12.5px; letter-spacing: .04em; box-shadow: inset 0 0 0 2px var(--cc, #b58cff), 0 3px 0 rgba(0, 0, 0, .35); white-space: nowrap; }
+.ch-chip .ic { width: 24px; height: 24px; } .ch-chip b { font-weight: 700; } .ch-chip .ch-lv { font-style: normal; font-size: 8px; letter-spacing: 1px; color: var(--cc, #b58cff); }
+.ch-chip.k-text { --cc: #c9a3ff; } .ch-chip.k-map { --cc: #5fd6b8; } .ch-chip.k-rule { --cc: #fe5f55; }
+.ch-chip.sm { padding: 3px 9px 3px 5px; font-size: 11px; } .ch-chip.sm .ic { width: 18px; height: 18px; }
+
+/* ---------------------------------------------------------------- crupier */
+.dealer { position: absolute; left: 16px; bottom: 112px; z-index: 30; display: flex; align-items: flex-end; gap: 4px; pointer-events: none; transform: translateX(-140%); opacity: 0; transition: transform .45s cubic-bezier(.2, 1.4, .4, 1), opacity .3s; }
+.dealer.in { transform: none; opacity: 1; }
+.dealer.hidden { display: none; }
+.dl-face { width: 124px; height: 124px; image-rendering: pixelated; object-fit: contain; filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .4)); flex: none; }
+.dealer.laugh .dl-face { animation: dl-laugh .18s steps(2, end) infinite; } .dealer.angry .dl-face { animation: dl-angry .12s steps(2, end) infinite; } .dealer.shock .dl-face { animation: dl-shock .5s ease-out; }
+.dealer.sly:not(.done) .dl-face, .dealer.boss:not(.done) .dl-face { animation: dl-talk .22s steps(2, end) infinite; }
+@keyframes dl-laugh { 0% { transform: translateY(0) rotate(-3deg); } 100% { transform: translateY(-6px) rotate(3deg); } }
+@keyframes dl-angry { 0% { transform: translateX(-2px); } 100% { transform: translateX(2px); } }
+@keyframes dl-shock { 0% { transform: scale(1); } 30% { transform: scale(1.18) translateY(-6px); } 100% { transform: none; } }
+@keyframes dl-talk { 0% { transform: translateY(0); } 100% { transform: translateY(-3px) scaleY(1.02); } }
+.dl-bubble { position: relative; max-width: min(340px, 52vw); margin-bottom: 44px; padding: 12px 16px 12px 14px; background: #fdf5fd; color: #191325; font-family: var(--mono); font-weight: 700; font-size: 14px; line-height: 1.32; box-shadow: inset 0 0 0 3px #191325, 0 6px 0 rgba(0, 0, 0, .4); opacity: 0; transform: scale(.85); transform-origin: 0 100%; transition: opacity .2s, transform .3s cubic-bezier(.2, 1.6, .4, 1); clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% + 12px)); }
+.dl-bubble.on { opacity: 1; transform: none; } .dl-bubble p { margin: 0; min-height: 1.3em; }
+.dealer.big { position: relative; left: 0; bottom: 0; transform: none; opacity: 1; flex-direction: column; align-items: center; gap: 8px; z-index: 2; }
+.dealer.big .dl-face { width: clamp(150px, 26vh, 260px); height: clamp(150px, 26vh, 260px); order: 2; }
+.dealer.big .dl-bubble { margin: 0; max-width: min(420px, 80vw); font-size: clamp(14px, 2.2vh, 18px); order: 1; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(50% + 10px) calc(100% - 12px), 50% 100%, calc(50% - 10px) calc(100% - 12px), 0 calc(100% - 12px)); padding-bottom: 20px; }
+@media (max-width: 720px) { .dl-face { width: 84px; height: 84px; } .dealer { bottom: 130px; } .dl-bubble { font-size: 12px; max-width: 60vw; margin-bottom: 20px; } }
+
+/* crupier: retrato a la izquierda, globo a la derecha */
+.dealer:not(.big) { flex-direction: row-reverse; }
+.dealer:not(.big) .dl-bubble { transform-origin: 0 100%; margin: 0 0 58px 0; }
+
+/* intro de ronda con retos */
+.intro-art { position: relative; }
+.intro-dealer { position: absolute; left: -6%; bottom: -22%; z-index: 3; }
+.adv-chal-h { margin: 14px 0 6px; font-family: var(--mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #ffd98a; }
+.boss-combo { margin: 2px 0 8px; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: clamp(20px, 3.4vh, 34px); color: #fe5f55; text-shadow: 0 3px 0 rgba(0, 0, 0, .5); }
+.adv-debuff .ch-lv { font-style: normal; font-size: 9px; letter-spacing: 2px; color: #ffd98a; margin-left: 4px; }
+.adv-debuff.k-text { box-shadow: inset 4px 0 0 #c9a3ff; } .adv-debuff.k-map { box-shadow: inset 4px 0 0 #5fd6b8; } .adv-debuff.k-rule { box-shadow: inset 4px 0 0 #fe5f55; }
+
+/* barra de la aventura: retos activos */
+.ab-chal { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 8px; }
+
+/* campamento: proxima ronda y perks que ayudan */
+.tb-next { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 10px; }
+.tb-next-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } .tb-next-row.far { opacity: .72; }
+.tb-next-h { font-family: var(--mono); font-weight: 700; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #ffd98a; margin-right: 4px; } .tb-next-none { font-family: var(--mono); font-size: 12px; opacity: .65; }
+.offer.counter { box-shadow: 0 0 0 3px #5fd6b8, 0 0 26px rgba(95, 214, 184, .55); }
+.offer .of-ctr { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); z-index: 6; display: inline-flex; align-items: center; gap: 6px; padding: 2px 12px 2px 4px; border-radius: 999px; background: #191325; box-shadow: inset 0 0 0 2px #5fd6b8; color: #9ff3dc; font-family: var(--mono); font-weight: 700; font-size: 11px; letter-spacing: .04em; white-space: nowrap; }
+.offer .of-ctr .ic { width: 22px; height: 22px; } .offer .of-ctr em { font-style: normal; }
+
+/* sacudida de "glitch" cuando el crupier toca la mesa */
+#app.ch-glitch #map, #app.ch-glitch #fx { animation: ch-glitch .55s steps(6, end); }
+@keyframes ch-glitch { 0% { filter: none; transform: none; } 16% { filter: hue-rotate(80deg) saturate(2.2) contrast(1.3); transform: translate(-6px, 2px) skewX(2deg); } 33% { filter: brightness(1.6); transform: translate(7px, -3px); } 50% { filter: hue-rotate(-70deg) saturate(1.8); transform: translate(-3px, 4px) skewX(-2deg); } 75% { filter: contrast(1.4); transform: translate(2px, -1px); } 100% { filter: none; transform: none; } }
