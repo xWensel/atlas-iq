@@ -545,5 +545,16 @@ window.AIQ = window.AIQ || {};
     "+20%, −2 s. From act 2, a rule challenge (wind, storm or silence) every round": ["+20 %, −2 s. Dès l'acte 2, un défi de règle (vent, tempête ou silence) à chaque manche", "+20%, −2 s. Do ato 2, um desafio de regra (vento, tempestade ou silêncio) em cada rodada", "+20 %, −2 s. Ab Akt 2 eine Regelprüfung (Sturm, Gewitter oder Stille) pro Runde", "+20%, −2 s. Dall'atto 2, una sfida di regola (vento, tempesta o silenzio) a ogni round"],
     "+30%, −3 s, challenges one level stronger and one fewer provision": ["+30 %, −3 s, défis un niveau plus forts et une provision de moins", "+30%, −3 s, desafios um nível mais fortes e uma provisão a menos", "+30 %, −3 s, Herausforderungen eine Stufe stärker und ein Proviant weniger", "+30%, −3 s, sfide un livello più forti e una provvista in meno"],
     "+40%, −4 s. Bosses bring one extra power": ["+40 %, −4 s. Les boss apportent un pouvoir de plus", "+40%, −4 s. Os chefes trazem um poder extra", "+40 %, −4 s. Bosse bringen eine zusätzliche Kraft mit", "+40%, −4 s. I boss portano un potere in più"],
+    "Double espresso": ["Double expresso", "Café duplo", "Doppelter Espresso", "Espresso doppio"],
+    "+4 s per question next round": ["+4 s par question à la prochaine manche", "+4 s por pergunta na próxima rodada", "+4 s pro Frage in der nächsten Runde", "+4 s per domanda nel prossimo round"],
+    "Resupply": ["Réapprovisionnement", "Reforço", "Nachschub", "Rifornimento"],
+    "+1 use on all your tools next round": ["+1 usage sur tous tes outils à la prochaine manche", "+1 uso em todas as suas ferramentas na próxima rodada", "+1 Nutzung für alle Werkzeuge in der nächsten Runde", "+1 uso su tutti i tuoi strumenti nel prossimo round"],
+    "Round insurance": ["Assurance de manche", "Seguro de rodada", "Rundenversicherung", "Assicurazione del round"],
+    "If you fail next round, you keep your provision": ["Si tu rates la prochaine manche, tu gardes ta provision", "Se falhar a próxima rodada, você mantém a provisão", "Scheiterst du in der nächsten Runde, behältst du deinen Proviant", "Se fallisci il prossimo round, non perdi la provvista"],
+    "Round bet": ["Pari sur la manche", "Aposta na rodada", "Rundenwette", "Scommessa sul round"],
+    "Beat the target by 30%: get ×2.5 back": ["Dépasse l'objectif de 30 % : tu touches ×2,5", "Supere a meta em 30%: recebe ×2,5", "Übertriff das Ziel um 30 %: du bekommst ×2,5", "Supera l'obiettivo del 30%: incassi ×2,5"],
+    "Bet won": ["Pari gagné", "Aposta ganha", "Wette gewonnen", "Scommessa vinta"],
+    "Bet lost": ["Pari perdu", "Aposta perdida", "Wette verloren", "Scommessa persa"],
+    "Interest (1 per 10)": ["Intérêt (1 par 10)", "Juro (1 por 10)", "Zinsen (1 pro 10)", "Interesse (1 ogni 10)"],
   });
 })(window.AIQ);

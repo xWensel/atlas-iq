@@ -225,3 +225,15 @@ html[data-skin="casino"] .offer b { font-size: 23px; } html[data-skin="casino"] 
 .cx-card.locked .ix, .cx-bigcard.locked .ix { opacity: .45; filter: grayscale(1); }
 .cx-bigcard .ix.tl { left: 20px; top: 20px; } .cx-bigcard .ix.br { right: 20px; bottom: 56px; } .cx-bigcard .ix b { font-size: 24px; } .cx-bigcard .ix .ic { width: 20px; height: 20px; }
 .cx-card.open .cx-art { background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .07) 0 1.5px, transparent 1.5px 16px), repeating-linear-gradient(90deg, rgba(255, 255, 255, .07) 0 1.5px, transparent 1.5px 16px), radial-gradient(ellipse at 50% 28%, #35a56a, #17553a 78%); }
+
+/* Campamento: suministros de la proxima ronda y apuesta */
+.tb-sup { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 2px 0 6px; }
+.sup { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 8px; min-width: 230px; max-width: 320px; padding: 6px 10px; text-align: left; color: #f6efdc; background: rgba(16, 10, 30, .82); border: 0; border-radius: 10px; cursor: pointer; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .16); transition: transform .15s, box-shadow .15s; }
+.sup:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2px #ffd98a; } .sup.on { background: rgba(38, 92, 70, .85); box-shadow: inset 0 0 0 2px #5fd6b8; }
+.sp-ic { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: #17553a; box-shadow: inset 0 0 0 2px #191325; } .sp-ic .ic { width: 26px; height: 26px; }
+.sp-t { display: grid; gap: 1px; min-width: 0; } .sp-t b { font-family: var(--serif); font-size: 16px; font-weight: 800; color: #fff; } .sp-t i { font-style: normal; font-size: 11.5px; line-height: 1.15; opacity: .8; }
+.sup em { font-style: normal; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: #ffd98a; display: inline-flex; align-items: center; gap: 4px; } .sup em .ic { width: 16px; height: 16px; }
+.sup.bet { cursor: default; } .sup.bet:hover { transform: none; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .16); } .sup.bet.on { box-shadow: inset 0 0 0 2px #fe5f55; background: rgba(90, 24, 40, .85); }
+.stakes { display: inline-flex; gap: 4px; } .stk { min-width: 30px; padding: 5px 7px; border: 0; border-radius: 7px; cursor: pointer; font-family: var(--mono); font-size: 12px; color: #191325; background: #ffd98a; box-shadow: 0 3px 0 rgba(0, 0, 0, .4); } .stk.on { background: #fe5f55; color: #fff; }
+@media (max-width: 700px) { .sup { min-width: 100%; max-width: none; } }
+.tb-note { margin-bottom: 8px; } .tb-sup { margin-top: 4px; }

@@ -2,6 +2,11 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.21.0** - Pangea de verdad y economia con peso.
+- **Pangea:** el reto ya no es un barajado: los continentes se deslizan lentamente (2,6 s, sin rebote) hasta encajar como en el supercontinente: Africa, Europa y la Antartida quietas, Sudamerica gira y se pega a la costa africana, Norteamerica se cierra contra Europa, Asia se une a Europa y Arabia y Oceania a la Antartida. Colocacion calculada con las mascaras reales de tierra (maximizar contacto sin solapes grandes). Hay un pequeno solape residual entre Norteamerica/Groenlandia e Islandia.
+- **Atlas de bolsillo:** ahora ilumina el pais a 5 s del final (no a mitad de tiempo), cuesta 9 y es raro.
+- **Economia:** menos ingresos (solo las dianas dan doblon; ronda superada +2, jefe +2; interes 1 por cada 10, tope 2), precios que suben un 25 % por acto, cada provision comprada cuesta 2 mas, Tesorero +2 y Banquero mas contenido. Nuevos gastos en cada Campamento: **Suministros** de una ronda (Cafe doble +4 s por pregunta, Refuerzo +1 uso en las herramientas, Seguro de ronda que evita perder provision) y **Apuesta a la ronda** (3/6/10 doblones: si superas el objetivo +30 % cobras x2,5). Con el bot, un jugador habil compra ahora ~1 pieza por ronda en vez de llenarlo todo.
+
 **v0.20.1** - El escudo ya no es un cuadrado: es la Tierra del logo (la O de GEOLITE) con la carta y la ficha encima, en pixel art de 48 px nativos (`tools/make_emblem.py`), con fondo transparente en favicon, iconos de app y de escritorio (solo iOS y el icono adaptable llevan fondo porque el sistema lo exige). Todas las marcas nacen de el.
 
 **v0.20.0** - Logo en PNG en todas partes y titulos de cancion completos.

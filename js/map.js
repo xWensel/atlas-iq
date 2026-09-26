@@ -608,7 +608,7 @@ void main(){
       const d = this.dist; if (!d.spec && !d.k && !d.ko) return;
       if (d.k !== d.to || d.kl !== d.lto || d.ko !== d.oto) {
         const t = d.ms <= 0 ? 1 : Math.min(1, (now - d.t0) / d.ms), back = x => 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2);
-        d.k = d.from + (d.to - d.from) * (d.to > d.from ? back(t) : easeIO(t)); d.kk = d.k;
+        d.k = d.from + (d.to - d.from) * (d.to > d.from && !(d.spec && d.spec.smooth) ? back(t) : easeIO(t)); d.kk = d.k;
         d.kl = d.lfrom + (d.lto - d.lfrom) * easeIO(t); d.ko = d.ofrom + (d.oto - d.ofrom) * easeIO(t);
         if (t >= 1) { d.k = d.kk = d.to; d.kl = d.lto; d.ko = d.oto; if (d.to === 0 && d.oto === 0) { d.spec = null; d.ko = 0; } }
         this.dirty = this.fxDirty = true;

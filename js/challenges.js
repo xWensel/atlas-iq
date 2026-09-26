@@ -40,7 +40,7 @@ window.AIQ = window.AIQ || {};
   def("flicker", "map", "ch_flicker", "Luces parpadeantes|Flickering lights|Lumières clignotantes|Luzes piscando|Flackerndes Licht|Luci intermittenti", "Las luces se apagan a ratos y el mapa desaparece.|The lights cut out and the map vanishes for a moment.|Les lumières s'éteignent et la carte disparaît un instant.|As luzes apagam e o mapa some por um instante.|Das Licht fällt aus und die Karte verschwindet kurz.|Le luci si spengono e la mappa sparisce per un attimo.");
   def("wrongborders", "map", "ch_wrongborders", "Fronteras falsas|False borders|Fausses frontières|Fronteiras falsas|Falsche Grenzen|Confini falsi", "Las fronteras dibujadas mienten.|The drawn borders are lying.|Les frontières dessinées mentent.|As fronteiras desenhadas mentem.|Die gezeichneten Grenzen lügen.|I confini disegnati mentono.", ["customs"]);
   def("noborders", "map", "ch_noborders", "Mapa mudo|Blank map|Carte muette|Mapa mudo|Stumme Karte|Mappa muta", "Sin fronteras en el mapa.|No borders on the map.|Pas de frontières sur la carte.|Sem fronteiras no mapa.|Keine Grenzen auf der Karte.|Nessun confine sulla mappa.", ["customs"]);
-  def("pangea", "map", "ch_pangea", "Pangea|Pangaea|Pangée|Pangeia|Pangaea|Pangea", "Los continentes se han acercado.|The continents have drifted closer.|Les continents se sont rapprochés.|Os continentes se aproximaram.|Die Kontinente sind zusammengerückt.|I continenti si sono avvicinati.", ["plates"]);
+  def("pangea", "map", "ch_pangea", "Pangea|Pangaea|Pangée|Pangeia|Pangaea|Pangea", "Los continentes se han unido en un solo supercontinente, como hace 250 millones de años.|The continents have merged into one supercontinent, like 250 million years ago.|Les continents se sont réunis en un seul supercontinent, comme il y a 250 millions d'années.|Os continentes se uniram num único supercontinente, como há 250 milhões de anos.|Die Kontinente sind zu einem Superkontinent verschmolzen, wie vor 250 Millionen Jahren.|I continenti si sono uniti in un unico supercontinente, come 250 milioni di anni fa.", ["plates"]);
   def("shuffle", "map", "ch_shuffle", "Continentes cambiados|Continents swapped|Continents échangés|Continentes trocados|Kontinente vertauscht|Continenti scambiati", "Los continentes han cambiado de sitio.|The continents have changed places.|Les continents ont changé de place.|Os continentes mudaram de lugar.|Die Kontinente haben die Plätze getauscht.|I continenti hanno cambiato posto.", ["plates"]);
   def("spread", "map", "ch_spread", "Big bang|Big bang|Big bang|Big bang|Urknall|Big bang", "Los continentes se han separado.|The continents have drifted apart.|Les continents se sont éloignés.|Os continentes se afastaram.|Die Kontinente sind auseinandergedriftet.|I continenti si sono allontanati.", ["plates"]);
   def("tilt", "map", "ch_tilt", "Continentes torcidos|Crooked continents|Continents de travers|Continentes tortos|Schiefe Kontinente|Continenti storti", "Cada continente está girado.|Every continent is turned.|Chaque continent est tourné.|Cada continente está girado.|Jeder Kontinent ist gedreht.|Ogni continente è ruotato.", ["plates"]);
@@ -149,7 +149,7 @@ window.AIQ = window.AIQ || {};
     case "flicker": return { iv: [[5.5, 8.5], [3.8, 6], [2.5, 4.2]][i], len: [250, 450, 700][i] * fx.blackoutMul * h };
     case "lightning": return { iv: [[4.5, 7], [3.2, 5.2], [2.2, 4]][i] };
     case "wrongborders": return { amp: [0.014, 0.024, 0.038][i] * h };
-    case "pangea": return { k: [0.4, 0.6, 0.8][i] * fx.plateMul * h };
+    case "pangea": return { k: [0.75, 0.9, 1][i] * fx.plateMul * h };
     case "shuffle": return { k: [0.6, 0.85, 1][i] * fx.plateMul * h };
     case "spread": return { k: [0.5, 0.8, 1][i] * fx.plateMul * h };
     case "tilt": return { k: [0.4, 0.65, 0.9][i] * fx.plateMul * h };
@@ -288,12 +288,18 @@ window.AIQ = window.AIQ || {};
   function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
+  /* Pangea (unidades del mapa; indices 0 Africa, 1 Norteamerica, 2 Sudamerica, 3 Asia, 4 Europa, 5 Oceania, 6 Antartida). Ajuste de contacto calculado con las mascaras reales:
+     Africa, Europa y la Antartida quedan quietas; Sudamerica gira y se encaja en la costa de Africa, Norteamerica se cierra contra Europa y el noroeste africano,
+     Asia se pega a Europa y a Arabia y Oceania a la Antartida. Rotaciones en radianes (positivas = antihorario). */
+  const PANGEA = { shift: [[0, 0], [0.529, -0.152], [0.871, -0.443], [0.383, 0.143], [0, 0], [-1.124, -0.699], [0, 0]], rot: [0, 5, 35, -7, 0, 20, 0].map(d => d * Math.PI / 180) };
   function mapSpec(map, o) {
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}`);
     const lay = ["pangea", "shuffle", "spread"].map(id => get(id)).find(Boolean);
     const tl = get("tilt"); if (tl) { const k = par(tl).k; for (let c = 0; c < 6; c++) spec.rot[c] = (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * k; any = true; }
-    if (lay || tl) { const L = map.layout(lay ? lay.id : "hold", lay ? par(lay).k : 1, rr, spec.rot); spec.shift = L.shift; spec.scale = L.scale; any = true; }   // los continentes nunca se pisan
+    if (lay && lay.id === "pangea") {                                                              // Pangea de verdad: los continentes se encajan como en el supercontinente (sin pisarse)
+      const kp = par(lay).k; spec.shift = PANGEA.shift.map(s => [s[0] * kp, s[1] * kp]); spec.rot = PANGEA.rot.map(r => r * kp); spec.scale = [1, 1, 1, 1, 1, 1, 1]; spec.smooth = true; spec.ms = 2600; any = true;
+    } else if (lay || tl) { const L = map.layout(lay ? lay.id : "hold", lay ? par(lay).k : 1, rr, spec.rot); spec.shift = L.shift; spec.scale = L.scale; any = true; }   // los continentes nunca se pisan
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
     if (has("noborders")) { spec.lineA = 0; any = true; }
     const fl = get("flip"); if (fl) { spec.orient = { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 }; any = true; }
@@ -353,7 +359,7 @@ window.AIQ = window.AIQ || {};
       const map = S.map = (A.core && A.core.map) || S.map; if (!map || !S.on) return; S.q = qi; S.suspended = false; clearTimers(); ensureOverlay(map);
       decorate(o);
       const spec = map.setDistort ? mapSpec(map, o) : null, app = $("app");
-      if (spec) { map.setDistort(spec, 900); say("chal"); } else if (map.clearDistort) map.clearDistort(300);
+      if (spec) { map.setDistort(spec, spec.ms || 900); say("chal"); } else if (map.clearDistort) map.clearDistort(300);
       if (S.list.some(c => D[c.id].kind === "map")) { app.classList.remove("ch-glitch"); void app.offsetWidth; app.classList.add("ch-glitch"); later(() => app.classList.remove("ch-glitch"), 600); }
       app.classList.toggle("ch-negative", has("negative") && !S.fx.noNegative);
       ensureOverlay(map).classList.add("on");

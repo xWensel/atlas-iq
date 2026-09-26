@@ -159,7 +159,9 @@ window.AIQ = window.AIQ || {};
   const owned = id => run.perks.includes(id);
   const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = 7000 * Math.min(0.95, 0.3 + 0.05 * r) * (isBoss() ? 1.08 : 1) * ascFx(run.asc).target; return Math.round((base * t.target) / 50) * 50; };
   const shopCtx = () => { const x = { price: 0, freeReroll: 0, slots: 3 }; perkList().forEach(p => p.shop && p.shop(x, run)); return x; };
-  const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price) + shopCtx().price);
+  const inflation = () => 1 + 0.25 * run.act;                            // todo cuesta mas en cada acto: el dinero pesa mas segun avanzas
+  const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price * inflation()) + shopCtx().price);
+  const lifePrice = () => price(6 + 2 * (run.lifeBuys || 0));            // cada provision comprada en la partida cuesta 2 mas
   const sellValue = id => Math.floor(A.RELICS[id].cost * 0.5);
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades) */
@@ -209,7 +211,7 @@ window.AIQ = window.AIQ || {};
   A.adv.summary = () => { try { const r = run || JSON.parse(localStorage.getItem(RUNKEY)); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives } : null; } catch (e) { return null; } };
   A.adv.active = () => !!run;
 
-  function toolMax(id) { const t = run.tools[id]; if (!t) return 0; const plus = perkList().reduce((n, p) => n + (p.toolBonus || 0), 0); return t.max + plus; }
+  function toolMax(id) { const t = run.tools[id]; if (!t) return 0; const plus = perkList().reduce((n, p) => n + (p.toolBonus || 0), 0) + (run.sup && run.sup.kit ? 1 : 0); return t.max + plus; }
   function addTool(id) { const t = run.tools[id]; if (t) t.max++; else run.tools[id] = { max: TOOLS[id].uses, left: TOOLS[id].uses }; }
   function refillTools() { for (const id in run.tools) run.tools[id].left = toolMax(id); }
 
@@ -228,6 +230,7 @@ window.AIQ = window.AIQ || {};
     const r = roundNo(), boss = isBoss(), def = rdef(), cf = chalFor(r), halve = 1;
     const ctx = { seconds: clamp(Math.round(26 - 1.0 * r + ascFx(run.asc).secs), 10, 28), target: 1 };
     perkList().forEach(p => p.round && p.round(ctx, run));
+    if (run.sup && run.sup.cafe) ctx.seconds += 4;                                       // suministro: Cafe doble
     ctx.seconds = Math.max(6, ctx.seconds);
     run.chal = cf.list; run.chalName = cf.combo ? cf.combo.n : null; run.chalHalve = halve;
     const rules = cf.list.map(c => (c.id === "storm" ? "clock" : c.id)).filter(id => ["wind", "clock", "silence"].includes(id));
@@ -300,7 +303,7 @@ window.AIQ = window.AIQ || {};
     c.qi = run.qi;
     if (km != null) perkList().forEach(p => { if (!p.post) return; const tx = p.post(c, run); if (tx) c.lines.push([p.ico, A.tx(p.n), tx]); });
     c.total = km == null ? 0 : Math.round(c.chips * c.mult * c.xmult);
-    c.coinsBase = km == null ? 0 : dist >= 960 ? 2 : dist >= 750 ? 1 : 0;
+    c.coinsBase = km == null ? 0 : dist >= 960 ? 1 : 0;                         // solo las dianas dan doblon
     c.coins += c.coinsBase; c.coins = gain(c.coins);
     c.sc = { dist, time, distMax: 1000, timeMax: 400 };
     return c;
@@ -436,10 +439,11 @@ window.AIQ = window.AIQ || {};
     S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); clearTimeout(reactT); A.chal.end(); C().map.setStyle(mapStyleFor());
     if (pass) {
       run.score += S.levelScore; run.cleared++; S.runTotal = run.score;
-      const x = { coins: 3 + (boss ? 4 : 0) }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + x.coins]];
-      const cap = has("interest") ? 6 : 3, interest = Math.min(cap, Math.floor(run.coins / 5));
-      if (interest) { x.coins += interest; lines.push([A.T("Interés (1 por cada 5)", "Interest (1 per 5)"), "+" + interest]); }
+      const x = { coins: 2 + (boss ? 2 : 0) }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + x.coins]];
+      const cap = sumFlag("interest") || 2, interest = Math.min(cap, Math.floor(run.coins / 10));
+      if (interest) { x.coins += interest; lines.push([A.T("Interés (1 por cada 10)", "Interest (1 per 10)"), "+" + interest]); }
       perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins]); } } });
+      if (run.bet) { const win = S.levelScore >= Lv.advance * 1.3; if (win) { const pay = Math.round(run.bet * 2.5); x.coins += pay; lines.push([A.T("Apuesta ganada", "Bet won"), "+" + pay]); } else lines.push([A.T("Apuesta perdida", "Bet lost"), "−" + run.bet]); }
       const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins)]);
       run.coins += got; run.stats.coinsEarned += got;
       A.ach.emit("adv", { kind: "clear", tools: run.rTools }); if (boss) { A.ach.emit("adv", { kind: "boss" }); A.profile.get().adv.boss++; }
@@ -457,8 +461,8 @@ window.AIQ = window.AIQ || {};
       });
       setTimeout(() => A.dealer.react("roundWin"), 700);                    // el crupier protesta (antes estas frases nunca se decian)
     } else {
-      const shielded = has("shieldAct") && run.shieldAct !== run.act;
-      if (shielded) run.shieldAct = run.act; else { run.lives--; run.livesLostAct++; }
+      const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
+      if (shielded && !insured) run.shieldAct = run.act; else if (!shielded) { run.lives--; run.livesLostAct++; }
       run.attempt++; run.phase = "retry"; persist();
       A.sfx.stamp(); setTimeout(A.sfx.lose, 300);
       if (run.lives <= 0) return endRun(false);
@@ -470,6 +474,7 @@ window.AIQ = window.AIQ || {};
       });
       setTimeout(() => A.dealer.react("roundFail"), 700);
     }
+    run.sup = {}; run.bet = 0; persist();                                   // los suministros y la apuesta solo valen para una ronda
   };
   function afterVerdict(boss) { if (boss && run.act + 1 === 3 && !run.won) return winScreen(); nextStep(boss); }
   function nextStep(boss) {
@@ -558,7 +563,7 @@ window.AIQ = window.AIQ || {};
       const t = TOOLS[s.id], c = price(t.cost), have = run.tools[s.id];
       return `<div class="offer pc otool r${t.r}${bought ? " sold" : ""}" data-i="${i}" data-suit="blk">${ixs("A", "s_palm")}<span class="of-r">${A.T("Herramienta", "Tool")}</span><div class="of-ico felt">${ic(t.ico)}</div><b class="of-n">${A.tx(t.n)}${have ? ` <em>+1 ${A.T("carga", "charge")}</em>` : ""}</b><p>${A.tx(t.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : CN() + c}</button></div>`;
     }
-    return `<div class="offer pc life${bought ? " sold" : ""}" data-i="${i}" data-suit="red">${ixs("♥", "heart")}<span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico felt">${ic("heart")}</div><b class="of-n">+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${bought || run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${price(6)}</button></div>`;
+    return `<div class="offer pc life${bought ? " sold" : ""}" data-i="${i}" data-suit="red">${ixs("♥", "heart")}<span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico felt">${ic("heart")}</div><b class="of-n">+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${bought || run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${lifePrice()}</button></div>`;
   }
   function renderShop(chest) {
     const slots = 5, info = actInfo(run.act), rc = rerollCost();
@@ -568,7 +573,7 @@ window.AIQ = window.AIQ || {};
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
         <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
       ${nextHtml()}
-      ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${A.T("Tres cartas sobre la mesa. ¿Compras una o pides otras?", "Three cards on the table. Buy one, or ask for new ones?")}</p>`}
+      ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${A.T("Tres cartas sobre la mesa. ¿Compras una o pides otras?", "Three cards on the table. Buy one, or ask for new ones?")}</p>${supHtml()}`}
       <section class="offers">${cards}</section>
       <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Cambiar cartas", "New cards")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
         </div>
@@ -582,14 +587,40 @@ window.AIQ = window.AIQ || {};
     $("shopMenu").onclick = () => C().runMenu();
     document.querySelectorAll(".ch-buy").forEach(b => (b.onclick = () => bribe(b.dataset.id)));
     if ($("chalReroll")) $("chalReroll").onclick = rerollChal;
+    if (!chest) wireSup();
     $("goRound").onclick = () => { run.stock = null; persist(); chest ? openShop(false) : startRound(); };
     A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
     if (A.tour) A.tour.maybe("camp");
   }
+  /* Suministros de la proxima ronda (se gastan cada ronda: el dinero siempre tiene en que invertirse) y Apuesta */
+  const SUPS = [
+    { id: "cafe", cost: 4, ico: "hourglass", n: A.L("Café doble", "Double espresso"), d: A.L("+4 s por pregunta en la próxima ronda", "+4 s per question next round") },
+    { id: "kit", cost: 6, ico: "glass", n: A.L("Refuerzo", "Resupply"), d: A.L("+1 uso en todas tus herramientas la próxima ronda", "+1 use on all your tools next round") },
+    { id: "seguro", cost: 8, ico: "shield", n: A.L("Seguro de ronda", "Round insurance"), d: A.L("Si fallas la próxima ronda, no pierdes provisión", "If you fail next round, you keep your provision") },
+  ];
+  const BETS = [3, 6, 10];
+  function supHtml() {
+    const sup = run.sup || {}, items = SUPS.map(s => `<button class="sup${sup[s.id] ? " on" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span><em>${sup[s.id] ? A.T("Activo", "On") : CN() + price(s.cost)}</em></button>`).join("");
+    const bets = BETS.map(n => `<button class="stk${run.bet === n ? " on" : ""}" data-bet="${n}" type="button">${n}</button>`).join("");
+    return `<div class="tb-sup">${items}<div class="sup bet${run.bet ? " on" : ""}"><span class="sp-ic">${ic("dice")}</span><span class="sp-t"><b>${A.T("Apuesta a la ronda", "Round bet")}</b><i>${A.T("Supera el objetivo +30 %: cobras ×2,5", "Beat the target by 30%: get ×2.5 back")}</i></span><span class="stakes">${bets}</span></div></div>`;
+  }
+  function wireSup() {
+    document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {
+      const s = SUPS.find(x => x.id === b.dataset.sup), c = price(s.cost); run.sup = run.sup || {};
+      if (run.sup[s.id]) { run.sup[s.id] = false; run.coins += c; A.sfx.sell(); }
+      else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = true; A.sfx.buy(); }
+      persist(); renderShop(false);
+    }));
+    document.querySelectorAll("[data-bet]").forEach(b => (b.onclick = () => {
+      const n = +b.dataset.bet; if (run.bet === n) { run.coins += n; run.bet = 0; A.sfx.sell(); persist(); return renderShop(false); }
+      const back = run.bet || 0; if (run.coins + back < n) { A.sfx.deny(); shake(b); return; }
+      run.coins += back - n; run.bet = n; A.sfx.buy(); persist(); renderShop(false);
+    }));
+  }
   const shake = el => { el.classList.remove("no"); void el.offsetWidth; el.classList.add("no"); };
   function buy(el, chest) {
     const i = +el.dataset.i, s = run.stock[i]; if (!s || run.bought.includes(i)) return;
-    if (s.k === "life") { const c = price(6); if (run.coins < c || run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } run.coins -= c; run.lives++; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
+    if (s.k === "life") { const c = lifePrice(); if (run.coins < c || run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : price(p.cost);
       if (run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
