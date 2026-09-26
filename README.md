@@ -1,5 +1,7 @@
 # Atlas IQ
 
+**v0.14.3** - Movil en horizontal: HUD compacto (placa mas pequena arriba, marcas y zoom a los lados, herramientas reducidas, nota solo cuando hay texto y ticket de resultado a la derecha) para que el mapa se vea entero.
+
 **v0.14.2** - Pistas completas, sin puntos suspensivos.
 - **Notas de campo enteras:** las notas (Cuaderno, Almanaque, Adivinanza) se cortaban a 240 caracteres a mitad de frase y el pie las recortaba con "…". Se han regenerado (`data/wiki/*-s.json`) con descripcion + primera frase COMPLETA (sin partir en abreviaturas), se limpian pronunciaciones y parentesis anidados, y el pie ya no recorta: si es muy largo, se desplaza.
 - **Huecos de la respuesta:** en las preguntas de descripcion/apodo, bajo la pista aparece una casilla por cada letra, con las palabras separadas y el recuento, p. ej. `▁▁▁ ▁▁▁▁▁▁▁ (3, 7)`. En el reto Adivinanza, el nombre tapado dentro del texto tiene exactamente tantas casillas como letras (antes tope de 6) y el texto ya no se recorta a 130 caracteres ni parte las palabras a mitad.

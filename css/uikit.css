@@ -141,3 +141,26 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 .wd { display: inline-block; white-space: nowrap; }
 #askName.ch-long, #askSub.ch-long { font-size: .42em; }
 #askSub .blk { opacity: .85; }
+
+/* movil en horizontal (poca altura): HUD compacto para que el mapa mande */
+@media (max-height: 520px) and (orientation: landscape) {
+  .brand-sh { display: none; }
+  #hud { top: 6px; left: 8px; right: 8px; gap: 8px; grid-template-columns: 1fr auto; }
+  .plate-sh { grid-column: 1; grid-row: 1; justify-self: center; width: min(42vw, 440px); }
+  .ledger-sh { grid-column: 2; grid-row: 1; } .ledger { min-width: 0; padding: 5px 12px 6px; } .lg-num { font-size: 24px; margin: 0; } .ledger .gauge, .ledger .lg-row, .lg-label { display: none; }
+  #plate { min-width: 0; max-width: none; padding: 6px 14px 7px; }
+  .plate-top, #pips { display: none; }
+  #askName, html[data-skin="casino"] #askName { font-size: clamp(17px, 5vh, 26px); margin-top: 0; }
+  #askSub, html[data-skin="casino"] #askSub { font-size: clamp(13px, 3.8vh, 18px); margin-top: 1px; }
+  #plate .clock { margin-top: 4px; }
+  .adv-bar { top: 6px; left: 8px; max-width: 200px; padding: 5px 8px 6px; gap: 3px; } .ab-perks { display: none; } .ab-top { gap: 8px; font-size: 12px; }
+  .rail-sh { left: auto; right: 8px; top: 58%; transform: translateY(-50%) scale(.72); transform-origin: right center; }
+  .dock-sh { left: 8px; bottom: 8px; transform: scale(.78); transform-origin: left bottom; }
+  .note-sh:has(#factText:empty) { display: none; }
+  #noteSh, .note-sh { width: min(56vw, 560px); bottom: 6px; } #note { padding: 5px 14px 6px; } #lvlText { display: none; } #factText:not(:empty) { font-size: 13px; max-height: 32vh; }
+  #toolBar.tool-bar { left: auto; right: 74px; bottom: 6px; transform: scale(.55); transform-origin: right bottom; }
+  #dlg.side { place-self: end end; margin: 0 62px 6px 0; width: min(46vw, 340px); max-height: calc(100vh - 92px); overflow-y: auto; }
+  #dlg.side .tk-band, #dlg.side .tk-perf, #dlg.side .tk-cx { display: none; }
+  #dlg.side .tk-title { font-size: 18px; margin-top: 8px; } #dlg.side .tk-km { font-size: 30px; margin-top: 0; } #dlg.side .tk-total { margin: 2px 0 4px; } #dlg.side .tk-total .odo { font-size: 26px; } #dlg.side .btn-ink { padding-top: 8px; padding-bottom: 8px; }
+  body.tk-on .rail-sh { display: none; }
+}
