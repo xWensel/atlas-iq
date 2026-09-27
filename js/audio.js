@@ -1,9 +1,10 @@
 /*
  * Geolite - identidad sonora.
- * Todo se sintetiza en el navegador (sin archivos de audio).
+ * Los efectos se sintetizan en el navegador; la musica son 21 pistas fijas (assets/music/*.mp3),
+ * bounced desde el motor generativo original (que ahora vive como herramienta de composicion en tools/render/).
  *  - Firma: motivo de tres notas ascendentes (sol-do-re) que suena al empezar, al superar niveles y en la victoria.
  *  - Escala pentatonica de Do mayor: cualquier nota que suene "encaja", asi nada choca.
- *  - Musica generativa (kalimba + pad + bajo) con 3 intensidades: menu, juego y tension (ultimos segundos).
+ *  - La intensidad de "tension" (ultimos segundos) abre el filtro de la musica; no cambia de pista.
  *  - Los sonidos del resultado cambian segun lo cerca que estes: diana, muy bien, bien, fallo, tiempo agotado.
  */
 window.AIQ = window.AIQ || {};
@@ -108,293 +109,13 @@ window.AIQ = window.AIQ || {};
     lp.type = "lowpass"; lp.frequency.value = 2600; os.connect(lp).connect(g).connect(sfxBus); env(g, t, 0.004, m.v, m.d); os.start(t); os.stop(t + m.d + 0.05);
   }
 
-  /* ------------------------------------------------------------------ musica: jazz lo-fi con swing (estilo Balatro) */
+  /* ------------------------------------------------------------------ musica: 21 pistas fijas ("BSO" del casino) */
   /*
-   *  Piano electrico FM (Rhodes) haciendo stabs sincopados, contrabajo con notas de aproximacion, escobillas y charles con swing,
-   *  melodia de blues-pentatonica con licks al azar, crujido de vinilo y "tape wobble" (vibrato lento de cinta) en toda la banda.
-   *  Progresion de 8 compases: Dm9 . G13 . Cmaj9 . A7b13  |  Gm9 . C13 . Fmaj9 . D7b13
+   * Cada pista es un archivo real en assets/music/ (bounced offline desde el motor generativo original;
+   * ese motor sigue vivo como herramienta de composicion en tools/render/, fuera del bundle del juego).
+   * Aqui solo se reproducen, se encadenan solas al terminar y se anuncian con una pequena transicion.
+   * Titulos: terminos de apuestas [es, en, fr, pt, de, it].
    */
-  let BPM = 86, STEP = 60 / BPM / 4, SW = 0.3, SHIFT = 0, EPMOD = 1, EPIDX = 2.2;   // se ajustan por skin
-  const PROG_A = [
-    { root: 38, v: [53, 57, 60, 64], tonic: 50 },   // Dm9
-    { root: 43, v: [53, 57, 59, 64], tonic: 50 },   // G13
-    { root: 36, v: [52, 55, 59, 62], tonic: 50 },   // Cmaj9
-    { root: 33, v: [55, 61, 64, 65], tonic: 50 },   // A7b13
-  ];
-  const PROG = [...PROG_A, ...PROG_A.map(c => ({ root: c.root + 5, v: c.v.map(n => n + 5), tonic: c.tonic + 5 }))];
-  const PENTA_MIN = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22];
-  const LICKS = [
-    [[2, 4], [3, 3], [6, 2], [10, 0]], [[0, 5], [2, 4], [4, 2], [7, 3]], [[6, 3], [7, 4], [10, 5], [14, 4]],
-    [[2, 2], [4, 3], [5, 4], [8, 6]], [[3, 6], [6, 5], [9, 3], [12, 2]], [[0, 4], [3, 2], [8, 3], [11, 0]],
-  ];
-  let timer = null, nextT = 0, mode = 0, wob = null, curLick = null, lickMem = [null, null];
-
-  function wobble() {
-    if (wob) return wob;
-    const slow = ctx.createOscillator(), fast = ctx.createOscillator(), g1 = ctx.createGain(), g2 = ctx.createGain(), out = ctx.createGain();
-    slow.frequency.value = 0.55; g1.gain.value = 9; fast.frequency.value = 6.2; g2.gain.value = 2.6;   // centesimas
-    slow.connect(g1).connect(out); fast.connect(g2).connect(out); slow.start(); fast.start();
-    return (wob = out);
-  }
-  /* piano electrico FM: portadora + modulador que decae (timbre de "tine") */
-  function epiano(m, t, o = {}) {
-    const { vol = 0.07, dur = 0.9, mod = EPMOD, idx = EPIDX, rev = 0.35, bus = musBus } = o;
-    const f = mtof(m), car = ctx.createOscillator(), md = ctx.createOscillator(), mg = ctx.createGain(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
-    car.type = "sine"; md.type = "sine"; car.frequency.value = f; md.frequency.value = f * mod;
-    mg.gain.setValueAtTime(f * idx, t); mg.gain.exponentialRampToValueAtTime(f * 0.12, t + Math.min(0.5, dur));
-    md.connect(mg).connect(car.frequency);
-    const w = wobble(); w.connect(car.detune); w.connect(md.detune);
-    lp.type = "lowpass"; lp.frequency.value = 4200;
-    car.connect(g); g.connect(lp); lp.connect(bus); send(lp, rev);
-    env(g, t, 0.004, vol, dur);
-    [car, md].forEach(x => { x.start(t); x.stop(t + dur + 0.1); });
-    const tn = ctx.createOscillator(), tg = ctx.createGain(); tn.type = "sine"; tn.frequency.value = f * 7.1; tn.connect(tg).connect(lp); env(tg, t, 0.002, vol * 0.18, 0.06); tn.start(t); tn.stop(t + 0.15);
-  }
-  function upright(m, t, dur = 0.34, vol = 0.2) {
-    const f = mtof(m), o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter(), g2 = ctx.createGain();
-    o1.type = "triangle"; o2.type = "sine"; o1.frequency.value = f; o2.frequency.value = f * 2; wobble().connect(o1.detune);
-    g2.gain.value = 0.25; o2.connect(g2).connect(g); o1.connect(g);
-    lp.type = "lowpass"; lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(260, t + dur);
-    g.connect(lp); lp.connect(musBus); env(g, t, 0.006, vol, dur); [o1, o2].forEach(x => { x.start(t); x.stop(t + dur + 0.1); });
-  }
-  const brush = (t, v = 1) => noise(t, 0.17, { lp: 3400, vol: 0.022 * v, bus: musBus, type: "bandpass", q: 0.6 });
-  const hat = (t, v = 1, open = false) => noise(t, open ? 0.16 : 0.04, { hp: 7800, vol: 0.016 * v, bus: musBus });
-  const crackle = t => noise(t, 0.012, { hp: 2600, vol: 0.009 * Math.random(), bus: musBus });
-
-  function stepLounge(s, t0) {
-    const bar = Math.floor(s / 16) % 8, st = s % 16, c0 = PROG[bar], n0 = PROG[(bar + 1) % 8];
-    const ch = { root: c0.root + SHIFT, v: c0.v.map(n => n + SHIFT), tonic: c0.tonic + SHIFT }, nx = { root: n0.root + SHIFT };
-    const t = t0 + (Math.floor(st / 2) % 2 === 1 ? STEP * 2 * SW : 0);          // swing en las corcheas de contratiempo
-    const full = mode >= 1, rnd = Math.random;
-    // bajo
-    if (st === 0) upright(ch.root, t, 0.42, 0.22);
-    if (full && st === 6) upright(ch.root + 7, t, 0.3, 0.16);
-    if (st === 8) upright(ch.root + (rnd() < 0.4 ? 12 : 0), t, 0.32, 0.17);
-    if (full && st === 10 && rnd() < 0.6) upright(ch.root + 3 + (bar % 2 ? 4 : 0), t, 0.24, 0.13);
-    if (st === 14) upright(nx.root + (rnd() < 0.5 ? 1 : -1), t, 0.2, 0.14);      // nota de aproximacion al siguiente acorde
-    // piano electrico: stabs sincopados con "strum"
-    const comp = (v, dur) => ch.v.forEach((n, i) => epiano(n + (rnd() < 0.05 ? 12 : 0), t + i * 0.011, { vol: 0.045 * v * (0.85 + rnd() * 0.3), dur }));
-    if (st === 2 && (full || rnd() < 0.75)) comp(1, 0.7);
-    if (st === 9 && (full ? rnd() < 0.8 : rnd() < 0.35)) comp(0.75, 0.55);
-    if (full && st === 13 && rnd() < 0.4) comp(0.55, 0.4);
-    // melodia por licks (blues-pentatonica)
-    if (st === 0) {                                                       // frase de 4 compases: A, B, A, B (repite lo que suena bien)
-      const ph = bar % 4;
-      if (ph >= 2) curLick = lickMem[ph - 2]; else curLick = lickMem[ph] = rnd() < (mode === 0 ? 0.3 : mode === 1 ? 0.7 : 0.8) ? LICKS[Math.floor(rnd() * LICKS.length)] : null;
-    }
-    if (curLick) for (const [ls, deg] of curLick) if (ls === st) {
-      const n = ch.tonic + 24 + PENTA_MIN[deg];
-      epiano(n, t, { vol: 0.07, dur: 0.8, mod: EPMOD * 2, idx: EPIDX * 0.6, rev: 0.55 });
-    }
-    // bateria
-    if (full) {
-      if (st === 0 || (st === 6 && rnd() < 0.7) || (st === 10 && rnd() < 0.85)) thump(t, { vol: st === 0 ? 0.16 : 0.1, f0: 100, f1: 44, dur: 0.14, bus: musBus });
-      if (st === 4 || st === 12) brush(t, 1);
-      if ((st === 7 || st === 15) && rnd() < 0.4) brush(t, 0.35);
-    } else if (st === 4 || st === 12) brush(t, 0.55);
-    if (st % 2 === 0) hat(t, (st % 4 === 0 ? 0.6 : 1) * (mode === 0 ? 0.6 : 1), st === 14 && rnd() < 0.3);
-    if (mode === 2) { if (st % 2 === 1) hat(t, 0.5); if (st % 4 === 0) noise(t, 0.03, { hp: 1800, vol: 0.02, bus: musBus }); }   // reloj de tension
-    if (rnd() < 0.14) crackle(t);
-  }
-
-  /* ------------------------------------------------------------------ 14 canciones de casino: mismo estilo, ritmos y melodias distintos */
-  /*  Rotan solas cada ~90 s (al acabar una vuelta completa de acordes) con un pequeno "cambio de disco". La 0 es el lounge de siempre. */
-  function organ(m, t, dur, vol = 0.02) {
-    const f = mtof(m), g = ctx.createGain(), tr = ctx.createGain(), lp = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), lg = ctx.createGain();
-    lp.type = "lowpass"; lp.frequency.value = 2600; tr.gain.value = 0.8; lfo.frequency.value = 6.4; lg.gain.value = 0.2; lfo.connect(lg).connect(tr.gain);
-    [[1, 1], [2, 0.55], [3, 0.3], [4, 0.16]].forEach(([r, a]) => { const o = ctx.createOscillator(), ga = ctx.createGain(); o.type = "sine"; o.frequency.value = f * r; ga.gain.value = a; o.connect(ga).connect(g); o.start(t); o.stop(t + dur + 0.1); });
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.03); g.gain.setValueAtTime(vol, t + dur * 0.85); g.gain.linearRampToValueAtTime(0.0001, t + dur);
-    g.connect(tr).connect(lp); lp.connect(musBus); send(lp, 0.25); lfo.start(t); lfo.stop(t + dur + 0.1);
-  }
-  function flute(m, t, dur, vol = 0.07) {
-    const f = mtof(m), o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), g2 = ctx.createGain(), lp = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), lg = ctx.createGain();
-    o.type = "sine"; o2.type = "triangle"; o.frequency.value = f; o2.frequency.value = f * 2; g2.gain.value = 0.12; lfo.frequency.value = 5.3; lg.gain.value = 7; lfo.connect(lg); lg.connect(o.detune); lg.connect(o2.detune);
-    o.connect(g); o2.connect(g2).connect(g); lp.type = "lowpass"; lp.frequency.value = 3800; g.connect(lp); lp.connect(musBus); send(lp, 0.45);
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.05); g.gain.setValueAtTime(vol * 0.85, t + dur * 0.7); g.gain.linearRampToValueAtTime(0.0001, t + dur);
-    noise(t, 0.09, { hp: 4200, vol: 0.006, bus: musBus });
-    [o, o2, lfo].forEach(x => { x.start(t); x.stop(t + dur + 0.1); });
-  }
-  function brass(m, t, dur, vol = 0.05) {
-    const f = mtof(m), g = ctx.createGain(), lp = ctx.createBiquadFilter();
-    lp.type = "lowpass"; lp.Q.value = 1.2; lp.frequency.setValueAtTime(Math.max(300, f * 1.2), t); lp.frequency.linearRampToValueAtTime(Math.min(4200, f * 5), t + 0.07); lp.frequency.linearRampToValueAtTime(Math.min(2200, f * 2.5), t + dur);
-    [-7, 7].forEach(d => { const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.value = f; o.detune.value = d; o.connect(g); o.start(t); o.stop(t + dur + 0.1); });
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.035); g.gain.setValueAtTime(vol * 0.8, t + Math.max(0.05, dur * 0.6)); g.gain.linearRampToValueAtTime(0.0001, t + dur);
-    g.connect(lp); lp.connect(musBus); send(lp, 0.3);
-  }
-  const conga = (t, hi, v = 1) => { const o = ctx.createOscillator(), g = ctx.createGain(), f = hi ? 330 : 230; o.type = "sine"; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 0.78, t + 0.1); o.connect(g).connect(musBus); env(g, t, 0.002, 0.07 * v, 0.13); o.start(t); o.stop(t + 0.2); noise(t, 0.03, { hp: 1200, vol: 0.012 * v, bus: musBus }); };
-  const cowbell = (t, v = 1) => { const g = ctx.createGain(), bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2400; bp.Q.value = 1.6; [587, 845].forEach(fr => { const o = ctx.createOscillator(); o.type = "square"; o.frequency.value = fr; o.connect(g); o.start(t); o.stop(t + 0.2); }); g.connect(bp).connect(musBus); env(g, t, 0.002, 0.024 * v, 0.14); };
-  const clave = (t, v = 1) => [2100, 3150].forEach((fr, i) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = fr; o.connect(g).connect(musBus); env(g, t, 0.001, 0.05 * v * (i ? 0.4 : 1), 0.05); o.start(t); o.stop(t + 0.1); });
-  const snare = (t, v = 1) => { noise(t, 0.13, { hp: 1900, vol: 0.03 * v, bus: musBus, type: "bandpass", q: 0.8 }); thump(t, { vol: 0.05 * v, f0: 220, f1: 150, dur: 0.07, bus: musBus }); };
-  const kick = (t, v = 1) => thump(t, { vol: 0.16 * v, f0: 100, f1: 44, dur: 0.14, bus: musBus });
-  const surdo = (t, v = 1) => thump(t, { vol: 0.2 * v, f0: 80, f1: 52, dur: 0.22, bus: musBus });
-  const ride = (t, v = 1) => noise(t, 0.22, { hp: 6200, vol: 0.011 * v, bus: musBus });
-  const shaker = (t, v = 1) => noise(t, 0.04, { hp: 6800, vol: 0.013 * v, bus: musBus });
-  const rim = (t, v = 1) => noise(t, 0.03, { hp: 2400, vol: 0.028 * v, bus: musBus, type: "bandpass", q: 3 });
-  const has = (a, x) => a.indexOf(x) >= 0;
-  const stab = (v, t, dur, vol, fn) => v.forEach((n, i) => fn(n, t + i * 0.01, dur, vol * (0.85 + Math.random() * 0.3)));
-  const EP = (n, t, d, v) => epiano(n, t, { vol: v, dur: d, mod: 1, idx: 2.2 });
-  const EPC = (n, t, d, v) => epiano(n, t, { vol: v, dur: d, mod: 3, idx: 2.6, rev: 0.15 });
-  const PL = (n, t, d, v) => pluck(n, t, { vol: v, dur: d, bright: 4, bus: musBus, rev: 0.2 });
-  const Ch = (r, v, t3 = 4) => ({ r, v, t3 });
-
-  const TRK = [
-    { name: "Lounge Nocturno", spb: 16, prog: PROG },
-    { /* 1: ragtime de salon, piano tipo taberna */
-      name: "Ragtime Roulette", bpm: 112, sw: 0.08, spb: 16, tonic: 72, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8, 11, 14], [0, 2, 4, 6, 8, 10, 12, 14], [0, 3, 6, 10, 12], [0, 4, 6, 8, 12, 14]],
-      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.5, dur: Math.min(d, 0.5), bright: 5, bus: musBus, rev: 0.25 }),
-      prog: [Ch(36, [60, 64, 67]), Ch(33, [55, 61, 64, 69]), Ch(38, [57, 60, 66, 69]), Ch(43, [59, 62, 65, 67]), Ch(36, [60, 64, 67]), Ch(41, [57, 60, 65]), Ch(36, [55, 60, 64, 67]), Ch(43, [59, 62, 65, 67])],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.3, 0.2); if (st === 8) upright(c.r + 7, t, 0.3, 0.16);
-        if (st === 4 || st === 12) stab(c.v, t, 0.2, 0.05, PL);
-        if (m >= 1) { if (st === 4 || st === 12) rim(t, 0.7); if (st === 0 || st === 8) kick(t, 0.45); if (st % 4 === 2) shaker(t, 0.7); }
-        else if (st % 8 === 4) shaker(t, 0.6);
-      },
-    },
-    { /* 2: bossa nova de bar de hotel */
-      name: "Bossa de Medianoche", bpm: 96, sw: 0, spb: 16, tonic: 67, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8], [0, 6, 8, 12], [2, 6, 8, 12, 14], [0, 3, 6, 10, 12]],
-      lead: (n, t, d, v) => flute(n, t, d, v * 1.1),
-      prog: [Ch(33, [55, 59, 60, 64], 3), Ch(38, [54, 57, 60, 64]), Ch(43, [59, 62, 66, 69]), Ch(36, [55, 59, 64, 66]), Ch(42, [57, 60, 64, 66], 3), Ch(35, [57, 60, 63, 66]), Ch(40, [55, 59, 62, 66], 3), Ch(40, [56, 59, 62, 66])],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.4, 0.2); if (st === 6) upright(c.r + 7, t, 0.3, 0.15); if (st === 8 && r() < 0.8) upright(c.r + (r() < 0.4 ? 12 : 0), t, 0.3, 0.16);
-        if (has(m >= 1 ? [0, 3, 6, 10, 13] : [3, 10], st)) stab(c.v, t, 0.5, 0.036, EP);
-        if (m >= 1) { if (has([0, 3, 6, 10, 12], st)) rim(t, 0.6); if (st === 0 || st === 8) kick(t, 0.4); }
-        if (st % 2 === 0) shaker(t, st % 4 === 0 ? 0.8 : 0.5);
-      },
-    },
-    { /* 3: samba, marimba y agitador */
-      name: "Samba del Crupier", bpm: 100, sw: 0, spb: 16, tonic: 74, scale: [0, 2, 4, 7, 9], rh: [[0, 3, 6, 8, 11, 14], [0, 2, 4, 6, 8, 10], [0, 3, 6, 9, 12], [2, 4, 8, 10, 12, 14]],
-      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.7, dur: Math.min(d, 0.55), bright: 6, bus: musBus, rev: 0.35, wave: "sine" }),
-      prog: [Ch(40, [55, 59, 62, 64], 3), Ch(45, [55, 61, 64, 66]), Ch(38, [57, 61, 64, 66]), Ch(35, [57, 62, 66], 3), Ch(40, [55, 59, 62, 64], 3), Ch(45, [55, 58, 61, 64]), Ch(38, [57, 61, 64, 66]), Ch(38, [57, 61, 64, 66])],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.25, 0.2); if (st === 3) upright(c.r + 7, t, 0.15, 0.12); if (st === 8) upright(c.r, t, 0.22, 0.18); if (st === 11) upright(c.r + 7, t, 0.15, 0.12);
-        if (has(m >= 1 ? [3, 7, 10, 14] : [3, 10], st)) stab(c.v, t, 0.2, 0.038, EP);
-        if (m >= 1) { if (st === 4 || st === 12) surdo(t, 1); if (st === 0 || st === 8) surdo(t, 0.4); if (has([0, 3, 6, 10, 12, 14], st)) rim(t, 0.55); }
-        if (m >= 1 || st % 2 === 0) shaker(t, st % 4 === 0 ? 0.85 : 0.5);
-      },
-    },
-    { /* 4: blues en shuffle de 12 compases */
-      name: "Blues del Tapete", bpm: 108, sw: 0.33, spb: 16, tonic: 65, scale: [0, 3, 5, 6, 7, 10], rh: [[0, 4, 8, 12], [0, 2, 4, 8], [0, 4, 6, 8, 10, 12], [2, 4, 6, 8]],
-      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.6, dur: Math.min(d, 0.7), bright: 3.6, bus: musBus, rev: 0.3, wave: "sawtooth" }),
-      prog: (() => { const F = Ch(41, [57, 60, 63, 65]), B = Ch(34, [56, 58, 62, 65]), C = Ch(36, [55, 58, 64, 67]); return [F, F, F, F, B, B, F, F, C, B, F, C]; })(),
-      play(st, bar, t, c, nx, m, r) {
-        if (st % 4 === 0 && (m >= 1 || st % 8 === 0)) { const b = st / 4; upright(b === 3 ? nx.r + (r() < 0.5 ? 1 : -1) : c.r + [0, c.t3, 7, 9][b], t, 0.3, 0.19); }
-        if (st === 0) c.v.forEach(n => organ(n, t, STEP * 15, 0.017));
-        if (m >= 1) { if (st === 0 || st === 8) kick(t, 0.5); if (st === 4 || st === 12) brush(t, 1); if (has([0, 4, 6, 8, 12, 14], st)) ride(t, st % 4 === 0 ? 1 : 0.7); if (st === 4 || st === 12) hat(t, 1); }
-        else if (has([0, 4, 8, 12], st)) ride(t, 0.5);
-      },
-    },
-    { /* 5: vals de casino, caja de musica y cuerdas */
-      name: "Vals Real", bpm: 138, sw: 0, spb: 12, tonic: 69, scale: [0, 2, 3, 5, 7, 8, 11], rh: [[0, 4, 8], [0, 4, 6, 8], [0, 6, 8, 10], [0, 2, 4, 8]],
-      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.3, dur: Math.min(1, d + 0.3), bright: 9, bus: musBus, rev: 0.6, wave: "sine" }),
-      prog: [Ch(33, [57, 60, 64], 3), Ch(40, [56, 59, 62]), Ch(33, [57, 60, 64], 3), Ch(38, [57, 62, 65], 3), Ch(43, [59, 62, 65]), Ch(36, [55, 60, 64]), Ch(40, [56, 59, 62]), Ch(33, [57, 60, 64], 3)],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.4, 0.2);
-        if (st === 4 || st === 8) stab(c.v, t, 0.3, 0.04, EP);
-        if (m >= 1) { if (st === 0 && bar % 2 === 0) pad(c.v.map(n => n - 12), t, STEP * 24, 0.028); if (st === 0) kick(t, 0.35); if (st === 4 || st === 8) brush(t, 0.5); }
-      },
-    },
-    { /* 6: funk de sala VIP */
-      name: "Funk Jackpot", bpm: 104, sw: 0.05, spb: 16, tonic: 64, scale: [0, 3, 5, 7, 10], rh: [[0, 3, 6, 10], [2, 3, 7, 10, 11], [0, 6, 7, 10, 14], [3, 7, 11, 14]],
-      lead: (n, t, d, v) => brass(n, t, Math.min(d, 0.32), v * 0.9),
-      prog: [Ch(40, [55, 59, 62, 66], 3), Ch(45, [55, 61, 64, 66]), Ch(40, [55, 59, 62, 66], 3), Ch(35, [57, 62, 63, 66]), Ch(36, [55, 59, 62, 64]), Ch(35, [57, 62, 66], 3), Ch(40, [55, 59, 62, 66], 3), Ch(45, [55, 61, 64, 66])],
-      play(st, bar, t, c, nx, m, r) {
-        const B = [[0, 0, 0.18, 0.22], [3, 0, 0.1, 0.13], [6, 12, 0.1, 0.15], [7, 10, 0.1, 0.12], [10, 0, 0.14, 0.17], [12, 7, 0.1, 0.14], [14, 5, 0.1, 0.12]];
-        for (const [s0, iv, d, v] of B) if (s0 === st && (m >= 1 || s0 % 6 === 0)) upright(c.r + iv, t, d, v);
-        if (has(m >= 1 ? [2, 3, 7, 10, 11, 14] : [3, 10], st)) stab(c.v, t, 0.09, 0.034, EPC);
-        if (m >= 1) { if (has([0, 7, 10], st)) kick(t, 0.9); if (st === 4 || st === 12) snare(t, 0.9); if (st === 9 || st === 15) snare(t, 0.25); hat(t, st % 4 === 0 ? 1.1 : 0.6, st === 14); }
-        else if (st % 4 === 0) hat(t, 0.8);
-      },
-    },
-    { /* 7: big band, swing rapido con metales */
-      name: "Big Band All-In", bpm: 132, sw: 0.3, spb: 16, tonic: 70, scale: [0, 2, 4, 7, 9], rh: [[0, 4, 6, 8, 12], [2, 6, 8, 12, 14], [0, 3, 6, 10, 12], [0, 2, 4, 8]],
-      lead: (n, t, d, v) => brass(n, t, Math.min(d, 0.6), v),
-      prog: [Ch(34, [57, 62, 65, 69]), Ch(31, [58, 62, 65, 67], 3), Ch(36, [55, 58, 63, 67], 3), Ch(41, [57, 60, 63, 65]), Ch(38, [57, 60, 62, 65], 3), Ch(43, [59, 62, 65, 67]), Ch(36, [55, 58, 63, 67], 3), Ch(41, [57, 60, 63, 65])],
-      play(st, bar, t, c, nx, m, r) {
-        if (st % 4 === 0 && (m >= 1 || st % 8 === 0)) { const b = st / 4; upright(b === 3 ? nx.r + (r() < 0.5 ? 1 : -1) : c.r + [0, c.t3, 7, 9][b], t, 0.28, 0.19); }
-        if (st % 4 === 0) stab(c.v, t, 0.08, m >= 1 ? 0.028 : 0.02, EP);
-        if (m >= 1) { if (has([0, 4, 6, 8, 12, 14], st)) ride(t, st % 4 === 0 ? 1 : 0.75); if (st === 4 || st === 12) hat(t, 1); if (st % 4 === 0) kick(t, 0.22); if (st === 10 && r() < 0.5) snare(t, 0.3); }
-        else if (has([0, 4, 8, 12], st)) ride(t, 0.5);
-      },
-    },
-    { /* 8: mambo, clave, congas y cencerro */
-      name: "Mambo Royale", bpm: 116, sw: 0, spb: 16, tonic: 72, scale: [0, 3, 5, 7, 10], rh: [[0, 3, 6, 10], [0, 6, 8, 12], [2, 6, 10, 14], [0, 4, 7, 10, 12]],
-      lead: (n, t, d, v) => brass(n, t, Math.min(d, 0.4), v * 0.95),
-      prog: [Ch(36, [55, 58, 63, 67], 3), Ch(41, [57, 60, 63, 65]), Ch(34, [57, 62, 65, 69]), Ch(39, [55, 58, 62, 67]), Ch(45, [57, 60, 63, 67], 3), Ch(38, [57, 60, 63, 66]), Ch(43, [59, 62, 65, 68]), Ch(36, [55, 58, 62, 63], 3)],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.2, 0.2); if (st === 6) upright(c.r + 7, t, 0.2, 0.17); if (st === 12) upright(c.r, t, 0.2, 0.19); if (st === 14) upright(nx.r, t, 0.14, 0.14);
-        const MO = [[0, 0], [3, 2], [6, 1], [8, 3], [11, 2], [14, 1]];
-        for (const [s0, k] of MO) if (s0 === st && (m >= 1 || s0 % 6 === 0)) epiano(c.v[k], t, { vol: 0.045, dur: 0.22, mod: 1, idx: 1.4, rev: 0.25 });
-        if (m >= 1) {
-          if (has(bar % 2 === 0 ? [0, 6, 12] : [4, 8], st)) clave(t, 0.9);
-          for (const [s0, hi] of [[2, 0], [4, 1], [6, 0], [7, 1], [10, 1], [12, 0], [14, 1]]) if (s0 === st) conga(t, hi, hi ? 1 : 0.7);
-          if (st % 2 === 0) cowbell(t, st % 4 === 0 ? 0.9 : 0.45); if (st === 0 || st === 8) kick(t, 0.3);
-        } else if (st % 4 === 0) shaker(t, 0.7);
-      },
-    },
-    { /* 9: lo-fi de madrugada: piano polvoriento, bombo flojo y crepitar de vinilo */
-      name: "Cash Out", bpm: 74, sw: 0.22, spb: 16, tonic: 62, scale: [0, 3, 5, 7, 10], rh: [[0, 6, 10], [0, 3, 8, 12], [2, 6, 12], [0, 4, 8, 11]],
-      lead: (n, t, d, v) => epiano(n, t, { vol: v * 0.9, dur: Math.min(1.1, d + 0.25), mod: 1, idx: 1.2, rev: 0.55 }),
-      prog: [Ch(38, [53, 57, 60, 64]), Ch(43, [53, 59, 64, 69]), Ch(36, [52, 55, 59, 62]), Ch(45, [55, 60, 64, 67]), Ch(34, [53, 57, 62, 65]), Ch(43, [55, 58, 62, 65]), Ch(45, [55, 61, 64, 70]), Ch(38, [53, 57, 60, 64])],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.5, 0.2); if (st === 10 && (m >= 1 || r() < 0.5)) upright(c.r + (r() < 0.5 ? 7 : 0), t, 0.3, 0.14);
-        if (st === 2 || (st === 9 && (m >= 1 || r() < 0.4))) stab(c.v, t, 0.9, 0.036, EP);
-        if (st === 0 && bar % 2 === 0) pad(c.v.map(n => n - 12), t, STEP * 30, 0.02);
-        if (m >= 1) { if (st === 0 || (st === 7 && r() < 0.5) || (st === 10 && r() < 0.7)) kick(t, st === 0 ? 0.55 : 0.35); if (st === 4 || st === 12) rim(t, 0.5); if (st % 2 === 0) hat(t, 0.5, false); }
-        else if (st === 4 || st === 12) brush(t, 0.4);
-        if (r() < 0.35) crackle(t);
-      },
-    },
-    { /* 10: reggae, one-drop: bombo y aro en el tercer tiempo, guitarra en el contratiempo */
-      name: "Banca al Día", bpm: 76, sw: 0.06, spb: 16, tonic: 69, scale: [0, 3, 5, 7, 10], rh: [[0, 6, 8, 12], [2, 6, 10, 14], [0, 3, 8, 11], [0, 8, 10, 14]],
-      lead: (n, t, d, v) => flute(n, t, Math.min(d, 0.7), v * 1.05),
-      prog: [Ch(33, [57, 60, 64]), Ch(38, [57, 62, 65]), Ch(33, [57, 60, 64]), Ch(40, [56, 59, 64]), Ch(33, [57, 60, 64]), Ch(41, [57, 60, 65]), Ch(43, [55, 59, 62]), Ch(40, [56, 59, 62, 64])],
-      play(st, bar, t, c, nx, m, r) {
-        const B = [[0, 0, 0.28, 0.25], [3, 0, 0.14, 0.15], [6, 7, 0.22, 0.2], [8, 0, 0.3, 0.22], [11, 3, 0.14, 0.15], [14, 5, 0.16, 0.16]];
-        for (const [s0, iv, d, v] of B) if (s0 === st && (m >= 1 || s0 % 8 === 0)) upright(c.r + iv, t, d, v);
-        if (has([2, 6, 10, 14], st)) stab(c.v, t, 0.08, m >= 1 ? 0.042 : 0.03, EPC);
-        if (m >= 1) { if (st === 8) { kick(t, 0.8); rim(t, 1); } if (st % 2 === 0) hat(t, st % 4 === 0 ? 0.9 : 0.5, st === 14); if (has([3, 7, 11, 15], st)) organ(c.v[0] + 12, t, STEP * 1.5, 0.014); }
-        else if (st === 8) rim(t, 0.6);
-      },
-    },
-    { /* 11: reggaeton, dembow con bajo 808 */
-      name: "Apuesta en Vivo", bpm: 92, sw: 0, spb: 16, tonic: 69, scale: [0, 3, 5, 7, 10], rh: [[0, 3, 6, 10, 12], [0, 3, 8, 11, 14], [2, 6, 10, 14], [0, 3, 6, 8, 12]],
-      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.5, dur: Math.min(d, 0.4), bright: 5, bus: musBus, rev: 0.25, wave: "sawtooth" }),
-      prog: [Ch(33, [57, 60, 64]), Ch(41, [57, 60, 65]), Ch(36, [55, 60, 64]), Ch(43, [55, 59, 62]), Ch(33, [57, 60, 64]), Ch(41, [57, 60, 65]), Ch(38, [57, 62, 65]), Ch(40, [56, 59, 64])],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.5, 0.27); if (st === 6 && (m >= 1 || r() < 0.5)) upright(c.r, t, 0.26, 0.2); if (st === 10 && m >= 1) upright(c.r + (r() < 0.5 ? 7 : 12), t, 0.2, 0.17); if (st === 14 && m >= 1 && r() < 0.6) upright(nx.r, t, 0.16, 0.15);
-        if (has([3, 6, 11, 14], st) && (m >= 1 || st === 3)) stab(c.v, t, 0.1, 0.03, PL);
-        if (m >= 1) { if (has([0, 4, 8, 12], st)) kick(t, st === 0 ? 1 : 0.85); if (has([3, 6, 11, 14], st)) snare(t, st === 3 || st === 11 ? 0.8 : 0.55); if (st % 2 === 0) shaker(t, st % 4 === 0 ? 0.9 : 0.5); if (st === 15 && r() < 0.4) hat(t, 0.8, true); }
-        else { if (st === 0 || st === 8) kick(t, 0.7); if (st === 3 || st === 11) rim(t, 0.6); }
-      },
-    },
-    { /* 12: flamenco, rumba flamenca con rasgueos, palmas y cajon (cadencia andaluza) */
-      name: "Pleno al Quince", bpm: 108, sw: 0, spb: 16, tonic: 69, scale: [0, 1, 4, 5, 7, 8, 10], rh: [[0, 2, 3, 6, 8, 11], [0, 3, 6, 8, 10, 14], [2, 3, 6, 10, 12], [0, 4, 6, 8, 12, 14]],
-      lead: (n, t, d, v) => pluck(n, t, { vol: v * 1.6, dur: Math.min(d, 0.45), bright: 6.5, bus: musBus, rev: 0.3, wave: "sawtooth" }),
-      prog: [Ch(33, [57, 60, 64, 69]), Ch(43, [55, 59, 62, 67]), Ch(41, [57, 60, 65, 69]), Ch(40, [56, 59, 64, 68]), Ch(33, [57, 60, 64, 69]), Ch(43, [55, 59, 62, 67]), Ch(41, [57, 60, 65, 69]), Ch(40, [56, 59, 64, 68])],
-      play(st, bar, t, c, nx, m, r) {
-        if (st === 0) upright(c.r, t, 0.3, 0.16); if (st === 8) upright(c.r + 7, t, 0.25, 0.13);
-        // rasgueo de la guitarra (acordes rapidos de arriba a abajo)
-        const RS = m >= 1 ? [0, 3, 6, 10, 12, 14] : [0, 6, 12];
-        if (RS.includes(st)) c.v.slice().reverse().forEach((n, i) => pluck(n + 12, t + i * 0.014, { vol: 0.05 * (st === 0 ? 1.2 : 0.9), dur: 0.22, bright: 5, bus: musBus, rev: 0.2, wave: "sawtooth" }));
-        if (m >= 1) { if (has([0, 8], st)) kick(t, 0.5); if (has([4, 12], st)) snare(t, 0.55); if (has([2, 6, 10, 14], st)) rim(t, 1.15); if (st % 2 === 1 && r() < 0.3) rim(t, 0.6); }
-        else if (has([4, 12], st)) rim(t, 0.8);
-      },
-    },
-    { /* 13: deep house, bombo a negras, contratiempo abierto y acordes calidos */
-      name: "Handicap Asiático", bpm: 122, sw: 0.02, spb: 16, tonic: 62, scale: [0, 3, 5, 7, 10], rh: [[0, 6, 10], [3, 8, 11, 14], [0, 4, 10], [2, 6, 12]],
-      lead: (n, t, d, v) => epiano(n, t, { vol: v * 0.85, dur: Math.min(0.9, d + 0.2), mod: 2, idx: 1.6, rev: 0.5 }),
-      prog: [Ch(38, [53, 57, 60, 64]), Ch(38, [53, 57, 60, 64]), Ch(43, [55, 58, 62, 65]), Ch(43, [55, 58, 62, 65]), Ch(34, [53, 57, 62, 65]), Ch(34, [53, 57, 62, 65]), Ch(36, [55, 58, 64, 67]), Ch(33, [55, 61, 64, 67])],
-      play(st, bar, t, c, nx, m, r) {
-        if (has([2, 6, 10, 14], st) && (m >= 1 || st === 2 || st === 10)) upright(c.r + (st === 14 && r() < 0.4 ? 7 : 0), t, 0.2, 0.22);
-        if (st === 0 && m >= 1) pad(c.v, t, STEP * 15, 0.028);
-        if (has(m >= 1 ? [3, 6, 10, 13] : [3, 10], st)) stab(c.v, t, 0.24, 0.032, EPC);
-        if (has([0, 4, 8, 12], st)) kick(t, m >= 1 ? 1 : 0.6);
-        if (m >= 1) { if (has([2, 6, 10, 14], st)) hat(t, 1, true); if (st === 4 || st === 12) snare(t, 0.35); if (st % 2 === 1) shaker(t, 0.55); }
-        else if (has([2, 6, 10, 14], st)) hat(t, 0.6, true);
-      },
-    },
-  ];
-  /* titulos de las canciones: terminos de apuestas [es, en, fr, pt, de, it] */
   const NAMES = [
     ["Apuesta segura", "Sure Bet", "Pari sûr", "Aposta segura", "Sichere Wette", "Scommessa sicura"],
     ["Doble o nada", "Double or Nothing", "Quitte ou double", "Dobro ou nada", "Doppelt oder nichts", "Doppio o niente"],
@@ -410,96 +131,65 @@ window.AIQ = window.AIQ || {};
     ["Apuesta en vivo", "Live Bet", "Pari en direct", "Aposta ao vivo", "Live-Wette", "Scommessa live"],
     ["Pleno al quince", "Straight Up", "Plein au quinze", "Pleno ao quinze", "Volltreffer", "Pieno al quindici"],
     ["Hándicap asiático", "Asian Handicap", "Handicap asiatique", "Handicap asiático", "Asiatisches Handicap", "Handicap asiatico"],
+    ["Gran apostador", "High Roller", "Flambeur", "Grande apostador", "Großspieler", "Giocatore d'alto bordo"],
+    ["Bote acumulado", "Progressive Jackpot", "Jackpot progressif", "Jackpot progressivo", "Progressiver Jackpot", "Jackpot progressivo"],
+    ["Ventaja de la casa", "House Edge", "Avantage de la maison", "Vantagem da casa", "Hausvorteil", "Vantaggio del banco"],
+    ["Mano caliente", "Hot Hand", "Main chaude", "Mão quente", "Heiße Hand", "Mano calda"],
+    ["Ganador y colocado", "Each Way", "Pari gagnant-placé", "Ganhador e colocado", "Sieg-Platz-Wette", "Vincente e piazzato"],
+    ["Empate no vale", "Draw No Bet", "Match nul remboursé", "Empate anula aposta", "Unentschieden, Geld zurück", "Pareggio rimborsato"],
+    ["Apuesta máxima", "Max Bet", "Mise maximale", "Aposta máxima", "Höchsteinsatz", "Puntata massima"],
   ];
-  const ROT = 88;                                            // segundos por cancion (aprox.: se cambia al terminar una vuelta de acordes)
-  const SK = { bpm: 86, sw: 0.3 };                           // tempo y swing del lounge (los fija setSkin)
-  let cur = -1, tstep = 0, trkT0 = 0, forceNext = false, mel = { on: false, A: null, B: null, C: null };
-  function useTrack(i, t, announce) {
-    const T = TRK[i]; cur = i; recent.push(i); if (recent.length > 4) recent.shift(); tstep = 0; trkT0 = t; forceNext = false; mel.A = null;
-    if (T.bpm) { BPM = T.bpm; SW = T.sw; } else { BPM = SK.bpm; SW = SK.sw; }
-    STEP = 60 / BPM / 4;
-    if (announce && A.music.onChange) { const ms = Math.max(0, (t - ctx.currentTime) * 1000); setTimeout(() => A.music.onChange(i), ms); }
+  const FILES = [
+    "assets/music/01-lounge-nocturno.mp3", "assets/music/02-ragtime-roulette.mp3", "assets/music/03-bossa-de-medianoche.mp3",
+    "assets/music/04-samba-del-crupier.mp3", "assets/music/05-blues-del-tapete.mp3", "assets/music/06-vals-real.mp3",
+    "assets/music/07-funk-jackpot.mp3", "assets/music/08-big-band-all-in.mp3", "assets/music/09-mambo-royale.mp3",
+    "assets/music/10-cash-out.mp3", "assets/music/11-banca-al-dia.mp3", "assets/music/12-apuesta-en-vivo.mp3",
+    "assets/music/13-pleno-al-quince.mp3", "assets/music/14-handicap-asiatico.mp3", "assets/music/15-funk-da-sorte.mp3",
+    "assets/music/16-house-del-crupier.mp3", "assets/music/17-tecno-del-bote.mp3", "assets/music/18-merengue-del-premio.mp3",
+    "assets/music/19-cha-cha-del-casino.mp3", "assets/music/20-ranchera-de-la-suerte.mp3", "assets/music/21-corrido-del-apostador.mp3",
+  ];
+  let cur = -1, mediaEl = null, mediaSrc = null, mode = 0;
+  const recent = [];
+
+  function ensureMedia() {
+    if (mediaEl) return;
+    mediaEl = new Audio(); mediaEl.preload = "auto"; mediaEl.loop = false;
+    mediaSrc = ctx.createMediaElementSource(mediaEl); mediaSrc.connect(musBus);
+    mediaEl.addEventListener("ended", () => useTrack(autoIdx(), true));
   }
+  const autoIdx = () => { const opts = FILES.map((_, i) => i).filter(i => !recent.includes(i)); return opts[Math.floor(Math.random() * opts.length)]; };
+  const nextIdx = () => (cur + 1) % FILES.length;
+  const prevIdx = () => (cur - 1 + FILES.length) % FILES.length;
   function transition(t) {
     noise(t, 1.1, { hp: 2500, vol: 0.035, sweepTo: 9000, type: "highpass", bus: musBus }); thump(t, { vol: 0.2, f0: 90, f1: 40, dur: 0.3, bus: musBus }); bell(84, t, { vol: 0.05, dur: 1.4, bus: musBus, rev: 0.6 });
   }
-  const recent = [];
-  const autoIdx = () => { const opts = TRK.map((_, i) => i).filter(i => !recent.includes(i)); return opts[Math.floor(Math.random() * opts.length)]; };   // rotacion automatica: al azar
-  const nextIdx = () => (cur + 1) % TRK.length;                          // las canciones van siempre en orden: 1, 2, 3... y vuelta a la 1
-  const prevIdx = () => (cur - 1 + TRK.length) % TRK.length;
-  /* Melodia por FRASES de 4 compases: motivo A, respuesta B (misma rima, contorno espejo que resuelve), A otra vez y una cadencia corta con silencio.
-   * Los tiempos fuertes se ajustan a notas del acorde; los debiles se mueven por la escala (grados contiguos). Asi suena a tema, no a notas al azar. */
-  const CONTOURS = [[0, 1, 2, 1], [0, 2, 1, 0], [0, 0, 1, 2], [2, 1, 0, 1], [0, 1, 0, -1], [0, -1, 0, 1], [1, 2, 1, 0]];
-  const ri = n => Math.floor(Math.random() * n);
-  function snap(n, c, tol) { let bd = 99, bn = n; for (const cv of c.v) { const x = cv + 12 * Math.round((n - cv) / 12); if (Math.abs(x - n) < bd) { bd = Math.abs(x - n); bn = x; } } return bd <= tol ? bn : n; }
-  function newPhrase(T) {
-    const L = T.scale.length, lim = L + 2, cl = d => Math.max(0, Math.min(lim, d));
-    const rh = T.rh[ri(T.rh.length)], ct = CONTOURS[ri(CONTOURS.length)], d0 = 1 + ri(L - 1), last = rh.length - 1;
-    mel.on = Math.random() < (mode === 0 ? 0.6 : 0.92);
-    mel.A = rh.map((s0, i) => ({ s: s0, d: cl(d0 + ct[i % ct.length]) }));
-    mel.B = rh.map((s0, i) => ({ s: s0, d: cl(i === last ? d0 : d0 - ct[i % ct.length]) }));
-    mel.C = rh.slice(0, Math.min(3, rh.length)).map((s0, i, arr) => ({ s: s0, d: cl(d0 + (arr.length - 1 - i)) })); mel.C.cad = true;
-    mel.skipC = Math.random() < 0.35;
-  }
-  function lead(T, st, t, c) {
-    if (!T.lead) return;
-    const spb = T.spb, ph = Math.floor(tstep / spb) % 4;
-    if (st === 0 && (ph === 0 || !mel.A)) newPhrase(T);
-    if (!mel.on || !mel.A) return;
-    if (mode === 0 && (ph === 1 || ph === 3)) return;                     // en el menu: solo A ... A, mas espacio
-    const arr = ph === 0 || ph === 2 ? mel.A : ph === 1 ? mel.B : (mel.skipC ? null : mel.C); if (!arr) return;
-    const i = arr.findIndex(x => x.s === st); if (i < 0) return;
-    const S = T.scale, L = S.length, d = arr[i].d;
-    let n = T.tonic + S[d % L] + 12 * Math.floor(d / L);
-    const strong = st === 0 || st === (spb >> 1) || i === 0;
-    if (arr.cad && i === arr.length - 1) n = snap(n, c, 6); else if (strong) n = snap(n, c, 2);
-    const nxt = arr[i + 1] ? arr[i + 1].s : Math.min(spb, st + 8), dur = Math.max(0.16, Math.min(1.1, (nxt - st) * STEP * 1.0));
-    T.lead(n, t, dur, (strong ? 0.07 : 0.058) + (mode === 2 ? 0.008 : 0));
-  }
-  function playStep(s, t0) {
-    const T = TRK[cur]; if (!T.play) return stepLounge(s, t0);
-    const spb = T.spb, bar = Math.floor(s / spb) % T.prog.length, st = s % spb, c = T.prog[bar], nx = T.prog[(bar + 1) % T.prog.length];
-    const t = t0 + (Math.floor(st / 2) % 2 === 1 ? STEP * 2 * SW : 0), rnd = Math.random;
-    T.play(st, bar, t, c, nx, mode, rnd);
-    lead(T, st, t, c);
-    if (mode === 2) { if (st % 2 === 1) hat(t, 0.5); if (st % 4 === 0) noise(t, 0.03, { hp: 1800, vol: 0.02, bus: musBus }); }   // reloj de tension
-    if (rnd() < 0.06) crackle(t);
-  }
-  function schedule() {
-    while (nextT < ctx.currentTime + 0.3) {
-      const T = TRK[cur], cyc = T.spb * T.prog.length;
-      if (tstep > 0 && ((forceNext && tstep % T.spb === 0) || (tstep % cyc === 0 && nextT - trkT0 > ROT))) { useTrack(autoIdx(), nextT, true); transition(nextT); }
-      playStep(tstep, nextT); nextT += STEP; tstep++;
-    }
+  function useTrack(i, announce) {
+    ensureMedia(); cur = i; recent.push(i); if (recent.length > 4) recent.shift();
+    mediaEl.src = FILES[i]; mediaEl.currentTime = 0; mediaEl.play().catch(() => {});
+    if (announce) { transition(ctx.currentTime); if (A.music.onChange) A.music.onChange(i); }
   }
   A.music = {
     start() {
-      if (!A.audio.musicOn || timer || !init()) return; nextT = ctx.currentTime + 0.08;
-      useTrack(cur < 0 ? 0 : cur, nextT, false); timer = setInterval(schedule, 60);
+      if (!A.audio.musicOn || !init()) return;
+      if (cur < 0) useTrack(autoIdx(), false); else { ensureMedia(); mediaEl.play().catch(() => {}); }
     },
-    next() { if (!timer) return; useTrack(nextIdx(), nextT, true); transition(nextT); },
-    prev() { if (!timer) return; useTrack(prevIdx(), nextT, true); transition(nextT); },
+    next() { if (cur < 0) return; useTrack(nextIdx(), true); },
+    prev() { if (cur < 0) return; useTrack(prevIdx(), true); },
     index() { return cur; },
-    _trk: () => TRK,   // dev
-    count() { return TRK.length; },
+    count() { return FILES.length; },
     title(i = cur) { const n = NAMES[i]; if (!n) return ""; const k = ["es", "en", "fr", "pt", "de", "it"].indexOf(A.lang); return n[k < 0 ? 1 : k]; },
-    go(i) { if (timer && TRK[i]) { useTrack(i, nextT, true); transition(nextT); } },   // dev: salta a una cancion
+    go(i) { if (FILES[i] != null) useTrack(i, true); },   // dev: salta a una cancion
     now() { return A.music.title(); },
-    stop() { clearInterval(timer); timer = null; },
+    stop() { if (mediaEl) mediaEl.pause(); },
     mode(m) { mode = m; if (ctx) musFilter.frequency.setTargetAtTime(m === 2 ? 12500 : 8600, ctx.currentTime, 0.15); },
     duck(level = 0.3, ms = 1400) {
-      if (!ctx || !timer) return;
+      if (!ctx || cur < 0) return;
       const base = MUS_BASE * A.audio.vol.music, t = ctx.currentTime; musBus.gain.cancelScheduledValues(t);
       musBus.gain.setTargetAtTime(base * level, t, 0.05); musBus.gain.setTargetAtTime(base, t + ms / 1000, 0.4);
     },
     muffle(on) { if (ctx) musFilter.frequency.setTargetAtTime(on ? 320 : 8600, ctx.currentTime, 0.08); },
   };
-  /* cada skin tiene su propia banda: tempo, swing, transposicion y timbre del piano */
-  A.audio.setSkin = cfg => {
-    if (!cfg) return;
-    SK.bpm = cfg.bpm; SK.sw = cfg.sw; SHIFT = cfg.shift; EPMOD = cfg.mod; EPIDX = cfg.idx;
-    if (cur <= 0) { BPM = cfg.bpm; STEP = 60 / BPM / 4; SW = cfg.sw; }
-  };
+  A.audio.setSkin = () => {};   // las 21 pistas ya son archivos fijos: el timbre/tempo por skin ya no aplica
   A.audio.state = () => (ctx ? ctx.state : 'none');
   /* volumen 0..1 de "master" | "music" | "sfx" */
   A.audio.setVol = (kind, v) => {
@@ -510,7 +200,7 @@ window.AIQ = window.AIQ || {};
     else if (kind === "music") { musBus.gain.cancelScheduledValues(t); musBus.gain.setTargetAtTime(MUS_BASE * v, t, 0.03); }
     else sfxBus.gain.setTargetAtTime(v, t, 0.03);
   };
-  A.audio.unlock = (music = true) => { init(); if (music && A.audio.musicOn && !timer && ctx) A.music.start(); };
+  A.audio.unlock = (music = true) => { init(); if (music && A.audio.musicOn && ctx) A.music.start(); };
   A.audio.setMusic = on => { A.audio.musicOn = on; if (on) A.music.start(); else A.music.stop(); };
 
   /* ------------------------------------------------------------------ efectos */

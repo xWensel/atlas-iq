@@ -79,6 +79,7 @@
   function dialog(html, cls) {
     const d = $("dlg"); d.className = cls; d.innerHTML = html;
     document.body.classList.toggle("vd-on", cls === "verdict" || cls === "tablewrap"); document.body.classList.toggle("tk-on", cls === "side");
+    if (A.dealer && A.dealer.homeTease) A.dealer.homeTease(cls === "home");   // el crupier asoma de vez en cuando SOLO en la pantalla de inicio
     $("layer").classList.remove("hidden");
     requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add("in")));
     const b = d.querySelector("[data-primary]"); if (b) setTimeout(() => b.focus({ preventScroll: true }), 60);
@@ -300,19 +301,25 @@
   /* escala de la interfaz: en pantallas grandes todo el HUD y los menus crecen (k = 1 en 1280x720, hasta 1,85) para aprovechar el espacio */
   const uiK = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--k")) || 1;
   const setK = () => { const w = innerWidth, h = innerHeight, k = (w < 900 || h < 520) ? 1 : Math.max(1, Math.min(1.85, Math.min(w / 1280, h / 720))); document.documentElement.style.setProperty("--k", k.toFixed(3)); };
-  /* ajuste fino: si una pantalla escalada (inicio, campamento, veredicto...) no cabe, se baja SU k hasta que quepa (sin pasar de 1) */
+  /* ajuste fino: si una pantalla escalada (inicio, campamento, veredicto...) no cabe en la ventana, se baja SU k hasta que quepa entera (nunca hay que desplazarse: esto es un juego de escritorio) */
   const FIT = ".hh, .scr, .table, .vd";
   const fitK = () => {
     const d = $("dlg"), el = d && d.querySelector(":scope > " + FIT.split(", ").join(", :scope > ")); if (!el) return;
-    const base = uiK(); el.style.removeProperty("--k"); if (base <= 1) return;
-    const over = () => { const t = el.querySelector(".scr-body") || el, ch = t.clientHeight, sh = t.scrollHeight; return sh > ch * 1.015 ? ch / sh : 1; };
+    const base = uiK(); el.style.removeProperty("--k");
+    const over = () => {
+      const b = el.querySelector(".scr-body");
+      if (b) { const ch = b.clientHeight, sh = b.scrollHeight; return sh > ch * 1.015 ? ch / sh : 1; }
+      const ch = d.clientHeight, sh = el.getBoundingClientRect().height;                                 // sin .scr-body: el propio bloque (min-height:100%) puede salirse del dialogo, no de si mismo
+      return sh > ch * 1.015 ? ch / sh : 1;
+    };
     let k = base;
-    for (let i = 0; i < 6; i++) { const r = over(); if (r >= 1) break; k = Math.max(1, k * r * 0.985); el.style.setProperty("--k", k.toFixed(3)); if (k <= 1) break; }
+    for (let i = 0; i < 8; i++) { const r = over(); if (r >= 1) break; k = Math.max(0.55, k * r * 0.985); el.style.setProperty("--k", k.toFixed(3)); if (k <= 0.55) break; }
   };
   let fitT = 0; const fitSoon = () => { clearTimeout(fitT); fitT = setTimeout(() => { requestAnimationFrame(fitK); }, 60); };
   setK(); A.uiK = uiK; A.fitK = fitK;
   addEventListener("resize", () => { setK(); fitSoon(); });
-  if (window.MutationObserver && $("dlg")) { new MutationObserver(m => { if (m.some(x => x.addedNodes.length)) { fitSoon(); setTimeout(fitK, 700); } }).observe($("dlg"), { childList: true }); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSoon);
+  if (window.MutationObserver && $("dlg")) { new MutationObserver(m => { if (m.some(x => x.addedNodes.length)) { fitSoon(); setTimeout(fitK, 260); setTimeout(fitK, 700); } }).observe($("dlg"), { childList: true }); }
   { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
     if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
