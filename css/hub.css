@@ -41,13 +41,13 @@
 .ach-ico { font-size: 34px; } .ach-t { display: grid; gap: 1px; } .ach-t em { font-style: normal; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; opacity: .7; } .ach-t b { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: 20px; line-height: 1.05; } .ach-t i { font-style: normal; font-size: 15.5px; }
 
 /* ---------- Aventura: barra de estado y herramientas en partida ---------- */
-.adv-bar { position: absolute; left: 14px; top: 76px; z-index: 5; display: grid; gap: 6px; max-width: 250px; padding: 9px 12px 10px; background: rgba(16, 10, 30, .82); color: var(--paper); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .14), 0 6px 0 rgba(0, 0, 0, .35); }
+.adv-bar { position: absolute; left: 14px; top: 76px; z-index: 5; display: grid; gap: 6px; max-width: 250px; padding: 9px 12px 10px; background: rgba(10, 26, 18, .82); color: var(--paper); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .14), 0 6px 0 rgba(0, 0, 0, .35); }
 .adv-bar.hidden, .tool-bar.hidden { display: none; }
 .ab-top { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 15.5px; } .ab-act { white-space: nowrap; letter-spacing: .05em; text-transform: uppercase; font-size: 14px; opacity: .7; } .ab-coins { color: var(--brass); font-weight: 700; font-size: 18px; } @keyframes bump { 40% { transform: scale(1.4); } }
 .ab-hearts i, .hearts i { font-style: normal; color: rgba(255, 255, 255, .2); margin-right: 1px; } .ab-hearts i.on, .hearts i.on { color: var(--red); }
 .ab-perks { display: flex; gap: 4px; flex-wrap: wrap; } .ab-perk { width: 30px; height: 30px; display: grid; place-items: center; background: rgba(255, 255, 255, .1); font-size: 19px; cursor: help; } .ab-wind { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 15.5px; } .ab-wind svg { width: 26px; height: 26px; fill: var(--brass); }
 .tool-bar { position: absolute; z-index: 6; left: 50%; bottom: 86px; transform: translateX(-50%); display: flex; gap: 8px; }
-.tool { position: relative; display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; min-width: 138px; padding: 8px 12px 7px 10px; text-align: left; color: var(--paper); background: rgba(16, 10, 30, .9); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .18), 0 6px 0 rgba(0, 0, 0, .35); cursor: pointer; transition: transform .2s var(--spring), box-shadow .2s; }
+.tool { position: relative; display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; min-width: 138px; padding: 8px 12px 7px 10px; text-align: left; color: var(--paper); background: rgba(10, 26, 18, .9); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .18), 0 6px 0 rgba(0, 0, 0, .35); cursor: pointer; transition: transform .2s var(--spring), box-shadow .2s; }
 .tool:hover:not(.off) { transform: translateY(-4px); box-shadow: inset 0 0 0 2px var(--brass), 0 10px 0 rgba(0, 0, 0, .35); } .tool.on { background: var(--brass); color: var(--ink); animation: bump .4s var(--spring); }
 .tool.off { opacity: .4; cursor: not-allowed; } .tl-ico { grid-row: 1 / 3; font-size: 26px; } .tool b { font-family: var(--mono); font-weight: 500; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; } .tl-pips { display: flex; gap: 3px; } .tl-pips i { width: 12px; height: 5px; background: rgba(255, 255, 255, .2); } .tl-pips i.on { background: var(--brass); } .tool.on .tl-pips i.on { background: var(--ink); }
 .tool kbd { position: absolute; top: -8px; right: -6px; font-family: var(--mono); font-size: 14px; background: var(--red); color: var(--paper); padding: 1px 5px; }
@@ -70,7 +70,7 @@
 .route { display: flex; gap: 6px; align-items: center; } .route i { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .3); display: grid; place-items: center; font-style: normal; font-size: 14px; } .route i.done { background: var(--brass); border-color: var(--brass); } .route i.cur { background: var(--red); border-color: var(--red); animation: blink 1s ease-in-out infinite; } .route i.boss { border-radius: 4px; }
 .shop-flash { margin: 0; font-family: var(--mono); font-size: 15.5px; letter-spacing: .06em; color: var(--brass); } .shop-flash { color: var(--red); animation: rise .3s both; }
 .offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
-.offer { --rc: #9aa7a0; position: relative; display: grid; gap: 6px; align-content: start; text-align: center; padding: 14px 12px 12px; background: #1b1430; box-shadow: inset 0 0 0 3px var(--rc), 0 10px 0 -3px rgba(0, 0, 0, .4); transition: transform .25s var(--spring); animation: rise .5s var(--spring) both; }
+.offer { --rc: #9aa7a0; position: relative; display: grid; gap: 6px; align-content: start; text-align: center; padding: 14px 12px 12px; background: #12271d; box-shadow: inset 0 0 0 3px var(--rc), 0 10px 0 -3px rgba(0, 0, 0, .4); transition: transform .25s var(--spring); animation: rise .5s var(--spring) both; }
 .offer:nth-child(2) { animation-delay: .06s; } .offer:nth-child(3) { animation-delay: .12s; } .offer:nth-child(4) { animation-delay: .18s; } .offer:nth-child(5) { animation-delay: .24s; }
 .offer:hover { transform: translateY(-6px) rotate(-.6deg); } .offer.r1 { --rc: #4c9fb0; } .offer.r2 { --rc: #e8b23a; } .offer.otool { --rc: #6c8cff; } .offer.life { --rc: #fe5f55; }
 .offer.sold { opacity: .35; filter: grayscale(1); pointer-events: none; } .offer.no { animation: nope .35s; } @keyframes nope { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
@@ -144,7 +144,7 @@ html[data-skin="casino"] .offer b { font-size: 23px; } html[data-skin="casino"] 
 @media (max-width: 760px) { .intro-in.adv { flex-direction: column; } .intro-art { width: min(calc(80 * var(--vw)), 330px); } .shop header { grid-template-columns: 1fr; grid-template-areas: "art" "tag" "title" "top"; } }
 
 /* ---------- ilustraciones generadas (encima de la version vectorial, si existen) ---------- */
-.pic { position: relative; display: block; border-radius: 14px; overflow: hidden; background: #1c1640; box-shadow: 0 0 0 4px #191325, 0 10px 0 4px rgba(0, 0, 0, .4); aspect-ratio: 8 / 5; }
+.pic { position: relative; display: block; border-radius: 14px; overflow: hidden; background: #123420; box-shadow: 0 0 0 4px #16241c, 0 10px 0 4px rgba(0, 0, 0, .4); aspect-ratio: 8 / 5; }
 .pic .art { position: absolute; inset: 0; width: 100%; height: 100%; filter: none; }
 .pic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .7s ease; image-rendering: auto; } .pic-img.on { opacity: 1; }
 .pic-frame { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .16), inset 0 -18px 30px -18px rgba(0, 0, 0, .5); border-radius: inherit; }
@@ -161,37 +161,37 @@ html[data-skin="casino"] .offer b { font-size: 23px; } html[data-skin="casino"] 
 
 /* cartas: indice de rango + palo geografico en dos esquinas */
 .ix { position: absolute; display: grid; justify-items: center; gap: 1px; line-height: 1; font-family: var(--serif); z-index: 2; }
-.ix b { font-weight: 900; font-size: 20px; color: #191325; } .ix .ic { width: 15px; height: 15px; filter: none; }
+.ix b { font-weight: 900; font-size: 20px; color: #16241c; } .ix .ic { width: 15px; height: 15px; filter: none; }
 .ix.tl { left: 9px; top: 8px; } .ix.br { right: 9px; bottom: 9px; transform: rotate(180deg); }
 .pc[data-suit="red"] .ix b { color: #c2372e; }
 
 /* oferta = carta de poker */
-.offer.pc { --rc: #b7bfc4; background: #f6efdc; color: #191325; border-radius: 16px; padding: 30px 12px 14px; gap: 7px;
-  box-shadow: 0 0 0 3px #191325, inset 0 0 0 5px var(--rc), inset 0 0 0 7px #191325, 0 12px 0 3px rgba(0, 0, 0, .42); }
+.offer.pc { --rc: #b7bfc4; background: #f6efdc; color: #16241c; border-radius: 16px; padding: 30px 12px 14px; gap: 7px;
+  box-shadow: 0 0 0 3px #16241c, inset 0 0 0 5px var(--rc), inset 0 0 0 7px #16241c, 0 12px 0 3px rgba(0, 0, 0, .42); }
 .offer.pc.r1 { --rc: #4fb6a0; } .offer.pc.r2 { --rc: #c78bf0; } .offer.pc.otool { --rc: #6c8cff; } .offer.pc.life { --rc: #fe5f55; }
-.offer.pc .of-r { color: #5a4b7a; font-size: 14px; } .offer.pc.r2 .of-r { color: #8a3fc0; }
-.offer.pc .of-ico { height: 100px; margin: 0 4px; border: 3px solid #191325; border-radius: 10px; background-color: #17553a; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .12), inset 0 -10px 18px rgba(0, 0, 0, .3); }
+.offer.pc .of-r { color: #4a6b5a; font-size: 14px; } .offer.pc.r2 .of-r { color: #8a3fc0; }
+.offer.pc .of-ico { height: 100px; margin: 0 4px; border: 3px solid #16241c; border-radius: 10px; background-color: #17553a; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .12), inset 0 -10px 18px rgba(0, 0, 0, .3); }
 .offer.pc .of-ico .ic { width: 74px; height: 74px; }
-.offer.pc b:not(.ix b) { color: #191325; } .offer.pc p { color: #3c3358; min-height: 4.4em; }
+.offer.pc b:not(.ix b) { color: #16241c; } .offer.pc p { color: #3a4a3e; min-height: 4.4em; }
 .offer.pc em { color: #b3322a; }
 .offer.pc.r2::after { content: ""; position: absolute; inset: 0; border-radius: 16px; pointer-events: none; mix-blend-mode: color-dodge; opacity: .35;
   background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .8) 46%, rgba(160, 220, 255, .7) 52%, transparent 66%) 0 0 / 250% 100%; animation: holo 3.4s linear infinite; }
 @keyframes holo { to { background-position: -250% 0; } }
 /* etiqueta de precio: ficha colgando bajo la carta */
-.offer.pc .buy { position: relative; margin-top: 6px; border-radius: 999px; background: #191325; color: #ffe08a; box-shadow: 0 0 0 2px #ffe08a inset, 0 5px 0 rgba(0, 0, 0, .35); display: inline-flex; align-items: center; justify-content: center; }
-.offer.pc .buy:hover:not(:disabled) { background: #2b2340; transform: translateY(-2px) scale(1.05); } .offer.pc .buy:disabled { background: #b8b0c8; color: #6a6280; box-shadow: none; }
+.offer.pc .buy { position: relative; margin-top: 6px; border-radius: 999px; background: #16241c; color: #ffe08a; box-shadow: 0 0 0 2px #ffe08a inset, 0 5px 0 rgba(0, 0, 0, .35); display: inline-flex; align-items: center; justify-content: center; }
+.offer.pc .buy:hover:not(:disabled) { background: #1c3a2c; transform: translateY(-2px) scale(1.05); } .offer.pc .buy:disabled { background: #b8c2b4; color: #5f6e64; box-shadow: none; }
 .offer.pc:hover { transform: translateY(-8px) rotate(-1.2deg); }
 
 /* mano de herramientas: cartas en abanico abajo, como la mano de Balatro */
 .tool-bar { gap: 0; bottom: 74px; align-items: flex-end; }
-.tool.pc-hand { position: relative; display: grid; grid-template-columns: 1fr; justify-items: center; align-content: start; row-gap: 3px; width: 104px; min-width: 0; padding: 30px 8px 8px; margin: 0 -8px; text-align: center; color: #191325;
-  background: #f6efdc; border-radius: 12px; box-shadow: 0 0 0 3px #191325, inset 0 0 0 4px #6c8cff, inset 0 0 0 5.5px #191325, 0 8px 0 rgba(0, 0, 0, .4);
+.tool.pc-hand { position: relative; display: grid; grid-template-columns: 1fr; justify-items: center; align-content: start; row-gap: 3px; width: 104px; min-width: 0; padding: 30px 8px 8px; margin: 0 -8px; text-align: center; color: #16241c;
+  background: #f6efdc; border-radius: 12px; box-shadow: 0 0 0 3px #16241c, inset 0 0 0 4px #6c8cff, inset 0 0 0 5.5px #16241c, 0 8px 0 rgba(0, 0, 0, .4);
   transform: rotate(var(--r, 0deg)); transform-origin: 50% 130%; transition: transform .25s var(--spring); }
-.tool.pc-hand:hover:not(.off) { transform: rotate(0deg) translateY(-22px) scale(1.06); z-index: 3; box-shadow: 0 0 0 3px #191325, inset 0 0 0 4px #f8b449, inset 0 0 0 5.5px #191325, 0 14px 0 rgba(0, 0, 0, .4); }
+.tool.pc-hand:hover:not(.off) { transform: rotate(0deg) translateY(-22px) scale(1.06); z-index: 3; box-shadow: 0 0 0 3px #16241c, inset 0 0 0 4px #f8b449, inset 0 0 0 5.5px #16241c, 0 14px 0 rgba(0, 0, 0, .4); }
 .tool.pc-hand.on { background: #ffe08a; transform: rotate(0deg) translateY(-26px) scale(1.08); z-index: 4; }
-.tool.pc-hand .tl-ico { grid-column: 1; grid-row: auto; width: 100%; height: 58px; display: grid; place-items: center; border: 2.5px solid #191325; border-radius: 8px; background-color: #17553a; }
-.tool.pc-hand .tl-ico .ic { width: 42px; height: 42px; } .tool.pc-hand b { font-size: 15.5px; color: #191325; letter-spacing: .06em; }
-.tool.pc-hand .ix.tl { left: 8px; top: 7px; } .tool.pc-hand .ix b { font-size: 18px; } .tool.pc-hand .tl-pips i { background: rgba(25, 19, 37, .22); } .tool.pc-hand .tl-pips i.on { background: #c2372e; }
+.tool.pc-hand .tl-ico { grid-column: 1; grid-row: auto; width: 100%; height: 58px; display: grid; place-items: center; border: 2.5px solid #16241c; border-radius: 8px; background-color: #17553a; }
+.tool.pc-hand .tl-ico .ic { width: 42px; height: 42px; } .tool.pc-hand b { font-size: 15.5px; color: #16241c; letter-spacing: .06em; }
+.tool.pc-hand .ix.tl { left: 8px; top: 7px; } .tool.pc-hand .ix b { font-size: 18px; } .tool.pc-hand .tl-pips i { background: rgba(22, 36, 28, .22); } .tool.pc-hand .tl-pips i.on { background: #c2372e; }
 .tool.pc-hand kbd { top: -10px; right: -4px; } .tool.pc-hand.off { filter: grayscale(.9) brightness(.85); }
 
 /* ficha "ciega": cae y gira como una moneda al empezar una ronda */
@@ -213,14 +213,14 @@ html[data-skin="casino"] .offer b { font-size: 23px; } html[data-skin="casino"] 
 .shop::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; background:
   repeating-linear-gradient(0deg, rgba(255, 255, 255, .035) 0 1.5px, transparent 1.5px 40px), repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 1.5px, transparent 1.5px 40px); }
 .shop > * { position: relative; }
-.inv-perk { background: #f6efdc; border-radius: 8px; box-shadow: 0 0 0 2px #191325, inset 0 0 0 3px #c78bf0; } .inv { background: rgba(10, 40, 30, .7); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .25); }
+.inv-perk { background: #f6efdc; border-radius: 8px; box-shadow: 0 0 0 2px #16241c, inset 0 0 0 3px #c78bf0; } .inv { background: rgba(10, 40, 30, .7); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .25); }
 .shop .coins { color: #ffe08a; text-shadow: 0 3px 0 rgba(0, 0, 0, .5); }
 .tool-bar { bottom: 98px; } .tool.pc-hand { padding-top: 40px; width: 108px; } .tool.pc-hand .ix.tl { left: 9px; top: 8px; grid-auto-flow: column; align-items: center; gap: 4px; } .tool.pc-hand .ix .ic { width: 17px; height: 17px; }
 .tool.pc-hand .ix b { font-size: 20px; line-height: 1; }
 .offer.pc .buy { width: 72%; margin: 6px auto 0; }
 /* Enciclopedia: indices de carta de poker */
 .cx-card .ix, .cx-bigcard .ix { z-index: 3; } .cx-card .ix.tl { left: 9px; top: 8px; } .cx-card .ix.br { right: 9px; bottom: 30px; }
-.cx-card .ix b, .cx-bigcard .ix b { font-size: 19px; text-shadow: 0 0 3px #f6efdc, 0 0 3px #f6efdc; color: #191325; } .cx-card .ix.red b, .cx-bigcard .ix.red b { color: #c2372e; } .cx-card .ix .ic, .cx-bigcard .ix .ic { width: 15px; height: 15px; }
+.cx-card .ix b, .cx-bigcard .ix b { font-size: 19px; text-shadow: 0 0 3px #f6efdc, 0 0 3px #f6efdc; color: #16241c; } .cx-card .ix.red b, .cx-bigcard .ix.red b { color: #c2372e; } .cx-card .ix .ic, .cx-bigcard .ix .ic { width: 15px; height: 15px; }
 .cx-card .cx-no, .cx-bigcard .cx-no { display: none; }
 .cx-card.locked .ix, .cx-bigcard.locked .ix { opacity: .45; filter: grayscale(1); }
 .cx-bigcard .ix.tl { left: 20px; top: 20px; } .cx-bigcard .ix.br { right: 20px; bottom: 56px; } .cx-bigcard .ix b { font-size: 24px; } .cx-bigcard .ix .ic { width: 20px; height: 20px; }
@@ -228,12 +228,12 @@ html[data-skin="casino"] .offer b { font-size: 23px; } html[data-skin="casino"] 
 
 /* Campamento: suministros de la proxima ronda y apuesta */
 .tb-sup { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 2px 0 6px; }
-.sup { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 8px; min-width: 230px; max-width: 320px; padding: 6px 10px; text-align: left; color: #f6efdc; background: rgba(16, 10, 30, .82); border: 0; border-radius: 10px; cursor: pointer; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .16); transition: transform .15s, box-shadow .15s; }
+.sup { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 8px; min-width: 230px; max-width: 320px; padding: 6px 10px; text-align: left; color: #f6efdc; background: rgba(10, 26, 18, .82); border: 0; border-radius: 10px; cursor: pointer; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .16); transition: transform .15s, box-shadow .15s; }
 .sup:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2px #ffd98a; } .sup.on { background: rgba(38, 92, 70, .85); box-shadow: inset 0 0 0 2px #5fd6b8; }
-.sp-ic { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: #17553a; box-shadow: inset 0 0 0 2px #191325; } .sp-ic .ic { width: 26px; height: 26px; }
+.sp-ic { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: #17553a; box-shadow: inset 0 0 0 2px #16241c; } .sp-ic .ic { width: 26px; height: 26px; }
 .sp-t { display: grid; gap: 1px; min-width: 0; } .sp-t b { font-family: var(--serif); font-size: 18px; font-weight: 800; color: #fff; } .sp-t i { font-style: normal; font-size: 14px; line-height: 1.15; opacity: .8; }
 .sup em { font-style: normal; font-family: var(--mono); font-size: 15.5px; letter-spacing: .06em; color: #ffd98a; display: inline-flex; align-items: center; gap: 4px; } .sup em .ic { width: 16px; height: 16px; }
 .sup.bet { cursor: default; } .sup.bet:hover { transform: none; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .16); } .sup.bet.on { box-shadow: inset 0 0 0 2px #fe5f55; background: rgba(90, 24, 40, .85); }
-.stakes { display: inline-flex; gap: 4px; } .stk { min-width: 30px; padding: 5px 7px; border: 0; border-radius: 7px; cursor: pointer; font-family: var(--mono); font-size: 15.5px; color: #191325; background: #ffd98a; box-shadow: 0 3px 0 rgba(0, 0, 0, .4); } .stk.on { background: #fe5f55; color: #fff; }
+.stakes { display: inline-flex; gap: 4px; } .stk { min-width: 30px; padding: 5px 7px; border: 0; border-radius: 7px; cursor: pointer; font-family: var(--mono); font-size: 15.5px; color: #16241c; background: #ffd98a; box-shadow: 0 3px 0 rgba(0, 0, 0, .4); } .stk.on { background: #fe5f55; color: #fff; }
 @media (max-width: 700px) { .sup { min-width: 100%; max-width: none; } }
 .tb-note { margin-bottom: 8px; } .tb-sup { margin-top: 4px; }

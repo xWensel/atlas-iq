@@ -92,7 +92,7 @@
 
 /* ---------- por aspecto ---------- */
 html[data-skin="casino"] #codex { --cxc: 0px; --cxrad: 16px; } html[data-skin="casino"] .cx-card, html[data-skin="casino"] .cx-bigcard { clip-path: none; }
-html[data-skin="casino"] .cx-card { box-shadow: inset 0 0 0 4px var(--rc), 0 6px 0 rgba(8,4,16,.6); } html[data-skin="casino"] .cx-chip, html[data-skin="casino"] .cx-x, html[data-skin="casino"] .cx-rel, html[data-skin="casino"] .cx-search input { border-radius: 10px; }
+html[data-skin="casino"] .cx-card { box-shadow: inset 0 0 0 4px var(--rc), 0 6px 0 rgba(5,11,7,.6); } html[data-skin="casino"] .cx-chip, html[data-skin="casino"] .cx-x, html[data-skin="casino"] .cx-rel, html[data-skin="casino"] .cx-search input { border-radius: 10px; }
 html[data-skin="casino"] .cx-art { border-radius: 10px; } html[data-skin="casino"] .cx-strip { border-radius: 14px; clip-path: none; }
 
 @media (max-width: 760px) {

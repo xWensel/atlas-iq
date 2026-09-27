@@ -29,7 +29,7 @@ window.AIQ = window.AIQ || {};
   const countryAt = (lon, lat) => { for (const f of map.world.features) { const b = f.polys; let near = false; for (const p of b) if (lon >= p.bbox[0] - 1 && lon <= p.bbox[2] + 1 && lat >= p.bbox[1] - 1 && lat <= p.bbox[3] + 1) { near = true; break; } if (near && A.geo.inFeature(lon, lat, f)) return f; } return null; };
 
   /* ---------------------------------------------------------------- dibujo del reticulo (64x64, pixel a pixel) */
-  const INK = "#191325", GOLD = "#f8b449", GOLD2 = "#ffe08a", TEAL = "#5fd6b8", RED = "#fe5f55", WHITE = "#fff7e6", CYAN = "#7fe3ff";
+  const INK = "#16241c", GOLD = "#f8b449", GOLD2 = "#ffe08a", TEAL = "#5fd6b8", RED = "#fe5f55", WHITE = "#fff7e6", CYAN = "#7fe3ff";
   const px = (x, y, col) => { c.fillStyle = col; c.fillRect(Math.round(x), Math.round(y), 1, 1); };
   function circle(cx, cy, r, col) { let x = r, y = 0, e = 1 - r; while (x >= y) { for (const [a, b] of [[x, y], [y, x], [-x, y], [-y, x], [x, -y], [y, -x], [-x, -y], [-y, -x]]) px(cx + a, cy + b, col); y++; if (e < 0) e += 2 * y + 1; else { x--; e += 2 * (y - x) + 1; } } }
   function arc(cx, cy, r, a0, a1, col) { for (let a = a0; a < a1; a += 0.04) px(cx + Math.cos(a) * r, cy + Math.sin(a) * r, col); }
@@ -85,7 +85,7 @@ window.AIQ = window.AIQ || {};
     if (fx.mag && mag.classList.contains("on")) {
       const f = map.cv.width / map.W, S = 168, z = 2.4, sw = (S / z) * f; mctx.imageSmoothingEnabled = false;
       mctx.drawImage(map.cv, P.x * f - sw / 2, P.y * f - sw / 2, sw, sw, 0, 0, S, S);
-      mctx.strokeStyle = "rgba(25,19,37,.9)"; mctx.lineWidth = 3; mctx.beginPath(); mctx.moveTo(S / 2 - 9, S / 2); mctx.lineTo(S / 2 + 9, S / 2); mctx.moveTo(S / 2, S / 2 - 9); mctx.lineTo(S / 2, S / 2 + 9); mctx.stroke();
+      mctx.strokeStyle = "rgba(22,36,28,.9)"; mctx.lineWidth = 3; mctx.beginPath(); mctx.moveTo(S / 2 - 9, S / 2); mctx.lineTo(S / 2 + 9, S / 2); mctx.moveTo(S / 2, S / 2 - 9); mctx.lineTo(S / 2, S / 2 + 9); mctx.stroke();
       mctx.strokeStyle = "#f8b449"; mctx.lineWidth = 1.2; mctx.stroke();
       const mx = P.x + 84 + S > innerWidth ? P.x - 84 - S : P.x + 84, my = Math.max(8, P.y - 84 - S / 2);
       mag.style.transform = `translate(${mx}px,${my}px)`;

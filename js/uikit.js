@@ -11,7 +11,7 @@
   A.ttAttr = (t, d) => `data-tt="${esc(d ? t + "\n" + d : t)}"`;
 
   /* ------------------------------------------------------------------ puntero de casino */
-  const PAL = { w: "#fff3cf", g: "#f8b449", r: "#ff5a4d", b: "#69c7ff", k: "#191325" };
+  const PAL = { w: "#fff3cf", g: "#f8b449", r: "#ff5a4d", b: "#69c7ff", k: "#16241c" };
   const CELL = 2;
   const ARROW = [
     "w..........", "ww.........", "www........", "wwww.......", "wwwww......", "wwwwww.....", "wwwwwww....", "wwwwwwww...", "wwwwwwwww..", "wwwwwwwwww.",

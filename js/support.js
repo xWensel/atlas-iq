@@ -43,12 +43,12 @@ window.AIQ = window.AIQ || {};
   const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
   A.makeBadge = async (iq, tierName, subtitle) => {
     const W = 1200, H = 630, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-    const c = cv.getContext("2d"), GOLD = "#f8b449", INK = "#191325", RED = "#fe5f55", PAPER = "#f3eddc", FELT = "#17553a";
+    const c = cv.getContext("2d"), GOLD = "#f8b449", INK = "#16241c", RED = "#fe5f55", PAPER = "#f3eddc", FELT = "#17553a";
     try { await Promise.all([document.fonts.load("400 40px 'Jersey 15'"), document.fonts.load("700 20px Silkscreen")]); } catch (e) { /* sin fuentes */ }
     const logo = await loadImg("assets/logo.png");
     const rr = (x, y, w, h, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
     // fondo y tapete
-    const g = c.createRadialGradient(W / 2, H * 0.45, 60, W / 2, H / 2, W * 0.7); g.addColorStop(0, "#2a1650"); g.addColorStop(1, "#0c0818"); c.fillStyle = g; c.fillRect(0, 0, W, H);
+    const g = c.createRadialGradient(W / 2, H * 0.45, 60, W / 2, H / 2, W * 0.7); g.addColorStop(0, "#1a4a30"); g.addColorStop(1, "#0a140f"); c.fillStyle = g; c.fillRect(0, 0, W, H);
     rr(34, 34, W - 68, H - 68, 28); c.fillStyle = FELT; c.fill(); c.lineWidth = 8; c.strokeStyle = INK; c.stroke();
     rr(48, 48, W - 96, H - 96, 20); c.lineWidth = 4; c.strokeStyle = GOLD; c.stroke();
     c.save(); rr(48, 48, W - 96, H - 96, 20); c.clip(); c.globalAlpha = 0.07; c.fillStyle = "#fff"; for (let x = 0; x < W; x += 18) for (let y = 0; y < H; y += 18) if (((x + y) / 18) % 2 === 0) c.fillRect(x, y, 9, 9); c.restore();
