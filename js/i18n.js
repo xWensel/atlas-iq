@@ -33,6 +33,7 @@ window.AIQ = window.AIQ || {};
     "intro.goal": ["Meta: {a} pts", "Goal: {a} pts", "Objectif : {a} pts", "Meta: {a} pts", "Ziel: {a} Pkt.", "Obiettivo: {a} pt"],
     "intro.bonus": ["Ronda bonus", "Bonus round", "Manche bonus", "Rodada bônus", "Bonusrunde", "Round bonus"],
     "ask.no": ["Nº {n} / {m}", "No. {n} / {m}", "N° {n} / {m}", "Nº {n} / {m}", "Nr. {n} / {m}", "N. {n} / {m}"],
+    "ask.inf": ["Nº {n} · ∞", "No. {n} · ∞", "N° {n} · ∞", "Nº {n} · ∞", "Nr. {n} · ∞", "N. {n} · ∞"],
     "score.level": ["Puntos del nivel", "Level score", "Points du niveau", "Pontos do nível", "Level-Punkte", "Punti del livello"],
     "score.need": ["Meta", "Goal", "Objectif", "Meta", "Ziel", "Obiettivo"],
     "score.total": ["Total", "Total", "Total", "Total", "Gesamt", "Totale"],

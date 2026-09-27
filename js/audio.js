@@ -209,6 +209,8 @@ window.AIQ = window.AIQ || {};
   A.sfx = {
     ui: go(t => pluck(84, t, { vol: 0.05, dur: 0.12, bright: 3, rev: 0.1 })),
     hover: go(t => noise(t, 0.02, { hp: 5000, vol: 0.02 })),
+    /* clic en el fieltro: pulsar donde sea en el menu, sin que haya nada que pulsar, y aun asi se siente bien */
+    felt: go(t => { thump(t, { vol: 0.13, f0: 150, f1: 58, dur: 0.08 }); noise(t, 0.04, { lp: 1700, vol: 0.035 }); pluck(64, t + 0.012, { vol: 0.03, dur: 0.14, bright: 2, rev: 0.15 }); }),
     start: go(t => { MOTIF.forEach((m, i) => pluck(m, t + i * 0.13, { vol: 0.16, dur: 0.9, rev: 0.6 })); bell(79, t + 0.42, { vol: 0.07 }); }),
     /* clic en el mapa: chincheta que cae */
     tap: go(t => { thump(t, { vol: 0.32, f0: 320, f1: 70, dur: 0.1 }); noise(t, 0.05, { lp: 2200, vol: 0.06 }); pluck(76, t + 0.02, { vol: 0.05, dur: 0.15, rev: 0.15 }); }),

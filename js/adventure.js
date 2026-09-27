@@ -34,14 +34,14 @@ window.AIQ = window.AIQ || {};
     nature: [L6("Maravillas de la naturaleza|Natural wonders|Merveilles de la nature|Maravilhas da natureza|Naturwunder|Meraviglie della natura"), L6("Mares y montañas|Seas and mountains|Mers et montagnes|Mares e montanhas|Meere und Berge|Mari e montagne")],
     clue: [L6("Apodos y pistas|Nicknames and clues|Surnoms et indices|Apelidos e pistas|Spitznamen und Hinweise|Soprannomi e indizi")],
     mixed: [L6("¡Jackpot! De todo un poco|Jackpot! A bit of everything|Jackpot ! Un peu de tout|Jackpot! Um pouco de tudo|Jackpot! Von allem etwas|Jackpot! Un po' di tutto")],
-    flag: [L6("Banderas del mundo|World flags|Drapeaux du monde|Bandeiras do mundo|Flaggen der Welt|Bandiere del mondo")],
+    flag: [L6("Banderas del mundo|World flags|Drapeaux du monde|Bandeiras do mundo|Flaggen der Welt|Bandiere del mondo"), L6("El coleccionista de banderas|The flag collector|Le collectionneur de drapeaux|O colecionador de bandeiras|Der Flaggensammler|Il collezionista di bandiere")],
   };
   const KIND_FACTOR = { capital: 1, city: 1, landmark: 0.9, nature: 1.5, battle: 0.9, event: 0.9, country: 0.7, clue: 1, water: 1.6, strait: 1.4 };
   /* 12 rondas: 3 actos de 4 (la 4.a es el jefe). Empieza facil y va cambiando de tema y subiendo el nivel. */
   const ROUNDS = [
-    { topic: "capital", tier: 0 }, { topic: "landmark", tier: 0 }, { topic: "city", tier: 0 }, { topic: "country", tier: 0, boss: true },
-    { topic: "capital", tier: 1 }, { topic: "history", tier: 0 }, { topic: "nature", tier: 0 }, { topic: "city", tier: 1, boss: true },
-    { topic: "flag", tier: 0 }, { topic: "landmark", tier: 1 }, { topic: "history", tier: 1 }, { topic: "mixed", tier: 1, boss: true },
+    { topic: "capital", tier: 0 }, { topic: "landmark", tier: 0 }, { topic: "flag", tier: 0 }, { topic: "country", tier: 0, boss: true },
+    { topic: "capital", tier: 1 }, { topic: "history", tier: 0 }, { topic: "nature", tier: 0 }, { topic: "flag", tier: 1, boss: true },
+    { topic: "city", tier: 1 }, { topic: "clue", tier: 1 }, { topic: "history", tier: 1 }, { topic: "mixed", tier: 1, boss: true },
   ];
   const roundDefOf = r => (r < ROUNDS.length ? ROUNDS[r] : (() => { const b = ROUNDS[4 + ((r - 4) % 8)]; return { ...b, tier: Math.min(2, b.tier + 1), boss: (r % 4) === 3 }; })());
 
@@ -76,7 +76,7 @@ window.AIQ = window.AIQ || {};
   }
   const ROUND_POOL = 80;                                             // lugares distintos por ronda: de ahi salen las preguntas de cada ronda
   const CAP = { 1: 99, 2: 12, 3: 12, 4: 99, 5: 99, 6: 10, 7: 12, 8: 8, 9: 8, 10: 8, 11: 10, 12: 6 };   // maximo de lugares del mismo pais por ronda (ronda 1..12)
-  const ROUND_KIND = ["capital", "landmark", "city", "country", "capital", "history", "nature", "city", "country", "landmark", "history", "mixed"];
+  const ROUND_KIND = ["capital", "landmark", "country", "country", "capital", "history", "nature", "country", "city", "clue", "history", "mixed"];
   const byDiff = (a, b) => (a.tier - b.tier) || ((a.fame || 0) - (b.fame || 0));   // de mas facil a mas dificil dentro de un tipo
   const nk = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
   const nameKeys = q => [nk(q.name && q.name.en), nk(q.name && q.name.es)].filter(Boolean);
@@ -98,7 +98,7 @@ window.AIQ = window.AIQ || {};
       }
       return got;
     };
-    for (const kind of ["capital", "landmark", "city", "country", "history", "nature"]) {
+    for (const kind of ["capital", "landmark", "city", "country", "history", "nature", "clue"]) {
       const rounds = ROUND_KIND.map((k, i) => (k === kind ? i : -1)).filter(i => i >= 0);
       let rest = kindList(kind);
       rounds.forEach((r, idx) => {
@@ -127,8 +127,8 @@ window.AIQ = window.AIQ || {};
   const TOOLS = {
     sonar: { ico: "sonar", uses: 2, cost: 5, r: 1, n: L("Sonar", "Sonar"), d: L("Toca un punto del mapa: te dice a cuántos km está el objetivo (±6 %) y dibuja el anillo. Con tres sondas, triangulas.", "Tap a point: tells you how far the target is (±6%) and draws the ring. Three probes triangulate."), kind: "probe" },
     compass: { ico: "compass", uses: 3, cost: 4, r: 0, n: L("Brújula", "Compass"), d: L("Toca un punto: una flecha señala el rumbo (8 direcciones) hacia el objetivo.", "Tap a point: an arrow shows the heading (8 directions) to the target."), kind: "probe" },
-    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pasaporte", "Passport"), d: L("Ilumina en el mapa el país del lugar (en un país, te dice el continente).", "Lights up the place's country on the map (for a country, tells you the continent)."), kind: "instant" },
-    journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Cuaderno", "Field journal"), d: L("Lee la nota de campo del lugar antes de responder.", "Read the place's field note before answering."), kind: "instant" },
+    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pase VIP", "VIP pass"), d: L("Ilumina en el mapa el país del lugar (en un país, te dice el continente).", "Lights up the place's country on the map (for a country, tells you the continent)."), kind: "instant" },
+    journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Nota del crupier", "Dealer's note"), d: L("Lee la nota de campo del lugar antes de responder.", "Read the place's field note before answering."), kind: "instant" },
     hourglass: { ico: "hourglass", uses: 2, cost: 4, r: 0, n: L("Reloj de arena", "Hourglass"), d: L("+6 segundos en la pregunta actual.", "+6 seconds on the current question."), kind: "instant" },
     interruptor: { ico: "interruptor", uses: 1, cost: 8, r: 2, n: L("Interruptor", "Master switch"), d: L("Apaga todos los retos durante esta pregunta.", "Switches every challenge off for this question."), kind: "instant" },
     swapcard: { ico: "swapcard", uses: 1, cost: 6, r: 1, n: L("Carta de cambio", "Swap card"), d: L("Cambia esta pregunta por otro lugar de la ronda.", "Swaps this question for another place from the round."), kind: "instant" },
@@ -200,8 +200,9 @@ window.AIQ = window.AIQ || {};
     migrate(run);
     if (run.phase === "shop" || run.phase === "chest") openShop(run.phase === "chest");
     else if (run.phase === "verdict") afterVerdict(!!run.vBoss);                            // la ronda ya estaba superada y cobrada: seguimos al campamento
-    else if (run.phase === "win") openShop(true);                                             // ya habias ganado: sigues hacia la Leyenda
+    else if (run.phase === "win") showWinChoice();                                          // ya habias ganado: vuelve a preguntar cobrar o modo infinito
     else if (run.phase === "retry") openShop(false);                                        // ronda fallida: vuelves al campamento para reintentar
+    else if (run.phase === "round" && run.inf) startInfinite(true);                         // sigue en el modo infinito donde lo dejaste
     else if (run.phase === "round" && run.qi > 0 && run.qi < run.qn && run.curQ) { run.used = run.used.filter(id => !run.curQ.includes(id)); startRound(true); }   // sigue en la misma pregunta con las mismas preguntas
     else startRound();
     return true;
@@ -257,10 +258,48 @@ window.AIQ = window.AIQ || {};
     if (keep) { S.qi = run.qi; S.levelScore = run.roundScore; S.streak = run.streak || 0; S.hits = run.rGood; C().updateHud && C().updateHud(); }
     if (Lv.boss) setTimeout(() => A.sfx.boss(), 200);
   }
+  /* ---------------- modo infinito: tras la ronda 12, ya no hay mas rondas numeradas ni campamento ---------------- */
+  function infPool() {                                                 // todo el banco de lugares, de todos los temas, sin repetir
+    const P = pools(), seen = new Set(), out = [];
+    Object.keys(P).forEach(k => P[k].forEach(q => { if (!seen.has(q.cid[0])) { seen.add(q.cid[0]); out.push(q); } }));
+    return out;
+  }
+  function infBatch() {
+    const rr = A.rng(`${run.seed}:inf:${run.infN = (run.infN || 0) + 1}`);
+    return rr.shuffle(infPool()).map(q => withSub({ ...q }));
+  }
+  function infiniteLevel() {
+    const qs = [].concat(infBatch(), infBatch());                     // dos barajadas del banco entero: de sobra para una sesion normal (se rellena sola si hace falta)
+    return {
+      name: A.T("Modo infinito", "Infinite mode"), topicName: A.T("Preguntas sin parar", "Nonstop questions"), topic: "mixed", kind: "adventure", boss: false,
+      seconds: run.infSeconds, advance: 1, maxPerQ: 1400, bonus: false, plainName: true, questions: () => qs,
+      score: (q, km, left) => A.adv.score(q, km, left, true).sc,
+    };
+  }
+  function startInfinite(keep) {
+    run.inf = true; run.phase = "round"; run.topic = "mixed"; run.tier = 2; run.chal = []; run.chalName = null; run.chalHalve = 1; run.boss = []; run.wind = null;
+    if (!keep) { run.infOver = false; run.infSeconds = 12; run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
+    const Lv = infiniteLevel(), S = C().S;
+    S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
+    S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
+    A.dealer.enable(true); A.chal.begin([], A.chal.fx(perkList()), { seed: run.seed, round: roundNo(), halve: 1 });
+    persist(); A.ach.emit("adv", { kind: "round", act: run.act }); C().startLevel(0);
+    if (keep) { S.qi = run.qi; S.levelScore = run.roundScore; S.streak = run.streak || 0; S.hits = run.rGood; C().updateHud && C().updateHud(); }
+  }
+  A.adv.startInfinite = startInfinite;
+  A.adv.isInfinite = () => !!(run && run.inf);
+  A.adv.infDone = () => !!(run && run.inf && run.infOver);
   function mapStyleFor() { return A.MAPSTYLES[A.skin] || A.MAPSTYLES.casino; }
   const DIRS16 = [["N", "N"], ["NNE", "NNE"], ["NE", "NE"], ["ENE", "ENE"], ["E", "E"], ["ESE", "ESE"], ["SE", "SE"], ["SSE", "SSE"], ["S", "S"], ["SSW", "SSO"], ["SW", "SO"], ["WSW", "OSO"], ["W", "O"], ["WNW", "ONO"], ["NW", "NO"], ["NNW", "NNO"]];
   const dirName = brg => { const idx = Math.round((((brg % 360) + 360) % 360) / 22.5) % 16, d = has("compass16") ? DIRS16[idx] : DIRS16[Math.round(idx / 2) % 8 * 2]; return A.lang === "es" ? d[1] : d[0]; };
   A.adv.introHtml = Lv => {
+    if (run.inf) {
+      return `<div class="intro-in adv"><div class="intro-left"><div class="intro-num blind">${A.blind("small", "s_compass")}</div><div class="intro-body">
+        <span class="tag">${A.tx(actInfo(run.act).n)} · ${A.T("Modo infinito", "Infinite mode")}</span><h2>${A.tx(Lv.topicName)}</h2>
+        <p class="intro-sub">${A.T("De todo tipo: mapas, países, monumentos, historia… Cada pregunta, menos tiempo.", "Every kind of question: maps, countries, landmarks, history… Less time on every question.")}</p>
+        <p class="adv-goal">${Lv.seconds.toFixed(1)} s</p></div></div>
+        <div class="intro-art">${A.pic("topic_mixed")}<div class="intro-dealer" id="introDealer"></div></div></div>`;
+    }
     const info = actInfo(run.act), def = rdef(), list = run.chal || [];
     const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${run.wind.km} km</em>` : ""}</div></div>`; }).join("");
     const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? "skull" : run.round === 0 ? "s_pin" : "s_compass";
@@ -314,7 +353,19 @@ window.AIQ = window.AIQ || {};
     clearTimers();
     run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) run.stats.bulls++; run.stats.best = Math.max(run.stats.best, res.total);
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
-    run.streak = res.streak || 0; run.qi++; run.qTools = 0; persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
+    run.streak = res.streak || 0; run.qi++; run.qTools = 0;
+    if (run.inf && !run.infOver) {
+      const S = C().S, Lv = S.camp.levels[0];
+      Lv.seconds = Math.max(3, Math.round((Lv.seconds - 0.2) * 10) / 10); run.infSeconds = Lv.seconds;
+      if (S.qs.length - S.qi < 60) S.qs.push(...infBatch());                        // se acerca el final del carrete: se rellena antes de que se note
+      const failed = res.km == null || res.dist < 400;
+      if (failed) {
+        const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
+        if (shielded && !insured) run.shieldAct = run.act; else { run.lives--; run.livesLostAct++; }
+        if (run.lives <= 0) run.infOver = true;                                     // se acaban las provisiones: la siguiente pantalla cobra la expedicion
+      }
+    }
+    persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
     const kind = res.km == null ? "timeout" : res.dist >= 960 ? "bull" : res.dist < 400 ? "miss" : res.streak >= 3 ? "streak" : res.dist >= 750 ? "good" : null;
     clearTimeout(reactT); if (kind) reactT = setTimeout(() => A.dealer.react(kind), 1300);
   };
@@ -444,12 +495,13 @@ window.AIQ = window.AIQ || {};
   }
   A.adv.refresh = renderBars;
   A.adv.hideBars = () => { const a = $("advBar"), b = $("toolBar"); if (a) a.classList.add("hidden"); if (b) b.classList.add("hidden"); };
-  A.adv.hudTitle = () => { const Lv = C().S.camp.levels[0]; return `${A.tx(Lv.name)} · ${A.tx(Lv.topicName)} · ${A.T("Objetivo", "Target")} ${A.fmt(Lv.advance)}`; };
+  A.adv.hudTitle = () => { const Lv = C().S.camp.levels[0]; return run && run.inf ? `${A.tx(Lv.name)} · ${A.tx(Lv.topicName)} · ${Lv.seconds.toFixed(1)}s` : `${A.tx(Lv.name)} · ${A.tx(Lv.topicName)} · ${A.T("Objetivo", "Target")} ${A.fmt(Lv.advance)}`; };
   A.adv.toolKey = n => { const ids = run ? Object.keys(run.tools) : []; if (ids[n]) A.adv.useTool(ids[n]); };
   A.adv.cancelTool = () => { const S = C().S; if (S.tool) { S.tool = null; note(hints.join("  ·  ")); renderBars(); } };
 
   /* ---------------- fin de ronda ---------------- */
   A.adv.roundEnd = function () {
+    if (run.inf) { run.score += C().S.levelScore; run.sup = {}; run.bet = 0; persist(); A.adv.hideBars(); return endRun(true); }   // modo infinito: sin provisiones, se cobra directamente
     const S = C().S, Lv = S.camp.levels[0], pass = S.levelScore >= Lv.advance, boss = isBoss();
     S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); clearTimeout(reactT); A.chal.end(); C().map.setStyle(mapStyleFor());
     if (pass) {
@@ -499,11 +551,15 @@ window.AIQ = window.AIQ || {};
   function winScreen() {
     run.won = true; run.act++; run.round = 0; run.attempt = 0; run.phase = "win"; persist(); A.sfx.victory();
     A.profile.get().adv.wins++; A.profile.save();
+    showWinChoice();
+  }
+  /* ronda 12 es la ultima: desde aqui solo se puede cobrar o pasar al modo infinito (nunca mas rondas numeradas) */
+  function showWinChoice() {
     C().verdict({
       kind: "win", level: 12, tag: A.T("Tres actos completados", "Three acts completed"), title: A.T("¡Terra Incognita conquistada!", "Terra Incognita conquered!"),
-      text: A.T("Has completado los tres actos. Puedes cobrar tu gloria ahora o seguir hacia la Leyenda: rondas infinitas cada vez más duras, con el mismo marcador.", "You've completed all three acts. Cash out your glory now, or push on into Legend: endless, ever-harder rounds on the same scoreboard."),
+      text: A.T("Has completado los tres actos. Puedes cobrar tu gloria ahora o entrar en el modo infinito: preguntas sin parar de todo tipo, cada vez con menos tiempo, hasta que se te acaben las provisiones.", "You've completed all three acts. Cash out your glory now, or enter infinite mode: nonstop questions of every kind, with less time each round, until you run out of provisions."),
       stats: [[A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("VICTORIA", "VICTORY"), stampSub: A.icon("u_star", "st"), art: "win",
-      buttons: [{ id: "legBtn", cls: "btn-ink", label: A.T("Seguir a la Leyenda", "Push into Legend"), arrow: true, primary: true, onclick: () => openShop(true) }, { id: "endBtn", cls: "btn-line", label: A.T("Cobrar y terminar", "Cash out"), onclick: () => endRun(true) }],
+      buttons: [{ id: "infBtn", cls: "btn-ink", label: A.T("Modo infinito", "Infinite mode"), arrow: true, primary: true, onclick: () => startInfinite() }, { id: "endBtn", cls: "btn-line", label: A.T("Cobrar y terminar", "Cash out"), onclick: () => endRun(true) }],
     });
   }
 
@@ -531,7 +587,7 @@ window.AIQ = window.AIQ || {};
     persist(); renderShop(chest);
   }
   /* "proxima ronda" del Campamento: una tarjeta por ronda con cada truco explicado (que hace, cuanto pesa y que reliquia lo frena).
-     El jefe del acto es una tarjeta grande con su nombre y numero de poderes; con la Mirilla tambien se ve la ronda siguiente. */
+     El jefe del acto es una tarjeta grande con su nombre y numero de poderes; con el Ojo en el cielo tambien se ve la ronda siguiente. */
   const counterInfo = id => {
     const list = A.CHAL[id].counters || [], own = list.filter(p => owned(p));
     if (own.length) return `<em class="nx-have">${A.T("Lo frenas con", "You counter it with")}: ${own.map(p => A.tx(A.RELICS[p].n)).join(", ")}</em>`;

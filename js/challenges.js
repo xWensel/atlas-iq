@@ -88,6 +88,8 @@ window.AIQ = window.AIQ || {};
     [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme", ["shuffle", "wrongborders"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto", ["nocountry", "blur"]], ["Mala visión|Bad eyesight|Mauvaise vue|Vista turva|Schlechte Sicht|Vista offuscata", ["flip", "anagram"]], ["Noche cerrada|Dead of night|Nuit noire|Noite fechada|Tiefste Nacht|Notte fonda", ["dark", "shaky", "wind"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala", ["quake", "decoys"]]],
     [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato", ["shuffle", "dark", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta", ["lightning", "rain", "tremble"]], ["Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele", ["babel", "runes", "mosaic"]]],
   ].map(a => a.map(c => ({ n: L6(c[0]), ids: c[1] })));
+  /* jefe de la ronda de banderas: la bandera trae su propio filtro y el mapa se lía por su cuenta */
+  const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto", ["flaginvert", "shuffle"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata", ["flagblur", "mosaic"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
   const ACT1 = [["text", "map"], ["ptr", "map"], ["text", "ptr"]], ACT2 = [["text", "map", "ptr"], ["map", "ptr", "rule"], ["text", "map", "map"]];
 
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
@@ -100,7 +102,7 @@ window.AIQ = window.AIQ || {};
       const lv = clamp(a + 1 + (asc >= 3 ? 1 : 0), 1, 3);
       let list = [], combo = null;
       if (boss) {
-        combo = A.rng(`${seed}:boss:${act}`).pick(BOSS[a]);
+        combo = A.rng(`${seed}:boss:${act}`).pick(flagRound ? FLAG_BOSS : BOSS[a]);
         list = combo.ids.map((id, i) => ({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) }));
         if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPC, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
         if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia
@@ -152,7 +154,7 @@ window.AIQ = window.AIQ || {};
     case "runes": return { frac: [0.4, 0.6, 0.85][i] * fx.textMul * h };
     case "memory": return { ms: [2600, 1800, 1200][i] / Math.max(0.3, fx.textMul * h) };
     case "blur": return { px: [4.5, 7, 10][i] * fx.blurMul * h };
-    case "dark": return { r: [230, 170, 120][i] * fx.darkR / Math.max(0.5, h), a: [0.93, 0.96, 0.98][i] * (1 - fx.darkDim) };
+    case "dark": return { r: [230, 170, 120][i] * fx.darkR / Math.max(0.5, h), a: [0.975, 0.988, 0.997][i] * (1 - fx.darkDim) };
     case "flicker": return { iv: [[5.5, 8.5], [3.8, 6], [2.5, 4.2]][i], len: [250, 450, 700][i] * fx.blackoutMul * h };
     case "lightning": return { iv: [[4.5, 7], [3.2, 5.2], [2.2, 4]][i] };
     case "wrongborders": return { amp: [0.014, 0.024, 0.038][i] * h };
@@ -237,6 +239,7 @@ window.AIQ = window.AIQ || {};
   /* el nombre y el pais de debajo sufren los mismos retos de texto (el pais tambien tiembla, se borra, se cambia...) */
   function decorate(o) {
     const el = $("askName"), sub = $("askSub"); if (!el || !o) return; clearText();
+    if (o.t === "c" && A.adv && A.adv.isFlagRound && A.adv.isFlagRound()) { if (sub) sub.textContent = ""; if (A.adv.renderFlag) A.adv.renderFlag(o); return; }   // ronda de banderas: la bandera manda, nunca el texto
     const tx = S.list.filter(c => D[c.id].kind === "text"), nameTxt = A.tx(o.name), subTxt = A.tx(o.sub);
     if (S.suspended || !tx.length) { el.textContent = nameTxt; if (sub) A.renderBlanks(sub, subTxt); return; }
     let alt = null;                                                   // Torre de Babel: los dos textos salen en el mismo otro idioma
@@ -354,6 +357,7 @@ window.AIQ = window.AIQ || {};
   A.chal.ptrMods = () => {
     if (S.suspended || !S.on) return null;
     const m = {}; for (const c of kindOn("ptr")) { const p = par(c); if (c.id === "cmirror" && S.fx.unmirror) continue; m[c.id] = p; }
+    if (get("dark") && !S.fx.halo) m.tinyDark = true;                   // sin linterna, el puntero se ve mas pequeño en el apagon
     return Object.keys(m).length ? m : null;
   };
 

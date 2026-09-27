@@ -102,22 +102,22 @@
   }
   function levelTitle(L) { return A.tx(L.name) + (L.diff ? " · " + A.t("diff." + L.diff) : ""); }
   function updateHud() {
-    const L = lv();
+    const L = lv(), inf = S.run && A.adv.isInfinite && A.adv.isInfinite();
     $("lvlText").textContent = S.run ? A.adv.hudTitle() : A.t("lvl", { n: S.level + 1, m: S.camp.levels.length, name: levelTitle(L) });
     if (S.run) A.adv.refresh();
     odoSet($("scLevel"), S.levelScore, { ms: 900 });
     $("scTotal").textContent = A.fmt(S.runTotal + S.levelScore);
     $("scNeed").textContent = L.advance > 1 ? A.fmt(L.advance) : "—";
     $("scBar").style.width = Math.min(100, (S.levelScore / Math.max(1, L.advance)) * 100) + "%";
-    $("scBar").classList.toggle("done", S.levelScore >= L.advance);
+    $("scBar").classList.toggle("done", L.advance > 1 && S.levelScore >= L.advance);
     $("scMark").style.display = L.advance > 1 ? "" : "none";
     const pips = $("pips"); pips.innerHTML = "";
-    for (let i = 0; i < S.qs.length; i++) {
+    if (!inf) for (let i = 0; i < S.qs.length; i++) {
       const p = document.createElement("i");
       p.className = i < S.qi || (i === S.qi && S.phase === "reveal") ? "done" : i === S.qi && S.phase === "asking" ? "cur" : "";
       pips.appendChild(p);
     }
-    $("askNo").textContent = A.t("ask.no", { n: pad2(Math.min(S.qi + 1, S.qs.length)), m: pad2(S.qs.length) });
+    $("askNo").textContent = inf ? A.t("ask.inf", { n: pad2(S.qi + 1) }) : A.t("ask.no", { n: pad2(Math.min(S.qi + 1, S.qs.length)), m: pad2(S.qs.length) });
   }
   function setPrompt() {
     const o = q(); if (!o) return;
@@ -429,12 +429,12 @@
     if (adv && adv.coins) coinFx(adv.coins);
     if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
 
-    const last = S.qi === S.qs.length - 1;
+    const last = S.qi === S.qs.length - 1 || (S.run && A.adv.infDone && A.adv.infDone());
     const place = o.answer ? A.tx(o.answer) : A.tx(o.name) + (A.tx(o.sub) ? ", " + A.tx(o.sub) : "");
     const from = !guess ? "" : isC ? A.t("res.border", { name: A.tx(o.name) }) : o.clue ? "" : A.t("res.from", { name: place });
     const showKm = guess && !(isC && km === 0);
     dialog(`<div class="sheet ticket">
-      <div class="tk-band"><span>${A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : o.kind || L.kind))}</span></div>
+      <div class="tk-band"><span>${S.run && A.adv.isInfinite && A.adv.isInfinite() ? A.t("ask.inf", { n: pad2(S.qi + 1) }) : A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : o.kind || L.kind))}</span></div>
       <div class="tk-title">${title}</div>
       ${showKm ? `<div class="tk-km"><span class="odo" id="kmNum"></span><span>km</span></div>` : ""}
       <div class="tk-from">${[from, guess ? A.t("res.clicked", { t: (S.limit - left).toFixed(1) }) : ""].filter(Boolean).join(" · ")}</div>
@@ -593,6 +593,8 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
   document.addEventListener("pointerdown", e => {
     A.audio.unlock(!S.booting);
     if (e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv, #dock button, #rail button, .seg button, .menu-gear, .hub-back, .asc, .tool")) A.sfx.ui();
+    /* menu principal: pulsar el fondo (nada activable) tambien suena, para que cada toque se sienta reconocido */
+    else if (S.phase === "title" && !(e.target.closest && e.target.closest("button, a, input, select, textarea, label, [role=button]"))) A.sfx.felt();
   }, true);
 
   addEventListener("keydown", e => {

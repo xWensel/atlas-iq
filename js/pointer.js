@@ -36,7 +36,8 @@ window.AIQ = window.AIQ || {};
   function draw(now) {
     const t = now / 1000, st = P.st, land = lastLand, tool = st.tool, cx = 32, cy = 32;
     c.clearRect(0, 0, 64, 64);
-    const R = 19 - (P.press > 0 ? 3 * Math.min(1, P.press / 100) : 0) + (tool ? Math.sin(t * 6) * 0.6 : 0);
+    const shrink = P.m && P.m.tinyDark ? 0.55 : 1;
+    const R = (19 - (P.press > 0 ? 3 * Math.min(1, P.press / 100) : 0) + (tool ? Math.sin(t * 6) * 0.6 : 0)) * shrink;
     const ring = hotCol || (tool === "sonar" || tool === "compass" ? CYAN : land ? GOLD : TEAL);
     circle(cx, cy, Math.round(R) + 1, INK); circle(cx, cy, Math.round(R) - 2, INK);                     // borde oscuro
     circle(cx, cy, Math.round(R), ring); circle(cx, cy, Math.round(R) - 1, ring);

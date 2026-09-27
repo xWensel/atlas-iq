@@ -105,9 +105,9 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
 /* Campamento en movil o pantallas muy bajas: se desplaza en vez de cortar cartas y botones */
 @media (max-width: 700px), (max-height: 600px) {
   #dlg.tablewrap { overflow-y: auto; overflow-x: hidden; }
-  .table { height: auto; min-height: 100%; grid-template-rows: auto; grid-template-columns: minmax(0, 1fr); }
+  .table { height: auto; min-height: 100%; }
   .tb-note { font-size: 17px; } .tray-row { flex-wrap: wrap; }
-  .table .offers { flex-wrap: wrap; } .table .offer.pc { --w: min(calc(44 * var(--vw)), 260px); height: auto; }
+  .table .offers { flex: none; flex-wrap: wrap; } .table .offer.pc { --w: min(calc(44 * var(--vw)), 260px); height: auto; }
   .tb-head { grid-template-columns: minmax(0, 1fr) auto; } .tb-head .route { display: none; } .tb-right { gap: 8px; } .tb-coins { padding: 4px 12px 4px 6px; } .tb-coins b { font-size: 22px; } .tb-coins .ic { width: 28px; height: 28px; }
   .tb-next-row { max-width: 100%; } .tb-tray { grid-template-columns: 1fr 1fr; margin: 0 -14px; padding-left: 14px; padding-right: 14px; } .tb-tray .go-next { grid-column: 1 / -1; min-width: 0; width: 100%; }
 }
@@ -272,7 +272,7 @@ html body .seg > button { font-size: 15.5px; } html body .set-card > h3 { font-s
 html body .adv-chal-h { font-size: 15.5px; } html body .ab-act { font-size: 15.5px; } html body .ch-chip > b { font-size: 15.5px; } html body .ch-chip .ch-lv { font-size: 14px; }
 html body .tk-band > span { font-size: 15.5px; } html body .tk-from { font-size: 19px; } html body .tk-total > span { font-size: 15.5px; } html body .tk-cx > span, html body .tk-cx > b { font-size: 15.5px; }
 html body .nx-n, html body .nx-none, html body .nx-hint, html body .nx-have, html body .ch-buy { font-size: 15.5px; } html body .nx-body > p { font-size: 18px; }
-html body .tb-note { font-size: 19px; } html body .sp-t > i { font-size: 17px; } html body .of-r { font-size: 15.5px; } html body .offer > p, html body .table .offer.pc p { font-size: 18px; line-height: 1.2; } html body .tray-col > h4 { font-size: 15.5px; } html body .inv-perk > em { font-size: 15.5px; }
+html body .tb-note { font-size: 19px; } html body .sp-t > i { font-size: 17px; } html body .of-r { font-size: 15.5px; } html body .offer > p { font-size: 18px; line-height: 1.2; } html body .tray-col > h4 { font-size: 15.5px; } html body .inv-perk > em { font-size: 15.5px; }
 html body .tour-txt { font-size: 19px; } html body .dl-bubble p { font-size: inherit; }
 
 /* ==== v0.22: columna izquierda (placa de la pregunta, marcador de partida y logros) para dejar libre el mapa ==== */
