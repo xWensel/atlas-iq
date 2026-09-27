@@ -299,18 +299,15 @@ window.AIQ = window.AIQ || {};
   function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
-  /* Pangea (unidades del mapa; indices 0 Africa, 1 Norteamerica, 2 Sudamerica, 3 Asia, 4 Europa, 5 Oceania, 6 Antartida). Ajuste de contacto calculado con las mascaras reales:
-     Africa, Europa y la Antartida quedan quietas; Sudamerica gira y se encaja en la costa de Africa, Norteamerica se cierra contra Europa y el noroeste africano,
-     Asia se curva contra Europa y Arabia y Oceania se coloca al sur. Ajuste final por descenso de coordenadas con solape cero entre continentes (salvo los contactos que ya existen en el mapa real). Rotaciones en radianes (positivas = antihorario). */
-  const PANGEA = { shift: [[0, 0], [0.559, 0.448], [0.811, -0.413], [-0.007, -0.097], [0, 0], [-1.154, -0.309], [0, 0]], rot: [0, 5, 40, -22, 0, 40, 0].map(d => d * Math.PI / 180) };
   function mapSpec(map, o) {
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}`);
     const lay = ["pangea", "shuffle", "spread"].map(id => get(id)).find(Boolean);
     const tl = get("tilt"); if (tl) { const k = par(tl).k; for (let c = 0; c < 6; c++) spec.rot[c] = (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * k; any = true; }
-    if (lay && lay.id === "pangea") {                                                              // Pangea de verdad: los continentes se encajan como en el supercontinente (sin pisarse)
-      const kp = par(lay).k; spec.shift = PANGEA.shift.map(s => [s[0] * kp, s[1] * kp]); spec.rot = PANGEA.rot.map(r => r * kp); spec.scale = [1, 1, 1, 1, 1, 1, 1]; spec.smooth = true; spec.ms = 2600; any = true;
-    } else if (lay || tl) { const L = map.layout(lay ? lay.id : "hold", lay ? par(lay).k : 1, rr, spec.rot); spec.shift = L.shift; spec.scale = L.scale; any = true; }   // los continentes nunca se pisan
+    if (lay || tl) {                                                                                // motor de encaje con mascaras reales: los continentes nunca se pisan, tambien en Pangea
+      const L = map.layout(lay ? lay.id : "hold", lay ? par(lay).k : 1, rr, spec.rot); spec.shift = L.shift; spec.scale = L.scale; any = true;
+      if (lay && lay.id === "pangea") { spec.smooth = true; spec.ms = 2600; }
+    }
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
     if (has("noborders")) { spec.lineA = 0; any = true; }
     const fl = get("flip"); if (fl) { spec.orient = { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 }; any = true; }
