@@ -23,6 +23,7 @@ ICON = (64, 28, 4)            # nativo 64 px -> 256
 OVR = {                       # id -> (nativo, colores, escala)
     "dealer_neutral": (128, 36, 4), "dealer_laugh": (128, 36, 4), "dealer_angry": (128, 36, 4), "dealer_shock": (128, 36, 4),
     "shop_bg": (256, 48, 5), "hub_hero": (256, 48, 4),
+    "type_person": (96, 32, 5),
 }
 SCENE = (256, 48, 4)          # nativo 256 de ancho -> 1024
 TYPE = (128, 40, 4)           # type_* cuadradas 640 -> 512

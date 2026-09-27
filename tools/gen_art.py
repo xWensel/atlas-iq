@@ -81,7 +81,7 @@ icons({
  # tipos de tarjeta
  "t_city": "a city skyline with lit windows", "t_capital": "a government building with a golden dome and a red star", "t_country": "a tall flag pole with a red waving flag", "t_landmark": "an ancient temple with columns",
  "t_nature": "snowy mountain peaks with a sun", "t_water": "blue ocean waves", "t_strait": "a narrow blue sea channel between two green coasts", "t_battle": "two crossed swords",
- "t_event": "a tear-off calendar page with a golden star", "t_person": "a marble bust with a golden laurel wreath", "t_curio": "a glowing lightbulb with sparkles", "t_place": "a big red map pin on a folded map",
+ "t_event": "a tear-off calendar page with a golden star", "t_person": "a distinguished vintage explorer bust portrait, feathered tricorn hat, navy coat with golden epaulets and medals, thick mustache, confident smile, facing front", "t_curio": "a glowing lightbulb with sparkles", "t_place": "a big red map pin on a folded map",
  # logros (glifos)
  "a_target": "an archery target with an arrow in the bullseye", "a_flame": "a bright orange flame", "a_comet": "a golden comet with a trail", "a_volcano": "an erupting volcano", "a_stopwatch": "a white stopwatch",
  "a_book": "an open book with a red ribbon", "a_medal": "a golden medal with a star", "a_cap": "a black graduation cap with a golden tassel", "a_moon": "a golden crescent moon with stars", "a_pack": "a brown adventurer backpack",
@@ -198,7 +198,7 @@ scene("card_compete", "a golden trophy on a podium surrounded by poker chips, sp
 for t, d in [("city", "a dense old city skyline at dusk with lit windows"), ("capital", "a grand capital building with a golden dome and flags"), ("country", "a tall flagpole with a big red waving flag over a landscape"),
              ("landmark", "a majestic ancient temple with columns"), ("nature", "snowy mountain peaks with a sun and a forest"), ("water", "a deep blue ocean with big waves and a small island"),
              ("strait", "a narrow sea strait between two green coasts seen from above"), ("battle", "crossed swords and shields on a battlefield with banners"),
-             ("event", "an old calendar page with a golden star and a wax seal"), ("person", "a marble bust of a historical figure with a laurel wreath on a pedestal"),
+             ("event", "an old calendar page with a golden star and a wax seal"), ("person", "a distinguished vintage historical figure portrait, half body, feathered tricorn hat, ornate navy coat with golden epaulets and medals, sash, thick mustache, holding a rolled map, confident smile, facing front"),
              ("curiosity", "a glowing lightbulb with sparkles and a magnifying glass"), ("place", "a big red map pin on a folded map")]:
     scene("type_" + t, d + ", vivid colors, filling the entire square frame edge to edge with no border, no card, no table", 640, 640)
 # logo
