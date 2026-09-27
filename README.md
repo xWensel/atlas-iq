@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.23.2** - Corregido el recorte por abajo en pantallas grandes (inicio, campamento, aventura, veredicto): el ajuste automatico de escala comparaba mal el espacio disponible y no reducia el tamano cuando hacia falta; ahora encoge el propio panel hasta que quepa entero, sin cortar nada (probado a 1280x720, 1600x900, 1920x1080 y 2560x1440).
+
 **v0.23.1** - El HUD de la partida (placa de pregunta, marcador, zoom, herramientas, ticket) vuelve a su tamano compacto para dejar libre el mapa y que nada se pise; el escalado ampliado queda solo en menus, campamento y veredicto (la letra mas grande se mantiene).
 
 **v0.23.0** - Interfaz mas grande y legible: la UI se escala con la pantalla (menus, campamento, tickets y marcador de partida hasta x1,85 en pantallas grandes; movil sin cambios) y las letras pequenas suben unos 3 px (la placa de la pregunta no cambia), con menos espaciado entre letras. Las pantallas de menu se centran en vertical. Perks con descripciones mas claras y practicas (Gafas de lectura, Placas tectonicas, Monedero, Banquero, Paraguas, Sextante...). Nuevo boton de desarrollo en Ajustes > Datos: reinicia TODO desde cero (logros, personajes desbloqueados, enciclopedia, ajustes).

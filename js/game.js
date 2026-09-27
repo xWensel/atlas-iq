@@ -298,7 +298,19 @@
   /* escala de la interfaz: en pantallas grandes todo el HUD y los menus crecen (k = 1 en 1280x720, hasta 1,85) para aprovechar el espacio */
   const uiK = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--k")) || 1;
   const setK = () => { const w = innerWidth, h = innerHeight, k = (w < 900 || h < 520) ? 1 : Math.max(1, Math.min(1.85, Math.min(w / 1280, h / 720))); document.documentElement.style.setProperty("--k", k.toFixed(3)); };
-  setK(); addEventListener("resize", setK); A.uiK = uiK;
+  /* ajuste fino: si una pantalla escalada (inicio, campamento, veredicto...) no cabe, se baja SU k hasta que quepa (sin pasar de 1) */
+  const FIT = ".hh, .scr, .table, .vd";
+  const fitK = () => {
+    const d = $("dlg"), el = d && d.querySelector(":scope > " + FIT.split(", ").join(", :scope > ")); if (!el) return;
+    const base = uiK(); el.style.removeProperty("--k"); if (base <= 1) return;
+    const over = () => { const t = el.querySelector(".scr-body") || el, ch = t.clientHeight, sh = t.scrollHeight; return sh > ch * 1.015 ? ch / sh : 1; };
+    let k = base;
+    for (let i = 0; i < 6; i++) { const r = over(); if (r >= 1) break; k = Math.max(1, k * r * 0.985); el.style.setProperty("--k", k.toFixed(3)); if (k <= 1) break; }
+  };
+  let fitT = 0; const fitSoon = () => { clearTimeout(fitT); fitT = setTimeout(() => { requestAnimationFrame(fitK); }, 60); };
+  setK(); A.uiK = uiK; A.fitK = fitK;
+  addEventListener("resize", () => { setK(); fitSoon(); });
+  if (window.MutationObserver && $("dlg")) { new MutationObserver(m => { if (m.some(x => x.addedNodes.length)) { fitSoon(); setTimeout(fitK, 700); } }).observe($("dlg"), { childList: true }); }
   { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
     if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
