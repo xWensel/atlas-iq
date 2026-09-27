@@ -167,21 +167,17 @@
   </section></div>
 
 
-  <!-- entrada: idioma + pantalla completa, y despues la intro del estudio -->
+  <!-- entrada: primero el estudio (Vault Raiders), luego pulsar para entrar (pantalla completa automatica) -->
   <div id="boot" class="hidden">
-    <div class="gate" id="gate">
-      <div class="gate-glow"></div>
-      <div class="gate-logo" id="gateLogo"><img src="assets/logo.png" alt="Geolite"></div>
-      <div class="gate-opts">
-        <div class="gate-langs" id="gateLangs"></div>
-        <button class="gate-fs" id="gateFs" type="button" role="switch" aria-checked="true"><i class="uic" data-ic="u_fs"></i><span data-i="boot.fs"></span><i class="sw-mini"></i></button>
-      </div>
-      <button class="gate-enter" id="gateEnter" type="button"><span data-i="boot.enter"></span></button>
-    </div>
-    <div class="studio hidden" id="studio" aria-label="Vault Raiders">
+    <div class="studio" id="studio" aria-label="Vault Raiders">
       <div class="st-bg"></div>
       <div class="st-logo" id="stLogo"></div>
       <div class="st-skip" data-i="boot.skip"></div>
+    </div>
+    <div class="gate hidden" id="gate">
+      <div class="gate-glow"></div>
+      <div class="gate-logo" id="gateLogo"><img src="assets/logo.png" alt="Geolite"></div>
+      <button class="gate-enter" id="gateEnter" type="button"><span data-i="boot.enter"></span></button>
     </div>
   </div>
   <div id="langPop" class="langpop hidden" role="menu"><div class="langgrid" id="langPopGrid"></div></div>
