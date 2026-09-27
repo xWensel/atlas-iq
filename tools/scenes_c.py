@@ -282,7 +282,7 @@ def card_compete(id):
         sc.put(hi.rect(x, y, 3, 2) if i % 2 else hi.rect(x, y, 2, 3), hexc(col))
     pod = hi.rect(40, 236, 176, 84); sc.add(hi.bevel(pod, R["red"])); sc.add(hi.bevel(hi.rect(30, 228, 196, 12), R["red"]))
     for x in (60, 196): sc.paste(prop("chip_r", .5), x - 16, 262, True)
-    trophy(sc, 128, 98, 2.0)
+    trophy(sc, 128, 112, 1.45)
     stands = np.zeros((sc.S, sc.S), bool)
     for i in range(14): stands |= hi.circle(8 + i * 19, 312, 11)
     sc.a[stands & (yy < 320)] = hexc("1a0f36")

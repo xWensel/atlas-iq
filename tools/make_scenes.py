@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import hand_scenes as K
-import scenes_a, scenes_b, scenes_c, scenes_d  # noqa: F401  (registran sus escenas en K.REG)
+import scenes_a, scenes_b, scenes_c, scenes_d, scenes_e  # noqa: F401  (registran sus escenas en K.REG)
 
 if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("--") and not a.endswith(".png")]
