@@ -24,7 +24,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
   background: #f6efdc; box-shadow: 0 0 0 3px #191325, inset 0 0 0 5px var(--rc), inset 0 0 0 7px #191325, 0 18px 0 3px rgba(0, 0, 0, .45), 0 30px 60px rgba(0, 0, 0, .5);
   transform: rotate(var(--rot)); transition: transform .35s var(--spring), box-shadow .3s; animation: deal .7s var(--spring) both; }
 .mcard:nth-child(1) { --rot: -4deg; animation-delay: .05s; --rc: #4fb6a0; } .mcard:nth-child(2) { --rot: -1.2deg; animation-delay: .12s; } .mcard:nth-child(3) { --rot: 1.4deg; animation-delay: .19s; --rc: #c78bf0; } .mcard:nth-child(4) { --rot: 4deg; animation-delay: .26s; --rc: #f8b449; }
-.mcard.hero { --rc: #ffd06b; width: clamp(210px, calc(24 * var(--vw)), 360px); transform: rotate(var(--rot)) translateY(-16px) scale(1.04); z-index: 2; }
+.mcard.hero { --rc: #ffd06b; width: clamp(210px, calc(24 * var(--vw)), 360px); transform: rotate(var(--rot)) translateY(-8px) scale(1.04); z-index: 2; }
 @keyframes deal { from { opacity: 0; transform: translateY(160px) rotate(24deg) scale(.7); } }
 .mcard:hover { transform: rotate(0deg) translateY(-24px) scale(1.07); z-index: 5; box-shadow: 0 0 0 3px #191325, inset 0 0 0 5px #ffd06b, inset 0 0 0 7px #191325, 0 26px 0 3px rgba(0, 0, 0, .45), 0 0 60px rgba(255, 208, 107, .55); }
 .mcard.hero:hover { transform: rotate(0deg) translateY(-34px) scale(1.09); }
@@ -33,7 +33,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .mc-name { font-family: var(--serif); font-weight: 900; font-size: clamp(24px, calc(2.4 * var(--vw)), 36px); line-height: 1; padding: 0 30px 0 2px; color: #191325; }
 .mc-desc { font-size: clamp(13px, calc(1.05 * var(--vw)), 16px); line-height: 1.2; color: #3c3358; min-height: 3.6em; padding-right: 26px; }
 .mc-stat { align-self: flex-start; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: #f6efdc; background: #191325; padding: 5px 9px 4px; }
-.mc-ribbon { position: absolute; z-index: 4; top: -12px; left: 50%; transform: translateX(-50%) rotate(-2deg); font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: #fff; background: var(--red); padding: 6px 12px 5px; box-shadow: 0 4px 0 rgba(0, 0, 0, .45), 0 0 0 2px #191325; white-space: nowrap; }
+.mc-ribbon { position: absolute; z-index: 4; top: -6px; left: 50%; transform: translateX(-50%) rotate(-2deg); font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: #fff; background: var(--red); padding: 6px 12px 5px; box-shadow: 0 4px 0 rgba(0, 0, 0, .45), 0 0 0 2px #191325; white-space: nowrap; }
 .mcard.hero .marq { border-radius: 18px; }
 .hh-bottom { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; }
 .hh-ver { font-family: var(--mono); font-size: 14px; letter-spacing: .05em; color: rgba(242, 233, 214, .45); }
@@ -56,7 +56,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .hh-tag { font-size: clamp(18px, calc(2.2 * var(--vh)) + 8px, 30px); }
 .mcard { width: min(calc(20.5 * var(--vw)), calc(28 * var(--vh)) * .7 * 1.36, 310px); } .mcard.hero { width: min(calc(24 * var(--vw)), calc(33 * var(--vh)) * .7 * 1.36, 360px); }
 .hh { grid-template-rows: auto auto minmax(0, 1fr) auto; }
-.hh-cards { padding: max(clamp(18px, calc(3.5 * var(--vh)), 40px), 66px) 0 clamp(8px, calc(2 * var(--vh)), 24px); }
+.hh-cards { padding: clamp(18px, calc(3.5 * var(--vh)), 40px) 0 clamp(8px, calc(2 * var(--vh)), 24px); }
 
 /* ==================================================================== premium2.css */
 /* Geolite v0.9 - premium (parte 2): campamento/cofre, intro de ronda, veredictos y marcador de partida. */

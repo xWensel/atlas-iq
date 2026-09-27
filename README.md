@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.24.2** - Nunca mas hay que desplazarse en los menus: el ajuste automatico de escala ahora sabe encoger la interfaz por debajo del tamano normal (antes solo podia agrandarla), asi que en cualquier resolucion la pantalla de inicio, el campamento y el veredicto de ronda caben enteros sin barra de scroll. Tambien se rebaja el efecto elevado de la carta de Aventura y de su cinta roja para que nunca puedan asomar por encima del subtitulo, sin anadir peso extra que pudiera volver a provocar el recorte.
+
 **v0.24.1** - Corregidos solapes reales: en partida, el ticket de resultado ya no se pisa con el zoom (se oculta mientras se ve el ticket) ni con el aviso de nueva entrada de enciclopedia (ahora aparece a la izquierda, junto a los logros, no a la derecha). En el inicio, la cinta roja "MODO PRINCIPAL" de la carta de Aventura reserva sitio de sobra por encima para no pisar nunca el subtitulo, con partida guardada o sin ella. Version de app y de cache sincronizadas (arrastraban un desfase de la v0.24.0).
 
 **v0.24.0** - Ronda de banderas y ajustes de reliquias.
