@@ -321,6 +321,8 @@
   addEventListener("resize", () => { setK(); fitSoon(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSoon);
   if (window.MutationObserver && $("dlg")) { new MutationObserver(m => { if (m.some(x => x.addedNodes.length)) { fitSoon(); setTimeout(fitK, 260); setTimeout(fitK, 700); } }).observe($("dlg"), { childList: true }); }
+  /* las cartas (retratos, iconos) pueden tardar en cargar en la primera visita: si llegan tarde, el ajuste ya hecho se queda corto y el panel desborda */
+  if ($("dlg")) $("dlg").addEventListener("load", e => { if (e.target.tagName === "IMG") { fitSoon(); setTimeout(fitK, 300); } }, true);
   { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
     if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
