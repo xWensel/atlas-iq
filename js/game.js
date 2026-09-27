@@ -150,6 +150,7 @@
       if (sw) { const on = k === "music" ? A.audio.musicOn : A.audio.sfxOn; sw.setAttribute("aria-checked", on); f.classList.toggle("off", !on); }
     }
     segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs(); if (A.syncWin) A.syncWin();
+    A.fitAll(document.querySelectorAll("#setSh .seg button"));
     const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast };
     for (const k in st) { const el = document.querySelector('.sw[data-sw="' + k + '"]'); if (el) el.setAttribute("aria-checked", !!st[k]); }
     const sg = document.querySelector('.sw[data-sw="songs"]'); if (sg) sg.closest(".row-sw").classList.toggle("off", !A.audio.musicOn);

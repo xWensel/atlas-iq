@@ -10,6 +10,21 @@
   A.esc = A.esc || esc;
   A.ttAttr = (t, d) => `data-tt="${esc(d ? t + "\n" + d : t)}"`;
 
+  /* ------------------------------------------------------------------ autofit de texto: en vez de cortar con "..." a mitad de
+   * palabra (pestanas, insignias, titulos de cancion, nombres de carta), se reduce el tamano de letra hasta que quepa entero.
+   * Mismo mecanismo para todos los casos: se llama tras fijar el texto y siempre parte del tamano declarado en CSS. */
+  A.fitText = (el, opts = {}) => {
+    if (!el) return;
+    const min = opts.min || 9, wrap = (opts.lines || 1) > 1;
+    el.style.fontSize = "";
+    const base = parseFloat(getComputedStyle(el).fontSize);
+    const fits = () => wrap ? el.scrollHeight <= el.clientHeight + 1 : el.scrollWidth <= el.clientWidth + 1;
+    if (!base || fits()) return;
+    let size = base;
+    while (size > min && !fits()) { size -= 0.5; el.style.fontSize = size + "px"; }
+  };
+  A.fitAll = (list, opts) => list && list.forEach(el => A.fitText(el, opts));
+
   /* ------------------------------------------------------------------ puntero de casino */
   const PAL = { w: "#fff3cf", g: "#f8b449", r: "#ff5a4d", b: "#69c7ff", k: "#191325" };
   const CELL = 2;

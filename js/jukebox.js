@@ -25,7 +25,7 @@
   function fill(box) {
     const n = A.music.count(), i = A.music.index();
     const t = box.querySelector("[data-np-t], #npT"), c = box.querySelector("[data-np-n], #npN");
-    if (t) t.textContent = A.music.title(); if (c) c.textContent = i >= 0 ? (i + 1) + "/" + n : "";
+    if (t) { t.textContent = A.music.title(); A.fitText(t); } if (c) c.textContent = i >= 0 ? (i + 1) + "/" + n : "";
   }
   function show() {
     if (!musicOn() || S().songToast === false || S().settingsOpen || A.music.index() < 0) return;

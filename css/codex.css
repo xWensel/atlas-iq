@@ -38,7 +38,7 @@
 .cx-card .cx-art, .cx-bigcard .cx-art { position: relative; flex: 1; min-height: 0; overflow: hidden; display: grid; place-items: center; background: linear-gradient(160deg, var(--ink-2), var(--ink)); color: rgba(242,233,214,.35); }
 .cx-art .cx-ic { width: 46%; height: auto; } .cx-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: cx-fade .5s both; } @keyframes cx-fade { from { opacity: 0; } }
 .cx-card.has-img .cx-art .cx-ic { display: none; }
-.cx-card .cx-nm { display: block; margin-top: 7px; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 700; font-size: 16px; line-height: 1.05; min-height: 2.1em; overflow-wrap: anywhere; }
+.cx-card .cx-nm { display: block; margin-top: 7px; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 700; font-size: 16px; line-height: 1.05; height: 33.6px; overflow: hidden; overflow-wrap: anywhere; }
 .cx-mt { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; }
 .cx-mt em { font-style: normal; color: var(--ink-2); } .cx-mt i { font-style: normal; color: var(--rc); letter-spacing: 1px; filter: brightness(.85); }
 .cx-no { position: absolute; top: 12px; left: 13px; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; color: #fff; background: var(--ink); padding: 2px 5px 1px; opacity: .85; }
@@ -58,7 +58,7 @@
 .cx-d-card { position: sticky; top: 8px; perspective: 1000px; }
 .cx-bigcard { width: 100%; cursor: default; padding: 12px 12px 14px; box-shadow: inset 0 0 0 4px var(--rc), 0 30px 50px -20px #000; --cxc: 20px; }
 .cx-bigcard .cx-art { border: 1.5px solid var(--ink); } .cx-bigcard .cx-art img { cursor: zoom-in; } .cx-bigcard .cx-art .cx-ic { width: 30%; }
-.cx-bigcard .cx-cap { padding-top: 12px; display: grid; gap: 5px; } .cx-bigcard .cx-nm { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 800; font-size: 24px; line-height: 1; }
+.cx-bigcard .cx-cap { padding-top: 12px; display: grid; gap: 5px; } .cx-bigcard .cx-nm { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 800; font-size: 24px; line-height: 1.1; height: 52.8px; overflow: hidden; overflow-wrap: anywhere; }
 .cx-bigcard .cx-mt { font-size: 14px; margin: 0; } .cx-bigcard .cx-no { top: 18px; left: 19px; font-size: 14px; }
 .cx-credit { margin: 10px 0 0; font-family: var(--mono); font-size: 14px; letter-spacing: .06em; color: rgba(242,233,214,.55); } .cx-credit a { color: inherit; }
 .cx-hd { margin-top: 10px; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink); background: var(--brass-lt); border: 0; padding: 9px 13px 8px; cursor: pointer; transition: transform .2s var(--spring); } .cx-hd:hover { transform: translateY(-2px); }

@@ -384,9 +384,10 @@ window.AIQ = window.AIQ || {};
   }
   function more() {
     const g = $("cxGrid"), sent = $("cxSent"); if (ui.shown >= ui.list.length) return;
-    const frag = document.createDocumentFragment();
-    for (const id of ui.list.slice(ui.shown, ui.shown + 48)) frag.appendChild(cardEl(id));
+    const frag = document.createDocumentFragment(), added = [];
+    for (const id of ui.list.slice(ui.shown, ui.shown + 48)) { const b = cardEl(id); added.push(b); frag.appendChild(b); }
     ui.shown = Math.min(ui.list.length, ui.shown + 48); g.insertBefore(frag, sent); A.genFill($("codex"));
+    A.fitAll(added.map(b => b.querySelector(".cx-nm")), { lines: 2 });
   }
   const io = new IntersectionObserver(en => en.forEach(x => { if (x.isIntersecting) { io.unobserve(x.target); paintThumb(x.target.dataset.id); } }), { rootMargin: "300px" });
   function cardEl(id) {
@@ -407,7 +408,7 @@ window.AIQ = window.AIQ || {};
     const b = $("cxGrid") && $("cxGrid").querySelector(`.cx-card[data-id="${CSS.escape(id)}"]`); if (!b || !isUnlocked(id)) return;
     try {
       const rec = await loadContent(E[id], A.lang); if (rec.none) return;
-      b.querySelector(".cx-nm").textContent = nameOf(E[id], rec);
+      const nm = b.querySelector(".cx-nm"); nm.textContent = nameOf(E[id], rec); A.fitText(nm, { lines: 2 });
       if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.onload = () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }; im.src = rec.img.thumb; }
     } catch (x) { /* sin conexion: se queda el icono */ }
   }
@@ -461,6 +462,7 @@ window.AIQ = window.AIQ || {};
         </div>
       </div>`;
     $("cxBig").addEventListener("pointermove", ev => tiltMove($("cxBig"), ev, 12)); $("cxBig").addEventListener("pointerleave", () => tiltReset($("cxBig")));
+    A.fitText($("cxBig").querySelector(".cx-nm"), { lines: 2 });
     A.genFill(d); d.querySelectorAll(".cx-rel").forEach(b => (b.onclick = () => openDetail(b.dataset.id)));
     if ($("cxHd")) $("cxHd").onclick = () => lightbox(id); if ($("cxHero")) $("cxHero").onclick = () => lightbox(id);
     if (un && e.lat != null && map && $("cxMini")) requestAnimationFrame(() => { try { map.drawThumb($("cxMini"), { lat: e.lat, lon: e.lon, zoom: e.type === "country" ? 3 : e.type === "water" ? 3.5 : 9 }); } catch (x) { /* sin miniatura */ } });
