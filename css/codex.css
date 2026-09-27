@@ -38,7 +38,7 @@
 .cx-card .cx-art, .cx-bigcard .cx-art { position: relative; flex: 1; min-height: 0; overflow: hidden; display: grid; place-items: center; background: linear-gradient(160deg, var(--ink-2), var(--ink)); color: rgba(242,233,214,.35); }
 .cx-art .cx-ic { width: 46%; height: auto; } .cx-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: cx-fade .5s both; } @keyframes cx-fade { from { opacity: 0; } }
 .cx-card.has-img .cx-art .cx-ic { display: none; }
-.cx-card .cx-nm { display: block; margin-top: 7px; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 700; font-size: 16px; line-height: 1.05; min-height: 2.1em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cx-card .cx-nm { display: block; margin-top: 7px; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 700; font-size: 16px; line-height: 1.05; min-height: 2.1em; overflow-wrap: anywhere; }
 .cx-mt { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; }
 .cx-mt em { font-style: normal; color: var(--ink-2); } .cx-mt i { font-style: normal; color: var(--rc); letter-spacing: 1px; filter: brightness(.85); }
 .cx-no { position: absolute; top: 12px; left: 13px; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; color: #fff; background: var(--ink); padding: 2px 5px 1px; opacity: .85; }

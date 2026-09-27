@@ -174,7 +174,7 @@ input[type=range]:focus-visible { outline: 2px solid var(--brass); outline-offse
 .seg { --n: 2; position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border-radius: 999px; background: rgba(0,0,0,.3); box-shadow: inset 0 0 0 1.5px rgba(242,233,214,.28); padding: 4px; }
 .seg.s3 { --n: 3; } .seg.s4 { --n: 4; }
 .seg button { position: relative; z-index: 1; min-width: 0; padding: 10px 4px 9px; font-family: var(--mono); font-size: 13px; letter-spacing: .02em; text-transform: uppercase; color: rgba(242,233,214,.7); transition: color .25s;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  white-space: normal; overflow-wrap: anywhere; text-align: center; line-height: 1.15; }
 .seg.s4 button { font-size: clamp(10px, 3.1vw, 13px); }
 .seg button.on { color: var(--ink); } .seg button:hover:not(.on) { color: var(--paper); }
 .seg > i { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / var(--n)); border-radius: 999px; background: linear-gradient(180deg, var(--brass-lt), var(--brass)); box-shadow: 0 2px 0 rgba(0,0,0,.35), 0 0 12px rgba(248,180,73,.35);
