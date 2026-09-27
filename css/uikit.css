@@ -315,7 +315,7 @@ body.tk-on .rail-sh { display: none; }
 .adv-stats b { font-size: 26px; }
 
 /* ==== v0.25: el crupier asoma de vez en cuando en el inicio (arriba a la izquierda o a la derecha), sin tapar ni bloquear nada ==== */
-.dealer.home { top: 92px; bottom: auto; z-index: 3; pointer-events: none; }
+.dealer.home { top: 92px; bottom: auto; z-index: 5; pointer-events: none; }   /* por encima del oscurecido radial de #layer (z-index 4) en la pantalla de inicio */
 .dealer.home.home-tl { left: 22px; right: auto; }
 .dealer.home.home-tr { left: auto; right: 88px; flex-direction: row; transform: translateX(140%); }
 .dealer.home.home-tr.in { transform: none; }
