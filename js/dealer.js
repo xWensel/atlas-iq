@@ -73,10 +73,39 @@ window.AIQ = window.AIQ || {};
     wind: ["¡Vendaval! Apunta con la cabeza.|Gale! Aim with your head.|Rafale ! Vise avec la tête.|Vendaval! Mire com a cabeça.|Sturm! Ziel mit dem Kopf.|Bufera! Mira con la testa."],
     storm: ["El reloj corre más rápido esta noche.|The clock runs faster tonight.|L'horloge tourne plus vite ce soir.|O relógio corre mais rápido esta noite.|Die Uhr läuft heute schneller.|L'orologio corre più veloce stasera."],
     silence: ["Shhh. Tus juguetes se quedan en silencio.|Shhh. Your toys stay silent.|Chut. Tes jouets restent muets.|Shhh. Seus brinquedos ficam em silêncio.|Pssst. Deine Spielzeuge bleiben stumm.|Shhh. I tuoi giocattoli restano muti."],
+
+    /* ---------------------------------------------------------------- pantalla principal: apariciones al azar mientras eliges modo (nunca durante una partida) */
+    homeTaunt: [
+      "¿A que no sabes ni dónde queda esto? Adelante, sorpréndeme.|Bet you don't even know where this is. Go on, surprise me.|Je parie que tu ne sais même pas où c'est. Vas-y, surprends-moi.|Aposto que nem sabe onde fica isso. Vamos, me surpreenda.|Wetten, du weißt nicht mal, wo das liegt? Los, überrasch mich.|Scommetto che non sai nemmeno dove si trova. Forza, sorprendimi.",
+      "Ese país de ahí… ni idea, ¿eh? Tranquilo, a nadie le importa.|That country over there… no clue, huh? Relax, nobody's judging.|Ce pays-là… aucune idée, hein ? Tranquille, personne ne juge.|Aquele país ali… nem ideia, né? Relaxa, ninguém está julgando.|Dieses Land dort drüben… keine Ahnung, oder? Entspann dich, keiner urteilt.|Quel paese laggiù… nessuna idea, eh? Tranquillo, nessuno giudica.",
+      "Vamos, atrévete a sentarte. O sigue mirando el mapa desde ahí, cobarde.|Come on, dare to sit down. Or keep staring at the map from over there, coward.|Allez, ose t'asseoir. Ou continue à fixer la carte de loin, peureux.|Vamos, tenha coragem de sentar. Ou fique só olhando o mapa daí, covarde.|Los, trau dich zu setzen. Oder starr weiter von dort auf die Karte, Feigling.|Dai, osa sederti. O continua a fissare la mappa da lì, coniglio.",
+      "¿Miedo a fallar? Aquí todos fallan. Yo me río igual.|Scared of missing? Everyone misses here. I laugh either way.|Peur de te tromper ? Tout le monde se trompe ici. Je ris quand même.|Medo de errar? Todo mundo erra aqui. Eu rio de qualquer jeito.|Angst vor Fehlern? Hier scheitert jeder. Ich lache trotzdem.|Paura di sbagliare? Qui sbagliano tutti. Io rido comunque.",
+      "Seguro que confundes un continente con otro. Es un clásico.|I bet you mix up continents. It's a classic.|Je parie que tu confonds les continents. Un classique.|Aposto que você confunde continentes. É clássico.|Wetten, du verwechselst Kontinente. Ein Klassiker.|Scommetto che confondi i continenti. Un classico.",
+      "¿Sabes jugarte unos doblones o solo mirar el escaparate?|Do you know how to bet a few doubloons, or just window-shop?|Tu sais miser quelques doublons, ou juste lécher la vitrine ?|Sabe apostar uns dobrões ou só olhar a vitrine?|Kannst du ein paar Dublonen setzen, oder nur Schaufenster gucken?|Sai puntare qualche dobbline o guardi solo la vetrina?",
+      "La mesa lleva rato esperándote. No le hagas el feo.|The table's been waiting a while. Don't leave it hanging.|La table t'attend depuis un moment. Ne la laisse pas en plan.|A mesa está esperando faz tempo. Não deixe ela na mão.|Der Tisch wartet schon eine Weile. Lass ihn nicht hängen.|Il tavolo aspetta da un po'. Non lasciarlo in sospeso.",
+    ],
+    homeTempt: [
+      "Psst… una partida rápida. Nadie tiene por qué enterarse.|Psst… one quick round. No one has to know.|Psst… une partie rapide. Personne n'a besoin de savoir.|Psst… uma partida rápida. Ninguém precisa saber.|Psst… eine schnelle Runde. Keiner muss es wissen.|Psst… una partita veloce. Nessuno deve saperlo.",
+      "Los doblones no se ganan solos, explorador.|Doubloons don't win themselves, explorer.|Les doublons ne se gagnent pas tout seuls, explorateur.|Os dobrões não se ganham sozinhos, explorador.|Dublonen gewinnen sich nicht von selbst, Entdecker.|I dobloni non si vincono da soli, esploratore.",
+      "El mapa está calentito. Ven a tocarlo.|The map's still warm. Come touch it.|La carte est encore chaude. Viens la toucher.|O mapa ainda está quentinho. Venha tocar.|Die Karte ist noch warm. Komm, berühr sie.|La mappa è ancora calda. Vieni a toccarla.",
+      "Una manita más y lo dejamos… como todos dicen.|Just one more hand and we stop… like everyone says.|Encore une main et on arrête… comme tout le monde dit.|Só mais uma mão e paramos… como todo mundo diz.|Nur noch eine Runde, dann hören wir auf… wie alle sagen.|Ancora una mano e la finiamo… come dicono tutti.",
+      "Tengo una silla libre en mi mesa. Con tu nombre.|I've got an empty seat at my table. With your name on it.|J'ai une place libre à ma table. À ton nom.|Tenho uma cadeira livre na minha mesa. Com seu nome.|Ich habe einen freien Platz an meinem Tisch. Mit deinem Namen drauf.|Ho un posto libero al mio tavolo. Con il tuo nome.",
+      "¿Y si esta vez me ganas de verdad? Casi me lo creo.|What if you actually beat me this time? I almost believe it.|Et si cette fois tu me battais vraiment ? J'y crois presque.|E se desta vez você realmente me vencer? Quase acredito.|Was, wenn du mich diesmal wirklich schlägst? Fast glaube ich das.|E se stavolta mi battessi davvero? Quasi ci credo.",
+      "El casino nunca cierra. Tú tampoco deberías.|The casino never closes. Neither should you.|Le casino ne ferme jamais. Toi non plus, tu ne devrais pas.|O cassino nunca fecha. Você também não deveria.|Das Casino schließt nie. Du solltest das auch nicht.|Il casinò non chiude mai. Nemmeno tu dovresti.",
+    ],
+    homeTrivia: [
+      "¿Sabías que Rusia cruza 11 husos horarios? Ni yo doy tantas vueltas en una noche.|Did you know Russia spans 11 time zones? Even I don't spin that much in one night.|Tu savais que la Russie traverse 11 fuseaux horaires ? Même moi je ne tourne pas autant en une nuit.|Sabia que a Rússia atravessa 11 fusos horários? Nem eu giro tanto assim numa noite.|Wusstest du, dass Russland 11 Zeitzonen umfasst? Nicht mal ich drehe mich so oft an einem Abend.|Sapevi che la Russia attraversa 11 fusi orari? Nemmeno io giro così tanto in una notte.",
+      "El Nilo mide más de 6.500 km. Y tú sin saber ni tu propia capital.|The Nile is over 6,500 km long. And you don't even know your own capital.|Le Nil fait plus de 6 500 km. Et toi, tu ne connais même pas ta propre capitale.|O Nilo tem mais de 6.500 km. E você nem sabe a própria capital.|Der Nil ist über 6.500 km lang. Und du kennst nicht mal deine eigene Hauptstadt.|Il Nilo è lungo oltre 6.500 km. E tu non conosci nemmeno la tua capitale.",
+      "El Vaticano es el país más pequeño del mundo. Como tu paciencia para estudiar geografía.|The Vatican is the smallest country in the world. Like your patience for studying geography.|Le Vatican est le plus petit pays du monde. Comme ta patience pour étudier la géographie.|O Vaticano é o menor país do mundo. Igual à sua paciência para estudar geografia.|Der Vatikan ist das kleinste Land der Welt. Wie deine Geduld beim Geografie-Lernen.|Il Vaticano è il paese più piccolo del mondo. Come la tua pazienza nello studiare geografia.",
+      "Canadá tiene más lagos que el resto del planeta junto. A ver si aciertas uno.|Canada has more lakes than the rest of the planet combined. Let's see if you can name one.|Le Canada a plus de lacs que le reste de la planète réunie. Voyons si tu en trouves un.|O Canadá tem mais lagos que o resto do planeta junto. Vamos ver se você acerta um.|Kanada hat mehr Seen als der Rest der Welt zusammen. Mal sehen, ob du einen triffst.|Il Canada ha più laghi del resto del pianeta messo insieme. Vediamo se ne indovini uno.",
+      "El Sáhara es casi tan grande como Estados Unidos. Y tú perdido en tu propio barrio.|The Sahara is almost as big as the United States. And you get lost in your own neighborhood.|Le Sahara est presque aussi grand que les États-Unis. Et toi, tu te perds dans ton propre quartier.|O Saara é quase do tamanho dos Estados Unidos. E você se perde no próprio bairro.|Die Sahara ist fast so groß wie die USA. Und du verläufst dich in deiner eigenen Nachbarschaft.|Il Sahara è quasi grande quanto gli Stati Uniti. E tu ti perdi nel tuo stesso quartiere.",
+      "Australia es una isla, un país y un continente a la vez. Presume de eso en la próxima mano.|Australia is an island, a country and a continent all at once. Brag about that on the next hand.|L'Australie est une île, un pays et un continent à la fois. Vante-toi de ça à la prochaine main.|A Austrália é uma ilha, um país e um continente ao mesmo tempo. Se gabe disso na próxima mão.|Australien ist Insel, Land und Kontinent zugleich. Prahl damit bei der nächsten Runde.|L'Australia è un'isola, un paese e un continente insieme. Vantatene alla prossima mano.",
+      "Groenlandia parece enorme en el mapa… y en realidad cabe varias veces en África. Sorpresa.|Greenland looks huge on the map… and it actually fits inside Africa several times over. Surprise.|Le Groenland paraît énorme sur la carte… et il tient plusieurs fois dans l'Afrique. Surprise.|A Groenlândia parece enorme no mapa… e na verdade cabe várias vezes dentro da África. Surpresa.|Grönland sieht auf der Karte riesig aus… und passt tatsächlich mehrfach in Afrika. Überraschung.|La Groenlandia sembra enorme sulla mappa… e in realtà ci sta più volte dentro l'Africa. Sorpresa.",
+    ],
   };
   for (const k in LINES) LINES[k] = LINES[k].map(L6);
 
-  const D = A.dealer = { on: false, host: null, timers: [], busy: false };
+  const D = A.dealer = { on: false, onHome: false, host: null, timers: [], busy: false };
   let el, face, bubble, txt;
   const rand = a => a[Math.floor(Math.random() * a.length)];
 
@@ -91,7 +120,7 @@ window.AIQ = window.AIQ || {};
 
   /* dice una frase con voz arcade y maquina de escribir */
   D.say = (line, o = {}) => {
-    if (!D.on) return; ensure(); clear();
+    if (!D.on && !D.onHome) return; ensure(); clear();
     const mood = o.mood || "sly", text = typeof line === "string" ? line : A.tx(line), src = FACE[mood] || "dealer_neutral";
     face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (el.closest("#vdDealer") ? " inline" : ""); txt.textContent = ""; bubble.classList.add("on");
     if (mood === "laugh") A.sfx.laugh && A.sfx.laugh();
@@ -112,6 +141,31 @@ window.AIQ = window.AIQ || {};
   D.sequence = (items, done) => { let k = 0; const next = () => { if (k >= items.length) return done && done(); const it = items[k++]; D.say(it.line, { mood: it.mood, hold: 0, done: () => later(next, it.gap || 700) }); }; next(); };
   D.line = (key, i) => { const a = LINES[key]; return a ? (i == null ? rand(a) : a[i % a.length]) : null; };
   D.lines = LINES;
+
+  /* ---------------------------------------------------------------- pantalla principal: apariciones sueltas del crupier mientras el jugador elige modo */
+  const HOME_CORNERS = ["home-tl", "home-tr"];
+  let homeT = 0, homeLast = "";
+  function homeTick() {
+    if (!D.onHome) return;
+    if (!document.querySelector(".hh") || D.busy) { homeT = setTimeout(homeTick, 2500); return; }         // solo en la pantalla de inicio, y no interrumpe si ya esta hablando
+    const P = A.profile ? A.profile.get() : null, hasSave = A.adv && A.adv.hasSave && A.adv.hasSave(), seen = P && P.ach ? Object.keys(P.ach).length : 0;
+    const pool = []; const push = (k, n) => { for (let i = 0; i < n; i++) pool.push(k); };
+    if (hasSave) { push("homeTempt", 5); push("homeTaunt", 3); push("homeTrivia", 3); }                    // partida a medias: mas tentacion para que la retome
+    else if (!seen) { push("homeTaunt", 5); push("homeTrivia", 4); push("homeTempt", 2); }                 // nunca ha jugado: mas burla y datos, poca tentacion
+    else { push("homeTaunt", 4); push("homeTrivia", 4); push("homeTempt", 3); }
+    let cat = rand(pool); if (cat === homeLast && pool.some(p => p !== cat)) cat = rand(pool.filter(p => p !== cat));
+    const line = D.line(cat); homeLast = cat;
+    ensure(); el.classList.remove(...HOME_CORNERS);
+    D.say(line, { mood: rand(["sly", "laugh"]), hold: 4200 + (typeof line === "string" ? line.length : 60) * 24 });
+    el.classList.add("home", rand(HOME_CORNERS));
+    homeT = setTimeout(homeTick, 15000 + Math.random() * 14000);
+  }
+  /* activa/desactiva las apariciones de inicio (independiente de D.on, que es solo para dentro de una partida) */
+  D.homeTease = on => {
+    D.onHome = !!on; clearTimeout(homeT);
+    if (!on) { if (el) el.classList.remove(...HOME_CORNERS, "home"); D.hide(); return; }
+    ensure(); el.classList.remove("hidden"); homeT = setTimeout(homeTick, 7000 + Math.random() * 6000);
+  };
 
   /* reacciones a lo que pasa en la mesa */
   D.react = (kind, o = {}) => {

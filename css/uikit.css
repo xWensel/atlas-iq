@@ -321,3 +321,13 @@ body.tk-on .rail-sh { display: none; }
 .hub .adv-stats, .adv-stats { grid-template-columns: repeat(2, 1fr); gap: 10px 14px; }
 .adv-stats span { line-height: 1.2; }
 .adv-stats b { font-size: 26px; }
+
+/* ==== v0.25: el crupier asoma de vez en cuando en el inicio (arriba a la izquierda o a la derecha), sin tapar ni bloquear nada ==== */
+.dealer.home { top: 92px; bottom: auto; z-index: 3; pointer-events: none; }
+.dealer.home.home-tl { left: 22px; right: auto; }
+.dealer.home.home-tr { left: auto; right: 88px; flex-direction: row; transform: translateX(140%); }
+.dealer.home.home-tr.in { transform: none; }
+.dealer.home.home-tr .dl-bubble { transform-origin: 100% 100%; }
+.dealer.home .dl-face { width: 92px; height: 92px; }
+.dealer.home .dl-bubble { max-width: min(300px, calc(44 * var(--vw))); font-size: 15px; margin-bottom: 38px; }
+@media (max-width: 900px), (max-height: 560px) { .dealer.home { display: none; } }   /* movil: la pantalla ya va justa, sin distracciones extra */
