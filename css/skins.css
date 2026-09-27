@@ -57,7 +57,7 @@ html[data-skin="casino"] .stamp { border-radius: 12px; border-style: double; fil
 html[data-skin="casino"] .idcard { clip-path: none; border-radius: 14px; box-shadow: 0 0 0 3px #16241c inset, 0 6px 0 rgba(0, 0, 0, .5); }
 html[data-skin="casino"] .ticket { -webkit-mask: none; mask: none; border-radius: 14px; box-shadow: 0 0 0 3px #16241c inset; }
 html[data-skin="casino"] .tk-band { border-radius: 11px 11px 0 0; }
-html[data-skin="casino"] .fader label, html[data-skin="casino"] .set-head { color: var(--paper); } html[data-skin="casino"] .set-head { color: var(--brass); }
+html[data-skin="casino"] .fader label { color: var(--paper); }
 html[data-skin="casino"] #tip { border-radius: 8px; box-shadow: 0 4px 0 rgba(0, 0, 0, .5); } html[data-skin="casino"] .langpop { clip-path: none; border-radius: 14px; }
 html[data-skin="casino"] #factText { font-style: normal; font-size: 19px; }
 

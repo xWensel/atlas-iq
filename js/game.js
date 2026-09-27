@@ -180,10 +180,10 @@
     }; }
   function openSettings(on) {
     S.settingsOpen = on; const sh = $("setSh"), sv = $("setVeil");
-    sh.classList.toggle("hidden", !on); sh.classList.toggle("on-menu", S.phase === "title");
+    sh.classList.toggle("hidden", !on);
     if (sv) sv.classList.toggle("hidden", !on);
     $("setBtn").setAttribute("aria-expanded", on);
-    if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); }
+    if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; }
   }
   let blipT = 0;
   for (const f of document.querySelectorAll(".fader")) {

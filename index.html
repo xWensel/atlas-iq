@@ -91,61 +91,75 @@
     <p id="factText"></p>
   </footer></div>
 
-  <!-- panel de ajustes: cuatro pestanas cortas -->
+  <!-- panel de ajustes: pantalla completa, la sala de control del casino -->
   <div class="set-veil hidden" id="setVeil"></div>
-  <div class="sh set-sh hidden" id="setSh"><section id="settings" class="cut ink" role="dialog" aria-label="Ajustes">
-    <div class="set-head"><span class="set-h-t"><i class="set-h-ic" data-ic="chips"></i><span data-i="set.title"></span></span><button id="setClose" aria-label="Cerrar"><i class="uic" data-ic="u_close"></i></button></div>
-    <div class="seg s4 set-tabs" data-seg="settab"><button type="button" data-v="general" data-i="set.tab.general"></button><button type="button" data-v="sound" data-i="set.tab.sound"></button><button type="button" data-v="video" data-i="set.tab.video"></button><button type="button" data-v="data" data-i="set.tab.data"></button><i></i></div>
+  <div class="set-sh hidden" id="setSh"><section id="settings" role="dialog" aria-label="Ajustes">
+    <header class="set-top">
+      <button class="set-back" id="setClose"><i class="uic" data-ic="u_back"></i><span data-i="set.close"></span></button>
+      <div class="set-title"><i class="set-h-ic" data-ic="chips"></i><h1 data-i="set.title"></h1></div>
+      <div class="set-ver">GEOLITE · V<span id="setVer"></span></div>
+    </header>
 
-    <div class="set-pane" data-pane="general">
-      <div class="set-sec"><h3 data-i="set.lang"></h3>
-        <div class="langgrid" id="langGrid"></div>
-      </div>
-      <div class="set-sec">
-        <h3 data-i="set.screen"></h3>
-        <div class="seg" data-seg="win"><button data-v="window" data-i="win.window"></button><button data-v="full" data-i="win.full"></button><i></i></div>
-        <p class="set-note" data-i="set.win.d"></p>
-        <div class="row-sw"><div class="rs-t"><label data-i="set.intro"></label></div><button class="sw" data-sw="intro" role="switch" aria-checked="true" aria-label="Intro del estudio"><i></i></button></div>
-        <div class="row-sw"><div class="rs-t"><label data-i="set.tour"></label><small data-i="set.tour.d"></small></div><button class="sw" data-sw="tour" role="switch" aria-checked="true" aria-label="Tutorial guiado"><i></i></button></div>
-      </div>
-    </div>
+    <div class="set-body">
+      <nav class="set-nav" data-seg="settab">
+        <button type="button" data-v="general"><i class="set-nav-ic" data-ic="chip_k"></i><span class="set-nav-t"><b data-i="set.tab.general"></b><small data-i="set.nav.general"></small></span></button>
+        <button type="button" data-v="sound"><i class="set-nav-ic" data-ic="chip_r"></i><span class="set-nav-t"><b data-i="set.tab.sound"></b><small data-i="set.nav.sound"></small></span></button>
+        <button type="button" data-v="video"><i class="set-nav-ic" data-ic="chip_b"></i><span class="set-nav-t"><b data-i="set.tab.video"></b><small data-i="set.nav.video"></small></span></button>
+        <button type="button" data-v="data"><i class="set-nav-ic" data-ic="chip_p"></i><span class="set-nav-t"><b data-i="set.tab.data"></b><small data-i="set.nav.data"></small></span></button>
+        <i></i>
+      </nav>
 
-    <div class="set-pane hidden" data-pane="sound">
-      <div class="set-sec">
-        <div class="fader" data-k="master"><label data-i="vol.master"></label><output>85</output><input type="range" min="0" max="100" value="85" aria-label="Volumen general"><div class="ftrack"></div></div>
-        <div class="fader" data-k="music"><label data-i="vol.music"></label><button class="sw" data-sw="music" role="switch" aria-checked="true" aria-label="Música"><i></i></button><output>70</output><input type="range" min="0" max="100" value="70" aria-label="Volumen de la música"><div class="ftrack"></div></div>
-        <div class="np np-set" id="setSong"><button type="button" class="np-b" data-d="-1" data-tf="songprev"><i class="np-tri l"></i></button><span class="np-t"><i class="np-note">&#9834;</i><b data-np-t></b><em data-np-n></em></span><button type="button" class="np-b" data-d="1" data-tf="songnext"><i class="np-tri r"></i></button></div>
-        <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
-      </div>
-      <div class="set-sec">
-        <div class="row-sw"><div class="rs-t"><label data-i="set.songs"></label><small data-i="set.songs.d"></small></div><button class="sw" data-sw="songs" role="switch" aria-checked="true" aria-label="Aviso de canciones"><i></i></button></div>
-      </div>
-    </div>
+      <div class="set-panes">
+        <div class="set-pane" data-pane="general"><div class="set-grid">
+          <div class="set-card wide"><h3 data-i="set.lang"></h3>
+            <div class="langgrid" id="langGrid"></div>
+          </div>
+          <div class="set-card"><h3 data-i="set.screen"></h3>
+            <div class="seg" data-seg="win"><button data-v="window" data-i="win.window"></button><button data-v="full" data-i="win.full"></button><i></i></div>
+            <p class="set-note" data-i="set.win.d"></p>
+          </div>
+          <div class="set-card">
+            <div class="row-sw"><div class="rs-t"><label data-i="set.intro"></label></div><button class="sw" data-sw="intro" role="switch" aria-checked="true" aria-label="Intro del estudio"><i></i></button></div>
+            <div class="row-sw"><div class="rs-t"><label data-i="set.tour"></label><small data-i="set.tour.d"></small></div><button class="sw" data-sw="tour" role="switch" aria-checked="true" aria-label="Tutorial guiado"><i></i></button></div>
+          </div>
+        </div></div>
 
-    <div class="set-pane hidden" data-pane="video">
-      <div class="set-sec"><h3 data-i="set.gfx"></h3>
-        <div class="seg s3" data-seg="gfx"><button data-v="auto" data-i="gfx.auto"></button><button data-v="high" data-i="gfx.high"></button><button data-v="saver" data-i="gfx.saver"></button><i></i></div>
-        <p class="set-note" data-i="set.gfx.d"></p>
-      </div>
-      <div class="set-sec">
-        <div class="row-sw"><div class="rs-t"><label data-i="set.motion"></label><small data-i="set.motion.d"></small></div><button class="sw" data-sw="motion" role="switch" aria-checked="false" aria-label="Reducir movimiento"><i></i></button></div>
-        <div class="row-sw" id="rowCursor"><div class="rs-t"><label data-i="set.cursor"></label><small data-i="set.cursor.d"></small></div><button class="sw" data-sw="cursor" role="switch" aria-checked="true" aria-label="Puntero de casino"><i></i></button></div>
-        <div class="row-sw"><div class="rs-t"><label data-i="set.tips"></label><small data-i="set.tips.d"></small></div><button class="sw" data-sw="tips" role="switch" aria-checked="true" aria-label="Ayudas emergentes"><i></i></button></div>
-      </div>
-    </div>
+        <div class="set-pane hidden" data-pane="sound"><div class="set-grid">
+          <div class="set-card wide">
+            <div class="fader" data-k="master"><label data-i="vol.master"></label><output>85</output><input type="range" min="0" max="100" value="85" aria-label="Volumen general"><div class="ftrack"></div></div>
+            <div class="fader" data-k="music"><label data-i="vol.music"></label><button class="sw" data-sw="music" role="switch" aria-checked="true" aria-label="Música"><i></i></button><output>70</output><input type="range" min="0" max="100" value="70" aria-label="Volumen de la música"><div class="ftrack"></div></div>
+            <div class="np np-set" id="setSong"><button type="button" class="np-b" data-d="-1" data-tf="songprev"><i class="np-tri l"></i></button><span class="np-t"><i class="np-note">&#9834;</i><b data-np-t></b><em data-np-n></em></span><button type="button" class="np-b" data-d="1" data-tf="songnext"><i class="np-tri r"></i></button></div>
+            <div class="fader" data-k="sfx"><label data-i="vol.sfx"></label><button class="sw" data-sw="sfx" role="switch" aria-checked="true" aria-label="Efectos"><i></i></button><output>90</output><input type="range" min="0" max="100" value="90" aria-label="Volumen de los efectos"><div class="ftrack"></div></div>
+            <div class="row-sw"><div class="rs-t"><label data-i="set.songs"></label><small data-i="set.songs.d"></small></div><button class="sw" data-sw="songs" role="switch" aria-checked="true" aria-label="Aviso de canciones"><i></i></button></div>
+          </div>
+        </div></div>
 
-    <div class="set-pane hidden" data-pane="data">
-      <div class="set-sec">
-        <button class="row-btn danger" id="resetCodex" type="button"></button>
-        <p class="set-note" id="resetCodexNote"></p>
-      </div>
-      <div class="set-sec">
-        <button class="row-btn danger" id="resetSet" type="button"></button>
-        <p class="set-note" id="resetSetNote"></p>
-      </div>
-      <div class="set-sec">
-        <button class="row-btn danger" id="resetAll" type="button"></button>
-        <p class="set-note" id="resetAllNote"></p>
+        <div class="set-pane hidden" data-pane="video"><div class="set-grid">
+          <div class="set-card wide"><h3 data-i="set.gfx"></h3>
+            <div class="seg s3" data-seg="gfx"><button data-v="auto" data-i="gfx.auto"></button><button data-v="high" data-i="gfx.high"></button><button data-v="saver" data-i="gfx.saver"></button><i></i></div>
+            <p class="set-note" data-i="set.gfx.d"></p>
+          </div>
+          <div class="set-card wide">
+            <div class="row-sw"><div class="rs-t"><label data-i="set.motion"></label><small data-i="set.motion.d"></small></div><button class="sw" data-sw="motion" role="switch" aria-checked="false" aria-label="Reducir movimiento"><i></i></button></div>
+            <div class="row-sw" id="rowCursor"><div class="rs-t"><label data-i="set.cursor"></label><small data-i="set.cursor.d"></small></div><button class="sw" data-sw="cursor" role="switch" aria-checked="true" aria-label="Puntero de casino"><i></i></button></div>
+            <div class="row-sw"><div class="rs-t"><label data-i="set.tips"></label><small data-i="set.tips.d"></small></div><button class="sw" data-sw="tips" role="switch" aria-checked="true" aria-label="Ayudas emergentes"><i></i></button></div>
+          </div>
+        </div></div>
+
+        <div class="set-pane hidden" data-pane="data"><div class="set-grid">
+          <div class="set-card">
+            <button class="row-btn danger" id="resetCodex" type="button"></button>
+            <p class="set-note" id="resetCodexNote"></p>
+          </div>
+          <div class="set-card">
+            <button class="row-btn danger" id="resetSet" type="button"></button>
+            <p class="set-note" id="resetSetNote"></p>
+          </div>
+          <div class="set-card">
+            <button class="row-btn danger" id="resetAll" type="button"></button>
+            <p class="set-note" id="resetAllNote"></p>
+          </div>
+        </div></div>
       </div>
     </div>
 
