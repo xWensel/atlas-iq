@@ -685,6 +685,292 @@ def blindfold(id):
     I.add(bevel(ellipse(48, 30, 8, 9), R["red"]))
     return I
 
+
+# ============================================================ tanda 4b: retos (lenguaje comun: fichas de letra, mini-mapa, puntero)
+FONT = {  # 5x7
+    "A": ["01110", "10001", "10001", "11111", "10001", "10001", "10001"], "B": ["11110", "10001", "11110", "10001", "10001", "10001", "11110"],
+    "R": ["11110", "10001", "10001", "11110", "10100", "10010", "10001"], "K": ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+    "E": ["11111", "10000", "11110", "10000", "10000", "10000", "11111"], "L": ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+    "O": ["01110", "10001", "10001", "10001", "10001", "10001", "01110"], "?": ["01110", "10001", "00001", "00110", "00100", "00000", "00100"],
+    "M": ["10001", "11011", "10101", "10101", "10001", "10001", "10001"], "N": ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
+    "G": ["01110", "10001", "10000", "10111", "10001", "10001", "01111"],
+    "Y": ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
+}
+def glyph_mask(ch, x, y, k=2, flipx=False, flipy=False):
+    g = [r[::-1] if flipx else r for r in FONT[ch]]; g = g[::-1] if flipy else g
+    m = blank()
+    for j, row in enumerate(g):
+        for i, b in enumerate(row):
+            if b == "1": m[y + j * k:y + j * k + k, x + i * k:x + i * k + k] = True
+    return m
+
+def tile(I, x, y, ch=None, w=20, h=24, k=2, rp="paper", ink=None, **kw):
+    I.add(flat(rrect(x, y + 3, w, h, 3), R[rp][4]))
+    I.add(bevel(rrect(x, y, w, h, 3), R[rp]), outline=False)
+    if ch:
+        gm = glyph_mask(ch, x + (w - 5 * k) // 2, y + (h - 7 * k) // 2, k, **kw); I.put(gm, ink or R["dark"][2])
+
+def shake_lines(I, x, y, h, side):
+    for i, dy in enumerate((0, h // 2 - 2, h - 4)):
+        I.put(rect(x + side * (i % 2) * 2, y + dy, 3, 2), R["paper"][1])
+
+@icon("ch_shaky")
+def ch_shaky(id):
+    I = Icon(); tile(I, 14, 10, "A", 36, 42, 4); shake_lines(I, 6, 14, 34, -1); shake_lines(I, 55, 14, 34, 1); return I
+
+@icon("ch_missing")
+def ch_missing(id):
+    I = Icon(); tile(I, 2, 20, "M", 18, 22); tile(I, 44, 20, "L", 18, 22)
+    ghost = rrect(23, 20, 18, 22, 3); I.put(ghost & ~erode(ghost, 1) & ((np.indices((N, N)).sum(0) % 3) == 0), R["paper"][2])
+    return I
+
+def curved(I, x0, x1, y, up, rp="gold"):
+    pts = [(x0 + (x1 - x0) * t, y + (-1 if up else 1) * 9 * math.sin(math.pi * t)) for t in np.linspace(0, .82, 8)]
+    m = thick_line(pts, 3); d = 1 if x1 > x0 else -1
+    m |= poly([(x1 - d * 7, y - 5), (x1 - d * 7, y + 5), (x1, y)] if True else [])
+    I.add(bevel(m, R[rp], soft=False))
+
+@icon("ch_swap")
+def ch_swap(id):
+    I = Icon(); tile(I, 4, 20, "A", 22, 26); tile(I, 38, 20, "B", 22, 26)
+    curved(I, 14, 52, 12, True); curved(I, 50, 12, 56, False); return I
+
+@icon("ch_mirror")
+def ch_mirror(id):
+    I = Icon(); tile(I, 12, 8, "R", 40, 46, 5, flipx=True); return I
+
+@icon("ch_upside")
+def ch_upside(id):
+    I = Icon(); tile(I, 12, 10, "A", 40, 44, 5, flipy=True); return I
+
+@icon("ch_runes")
+def ch_runes(id):
+    I = Icon(); I.add(flat(rrect(10, 10, 44, 50, 6), R["grey"][4])); I.add(bevel(rrect(10, 6, 44, 50, 6), R["grey"]), outline=False)
+    rune = thick_line([(26, 16), (26, 46)], 4) | thick_line([(26, 16), (38, 24), (26, 32), (40, 46)], 4)
+    I.put(rune, R["purple"][1]); I.put(rune & edge(rune, 0, 1), R["purple"][3]); return I
+
+@icon("ch_novowels")
+def ch_novowels(id):
+    I = Icon(); tile(I, 12, 8, "A", 40, 46, 5)
+    I.add(bevel(thick_line([(10, 10), (54, 54)], 7) | thick_line([(54, 10), (10, 54)], 7), R["red"])); return I
+
+@icon("ch_anagram")
+def ch_anagram(id):
+    I = Icon()
+    for (x, y, ch) in ((4, 30, "O"), (22, 8, "M"), (40, 30, "R")): tile(I, x, y, ch, 20, 24)
+    return I
+
+@icon("ch_dance")
+def ch_dance(id):
+    I = Icon()
+    for (x, y, ch) in ((2, 22, "B"), (22, 8, "O"), (42, 26, "L")):
+        tile(I, x, y, ch, 20, 24); I.put(rect(x + 6, y + 30, 8, 2), R["dark"][1])
+    return I
+
+@icon("ch_scroll")
+def ch_scroll(id):
+    I = Icon(); I.add(bevel(rrect(2, 14, 60, 36, 5), R["red"]))
+    inner = rrect(7, 19, 50, 26, 3); I.put(inner, R["dark"][3])
+    for x in range(8, 58, 6):
+        for y in (16, 47): I.put(rect(x, y, 2, 2), R["gold"][0])
+    I.put(glyph_mask("G", 10, 25, 2), R["gold"][1])
+    for i, ch in enumerate("EO"): I.put(glyph_mask(ch, 22 + i * 12, 25, 2), R["gold"][1])
+    I.add(bevel(poly([(48, 24), (56, 32), (48, 40)]), R["gold"], soft=False)); return I
+
+@icon("ch_riddle")
+def ch_riddle(id):
+    I = Icon()
+    I.add(bevel(rect(12, 8, 40, 48), R["sand"]))
+    for y in (6, 52): I.add(bevel(rrect(6, y, 52, 8, 4), R["brown"]))
+    I.put(glyph_mask("?", 22, 17, 4), R["red"][2]); return I
+
+@icon("ch_memory")
+def ch_memory(id):
+    I = Icon()
+    body = ellipse(28, 34, 19, 14); tail = poly([(44, 34), (60, 20), (56, 34), (60, 48)])
+    I.add(bevel(tail, R["orange"])); I.add(bevel(body, R["orange"]))
+    I.put(poly([(22, 22), (30, 14), (34, 22)]), R["orange"][1])
+    I.put(circle(18, 30, 3.2), WHITE); I.put(circle(17, 31, 1.6), INK)
+    for x, y, r in ((6, 14, 3), (12, 6, 2)): I.add(bevel(circle(x, y, r), R["ice"], soft=False))
+    return I
+
+# ---- mini-mapa
+def minimap(I, x=4, y=6, w=56, h=52, land=True):
+    I.add(bevel(rrect(x, y, w, h, 5), R["blue"]))
+    if land:
+        m = blank()
+        m |= ellipse(x + w * .34, y + h * .42, w * .2, h * .24) | ellipse(x + w * .42, y + h * .62, w * .12, h * .2)
+        m |= ellipse(x + w * .7, y + h * .34, w * .16, h * .14) | ellipse(x + w * .72, y + h * .66, w * .11, h * .15)
+        m &= erode(rrect(x, y, w, h, 5), 3)
+        I.add(bevel(m, R["green"]), outline=False)
+        return m
+    return blank()
+
+def cloud(cx, cy, s):
+    return circle(cx - s * .45, cy + s * .08, s * .32) | circle(cx, cy - s * .12, s * .42) | circle(cx + s * .45, cy + s * .1, s * .3) | rect(int(cx - s * .6), int(cy + s * .05), int(s * 1.2), int(s * .34))
+
+@icon("ch_clouds")
+def ch_clouds(id):
+    I = Icon(); minimap(I)
+    for cx, cy, s in ((22, 24, 26), (44, 44, 24)): I.add(bevel(cloud(cx, cy, s), R["grey"]))
+    return I
+
+@icon("ch_rain")
+def ch_rain(id):
+    I = Icon()
+    for x in range(10, 56, 9):
+        for y in (40, 52):
+            I.add(bevel(thick_line([(x + (y - 40) // 3, y), (x - 3 + (y - 40) // 3, y + 7)], 3), R["blue"], soft=False))
+    I.add(bevel(cloud(32, 20, 44), R["grey"])); return I
+
+@icon("ch_lightning")
+def ch_lightning(id):
+    I = Icon(); I.add(bevel(poly([(34, 22), (20, 44), (30, 44), (24, 62), (44, 36), (34, 36), (40, 22)]), R["gold"]))
+    I.add(bevel(cloud(32, 18, 46), R["dark"])); return I
+
+@icon("ch_dark")
+def ch_dark(id):
+    I = Icon(); I.add(bevel(rrect(4, 6, 56, 52, 5), R["dark"]))
+    lit = circle(34, 34, 14); c = np.zeros((N, N, 4), np.uint8); c[lit] = R["blue"][2]
+    land = ellipse(30, 32, 10, 8) & lit; c[land] = R["green"][2]; c[land & edge(land, 0, -1)] = R["green"][0]
+    I.add(c, outline=False); I.a[ring(34, 34, 14, 15.2)] = R["gold"][1]
+    I.add(bevel(cursor(38, 36, .55), R["paper"])); return I
+
+@icon("ch_flicker")
+def ch_flicker(id):
+    I = Icon()
+    for i, y in enumerate((44, 49, 54)): I.add(bevel(rrect(24 + (i == 2) * 2, y, 16 - (i == 2) * 4, 5, 2), R["grey"]))
+    I.add(sphere(circle(32, 25, 17) | poly([(22, 34), (42, 34), (38, 44), (26, 44)]), 28, 20, 18, R["gold"], cuts=(.7, .35, 0, -.4)))
+    I.put(thick_line([(28, 40), (28, 30), (32, 34), (36, 30), (36, 40)], 1), R["orange"][3])
+    for a in (-70, -30, 30, 70):
+        t = math.radians(a); I.add(bevel(thick_line([(32 + 22 * math.sin(t), 25 - 22 * math.cos(t)), (32 + 29 * math.sin(t), 25 - 29 * math.cos(t))], 3), R["gold"], soft=False))
+    return I
+
+@icon("ch_wrongborders")
+def ch_wrongborders(id):
+    I = Icon(); m = minimap(I)
+    yy, xx = np.indices((N, N)); dash = (np.abs(xx - 30 - (yy - 30) * .5) < 1.5) & ((yy // 4) % 2 == 0) & erode(rrect(4, 6, 56, 52, 5), 3)
+    I.put(dash, R["red"][1]); I.put(dilate(dash, 1) & ~dash & erode(rrect(4, 6, 56, 52, 5), 3) & ((yy // 4) % 2 == 0), R["red"][3]); return I
+
+@icon("ch_pangea")
+def ch_pangea(id):
+    I = Icon(); m = blank()
+    for k, (x, y), sc_ in (("na", (-12, -14), .6), ("sa", (-2, 14), .6), ("af", (14, 6), .62), ("eu", (12, -12), .55)):
+        lon0, lat0, sc, _ = CONT["k_" + k]
+        mm = ortho_mask(continent_mask(k), lon0, lat0, sc * sc_, cx=32 + x, cy=32 + y, ss=3)
+        m |= mm
+    m = dilate(m, 1, False); m = opening(m, 1); m = drop_small(m, 20)
+    I.add(bevel(m, R["green"])); return I
+
+@icon("ch_shuffle")
+def ch_shuffle(id):
+    I = Icon()
+    for k, (cx, cy), rp_, f in (("sa", (17, 36), "green", .62), ("af", (46, 34), "orange", .55)):
+        lon0, lat0, sc, _ = CONT["k_" + k]
+        I.add(bevel(drop_small(despeckle(ortho_mask(continent_mask(k), lon0, lat0, sc * f, cx=cx, cy=cy, ss=4)), 8), R[rp_]))
+    curved(I, 14, 50, 11, True, "paper"); curved(I, 50, 14, 52, False, "paper"); return I
+
+@icon("ch_tilt")
+def ch_tilt(id):
+    I = Icon(); lon0, lat0, sc, _ = CONT["k_af"]
+    m = ortho_mask(continent_mask("af"), lon0, lat0, sc * .8, cx=30, cy=34, ss=4)
+    m = np.array(Image.fromarray(m.astype(np.uint8) * 255).rotate(-35, Image.NEAREST, center=(30, 34))) > 0
+    I.add(bevel(despeckle(m), R["orange"])); I.add(arc_arrow(32, 32, 28, 300, 380, 4)); return I
+
+@icon("ch_spin")
+def ch_spin(id):
+    I = Icon(); I.add(bevel(circle(32, 32, 30), R["gold"]))
+    y, x = np.mgrid[0:N, 0:N]; ang = (np.degrees(np.arctan2(x + .5 - 32, -(y + .5 - 32))) + 360) % 360
+    pk = ring(32, 32, 17, 26.5); c = np.zeros((N, N, 4), np.uint8)
+    c[pk & ((ang // 20) % 2 == 0)] = R["red"][2]; c[pk & ((ang // 20) % 2 == 1)] = R["dark"][3]; c[pk & (ang < 20)] = R["green"][2]
+    I.add(c, outline=False); I.a[ring(32, 32, 26.5, 27.5)] = INK
+    for a in range(0, 360, 20):
+        t = math.radians(a); I.put(thick_line([(32 + 17 * math.sin(t), 32 - 17 * math.cos(t)), (32 + 26 * math.sin(t), 32 - 26 * math.cos(t))], 1), INK)
+    I.add(globe_part(31, 32, 32, -50, 10)); return I
+
+@icon("ch_myopia")
+def ch_myopia(id):
+    I = Icon(); I.add(bevel(thick_line([(4, 26), (10, 22), (54, 22), (60, 26)], 4), R["red"], soft=False))
+    for cx in (18, 46):
+        I.add(bevel(circle(cx, 32, 14), R["red"]))
+        I.add(sphere(circle(cx, 32, 10), cx - 2, 30, 10, R["teal"]), outline=False)
+        for r in (4, 7): I.put(ring(cx, 32, r, r + 1), R["teal"][0])
+    I.add(bevel(thick_line([(29, 30), (35, 30)], 4), R["red"], soft=False)); return I
+
+@icon("ch_blur")
+def ch_blur(id):
+    I = Icon(); I.add(bevel(ellipse(32, 32, 30, 20), R["paper"]))
+    I.add(sphere(circle(32, 32, 14), 29, 29, 14, R["teal"]), outline=False)
+    I.put(circle(32, 32, 6), INK); I.put(ring(32, 32, 14, 16.5) & ((np.indices((N, N)).sum(0) % 2) == 0), R["teal"][1]); I.put(circle(28, 27, 2.4), WHITE)
+    return I
+
+@icon("ch_quake")
+def ch_quake(id):
+    I = Icon(); m = minimap(I, 4, 10, 56, 44)
+    crack = thick_line([(22, 10), (28, 22), (22, 30), (32, 40), (28, 54)], 3); I.put(crack & rrect(4, 10, 56, 44, 5), INK)
+    for x, s in ((2, -1), (60, 1)):
+        for y in (18, 30, 42): I.put(rect(x - (s < 0) * 0, y, 2, 6), R["paper"][1])
+    return I
+
+@icon("ch_drift")
+def ch_drift(id):
+    I = Icon()
+    for y, w in ((18, 14), (30, 20), (42, 12)): I.add(bevel(rrect(2, y, w, 4, 2), R["paper"], soft=False))
+    minimap(I, 18, 10, 44, 44); return I
+
+def pin(cx, cy, r, rp):
+    m = circle(cx, cy, r) | poly([(cx - r * .8, cy + r * .5), (cx + r * .8, cy + r * .5), (cx, cy + r * 2.2)])
+    c = bevel(m, R[rp]); c[circle(cx, cy - 1, r * .38)] = R["paper"][1]; return c
+
+@icon("ch_decoys")
+def ch_decoys(id):
+    I = Icon(); I.add(pin(14, 16, 9, "purple")); I.add(pin(50, 18, 9, "purple")); I.add(pin(32, 26, 12, "red")); return I
+
+# ---- puntero
+@icon("ch_tremble")
+def ch_tremble(id):
+    I = Icon(); I.add(bevel(cursor(20, 8, 1.2), R["paper"]))
+    for (x, y) in ((8, 14), (6, 26), (8, 38), (52, 30), (54, 42), (50, 54)): I.put(rect(x, y, 4, 2), R["paper"][1])
+    return I
+
+@icon("ch_blink")
+def ch_blink(id):
+    I = Icon(); c = bevel(cursor(18, 8, 1.2), R["paper"]); rows = (np.arange(N) // 3) % 2 == 1; c[rows] = 0
+    I.add(c); I.add(faceted_star(50, 14, 10, 3, "gold", n=4)); return I
+
+@icon("ch_ghost")
+def ch_ghost(id):
+    I = Icon(); body = circle(32, 26, 20) | rect(12, 26, 40, 22)
+    for i in range(5): body &= ~circle(16 + i * 8, 50, 4) if i % 2 else body
+    for i in (0, 2, 4): body &= ~circle(12 + i * 10 + 5, 50, 3.6)
+    I.add(bevel(body, R["ice"]))
+    for x in (24, 40): I.put(ellipse(x, 26, 3.4, 5), INK)
+    return I
+
+@icon("ch_cblur")
+def ch_cblur(id):
+    I = Icon(); halo = dilate(cursor(20, 10, 1.15), 3, False); I.add(flat(halo, R["purple"][1]), outline=False)
+    c = flat(dilate(cursor(20, 10, 1.15), 1, False) & ~cursor(20, 10, 1.15), R["purple"][0]); I.add(c, outline=False)
+    I.add(bevel(cursor(20, 10, 1.15), R["paper"]), outline=False); return I
+
+@icon("ch_lag")
+def ch_lag(id):
+    I = Icon()
+    for i, (x, y) in enumerate(((2, 2), (12, 11))): I.add(flat(cursor(x, y, 1.0), R["purple"][1 + i]), outline=False)
+    I.add(bevel(cursor(24, 20, 1.0), R["paper"])); return I
+
+@icon("ch_cmirror")
+def ch_cmirror(id):
+    I = Icon(); a = bevel(cursor(2, 6, .9), R["paper"]); I.add(a); b = bevel(cursor(2, 6, .9), R["paper"])[:, ::-1].copy(); I.add(b)
+    I.add(bevel(thick_line([(22, 56), (42, 56)], 3) | poly([(18, 56), (24, 50), (24, 62)]) | poly([(46, 56), (40, 50), (40, 62)]), R["gold"], soft=False)); return I
+
+@icon("ch_dizzy")
+def ch_dizzy(id):
+    I = Icon(); orb = ring(32, 32, 26, 28) & ((np.indices((N, N))[1] // 3) % 2 == 0); I.put(orb, R["purple"][1])
+    I.add(bevel(cursor(24, 16, 1.0), R["paper"]))
+    for (x, y) in ((8, 20), (54, 42), (46, 8)): I.add(faceted_star(x, y, 7, 2.5, "gold", n=4))
+    return I
+
 # ============================================================ salida
 def build(ids):
     done = []
