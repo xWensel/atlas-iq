@@ -262,7 +262,7 @@ html body { -webkit-font-smoothing: none; font-smooth: never; text-rendering: op
 html body .brand-txt > i { font-size: 15.5px; } html body .mc-desc { font-size: 18px; line-height: 1.25; } html body .mc-stat { font-size: 15.5px; } html body .mc-ribbon { font-size: 15.5px; }
 html body .hr-t > b { font-size: 19px; } html body .hr-t > i { font-size: 17px; } html body .cs-t > i { font-size: 15.5px; } html body .hh-ver { font-size: 15.5px; }
 html body .tag { font-size: 15.5px; } html body #plate .tag { font-size: 10.5px; }
-html body .dc-d { font-size: 17px; } html body .dc-kit > em { font-size: 15.5px; } html body .rm-node > em { font-size: 15.5px; } html body .adv-stats > span { font-size: 15.5px; }
+html body .rm-node > em { font-size: 15.5px; } html body .adv-stats > span { font-size: 15.5px; }
 html body .sb-t > i { font-size: 15.5px; } html body .mode-d { font-size: 19px; } html body .nick > span { font-size: 15.5px; } html body .dy-body > i { font-size: 19px; }
 html body .lb-src, html body .lb-empty { font-size: 15.5px; } html body .camp-d { font-size: 19px; } html body .camp-m > span { font-size: 15.5px; } html body .pf-cell > span { font-size: 15.5px; }
 html body .ach > i { font-size: 18px; } html body .ach-t > i { font-size: 18px; } html body .ach-t > em { font-size: 15.5px; }
