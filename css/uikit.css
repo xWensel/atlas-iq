@@ -105,8 +105,8 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
 /* notas de campo: como mucho 3 lineas (2 en pantallas medianas) para no empujar el ticket ni las cartas */
 #factText:not(:empty) { max-height: calc(30 * var(--vh)); overflow-y: auto; scrollbar-width: thin; }   /* el texto entero, sin puntos suspensivos: si es muy largo, se desplaza */
 @media (max-width: 1100px) { #factText:not(:empty) { font-size: 17px; max-height: calc(26 * var(--vh)); } }
-/* Campamento en movil o pantallas muy bajas: se desplaza en vez de cortar cartas y botones */
-@media (max-width: 700px), (max-height: 600px) {
+/* Campamento en movil o pantallas bajas (o con muchos retos/textos largos que no caben): se desplaza en vez de cortar cartas y botones */
+@media (max-width: 700px), (max-height: 760px) {
   #dlg.tablewrap { overflow-y: auto; overflow-x: hidden; }
   .table { height: auto; min-height: 100%; grid-template-rows: auto; grid-template-columns: minmax(0, 1fr); }
   .tb-note { font-size: 17px; } .tray-row { flex-wrap: wrap; }
