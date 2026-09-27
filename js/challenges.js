@@ -60,19 +60,25 @@ window.AIQ = window.AIQ || {};
   /* --- puntero --- */
   def("tremble", "ptr", "ch_tremble", "Pulso tembloroso|Shaky hand|Main tremblante|Mão trêmula|Zittrige Hand|Mano tremante", "Tu puntero tiembla, y el clic también.|Your pointer shakes, and so does your click.|Ton pointeur tremble, et ton clic aussi.|Seu ponteiro treme, e o clique também.|Dein Zeiger zittert, und dein Klick auch.|Il puntatore trema, e anche il clic.", ["steadyhand"]);
   def("blink", "ptr", "ch_blink", "Cursor parpadeante|Blinking cursor|Curseur clignotant|Cursor piscante|Blinkender Zeiger|Cursore lampeggiante", "El puntero parpadea y se apaga a ratos.|The pointer blinks on and off.|Le pointeur clignote.|O ponteiro pisca e apaga.|Der Zeiger blinkt.|Il puntatore lampeggia.", ["gamer"]);
-  def("ghost", "ptr", "ch_ghost", "Cursor fantasma|Ghost cursor|Curseur fantôme|Cursor fantasma|Geisterzeiger|Cursore fantasma", "El puntero desaparece unos segundos.|The pointer vanishes for a few seconds.|Le pointeur disparaît quelques secondes.|O ponteiro some por alguns segundos.|Der Zeiger verschwindet für einige Sekunden.|Il puntatore sparisce per qualche secondo.");
+  def("ghost", "ptr", "ch_ghost", "Cursor fantasma|Ghost cursor|Curseur fantôme|Cursor fantasma|Geisterzeiger|Cursore fantasma", "El puntero desaparece unos segundos.|The pointer vanishes for a few seconds.|Le pointeur disparaît quelques secondes.|O ponteiro some por alguns segundos.|Der Zeiger verschwindet für einige Sekunden.|Il puntatore sparisce per qualche secondo.", ["spareeye"]);
   def("cblur", "ptr", "ch_cblur", "Cursor borroso|Blurry cursor|Curseur flou|Cursor borrado|Verschwommener Zeiger|Cursore sfocato", "El puntero se ve desenfocado.|The pointer looks out of focus.|Le pointeur est flou.|O ponteiro fica desfocado.|Der Zeiger ist unscharf.|Il puntatore è sfocato.", ["divingmask"]);
   def("lag", "ptr", "ch_lag", "Cursor con retraso|Laggy cursor|Curseur en retard|Cursor com atraso|Verzögerter Zeiger|Cursore in ritardo", "El puntero va con retraso.|The pointer lags behind.|Le pointeur est en retard.|O ponteiro anda atrasado.|Der Zeiger hinkt hinterher.|Il puntatore è in ritardo.", ["gamer"]);
   def("cmirror", "ptr", "ch_cmirror", "Controles invertidos|Reversed controls|Commandes inversées|Controles invertidos|Umgekehrte Steuerung|Comandi invertiti", "El puntero se mueve al revés.|The pointer moves the opposite way.|Le pointeur bouge à l'envers.|O ponteiro se move ao contrário.|Der Zeiger bewegt sich verkehrt herum.|Il puntatore si muove al contrario.", ["handmirror"]);
-  def("dizzy", "ptr", "ch_dizzy", "Mareo|Dizzy|Vertige|Tontura|Schwindel|Capogiro", "El puntero da vueltas a tu alrededor.|The pointer circles around you.|Le pointeur tourne autour de toi.|O ponteiro gira ao seu redor.|Der Zeiger kreist um dich.|Il puntatore ti gira intorno.");
+  def("dizzy", "ptr", "ch_dizzy", "Mareo|Dizzy|Vertige|Tontura|Schwindel|Capogiro", "El puntero da vueltas a tu alrededor.|The pointer circles around you.|Le pointeur tourne autour de toi.|O ponteiro gira ao seu redor.|Der Zeiger kreist um dich.|Il puntatore ti gira intorno.", ["steadyhand"]);
   /* --- reglas --- */
   def("wind", "rule", "wind", "Vendaval|Gale|Rafale|Vendaval|Sturm|Bufera", "El viento desvía tu pin.|The wind pushes your pin.|Le vent dévie ton épingle.|O vento desvia seu pino.|Der Wind lenkt deinen Pin ab.|Il vento sposta il tuo pin.", ["weathervane"]);
   def("storm", "rule", "storm", "Tormenta|Storm|Tempête|Tempestade|Gewitter|Tempesta", "Solo tienes el 55 % del tiempo.|You only get 55% of the time.|Tu n'as que 55 % du temps.|Você só tem 55% do tempo.|Du hast nur 55 % der Zeit.|Hai solo il 55% del tempo.", ["earplugs"]);
   def("silence", "rule", "silence", "Silencio|Silence|Silence|Silêncio|Stille|Silenzio", "Tus herramientas no funcionan.|Your tools don't work.|Tes outils ne marchent pas.|Suas ferramentas não funcionam.|Deine Werkzeuge funktionieren nicht.|I tuoi strumenti non funzionano.", ["earplugs"]);
+  /* --- banderas (solo en la ronda de banderas) --- */
+  def("flaginvert", "flag", "ch_negative", "Colores invertidos|Inverted colors|Couleurs inversées|Cores invertidas|Invertierte Farben|Colori invertiti", "La bandera se ve en negativo.|The flag looks like a photo negative.|Le drapeau apparaît en négatif.|A bandeira aparece em negativo.|Die Flagge erscheint als Negativ.|La bandiera appare in negativo.");
+  def("flaghue", "flag", "ch_mosaic", "Luces de neón|Neon lights|Néons|Luzes neon|Neonlicht|Luci al neon", "Las luces del casino cambian los colores de la bandera.|The casino lights shift the flag's colors.|Les néons du casino changent les couleurs du drapeau.|As luzes do cassino mudam as cores da bandeira.|Die Casino-Lichter verändern die Farben der Flagge.|Le luci del casinò cambiano i colori della bandiera.");
+  def("flagblur", "flag", "ch_blur", "Bandera borrosa|Blurry flag|Drapeau flou|Bandeira desfocada|Unscharfe Flagge|Bandiera sfocata", "La bandera está desenfocada.|The flag is out of focus.|Le drapeau est flou.|A bandeira está desfocada.|Die Flagge ist unscharf.|La bandiera è sfocata.", ["divingmask", "lens"]);
+  def("flagdark", "flag", "ch_dark", "Bandera a oscuras|Flag in the dark|Drapeau dans le noir|Bandeira no escuro|Flagge im Dunkeln|Bandiera al buio", "La bandera casi no se distingue en la penumbra.|The flag is barely visible in the dim light.|Le drapeau se distingue à peine dans la penombre.|A bandeira quase não se distingue na penumbra.|Die Flagge ist im Dämmerlicht kaum zu erkennen.|La bandiera si distingue a malapena nella penombra.");
+  def("flaggray", "flag", "ch_missing", "Sin colores|No colors|Sans couleurs|Sem cores|Ohne Farben|Senza colori", "La bandera se ve en blanco y negro.|The flag shows in black and white.|Le drapeau apparaît en noir et blanc.|A bandeira aparece em preto e branco.|Die Flagge ist schwarz-weiß.|La bandiera appare in bianco e nero.");
   A.CHAL = D;
 
   const KIND = k => Object.keys(D).filter(id => D[id].kind === k);
-  const TEXT = KIND("text"), MAPC = KIND("map"), PTR = KIND("ptr"), RULE = KIND("rule");
+  const TEXT = KIND("text"), MAPC = KIND("map"), PTR = KIND("ptr"), RULE = KIND("rule"), FLAG = KIND("flag");
   /* en una misma ronda no se juntan retos "de la misma familia" */
   const FAMILY = { wrongborders: "b", noborders: "b", pangea: "p", shuffle: "p", spread: "p", tilt: "p", flip: "o", mirrorx: "o", spin: "o", blur: "v", dark: "v", myopia: "v", blindspot: "v", clouds: "v", rain: "v", mosaic: "v", flicker: "l", lightning: "l", quake: "m", drift: "m", decoys: "d", negative: "n" };
   const famOf = id => FAMILY[id] || (D[id].kind === "text" ? "t" : D[id].kind === "ptr" ? "c" : id);
@@ -87,8 +93,9 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
   const pickFrom = (seed, tag, list, r, avoid) => { const ok = list.filter(id => !avoid.includes(famOf(id))), l = ok.length ? ok : list; return A.rng(`${seed}:${tag}:${Math.floor(r / 4)}:${r % 4}`).pick(l); };
   A.chal = {
-    DEFS: D, TEXT, MAPC, PTR, RULE,
-    plan(seed, r, asc = 0) {
+    DEFS: D, TEXT, MAPC, PTR, RULE, FLAG,
+    plan(seed, r, asc = 0, topic) {
+      const flagRound = topic === "flag";
       const act = Math.floor(r / 4), pos = r % 4, boss = pos === 3, a = Math.min(act, 2);
       const lv = clamp(a + 1 + (asc >= 3 ? 1 : 0), 1, 3);
       let list = [], combo = null;
@@ -103,7 +110,7 @@ window.AIQ = window.AIQ || {};
         return { list, boss, combo };
       }
       const used = [];
-      const add = (cat, mild) => { const pool = cat === "text" ? (mild ? MILD_TEXT : TEXT) : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPC); const id = pickFrom(seed, cat + list.length, pool, r, used); list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); };
+      const add = (cat, mild) => { const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT)) : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPC); const id = pickFrom(seed, cat + list.length, pool, r, used); list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); };
       if (act === 0) { if (pos === 1) add("text", true); else if (pos === 2) add("map", true); }
       else if (act === 1) ACT1[pos % 3].forEach(c => add(c, false));
       else ACT2[pos % 3].forEach(c => add(c, false));
@@ -116,7 +123,7 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */
   A.chal.fx = perks => {
-    const fx = { shakeMul: 1, textMul: 1, blurMul: 1, plateMul: 1, blackoutMul: 1, cloudMul: 1, focusMul: 1, lagMul: 1, quakeMul: 1, mosaicMul: 1, rainMul: 1, darkR: 1, darkDim: 0, lensR: 0, trueR: 0, peekR: 0, missingRate: 0, unswapMs: 0, decodeMs: 0, riddleMs: 0, unmirror: false, keepName: false, halo: false, flickerWarn: false, windPreview: false, windMul: 1, coords: false, guides: false, mag: false, country: false, thermo: false, beacon: false, noBabel: false, noMarquee: false, noNegative: false, noFlash: false, trapGhost: false, cloudClear: 0 };
+    const fx = { shakeMul: 1, textMul: 1, blurMul: 1, plateMul: 1, blackoutMul: 1, cloudMul: 1, focusMul: 1, lagMul: 1, quakeMul: 1, mosaicMul: 1, rainMul: 1, ghostMul: 1, darkR: 1, darkDim: 0, lensR: 0, trueR: 0, peekR: 0, missingRate: 0, unswapMs: 0, decodeMs: 0, riddleMs: 0, unmirror: false, keepName: false, halo: false, flickerWarn: false, windPreview: false, windMul: 1, coords: false, guides: false, mag: false, country: false, thermo: false, beacon: false, noBabel: false, noMarquee: false, noNegative: false, noFlash: false, trapGhost: false, cloudClear: 0 };
     for (const p of perks) {
       const f = p.fx; if (!f) continue;
       for (const k in f) {
@@ -138,8 +145,8 @@ window.AIQ = window.AIQ || {};
   const phaseOk = () => { const g = A.core && A.core.S; return g && g.phase === "asking" && !g.paused; };
   const lvi = c => clamp((c.lv || 1) - 1, 0, 2);
   const par = c => { const i = lvi(c), h = S.halve, fx = S.fx; switch (c.id) {
-    case "shaky": return { amp: [2.2, 3.6, 5.4][i] * fx.shakeMul * fx.textMul * h };
-    case "dance": return { amp: [0.16, 0.26, 0.38][i] * fx.shakeMul * fx.textMul * h };
+    case "shaky": return { amp: [2.2, 3.6, 5.4][i] * Math.max(0.35, fx.shakeMul * fx.textMul) * h };
+    case "dance": return { amp: [0.16, 0.26, 0.38][i] * Math.max(0.35, fx.shakeMul * fx.textMul) * h };
     case "missing": return { frac: [0.34, 0.5, 0.65][i] * fx.textMul * h };
     case "swap": return { pairs: Math.max(1, Math.round([1, 2, 3][i] * fx.textMul * h)) };
     case "runes": return { frac: [0.4, 0.6, 0.85][i] * fx.textMul * h };
@@ -164,11 +171,15 @@ window.AIQ = window.AIQ || {};
     case "decoys": return { n: [4, 7, 11][i] };
     case "tremble": return { px: [7, 13, 21][i] * fx.shakeMul * h };
     case "blink": return { period: [0.55, 0.42, 0.3][i], duty: 0.45 };
-    case "ghost": return { every: [5.5, 4.2, 3.2][i], off: [0.9, 1.4, 2.0][i] };
+    case "ghost": return { every: [5.5, 4.2, 3.2][i], off: [0.9, 1.4, 2.0][i] * fx.ghostMul };
     case "cblur": return { px: [3, 5, 8][i] * fx.blurMul * h };
     case "lag": return { tau: [140, 240, 380][i] * fx.lagMul * h };
     case "cmirror": return { both: c.lv >= 3 };
     case "dizzy": return { r: [14, 22, 32][i] * fx.shakeMul * h };
+    case "flaghue": return { deg: [70, 130, 200][i] };
+    case "flagblur": return { px: [3, 6, 10][i] * fx.blurMul * h };
+    case "flagdark": return { b: [0.55, 0.35, 0.18][i] };
+    case "flaggray": return { amt: [0.6, 0.85, 1][i] };
     default: return {};
   } };
   const has = id => S.list.some(c => c.id === id);
@@ -344,6 +355,21 @@ window.AIQ = window.AIQ || {};
     if (S.suspended || !S.on) return null;
     const m = {}; for (const c of kindOn("ptr")) { const p = par(c); if (c.id === "cmirror" && S.fx.unmirror) continue; m[c.id] = p; }
     return Object.keys(m).length ? m : null;
+  };
+
+  /* ------------------------------------------------------------------ bandera: filtro CSS para js/adventure.js (renderFlag) */
+  A.chal.flagFx = () => {
+    if (S.suspended || !S.on) return null;
+    const c = kindOn("flag")[0]; if (!c) return null;
+    const p = par(c);
+    switch (c.id) {
+      case "flaginvert": return "invert(1)";
+      case "flaghue": return `hue-rotate(${p.deg}deg)`;
+      case "flagblur": return `blur(${p.px}px)`;
+      case "flagdark": return `brightness(${p.b})`;
+      case "flaggray": return `grayscale(${p.amt})`;
+      default: return null;
+    }
   };
 
   /* ------------------------------------------------------------------ API */

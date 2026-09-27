@@ -122,8 +122,10 @@
     const o = q(); if (!o) return;
     $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : o.kind || lv().kind));
     if (o.clue && o.answer && !(o.sub && (o.sub.en || o.sub.es))) o.sub = A.blankObj(o.answer);        // descripcion: debajo, la casilla de cada letra
-    $("askName").textContent = A.tx(o.name); A.renderBlanks($("askSub"), A.tx(o.sub));
-    if (S.run && A.adv.decorate) A.adv.decorate(o);
+    const flagRound = !!(S.run && o.t === "c" && A.adv.isFlagRound && A.adv.isFlagRound());
+    $("askName").classList.toggle("ask-flag-wrap", flagRound);
+    if (flagRound && A.adv.renderFlag) { A.adv.renderFlag(o); }
+    else { $("askName").textContent = A.tx(o.name); A.renderBlanks($("askSub"), A.tx(o.sub)); if (S.run && A.adv.decorate) A.adv.decorate(o); }
     $("plate").classList.toggle("clue", !!o.clue);
   }
   function setTimer(left) {

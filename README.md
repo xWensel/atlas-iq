@@ -2,6 +2,10 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.24.0** - Ronda de banderas y ajustes de reliquias.
+- **Banderas del mundo:** nueva ronda en el Acto III (sustituye a la ultima de Ciudades dificiles) que muestra la bandera del pais en vez de su nombre; se carga en vivo desde Wikimedia Commons (igual que las fotos de la Enciclopedia, `tools/build-flags.mjs` genera `data/flags.js` con el archivo y el credito de cada pais). Cinco retos nuevos solo para esta ronda: colores invertidos, luces de neon (cambia el tono), bandera borrosa, a oscuras y sin colores.
+- **Reliquias:** Pulso firme y Gafas de lectura ya no casi anulan el temblor de letras al combinarse (suelo del 35 % conjunto). Talisman ya no elimina el primer reto del jefe: ahora lo suaviza a nivel 1, para no repetir el mismo efecto que la Llave maestra. Nuevo perk **Visor de repuesto** contra el Cursor fantasma. El Campamento ya reconoce que Pulso firme tambien ayuda contra el Mareo.
+
 **v0.23.1** - El HUD de la partida (placa de pregunta, marcador, zoom, herramientas, ticket) vuelve a su tamano compacto para dejar libre el mapa y que nada se pise; el escalado ampliado queda solo en menus, campamento y veredicto (la letra mas grande se mantiene).
 
 **v0.23.0** - Interfaz mas grande y legible: la UI se escala con la pantalla (menus, campamento, tickets y marcador de partida hasta x1,85 en pantallas grandes; movil sin cambios) y las letras pequenas suben unos 3 px (la placa de la pregunta no cambia), con menos espaciado entre letras. Las pantallas de menu se centran en vertical. Perks con descripciones mas claras y practicas (Gafas de lectura, Placas tectonicas, Monedero, Banquero, Paraguas, Sextante...). Nuevo boton de desarrollo en Ajustes > Datos: reinicia TODO desde cero (logros, personajes desbloqueados, enciclopedia, ajustes).

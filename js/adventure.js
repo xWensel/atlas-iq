@@ -34,13 +34,14 @@ window.AIQ = window.AIQ || {};
     nature: [L6("Maravillas de la naturaleza|Natural wonders|Merveilles de la nature|Maravilhas da natureza|Naturwunder|Meraviglie della natura"), L6("Mares y montañas|Seas and mountains|Mers et montagnes|Mares e montanhas|Meere und Berge|Mari e montagne")],
     clue: [L6("Apodos y pistas|Nicknames and clues|Surnoms et indices|Apelidos e pistas|Spitznamen und Hinweise|Soprannomi e indizi")],
     mixed: [L6("¡Jackpot! De todo un poco|Jackpot! A bit of everything|Jackpot ! Un peu de tout|Jackpot! Um pouco de tudo|Jackpot! Von allem etwas|Jackpot! Un po' di tutto")],
+    flag: [L6("Banderas del mundo|World flags|Drapeaux du monde|Bandeiras do mundo|Flaggen der Welt|Bandiere del mondo")],
   };
   const KIND_FACTOR = { capital: 1, city: 1, landmark: 0.9, nature: 1.5, battle: 0.9, event: 0.9, country: 0.7, clue: 1, water: 1.6, strait: 1.4 };
   /* 12 rondas: 3 actos de 4 (la 4.a es el jefe). Empieza facil y va cambiando de tema y subiendo el nivel. */
   const ROUNDS = [
     { topic: "capital", tier: 0 }, { topic: "landmark", tier: 0 }, { topic: "city", tier: 0 }, { topic: "country", tier: 0, boss: true },
     { topic: "capital", tier: 1 }, { topic: "history", tier: 0 }, { topic: "nature", tier: 0 }, { topic: "city", tier: 1, boss: true },
-    { topic: "city", tier: 2 }, { topic: "landmark", tier: 1 }, { topic: "history", tier: 1 }, { topic: "mixed", tier: 1, boss: true },
+    { topic: "flag", tier: 0 }, { topic: "landmark", tier: 1 }, { topic: "history", tier: 1 }, { topic: "mixed", tier: 1, boss: true },
   ];
   const roundDefOf = r => (r < ROUNDS.length ? ROUNDS[r] : (() => { const b = ROUNDS[4 + ((r - 4) % 8)]; return { ...b, tier: Math.min(2, b.tier + 1), boss: (r % 4) === 3 }; })());
 
@@ -75,7 +76,7 @@ window.AIQ = window.AIQ || {};
   }
   const ROUND_POOL = 80;                                             // lugares distintos por ronda: de ahi salen las preguntas de cada ronda
   const CAP = { 1: 99, 2: 12, 3: 12, 4: 99, 5: 99, 6: 10, 7: 12, 8: 8, 9: 8, 10: 8, 11: 10, 12: 6 };   // maximo de lugares del mismo pais por ronda (ronda 1..12)
-  const ROUND_KIND = ["capital", "landmark", "city", "country", "capital", "history", "nature", "city", "city", "landmark", "history", "mixed"];
+  const ROUND_KIND = ["capital", "landmark", "city", "country", "capital", "history", "nature", "city", "country", "landmark", "history", "mixed"];
   const byDiff = (a, b) => (a.tier - b.tier) || ((a.fame || 0) - (b.fame || 0));   // de mas facil a mas dificil dentro de un tipo
   const nk = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
   const nameKeys = q => [nk(q.name && q.name.en), nk(q.name && q.name.es)].filter(Boolean);
@@ -166,11 +167,11 @@ window.AIQ = window.AIQ || {};
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades) */
   const chalFor = r => {
-    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc), boss = r % 4 === 3;
+    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, roundDefOf(r).topic), boss = r % 4 === 3;
     let list = A.adv._force ? A.adv._force.map(id => ({ id, lv: 2 })) : plan.list.slice();
     const bribed = (run.bribed && run.bribed[r]) || []; if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento
     const skip = sumFlag("skipFirst"); if (skip) list = list.slice(skip);
-    if (boss) { let ign = sumFlag("ignoreBoss"); list = list.filter(() => (ign > 0 ? (ign--, false) : true)); }
+    if (boss) { let soft = sumFlag("softenBoss"); list = list.map((c, i) => (i < soft ? { ...c, lv: 1 } : c)); }
     list = list.filter(c => !perkList().some(p => (p.immune || []).includes(c.id)));
     return { list, combo: plan.combo, boss };
   };
@@ -353,6 +354,17 @@ window.AIQ = window.AIQ || {};
   const gust = () => 1 + 0.22 * Math.sin(performance.now() / 1000 * 1.9) + 0.08 * Math.sin(performance.now() / 1000 * 5.3);
   const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat, gust()), p = m.lonLatToScreen(a.lon, a.lat); return [p[0] - px, p[1] - py]; };
   A.adv.decorate = o => A.chal.decorate(o);
+  /* ronda de banderas: la placa muestra la bandera (traida en vivo de Wikimedia Commons, ver data/flags.js) en vez del nombre */
+  A.adv.isFlagRound = () => !!(run && run.topic === "flag");
+  A.adv.renderFlag = o => {
+    const el = $("askName"); if (!el) return; const sub = $("askSub"); if (sub) sub.textContent = "";
+    const rec = A.FLAGS && o.name && A.FLAGS[o.name.en];
+    if (!rec) { el.textContent = A.tx(o.name); return; }                          // sin datos empaquetados todavia: se ve el nombre, nunca un hueco vacio
+    const src = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(rec[0])}?width=480`;
+    el.innerHTML = `<img class="ask-flag" src="${src}" alt="" draggable="false">`;
+    const img = el.querySelector(".ask-flag"), fx = A.chal.flagFx && A.chal.flagFx();
+    if (img && fx) img.style.filter = fx;
+  };
   /* el viento desvia el clic */
   A.adv.adjust = function (lon, lat, mul = 1) {
     if (!run || !run.wind || run.windOff) return { lon, lat };
