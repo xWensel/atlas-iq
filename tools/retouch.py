@@ -110,7 +110,8 @@ def fill_white_margin(out):
         for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             yy, xx = y + dy, x + dx
             if 0 <= yy < h and 0 <= xx < w and white[yy, xx] and not seen[yy, xx]: seen[yy, xx] = True; st.append((yy, xx))
-    if seen.sum() < h * w * .004: return out
+    border = np.concatenate([seen[0], seen[-1], seen[:, 0], seen[:, -1]])
+    if seen.sum() < h * w * .004 or border.mean() < .6: return out      # solo un margen que rodea la imagen, no objetos blancos que tocan el borde
     ring = np.zeros_like(seen)
     for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)): ring |= np.roll(np.roll(seen, dy, 0), dx, 1)
     ring &= ~seen & (out[..., 3] > 0)
