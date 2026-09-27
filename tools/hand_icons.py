@@ -532,6 +532,159 @@ def u_home(id):
     I.add(bevel(rrect(26, 40, 12, 18, 2), R["brown"]))
     return I
 
+
+# ============================================================ tanda 4a: gemas, astros, medallas, corazones y retos rotos
+def facets(I, polys, rp, order):
+    """pinta facetas (poligonos) con tonos de la rampa segun `order` (indice de la rampa por faceta) y contorno exterior"""
+    whole = blank()
+    for pts in polys: whole |= poly(pts)
+    c = np.zeros((N, N, 4), np.uint8)
+    for pts, k in zip(polys, order): c[poly(pts)] = R[rp][k]
+    c[whole & edge(whole, 0, -1)] = R[rp][0]
+    I.add(c); return whole
+
+@icon("g_0")
+def g0(id):
+    I = Icon(); m = ellipse(32, 34, 24, 20); I.add(sphere(m, 32, 34, 24, R["grey"]))
+    I.put(ellipse(24, 26, 5, 3), R["grey"][0]); return I
+
+@icon("g_1")
+def g1(id):   # talla esmeralda (octogono con mesa)
+    o = [(20, 8), (44, 8), (56, 20), (56, 44), (44, 56), (20, 56), (8, 44), (8, 20)]
+    t = [(24, 18), (40, 18), (46, 24), (46, 40), (40, 46), (24, 46), (18, 40), (18, 24)]
+    pol = [[o[i], o[(i + 1) % 8], t[(i + 1) % 8], t[i]] for i in range(8)] + [t]
+    I = Icon(); facets(I, pol, "green", [0, 2, 3, 3, 4, 3, 1, 1, 1]); I.put(poly([(24, 20), (30, 20), (22, 28), (20, 26)]), R["green"][0]); return I
+
+@icon("g_2")
+def g2(id):   # talla brillante de perfil
+    pol = [[(16, 12), (24, 12), (20, 24), (6, 24)], [(24, 12), (40, 12), (44, 24), (20, 24)], [(40, 12), (48, 12), (58, 24), (44, 24)],
+           [(6, 24), (20, 24), (32, 58)], [(20, 24), (32, 24), (32, 58)], [(32, 24), (44, 24), (32, 58)], [(44, 24), (58, 24), (32, 58)]]
+    I = Icon(); facets(I, pol, "purple", [1, 0, 2, 1, 2, 3, 4]); I.put(poly([(26, 14), (32, 14), (28, 20), (24, 20)]), WHITE); return I
+
+@icon("g_3")
+def g3(id):
+    I = Icon(); I.add(faceted_star(32, 34, 30, 13, "gold")); I.add(sphere(circle(32, 35, 6), 31, 34, 6, R["red"])); return I
+
+@icon("a_spark")
+def a_spark(id):
+    I = Icon()
+    for cx, cy, ro, ri in ((28, 34, 26, 6), (51, 13, 10, 3), (52, 50, 7, 2.2)):
+        I.add(faceted_star(cx, cy, ro, ri, "gold", n=4))
+    I.put(circle(28, 34, 3), R["gold"][0]); return I
+
+@icon("a_sun")
+def a_sun(id):
+    I = Icon(); rays = blank()
+    for i in range(12):
+        a = math.radians(i * 30); w = 5 if i % 2 == 0 else 3.5; r = 30 if i % 2 == 0 else 26
+        rays |= poly([(32 + 19 * math.sin(a - .28), 32 - 19 * math.cos(a - .28)), (32 + r * math.sin(a), 32 - r * math.cos(a)), (32 + 19 * math.sin(a + .28), 32 - 19 * math.cos(a + .28))])
+    I.add(bevel(rays, R["orange"], soft=False)); I.add(sphere(circle(32, 32, 18), 32, 32, 18, R["gold"])); return I
+
+@icon("a_comet")
+def a_comet(id):
+    I = Icon(); tail = blank()
+    for i, (rp_, w) in enumerate((("purple", 18), ("blue", 12), ("ice", 6))):
+        tail = thick_line([(8, 58), (40, 26)], w); I.add(bevel(tail & ~circle(8, 58, 10 - i * 2) | (tail & circle(40, 26, 20)), R[rp_], soft=False), outline=(i == 0))
+    I.add(sphere(circle(44, 21, 13), 44, 21, 13, R["ice"])); return I
+
+@icon("flash")
+def flash_icon(id):
+    m = poly([(38, 2), (12, 36), (29, 36), (22, 62), (52, 24), (35, 24), (44, 2)])
+    I = Icon(); I.add(bevel(m, R["gold"])); return I
+
+@icon("earplugs")
+def earplugs(id):
+    I = Icon()
+    I.add(bevel(thick_line([(18, 50), (22, 60), (42, 60), (46, 50)], 3), R["blue"], soft=False))
+    for cx in (18, 46):
+        cap = rrect(cx - 9, 8, 18, 44, 8)
+        c = bevel(cap, R["orange"])
+        for y in range(16, 48, 7): c[rect(cx - 8, y, 16, 1) & erode(cap, 1)] = R["orange"][3]
+        I.add(c)
+    return I
+
+@icon("ch_spread")
+def ch_spread(id):
+    I = Icon()
+    burst = blank()
+    for i in range(8):
+        a = math.radians(i * 45 + 22); burst |= thick_line([(32 + 5 * math.sin(a), 32 - 5 * math.cos(a)), (32 + 11 * math.sin(a), 32 - 11 * math.cos(a))], 2)
+    I.add(flat(burst, R["gold"][1]), outline=False)
+    for k, (x, y), rp_ in (("na", (-3, -3), "blue"), ("eu", (34, -2), "pink"), ("sa", (2, 34), "green"), ("af", (34, 33), "orange")):
+        lon0, lat0, sc, _ = CONT["k_" + k]
+        m = ortho_mask(continent_mask(k), lon0, lat0, sc * .5, cx=14, cy=14, ss=4)
+        m = drop_small(despeckle(m), 6)
+        big = np.zeros((N, N), bool); ys, xs = np.where(m); big[np.clip(ys + y, 0, N - 1), np.clip(xs + x, 0, N - 1)] = True
+        I.add(bevel(big, R[rp_]))
+    return I
+
+@icon("ch_babel")
+def ch_babel(id):
+    I = Icon()
+    for i in range(5):
+        w = 52 - i * 9; y = 56 - i * 10
+        I.add(bevel(rect(32 - w // 2, y - 8, w, 9), R["sand"]))
+        for d in range(-w // 2 + 4, w // 2 - 3, 6): I.put(rect(32 + d, y - 5, 2, 3), R["sand"][4])
+    I.add(bevel(poly([(27, 8), (37, 8), (35, 2), (29, 2)]), R["sand"]))
+    return I
+
+def heart_mask(cx=32, cy=34, s=54):
+    r = s * .26; return circle(cx - r * .92, cy - s * .16, r) | circle(cx + r * .92, cy - s * .16, r) | poly([(cx - s * .5, cy - s * .08), (cx + s * .5, cy - s * .08), (cx, cy + s * .46)])
+
+@icon("heart", "heartperk")
+def heart_icon(id):
+    I = Icon(); m = heart_mask(); c = bevel(m, R["red"])
+    c[ellipse(22, 22, 5, 3.5) & m] = R["red"][0]; c[circle(19, 26, 1.6)] = R["red"][1]
+    I.add(c)
+    if id == "heartperk":
+        I.add(bevel(rect(44, 36, 16, 6) | rect(49, 31, 6, 16), R["gold"]))
+    return I
+
+MEDAL = {"medal_gold": "gold", "medal_silver": "grey", "medal_bronze": "brown"}
+@icon(*MEDAL)
+def medal(id):
+    I = Icon()
+    I.add(bevel(poly([(12, 2), (26, 2), (38, 30), (26, 34)]), R["blue"]))
+    I.add(bevel(poly([(52, 2), (38, 2), (26, 30), (38, 34)]), R["red"]))
+    rp_ = MEDAL[id]; I.add(sphere(circle(32, 42, 19), 31, 41, 19, R[rp_]))
+    I.add(faceted_star(32, 43, 11, 4.5, rp_)); return I
+
+def cursor(x, y, s=1.0):
+    pts = [(0, 0), (0, 36), (9, 28), (15, 41), (22, 38), (16, 25), (27, 25)]
+    return poly([(x + px * s, y + py * s) for px, py in pts])
+
+@icon("ch_blindspot")
+def ch_blindspot(id):
+    I = Icon(); I.add(bevel(cursor(22, 16, 1.15), R["paper"]))
+    I.add(sphere(circle(21, 19, 14), 18, 16, 14, R["dark"])); I.a[ring(21, 19, 14, 15.2)] = INK
+    return I
+
+@icon("gamer")
+def gamer(id):
+    I = Icon(); I.add(bevel(thick_line([(32, 10), (32, 4), (44, 2)], 3), R["grey"], soft=False))
+    body = opening(ellipse(32, 36, 19, 25), 1); I.add(bevel(body, R["dark"]))
+    I.put(rect(31, 12, 2, 18) & body, INK); I.put(rect(14, 30, 36, 1) & body, INK)
+    I.put(rect(30, 16, 4, 9), R["red"][1]); I.put(rect(17, 44, 30, 3) & erode(body, 2), R["teal"][1]); return I
+
+@icon("deck_blind")
+def dark_glasses(id):
+    I = Icon(); I.add(bevel(thick_line([(4, 26), (10, 22), (54, 22), (60, 26)], 4), R["gold"], soft=False))
+    for cx in (18, 46):
+        I.add(bevel(circle(cx, 32, 13), R["gold"]))
+        I.add(sphere(circle(cx, 32, 10), cx - 2, 30, 10, R["dark"]), outline=False)
+        I.put(rect(cx - 6, 26, 3, 2), R["dark"][0])
+    I.add(bevel(thick_line([(29, 30), (35, 30)], 4), R["gold"], soft=False)); return I
+
+@icon("blindperk")
+def blindfold(id):
+    I = Icon()
+    band = poly([(2, 24), (62, 20), (62, 38), (2, 42)])
+    I.add(bevel(thick_line([(50, 38), (58, 56)], 7), R["red"])); I.add(bevel(thick_line([(46, 38), (44, 58)], 6), R["red"]))
+    I.add(bevel(band, R["red"]))
+    I.put(rect(2, 34, 60, 2) & band, R["red"][3])
+    I.add(bevel(ellipse(48, 30, 8, 9), R["red"]))
+    return I
+
 # ============================================================ salida
 def build(ids):
     done = []
