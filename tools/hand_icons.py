@@ -32,6 +32,7 @@ R = {   # claro -> oscuro: brillo, luz, base, sombra, sombra profunda
     "pink": ramp("ffc9e4", "ff7ab8", "e5408f", "a82472", "6a1757"),
     "ice": ramp("ffffff", "e8f7ff", "b7e2f7", "7fb1d9", "4f73a8"),
     "sand": ramp("fff8d8", "ffe39a", "f2c46a", "c98f4a", "8a5a3a"),
+    "paper": ramp("ffffff", "ffffff", "fff5de", "e6d2b0", "a88c6e"),
     "dark": ramp("6a6f96", "4a4d72", "33345a", "24234a", "181636"),
 }
 WHITE = hexc("ffffff")
@@ -292,6 +293,153 @@ def ch_noborders(id):
         return poly([(x0, y0), (x0 + ux * l, y0 + uy * l), (x0 + ux * l + nx * w_, y0 + uy * l + ny * w_), (x0 + nx * w_, y0 + ny * w_)])
     I.add(bevel(quad(36, 50, 22, 11), R["pink"])); I.add(bevel(quad(36, 50, 7, 11), R["blue"]))
     return I
+
+
+# ============================================================ fichas, monedas y cartas
+def chip_top(cx, cy, r, rp, spots=8, center=None, th=3):
+    """ficha de casino vista casi cenital: canto de `th` px abajo, aro con incrustaciones blancas, filete y centro"""
+    parts = []
+    side = circle(cx, cy + th, r) | (rect(int(cx - r), int(cy), int(2 * r), th) & ellipse(cx, cy + th / 2, r, r + th))
+    sc = np.zeros((N, N, 4), np.uint8); sc[side] = R[rp][4]
+    y, x = np.mgrid[0:N, 0:N]; ang = (np.degrees(np.arctan2(x + .5 - cx, -(y + .5 - cy))) + 360) % 360
+    ins = lambda w: np.minimum(ang % (360 / spots), 360 / spots - ang % (360 / spots)) < w
+    sc[side & ins(9) & ~circle(cx, cy, r - 1)] = R["cream"][3]
+    parts.append(sc)
+    top = circle(cx, cy, r); t = bevel(top, R[rp])
+    band = top & ~circle(cx, cy, r - 7) & ins(10) & erode(top, 1)
+    t[band] = R["cream"][1]; t[band & edge(band, 0, 1)] = R["cream"][2]; t[band & edge(band, 0, -1)] = R["cream"][0]
+    fil = ring(cx, cy, r - 9, r - 7.2); t[fil] = R[rp][3]
+    dash = ring(cx, cy, r - 10.4, r - 9) & ins(6); t[dash] = R["cream"][1]
+    ctr = circle(cx, cy, r - 10.4); t[ctr] = R[rp][1] if center is None else R[rp][2]
+    t[ctr & edge(ctr, 0, 1)] = R[rp][2]
+    parts.append(t)
+    return parts
+
+CHIP_COL = {"blank_big": "orange", "blank_boss": "red", "blank_gold": "gold", "blank_small": "blue", "blank_teal": "teal",
+            "chip_b": "blue", "chip_g": "green", "chip_k": "dark", "chip_p": "purple", "chip_r": "red"}
+@icon(*CHIP_COL)
+def chip_icon(id):
+    I = Icon()
+    for p_ in chip_top(32, 30, 29.5, CHIP_COL[id]): I.add(p_, outline=False)
+    I.add(np.zeros((N, N, 4), np.uint8)); I.a[dilate(I.a[..., 3] > 0, 1) & ~(I.a[..., 3] > 0)] = INK
+    if id.startswith("chip_"): I.add(globe_part(31, 32, 30, -50, 10))
+    return I
+
+def chip_side(cx, y, rx, rp, th=5):
+    """ficha de canto (para las pilas): elipse superior + canto con rayas blancas"""
+    ry = rx * .36; parts = []
+    body = ellipse(cx, y + th, rx, ry) | (rect(int(cx - rx), int(y), int(2 * rx), th) & ellipse(cx, y + th / 2, rx, 99))
+    sc = np.zeros((N, N, 4), np.uint8); sc[body] = R[rp][3]
+    xx = np.arange(N)[None, :].repeat(N, 0); u = (xx + .5 - cx) / rx
+    stripes = body & (np.abs(((np.arcsin(np.clip(u, -1, 1)) / math.pi * 8) % 2) - 1) < .32) & ~ellipse(cx, y, rx, ry)
+    sc[stripes] = R["cream"][2]; sc[body & (xx < cx - rx * .55) & ~stripes & ~ellipse(cx, y, rx, ry)] = R[rp][2]
+    parts.append(sc)
+    top = ellipse(cx, y, rx, ry); t = np.zeros((N, N, 4), np.uint8); t[top] = R[rp][2]
+    t[top & edge(top, 0, -1)] = R[rp][0]; t[ellipse(cx, y, rx * .62, ry * .62)] = R[rp][1]
+    t[ellipse(cx, y, rx * .62, ry * .62) & ~ellipse(cx, y, rx * .5, ry * .5)] = R[rp][3]
+    parts.append(t); return parts
+
+def stack(I, cx, base, rx, cols, th=5):
+    for i, c in enumerate(cols):
+        for j, p_ in enumerate(chip_side(cx, base - i * th, rx, c, th)): I.add(p_, outline=(j == 0))
+
+@icon("chips")
+def chips_icon(id):
+    I = Icon(); stack(I, 32, 52, 22, ["purple", "teal", "gold", "red", "teal", "gold", "red"], 5); return I
+
+@icon("allin")
+def allin_icon(id):
+    I = Icon(); stack(I, 38, 44, 18, ["teal", "red", "gold", "purple", "teal", "red"], 5)
+    stack(I, 20, 54, 16, ["red", "gold", "teal"], 5)
+    for p_ in chip_top(46, 52, 11, "gold", spots=6, th=2): I.add(p_)
+    return I
+
+@icon("coin")
+def coin_icon(id):
+    I = Icon(); cx, cy, r = 32, 30, 28
+    I.add(flat(circle(cx, cy + 3, r), R["gold"][4]))
+    face = circle(cx, cy, r); t = bevel(face, R["gold"])
+    t[ring(cx, cy, r - 5, r - 3.4)] = R["gold"][3]; t[ring(cx, cy, r - 5.8, r - 5)] = R["gold"][1]
+    y, x = np.mgrid[0:N, 0:N]; ins = circle(cx, cy, r - 6)
+    for k in (-.55, 0, .55):                          # meridianos y paralelos grabados: el doblon del explorador
+        t[ins & (np.abs((x + .5 - cx) - k * np.sqrt(np.clip((r - 6) ** 2 - (y + .5 - cy) ** 2, 0, None))) < .7)] = R["gold"][3]
+        t[ins & (np.abs(y + .5 - cy - k * (r - 10)) < .6)] = R["gold"][3]
+    t[ins & (np.abs(x + .5 - cx - 1) < .6) & (y > cy)] = R["gold"][1]
+    I.add(t); return I
+
+# ---- palos
+def pip(kind, cx, cy, s):
+    """palos de la baraja de tamano s (alto aprox.)"""
+    if kind == "diamond": return poly([(cx, cy - s / 2), (cx + s * .36, cy), (cx, cy + s / 2), (cx - s * .36, cy)])
+    if kind == "heart":
+        r = s * .27; return circle(cx - r * .95, cy - s * .18, r) | circle(cx + r * .95, cy - s * .18, r) | poly([(cx - s * .5, cy - s * .12), (cx + s * .5, cy - s * .12), (cx, cy + s * .48)])
+    if kind == "spade":
+        r = s * .25; m = circle(cx - r * .95, cy + s * .06, r) | circle(cx + r * .95, cy + s * .06, r) | poly([(cx - s * .48, cy + s * .02), (cx + s * .48, cy + s * .02), (cx, cy - s * .5)])
+        return m | poly([(cx - s * .06, cy + s * .1), (cx + s * .06, cy + s * .1), (cx + s * .2, cy + s * .5), (cx - s * .2, cy + s * .5)])
+    if kind == "club":
+        r = s * .21; m = circle(cx, cy - s * .24, r) | circle(cx - r * 1.2, cy + s * .06, r) | circle(cx + r * 1.2, cy + s * .06, r)
+        return m | poly([(cx - s * .05, cy - s * .1), (cx + s * .05, cy - s * .1), (cx + s * .2, cy + s * .5), (cx - s * .2, cy + s * .5)])
+
+def card_part(x, y, w, h, back=None):
+    m = rrect(x, y, w, h, 3); c = bevel(m, R["paper"])
+    if back:
+        inner = rrect(x + 3, y + 3, w - 6, h - 6, 2); c[inner] = R[back][2]
+        yy, xx = np.mgrid[0:N, 0:N]; lat = inner & (((xx + yy) % 6 == 0) | ((xx - yy) % 6 == 0)); c[lat] = R[back][3]
+        c[inner & edge(inner, 0, -1)] = R[back][1]; c[inner & edge(inner, -1, 0)] = R[back][1]
+    return c, m
+
+def shear_x(part, k, cy):
+    """inclina una pieza (cizalla horizontal limpia: 1 px cada 1/k filas)"""
+    out = np.zeros_like(part)
+    for y in range(N): out[y] = np.roll(part[y], int(round((cy - y) * k)), 0)
+    return out
+
+def red_or_black(kind): return R["red"] if kind in ("heart", "diamond") else R["dark"]
+
+def pip_part(kind, cx, cy, s):
+    m = pip(kind, cx, cy, s); rp = red_or_black(kind); c = flat(m, rp[2])
+    c[edge(m, 1, 0) | edge(m, 0, 1)] = rp[3]; c[edge(m, 0, -1) | edge(m, -1, 0)] = rp[1]; return c
+
+@icon("ace")
+def ace_icon(id):
+    I = Icon(); c, m = card_part(13, 5, 38, 54); I.add(c)
+    I.add(pip_part("spade", 32, 31, 24), outline=False)
+    return I
+
+def fan(I, n, kinds, spread, w=30, h=44, px=32, py=66, back=None):
+    """abanico: cartas giradas alrededor de un pivote bajo (px, py); cada carta es un poligono girado con su palo"""
+    for i in range(n):
+        t = math.radians((i - (n - 1) / 2) * spread); ct, st = math.cos(t), math.sin(t)
+        rot = lambda x, y: (px + (x - px) * ct - (y - py) * st, py + (x - px) * st + (y - py) * ct)
+        x0, y0 = px - w / 2, py - h - 10
+        corners = [rot(x0, y0), rot(x0 + w, y0), rot(x0 + w, y0 + h), rot(x0, y0 + h)]
+        m = poly(corners); c = bevel(m, R["paper"])
+        top = i == n - 1
+        pcx, pcy = rot(px, y0 + h * .42) if top else rot(x0 + 7, y0 + 9); pp = pip_part(kinds[i % len(kinds)], pcx, pcy, 15 if top else 8)
+        c[pp[..., 3] > 0] = pp[pp[..., 3] > 0]
+        I.add(c)
+
+@icon("cards")
+def cards_icon(id):
+    I = Icon(); fan(I, 3, ["club", "spade", "diamond"], 24); return I
+
+@icon("royalflush")
+def royal_icon(id):
+    I = Icon(); fan(I, 5, ["heart"], 15, w=26, h=40, py=68); return I
+
+@icon("cardback")
+def cardback_icon(id):
+    I = Icon(); c, m = card_part(13, 5, 38, 54, back="blue"); I.add(c)
+    I.add(sphere(circle(32, 32, 9), 31, 31, 9, R["gold"])); I.add(pip_part("spade", 32, 32, 9), outline=False); return I
+
+@icon("swapcard")
+def swap_icon(id):
+    I = Icon()
+    c, m = card_part(4, 10, 30, 42, back="red"); I.add(c)
+    c, m = card_part(28, 14, 30, 42); I.add(c); I.add(pip_part("diamond", 43, 35, 16), outline=False)
+    arr = thick_line([(14, 60), (26, 60)], 3) | poly([(26, 55), (26, 64), (32, 60)])
+    arr2 = thick_line([(38, 5), (50, 5)], 3) | poly([(38, 0), (38, 9), (32, 5)])
+    I.add(bevel(arr, R["gold"], soft=False)); I.add(bevel(arr2, R["gold"], soft=False)); return I
 
 # ============================================================ salida
 def build(ids):
