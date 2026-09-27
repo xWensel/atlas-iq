@@ -79,7 +79,7 @@ icons({
  "k_na": "a cartoon silhouette of the continent North America in blue", "k_sa": "a cartoon silhouette of the continent South America in green", "k_oc": "a cartoon silhouette of Australia and islands in cream",
  "k_an": "a cartoon silhouette of the continent Antarctica in white ice", "k_sea": "a blue ocean wave with foam",
  # tipos de tarjeta
- "t_city": "a city skyline with lit windows", "t_capital": "a government building with a golden dome and a red star", "t_country": "a tall flag pole with a red waving flag", "t_landmark": "an ancient temple with columns",
+ "t_city": "a city skyline with lit windows", "t_capital": "a government building with a golden dome and a red star", "t_country": "a big bold red and gold national flag banner waving, no pole, filling the frame", "t_landmark": "an ancient temple with columns",
  "t_nature": "snowy mountain peaks with a sun", "t_water": "blue ocean waves", "t_strait": "a narrow blue sea channel between two green coasts", "t_battle": "two crossed swords",
  "t_event": "a tear-off calendar page with a golden star", "t_person": "a distinguished vintage explorer bust portrait, feathered tricorn hat, navy coat with golden epaulets and medals, thick mustache, confident smile, facing front", "t_curio": "a glowing lightbulb with sparkles", "t_place": "a big red map pin on a folded map",
  # logros (glifos)
@@ -161,6 +161,7 @@ icons({
  "shockabsorber": "a heavy coil spring shock absorber in gold", "trapdetector": "a metal detector with a red warning light",
  "lightningrod": "a golden lightning rod on a rooftop", "umbrella": "a colorful open umbrella with raindrops", "graduated": "thick round graduated eyeglasses with a sparkle",
  "gamer": "a gaming mouse with glowing teal lights", "beacon": "a golden lighthouse beacon with light rays", "leadweight": "a heavy lead weight ball with a chain",
+ "spareeye": "a golden jeweler's loupe eyepiece with a spare violet lens clipped beside it on a small velvet tray",
 })
 
 # ---------------------------------------------------------------- ESCENAS (wide 16:9 salvo indicacion)
