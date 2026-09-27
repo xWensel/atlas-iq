@@ -171,7 +171,7 @@ window.AIQ = window.AIQ || {};
   A.music = {
     start() {
       if (!A.audio.musicOn || !init()) return;
-      if (cur < 0) useTrack(autoIdx(), false); else { ensureMedia(); mediaEl.play().catch(() => {}); }
+      if (cur < 0) useTrack(0, false); else { ensureMedia(); mediaEl.play().catch(() => {}); }
     },
     next() { if (cur < 0) return; useTrack(nextIdx(), true); },
     prev() { if (cur < 0) return; useTrack(prevIdx(), true); },

@@ -47,16 +47,20 @@
 /* sacudida suave al encadenar racha (la clase existia pero no tenia estilo) */
 #app.shake { animation: app-shake .38s ease; }
 @keyframes app-shake { 20% { transform: translate(-3px, 1px); } 40% { transform: translate(3px, -1px); } 60% { transform: translate(-2px, 0); } 80% { transform: translate(1px, 1px); } }
+/* rabieta del crupier: temblor de toda la pantalla (juego + dialogo, via el truco de transform en html) y apagon total con luz de vuelta */
+html.dl-tantrum { animation: dl-tantrum .7s cubic-bezier(.36, .07, .19, .97) both; }
+@keyframes dl-tantrum { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, -3px, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 4px, 0); } 40%, 60% { transform: translate3d(8px, -4px, 0); } }
+#dlBlackout { position: fixed; inset: 0; z-index: 9000; background: #000; opacity: 0; pointer-events: none; }
+#dlBlackout.go { animation: dl-blackout 1.3s ease both; }
+@keyframes dl-blackout { 0% { opacity: 0; } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
 /* las cartas de herramienta siempre por encima del pie de pagina (su altura cambia con las pistas) */
 #toolBar.tool-bar { bottom: calc(var(--note-top, 88px) + 12px); }
 /* veredicto: cabe en pantallas de 768 px de alto y el crupier habla en su hueco, sin tapar botones */
-.v-art { width: min(100%, 640px, calc(62 * var(--vh))); }
-.v-side .stamp { width: min(calc(34 * var(--vw)), 300px, calc(30 * var(--vh))); height: min(calc(34 * var(--vw)), 300px, calc(30 * var(--vh))); }
 .v-dealer:empty { display: none; }
 .v-dealer { min-height: 96px; display: flex; align-items: flex-end; }
-.dealer.inline { position: relative; left: auto; bottom: auto; z-index: 45; transform: translateX(-24px); }
+.dealer.inline { position: relative; left: auto; bottom: auto; z-index: 100010; transform: translateX(-24px); }
 .dealer.inline.in { transform: none; }
-.dealer.inline .dl-face { width: 88px; height: 88px; }
+.dealer.inline .dl-face { width: 180px; height: 180px; }
 .dealer.inline .dl-bubble { margin: 0 0 34px 0; max-width: min(380px, calc(62 * var(--vw))); }
 body.vd-on .cx-toast { display: none; }
 /* la marca del HUD sobra en el menu principal (ya esta el logo grande) */
@@ -72,7 +76,6 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
   .tb-tray { grid-template-columns: 1fr auto auto; } .tb-tray .go-next { grid-column: 1 / -1; min-width: 0; width: 100%; }
   .offer .of-ctr { max-width: 94%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
-@media (max-width: 900px) { .v-side .stamp { font-size: 13px; letter-spacing: .02em; padding: 10px; } }
 @media (max-width: 600px) { .deckrow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* ticket de resultado: por debajo del marcador (antes lo tapaba en pantallas de 720-800 px de alto) y compacto si falta altura */
 @media (min-width: 901px) {
@@ -91,8 +94,8 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
   .vd { padding-top: clamp(14px, calc(4 * var(--vh)), 40px); padding-bottom: clamp(14px, calc(4 * var(--vh)), 40px); }
   .v-main { gap: 9px; } .v-main h2 { font-size: clamp(40px, calc(9.5 * var(--vh)), 84px); } .v-main > p { font-size: 17px; }
   .v-stats { margin: 4px 0 2px; } .v-stats .odo { font-size: clamp(30px, calc(6.5 * var(--vh)), 52px); }
-  .v-art { width: min(100%, 640px, calc(50 * var(--vh))); } .v-side { gap: 16px; }
-  .v-dealer { min-height: 78px; } .dealer.inline .dl-face { width: 72px; height: 72px; } .dealer.inline .dl-bubble { margin-bottom: 26px; font-size: 15.5px; }
+  .v-medal { width: min(calc(30 * var(--vw)), 200px, calc(24 * var(--vh))); } .v-side { gap: 16px; }
+  .v-dealer { min-height: 120px; } .dealer.inline .dl-face { width: 145px; height: 145px; } .dealer.inline .dl-bubble { margin-bottom: 26px; font-size: 15.5px; }
 }
 /* portada con partida guardada: el banner resta altura, las cartas y el logo se encogen para que todo quepa sin desplazarse */
 .hh:has(.hh-resume) .hh-logo { height: min(calc(17 * var(--vh)), 190px); }
@@ -102,8 +105,8 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
 /* notas de campo: como mucho 3 lineas (2 en pantallas medianas) para no empujar el ticket ni las cartas */
 #factText:not(:empty) { max-height: calc(30 * var(--vh)); overflow-y: auto; scrollbar-width: thin; }   /* el texto entero, sin puntos suspensivos: si es muy largo, se desplaza */
 @media (max-width: 1100px) { #factText:not(:empty) { font-size: 17px; max-height: calc(26 * var(--vh)); } }
-/* Campamento en movil o pantallas muy bajas: se desplaza en vez de cortar cartas y botones */
-@media (max-width: 700px), (max-height: 600px) {
+/* Campamento en movil o pantallas bajas (o con muchos retos/textos largos que no caben): se desplaza en vez de cortar cartas y botones */
+@media (max-width: 700px), (max-height: 760px) {
   #dlg.tablewrap { overflow-y: auto; overflow-x: hidden; }
   .table { height: auto; min-height: 100%; }
   .tb-note { font-size: 17px; } .tray-row { flex-wrap: wrap; }
@@ -197,8 +200,8 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
   .vd { padding: 10px 24px; gap: 14px; align-content: center; }
   .v-main { gap: 5px; } .v-main h2 { font-size: 34px; } .v-main > p { font-size: 15.5px; }
   .v-stats { margin: 0; } .v-stats .odo { font-size: 30px; }
-  .v-art { width: min(100%, calc(34 * var(--vh))); } .v-side .stamp { width: min(calc(20 * var(--vw)), calc(22 * var(--vh))); height: min(calc(20 * var(--vw)), calc(22 * var(--vh))); font-size: 13px; padding: 6px; }
-  .v-dealer { min-height: 0; } .dealer.inline .dl-face { width: 48px; height: 48px; } .dealer.inline .dl-bubble { margin-bottom: 14px; font-size: 14px; max-width: calc(46 * var(--vw)); }
+  .v-medal { width: min(calc(20 * var(--vw)), calc(22 * var(--vh)), 160px); }
+  .v-dealer { min-height: 0; } .dealer.inline .dl-face { width: 100px; height: 100px; } .dealer.inline .dl-bubble { margin-bottom: 14px; font-size: 14px; max-width: calc(46 * var(--vw)); }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .vd { padding-top: 6px; padding-bottom: 6px; align-content: start; } .v-main h2 { font-size: 28px; } .v-main { gap: 3px; }
@@ -262,7 +265,7 @@ html body { -webkit-font-smoothing: none; font-smooth: never; text-rendering: op
 html body .brand-txt > i { font-size: 15.5px; } html body .mc-desc { font-size: 18px; line-height: 1.25; } html body .mc-stat { font-size: 15.5px; } html body .mc-ribbon { font-size: 15.5px; }
 html body .hr-t > b { font-size: 19px; } html body .hr-t > i { font-size: 17px; } html body .cs-t > i { font-size: 15.5px; } html body .hh-ver { font-size: 15.5px; }
 html body .tag { font-size: 15.5px; } html body #plate .tag { font-size: 10.5px; }
-html body .dc-d { font-size: 17px; } html body .dc-kit > em { font-size: 15.5px; } html body .rm-node > em { font-size: 15.5px; } html body .adv-stats > span { font-size: 15.5px; }
+html body .rm-node > em { font-size: 15.5px; } html body .adv-stats > span { font-size: 15.5px; }
 html body .sb-t > i { font-size: 15.5px; } html body .mode-d { font-size: 19px; } html body .nick > span { font-size: 15.5px; } html body .dy-body > i { font-size: 19px; }
 html body .lb-src, html body .lb-empty { font-size: 15.5px; } html body .camp-d { font-size: 19px; } html body .camp-m > span { font-size: 15.5px; } html body .pf-cell > span { font-size: 15.5px; }
 html body .ach > i { font-size: 18px; } html body .ach-t > i { font-size: 18px; } html body .ach-t > em { font-size: 15.5px; }
@@ -316,11 +319,11 @@ body.tk-on .rail-sh { display: none; }
 .adv-stats b { font-size: 26px; }
 
 /* ==== v0.25: el crupier asoma de vez en cuando en el inicio (arriba a la izquierda o a la derecha), sin tapar ni bloquear nada ==== */
-.dealer.home { top: 92px; bottom: auto; z-index: 45; pointer-events: none; }
+.dealer.home { top: 92px; bottom: auto; z-index: 100010; pointer-events: none; }
 .dealer.home.home-tl { left: 22px; right: auto; }
 .dealer.home.home-tr { left: auto; right: 88px; flex-direction: row; transform: translateX(140%); }
 .dealer.home.home-tr.in { transform: none; }
 .dealer.home.home-tr .dl-bubble { transform-origin: 100% 100%; }
-.dealer.home .dl-face { width: 92px; height: 92px; }
+.dealer.home .dl-face { width: 190px; height: 190px; }
 .dealer.home .dl-bubble { max-width: min(300px, calc(44 * var(--vw))); font-size: 15px; margin-bottom: 38px; }
 @media (max-width: 900px), (max-height: 560px) { .dealer.home { display: none; } }   /* movil: la pantalla ya va justa, sin distracciones extra */

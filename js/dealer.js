@@ -235,6 +235,24 @@ window.AIQ = window.AIQ || {};
       "El mundo es grande. Tus aciertos, no tanto.|The world is big. Your hits, not so much.|Le monde est grand. Tes réussites, moins.|O mundo é grande. Seus acertos, nem tanto.|Die Welt ist groß. Deine Treffer eher nicht.|Il mondo è grande. I tuoi successi, meno.",
       "Piensa rápido, apunta despacio. O al revés. Tú decides tu propio desastre.|Think fast, aim slow. Or the other way. Your disaster to choose.|Réfléchis vite, vise lentement. Ou l'inverse. Ton désastre, ton choix.|Pense rápido, mire devagar. Ou o contrário. O desastre é seu, escolha.|Denk schnell, ziel langsam. Oder umgekehrt. Dein Desaster, deine Wahl.|Pensa in fretta, mira piano. O il contrario. Il disastro è tuo, scegli.",
     ],
+
+    /* ---------------------------------------------------------------- rabieta del crupier: te gana la ronda y la paga con la pantalla */
+    tantrumShake: [
+      "¡¿Que tú me ganas?! Voy a hacer temblar hasta la pantalla.|YOU beat ME?! I'm making the whole screen shake.|Toi, tu me bats ?! Je vais faire trembler l'écran entier.|VOCÊ me vence?! Vou fazer a tela inteira tremer.|DU schlägst MICH?! Ich lasse gleich den ganzen Bildschirm beben.|TU mi batti?! Faccio tremare tutto lo schermo.",
+      "No pataleo… bueno, sí. Toda la sala tiembla conmigo.|I'm not throwing a tantrum… okay, I am. The whole room shakes with me.|Je ne fais pas de caprice… bon, si. Toute la salle tremble avec moi.|Não estou fazendo birra… tá, estou. A sala toda treme comigo.|Ich habe keinen Wutanfall… na gut, doch. Der ganze Saal bebt mit mir.|Non sto facendo i capricci… va bene, sì. Tutta la sala trema con me.",
+      "Esto no es un terremoto. Es mi orgullo cayéndose a pedazos.|This isn't an earthquake. It's my pride falling apart.|Ce n'est pas un séisme. C'est ma fierté qui s'effondre.|Isso não é um terremoto. É o meu orgulho desmoronando.|Das ist kein Erdbeben. Das ist mein Stolz, der zerbricht.|Questo non è un terremoto. È il mio orgoglio che va in pezzi.",
+      "¿Sientes eso? Es mi mal humor sacudiendo tu pantalla.|Feel that? That's my bad mood shaking your screen.|Tu sens ça ? C'est ma mauvaise humeur qui secoue ton écran.|Sentiu isso? É meu mau humor sacudindo sua tela.|Spürst du das? Das ist meine schlechte Laune, die deinen Bildschirm rüttelt.|Lo senti? È il mio malumore che scuote il tuo schermo.",
+      "Un poco de terremoto no le hace daño a nadie. A ti, un poco sí.|A little earthquake never hurt anybody. You, maybe a little.|Un petit séisme n'a jamais fait de mal à personne. À toi, un peu quand même.|Um terremotozinho não faz mal a ninguém. A você, um pouquinho sim.|Ein kleines Erdbeben hat noch niemandem geschadet. Dir vielleicht ein bisschen.|Un piccolo terremoto non ha mai fatto male a nessuno. A te, un po' sì.",
+      "Tranquilo: cuando pierdo, tiemblo yo… y tu pantalla también.|Relax: when I lose, I shake… and so does your screen.|Détends-toi : quand je perds, je tremble… et ton écran aussi.|Relaxa: quando eu perco, eu tremo… e sua tela também.|Entspann dich: wenn ich verliere, zittere ich… und dein Bildschirm auch.|Tranquillo: quando perdo, tremo io… e anche il tuo schermo.",
+    ],
+    tantrumBlackout: [
+      "¿Se ha ido la luz? Qué casualidad, justo cuando ganas.|Did the lights just go out? What a coincidence, right when you win.|La lumière vient de s'éteindre ? Quelle coïncidence, juste quand tu gagnes.|A luz caiu? Que coincidência, bem na hora que você ganha.|Ist gerade das Licht ausgegangen? Was für ein Zufall, genau als du gewinnst.|È andata via la luce? Che coincidenza, proprio quando vinci.",
+      "Un cortocircuito muy oportuno. No tiene nada que ver conmigo.|A very convenient short circuit. Nothing to do with me.|Un court-circuit bien pratique. Ça n'a rien à voir avec moi.|Um curto-circuito bem oportuno. Não tem nada a ver comigo.|Ein sehr passender Kurzschluss. Hat nichts mit mir zu tun.|Un cortocircuito molto opportuno. Non c'entro niente.",
+      "A oscuras se me disimula mejor la cara de fastidio. Ya vuelvo.|In the dark my annoyed face is easier to hide. Be right back.|Dans le noir, ma tête dépitée se voit moins. Je reviens.|No escuro minha cara de irritado se disfarça melhor. Já volto.|Im Dunkeln versteckt sich mein genervtes Gesicht besser. Bin gleich zurück.|Al buio la mia faccia scocciata si nota meno. Torno subito.",
+      "Apago las luces un segundo. Así no ves mi cara ahora mismo.|Turning off the lights for a second. So you don't see my face right now.|J'éteins les lumières une seconde. Comme ça tu ne vois pas ma tête maintenant.|Vou apagar as luzes um segundo. Assim você não vê minha cara agora.|Ich mache kurz das Licht aus. Damit du mein Gesicht jetzt nicht siehst.|Spengo le luci un secondo. Così non vedi la mia faccia adesso.",
+      "El casino se queda a oscuras. Yo sigo aquí. Siempre aquí.|The casino goes dark. I'm still here. Always here.|Le casino plonge dans le noir. Je suis toujours là. Toujours.|O cassino fica no escuro. Eu continuo aqui. Sempre aqui.|Das Casino wird dunkel. Ich bin immer noch da. Immer da.|Il casinò resta al buio. Io sono sempre qui. Sempre.",
+      "Un pequeño apagón de rabia. Nada personal. Bueno, un poco sí.|A little blackout of rage. Nothing personal. Okay, a little.|Une petite panne de rage. Rien de personnel. Bon, un peu quand même.|Um pequeno apagão de raiva. Nada pessoal. Tá, um pouquinho sim.|Ein kleiner Wutausbruch als Stromausfall. Nichts Persönliches. Na gut, ein bisschen.|Un piccolo blackout di rabbia. Niente di personale. Va bene, un po' sì.",
+    ],
   };
   for (const k in LINES) LINES[k] = LINES[k].map(L6);
 
@@ -347,10 +365,22 @@ window.AIQ = window.AIQ || {};
   }
 
   /* reacciones a lo que pasa en la mesa */
+  /* rabieta: la pantalla paga el enfado del crupier cuando le ganas una ronda o un jefe (temblor de toda la pantalla, o apagon total con la luz de vuelta) */
+  let bo;
+  const ensureBO = () => { if (!bo || !bo.isConnected) { bo = document.createElement("div"); bo.id = "dlBlackout"; document.body.appendChild(bo); } return bo; };
+  D.fx = kind => {
+    if (kind === "shake") { const root = document.documentElement; root.classList.remove("dl-tantrum"); void root.offsetWidth; root.classList.add("dl-tantrum"); setTimeout(() => root.classList.remove("dl-tantrum"), 700); }
+    else if (kind === "blackout") { const el = ensureBO(); el.classList.remove("go"); void el.offsetWidth; el.classList.add("go"); setTimeout(() => el.classList.remove("go"), 1300); }
+  };
   D.react = (kind, o = {}) => {
     if (!D.on || D.host) return; const ph = A.core && A.core.S && A.core.S.phase; if (ph === "shop" || ph === "title" || ph === "intro") return;
-    const p = { bull: 0.9, miss: 0.85, timeout: 1, good: 0.35, streak: 0.5, counter: 1, roundWin: 0.8, roundFail: 1, runWin: 1, runLose: 1 }[kind];
+    const p = { bull: 0.9, miss: 0.85, timeout: 1, good: 0.35, streak: 0.5, counter: 1, roundWin: 1, roundFail: 1, runWin: 1, runLose: 1 }[kind];
     if (p == null || Math.random() > p) return;
+    const reduced = A.core && A.core.S && A.core.S.reduce;
+    if (kind === "roundWin" && !reduced && Math.random() < 0.22) {
+      const fx = rand(["shake", "blackout"]), line = D.line(fx === "shake" ? "tantrumShake" : "tantrumBlackout");
+      if (line) { D.say(line, { mood: "angry" }); D.fx(fx); return; }
+    }
     const mood = { bull: "shock", miss: "laugh", timeout: "laugh", good: "sly", streak: "angry", counter: "angry", roundWin: "angry", roundFail: "laugh", runWin: "shock", runLose: "laugh" }[kind];
     const line = D.line(kind === "roundWin" ? "roundWin" : kind);
     if (line) D.say(line, { mood });

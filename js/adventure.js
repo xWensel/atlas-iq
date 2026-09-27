@@ -663,17 +663,15 @@ window.AIQ = window.AIQ || {};
     A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
     if (A.tour) A.tour.maybe("camp");
   }
-  /* Suministros de la proxima ronda (se gastan cada ronda: el dinero siempre tiene en que invertirse) y Apuesta */
+  /* Suministros de la proxima ronda (se gastan cada ronda: el dinero siempre tiene en que invertirse) */
   const SUPS = [
     { id: "cafe", cost: 4, ico: "hourglass", n: A.L("Café doble", "Double espresso"), d: A.L("+4 s por pregunta en la próxima ronda", "+4 s per question next round") },
     { id: "kit", cost: 6, ico: "glass", n: A.L("Refuerzo", "Resupply"), d: A.L("+1 uso en todas tus herramientas la próxima ronda", "+1 use on all your tools next round") },
     { id: "seguro", cost: 8, ico: "shield", n: A.L("Seguro de ronda", "Round insurance"), d: A.L("Si fallas la próxima ronda, no pierdes provisión", "If you fail next round, you keep your provision") },
   ];
-  const BETS = [3, 6, 10];
   function supHtml() {
     const sup = run.sup || {}, items = SUPS.map(s => `<button class="sup${sup[s.id] ? " on" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span><em>${sup[s.id] ? A.T("Activo", "On") : CN() + price(s.cost)}</em></button>`).join("");
-    const bets = BETS.map(n => `<button class="stk${run.bet === n ? " on" : ""}" data-bet="${n}" type="button">${n}</button>`).join("");
-    return `<div class="tb-sup">${items}<div class="sup bet${run.bet ? " on" : ""}"><span class="sp-ic">${ic("dice")}</span><span class="sp-t"><b>${A.T("Apuesta a la ronda", "Round bet")}</b><i>${A.T("Supera el objetivo +30 %: cobras ×2,5", "Beat the target by 30%: get ×2.5 back")}</i></span><span class="stakes">${bets}</span></div></div>`;
+    return `<div class="tb-sup">${items}</div>`;
   }
   function wireSup() {
     document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {
@@ -681,11 +679,6 @@ window.AIQ = window.AIQ || {};
       if (run.sup[s.id]) { run.sup[s.id] = false; run.coins += c; A.sfx.sell(); }
       else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = true; A.sfx.buy(); }
       persist(); renderShop(false);
-    }));
-    document.querySelectorAll("[data-bet]").forEach(b => (b.onclick = () => {
-      const n = +b.dataset.bet; if (run.bet === n) { run.coins += n; run.bet = 0; A.sfx.sell(); persist(); return renderShop(false); }
-      const back = run.bet || 0; if (run.coins + back < n) { A.sfx.deny(); shake(b); return; }
-      run.coins += back - n; run.bet = n; A.sfx.buy(); persist(); renderShop(false);
     }));
   }
   const shake = el => { el.classList.remove("no"); void el.offsetWidth; el.classList.add("no"); };
