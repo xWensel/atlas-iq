@@ -179,8 +179,9 @@
       ra.textContent = A.T("Reiniciado. Recargando…", "Reset. Reloading…"); setTimeout(() => location.reload(), 500);
     }; }
   function openSettings(on) {
-    S.settingsOpen = on; const sh = $("setSh");
+    S.settingsOpen = on; const sh = $("setSh"), sv = $("setVeil");
     sh.classList.toggle("hidden", !on); sh.classList.toggle("on-menu", S.phase === "title");
+    if (sv) sv.classList.toggle("hidden", !on);
     $("setBtn").setAttribute("aria-expanded", on);
     if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); }
   }

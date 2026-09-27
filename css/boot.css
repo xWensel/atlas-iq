@@ -65,7 +65,3 @@
 html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
 @media (max-width: 480px) { .st-logo { width: calc(88 * var(--vw)); } }
 
-/* el panel de ajustes nunca se sale de la pantalla */
-#settings { max-height: calc(calc(100 * var(--vh)) - 92px); overflow-y: auto; overscroll-behavior: contain; }
-.set-sh.on-menu #settings { max-height: calc(calc(100 * var(--vh)) - 44px); }
-@media (max-width: 900px) { #settings, .set-sh.on-menu #settings { max-height: calc(calc(100 * var(--vh)) - 28px); } }
