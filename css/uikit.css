@@ -50,8 +50,6 @@
 /* las cartas de herramienta siempre por encima del pie de pagina (su altura cambia con las pistas) */
 #toolBar.tool-bar { bottom: calc(var(--note-top, 88px) + 12px); }
 /* veredicto: cabe en pantallas de 768 px de alto y el crupier habla en su hueco, sin tapar botones */
-.v-art { width: min(100%, 640px, calc(62 * var(--vh))); }
-.v-side .stamp { width: min(calc(34 * var(--vw)), 300px, calc(30 * var(--vh))); height: min(calc(34 * var(--vw)), 300px, calc(30 * var(--vh))); }
 .v-dealer:empty { display: none; }
 .v-dealer { min-height: 96px; display: flex; align-items: flex-end; }
 .dealer.inline { position: relative; left: auto; bottom: auto; z-index: 45; transform: translateX(-24px); }
@@ -72,7 +70,6 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
   .tb-tray { grid-template-columns: 1fr auto auto; } .tb-tray .go-next { grid-column: 1 / -1; min-width: 0; width: 100%; }
   .offer .of-ctr { max-width: 94%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
-@media (max-width: 900px) { .v-side .stamp { font-size: 13px; letter-spacing: .02em; padding: 10px; } }
 @media (max-width: 600px) { .deckrow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* ticket de resultado: por debajo del marcador (antes lo tapaba en pantallas de 720-800 px de alto) y compacto si falta altura */
 @media (min-width: 901px) {
@@ -91,7 +88,7 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
   .vd { padding-top: clamp(14px, calc(4 * var(--vh)), 40px); padding-bottom: clamp(14px, calc(4 * var(--vh)), 40px); }
   .v-main { gap: 9px; } .v-main h2 { font-size: clamp(40px, calc(9.5 * var(--vh)), 84px); } .v-main > p { font-size: 17px; }
   .v-stats { margin: 4px 0 2px; } .v-stats .odo { font-size: clamp(30px, calc(6.5 * var(--vh)), 52px); }
-  .v-art { width: min(100%, 640px, calc(50 * var(--vh))); } .v-side { gap: 16px; }
+  .v-medal { width: min(calc(30 * var(--vw)), 200px, calc(24 * var(--vh))); } .v-side { gap: 16px; }
   .v-dealer { min-height: 78px; } .dealer.inline .dl-face { width: 72px; height: 72px; } .dealer.inline .dl-bubble { margin-bottom: 26px; font-size: 15.5px; }
 }
 /* portada con partida guardada: el banner resta altura, las cartas y el logo se encogen para que todo quepa sin desplazarse */
@@ -197,7 +194,7 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
   .vd { padding: 10px 24px; gap: 14px; align-content: center; }
   .v-main { gap: 5px; } .v-main h2 { font-size: 34px; } .v-main > p { font-size: 15.5px; }
   .v-stats { margin: 0; } .v-stats .odo { font-size: 30px; }
-  .v-art { width: min(100%, calc(34 * var(--vh))); } .v-side .stamp { width: min(calc(20 * var(--vw)), calc(22 * var(--vh))); height: min(calc(20 * var(--vw)), calc(22 * var(--vh))); font-size: 13px; padding: 6px; }
+  .v-medal { width: min(calc(20 * var(--vw)), calc(22 * var(--vh)), 160px); } .v-medal-plate b { font-size: 11px; } .v-medal-plate span { font-size: 20px; }
   .v-dealer { min-height: 0; } .dealer.inline .dl-face { width: 48px; height: 48px; } .dealer.inline .dl-bubble { margin-bottom: 14px; font-size: 14px; max-width: calc(46 * var(--vw)); }
 }
 @media (max-height: 520px) and (orientation: landscape) {

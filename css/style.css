@@ -273,12 +273,24 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 .tk-total > span:first-child { font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; padding-bottom: 6px; }
 .tk-total .odo { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: 46px; letter-spacing: -.02em; }
 
-/* sellos */
-.stamp { width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; text-align: center; color: var(--red);
-  border: 4px solid currentColor; box-shadow: 0 0 0 5px currentColor inset; transform: rotate(-14deg); opacity: .95;
-  font-family: var(--mono); font-weight: 500; font-size: 15.5px; letter-spacing: .05em; line-height: 1.25; text-transform: uppercase; padding: 20px; filter: url(#rough); animation: slam .6s cubic-bezier(.2, 1.3, .3, 1) .3s both; }
-.stamp.ok { color: var(--green); } .stamp.win { color: var(--brass); } .stamp b { font-family: var(--serif); font-weight: 900; font-size: 24px; letter-spacing: 0; display: block; }
-@keyframes slam { 0% { transform: rotate(-30deg) scale(2.8); opacity: 0; } 55% { opacity: 1; } 100% { transform: rotate(-14deg) scale(1); } }
+/* medalla de veredicto (ficha de casino con globo, sustituye al sello circular) */
+.v-medal { --vm: var(--red); position: relative; display: grid; place-items: center; perspective: 700px; width: min(calc(30 * var(--vw)), 250px, calc(30 * var(--vh))); }
+.v-medal.ok { --vm: var(--green); } .v-medal.win { --vm: var(--brass); }
+.v-medal-glow { position: absolute; inset: -22%; z-index: 0; border-radius: 50%; background: radial-gradient(circle, var(--vm) 0%, transparent 68%); opacity: .5; filter: blur(16px); animation: medal-pulse 2.6s ease-in-out .4s infinite; }
+.v-medal-chip { position: relative; z-index: 1; display: block; width: 100%; filter: drop-shadow(0 16px 14px rgba(0,0,0,.55)) drop-shadow(0 0 18px color-mix(in srgb, var(--vm) 55%, transparent));
+  animation: coin-spin .7s cubic-bezier(.2,.9,.2,1) .2s both, medal-float 3.6s ease-in-out 1s infinite; }
+.v-medal-chip img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.v-medal-crown { position: absolute; z-index: 2; top: -10%; right: 0; width: 30%; transform: rotate(14deg); filter: drop-shadow(0 6px 6px rgba(0,0,0,.55)); animation: rise .4s .95s var(--spring) both; }
+.v-medal-crown img { display: block; width: 100%; }
+.v-medal-plate { position: relative; z-index: 2; margin-top: -10%; padding: 9px 20px 8px; display: grid; justify-items: center; gap: 1px; text-align: center;
+  background: linear-gradient(180deg, #241812, #0e0906); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); box-shadow: 0 0 0 2px var(--vm) inset, 0 7px 0 rgba(0,0,0,.4);
+  animation: rise .5s .55s both; }
+.v-medal-plate b { font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--vm); }
+.v-medal-plate span { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: clamp(24px, calc(3.2 * var(--vw)), 38px); letter-spacing: -.02em; line-height: 1.15; color: var(--paper); }
+.v-medal-plate span .ic.st { width: .9em; height: .9em; display: inline-block; vertical-align: -.12em; filter: none; }
+@keyframes coin-spin { from { transform: rotateY(200deg) scale(.35); opacity: 0; } to { transform: rotateY(0) scale(1); opacity: 1; } }
+@keyframes medal-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes medal-pulse { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .68; transform: scale(1.08); } }
 
 /* pagina de veredicto (nivel superado / fallo / fin) */
 .vd { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); align-items: center; gap: clamp(20px, calc(5 * var(--vw)), 80px); padding: clamp(24px, calc(6 * var(--vw)), 96px); color: var(--paper); min-height: 100%; }
@@ -292,7 +304,6 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 .v-stats .odo { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: clamp(38px, calc(5 * var(--vw)), 64px); letter-spacing: -.03em; }
 .v-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; animation: rise .5s .55s both; } .v-actions .btn-ink { width: auto; min-width: 220px; background: var(--paper); color: var(--ink); } .v-actions .btn-ink:hover { background: var(--brass-lt); }
 .v-side { display: grid; justify-items: center; gap: 26px; }
-.v-side .stamp { width: min(calc(34 * var(--vw)), 300px); height: min(calc(34 * var(--vw)), 300px); font-size: clamp(13px, calc(1.6 * var(--vw)), 20px); padding: 12%; } .v-side .stamp b { font-size: clamp(28px, calc(5 * var(--vw)), 60px); }
 .idcard { position: relative; width: min(100%, 360px); background-color: var(--paper); background-image: var(--paper-grain); color: var(--ink); padding: 16px 18px 16px; display: grid; grid-template-columns: auto 1fr; gap: 0 14px; align-items: center; text-align: left; transform-origin: 50% 0; animation: flip-in .9s cubic-bezier(.2, .9, .2, 1) .5s both;
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); box-shadow: 0 0 0 2px var(--ink) inset; }
 @keyframes flip-in { from { transform: perspective(700px) rotateX(-80deg); opacity: 0; } }
@@ -363,7 +374,7 @@ body.vd-on #hud, body.vd-on .dock-sh, body.vd-on .rail-sh, body.vd-on .note-sh {
   .tk-title { font-size: 24px; margin-top: 8px; } .tk-km { font-size: 44px; } .tk-perf { margin: 8px -26px 8px; } .tk-rows { grid-template-columns: 1fr 1fr; gap: 6px 16px; } .tk-total { margin: 8px 0 10px; } .tk-total .odo { font-size: 34px; } .tk-answer { font-size: 18px; margin-top: 6px; }
   #dlg.menu { width: calc(100 * var(--vw)); } .menu-in { padding: 20px 18px 16px; background: rgba(10, 24, 31, .97); } .menu-rose { width: 52px; height: 52px; }
   .camp { grid-template-columns: 84px 1fr; } .camp-thumb { width: 84px; height: 58px; }
-  .vd { grid-template-columns: 1fr; gap: 22px; padding: 22px 20px 30px; align-content: start; } .v-side { order: -1; justify-items: start; grid-template-columns: auto 1fr; align-items: center; } .v-side .stamp { width: 110px; height: 110px; font-size: 14px; } .v-side .stamp b { font-size: 22px; } .idcard { width: 100%; }
+  .vd { grid-template-columns: 1fr; gap: 22px; padding: 22px 20px 30px; align-content: start; } .v-side { order: -1; justify-items: start; grid-template-columns: auto 1fr; align-items: center; } .v-medal { width: 110px; } .v-medal-plate b { font-size: 11px; } .v-medal-plate span { font-size: 20px; } .idcard { width: 100%; }
 }
 @media (max-width: 480px) {
   #dock button, #rail button { width: 38px; height: 38px; } #dock svg:not(.ic), #rail svg:not(.ic) { width: 20px; height: 20px; } #dock .ic, #rail .ic { width: 24px; height: 24px; }
