@@ -7,3 +7,4 @@ assets/raw/
 tools/cache/
 tools/*.log
 assets_stage/
+tools/__pycache__/

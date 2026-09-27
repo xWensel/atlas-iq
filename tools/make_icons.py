@@ -17,18 +17,20 @@ A = ROOT / "assets"; (A / "desktop").mkdir(exist_ok=True)
 
 def up(im, k): return im.resize((im.width * k, im.height * k), Image.NEAREST)
 
-# ---- fuentes en pixel nativo: el logo (200) sale del WebP pixelizado y el escudo es LA TIERRA con la carta y la ficha (tools/make_emblem.py, 48 nativos)
+# ---- fuentes en pixel nativo, dibujadas pixel a pixel por tools/make_brand.py: el logo (200 px) y el escudo (LA TIERRA con la carta y la ficha)
+#      en 48, 32 y 16 px nativos (cada tamano pequeno esta dibujado aparte, no reducido)
 sys.path.insert(0, str(ROOT / "tools"))
-from pixelize import pixelize
-import make_emblem                                                              # (re)genera tools/brand/emblem48.png
-emb = Image.open(ROOT / "tools" / "brand" / "emblem48.png").convert("RGBA")       # 48 nativos, transparente
-logo3 = Image.open(ROOT / "tools" / "brand" / "logo.webp").convert("RGBA")        # 600 = 200 x3
-logo = logo3.resize((logo3.width // 3, logo3.height // 3), Image.NEAREST)
+import make_brand
+B = ROOT / "tools" / "brand"; B.mkdir(exist_ok=True)
+logo = make_brand.to_image(make_brand.logo()); logo.save(B / "logo_native.png")
+emb = make_brand.to_image(make_brand.emblem(48)); emb.save(B / "emblem48.png")
+_small = {n: make_brand.to_image(make_brand.emblem(n)) for n in (16, 32)}
+for n, im in _small.items(): im.save(B / f"emblem{n}.png")
+logo3 = up(logo, 3)
 
 def small(n):
-    """version de n px nativos del escudo (para tamanos pequenos: pestana, HUD, iconos de 16-32 px)"""
-    tmp = ROOT / "tools" / "brand" / f"_e{n}.png"; up(emb, 4).save(tmp)
-    pixelize(tmp, tmp, n, 22, 1, alpha_cut=110); im = Image.open(tmp).convert("RGBA"); tmp.unlink(); return im
+    """escudo dibujado a n px nativos (16 o 32); tamanos intermedios (24) usan el de 16 centrado"""
+    return _small[32 if n >= 32 else 16]
 
 def fit(size, pad=0.04, src=None, bg=None):
     """escudo a escala entera dentro de un lienzo size x size (transparente, o con fondo `bg` si el sistema lo exige: iOS / maskable)"""

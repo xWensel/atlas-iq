@@ -233,13 +233,8 @@ def job(kind, id, seed_extra):
 def post(kind, id):
     raw = RAW / f"{id}.jpg"
     if not raw.exists(): return
-    if kind == "icon" and id == "logo_mark":                       # marca: pixel art de verdad (rejilla nativa 64 y 32, paleta corta)
-        from pixelize import pixelize
-        tmp = RAW / "_k_mark.png"; keyout(raw, tmp, 512); B = ROOT / "tools" / "brand"; B.mkdir(exist_ok=True); pixelize(tmp, B / "logo_mark.webp", 64, 24, 4); pixelize(tmp, B / "logo_mark_s.webp", 32, 18, 2); tmp.unlink(); import make_icons
-    elif kind == "icon": keyout(raw, ICONS / f"{id}.webp", 512 if id.startswith("dealer_") else 256)
-    elif kind == "logo":                                            # logo: rejilla nativa 200 px, 32 colores, x3
-        from pixelize import pixelize
-        tmp = RAW / "_k_logo.png"; keyout(raw, tmp, 1024, square=False); B = ROOT / "tools" / "brand"; B.mkdir(exist_ok=True); pixelize(tmp, B / "logo.webp", 200, 32, 3); tmp.unlink(); import make_icons
+    if kind == "logo" or id == "logo_mark": return                  # la marca ya no se genera: se dibuja pixel a pixel (tools/make_brand.py + make_icons.py)
+    if kind == "icon": keyout(raw, ICONS / f"{id}.webp", 512 if id.startswith("dealer_") else 256)
     else:
         im = Image.open(raw).convert("RGB"); w, h = im.size
         if w > 1280: im = im.resize((1280, round(h * 1280 / w)), Image.LANCZOS)

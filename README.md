@@ -2,6 +2,11 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.24.1** - Marca y pixel art pulidos.
+- **Logo y escudo redibujados pixel a pixel** (`tools/make_brand.py`, sin IA ni reescalados): letras de marquesina con cara dorada biselada, bombillas a ritmo constante sobre el eje de cada trazo, canto en relieve y contorno de tinta; la O es la Tierra con los continentes reales (Natural Earth, proyeccion ortografica) sombreada por bandas limpias; carta y ficha dibujadas a mano. El escudo tiene versiones propias a 48, 32 y 16 px (antes los tamanos pequenos eran reducciones borrosas). Favicon, iconos de app/escritorio y og.png regenerados con `tools/make_icons.py`.
+- **Acabado de los 248 iconos y las 38 escenas** (`tools/pixel_cleanup.py`): paleta sin medio-tonos casi repetidos, fuera las motas del reescalado, contorno indigo de 1 px uniforme y sin escalones dobles (adios al halo doble) y sin anillo de antialias en los bordes.
+- El logo del menu en pantallas grandes se muestra a x2 exacto (antes x2,35 deformaba los pixeles).
+
 **v0.24.0** - Ronda de banderas y ajustes de reliquias.
 - **Banderas del mundo:** nueva ronda en el Acto III (sustituye a la ultima de Ciudades dificiles) que muestra la bandera del pais en vez de su nombre; se carga en vivo desde Wikimedia Commons (igual que las fotos de la Enciclopedia, `tools/build-flags.mjs` genera `data/flags.js` con el archivo y el credito de cada pais). Cinco retos nuevos solo para esta ronda: colores invertidos, luces de neon (cambia el tono), bandera borrosa, a oscuras y sin colores.
 - **Reliquias:** Pulso firme y Gafas de lectura ya no casi anulan el temblor de letras al combinarse (suelo del 35 % conjunto). Talisman ya no elimina el primer reto del jefe: ahora lo suaviza a nivel 1, para no repetir el mismo efecto que la Llave maestra. Nuevo perk **Visor de repuesto** contra el Cursor fantasma. El Campamento ya reconoce que Pulso firme tambien ayuda contra el Mareo.
