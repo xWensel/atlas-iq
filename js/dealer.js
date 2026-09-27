@@ -374,7 +374,7 @@ window.AIQ = window.AIQ || {};
   };
   D.react = (kind, o = {}) => {
     if (!D.on || D.host) return; const ph = A.core && A.core.S && A.core.S.phase; if (ph === "shop" || ph === "title" || ph === "intro") return;
-    const p = { bull: 0.9, miss: 0.85, timeout: 1, good: 0.35, streak: 0.5, counter: 1, roundWin: 0.8, roundFail: 1, runWin: 1, runLose: 1 }[kind];
+    const p = { bull: 0.9, miss: 0.85, timeout: 1, good: 0.35, streak: 0.5, counter: 1, roundWin: 1, roundFail: 1, runWin: 1, runLose: 1 }[kind];
     if (p == null || Math.random() > p) return;
     const reduced = A.core && A.core.S && A.core.S.reduce;
     if (kind === "roundWin" && !reduced && Math.random() < 0.22) {
