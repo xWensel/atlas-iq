@@ -284,12 +284,12 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 .v-medal-crown img { display: block; width: 100%; }
 @keyframes coin-spin { from { transform: rotateY(200deg) scale(.35); opacity: 0; } to { transform: rotateY(0) scale(1); opacity: 1; } }
 
-/* el crupier ocupa el hueco bajo la ficha: cara abajo, globo de texto arriba con la punta hacia el */
-.v-side .v-dealer { min-height: 0; width: 100%; display: grid; justify-items: center; margin-top: 2px; }
-.v-side .dealer.inline { flex-direction: column; align-items: center; gap: 8px; transform: none; }
-.v-side .dealer.inline .dl-face { width: 76px; height: 76px; order: 2; }
-.v-side .dealer.inline .dl-bubble { margin: 0; max-width: min(94%, 300px); font-size: 14.5px; text-align: center; order: 1; transform-origin: 50% 100%; padding-bottom: 18px;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(50% + 9px) calc(100% - 10px), 50% 100%, calc(50% - 9px) calc(100% - 10px), 0 calc(100% - 10px)); }
+/* el crupier ocupa el hueco bajo la ficha: es el protagonista de la mesa, asi que sale grande. cara abajo, globo de texto arriba con la punta hacia el */
+.v-side .v-dealer { min-height: 0; width: 100%; display: grid; justify-items: center; margin-top: 6px; }
+.v-side .dealer.inline { flex-direction: column; align-items: center; gap: 10px; transform: none; }
+.v-side .dealer.inline .dl-face { width: clamp(120px, calc(16 * var(--vh)), 190px); height: clamp(120px, calc(16 * var(--vh)), 190px); order: 2; }
+.v-side .dealer.inline .dl-bubble { margin: 0; max-width: min(96%, 340px); font-size: 16px; text-align: center; order: 1; transform-origin: 50% 100%; padding-bottom: 20px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(50% + 10px) calc(100% - 12px), 50% 100%, calc(50% - 10px) calc(100% - 12px), 0 calc(100% - 12px)); }
 @keyframes medal-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes medal-pulse { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .68; transform: scale(1.08); } }
 
