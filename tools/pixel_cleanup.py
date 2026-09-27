@@ -26,9 +26,6 @@ SKIP = {"logo_mark", "logo_mark_s"}                          # la marca la dibuj
 try:
     from hand_icons import REG as _HAND; SKIP |= set(_HAND)  # y los iconos redibujados a mano (tools/hand_icons.py) ya estan limpios
 except Exception: pass
-try:
-    import make_scenes as _MS; SKIP |= set(_MS.K.REG)     # escenas y retratos del crupier: tools/make_scenes.py
-except Exception: pass
 N4 = ((1, 0), (-1, 0), (0, 1), (0, -1)); N8 = N4 + ((1, 1), (-1, -1), (1, -1), (-1, 1))
 
 def block(a):

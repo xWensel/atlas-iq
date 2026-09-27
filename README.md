@@ -6,7 +6,6 @@
 - **Logo y escudo redibujados pixel a pixel** (`tools/make_brand.py`, sin IA ni reescalados): letras de marquesina con cara dorada biselada, bombillas a ritmo constante sobre el eje de cada trazo, canto en relieve y contorno de tinta; la O es la Tierra con los continentes reales (Natural Earth, proyeccion ortografica) sombreada por bandas limpias; carta y ficha dibujadas a mano. El escudo tiene versiones propias a 48, 32 y 16 px (antes los tamanos pequenos eran reducciones borrosas). Favicon, iconos de app/escritorio y og.png regenerados con `tools/make_icons.py`.
 - **Acabado de los 248 iconos y las 38 escenas** (`tools/pixel_cleanup.py`): paleta sin medio-tonos casi repetidos, fuera las motas del reescalado, contorno indigo de 1 px uniforme y sin escalones dobles (adios al halo doble) y sin anillo de antialias en los bordes.
 - **Iconos redibujados pixel a pixel** (`tools/hand_icons.py`, 64 px nativos, misma luz, rampas y contorno que el logo): los 7 continentes con la costa real (la Antartida en vista polar dibujada a mano), los globos de los retos, fichas, doblon, pilas y cartas, los iconos de interfaz (flechas, cerrar, lupas, pausa, pantalla completa, ajustes, estrella, tecla Intro, casa), gemas de rareza, medallas, corazones, 34 retos con un lenguaje comun (fichas de letra, mini-mapa, puntero) y reliquias que no se entendian (Mirilla, Sonar afinado, Cupon, Piedra filosofal, Placas tectonicas, Guardarrachas...). Unos 110 iconos en total.
-- **Escenas y crupier redibujados pixel a pixel** (`tools/make_scenes.py` con el kit `tools/hand_scenes.py` y `tools/scenes_a..e.py`): las 38 ilustraciones de `assets/gen/` (actos, jefes, campamento, mesa del menu, temas de ronda, cartas del menu, cofre, victoria, derrota, tienda y los 12 tipos de la Enciclopedia) y los 4 retratos del crupier (neutral, risa, enfado, sorpresa). Cielos por bandas con tramado ordenado, capas de paisaje con perspectiva atmosferica, la misma luz y paleta que el logo y los iconos, y ningun resto del arte generado.
 - El logo del menu en pantallas grandes se muestra a x2 exacto (antes x2,35 deformaba los pixeles).
 
 **v0.24.0** - Ronda de banderas y ajustes de reliquias.
@@ -29,7 +28,7 @@
 
 ## Creditos
 - **Banda sonora:** creada por el autor del juego con AKAI; los audios se exportaron y se integraron en el motor de audio del juego.
-- **Arte:** logo, escenas, retratos y la mayoria de iconos dibujados pixel a pixel en codigo (`tools/make_brand.py`, `tools/hand_icons.py`, `tools/make_scenes.py`); el resto de iconos parte de ilustraciones generadas y post-procesadas a pixel art (`tools/pixel_cleanup.py`).
+- **Arte:** ilustraciones generadas con IA a partir de un libro de estilo y post-procesadas a pixel art (ver `tools/`).
 
 **v0.21.0** - Pangea de verdad y economia con peso.
 - **Pangea:** el reto ya no es un barajado: los continentes se deslizan lentamente (2,6 s, sin rebote) hasta encajar como en el supercontinente: Africa, Europa y la Antartida quietas, Sudamerica gira y se pega a la costa africana, Norteamerica se cierra contra Europa, Asia se une a Europa y Arabia y Oceania a la Antartida. Colocacion calculada con las mascaras reales de tierra (maximizar contacto sin solapes grandes). Hay un pequeno solape residual entre Norteamerica/Groenlandia e Islandia.
