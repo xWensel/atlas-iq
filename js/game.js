@@ -299,7 +299,7 @@
   const uiK = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--k")) || 1;
   const setK = () => { const w = innerWidth, h = innerHeight, k = (w < 900 || h < 520) ? 1 : Math.max(1, Math.min(1.85, Math.min(w / 1280, h / 720))); document.documentElement.style.setProperty("--k", k.toFixed(3)); };
   setK(); addEventListener("resize", setK); A.uiK = uiK;
-  { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round((innerHeight - r.top) / uiK()) : 16) + "px"); };
+  { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
     if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
   /* ------------------------------------------------------------ partida */
@@ -361,7 +361,7 @@
     pingFx(lastPtr.x, lastPtr.y); A.sfx.tap(); A.sfx.pin(S.streak);
     reveal({ lon, lat }, Math.max(0, S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000));
   }
-  const padForDialog = () => { const k = uiK(); return window.innerWidth > 900 ? { l: 60 * k, r: 410 * k, t: 170 * k, b: 130 * k } : { l: 30, r: 30, t: 240, b: 410 }; };
+  const padForDialog = () => { return window.innerWidth > 900 ? { l: 60, r: 410, t: 170, b: 130 } : { l: 30, r: 30, t: 240, b: 410 }; };
 
   function reveal(guess, left) {
     S.phase = "reveal"; map.setPick(false); S.tense = false; A.music.mode(1); if (S.run) A.chal.reveal();

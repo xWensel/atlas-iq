@@ -301,14 +301,14 @@ body:not(.title-on) .brand-sh { display: none; }
   #leftCol .ab-wind { font-size: 14px; } #leftCol .ab-perk { width: 22px; height: 22px; } #leftCol .ab-perk .ic { width: 18px; height: 18px; }
 }
 
-/* ==== v0.23: escala de la interfaz (--k lo fija js/game.js: 1 en 1280x720 y hasta 1,85 en pantallas grandes) ====
+/* ==== v0.23: escala de la interfaz (--k lo fija js/game.js: 1 en 1280x720 y hasta 1,85 en pantallas grandes; SOLO menus, campamento y veredicto: el HUD de la partida no se escala para dejar libre el mapa) ====
    `zoom` escala TODO lo de dentro (tipografia, cartas, margenes) PERO tambien las unidades vh/vw; por eso todas las unidades vh/vw del CSS pasan por --vh y --vw,
    que dentro de las cajas escaladas se dividen entre k (asi 50vw sigue siendo media pantalla). Las cajas que rellenan la pantalla se dividen entre k. */
 :root { --k: 1; --vh: 1vh; --vw: 1vw; }
-.hh, .scr, .table, .vd, #leftCol, .ledger-sh, .note-sh, .dock-sh, .rail-sh, #toolBar, #dlg.side { zoom: var(--k); --vh: calc(1vh / var(--k)); --vw: calc(1vw / var(--k)); }
+.hh, .scr, .table, .vd { zoom: var(--k); --vh: calc(1vh / var(--k)); --vw: calc(1vw / var(--k)); }
 .hh { min-height: 100%; } .scr { height: 100%; } .table { height: 100%; } .vd { min-height: 100%; }
 #dlg.menu { width: min(calc(1240px * var(--k)), 100vw); }
-#dlg.side { max-height: calc(100 * var(--vh) - 160px / var(--k)); }
+
 @media (max-width: 899px), (max-height: 519px) { :root { --k: 1 !important; } }
 
 /* ==== v0.23: pantallas de menu centradas en vertical (antes se pegaban arriba) y estadisticas en 2x2 con la letra mayor ==== */
