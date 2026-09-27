@@ -441,6 +441,97 @@ def swap_icon(id):
     arr2 = thick_line([(38, 5), (50, 5)], 3) | poly([(38, 0), (38, 9), (32, 5)])
     I.add(bevel(arr, R["gold"], soft=False)); I.add(bevel(arr2, R["gold"], soft=False)); return I
 
+
+# ============================================================ interfaz (se ven a 16-22 px: siluetas gruesas, poco detalle)
+def star(cx, cy, ro, ri, n=5, rot=0):
+    return poly([(cx + (ro if i % 2 == 0 else ri) * math.sin(math.radians(rot + i * 180 / n)), cy - (ro if i % 2 == 0 else ri) * math.cos(math.radians(rot + i * 180 / n))) for i in range(2 * n)])
+
+def faceted_star(cx, cy, ro, ri, rp, n=5):
+    """estrella con facetas: cada punta con su mitad izquierda clara y la derecha oscura (luz arriba-izquierda)"""
+    m = star(cx, cy, ro, ri, n); c = bevel(m, R[rp], soft=False); L = (-.6, -.8)
+    for i in range(2 * n):                      # 10 facetas: cada una mira hacia su arista exterior
+        a0 = math.radians(i * 180 / n); a1 = math.radians((i + 1) * 180 / n)
+        r0, r1 = (ro, ri) if i % 2 == 0 else (ri, ro)
+        p0 = (cx + r0 * math.sin(a0), cy - r0 * math.cos(a0)); p1 = (cx + r1 * math.sin(a1), cy - r1 * math.cos(a1))
+        ex, ey = p1[0] - p0[0], p1[1] - p0[1]; nx, ny = ey, -ex; ln = math.hypot(nx, ny); d = (nx * L[0] + ny * L[1]) / ln
+        col = R[rp][1] if d > .35 else R[rp][3] if d < -.35 else R[rp][2]
+        c[poly([(cx, cy), p0, p1]) & erode(m, 1)] = col
+    c[erode(m, 1) & edge(m, 0, -1)] = R[rp][0]
+    return c
+
+def arrow(right=True):
+    m = rect(6, 23, 30, 18) | poly([(30, 7), (58, 32), (30, 57)])
+    m = opening(m, 1)
+    return m if right else m[:, ::-1]
+
+from pxkit import opening
+@icon("u_next", "u_back")
+def u_arrow(id):
+    I = Icon(); I.add(bevel(arrow(id == "u_next"), R["paper"])); return I
+
+@icon("u_close")
+def u_close(id):
+    m = thick_line([(12, 12), (52, 52)], 13) | thick_line([(52, 12), (12, 52)], 13)
+    I = Icon(); I.add(bevel(m, R["red"])); return I
+
+def magnifier(sym):
+    I = Icon()
+    I.add(bevel(thick_line([(40, 40), (56, 56)], 9), R["brown"]))
+    I.add(bevel(circle(26, 26, 22), R["red"]))
+    glass = circle(26, 26, 16); g = sphere(glass, 24, 24, 17, R["teal"]); I.add(g, outline=False)
+    I.a[ring(26, 26, 16, 17.2)] = INK
+    bar = rect(15, 23, 22, 7) | (rect(22, 16, 7, 21) if sym == "+" else blank())
+    I.add(bevel(bar, R["paper"], soft=False)); return I
+
+@icon("u_plus", "u_minus")
+def u_mag(id): return magnifier("+" if id == "u_plus" else "-")
+
+@icon("u_pause")
+def u_pause(id):
+    I = Icon(); I.add(bevel(rrect(12, 8, 15, 48, 2), R["gold"])); I.add(bevel(rrect(37, 8, 15, 48, 2), R["gold"])); return I
+
+@icon("u_fs")
+def u_fs(id):
+    I = Icon()
+    for sx in (0, 1):
+        for sy in (0, 1):
+            m = rect(6, 6, 20, 8) | rect(6, 6, 8, 20)
+            if sx: m = m[:, ::-1]
+            if sy: m = m[::-1]
+            I.add(bevel(m, R["gold"]))
+    return I
+
+@icon("u_set")
+def u_set(id):
+    teeth = blank()
+    for i in range(8):
+        a = math.radians(i * 45); ca, sa = math.cos(a), math.sin(a)
+        pts = [(-5, -30), (5, -30), (6.5, -18), (-6.5, -18)]
+        teeth |= poly([(32 + x * ca - y * sa, 32 + x * sa + y * ca) for x, y in pts])
+    m = (teeth | circle(32, 32, 22)) & ~circle(32, 32, 8.5)
+    I = Icon(); I.add(bevel(m, R["grey"])); I.put(ring(32, 32, 12, 14.5), R["grey"][3]); return I
+
+@icon("u_star")
+def u_star(id):
+    I = Icon(); I.add(faceted_star(32, 34, 30, 13, "gold")); return I
+
+@icon("u_enter")
+def u_enter(id):
+    I = Icon()
+    I.add(flat(rrect(4, 10, 56, 48, 5), R["paper"][4]))
+    I.add(bevel(rrect(4, 6, 56, 46, 5), R["paper"]), outline=False)
+    ar = thick_line([(44, 16), (44, 32), (22, 32)], 6) | poly([(24, 22), (24, 42), (12, 32)])
+    I.put(ar, R["dark"][2]); return I
+
+@icon("u_home")
+def u_home(id):
+    I = Icon()
+    I.add(bevel(rect(14, 30, 36, 28), R["paper"]))
+    I.add(bevel(rect(40, 8, 8, 18), R["brown"]))
+    I.add(bevel(poly([(3, 34), (32, 6), (61, 34), (54, 38), (32, 17), (10, 38)]), R["red"]))
+    I.add(bevel(rrect(26, 40, 12, 18, 2), R["brown"]))
+    return I
+
 # ============================================================ salida
 def build(ids):
     done = []
