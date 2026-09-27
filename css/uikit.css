@@ -101,7 +101,8 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
 /* portada con partida guardada: el banner resta altura, las cartas y el logo se encogen para que todo quepa sin desplazarse */
 .hh:has(.hh-resume) .hh-logo { height: min(calc(17 * var(--vh)), 190px); }
 .hh:has(.hh-resume) .mcard { width: min(calc(20.5 * var(--vw)), calc(26 * var(--vh)) * .7 * 1.36, 300px); } .hh:has(.hh-resume) .mcard.hero { width: min(calc(24 * var(--vw)), calc(30 * var(--vh)) * .7 * 1.36, 340px); }
-.hh:has(.hh-resume) .hh-cards { padding: clamp(12px, calc(2.6 * var(--vh)), 32px) 0 clamp(4px, calc(1.2 * var(--vh)), 16px); }
+/* la fila de cartas siempre reserva sitio de sobra para que la cinta roja de la carta central nunca pise el subtitulo de arriba */
+.hh:has(.hh-resume) .hh-cards { padding: max(clamp(12px, calc(2.6 * var(--vh)), 32px), 66px) 0 clamp(4px, calc(1.2 * var(--vh)), 16px); }
 @media (min-width: 901px) and (max-width: 1100px) { #dlg.side { max-height: calc(calc(100 * var(--vh)) - 198px - var(--note-top, 90px)); } }   /* el pie ocupa todo el ancho: el ticket termina encima */
 /* notas de campo: como mucho 3 lineas (2 en pantallas medianas) para no empujar el ticket ni las cartas */
 #factText:not(:empty) { max-height: calc(30 * var(--vh)); overflow-y: auto; scrollbar-width: thin; }   /* el texto entero, sin puntos suspensivos: si es muy largo, se desplaza */
@@ -290,11 +291,16 @@ html body .tour-txt { font-size: 19px; } html body .dl-bubble p { font-size: inh
 #leftCol .ach-toast { width: 100%; padding: 8px 12px 8px 8px; gap: 10px; margin: 0; z-index: 8; }
 #leftCol .ach-toast.in { animation: ach-in-l .6s var(--spring) both; } @keyframes ach-in-l { from { transform: translateX(-130%); opacity: 0; } }
 #leftCol .ach-toast .ach-ico { transform: scale(.75); transform-origin: left center; margin-right: -10px; } #leftCol .ach-t i { display: none; }
+/* aviso de enciclopedia: tambien a la izquierda (antes tapaba el marcador y el ticket a la derecha) */
+#leftCol .cx-toast { position: relative; width: 100%; max-width: none; right: auto; bottom: auto; top: auto; margin: 0; z-index: 8; }
+#leftCol .cx-toast.in { animation: cx-in-l .6s var(--spring) both; } @keyframes cx-in-l { from { transform: translateX(-130%) rotate(0); opacity: 0; } }
 body:not(.title-on) .brand-sh { display: none; }
 @media (max-width: 900px) { #leftCol { top: 8px; left: 8px; width: calc(calc(100 * var(--vw)) - 92px); } body:not(.title-on) .brand-sh { display: none; } }
 @media (max-height: 520px) and (orientation: landscape) { #leftCol { top: 6px; left: 8px; width: min(calc(46 * var(--vw)), 440px); gap: 6px; } #leftCol .adv-bar { min-width: 0; } }
 /* zoom a la derecha: la columna izquierda queda para la placa, el marcador y los logros */
 .rail-sh { left: auto; right: 14px; top: 46%; }
+/* el ticket de resultado ocupa esa misma esquina: mientras se ve, el zoom se aparta para no solaparse */
+body.tk-on .rail-sh { display: none; }
 @media (max-width: 900px) {
   #leftCol .adv-bar { padding: 5px 8px 6px; gap: 3px; width: auto; min-width: 0; }
   #leftCol .ab-chal { flex-direction: row; flex-wrap: wrap; gap: 4px; margin-top: 3px; } #leftCol .ab-chal .ch-chip { padding: 2px 7px 2px 4px; } #leftCol .ab-chal .ch-chip .ic { width: 16px; height: 16px; }

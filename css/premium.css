@@ -56,7 +56,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .hh-tag { font-size: clamp(18px, calc(2.2 * var(--vh)) + 8px, 30px); }
 .mcard { width: min(calc(20.5 * var(--vw)), calc(28 * var(--vh)) * .7 * 1.36, 310px); } .mcard.hero { width: min(calc(24 * var(--vw)), calc(33 * var(--vh)) * .7 * 1.36, 360px); }
 .hh { grid-template-rows: auto auto minmax(0, 1fr) auto; }
-.hh-cards { padding: clamp(18px, calc(3.5 * var(--vh)), 40px) 0 clamp(8px, calc(2 * var(--vh)), 24px); }
+.hh-cards { padding: max(clamp(18px, calc(3.5 * var(--vh)), 40px), 66px) 0 clamp(8px, calc(2 * var(--vh)), 24px); }
 
 /* ==================================================================== premium2.css */
 /* Geolite v0.9 - premium (parte 2): campamento/cofre, intro de ronda, veredictos y marcador de partida. */

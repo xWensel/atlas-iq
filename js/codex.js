@@ -510,7 +510,7 @@ window.AIQ = window.AIQ || {};
   let toastT = 0;
   function toast(ids) {
     if (!ids.length) return;
-    let el = $("cxToast"); if (!el) { el = document.createElement("button"); el.id = "cxToast"; el.type = "button"; el.className = "cx-toast hidden"; $("app").appendChild(el); }
+    let el = $("cxToast"); if (!el) { el = document.createElement("button"); el.id = "cxToast"; el.type = "button"; el.className = "cx-toast hidden"; (document.getElementById("leftCol") || $("app")).appendChild(el); }
     const e = E[ids[0]], more = ids.length - 1;
     el.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, memOf(ids[0]))}</b>${more > 0 ? `<i>${A.t("codex.newmore", { n: more })}</i>` : ""}</span>`;
     el.onclick = () => { el.classList.add("hidden"); open(ids[0]); };
