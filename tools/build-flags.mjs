@@ -49,8 +49,13 @@ async function qidOf(name) {
 async function flagFileOf(qid) {
   const j = await jget(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&props=claims&format=json`);
   const claims = j && j.entities && j.entities[qid] && j.entities[qid].claims;
-  const p41 = claims && claims.P41 && claims.P41[0];
-  return p41 && p41.mainsnak && p41.mainsnak.datavalue && p41.mainsnak.datavalue.value;
+  const list = (claims && claims.P41) || []; if (!list.length) return null;
+  /* P41 puede tener varias banderas historicas (con fecha de fin en P582): se descartan y se prefiere el rango "preferred" */
+  const val = c => c.mainsnak && c.mainsnak.datavalue && c.mainsnak.datavalue.value;
+  const current = c => !(c.qualifiers && c.qualifiers.P582);
+  const chosen = list.find(c => c.rank === "preferred" && current(c)) || list.find(c => c.rank === "preferred")
+    || list.find(c => c.rank !== "deprecated" && current(c)) || list[list.length - 1];
+  return val(chosen);
 }
 async function credit(fn) {
   try {
