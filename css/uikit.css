@@ -54,7 +54,7 @@
 .v-side .stamp { width: min(calc(34 * var(--vw)), 300px, calc(30 * var(--vh))); height: min(calc(34 * var(--vw)), 300px, calc(30 * var(--vh))); }
 .v-dealer:empty { display: none; }
 .v-dealer { min-height: 96px; display: flex; align-items: flex-end; }
-.dealer.inline { position: relative; left: auto; bottom: auto; z-index: 45; transform: translateX(-24px); }
+.dealer.inline { position: relative; left: auto; bottom: auto; z-index: 100010; transform: translateX(-24px); }
 .dealer.inline.in { transform: none; }
 .dealer.inline .dl-face { width: 88px; height: 88px; }
 .dealer.inline .dl-bubble { margin: 0 0 34px 0; max-width: min(380px, calc(62 * var(--vw))); }
@@ -316,7 +316,7 @@ body.tk-on .rail-sh { display: none; }
 .adv-stats b { font-size: 26px; }
 
 /* ==== v0.25: el crupier asoma de vez en cuando en el inicio (arriba a la izquierda o a la derecha), sin tapar ni bloquear nada ==== */
-.dealer.home { top: 92px; bottom: auto; z-index: 45; pointer-events: none; }
+.dealer.home { top: 92px; bottom: auto; z-index: 100010; pointer-events: none; }
 .dealer.home.home-tl { left: 22px; right: auto; }
 .dealer.home.home-tr { left: auto; right: 88px; flex-direction: row; transform: translateX(140%); }
 .dealer.home.home-tr.in { transform: none; }
