@@ -183,6 +183,10 @@
     sh.classList.toggle("hidden", !on);
     if (sv) sv.classList.toggle("hidden", !on);
     $("setBtn").setAttribute("aria-expanded", on);
+    if (A.dealer && A.dealer.homeTease) {
+      if (on) { S._dealerWasHome = A.dealer.onHome; A.dealer.homeTease(false); }
+      else if (S._dealerWasHome) A.dealer.homeTease(true);
+    }
     if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; }
   }
   let blipT = 0;
@@ -206,7 +210,8 @@
   function langChips(host, onPick) {
     host.innerHTML = "";
     A.LANGS.forEach(L => {
-      const b = document.createElement("button"); b.type = "button"; b.dataset.l = L.code; b.textContent = L.name; b.lang = L.code;
+      const b = document.createElement("button"); b.type = "button"; b.dataset.l = L.code; b.lang = L.code;
+      b.innerHTML = `${A.icon("flag_" + L.code, "lang-flag")}<span>${L.name}</span>`;
       b.className = L.code === A.lang ? "on" : ""; b.onclick = e => { e.stopPropagation(); onPick(L.code); }; host.appendChild(b);
     });
   }
