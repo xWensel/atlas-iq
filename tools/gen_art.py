@@ -55,7 +55,7 @@ icons({
  "wind": "swirling white wind gusts with flying paper scraps", "storm": "a dark storm cloud with a golden lightning bolt and rain", "strict": "golden balance scales with a ruler",
  "silence": "a golden bell crossed out by a red slash", "fog": "a thick white fog cloud with a small lighthouse",
  # barajas
- "deck_explorer": "a golden compass rose star", "deck_historian": "a broken ancient greek column with a scroll", "deck_navigator": "a wooden ship steering wheel", "deck_blind": "dark round sunglasses with a strap",
+ "deck_explorer": "a cheerful explorer bust portrait, brown fedora hat with a red band and a feather, khaki safari jacket, holding a brass compass, facing front", "deck_historian": "a scholarly historian bust portrait, round golden spectacles, brown tweed coat with a bow tie, holding an open old book, thoughtful smile, facing front", "deck_navigator": "a bold sea captain bust portrait, navy peacoat with golden buttons, white captain hat with an anchor emblem, holding a ship steering wheel, facing front", "deck_blind": "a rugged adventurer bust portrait wearing a black blindfold, miner headlamp on the forehead, weathered jacket, determined grin, facing front",
  # modos
  "m_adv": "a brown explorer fedora hat with a red band and a feather", "m_classic": "a vintage desk globe on a brass stand", "m_compete": "a golden trophy cup with a red star",
  "m_prof": "an explorer id card with a portrait", "m_codex": "a thick blue encyclopedia book with a globe emblem and a red ribbon",
