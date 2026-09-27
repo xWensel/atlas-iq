@@ -39,7 +39,7 @@ window.AIQ = window.AIQ || {};
   const KIND_FACTOR = { capital: 1, city: 1, landmark: 0.9, nature: 1.5, battle: 0.9, event: 0.9, country: 0.7, clue: 1, water: 1.6, strait: 1.4 };
   /* 12 rondas: 3 actos de 4 (la 4.a es el jefe). Empieza facil y va cambiando de tema y subiendo el nivel. */
   const ROUNDS = [
-    { topic: "capital", tier: 0 }, { topic: "landmark", tier: 0 }, { topic: "city", tier: 0 }, { topic: "country", tier: 0, boss: true },
+    { topic: "capital", tier: 0 }, { topic: "landmark", tier: 0 }, { topic: "flag", tier: 0 }, { topic: "country", tier: 0, boss: true },
     { topic: "capital", tier: 1 }, { topic: "history", tier: 0 }, { topic: "nature", tier: 0 }, { topic: "city", tier: 1, boss: true },
     { topic: "flag", tier: 0 }, { topic: "landmark", tier: 1 }, { topic: "history", tier: 1 }, { topic: "mixed", tier: 1, boss: true },
   ];

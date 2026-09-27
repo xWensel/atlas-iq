@@ -469,17 +469,15 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     const medal = `<div class="v-medal ${kind}">
         <i class="v-medal-glow"></i>${art === "chest" ? `<i class="v-medal-crown">${A.icon("crown")}</i>` : ""}
         <i class="v-medal-chip">${A.icon(chip)}</i>
-        <div class="v-medal-plate"><b>${stamp}</b><span>${stampSub}</span></div>
       </div>`;
     dialog(`<div class="vd">
       <div class="v-main">
         <span class="tag">${tag || A.t("v.level", { n: pad2(level) })}</span>
         <h2>${title}</h2><p>${text}</p>${lines && lines.length ? `<ul class="v-lines">${lines.map((l, i) => `<li style="animation-delay:${0.5 + i * 0.12}s"><span>${l[0]}</span><i></i><b>${l[1]}</b></li>`).join("")}</ul>` : ""}
         <div class="v-stats">${stats.map((s, i) => `<div><span>${s[0]}</span><span class="odo" id="vs${i}"></span></div>`).join("")}</div>
-        <div class="v-dealer" id="vdDealer"></div>
         <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? `<span class="ar">${A.icon("u_next", "sm")}</span>` : ""}</button>`).join("")}</div>
       </div>
-      <div class="v-side">${medal}${idc}</div>
+      <div class="v-side">${medal}<div class="v-dealer" id="vdDealer"></div>${idc}</div>
     </div>`, "verdict");
     stats.forEach((s, i) => { const el = $("vs" + i); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, s[1], { ms: 1300, delay: 700 + i * 120, tick: i === 0 && s[1] > 0 })); });
     if (iq != null) { const el = $("iqNum"); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, iq, { ms: 1400, delay: 1000 })); }

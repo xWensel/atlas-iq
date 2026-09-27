@@ -47,6 +47,12 @@
 /* sacudida suave al encadenar racha (la clase existia pero no tenia estilo) */
 #app.shake { animation: app-shake .38s ease; }
 @keyframes app-shake { 20% { transform: translate(-3px, 1px); } 40% { transform: translate(3px, -1px); } 60% { transform: translate(-2px, 0); } 80% { transform: translate(1px, 1px); } }
+/* rabieta del crupier: temblor de toda la pantalla (juego + dialogo, via el truco de transform en html) y apagon total con luz de vuelta */
+html.dl-tantrum { animation: dl-tantrum .7s cubic-bezier(.36, .07, .19, .97) both; }
+@keyframes dl-tantrum { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, -3px, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 4px, 0); } 40%, 60% { transform: translate3d(8px, -4px, 0); } }
+#dlBlackout { position: fixed; inset: 0; z-index: 9000; background: #000; opacity: 0; pointer-events: none; }
+#dlBlackout.go { animation: dl-blackout 1.3s ease both; }
+@keyframes dl-blackout { 0% { opacity: 0; } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
 /* las cartas de herramienta siempre por encima del pie de pagina (su altura cambia con las pistas) */
 #toolBar.tool-bar { bottom: calc(var(--note-top, 88px) + 12px); }
 /* veredicto: cabe en pantallas de 768 px de alto y el crupier habla en su hueco, sin tapar botones */
@@ -194,7 +200,7 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
   .vd { padding: 10px 24px; gap: 14px; align-content: center; }
   .v-main { gap: 5px; } .v-main h2 { font-size: 34px; } .v-main > p { font-size: 15.5px; }
   .v-stats { margin: 0; } .v-stats .odo { font-size: 30px; }
-  .v-medal { width: min(calc(20 * var(--vw)), calc(22 * var(--vh)), 160px); } .v-medal-plate b { font-size: 11px; } .v-medal-plate span { font-size: 20px; }
+  .v-medal { width: min(calc(20 * var(--vw)), calc(22 * var(--vh)), 160px); }
   .v-dealer { min-height: 0; } .dealer.inline .dl-face { width: 48px; height: 48px; } .dealer.inline .dl-bubble { margin-bottom: 14px; font-size: 14px; max-width: calc(46 * var(--vw)); }
 }
 @media (max-height: 520px) and (orientation: landscape) {

@@ -53,7 +53,6 @@ html[data-skin="casino"] .camp-thumb { border-radius: 8px; border: 2px solid #0a
 html[data-skin="casino"] .menu-in { background: linear-gradient(90deg, rgba(10, 26, 18, .97), rgba(10, 26, 18, .94) 84%, rgba(10, 26, 18, 0)); }
 html[data-skin="casino"] .go { --fill: #1a3528; --edge: var(--brass); } @keyframes chip-spin { to { transform: rotate(360deg); } }
 html[data-skin="casino"] .brand-rose, html[data-skin="casino"] .menu-rose { color: var(--brass); }
-html[data-skin="casino"] .v-medal-plate { border-radius: 10px; }
 html[data-skin="casino"] .idcard { clip-path: none; border-radius: 14px; box-shadow: 0 0 0 3px #16241c inset, 0 6px 0 rgba(0, 0, 0, .5); }
 html[data-skin="casino"] .ticket { -webkit-mask: none; mask: none; border-radius: 14px; box-shadow: 0 0 0 3px #16241c inset; }
 html[data-skin="casino"] .tk-band { border-radius: 11px 11px 0 0; }

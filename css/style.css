@@ -282,13 +282,14 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 .v-medal-chip img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 .v-medal-crown { position: absolute; z-index: 2; top: -10%; right: 0; width: 30%; transform: rotate(14deg); filter: drop-shadow(0 6px 6px rgba(0,0,0,.55)); animation: rise .4s .95s var(--spring) both; }
 .v-medal-crown img { display: block; width: 100%; }
-.v-medal-plate { position: relative; z-index: 2; margin-top: -10%; padding: 9px 20px 8px; display: grid; justify-items: center; gap: 1px; text-align: center;
-  background: linear-gradient(180deg, #241812, #0e0906); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); box-shadow: 0 0 0 2px var(--vm) inset, 0 7px 0 rgba(0,0,0,.4);
-  animation: rise .5s .55s both; }
-.v-medal-plate b { font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--vm); }
-.v-medal-plate span { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: clamp(24px, calc(3.2 * var(--vw)), 38px); letter-spacing: -.02em; line-height: 1.15; color: var(--paper); }
-.v-medal-plate span .ic.st { width: .9em; height: .9em; display: inline-block; vertical-align: -.12em; filter: none; }
 @keyframes coin-spin { from { transform: rotateY(200deg) scale(.35); opacity: 0; } to { transform: rotateY(0) scale(1); opacity: 1; } }
+
+/* el crupier ocupa el hueco bajo la ficha: cara abajo, globo de texto arriba con la punta hacia el */
+.v-side .v-dealer { min-height: 0; width: 100%; display: grid; justify-items: center; margin-top: 2px; }
+.v-side .dealer.inline { flex-direction: column; align-items: center; gap: 8px; transform: none; }
+.v-side .dealer.inline .dl-face { width: 76px; height: 76px; order: 2; }
+.v-side .dealer.inline .dl-bubble { margin: 0; max-width: min(94%, 300px); font-size: 14.5px; text-align: center; order: 1; transform-origin: 50% 100%; padding-bottom: 18px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(50% + 9px) calc(100% - 10px), 50% 100%, calc(50% - 9px) calc(100% - 10px), 0 calc(100% - 10px)); }
 @keyframes medal-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes medal-pulse { 0%, 100% { opacity: .4; transform: scale(1); } 50% { opacity: .68; transform: scale(1.08); } }
 
@@ -374,7 +375,7 @@ body.vd-on #hud, body.vd-on .dock-sh, body.vd-on .rail-sh, body.vd-on .note-sh {
   .tk-title { font-size: 24px; margin-top: 8px; } .tk-km { font-size: 44px; } .tk-perf { margin: 8px -26px 8px; } .tk-rows { grid-template-columns: 1fr 1fr; gap: 6px 16px; } .tk-total { margin: 8px 0 10px; } .tk-total .odo { font-size: 34px; } .tk-answer { font-size: 18px; margin-top: 6px; }
   #dlg.menu { width: calc(100 * var(--vw)); } .menu-in { padding: 20px 18px 16px; background: rgba(10, 24, 31, .97); } .menu-rose { width: 52px; height: 52px; }
   .camp { grid-template-columns: 84px 1fr; } .camp-thumb { width: 84px; height: 58px; }
-  .vd { grid-template-columns: 1fr; gap: 22px; padding: 22px 20px 30px; align-content: start; } .v-side { order: -1; justify-items: start; grid-template-columns: auto 1fr; align-items: center; } .v-medal { width: 110px; } .v-medal-plate b { font-size: 11px; } .v-medal-plate span { font-size: 20px; } .idcard { width: 100%; }
+  .vd { grid-template-columns: 1fr; gap: 22px; padding: 22px 20px 30px; align-content: start; } .v-side { order: -1; justify-items: start; grid-template-columns: auto 1fr; align-items: center; } .v-medal { width: 110px; } .idcard { width: 100%; }
 }
 @media (max-width: 480px) {
   #dock button, #rail button { width: 38px; height: 38px; } #dock svg:not(.ic), #rail svg:not(.ic) { width: 20px; height: 20px; } #dock .ic, #rail .ic { width: 24px; height: 24px; }
