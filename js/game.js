@@ -153,6 +153,8 @@
     $("rowCursor").classList.toggle("hidden", !A.cursor.available);
     setTab(S.setTab, true); if (A.jukebox) A.jukebox.sync();
     const rs = $("resetSet"); if (rs && !rs.classList.contains("armed")) rs.textContent = A.t("set.reset"); $("resetSetNote").textContent = A.t("set.reset.d");
+    const ra = $("resetAll"); if (ra && !ra.classList.contains("armed")) ra.textContent = A.T("Reiniciar TODO desde cero (desarrollo)", "Reset EVERYTHING from scratch (dev)");
+    if ($("resetAllNote")) $("resetAllNote").textContent = A.T("Borra partida guardada, perfil, logros, barajas y ascensiones desbloqueadas, récords, Enciclopedia, tutorial y ajustes. Solo para desarrollo.", "Deletes the saved run, profile, achievements, unlocked decks and ascensions, records, Encyclopedia, tutorial and settings. Dev only.");
     const rc = $("resetCodex"); if (rc && !rc.classList.contains("armed")) rc.textContent = A.T("Restablecer Enciclopedia", "Reset Encyclopedia");
     $("resetCodexNote").textContent = A.T("Borra todas las tarjetas desbloqueadas. Tu perfil, logros y récords no cambian.", "Deletes every unlocked card. Your profile, achievements and records stay.");
   }
@@ -161,6 +163,17 @@
     rc.onclick = () => {
       if (!rc.classList.contains("armed")) { rc.classList.add("armed"); rc.textContent = A.T("¿Seguro? Pulsa otra vez para borrar", "Sure? Press again to delete"); A.sfx.ui(); clearTimeout(tm); tm = setTimeout(() => { rc.classList.remove("armed"); syncSettings(); }, 4000); return; }
       clearTimeout(tm); rc.classList.remove("armed"); A.codex.reset(); A.sfx.card(); rc.textContent = A.T("Enciclopedia restablecida", "Encyclopedia reset"); setTimeout(syncSettings, 2200);
+    }; }
+  /* reinicio total (desarrollo): pulsar dos veces; borra TODO lo que guarda el juego en este navegador y recarga */
+  { const ra = $("resetAll"); let tm = 0;
+    ra.onclick = () => {
+      if (!ra.classList.contains("armed")) { ra.classList.add("armed"); ra.textContent = A.T("¿Seguro? Se borra TODO. Pulsa otra vez", "Sure? EVERYTHING is deleted. Press again"); A.sfx.deny(); clearTimeout(tm); tm = setTimeout(() => { ra.classList.remove("armed"); syncSettings(); }, 4500); return; }
+      clearTimeout(tm);
+      try { A.adv.abandon && A.adv.abandon(); } catch (e) { /* sin partida */ }
+      try { Object.keys(localStorage).filter(k => /^atlasiq\./.test(k)).forEach(k => localStorage.removeItem(k)); sessionStorage.clear(); } catch (e) { /* sin almacenamiento */ }
+      try { indexedDB.deleteDatabase("atlasiq-codex"); } catch (e) { /* sin IndexedDB */ }
+      try { navigator.serviceWorker && navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())); caches && caches.keys().then(ks => ks.forEach(k => caches.delete(k))); } catch (e) { /* sin SW */ }
+      ra.textContent = A.T("Reiniciado. Recargando…", "Reset. Reloading…"); setTimeout(() => location.reload(), 500);
     }; }
   function openSettings(on) {
     S.settingsOpen = on; const sh = $("setSh");
@@ -282,7 +295,11 @@
   }
   function renderMenu(screen) { A.hub.screen(screen || S.hub || "home"); }
   /* altura ocupada por el pie de pagina: las cartas de herramienta se colocan justo encima */
-  { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
+  /* escala de la interfaz: en pantallas grandes todo el HUD y los menus crecen (k = 1 en 1280x720, hasta 1,85) para aprovechar el espacio */
+  const uiK = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--k")) || 1;
+  const setK = () => { const w = innerWidth, h = innerHeight, k = (w < 900 || h < 520) ? 1 : Math.max(1, Math.min(1.85, Math.min(w / 1280, h / 720))); document.documentElement.style.setProperty("--k", k.toFixed(3)); };
+  setK(); addEventListener("resize", setK); A.uiK = uiK;
+  { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round((innerHeight - r.top) / uiK()) : 16) + "px"); };
     if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
   /* ------------------------------------------------------------ partida */
@@ -344,7 +361,7 @@
     pingFx(lastPtr.x, lastPtr.y); A.sfx.tap(); A.sfx.pin(S.streak);
     reveal({ lon, lat }, Math.max(0, S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000));
   }
-  const padForDialog = () => (window.innerWidth > 900 ? { l: 60, r: 410, t: 170, b: 130 } : { l: 30, r: 30, t: 240, b: 410 });
+  const padForDialog = () => { const k = uiK(); return window.innerWidth > 900 ? { l: 60 * k, r: 410 * k, t: 170 * k, b: 130 * k } : { l: 30, r: 30, t: 240, b: 410 }; };
 
   function reveal(guess, left) {
     S.phase = "reveal"; map.setPick(false); S.tense = false; A.music.mode(1); if (S.run) A.chal.reveal();

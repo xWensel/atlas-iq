@@ -2,6 +2,8 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.23.0** - Interfaz mas grande y legible: la UI se escala con la pantalla (menus, campamento, tickets y marcador de partida hasta x1,85 en pantallas grandes; movil sin cambios) y las letras pequenas suben unos 3 px (la placa de la pregunta no cambia), con menos espaciado entre letras. Las pantallas de menu se centran en vertical. Perks con descripciones mas claras y practicas (Gafas de lectura, Placas tectonicas, Monedero, Banquero, Paraguas, Sextante...). Nuevo boton de desarrollo en Ajustes > Datos: reinicia TODO desde cero (logros, personajes desbloqueados, enciclopedia, ajustes).
+
 **v0.22.1** - Pangea rehecha: ajuste conjunto por descenso de coordenadas con solape cero entre continentes (Sudamerica gira 40 grados y se encaja en Africa, Norteamerica se cierra contra Europa sin cubrir Islandia ni el Reino Unido, Asia se curva contra Europa y Arabia, Oceania al sur); el reto arranca al 90/95/100 % y no deja solapes apreciables.
 
 **v0.22.0** - Pixel art nitido, legibilidad, viento y HUD.

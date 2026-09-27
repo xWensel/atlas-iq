@@ -556,5 +556,9 @@ window.AIQ = window.AIQ || {};
     "Bet won": ["Pari gagné", "Aposta ganha", "Wette gewonnen", "Scommessa vinta"],
     "Bet lost": ["Pari perdu", "Aposta perdida", "Wette verloren", "Scommessa persa"],
     "Interest (1 per 10)": ["Intérêt (1 par 10)", "Juro (1 por 10)", "Zinsen (1 pro 10)", "Interesse (1 ogni 10)"],
+    "Reset EVERYTHING from scratch (dev)": ["Tout réinitialiser à zéro (dev)", "Reiniciar TUDO do zero (dev)", "ALLES von vorn zurücksetzen (Dev)", "Reimposta TUTTO da zero (dev)"],
+    "Deletes the saved run, profile, achievements, unlocked decks and ascensions, records, Encyclopedia, tutorial and settings. Dev only.": ["Supprime la partie sauvegardée, le profil, les succès, les decks et ascensions débloqués, les records, l'Encyclopédie, le tutoriel et les réglages. Réservé au développement.", "Apaga a partida salva, o perfil, as conquistas, os baralhos e ascensões desbloqueados, os recordes, a Enciclopédia, o tutorial e os ajustes. Só para desenvolvimento.", "Löscht gespeicherten Durchlauf, Profil, Erfolge, freigeschaltete Decks und Aufstiege, Rekorde, Enzyklopädie, Tutorial und Einstellungen. Nur für die Entwicklung.", "Cancella la partita salvata, il profilo, i risultati, i mazzi e le ascensioni sbloccati, i record, l'Enciclopedia, il tutorial e le impostazioni. Solo per sviluppo."],
+    "Sure? EVERYTHING is deleted. Press again": ["Sûr ? TOUT est supprimé. Appuie encore", "Certeza? TUDO será apagado. Toque de novo", "Sicher? ALLES wird gelöscht. Nochmal drücken", "Sicuro? Viene cancellato TUTTO. Premi ancora"],
+    "Reset. Reloading…": ["Réinitialisé. Rechargement…", "Reiniciado. Recarregando…", "Zurückgesetzt. Lade neu…", "Reimpostato. Ricarico…"],
   });
 })(window.AIQ);
