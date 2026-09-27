@@ -23,6 +23,9 @@ ICONS = ROOT / "assets" / "icons"; GEN = ROOT / "assets" / "gen"
 STAGE = ROOT / "assets_stage"; SI = STAGE / "icons"; SG = STAGE / "gen"
 INK = np.array((29, 10, 61, 255), np.uint8)                  # indigo del contorno original de los iconos (unificado)
 SKIP = {"logo_mark", "logo_mark_s"}                          # la marca la dibuja tools/make_brand.py
+try:
+    from hand_icons import REG as _HAND; SKIP |= set(_HAND)  # y los iconos redibujados a mano (tools/hand_icons.py) ya estan limpios
+except Exception: pass
 N4 = ((1, 0), (-1, 0), (0, 1), (0, -1)); N8 = N4 + ((1, 1), (-1, -1), (1, -1), (-1, 1))
 
 def block(a):

@@ -971,6 +971,122 @@ def ch_dizzy(id):
     for (x, y) in ((8, 20), (54, 42), (46, 8)): I.add(faceted_star(x, y, 7, 2.5, "gold", n=4))
     return I
 
+
+# ============================================================ tanda 4c: reliquias y logros confusos
+def flame(cx, by, h, w):
+    return poly([(cx, by - h), (cx + w * .35, by - h * .55), (cx + w * .5, by - h * .2), (cx + w * .42, by), (cx - w * .42, by), (cx - w * .5, by - h * .25), (cx - w * .2, by - h * .5)]) | ellipse(cx, by - h * .22, w * .48, h * .24)
+
+def shield_mask(cx=32, top=4, w=48, h=56):
+    return poly([(cx - w / 2, top), (cx + w / 2, top), (cx + w / 2, top + h * .45), (cx, top + h), (cx - w / 2, top + h * .45)])
+
+@icon("streakguard")
+def streakguard(id):
+    I = Icon(); sh = opening(shield_mask(), 2); I.add(bevel(sh, R["blue"]))
+    I.put(erode(sh, 4) & ~erode(sh, 5), R["blue"][1])
+    f = flame(32, 48, 32, 22); I.add(bevel(f, R["orange"])); I.add(bevel(flame(32, 47, 16, 11), R["gold"]), outline=False); return I
+
+@icon("a_volcano")
+def a_volcano(id):
+    I = Icon()
+    for (x, y, r) in ((24, 10, 5), (34, 6, 6), (42, 13, 4)): I.add(bevel(circle(x, y, r), R["grey"]))
+    I.add(bevel(poly([(2, 60), (22, 26), (42, 26), (62, 60)]), R["brown"]))
+    lava = poly([(24, 26), (40, 26), (38, 34), (42, 44), (36, 40), (32, 50), (28, 38), (22, 42)])
+    I.add(bevel(lava, R["orange"]), outline=False); I.put(rect(24, 24, 16, 4), R["red"][1]); return I
+
+@icon("a_inf")
+def a_inf(id):
+    m = blank()
+    for t in np.linspace(0, 2 * math.pi, 200):
+        x = 32 + 26 * math.cos(t) / (1 + math.sin(t) ** 2); y = 32 + 26 * math.sin(t) * math.cos(t) / (1 + math.sin(t) ** 2)
+        m |= circle(x, y, 5)
+    I = Icon(); I.add(bevel(m, R["gold"])); return I
+
+@icon("a_hundred")
+def a_hundred(id):
+    I = Icon(); tag = poly([(14, 6), (50, 6), (58, 18), (58, 58), (6, 58), (6, 18)]); I.add(bevel(tag, R["gold"]))
+    I.put(circle(32, 15, 4), INK); I.put(circle(32, 15, 2.4), R["dark"][2])
+    one = rect(14, 28, 4, 22) | rect(11, 30, 4, 3); I.put(one, R["red"][2])
+    for x in (22, 40): I.put(ring(x + 5, 39, 4, 7.5) & rect(0, 28, N, 22), R["red"][2])
+    return I
+
+@icon("t_strait")
+def t_strait(id):
+    I = Icon(); I.add(bevel(rrect(4, 4, 56, 56, 6), R["blue"]))
+    left = poly([(4, 4), (30, 4), (26, 22), (30, 34), (24, 60), (4, 60)]) & rrect(4, 4, 56, 56, 6)
+    right = poly([(38, 4), (60, 4), (60, 60), (32, 60), (36, 40), (32, 28), (38, 18)]) & rrect(4, 4, 56, 56, 6)
+    I.add(bevel(left, R["green"])); I.add(bevel(right, R["sand"]))
+    return I
+
+@icon("iq_0")
+def iq_0(id):
+    I = Icon(); I.add(pin(32, 24, 20, "grey")); I.put(glyph_mask("?", 27, 14, 2), INK); return I
+
+@icon("iq_5")
+def iq_5(id):
+    I = Icon()
+    orbit_b = (ellipse(32, 36, 30, 9) & ~ellipse(32, 36, 26, 6)) & rect(0, 0, N, 36)
+    I.add(bevel(orbit_b, R["gold"], soft=False))
+    I.add(globe_part(40, 32, 32, -50, 10))
+    orbit_f = (ellipse(32, 36, 30, 9) & ~ellipse(32, 36, 26, 6)) & rect(0, 36, N, 30)
+    I.add(bevel(orbit_f, R["gold"], soft=False)); return I
+
+@icon("passport")
+def passport(id):
+    I = Icon(); I.add(flat(rrect(12, 6, 42, 54, 3), R["paper"][3])); I.add(bevel(rrect(10, 4, 42, 54, 3), R["blue"]))
+    I.put(rect(14, 4, 2, 54), R["blue"][3])
+    g = globe_part(22, 32, 26, -50, 10); I.add(g)
+    I.put(rect(22, 44, 20, 2), R["gold"][1]); I.put(rect(25, 49, 14, 2), R["gold"][2]); return I
+
+@icon("coupon")
+def coupon(id):
+    I = Icon(); t = rrect(2, 14, 60, 36, 4) & ~circle(2, 32, 6) & ~circle(62, 32, 6)
+    I.add(bevel(t, R["red"]))
+    yy, xx = np.indices((N, N)); I.put((xx == 20) & ((yy // 3) % 2 == 0) & erode(t, 2), R["paper"][1])
+    I.put(rect(28, 30, 8, 4), R["paper"][1])
+    I.put(rect(40, 22, 4, 20) | rect(37, 25, 3, 3), R["paper"][1])
+    I.add(sphere(circle(11, 32, 5), 10, 31, 5, R["gold"]))
+    return I
+
+@icon("philosopher")
+def philosopher(id):
+    I = Icon()
+    pol = [[(32, 4), (46, 16), (32, 22)], [(32, 4), (18, 16), (32, 22)], [(18, 16), (32, 22), (24, 44)], [(46, 16), (32, 22), (40, 44)],
+           [(32, 22), (24, 44), (32, 58)], [(32, 22), (40, 44), (32, 58)], [(18, 16), (24, 44), (10, 34)], [(46, 16), (40, 44), (54, 34)],
+           [(10, 34), (24, 44), (32, 58)], [(54, 34), (40, 44), (32, 58)]]
+    facets(I, pol, "red", [2, 0, 1, 3, 2, 3, 1, 4, 3, 4])
+    for (x, y, r) in ((54, 8, 5), (10, 12, 3.5), (56, 54, 3)): I.add(faceted_star(x, y, r * 1.6, r * .5, "gold", n=4), outline=False)
+    return I
+
+@icon("spyhole")
+def spyhole(id):
+    I = Icon(); I.add(bevel(rrect(12, 4, 40, 58, 4), R["brown"]))
+    for y in (10, 36): I.put(rrect(17, y, 30, 20, 2) & ~erode(rrect(17, y, 30, 20, 2), 1), R["brown"][3])
+    I.add(bevel(circle(32, 22, 10), R["gold"])); I.add(sphere(circle(32, 22, 6), 30, 20, 6, R["teal"]), outline=False)
+    I.put(circle(32, 22, 2), INK); I.add(sphere(circle(44, 46, 3), 43, 45, 3, R["gold"])); return I
+
+@icon("sonarplus")
+def sonarplus(id):
+    I = Icon()
+    for r, rp_ in ((28, "teal"), (20, "teal"), (12, "teal")):
+        I.put(ring(30, 34, r - 2.2, r) & rect(0, 0, 44, N), R[rp_][1 if r == 28 else 2 if r == 20 else 0])
+    I.add(sphere(circle(30, 34, 6), 29, 33, 6, R["teal"]))
+    I.add(bevel(rect(44, 6, 18, 6) | rect(50, 0, 6, 18), R["gold"])); return I
+
+@icon("plates")
+def plates(id):
+    I = Icon(); I.add(globe_part(52, 32, 32, 20, 5))
+    crack = thick_line([(12, 22), (24, 28), (30, 20), (40, 30), (54, 26)], 2) | thick_line([(30, 20), (28, 40), (36, 56)], 2)
+    I.put(crack & circle(32, 32, 25), R["orange"][1]); I.put(dilate(crack, 1) & ~crack & circle(32, 32, 25), R["orange"][4])
+    return I
+
+@icon("wind")
+def wind_icon(id):
+    I = Icon()
+    for y, l, curl in ((16, 38, 1), (32, 50, 1), (50, 30, -1)):
+        pts = [(4, y), (4 + l, y)] + [(4 + l + 7 * math.sin(t), y - curl * (7 - 7 * math.cos(t))) for t in np.linspace(0, math.pi * 1.3, 8)]
+        I.add(bevel(thick_line(pts, 5), R["ice"], soft=False))
+    return I
+
 # ============================================================ salida
 def build(ids):
     done = []
