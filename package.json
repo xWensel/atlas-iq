@@ -3,5 +3,12 @@
   "version": "0.32.0",
   "description": "Geolite - juego de geografia: haz clic lo mas cerca posible del lugar que te piden.",
   "private": true,
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.4.11"
+  }
 }
