@@ -7,23 +7,24 @@ piden antes del 28 de septiembre.
 
 ## Bloqueantes legales
 
-- [ ] **Modo Clasico.** `data/classic.js` y `data/classic-tr.js` contienen ahora
-      mismo una copia literal de la base de datos del Traveler IQ Challenge
-      original: mismos nombres de nivel ("World Cities (Easy)", "Famous places
-      (Easy)"...), mismos umbrales de puntuacion (`kmBase`, `kmDist`, `speed`,
-      `cutoff`) y el texto exacto de los "fun facts" ("Buenos Aires means Fair
-      Winds", etc). Esto **no se arregla anadiendo mas preguntas o cambiando
-      algunas**: la mecanica de "haz clic lo mas cerca posible" no es
-      protegible, pero la lista curada de lugares + los textos de los datos
-      curiosos + la estructura de niveles copiada si lo son. Hay que:
-      - Generar una lista de lugares propia por nivel (puede reusar el motor
-        de datos de Wikipedia que ya alimenta Aventura/Enciclopedia).
-      - Redactar datos curiosos propios (o generarlos desde Wikipedia con
-        atribucion, igual que la Enciclopedia).
-      - Definir umbrales/curva de dificultad propios (no hace falta que
-        coincidan con los originales).
-      - Quitar el comentario interno "juego original" y cualquier referencia
-        a "Traveler IQ Challenge" en codigo/README.
+- [x] **Modo Clasico - hecho.** Las 6 campanas (`game1`/Mundo, `worldcapitals`,
+      `usa`, `asia`, `centralsouthamerica`, `oceania`) se regeneran con
+      `node tools/build-classic.mjs` a partir de `data/places.js` + `data/wiki`
+      (el mismo banco de Wikipedia/Wikidata que usan Aventura y la Enciclopedia).
+      Cero lugares, facts o umbrales de puntuacion copiados del Traveler IQ
+      Challenge original; el fichero de datos resultante conserva la forma que
+      espera el motor (`js/game.js`, `data/campaigns.js`), asi que no hizo
+      falta tocar codigo de juego. Los nombres de los lugares se traducen solos
+      via `data/places.js` (no hace falta ampliar `data/classic-tr.js` salvo
+      que se quiera traducir tambien el nombre de cada nivel, que hoy solo
+      esta en ingles). Tambien se actualizaron los textos de la interfaz que
+      decian "las preguntas y la puntuacion exactas del juego original"
+      (`js/hub.js`, `js/i18n.js`, `js/i18n2.js`, `data/campaigns.js`).
+      Pendiente si se quiere pulir mas: `worldcapitals` y `oceania` salen mas
+      pequenas de lo que eran (48 y 21 lugares) porque la reserva propia de
+      lugares para esas regiones es mas limitada - se podria ampliar
+      `tools/places-src.mjs` con mas capitales/ciudades del Pacifico si se
+      quiere un Next Fest con esas campanas mas largas.
 - [ ] Nombre "Geolite": comprobar marcas registradas (USPTO/EUIPO) antes de
       reservarlo en Steamworks.
 - [ ] Atribucion de Wikipedia (CC BY-SA 4.0) y fotos de Commons: ya se muestra
@@ -77,7 +78,7 @@ piden antes del 28 de septiembre.
 ## Roadmap sugerido (hoy: 27 sept 2026 -> Next Fest feb 2027)
 
 1. **Semanas 1-3 (paralelo):**
-   - Legal: reescribir datos del modo Clasico (lugares + facts + curva propia).
+   - Legal: ~~reescribir datos del modo Clasico~~ hecho (ver arriba).
    - Tecnico: montar el wrapper de Electron + primer build local. Empezar
      integracion de `steamworks.js` (logros primero, es lo mas mecanico).
    - Tienda: dar de alta la cuenta en Steamworks (paga el fee, reserva el

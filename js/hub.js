@@ -23,7 +23,7 @@ window.AIQ = window.AIQ || {};
       <div class="hh-top"><img class="hh-logo" src="assets/logo.png" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
       <p class="hh-tag">${A.t("title.tag")}</p>
       <div class="hh-cards">
-        ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Las preguntas y la puntuación exactas del juego original: seis partidas.", "The original game's exact questions and scoring: six campaigns."), T("Pulido y sin trampas", "Untouched"))}
+        ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Ciudades, capitales y monumentos de seis regiones del mundo, contra el reloj.", "Cities, capitals and landmarks across six regions of the world, against the clock."), T("Directo al grano", "No frills"))}
         ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: el crupier cambia las reglas. Mapa a oscuras, del revés, letras que tiemblan… y perks para vencerlo.", "Roguelike: the dealer changes the rules. Dark maps, upside-down worlds, shaky letters… and perks to beat him."), saved ? T("▶ Partida guardada", "▶ Saved run") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
         ${mc("daily", "Q", "s_compass", "card_compete", T("Reto diario", "Daily challenge"), T("La misma expedición para todos, una vez al día. Compara tu puntuación.", "The same expedition for everyone, once a day. Compare your score."), done ? T("Hoy: ", "Today: ") + A.fmt(done.score) : T("El de hoy te espera", "Today's is waiting"))}
       </div>
