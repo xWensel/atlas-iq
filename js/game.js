@@ -7,7 +7,7 @@
   const S = {
     mode: "classic", campId: null, camp: null, level: 0, qs: [], qi: 0, levelScore: 0, runTotal: 0, runMax: 0, completed: 0, streak: 0,
     phase: "title", limit: 10, t0: 0, pausedAcc: 0, pauseAt: 0, paused: false, lastTick: -1, tense: false, startLevel: 0, prog: {},
-    quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, fsGate: true, booting: true, skin: "casino",
+    quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, booting: true, skin: "casino",
     hub: "home", ranked: null, run: null, tool: null, hits: 0,
     cursor: true, tips: true, songToast: true, setTab: "general",
   };
@@ -16,14 +16,14 @@
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || "{}");
       A.lang = d.lang && A.STR[d.lang] ? d.lang : A.detectLang();
-      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.cursor = d.cursor !== false; S.tips = d.tips !== false; S.tour = d.tour !== false; S.songToast = d.songToast !== false; S.setTab = d.setTab || "general"; S.fsGate = d.fsGate !== false; S.skin = "casino";
+      S.intro = d.intro !== false; S.reduce = !!d.reduce; S.cursor = d.cursor !== false; S.tips = d.tips !== false; S.tour = d.tour !== false; S.songToast = d.songToast !== false; S.setTab = d.setTab || "general"; S.skin = "casino";
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
     } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, fsGate: S.fsGate, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
@@ -467,15 +467,19 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
   /* ------------------------------------------------------------ veredictos */
   function verdict({ kind, level, tag, title, text, stats, stamp, stampSub, iq, tier, tierName, buttons, art, lines }) {
     const idc = iq != null ? `<div class="idcard">${tier != null ? A.icon("iq_" + tier) : `<img class="ic" src="assets/icons/logo_mark.png" alt="">`}<span>${A.t("iq.label")}</span><span class="odo" id="iqNum"></span><em>${tierName}</em></div>` : "";
+    const chip = kind === "" ? "chip_r" : art === "chest" ? "chip_p" : kind === "win" ? "chip_b" : "chip_g";
+    const medal = `<div class="v-medal ${kind}">
+        <i class="v-medal-glow"></i>${art === "chest" ? `<i class="v-medal-crown">${A.icon("crown")}</i>` : ""}
+        <i class="v-medal-chip">${A.icon(chip)}</i>
+      </div>`;
     dialog(`<div class="vd">
       <div class="v-main">
         <span class="tag">${tag || A.t("v.level", { n: pad2(level) })}</span>
         <h2>${title}</h2><p>${text}</p>${lines && lines.length ? `<ul class="v-lines">${lines.map((l, i) => `<li style="animation-delay:${0.5 + i * 0.12}s"><span>${l[0]}</span><i></i><b>${l[1]}</b></li>`).join("")}</ul>` : ""}
         <div class="v-stats">${stats.map((s, i) => `<div><span>${s[0]}</span><span class="odo" id="vs${i}"></span></div>`).join("")}</div>
-        <div class="v-dealer" id="vdDealer"></div>
         <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? `<span class="ar">${A.icon("u_next", "sm")}</span>` : ""}</button>`).join("")}</div>
       </div>
-      <div class="v-side">${art ? `<div class="v-art">${A.pic(art)}</div>` : ""}<div class="stamp ${kind}"><div>${stamp}<b>${stampSub}</b></div></div>${idc}</div>
+      <div class="v-side">${medal}<div class="v-dealer" id="vdDealer"></div>${idc}</div>
     </div>`, "verdict");
     stats.forEach((s, i) => { const el = $("vs" + i); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, s[1], { ms: 1300, delay: 700 + i * 120, tick: i === 0 && s[1] > 0 })); });
     if (iq != null) { const el = $("iqNum"); odoNow(el, 0); requestAnimationFrame(() => odoSet(el, iq, { ms: 1400, delay: 1000 })); }
@@ -638,17 +642,16 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
   }
   function runBoot() {
     const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden");
-    langChips($("gateLangs"), setLang);
-    const fsBtn = $("gateFs"); fsBtn.setAttribute("aria-checked", S.fsGate);
-    fsBtn.onclick = e => { e.stopPropagation(); S.fsGate = !S.fsGate; fsBtn.setAttribute("aria-checked", S.fsGate); save(); };
+    const showGate = () => { $("studio").classList.add("hidden"); gate.classList.remove("hidden"); };
     let entered = false;
     const enter = () => {
-      if (entered) return; entered = true; A.audio.unlock(false); if (S.fsGate) requestFs();
-      gate.classList.add("hidden"); if (S.intro) playStudio(finishBoot); else finishBoot();
+      if (entered) return; entered = true; A.audio.unlock(false); requestFs();
+      gate.classList.add("hidden"); finishBoot();
     };
-    gate.addEventListener("pointerdown", e => { if (e.target.closest(".gate-opts")) return; enter(); });
+    gate.addEventListener("pointerdown", enter);
     addEventListener("keydown", function k(e) { if (entered) { removeEventListener("keydown", k); return; } if (e.key === "Enter" || e.key === " ") { e.preventDefault(); enter(); } });
     (A._debug = A._debug || {}).enterBoot = enter;
+    if (S.intro) playStudio(showGate); else showGate();
   }
 
   A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, refreshPrompt: () => { setPrompt(); }, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
