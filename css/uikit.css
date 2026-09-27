@@ -105,14 +105,23 @@ body.title-on .brand-sh { opacity: 0; pointer-events: none; }
 /* notas de campo: como mucho 3 lineas (2 en pantallas medianas) para no empujar el ticket ni las cartas */
 #factText:not(:empty) { max-height: calc(30 * var(--vh)); overflow-y: auto; scrollbar-width: thin; }   /* el texto entero, sin puntos suspensivos: si es muy largo, se desplaza */
 @media (max-width: 1100px) { #factText:not(:empty) { font-size: 17px; max-height: calc(26 * var(--vh)); } }
-/* Campamento en movil o pantallas bajas (o con muchos retos/textos largos que no caben): se desplaza en vez de cortar cartas y botones */
+/* Campamento: red de seguridad siempre activa (no solo en pantallas bajas) - si el contenido
+ * no cabe (p. ej. reto + las 3 cartas de tienda a la vez), se desplaza en vez de cortarse. */
+#dlg.tablewrap { overflow-y: auto; overflow-x: hidden; }
+.table { height: auto; min-height: 100%; }
+/* Comun a movil y a ventanas de escritorio bajas (<=760px de alto, p. ej. 720p/768p):
+ * NO se apila la bandeja aqui (eso multiplicaria su alto x3, que es justo lo que
+ * se queria evitar) - solo texto/tarjetas mas compactos. */
 @media (max-width: 700px), (max-height: 760px) {
-  #dlg.tablewrap { overflow-y: auto; overflow-x: hidden; }
-  .table { height: auto; min-height: 100%; }
   .tb-note { font-size: 17px; } .tray-row { flex-wrap: wrap; }
   .table .offers { flex: none; flex-wrap: wrap; } .table .offer.pc { --w: min(calc(44 * var(--vw)), 260px); height: auto; }
   .tb-head { grid-template-columns: minmax(0, 1fr) auto; } .tb-head .route { display: none; } .tb-right { gap: 8px; } .tb-coins { padding: 4px 12px 4px 6px; } .tb-coins b { font-size: 22px; } .tb-coins .ic { width: 28px; height: 28px; }
-  .tb-next-row { max-width: 100%; } .tb-tray { grid-template-columns: 1fr 1fr; margin: 0 -14px; padding-left: 14px; padding-right: 14px; } .tb-tray .go-next { grid-column: 1 / -1; min-width: 0; width: 100%; }
+  .tb-next-row { max-width: 100%; }
+}
+/* Solo en movil de verdad (ancho estrecho): aqui si hace falta apilar la bandeja
+ * en 2 filas porque 4 columnas no caben de ancho, aunque sea mas alta. */
+@media (max-width: 700px) {
+  .tb-tray { grid-template-columns: 1fr 1fr; margin: 0 -14px; padding-left: 14px; padding-right: 14px; } .tb-tray .go-next { grid-column: 1 / -1; min-width: 0; width: 100%; }
 }
 /* movil y tablet: el ticket es una hoja inferior sobre el pie de pagina; mientras se ve, el resto del HUD de partida se aparta */
 @media (max-width: 900px) {
@@ -271,7 +280,7 @@ html body .lb-src, html body .lb-empty { font-size: 15.5px; } html body .camp-d 
 html body .ach > i { font-size: 18px; } html body .ach-t > i { font-size: 18px; } html body .ach-t > em { font-size: 15.5px; }
 html body .cx-title > p { font-size: 15.5px; } html body .cx-chip, html body .cx-chip > span, html body .cx-chip > em { font-size: 15.5px; } html body .cx-nm { font-size: 19px; } html body .cx-mt > em { font-size: 15.5px; } html body .cx-new { font-size: 15.5px; }
 html body .cx-tt > em, html body .cx-tt > i { font-size: 15.5px; }
-html body .seg > button { font-size: 15.5px; } html body .set-card > h3 { font-size: 15.5px; } html body .langgrid > button { font-size: 15.5px; } html body .set-note { font-size: 18px; line-height: 1.25; } html body .rs-t > small { font-size: 17px; line-height: 1.2; }
+html body .set-card > h3 { font-size: 15.5px; } html body .langgrid > button { font-size: 15.5px; } html body .set-note { font-size: 18px; line-height: 1.25; } html body .rs-t > small { font-size: 17px; line-height: 1.2; }
 html body .adv-chal-h { font-size: 15.5px; } html body .ab-act { font-size: 15.5px; } html body .ch-chip > b { font-size: 15.5px; } html body .ch-chip .ch-lv { font-size: 14px; }
 html body .tk-band > span { font-size: 15.5px; } html body .tk-from { font-size: 19px; } html body .tk-total > span { font-size: 15.5px; } html body .tk-cx > span, html body .tk-cx > b { font-size: 15.5px; }
 html body .nx-n, html body .nx-none, html body .nx-hint, html body .nx-have, html body .ch-buy { font-size: 15.5px; } html body .nx-body > p { font-size: 18px; }

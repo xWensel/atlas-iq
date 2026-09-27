@@ -637,11 +637,8 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     const st = $("studio"); st.classList.remove("hidden"); $("stLogo").innerHTML = ""; A.buildLogo($("stLogo"), { animated: true }); $("stLogo").classList.remove("has-png");
     A.sfx.studio();
     let ended = false;
-    const end = fast => { if (ended) return; ended = true; st.classList.add("leave"); setTimeout(done, fast ? 320 : 540); };
-    const timer = A._holdStudio ? 0 : setTimeout(() => end(false), S.reduce ? 1500 : 3500);
-    const skip = () => { clearTimeout(timer); end(true); };
-    st.addEventListener("pointerdown", skip, { once: true });
-    addEventListener("keydown", function k(e) { if (["Enter", " ", "Escape"].includes(e.key)) { skip(); removeEventListener("keydown", k); } });
+    const end = () => { if (ended) return; ended = true; st.classList.add("leave"); setTimeout(done, 540); };
+    if (!A._holdStudio) setTimeout(end, S.reduce ? 1500 : 3500);   /* animacion obligatoria: no se puede saltar */
   }
   function finishBoot() {
     S.booting = false; const boot = $("boot"); boot.classList.add("out"); setTimeout(() => boot.classList.add("hidden"), 850);

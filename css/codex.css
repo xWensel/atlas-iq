@@ -44,7 +44,7 @@
 .cx-no { position: absolute; top: 12px; left: 13px; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; color: #fff; background: var(--ink); padding: 2px 5px 1px; opacity: .85; }
 .cx-new { position: absolute; top: 12px; right: 10px; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--paper); background: var(--red); padding: 3px 6px 2px; transform: rotate(4deg); animation: blink 1.2s ease-in-out infinite; }
 .cx-card.locked, .cx-bigcard.locked { --rc: #4a5a60; background: var(--ink-2); background-image: none; color: rgba(242,233,214,.4); } .cx-card.locked .cx-art { background: repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 6px, transparent 6px 12px), var(--ink); }
-.cx-card.locked .cx-ic, .cx-bigcard.locked .cx-ic { opacity: .5; filter: grayscale(1) brightness(.45) contrast(1.2); } .cx-art .q { position: absolute; font-family: var(--serif); font-weight: 900; font-size: 64px; color: rgba(242,233,214,.2); }
+.cx-card.locked .cx-ic, .cx-bigcard.locked .cx-ic { opacity: .5; filter: grayscale(1) brightness(.45) contrast(1.2); } .cx-art .q { position: absolute; right: 8px; bottom: 8px; top: auto; left: auto; width: 28%; height: auto; opacity: .55; }
 .cx-card.locked .cx-mt em, .cx-card.locked .cx-mt i { color: rgba(242,233,214,.35); } .cx-card.locked .cx-nm { letter-spacing: .05em; }
 /* brillo de rareza */
 .cx-card.open.r2::after, .cx-card.open.r3::after, .cx-bigcard.open.r2 .cx-foil, .cx-bigcard.open.r3 .cx-foil { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light; opacity: .8;
