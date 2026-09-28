@@ -660,7 +660,7 @@ void main(){
         if (this._orient().on) { const [a0, b0] = this._outToScene(0, 0), [a1, b1] = this._outToScene(dx, dy); dx = a1 - a0; dy = b1 - b0; }
         if (Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > (e.pointerType === "touch" ? 10 : 5)) p.moved = true;
         if (this.pointers.size === 1 && p.moved) {
-          this.anim = null; this.view.cx -= dx / this.view.s; this.view.cy += dy / this.view.s; this._clamp(this.view);
+          this.anim = null; this.view.cx -= (dx * A.mapSens.pan) / this.view.s; this.view.cy += (dy * A.mapSens.pan) / this.view.s; this._clamp(this.view);
           this.dirty = this.fxDirty = true; cv.classList.add("grabbing"); this.fx.classList.add("grabbing");
           const now = performance.now(); this.samples.push([now, dx, dy]); while (this.samples.length && now - this.samples[0][0] > 90) this.samples.shift();
         } else if (this.pointers.size === 2) {
@@ -682,14 +682,14 @@ void main(){
         if (p.moved && this.pointers.size === 0 && !this._wasPinch && this.samples.length > 1) {
           const t0 = this.samples[0][0], t1 = this.samples[this.samples.length - 1][0], dt = Math.max(16, t1 - t0) / 1000;
           const sx = this.samples.reduce((a, s) => a + s[1], 0) / dt, sy = this.samples.reduce((a, s) => a + s[2], 0) / dt;
-          if (performance.now() - t1 < 60 && Math.hypot(sx, sy) > 250) this.inertia = { vx: -sx / this.view.s, vy: sy / this.view.s };
+          if (performance.now() - t1 < 60 && Math.hypot(sx, sy) > 250) this.inertia = { vx: (-sx * A.mapSens.pan) / this.view.s, vy: (sy * A.mapSens.pan) / this.view.s };
         }
         this._wasPinch = this.pointers.size > 0; if (this.pointers.size === 0) this._wasPinch = false;
       };
       cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
       cv.addEventListener("wheel", e => {
         e.preventDefault(); const r = cv.getBoundingClientRect();
-        this.zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.012 : 0.0018)), e.clientX - r.left, e.clientY - r.top);
+        this.zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.012 : 0.0018) * A.mapSens.zoom), e.clientX - r.left, e.clientY - r.top);
       }, { passive: false });
       new ResizeObserver(() => this.resize()).observe(cv);
     }

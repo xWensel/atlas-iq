@@ -122,6 +122,10 @@
             <div class="row-sw"><div class="rs-t"><label data-i="set.intro"></label></div><button class="sw" data-sw="intro" role="switch" aria-checked="true" aria-label="Intro del estudio"><i></i></button></div>
             <div class="row-sw"><div class="rs-t"><label data-i="set.tour"></label><small data-i="set.tour.d"></small></div><button class="sw" data-sw="tour" role="switch" aria-checked="true" aria-label="Tutorial guiado"><i></i></button></div>
           </div>
+          <div class="set-card"><h3 data-i="set.units"></h3>
+            <div class="seg" data-seg="units"><button data-v="km" data-i="unit.km"></button><button data-v="mi" data-i="unit.mi"></button><i></i></div>
+            <p class="set-note" data-i="set.units.d"></p>
+          </div>
         </div></div>
 
         <div class="set-pane hidden" data-pane="sound"><div class="set-grid">
@@ -143,6 +147,21 @@
             <div class="row-sw"><div class="rs-t"><label data-i="set.motion"></label><small data-i="set.motion.d"></small></div><button class="sw" data-sw="motion" role="switch" aria-checked="false" aria-label="Reducir movimiento"><i></i></button></div>
             <div class="row-sw" id="rowCursor"><div class="rs-t"><label data-i="set.cursor"></label><small data-i="set.cursor.d"></small></div><button class="sw" data-sw="cursor" role="switch" aria-checked="true" aria-label="Puntero de casino"><i></i></button></div>
             <div class="row-sw"><div class="rs-t"><label data-i="set.tips"></label><small data-i="set.tips.d"></small></div><button class="sw" data-sw="tips" role="switch" aria-checked="true" aria-label="Ayudas emergentes"><i></i></button></div>
+          </div>
+          <div class="set-card wide"><h3 data-i="set.sens"></h3>
+            <div class="fader" data-range="pan"><label data-i="sens.pan"></label><output>100%</output><input type="range" min="50" max="200" step="10" value="100" aria-label="Sensibilidad de arrastre"><div class="ftrack"></div></div>
+            <div class="fader" data-range="zoom"><label data-i="sens.zoom"></label><output>100%</output><input type="range" min="50" max="200" step="10" value="100" aria-label="Sensibilidad de zoom"><div class="ftrack"></div></div>
+            <p class="set-note" data-i="set.sens.d"></p>
+          </div>
+          <div class="set-card wide"><h3 data-i="set.a11y"></h3>
+            <div class="row-sw"><div class="rs-t"><label data-i="set.contrast"></label><small data-i="set.contrast.d"></small></div><button class="sw" data-sw="contrast" role="switch" aria-checked="false" aria-label="Alto contraste"><i></i></button></div>
+            <div class="row-sw col"><div class="rs-t"><label data-i="set.cb"></label></div>
+              <div class="seg s4" data-seg="cb"><button data-v="off" data-i="cb.off"></button><button data-v="protan" data-i="cb.protan"></button><button data-v="deutan" data-i="cb.deutan"></button><button data-v="tritan" data-i="cb.tritan"></button><i></i></div>
+              <p class="set-note" data-i="set.cb.d"></p>
+            </div>
+          </div>
+          <div class="set-card wide"><h3 data-i="set.qsize"></h3>
+            <div class="seg s3" data-seg="qsize"><button data-v="n" data-i="qsize.n"></button><button data-v="l" data-i="qsize.l"></button><button data-v="xl" data-i="qsize.xl"></button><i></i></div>
           </div>
         </div></div>
 
@@ -187,6 +206,25 @@
   <div id="intro" class="hidden"></div>
   <div id="veil" class="hidden"></div>
 </div>
+
+<!-- Modo daltonico: simula la vision daltonica y le suma la diferencia con el original (feComposite),
+     lo que separa los colores que esa vision confunde. Los aplica game.js sobre document.body.style.filter. -->
+<svg id="cbDefs" width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="cbFix_protan" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0" result="sim"/>
+      <feComposite in="SourceGraphic" in2="sim" operator="arithmetic" k1="0" k2="2" k3="-1" k4="0"/>
+    </filter>
+    <filter id="cbFix_deutan" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0" result="sim"/>
+      <feComposite in="SourceGraphic" in2="sim" operator="arithmetic" k1="0" k2="2" k3="-1" k4="0"/>
+    </filter>
+    <filter id="cbFix_tritan" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0" result="sim"/>
+      <feComposite in="SourceGraphic" in2="sim" operator="arithmetic" k1="0" k2="2" k3="-1" k4="0"/>
+    </filter>
+  </defs>
+</svg>
 
 <script src="js/vendor/topojson-client.min.js"></script>
 <script src="data/world.js"></script>

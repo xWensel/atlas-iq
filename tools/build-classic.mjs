@@ -98,7 +98,7 @@ function buildGame(prefix, spec) {
     const kmBase = Math.max(1500, 6000 - i * 300);
     const speed = Math.max(300, 600 - i * 15);
     levels.push({
-      id: levels.length + 1, diff, name: `${prefix} ${LABEL[kind]} (${diff})`, bonus: false,
+      id: levels.length + 1, diff, name: `${prefix} ${LABEL[kind]} (${diff})`, kind, region: (opts && opts.region) || "world", bonus: false,
       tpq: 10, kmBase, kmDist: 2, speed, cutoff: 0.5,
       advance: Math.round((picks.length * kmBase * 0.55) / 100) * 100,
       dests: picks.map(mkDest),
@@ -120,6 +120,12 @@ const LV_usa = buildGame("USA", [
   ["Easy", "city", 0, 8, { region: "usa" }], ["Easy", "landmark", 0, 8, { region: "usa" }],
   ["Medium", "landmark", 1, 12, { region: "usa" }], ["Medium", "nature", 1, 12, { region: "usa" }],
   ["Hard", "city", 2, 15, { region: "usa" }], ["Hard", "history", 1, 12, { region: "usa" }],
+]);
+const LV_europe = buildGame("Europe", [
+  ["Easy", "city", 0, 8, { region: "europe" }], ["Easy", "capital", 0, 10, { region: "europe" }], ["Easy", "landmark", 0, 8, { region: "europe" }],
+  ["Medium", "city", 1, 12, { region: "europe" }], ["Medium", "landmark", 2, 10, { region: "europe" }], ["Medium", "nature", 1, 10, { region: "europe" }],
+  ["Hard", "city", 2, 12, { region: "europe" }], ["Hard", "landmark", 2, 12, { region: "europe" }], ["Hard", "history", 1, 12, { region: "europe" }],
+  ["Very hard", "history", 0, 10, { region: "europe" }],
 ]);
 const LV_asia = buildGame("Asia", [
   ["Easy", "capital", 0, 10, { region: "asia" }], ["Easy", "city", 0, 10, { region: "asia" }],
@@ -147,13 +153,70 @@ const LV_worldcapitals = [
   ...buildGame("Oceania", [["Hard", "capital", 0, 8, { region: "oceania" }]]),
 ].map((L, i) => ({ ...L, id: i + 1 }));
 
+/* Modo Banderas: las 196 banderas de paises (data/flags.js, casan 1:1 por nombre con
+ * las entradas "country" de data/places.js) en 5 tramos por fama. Sin tope por pais
+ * (cada entrada YA es un pais, el tope de take() no aplica aqui). */
+function buildFlags() {
+  const pool = [...(byKindTier["country/0"] || []), ...(byKindTier["country/1"] || [])]
+    .filter(p => !usedIds.has(p[0]) && !usedNames.has(norm(p[6].en)) && FACTS_EN[p[0]] && p[3] != null && p[4] != null)
+    .sort((a, b) => a[7] - b[7]);
+  pool.forEach(p => { usedIds.add(p[0]); usedNames.add(norm(p[6].en)); });
+  const BANDS = [["Easy", 30], ["Medium", 40], ["Hard", 40], ["Very hard", 40], ["Hardest", Infinity]];
+  const levels = []; let i = 0;
+  BANDS.forEach(([diff, n], idx) => {
+    const picks = n === Infinity ? pool.slice(i) : pool.slice(i, i + n); i += picks.length;
+    if (picks.length < 3) return;
+    const kmBase = Math.max(1500, 6000 - idx * 300);
+    const speed = Math.max(300, 600 - idx * 15);
+    levels.push({
+      id: levels.length + 1, diff, name: `Flags (${diff})`, kind: "flag", region: "world", bonus: false,
+      tpq: 10, kmBase, kmDist: 2, speed, cutoff: 0.5,
+      advance: Math.round((picks.length * kmBase * 0.55) / 100) * 100,
+      dests: picks.map(mkDest),
+    });
+  });
+  return levels;
+}
+const LV_flags = buildFlags();
+
+/* Modo Pistas: ronda "solo dato" (bonus:true, ver campaigns.js) que mezcla ciudades,
+ * monumentos, naturaleza e historia de todo el mundo; el nombre se oculta y se revela
+ * como respuesta, igual que las rondas bonus del original. */
+function buildClues() {
+  const BANDS = [
+    ["Easy", [["city", 0, 4], ["landmark", 0, 4], ["nature", 0, 3], ["history", 0, 3]]],
+    ["Medium", [["city", 1, 5], ["landmark", 2, 5], ["nature", 1, 4], ["history", 1, 4]]],
+    ["Hard", [["city", 2, 6], ["landmark", 2, 6], ["nature", 1, 5], ["history", 1, 5]]],
+    ["Very hard", [["city", 2, 6], ["landmark", 0, 6], ["history", 0, 6]]],
+  ];
+  const levels = [];
+  BANDS.forEach(([diff, parts], idx) => {
+    let picks = [];
+    parts.forEach(([kind, tier, n]) => { picks = picks.concat(take(kind, tier, n)); });
+    if (picks.length < 3) return;
+    const kmBase = Math.max(1500, 6000 - idx * 300);
+    const speed = Math.max(300, 600 - idx * 15);
+    levels.push({
+      id: levels.length + 1, diff, name: `Clues (${diff})`, kind: "clue", region: "world", bonus: true,
+      tpq: 10, kmBase, kmDist: 2, speed, cutoff: 0.5,
+      advance: Math.round((picks.length * kmBase * 0.55) / 100) * 100,
+      dests: picks.map(mkDest),
+    });
+  });
+  return levels;
+}
+const LV_clues = buildClues();
+
 const GAMES = {
   game1: { title: "World", levels: LV_game1 },
   worldcapitals: { title: "World Capitals", levels: LV_worldcapitals },
   usa: { title: "USA", levels: LV_usa },
+  europe: { title: "Europe", levels: LV_europe },
   asia: { title: "Asia", levels: LV_asia },
   centralsouthamerica: { title: "Latin America", levels: LV_latam },
   oceania: { title: "Oceania", levels: LV_oceania },
+  flags: { title: "Flags", levels: LV_flags },
+  clues: { title: "Clues", levels: LV_clues },
 };
 
 const arr = Object.entries(GAMES).map(([id, g]) => ({ id, title: g.title, home: { lat: 0.0, lon: 0.0, zoom: 1.0 }, levels: g.levels }));

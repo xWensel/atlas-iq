@@ -3,7 +3,7 @@
  * HTTP local (no file://) para que Service Worker, fetch relativo y rutas
  * funcionen exactamente igual que en el navegador.
  */
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, screen } = require("electron");
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -26,6 +26,71 @@ ipcMain.handle("steam:unlock", (e, id) => {
   if (!steamClient || typeof id !== "string") return false;
   try { return steamClient.achievement.activate(id); } catch (err) { console.warn("steam:unlock", id, err.message); return false; }
 });
+
+/* Modo de ventana: "window" (con bordes, tamano normal), "border" (sin
+ * bordes, ocupa todo el monitor sin salir del modo ventana - alt-tab
+ * instantaneo) y "full" (pantalla completa exclusiva del SO). El frame
+ * nativo no se puede cambiar en caliente, asi que pasar de/hacia "border"
+ * recrea la ventana; alternar entre "window" y "full" solo llama a
+ * setFullScreen porque ambas usan frame. El modo elegido se recuerda entre
+ * sesiones en un fichero junto al perfil de la app. */
+const MODE_FILE = path.join(app.getPath("userData"), "winmode.json");
+function loadMode() { try { const m = JSON.parse(fs.readFileSync(MODE_FILE, "utf8")).mode; return ["window", "border", "full"].includes(m) ? m : "full"; } catch (e) { return "full"; } }
+function saveMode(m) { try { fs.writeFileSync(MODE_FILE, JSON.stringify({ mode: m })); } catch (e) { /* sin permisos de escritura: se pierde al reiniciar */ } }
+let currentMode = loadMode();
+let win = null;
+const hasFrame = m => m !== "border";
+
+function wireWindow(w) {
+  w.webContents.on("did-finish-load", () => {
+    console.log("Ventana cargada OK");
+    w.webContents.executeJavaScript("innerWidth + 'x' + innerHeight").then(s => console.log("Tamano de contenido:", s));
+  });
+  w.webContents.on("did-fail-load", (e, code, desc) => console.error("Fallo al cargar:", code, desc));
+  w.webContents.on("console-message", (e, level, message, line, sourceId) => console.log("[renderer]", level, message, sourceId + ":" + line));
+  w.webContents.on("render-process-gone", (e, details) => console.error("Renderer crash:", details));
+  const notify = () => w.webContents.send("win:mode-changed", currentMode);
+  w.on("enter-full-screen", notify); w.on("leave-full-screen", notify);
+}
+
+function buildWindow(mode, url) {
+  const frame = hasFrame(mode);
+  const opts = {
+    minWidth: 960, minHeight: 600, useContentSize: true, autoHideMenuBar: true,
+    backgroundColor: "#0b2a44", frame, show: false,
+    webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(ROOT, "preload.js") },
+  };
+  if (mode === "border") {
+    const b = screen.getPrimaryDisplay().bounds; Object.assign(opts, b, { resizable: true, fullscreen: false });
+  } else {
+    opts.width = 1280; opts.height = 800; opts.fullscreen = mode === "full";
+  }
+  const w = new BrowserWindow(opts);
+  if (mode !== "border") w.center();
+  w.once("ready-to-show", () => w.show());
+  wireWindow(w);
+  w.loadURL(url);
+  return w;
+}
+
+function setWindowMode(mode) {
+  if (!["window", "border", "full"].includes(mode) || !win) return;
+  if (mode === currentMode) return;
+  const url = win.webContents.getURL();
+  if (hasFrame(mode) === hasFrame(currentMode)) {
+    currentMode = mode; saveMode(mode);
+    if (mode === "full") win.setFullScreen(true);
+    else { win.setFullScreen(false); win.setSize(1280, 800); win.center(); }
+    win.webContents.send("win:mode-changed", currentMode);
+    return;
+  }
+  currentMode = mode; saveMode(mode);
+  const old = win;
+  win = buildWindow(mode, url);
+  old.close();
+}
+ipcMain.on("win:getMode", (e) => { e.returnValue = currentMode; });
+ipcMain.on("win:setMode", (e, mode) => setWindowMode(mode));
 
 /* Las imagenes generadas (WebP) no pintan aunque devtools confirme que estan
  * cargadas (complete=true, naturalWidth=1024, opacity="1") - falla el pintado
@@ -63,19 +128,7 @@ function startServer() {
 async function createWindow() {
   const port = await startServer();
   console.log("Servidor local en el puerto", port);
-  const win = new BrowserWindow({
-    width: 1280, height: 800, minWidth: 960, minHeight: 600, useContentSize: true,
-    autoHideMenuBar: true, backgroundColor: "#0b2a44", fullscreen: true,
-    webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(ROOT, "preload.js") },
-  });
-  win.webContents.on("did-finish-load", () => {
-    console.log("Ventana cargada OK");
-    win.webContents.executeJavaScript("innerWidth + 'x' + innerHeight").then(s => console.log("Tamano de contenido:", s));
-  });
-  win.webContents.on("did-fail-load", (e, code, desc) => console.error("Fallo al cargar:", code, desc));
-  win.webContents.on("console-message", (e, level, message, line, sourceId) => console.log("[renderer]", level, message, sourceId + ":" + line));
-  win.webContents.on("render-process-gone", (e, details) => console.error("Renderer crash:", details));
-  win.loadURL(`http://127.0.0.1:${port}/index.html`);
+  win = buildWindow(currentMode, `http://127.0.0.1:${port}/index.html`);
 }
 
 app.whenReady().then(createWindow);

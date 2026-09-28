@@ -11,10 +11,11 @@ window.AIQ = window.AIQ || {};
   const locOf = () => (A.LANGS.find(l => l.code === A.lang) || A.LANGS[0]).loc;
   A.fmt = n => Math.round(n).toLocaleString(locOf());
   /* texto multilingue: objeto {en,es,...} o cadena. Si falta el idioma, ingles y luego espanol */
-  /* texto {es, en, ...}: idioma propio -> traduccion del ingles (js/i18n2.js) -> ingles -> espanol */
-  const TRI = { fr: 0, pt: 1, de: 2, it: 3 };
+  /* texto {es, en, ...}: idioma propio -> traduccion del ingles (js/i18n2.js) -> idioma base (p.ej. es-419 -> es) -> ingles -> espanol */
+  const TRI = { fr: 0, pt: 1, de: 2, it: 3, "es-419": 4, zh: 5, ko: 6, ja: 7, ru: 8 };
+  const BASE_OF = { "es-419": "es" };                                 // variantes sin datos propios: reusan el idioma base
   const trOf = en => { const t = A.TR && A.TR[en], i = TRI[A.lang]; return t && i != null ? t[i] : undefined; };
-  A.tx = v => (v && typeof v === "object" ? v[A.lang] || (v.en && trOf(v.en)) || (A.lang === "es" ? v.es : v.en) || v.en || v.es || "" : v || "");
+  A.tx = v => (v && typeof v === "object" ? v[A.lang] || (v.en && trOf(v.en)) || (BASE_OF[A.lang] && v[BASE_OF[A.lang]]) || (A.lang === "es" ? v.es : v.en) || v.en || v.es || "" : v || "");
   /* respuesta oculta: cada letra es un hueco, las palabras quedan separadas y al final va el recuento "(3, 7)" */
   A.blanks = (text, count) => {
     const t = String(text || "").trim(); if (!t) return "";

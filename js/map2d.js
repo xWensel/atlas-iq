@@ -15,6 +15,7 @@
  */
 window.AIQ = window.AIQ || {};
 (function (A) {
+  A.mapSens = A.mapSens || { pan: 1, zoom: 1 };     // multiplicador en vivo: lo muta Ajustes, lo leen ambos motores de mapa (este y map.js)
   const { project, unproject, D2R } = A.geo;
   const BX0 = -Math.PI, BX1 = Math.PI, BY0 = -1.5, BY1 = 2.1;      // limites del mundo (Miller)
 
@@ -180,7 +181,7 @@ window.AIQ = window.AIQ || {};
         const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
         if (Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > (e.pointerType === "touch" ? 10 : 5)) p.moved = true;
         if (this.pointers.size === 1 && p.moved) {
-          this.anim = null; this.view.cx -= dx / this.view.s; this.view.cy += dy / this.view.s;
+          this.anim = null; this.view.cx -= (dx * A.mapSens.pan) / this.view.s; this.view.cy += (dy * A.mapSens.pan) / this.view.s;
           this._clamp(this.view); this.dirty = this.fxDirty = this.hlDirty = true; cv.classList.add("grabbing"); this.fx.classList.add("grabbing");
         } else if (this.pointers.size === 2) {
           const st = this._pinchState();
@@ -201,7 +202,7 @@ window.AIQ = window.AIQ || {};
       cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
       cv.addEventListener("wheel", e => {
         e.preventDefault(); const r = cv.getBoundingClientRect();
-        this.zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0016)), e.clientX - r.left, e.clientY - r.top, false);
+        this.zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0016) * A.mapSens.zoom), e.clientX - r.left, e.clientY - r.top, false);
       }, { passive: false });
       new ResizeObserver(() => this.resize()).observe(cv);
     }

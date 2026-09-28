@@ -10,6 +10,7 @@
     quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, booting: true, skin: "casino",
     hub: "home", ranked: null, run: null, tool: null, hits: 0,
     cursor: true, tips: true, songToast: true, setTab: "general",
+    panSens: 100, zoomSens: 100, units: "km", contrast: false, colorblind: "off", qSize: "n",
   };
   const prog = id => (S.prog[id] = S.prog[id] || { unlocked: 1, best: 0, bestIq: 0 });
   function load() {
@@ -20,16 +21,23 @@
       A.audio.sfxOn = d.sfx !== false; A.audio.musicOn = d.music !== false;
       if (d.vol) Object.assign(A.audio.vol, d.vol);
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
+      S.panSens = d.panSens || 100; S.zoomSens = d.zoomSens || 100; S.units = d.units === "mi" ? "mi" : "km";
+      S.contrast = !!d.contrast; S.colorblind = ["protan", "deutan", "tritan"].includes(d.colorblind) ? d.colorblind : "off"; S.qSize = ["l", "xl"].includes(d.qSize) ? d.qSize : "n";
     } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab, panSens: S.panSens, zoomSens: S.zoomSens, units: S.units, contrast: S.contrast, colorblind: S.colorblind, qSize: S.qSize })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
   const q = () => S.qs[S.qi];
   const pad2 = n => String(n).padStart(2, "0");
-  const fmtKm = d => (d < 10 ? d.toFixed(1) : A.fmt(d)) + " km";
+  /* distancia mostrada al jugador: respeta S.units. Publica en A porque hub.js y adventure.js tambien muestran distancias. */
+  A.fmtDist = km => {
+    const mi = S.units === "mi", v = mi ? km / 1.609344 : km;
+    return (v < 10 ? v.toFixed(1) : A.fmt(v)) + " " + (mi ? "mi" : "km");
+  };
+  const fmtKm = A.fmtDist;
 
   /* ------------------------------------------------------------ arranque */
   load(); A.wiki.loadShort(A.lang);
@@ -39,6 +47,7 @@
   A.codex.init(world, map); A.pointer.init(map);
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
+  applySens(); applyVisualFX(); applyQSize();
   map.animateTo(map.home(), 0);
   A.cursor.set(S.cursor); A.tt.enable(S.tips);
 
@@ -143,14 +152,22 @@
 
   /* ------------------------------------------------------------ ajustes */
   function syncSettings() {
-    for (const f of document.querySelectorAll(".fader")) {
+    for (const f of document.querySelectorAll(".fader[data-k]")) {
       const k = f.dataset.k, v = Math.round(A.audio.vol[k] * 100), inp = f.querySelector("input");
       inp.value = v; inp.style.setProperty("--p", v + "%"); f.querySelector("output").textContent = v;
       const sw = f.querySelector(".sw");
       if (sw) { const on = k === "music" ? A.audio.musicOn : A.audio.sfxOn; sw.setAttribute("aria-checked", on); f.classList.toggle("off", !on); }
     }
-    segSet(document.querySelector('[data-seg="gfx"]'), S.quality); refreshLangUIs(); if (A.syncWin) A.syncWin();
-    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast };
+    for (const f of document.querySelectorAll(".fader[data-range]")) {
+      const k = f.dataset.range, v = S[k === "pan" ? "panSens" : "zoomSens"], inp = f.querySelector("input");
+      inp.value = v; inp.style.setProperty("--p", ((v - inp.min) / (inp.max - inp.min)) * 100 + "%"); f.querySelector("output").textContent = v + "%";
+    }
+    segSet(document.querySelector('[data-seg="gfx"]'), S.quality);
+    segSet(document.querySelector('[data-seg="units"]'), S.units);
+    segSet(document.querySelector('[data-seg="cb"]'), S.colorblind);
+    segSet(document.querySelector('[data-seg="qsize"]'), S.qSize);
+    refreshLangUIs(); if (A.syncWin) A.syncWin();
+    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast, contrast: S.contrast };
     for (const k in st) { const el = document.querySelector('.sw[data-sw="' + k + '"]'); if (el) el.setAttribute("aria-checked", !!st[k]); }
     const sg = document.querySelector('.sw[data-sw="songs"]'); if (sg) sg.closest(".row-sw").classList.toggle("off", !A.audio.musicOn);
     $("rowCursor").classList.toggle("hidden", !A.cursor.available);
@@ -190,7 +207,7 @@
     if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; }
   }
   let blipT = 0;
-  for (const f of document.querySelectorAll(".fader")) {
+  for (const f of document.querySelectorAll(".fader[data-k]")) {
     const k = f.dataset.k, inp = f.querySelector("input");
     inp.addEventListener("input", () => {
       const v = +inp.value / 100; A.audio.unlock(); A.audio.setVol(k, v);
@@ -200,6 +217,14 @@
     inp.addEventListener("change", save);
     const sw = f.querySelector(".sw");
     if (sw) sw.addEventListener("click", () => { toggleSwitch(k); });
+  }
+  for (const f of document.querySelectorAll(".fader[data-range]")) {
+    const k = f.dataset.range === "pan" ? "panSens" : "zoomSens", inp = f.querySelector("input");
+    inp.addEventListener("input", () => {
+      S[k] = +inp.value; applySens();
+      inp.style.setProperty("--p", ((inp.value - inp.min) / (inp.max - inp.min)) * 100 + "%"); f.querySelector("output").textContent = inp.value + "%";
+    });
+    inp.addEventListener("change", save);
   }
   function toggleSwitch(k) {
     if (k === "music") { A.audio.setMusic(!A.audio.musicOn); if (A.audio.musicOn) A.audio.unlock(); else if (A.jukebox) A.jukebox.hide(); A.sfx.flip(A.audio.musicOn); }
@@ -233,10 +258,20 @@
   }
   document.addEventListener("pointerdown", e => { if (!e.target.closest("#langPop, #menuLang")) $("langPop").classList.add("hidden"); }, true);
   function applyMotion() { document.documentElement.classList.toggle("reduce-motion", S.reduce); map.fxOn = !S.reduce; }
+  function applySens() { A.mapSens.pan = S.panSens / 100; A.mapSens.zoom = S.zoomSens / 100; }
+  /* daltonismo (filtro SVG, ver index.html #cbDefs) + alto contraste: se combinan en un solo filter CSS */
+  function applyVisualFX() {
+    const cb = S.colorblind !== "off" ? `url(#cbFix_${S.colorblind})` : "";
+    const hc = S.contrast ? "contrast(1.18) saturate(1.15)" : "";
+    document.body.style.filter = [cb, hc].filter(Boolean).join(" ");
+    document.documentElement.classList.toggle("hi-contrast", S.contrast);
+  }
+  function applyQSize() { document.documentElement.style.setProperty("--ask-scale", S.qSize === "xl" ? 1.3 : S.qSize === "l" ? 1.15 : 1); }
   const TOG = {
     motion: () => { S.reduce = !S.reduce; applyMotion(); }, intro: () => { S.intro = !S.intro; },
     cursor: () => { S.cursor = !S.cursor; A.cursor.set(S.cursor); }, tips: () => { S.tips = !S.tips; A.tt.enable(S.tips); }, tour: () => { S.tour = !S.tour; if (S.tour && A.tour) A.tour.reset(); },
     songs: () => { S.songToast = !S.songToast; if (!S.songToast && A.jukebox) A.jukebox.hide(); },
+    contrast: () => { S.contrast = !S.contrast; applyVisualFX(); },
   };
   for (const sw of document.querySelectorAll(".sw[data-sw]")) if (TOG[sw.dataset.sw]) sw.addEventListener("click", () => { TOG[sw.dataset.sw](); A.sfx.flip(true); save(); syncSettings(); });
   /* pestanas de Ajustes */
@@ -253,6 +288,7 @@
       clearTimeout(tm); rs.classList.remove("armed");
       A.audio.setVol("master", 0.85); A.audio.setVol("music", 0.7); A.audio.setVol("sfx", 0.9); A.audio.sfxOn = true; A.audio.setMusic(true); A.audio.unlock();
       S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.tour = true; if (A.tour) A.tour.reset(); S.songToast = true; A.cursor.set(true); A.tt.enable(true);
+      S.panSens = 100; S.zoomSens = 100; applySens(); S.units = "km"; S.contrast = false; S.colorblind = "off"; applyVisualFX(); S.qSize = "n"; applyQSize();
       save(); A.sfx.card(); syncSettings(); rs.textContent = A.t("set.reset.done"); setTimeout(syncSettings, 2200);
     }; }
   /* modo de pantalla: Ventana / Pantalla completa (y "Sin bordes" si el cliente de escritorio lo ofrece: window.geoliteHost) */
@@ -266,10 +302,23 @@
       setTimeout(() => segSet(seg, cur()), 120);
     });
     document.addEventListener("fullscreenchange", () => segSet(seg, cur()));
-    A.syncWin = () => segSet(seg, cur()); }
+    A.syncWin = () => segSet(seg, cur());
+    if (host && host.onWindowModeChange) host.onWindowModeChange(() => { segSet(seg, cur()); $("fsBtn").classList.toggle("on", cur() === "full"); }); }
   document.querySelector('[data-seg="gfx"]').addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b || b.dataset.v === S.quality) return;
     S.quality = b.dataset.v; save(); A.sfx.ui(); map.setQuality(S.quality); syncSettings();
+  });
+  document.querySelector('[data-seg="units"]').addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b || b.dataset.v === S.units) return;
+    S.units = b.dataset.v; save(); A.sfx.ui(); syncSettings(); if (S.camp) updateHud();
+  });
+  document.querySelector('[data-seg="cb"]').addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b || b.dataset.v === S.colorblind) return;
+    S.colorblind = b.dataset.v; save(); A.sfx.ui(); applyVisualFX(); syncSettings();
+  });
+  document.querySelector('[data-seg="qsize"]').addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b || b.dataset.v === S.qSize) return;
+    S.qSize = b.dataset.v; save(); A.sfx.ui(); applyQSize(); syncSettings();
   });
   $("setBtn").onclick = () => openSettings(!S.settingsOpen);
   $("setClose").onclick = () => openSettings(false);
@@ -443,7 +492,7 @@
     dialog(`<div class="sheet ticket">
       <div class="tk-band"><span>${S.run && A.adv.isInfinite && A.adv.isInfinite() ? A.t("ask.inf", { n: pad2(S.qi + 1) }) : A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : o.kind || L.kind))}</span></div>
       <div class="tk-title">${title}</div>
-      ${showKm ? `<div class="tk-km"><span class="odo" id="kmNum"></span><span>km</span></div>` : ""}
+      ${showKm ? `<div class="tk-km"><span class="odo" id="kmNum"></span><span>${S.units === "mi" ? "mi" : "km"}</span></div>` : ""}
       <div class="tk-from">${[from, guess ? A.t("res.clicked", { t: (S.limit - left).toFixed(1) }) : ""].filter(Boolean).join(" · ")}</div>
       ${o.clue ? `<div class="tk-answer"><span>${A.t("res.was")}</span>${A.tx(o.answer)}</div>` : ""}
       <div class="tk-perf"></div>
@@ -460,7 +509,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
       <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });
-    if (showKm) { const kmEl = $("kmNum"); odoNow(kmEl, 0); requestAnimationFrame(() => odoSet(kmEl, Math.round(km), { ms: 1100, delay: 560 })); }
+    if (showKm) { const kmEl = $("kmNum"); odoNow(kmEl, 0); requestAnimationFrame(() => odoSet(kmEl, Math.round(S.units === "mi" ? km / 1.609344 : km), { ms: 1100, delay: 560 })); }
     const totEl = $("totNum"); odoNow(totEl, 0); requestAnimationFrame(() => odoSet(totEl, total, { ms: 1100, delay: 700, tick: total > 0 }));
     $("nextBtn").onclick = () => { last ? finishLevel() : (S.qi++, nextQuestion()); };
 
@@ -494,7 +543,9 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
 
   function finishLevel() {
     if (S.run) { map.clearMarks(); map.animateTo(map.home(), 900); map.setPick(false); $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("factText").textContent = ""; $("streakChip").classList.add("hidden"); return A.adv.roundEnd(); }
-    A.ach.emit("level", { perfect: S.qs.length >= 5 && S.hits === S.qs.length });
+    const levelPerfect = S.qs.length >= 5 && S.hits === S.qs.length;
+    if (levelPerfect) { A.profile.get().stats.perfectRounds++; A.profile.save(); }
+    A.ach.emit("level", { perfect: levelPerfect });
     const L = lv(), pass = S.levelScore >= L.advance, p = prog(S.camp.id);
     map.clearMarks(); map.animateTo(map.home(), 900); map.setPick(false);
     $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("factText").textContent = ""; $("streakChip").classList.add("hidden");
@@ -595,6 +646,8 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
   $("zoomHome").onclick = () => map.animateTo(S.camp ? map.home() : { ...map.home(), s: map.minS }, 600);
   $("pauseBtn").onclick = togglePause;
   function toggleFs() {
+    const host = window.geoliteHost;
+    if (host && host.setWindowMode) { host.setWindowMode(host.windowMode() === "full" ? "window" : "full"); return; }
     if (document.fullscreenElement) document.exitFullscreen();
     else (document.documentElement.requestFullscreen || (() => {})).call(document.documentElement);
   }
@@ -614,7 +667,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     A.audio.unlock(!S.booting);
     if (S.booting) return;
     const k = e.key.toLowerCase();
-    if (k === "escape") { if (S.settingsOpen) openSettings(false); else if (S.run && S.tool) A.adv.cancelTool(); else runMenu(); }
+    if (k === "escape") { if (S.settingsOpen) openSettings(false); else if (S.run && S.tool) A.adv.cancelTool(); else if (S.phase === "title" && S.hub !== "home") A.hub.screen("home"); else runMenu(); }
     else if (S.run && S.phase === "asking" && /^[1-4]$/.test(k)) A.adv.toolKey(+k - 1);
     else if (k === "f") toggleFs();
     else if (k === "c" && S.phase === "title") (A.codex.isOpen() ? A.codex.close() : A.codex.open());
