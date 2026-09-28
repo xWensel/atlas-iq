@@ -45,9 +45,16 @@
 .studio.leave { animation: boot-out .6s ease forwards; }
 
 /* selector de idioma y ajustes de pantalla */
-.langgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 6px; }
-.langgrid button { padding: 10px 4px 9px; font-size: 14px; letter-spacing: .02em; text-transform: none; font-weight: 500; white-space: normal; overflow-wrap: break-word; line-height: 1.15; }
+/* selector de idioma: tarjetas identicas (bandera arriba, nombre debajo). La columna minima cabe la palabra mas larga
+   ("Português") para no partir palabras; como mucho 6 por fila y todas las filas igual de altas. */
+.langgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(124px, calc((100% - 40px) / 6)), 1fr)); grid-auto-rows: 1fr; gap: 8px; }
+.langgrid button { flex-direction: column; gap: 7px; padding: 12px 6px 10px; font-size: 14px; letter-spacing: .02em; text-transform: none; font-weight: 500; white-space: normal; line-height: 1.15; text-align: center; }
+.langgrid .lang-flag { width: 30px; }
 @media (max-width: 480px) { .langgrid { grid-template-columns: repeat(2, 1fr); } }
+/* Silkscreen no tiene CJK: cada nombre usa su fuente pixel propia (subconjunto de Fusion Pixel), a 18 px para igualar el alto visual de las mayusculas latinas */
+.langgrid button[lang="zh"] > span { font-family: "Lang Name ZH", system-ui, sans-serif; font-size: 18px; letter-spacing: .06em; }
+.langgrid button[lang="ja"] > span { font-family: "Lang Name JA", system-ui, sans-serif; font-size: 18px; letter-spacing: .06em; }
+.langgrid button[lang="ko"] > span { font-family: "Lang Name KO", system-ui, sans-serif; font-size: 18px; letter-spacing: .06em; }
 .row-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 11px 12px 10px; margin-bottom: 8px; border: 1.5px solid rgba(242, 233, 214, .3); font-family: var(--mono); font-size: 15.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--paper); transition: background .18s, border-color .18s;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px); }
 .row-btn:hover { background: rgba(242, 233, 214, .1); border-color: var(--brass); } .row-btn kbd { background: rgba(242, 233, 214, .14); padding: 1px 7px; }

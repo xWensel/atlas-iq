@@ -8,9 +8,9 @@
   --ink: #14232b; --ink-2: #2a4048; --ink-deep: #0c1a21;
   --paper: #f2e9d6; --paper-2: #e6d9bd; --paper-3: #d9c9a6;
   --red: #e0492b; --red-deep: #9b2a14; --brass: #c8963e; --brass-lt: #f1d79a; --teal: #2e8f8c; --green: #3f9b62;
-  --serif: "Jersey 15", "Pixelify Sans", sans-serif;
-  --sans: "Jersey 15", "Pixelify Sans", system-ui, sans-serif;
-  --mono: "Silkscreen", "Jersey 15", monospace;
+  --serif: "Jersey 15", "Pixelify Sans", var(--cjk, system-ui), sans-serif;
+  --sans: "Jersey 15", "Pixelify Sans", var(--cjk, system-ui), system-ui, sans-serif;
+  --mono: "Silkscreen", "Geolite Cyrillic Caps", "Jersey 15", "Pixelify Sans", var(--cjk, system-ui), sans-serif;
   --disp: "opsz" 144, "SOFT" 60, "WONK" 1;
   --spring: cubic-bezier(.2, 1.15, .3, 1);
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
@@ -166,9 +166,9 @@ kbd { font-family: var(--mono); font-size: .85em; }
 .set-nav button.on .set-nav-t b { color: #ffe9b0; }
 .set-nav-t small { font-family: var(--mono); font-size: 14.5px; letter-spacing: .02em; color: rgba(242, 233, 214, .5); line-height: 1.3; }
 
-#settings .langgrid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-#settings .langgrid button { padding: 16px 10px 14px; font-size: 17px; gap: 10px; }
-#settings .lang-flag { width: 28px; }
+#settings .langgrid { grid-template-columns: repeat(auto-fill, minmax(max(136px, calc((100% - 50px) / 6)), 1fr)); gap: 10px; }
+#settings .langgrid button { padding: 16px 8px 14px; font-size: 17px; gap: 10px; }
+#settings .lang-flag { width: 40px; }
 .set-panes { flex: 1 1 auto; min-width: 0; display: flex; overflow-y: auto; overflow-x: hidden; padding: 2px 10px 2px 2px; scrollbar-width: thin; scrollbar-color: var(--brass) transparent; }
 .set-pane { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; min-height: 100%; animation: set-pane-in .35s var(--spring) both; }
 @keyframes set-pane-in { from { opacity: 0; transform: translateY(8px); } }

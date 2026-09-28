@@ -5,7 +5,7 @@ window.AIQ = window.AIQ || {};
     { code: "es", name: "Español", loc: "es-ES" }, { code: "en", name: "English", loc: "en-US" },
     { code: "fr", name: "Français", loc: "fr-FR" }, { code: "pt", name: "Português", loc: "pt-BR" },
     { code: "de", name: "Deutsch", loc: "de-DE" }, { code: "it", name: "Italiano", loc: "it-IT" },
-    { code: "es-419", name: "Español (Latinoamérica)", loc: "es-419" }, { code: "zh", name: "中文（简体）", loc: "zh-CN" },
+    { code: "es-419", name: "Español (Latam)", loc: "es-419" }, { code: "zh", name: "简体中文", loc: "zh-CN" },
     { code: "ko", name: "한국어", loc: "ko-KR" }, { code: "ja", name: "日本語", loc: "ja-JP" }, { code: "ru", name: "Русский", loc: "ru-RU" },
   ];
   const T = (keys, rows) => { const o = {}; keys.forEach((k, i) => (o[k] = rows[i])); return o; };

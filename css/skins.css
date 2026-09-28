@@ -5,6 +5,25 @@
 @font-face { font-family: "Pixelify Sans"; src: url("../fonts/pixelify-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
 @font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+/* latin extendido (polaco, turco, checo...). Silkscreen no lo trae: sus letras polacas se construyen con sus propias piezas (tools/build_silkscreen_pl.py) */
+@font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-pl-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; unicode-range: U+0104-0107, U+0118-0119, U+0141-0144, U+015A-015B, U+0179-017C; }
+@font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-pl-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; unicode-range: U+0104-0107, U+0118-0119, U+0141-0144, U+015A-015B, U+0179-017C; }
+@font-face { font-family: "Jersey 15"; src: url("../fonts/jersey-15-latin-ext-400-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Pixelify Sans"; src: url("../fonts/pixelify-sans-latin-ext-wght-normal.woff2") format("woff2"); font-weight: 400 700; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+/* Silkscreen y Jersey solo traen latin: el cirilico sale de Pixelify Sans y el CJK/hangul de Fusion Pixel (OFL, fonts/LICENSE-fusion-pixel.txt).
+   Por unicode-range, cada archivo solo se descarga si en pantalla hay caracteres de ese alfabeto. */
+@font-face { font-family: "Pixelify Sans"; src: url("../fonts/pixelify-sans-cyrillic-wght-normal.woff2") format("woff2"); font-weight: 400 700; font-display: swap; unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+/* para var(--mono): cirilico de Tiny5 (misma altura de 5 px que Silkscreen) con minusculas = mayusculas, como Silkscreen (tools/build_cyrillic_caps.py) */
+@font-face { font-family: "Geolite Cyrillic Caps"; src: url("../fonts/geolite-cyrillic-caps.woff2") format("woff2"); font-display: swap; unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1; }
+@font-face { font-family: "Fusion Pixel ZH"; src: url("../fonts/fusion-pixel-12px-zh_hans.woff2") format("woff2"); font-display: swap; unicode-range: U+1100-11FF, U+3000-303F, U+3040-30FF, U+3130-318F, U+31F0-31FF, U+3200-32FF, U+3400-4DBF, U+4E00-9FFF, U+AC00-D7AF, U+F900-FAFF, U+FF00-FFEF; }
+@font-face { font-family: "Fusion Pixel JA"; src: url("../fonts/fusion-pixel-12px-ja.woff2") format("woff2"); font-display: swap; unicode-range: U+1100-11FF, U+3000-303F, U+3040-30FF, U+3130-318F, U+31F0-31FF, U+3200-32FF, U+3400-4DBF, U+4E00-9FFF, U+AC00-D7AF, U+F900-FAFF, U+FF00-FFEF; }
+@font-face { font-family: "Fusion Pixel KO"; src: url("../fonts/fusion-pixel-12px-ko.woff2") format("woff2"); font-display: swap; unicode-range: U+1100-11FF, U+3000-303F, U+3040-30FF, U+3130-318F, U+31F0-31FF, U+3200-32FF, U+3400-4DBF, U+4E00-9FFF, U+AC00-D7AF, U+F900-FAFF, U+FF00-FFEF; }
+/* solo los glifos de cada nombre del selector de idioma (<1 KB): asi el selector no obliga a bajar la fuente CJK entera */
+@font-face { font-family: "Lang Name ZH"; src: url("../fonts/lang-name-zh.woff2") format("woff2"); font-display: block; }
+@font-face { font-family: "Lang Name JA"; src: url("../fonts/lang-name-ja.woff2") format("woff2"); font-display: block; }
+@font-face { font-family: "Lang Name KO"; src: url("../fonts/lang-name-ko.woff2") format("woff2"); font-display: block; }
+html { --cjk: system-ui; }
+html:lang(zh) { --cjk: "Fusion Pixel ZH"; } html:lang(ja) { --cjk: "Fusion Pixel JA"; } html:lang(ko) { --cjk: "Fusion Pixel KO"; }
 
 /* selector de skins (comun) */
 .skins { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -16,7 +35,7 @@ body { transition: none; } @keyframes skin-flash { 0% { opacity: .0; } 18% { opa
 html[data-skin="casino"] {
   --ink: #16241c; --ink-2: #4a6b5a; --ink-deep: #0a140f; --paper: #f3eddc; --paper-2: #e4dcc4; --paper-3: #cfc4a4;
   --red: #fe5f55; --red-deep: #b3322a; --brass: #f8b449; --brass-lt: #ffd98a; --teal: #009dff; --green: #4bc292;
-  --serif: "Jersey 15", "Pixelify Sans", sans-serif; --sans: "Jersey 15", "Pixelify Sans", system-ui, sans-serif; --mono: "Silkscreen", "Jersey 15", monospace;
+  --serif: "Jersey 15", "Pixelify Sans", var(--cjk), sans-serif; --sans: "Jersey 15", "Pixelify Sans", var(--cjk), system-ui, sans-serif; --mono: "Silkscreen", "Geolite Cyrillic Caps", "Jersey 15", "Pixelify Sans", var(--cjk), sans-serif;
   --disp: "wght" 700; --paper-grain: none; --spring: cubic-bezier(.3, 1.7, .4, 1);
 }
 html[data-skin="casino"] #app { background: #0d2c33; }
