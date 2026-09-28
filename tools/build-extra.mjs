@@ -84,7 +84,12 @@ const lab = e => {
   for (const l of LANGS) o[l] = clean((pick(L, l) || L.mul || {}).value || (S[l + "wiki"] || {}).title || (L.en || {}).value || (S.enwiki || {}).title || "");
   return o;
 };
-const desc = e => { const o = {}, D = e.descriptions || {}; for (const l of LANGS) o[l] = (pick(D, l) || D.en || {}).value || ""; return o; };
+/* sin descripcion propia, o copiada tal cual del ingles: vacia (el dato se queda en lugar y pais, no en ingles) */
+const desc = e => {
+  const o = {}, D = e.descriptions || {}, en = (D.en || {}).value || "";
+  for (const l of LANGS) { const v = (pick(D, l) || {}).value || ""; o[l] = l !== "en" && v === en ? "" : v; }
+  return o;
+};
 const fame = e => Object.keys(e.sitelinks || {}).filter(k => /wiki$/.test(k) && !/^(commons|species|meta|mediawiki|wikidata|sources)wiki$/.test(k)).length;
 
 const P = await byTitles(PEOPLE), E = await byTitles(EVENTS);
@@ -130,6 +135,33 @@ const dedup = a => { const s = new Set(); return a.filter(x => !s.has(x.id) && s
 const vctx = { window: {} }; vm.createContext(vctx); vm.runInContext(fs.readFileSync(path.join(ROOT, "data", "places.js"), "utf8"), vctx);
 const CQ = await byIds(Object.keys(vctx.window.AIQ.PCOUNTRY || {}));
 const countries = Object.fromEntries(Object.entries(CQ).filter(([, e]) => e.labels).map(([q, e]) => [q, lab(e)]));
+
+/* chino: Wikidata guarda etiquetas y descripciones tal cual las escribio cada editor, a veces en tradicional.
+ * Se pasan a zh-cn con el conversor de la propia Wikipedia china, como tools/zh-simplify.mjs */
+{
+  const CJK = /[㐀-鿿]/, UNSAFE = /[[\]{}<>|'~=&]/;
+  const slots = [];                                                    // [objeto, clave] con texto zh
+  const add = o => { if (o && typeof o.zh === "string" && CJK.test(o.zh) && !UNSAFE.test(o.zh)) slots.push(o); };
+  for (const r of [...outP, ...outE]) { add(r.name); add(r.desc); add(r.place); add(r.country); }
+  Object.values(countries).forEach(add);
+  const uniq = [...new Set(slots.map(o => o.zh))], map = {};
+  const decode = s => s.replace(/<[^>]*>/g, "").replace(/&#(\d+);/g, (m, n) => String.fromCodePoint(+n)).replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCodePoint(parseInt(n, 16))).replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").trim();
+  for (const part of chunks(uniq, 80)) {
+    const text = part.map((d, k) => `QQ${k}QQ ${d}`).join("\n\n");
+    let j = null;
+    for (let t = 0; t < 5 && !j; t++) {
+      try {
+        const r = await fetch("https://zh.wikipedia.org/w/api.php", { method: "POST", headers: { ...UA, "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ action: "parse", contentmodel: "wikitext", text, variant: "zh-cn", prop: "text", format: "json", disablelimitreport: "1" }) });
+        if (r.ok) j = await r.json(); else await new Promise(s => setTimeout(s, 5000 * (t + 1)));
+      } catch (e) { await new Promise(s => setTimeout(s, 5000 * (t + 1))); }
+    }
+    const html = decode(((j && j.parse && j.parse.text) || {})["*"] || "");
+    part.forEach((d, k) => { const m = html.match(new RegExp(`QQ${k}QQ\\s*([\\s\\S]*?)(?=QQ\\d+QQ|$)`)); if (m && m[1].trim()) map[d] = m[1].trim(); });
+    await new Promise(s => setTimeout(s, 600));
+  }
+  let n = 0; for (const o of slots) if (map[o.zh] && map[o.zh] !== o.zh) { o.zh = map[o.zh]; n++; }
+  console.log(`Chino: ${uniq.length} textos revisados, ${n} pasados a simplificado`);
+}
 /* continente(s) de cada pais (P30): build-classic.mjs reparte los lugares en regiones con esto */
 const CONT = { Q46: "europe", Q48: "asia", Q15: "africa", Q49: "namerica", Q18: "samerica", Q55643: "oceania", Q538: "oceania", Q3960: "oceania", Q51: "antarctica" };
 const continents = Object.fromEntries(Object.entries(CQ).map(([q, e]) => [q, [...new Set(snaks(e, "P30").map(c => CONT[c.mainsnak.datavalue.value.id]).filter(Boolean))]]));

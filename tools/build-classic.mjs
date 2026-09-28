@@ -125,12 +125,15 @@ function firstSentenceL(s) {
   return (cut.length < 4 ? s : cut).replace(/\.\.+/g, ".").slice(0, 200);
 }
 const clip = (s, l) => { s = String(s || "").trim(); if (!s) return ""; const cjk = l === "zh" || l === "ja"; s = s.replace(/[.。]$/, ""); return s[0].toLocaleUpperCase() + s.slice(1) + (/[!?！？]$/.test(s) ? "" : cjk ? "。" : "."); };
+const WIKI_EN = wikiFile("en.json");
+/* descripcion copiada tal cual del ingles en Wikidata ("Architectural structure"): no cuenta; los nombres cortos
+ * que se escriben igual ("Haiti", "Verdun, France") si */
+const copiedEn = (s, id) => { const en = WIKI_EN[id] && WIKI_EN[id][1]; return !!en && s.trim() === en.trim() && s.length > 20; };
 function factIn(l, id) {
   if (FACT_FIX[id] && FACT_FIX[id][l]) return FACT_FIX[id][l];
   const w = WIKI_ALL[l][id], desc = w && w[1];
-  if (desc && desc.length >= 4) return clip(desc, l);
-  if (SHORT_ALL[l][id]) return firstSentenceL(SHORT_ALL[l][id]);
-  if (w && w[2]) return firstSentenceL(w[2]);
+  if (desc && desc.length >= 4 && !copiedEn(desc, id)) return clip(desc, l);
+  for (const src of [SHORT_ALL[l][id], w && w[2]]) { const t = src && firstSentenceL(src); if (t && !copiedEn(t.replace(/[.。]$/, ""), id) && !copiedEn(t, id)) return t; }
   return null;
 }
 function mkDest(p) {
