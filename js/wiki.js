@@ -20,7 +20,9 @@ window.AIQ = window.AIQ || {};
       const [W, I] = await Promise.all([load(lang), loadImg()]); let r = W[id], l = lang;
       if (!r && lang !== "en") { const E = await load("en"); r = E[id]; l = "en"; }
       if (!r) return null;
-      const im = I[id], rec = { t: Date.now(), lang: l, title: r[0], desc: r[1] || "", extract: r[2] || "", history: r[3] || "", more: "", url: `https://${l}.wikipedia.org/wiki/${encodeURIComponent(String(r[0]).replace(/ /g, "_"))}`, pack: true };
+      /* r[4] = idioma de origen: texto traducido a mano (tools/wiki-tr/) porque esa Wikipedia no tiene articulo; el enlace va al original */
+      const src = r[4] || null, srcTitle = src ? ((await load(src))[id] || [r[0]])[0] : r[0];
+      const im = I[id], rec = { t: Date.now(), lang: l, tr: src, title: r[0], desc: r[1] || "", extract: r[2] || "", history: r[3] || "", more: "", url: `https://${src || l}.wikipedia.org/wiki/${encodeURIComponent(String(srcTitle).replace(/ /g, "_"))}`, pack: true };
       if (im) { rec.img = { thumb: card(id), card: card(id), hd: hdOf(id), w: im[1], h: im[2] }; if (im[3]) rec.credit = { artist: im[3][0], license: im[3][1], page: im[3][2] }; }
       return rec;
     },

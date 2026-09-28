@@ -384,7 +384,7 @@ window.AIQ = window.AIQ || {};
     const heroWanted = rec.img && !$("cxHero");
     const T = tiers(rec), body = e.parent ? (e.tier === 2 ? T.hist : T.key) : T.intro, head = e.parent ? A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : A.t("codex.about");
     box().innerHTML = `<h3>${head}</h3>${par(body || rec.extract)}
-      <p class="cx-src">${A.t("codex.license")} · <a href="${rec.url || "#"}" target="_blank" rel="noopener">${A.t("codex.wiki")} ↗</a></p>`;
+      <p class="cx-src">${A.t(rec.tr ? "codex.license.tr" : "codex.license")} ·<a href="${rec.url || "#"}" target="_blank" rel="noopener">${A.t("codex.wiki")} ↗</a></p>`;
     if (heroWanted) renderDetail(id);
   }
   /* 3 textos a partir del articulo del lugar: generico (descripcion + inicio), historia y dato clave (el resto del texto de cabecera) */

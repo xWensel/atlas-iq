@@ -121,11 +121,16 @@ const SHORT_ALL = Object.fromEntries(FACT_LANGS.map(l => [l, wikiFile(`${l}-s.js
 const WIKI_ALL = Object.fromEntries(FACT_LANGS.map(l => [l, wikiFile(`${l}.json`)]));
 const FACT_MISSING = {};
 const FACT_FIX = fs.existsSync(path.join(ROOT, "tools", "classic-facts-fix.json")) ? JSON.parse(read("tools/classic-facts-fix.json")) : {};   // {id: {lang: "texto"}}: traducciones a mano, mandan sobre Wikipedia
+/* 1.a frase de una nota en otro idioma. Antes de cortar quita los parentesis (pronunciacion, "англ. ...", "英语：...")
+ * y las coordenadas del principio: sus abreviaturas cortaban la frase en "Ме́са-Ве́рде (англ." */
+const dropParens = s => { let t = s, prev; do { prev = t; t = t.replace(/\s*[(（][^()（）]*[)）]/g, ""); } while (t !== prev); return t; };
 function firstSentenceL(s) {
-  s = String(s || "").trim();
-  const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?(?:[.!?](?=\s|$)|[。！？])/);
-  const cut = (m ? m[0] : s).replace(/\u0001/g, ".");
-  return (cut.length < 4 ? s : cut).replace(/\.\.+/g, ".").slice(0, 200);
+  s = String(s || "").trim().replace(/^[\d°′″'".,\s]+[NS]\s*[\d°′″'".,\s]+[EW]\s*/, "");
+  s = dropParens(s).replace(/\s+([,，.。;；:：])/g, "$1").replace(/\s{2,}/g, " ").trim();
+  const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?(?:[.!?](?=\s|$)|(?<![\p{Lu}.])[.!?](?=\p{Lu})|[。！？])/u);
+  let cut = (m ? m[0] : s).replace(/\u0001/g, ".").replace(/\.\.+/g, ".");
+  if (cut.length < 4) cut = s;
+  return cut.length <= 200 ? cut : cut.slice(0, 200).replace(/[\s,，;；:：]+\S*$/, "") + "…";
 }
 const clip = (s, l) => { s = String(s || "").trim(); if (!s) return ""; const cjk = l === "zh" || l === "ja"; s = s.replace(/[.。]$/, ""); return s[0].toLocaleUpperCase() + s.slice(1) + (/[!?！？]$/.test(s) ? "" : cjk ? "。" : "."); };
 const WIKI_EN = wikiFile("en.json");
@@ -136,14 +141,14 @@ function factIn(l, id) {
   if (FACT_FIX[id] && FACT_FIX[id][l]) return FACT_FIX[id][l];
   const w = WIKI_ALL[l][id], desc = w && w[1];
   if (desc && desc.length >= 4 && !copiedEn(desc, id)) return clip(desc, l);
-  for (const src of [SHORT_ALL[l][id], w && w[2]]) { const t = src && firstSentenceL(src); if (t && !copiedEn(t.replace(/[.。]$/, ""), id) && !copiedEn(t, id)) return t; }
+  for (const src of [SHORT_ALL[l][id], w && w[2]]) { const t = src && firstSentenceL(src); if (t && !/[(（][^)）]*$/.test(t) && !copiedEn(t.replace(/[.。]$/, ""), id) && !copiedEn(t, id)) return t; }
   return null;
 }
 function mkDest(p) {
   const f6 = {};
   for (const l of FACT_LANGS) { const t = factIn(l, p[0]); if (t) f6[l] = t; else (FACT_MISSING[p[0]] ||= { en: firstSentence(FACTS_EN[p[0]]), langs: [] }).langs.push(l); }
   if (FACT_FIX[p[0]] && FACT_FIX[p[0]]["es-419"]) f6["es-419"] = FACT_FIX[p[0]]["es-419"];   // solo a mano: si no, el juego usa el de es
-  return { n: destName(p), lat: p[3], lon: p[4], f: FACT_OVERRIDES[p[0]] || firstSentence(FACTS_EN[p[0]]), f6 };
+  return { n: destName(p), ck: p[0], lat: p[3], lon: p[4], f: FACT_OVERRIDES[p[0]] || firstSentence(FACTS_EN[p[0]]), f6 };
 }
 
 /* Pista = la descripcion corta con la que arranca cada resumen (p. ej. "Ciudad más poblada de Marruecos."),
@@ -196,7 +201,7 @@ function mkClueDest(p) {
     const d = descOf(SHORT[l][p[0]]), nm = p[6][l];
     if (d && !(nm && d.toLowerCase().includes(String(nm).toLowerCase()))) c6[l] = d;
   }
-  return { n: c.en, c6, lat: p[3], lon: p[4], f: destName(p) };
+  return { n: c.en, c6, ck: p[0], lat: p[3], lon: p[4], f: destName(p) };
 }
 
 /* ---------------------------------------------------------------- Eventos y Personajes (tools/extra-data.json) */

@@ -144,7 +144,7 @@ window.AIQ = window.AIQ || {};
             const full = !clue && (A.CLASSIC_TR || {})[d.n] ? tr6(d.n) : null;                 // traduccion del nombre completo (p. ej. "Olympia, Washington"): se parte en cada idioma
             const part = k => { const o = {}; L6.forEach(l => { const v = full[l], i = v.lastIndexOf(", "); o[l] = i > 0 ? (k ? v.slice(i + 2) : v.slice(0, i)) : (k ? "" : v); }); return o; };
             return {
-              t: "p", lat: d.lat, lon: d.lon, cid: [A.ckey(clue ? d.f : d.n)],
+              t: "p", lat: d.lat, lon: d.lon, cid: [d.ck || A.ckey(clue ? d.f : d.n)],
               name: full ? part(0) : clue && d.c6 ? { en: d.n, ...d.c6 } : tr6(sp.name), sub: full ? part(1) : tr6(sp.sub),
               clue: !!clue, answer: clue ? tr6(d.f) : null,
               fact: clue ? same("") : d.f6 ? { en: d.f, ...d.f6 } : tr6(d.f, d.f.length > 40),
