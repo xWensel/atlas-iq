@@ -3,17 +3,42 @@
  * HTTP local (no file://) para que Service Worker, fetch relativo y rutas
  * funcionen exactamente igual que en el navegador.
  */
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 
-/* Algunos equipos no pintan bien WebP/canvas con aceleracion por GPU en
- * Electron (el texto e iconos SVG salen, las imagenes generadas no). Probado
- * y descartado: app.disableHardwareAcceleration() "arregla" las imagenes pero
- * deja el juego a ~2 FPS (software rendering completo) - inaceptable para un
- * juego. En su lugar, solo se quita el sandbox del proceso de GPU (mucho mas
- * barato) para ver si el problema era el sandbox y no la GPU en si. */
+/* Steamworks: steam_appid.txt trae 480 (Spacewar, el App ID publico de
+ * pruebas de Valve) para poder desarrollar sin tener aun un App ID propio;
+ * hay que cambiarlo por el real antes de publicar. Si Steam no esta abierto
+ * (o no hay steam_api64.dll junto al ejecutable en un build empaquetado),
+ * el init falla y el juego sigue funcionando normal, solo sin logros. */
+let steamClient = null;
+try {
+  steamClient = require("steamworks.js").init();
+  require("steamworks.js").electronEnableSteamOverlay();
+  console.log("Steamworks conectado:", steamClient.localplayer.getName());
+} catch (e) {
+  console.warn("Steamworks no disponible (¿Steam esta abierto?):", e.message);
+}
+ipcMain.handle("steam:available", () => !!steamClient);
+ipcMain.handle("steam:unlock", (e, id) => {
+  if (!steamClient || typeof id !== "string") return false;
+  try { return steamClient.achievement.activate(id); } catch (err) { console.warn("steam:unlock", id, err.message); return false; }
+});
+
+/* Las imagenes generadas (WebP) no pintan aunque devtools confirme que estan
+ * cargadas (complete=true, naturalWidth=1024, opacity="1") - falla el pintado
+ * final, no la carga. Investigado a fondo: NO es la GPU (chrome://gpu: RTX
+ * 3080 bien acelerada; probados y descartados disableHardwareAcceleration(),
+ * disable-gpu-compositing, disable-features=CanvasOopRasterization y
+ * disable-gpu-rasterization - ninguno arreglo las imagenes y algunos dejaban
+ * el juego renqueante). El patron real: los iconos pequenos (src fijo desde
+ * el HTML) SI pintan; las ilustraciones grandes (src asignado por JS despues
+ * de cargar, ver js/art.js) NO. Eso apunta a un bug de repintado tras
+ * asignacion asincrona de src, no a la GPU - se arregla en JS (ver
+ * js/art.js), asi que aqui solo se deja disable-gpu-sandbox (framerate
+ * normal, confirmado). */
 app.commandLine.appendSwitch("disable-gpu-sandbox");
 
 const ROOT = __dirname;
@@ -41,7 +66,7 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 1280, height: 800, minWidth: 960, minHeight: 600, useContentSize: true,
     autoHideMenuBar: true, backgroundColor: "#0b2a44", fullscreen: true,
-    webPreferences: { contextIsolation: true, nodeIntegration: false },
+    webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(ROOT, "preload.js") },
   });
   win.webContents.on("did-finish-load", () => {
     console.log("Ventana cargada OK");

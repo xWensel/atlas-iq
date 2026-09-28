@@ -6,10 +6,29 @@ window.AIQ = window.AIQ || {};
 (function (A) {
   A.GEN = new Set();
   A.genReady = fetch("assets/manifest.json").then(r => (r.ok ? r.json() : { gen: [] })).then(m => { A.GEN = new Set(m.gen || []); }).catch(() => {});
+  /* En algunos equipos (visto en Electron) el navegador no repinta la capa
+   * cuando el src se asigna por JS despues de insertar el <img>: la imagen
+   * queda decodificada (complete=true, opacity:1 por CSS) pero invisible
+   * hasta el siguiente repintado "de verdad". Forzar un reflow y esperar a
+   * decode() + dos rAF antes de tocar el DOM evita que quede huerfana. */
+  A.revealImg = (im, cb) => {
+    let done = false;
+    const run = () => {
+      if (done) return; done = true;
+      /* nudge de capa: nada de lo de arriba (decode + reflow + rAF) basta solo
+       * en algunos equipos; forzar una promocion/despromocion de capa via
+       * transform suele destrabar el pintado "fantasma" que se queda atras. */
+      im.style.transform = "translateZ(0)";
+      void document.body.offsetHeight;
+      requestAnimationFrame(() => { im.style.transform = ""; void im.offsetHeight; requestAnimationFrame(cb); });
+    };
+    (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(run);
+    im.onload = run;
+  };
   A.genFill = (root = document) => A.genReady.then(() => root.querySelectorAll("img[data-gen]:not([src])").forEach(im => {
     if (!A.GEN.has(im.dataset.gen)) return;
-    im.onload = () => { im.classList.add("on"); if (im.parentElement) im.parentElement.classList.add("has-gen"); };
     im.src = "assets/gen/" + im.dataset.gen + ".webp";
+    A.revealImg(im, () => { im.classList.add("on"); if (im.parentElement) im.parentElement.classList.add("has-gen"); });
   }));
   A.pic = (id, cls = "") => { setTimeout(() => A.genFill(), 0); return `<span class="pic ${cls}"><img class="pic-img" alt="" data-gen="${id}" decoding="async"><i class="pic-frame"></i><i class="marq"></i></span>`; };
   A.art = () => "";

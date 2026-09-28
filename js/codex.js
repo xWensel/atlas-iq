@@ -408,7 +408,7 @@ window.AIQ = window.AIQ || {};
     try {
       const rec = await loadContent(E[id], A.lang); if (rec.none) return;
       b.querySelector(".cx-nm").textContent = nameOf(E[id], rec);
-      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.onload = () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }; im.src = rec.img.thumb; }
+      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }); }
     } catch (x) { /* sin conexion: se queda el icono */ }
   }
   function tiltMove(el, ev, deg) {
@@ -515,7 +515,7 @@ window.AIQ = window.AIQ || {};
     el.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, memOf(ids[0]))}</b>${more > 0 ? `<i>${A.t("codex.newmore", { n: more })}</i>` : ""}</span>`;
     el.onclick = () => { el.classList.add("hidden"); open(ids[0]); };
     el.classList.remove("hidden", "in"); void el.offsetWidth; el.classList.add("in"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.add("hidden"), 7000);
-    loadContent(e, A.lang).then(rec => { if (rec && rec.img && el.isConnected) { const im = new Image(); im.onload = () => { const a = el.querySelector(".cx-art"); if (a) a.prepend(im); }; im.src = rec.img.thumb; im.alt = ""; } }).catch(() => {});
+    loadContent(e, A.lang).then(rec => { if (rec && rec.img && el.isConnected) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const a = el.querySelector(".cx-art"); if (a) a.prepend(im); }); } }).catch(() => {});
   }
   listeners.push(added => { setTimeout(() => { A.sfx.unlock(); toast(added); }, 1700); });
 

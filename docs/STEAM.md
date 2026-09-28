@@ -25,8 +25,16 @@ piden antes del 28 de septiembre.
       lugares para esas regiones es mas limitada - se podria ampliar
       `tools/places-src.mjs` con mas capitales/ciudades del Pacifico si se
       quiere un Next Fest con esas campanas mas largas.
-- [ ] Nombre "Geolite": comprobar marcas registradas (USPTO/EUIPO) antes de
-      reservarlo en Steamworks.
+- [x] **Nombre "Geolite" - comprobado.** Busqueda en TMview (100 resultados,
+      ~25 oficinas: USPTO, EUIPO, UKIPO, CNIPA, JPO...): ninguna marca
+      "GEOLITE" registrada en clase 9 (software) ni 41 (entretenimiento); las
+      que existen son de iluminacion, quimica y construccion, sin relacion.
+      Unico roce real: un juego movil pequeño "GeoLite: Geometry Roguelite"
+      (Google Play, ~100 descargas, sin marca registrada) - riesgo de
+      confusion bajo pero no nulo. 0 resultados para "geolite" en Steam ahora
+      mismo. Pendiente si se quiere blindar del todo: registrar la marca en
+      EUIPO (850 EUR, cubre los 27 paises de la UE) antes de anunciar en
+      Steam.
 - [ ] Atribucion de Wikipedia (CC BY-SA 4.0) y fotos de Commons: ya se muestra
       por tarjeta; falta pantalla de creditos dedicada.
 - [ ] Modo sin conexion: empaquetar textos y fotos de la Enciclopedia (con su
@@ -40,20 +48,32 @@ piden antes del 28 de septiembre.
 
 ## Tecnico (empaquetado)
 
-- [ ] **Electron (o NW.js)** envolviendo el HTML/JS/CSS actual (vanilla JS sin
-      build, encaja sin cambios de arquitectura). Se puede empezar ya: es una
-      capa aparte, no bloquea ni retrasa el resto del desarrollo del juego, y
-      los cambios normales de codigo se siguen viendo igual (recargar la
-      ventana de Electron), sin paso de compilacion nuevo.
-- [ ] `steamworks.js` (bindings de Node) para:
-      - Logros: mapear `A.ACH` (IDs estables) a logros de Steamworks;
-        `A.steam.unlock(id)` ya se llama al desbloquear.
-      - Leaderboards: Steam Leaderboards o backend propio con validacion en
-        servidor (reproducir la partida con la semilla, evita tramposos).
-      - Cloud save: perfil `atlasiq.profile.v1` y partida `atlasiq.run.v1` ya
-        existen en localStorage, falta mapearlos a Steam Cloud.
-- [ ] Overlay de Steam en Electron: requiere flags de GPU concretos, probar
-      pronto para no descubrir problemas tarde.
+- [x] **Electron - hecho.** `main.js` sirve el juego con un servidor HTTP
+      local (no `file://`), ventana en pantalla completa real (cubre la barra
+      de tareas), GPU sandbox desactivado (arregla WebP que no pintaba en
+      algunos equipos, sin perder framerate - `disableHardwareAcceleration()`
+      se probo y se descarto por dejar el juego a ~2 FPS). `npm start` para
+      lanzarlo.
+- [x] **`steamworks.js` - logros conectados.** `preload.js` expone
+      `window.geoliteHost.steamUnlock(id)` por IPC (contextIsolation se queda
+      en true, steamworks.js solo corre en el proceso principal, nunca en el
+      renderer - mas seguro que lo que sugiere el README oficial). `js/steam.js`
+      rellena `A.steam.unlock` solo dentro de Electron; en el navegador normal
+      no existe, igual que antes. Probado en real: con Steam abierto,
+      `steamworks.init()` conecta con la cuenta de Steam del usuario.
+      `steam_appid.txt` trae `480` (Spacewar, el App ID publico de pruebas de
+      Valve) - **hay que cambiarlo por el App ID real antes de publicar**.
+      Los logros en si no se pueden probar de verdad hasta tener ese App ID
+      propio con los logros de Geolite dados de alta en el panel de
+      Steamworks (activar uno de Spacewar con nuestros IDs simplemente no
+      hace nada, son logros que no existen para App 480).
+      Pendiente: Leaderboards (Steam Leaderboards o backend propio con
+      validacion en servidor, reproduciendo la partida con la semilla) y
+      Cloud save (perfil `atlasiq.profile.v1` y partida `atlasiq.run.v1` ya
+      existen en localStorage, falta mapearlos a Steam Cloud).
+- [x] Overlay de Steam en Electron: `electronEnableSteamOverlay()` ya se
+      llama en `main.js`. Sin verificar visualmente (pulsar Shift+Tab con
+      Steam abierto) - pendiente de probar a mano.
 - [ ] Mando y Steam Deck: cursor con stick, atajos de boton, texto legible en
       pantalla pequena.
 - [ ] Localizacion: interfaz nueva en es/en; completar fr/pt/de/it (no

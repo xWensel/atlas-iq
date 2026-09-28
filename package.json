@@ -9,6 +9,9 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^33.4.11"
+    "electron": "^44.4.5"
+  },
+  "dependencies": {
+    "steamworks.js": "^0.4.0"
   }
 }
