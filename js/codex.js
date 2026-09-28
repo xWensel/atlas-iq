@@ -122,10 +122,13 @@ window.AIQ = window.AIQ || {};
     (A.CLASSIC || []).forEach(g => g.levels.forEach((L, li) => {
       const r = rarityFor(li, g.levels.length);
       L.dests.forEach(d => {
-        const clue = L.bonus && d.f, title = clue ? d.f : d.n, id = A.ckey(title), base = title.replace(/\(.*?\)/g, "").split(",")[0].trim();
+        const clue = L.bonus && d.f, title = clue ? d.f : d.n, id = d.ck || A.ckey(title), base = title.replace(/\(.*?\)/g, "").split(",")[0].trim();   // d.ck: clave fija de Eventos y Personajes (reina Victoria != Victoria de Seychelles)
         let type = /capital/i.test(L.name) ? "capital" : /famous|unesco|heritage|places/i.test(L.name) ? "landmark" : /cit(y|ies)/i.test(L.name) ? "city" : "place";
-        if (eventLike.test(base) || /^battle of|bomb dropped/i.test(title)) type = "event";
-        add({ id, type, name: { en: base, es: "" }, wiki: wikiFor(id, title), full: clue ? "" : title.replace(/\(.*?\)/g, "").trim(), lat: d.lat, lon: d.lon, country: countryFrom(title, g.id), fact: clue ? { en: "", es: "" } : { en: d.f, es: "", ...(d.f6 || {}) }, rarity: r, src: "classic" });
+        if (["city", "capital", "landmark", "nature"].includes(L.kind)) type = L.kind;
+        if (L.kind === "character") type = "person";
+        else if (L.kind === "event") type = /^(battle|siege|fall of)\b/i.test(title) ? "battle" : "event";
+        else if (eventLike.test(base) || /^battle of|bomb dropped/i.test(title)) type = "event";
+        add({ id, type, name: d.n6 ? { en: base, ...d.n6 } : { en: base, es: "" }, wiki: wikiFor(id, title), full: clue ? "" : title.replace(/\(.*?\)/g, "").trim(), lat: d.lat, lon: d.lon, country: countryFrom(title, g.id), fact: clue ? { en: "", es: "" } : { en: d.f, es: "", ...(d.f6 || {}) }, rarity: r, src: "classic" });
       });
     }));
 
