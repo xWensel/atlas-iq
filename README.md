@@ -12,6 +12,7 @@
 - **Los perks se notan:** la ficha de cada reto contrarrestado brilla en verde con el icono del perk que lo frena, y al empezar la ronda suena la "contra".
 - **Hacen lo que dicen:** *Anagrama* no hacia nada (el barajado se descartaba y el nombre salia intacto); *Mano de crupier* prometia 75 % menos temblor y en las letras solo daba 65 %; *Visera de crupier* decia reducir el espejo (no puede) y el *Espejo del ilusionista* no decia que tambien endereza el mapa en espejo. Todo corregido en los 12 idiomas.
 - Sonidos nuevos: lluvia continua, caida de corriente, cristal roto, dedo en el cristal, aviso de error, bateria baja, carga y contra de perk.
+- **El crupier ya no tapa la placa:** en partida mide el hueco libre entre la placa/barra del acto y el dock, la nota y las cartas de herramientas; encoge el retrato hasta que quepa y sube o estrecha el bocadillo. Antes, en ventanas bajas (movil en horizontal, portatiles pequenos) el retrato de 250 px tapaba el nombre del lugar y el bocadillo pisaba las herramientas.
 
 **v0.29.0** - Ajustes rediseñado como una ventana modal de verdad: se centra en pantalla con un fondo oscurecido y desenfocado detras (antes era un panel pegado a una esquina, con reglas de posicion distintas en el menu y en partida). Cabecera con icono, pestañas, interruptores y deslizadores con un acabado mas pulido. Se comporta igual en el menu principal y dentro de una partida, y sigue cabiendo entero sin scroll en cualquier tamano de pantalla, incluido movil.
 

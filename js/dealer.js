@@ -510,12 +510,40 @@ window.AIQ = window.AIQ || {};
   const clear = () => { D.timers.forEach(clearTimeout); D.timers = []; };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); D.timers.push(t); return t; };
 
+  /* en partida el retrato va abajo a la izquierda, pero NUNCA encima de la placa del nombre, la barra del acto, las cartas de herramientas,
+     la nota ni el dock: mide el hueco real, encoge el retrato hasta que quepa y sube o estrecha el bocadillo (ventanas bajas, portatiles
+     pequenos, movil en horizontal). Antes el retrato de 250 px tapaba la placa en pantallas de poca altura. */
+  let curText = "";
+  function fitCorner(text) {
+    if (!el) return;
+    const bs = bubble.style, fs = face.style;
+    const reset = () => { el.style.bottom = ""; fs.width = fs.height = fs.display = ""; bs.marginBottom = bs.maxWidth = ""; };
+    if (D.host || !D.on || el.classList.contains("inline") || el.classList.contains("home") || el.classList.contains("big")) return reset();
+    const app = $("app"); if (!app) return reset();
+    const R = app.getBoundingClientRect(), box = id => { const e = $(id); if (!e || e.classList.contains("hidden")) return null; const r = e.getBoundingClientRect(); return r.width > 1 && r.height > 1 ? r : null; };
+    const hits = (r, x0, x1) => r && r.left < x1 && r.right > x0;
+    const mob = innerWidth <= 720, maxS = mob ? 170 : 250, L = R.left + 16;
+    const top = [box("plate"), box("advBar")].filter(r => hits(r, L, L + maxS + 360)).reduce((m, r) => Math.max(m, r.bottom), R.top) + 10;
+    const lows = [box("dock"), box("note"), box("toolBar")];
+    let floor = R.bottom - 8; for (const r of lows) if (hits(r, L, L + maxS)) floor = Math.min(floor, r.top - 8);
+    let sz = Math.round(Math.min(maxS, floor - top)); const noFace = sz < 84;
+    if (noFace) { sz = 0; fs.display = "none"; } else { fs.display = ""; fs.width = fs.height = sz + "px"; }
+    el.style.bottom = Math.max(0, R.bottom - floor) + "px";
+    const x0 = L + (noFace ? 0 : sz + 4), room = Math.max(150, Math.min(mob ? innerWidth * 0.6 : 340, R.right - 12 - x0));
+    bs.maxWidth = room + "px";
+    const keep = txt.textContent; txt.textContent = text || curText; const bh = bubble.offsetHeight || 90; txt.textContent = keep;   // alto real con la frase entera
+    let bFloor = floor; for (const r of lows) if (hits(r, x0, x0 + room)) bFloor = Math.min(bFloor, r.top - 8);
+    const minM = noFace ? 0 : mob ? 20 : 58, want = Math.max(minM, floor - bFloor), maxM = Math.max(0, floor - top - bh);
+    bs.marginBottom = Math.min(want, maxM) + "px";                                    // si no cabe del todo, antes pisa las herramientas que la placa
+  }
+  addEventListener("resize", () => { if (D.busy) fitCorner(curText); });
   /* dice una frase con voz arcade y maquina de escribir */
   D.say = (line, o = {}) => {
     if (!D.on && !D.onHome) return; ensure(); clear();
     const mood = o.mood || "sly", text = typeof line === "string" ? line : A.tx(line), src = FACE[mood] || "dealer_neutral";
     const inline = !!el.closest("#vdDealer"), home = D.onHome && !D.host && !inline && homeCorner ? " home " + homeCorner : "";
     face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (inline ? " inline" : "") + home; txt.textContent = ""; bubble.classList.add("on");
+    curText = text; fitCorner(text);
     if (mood === "laugh") A.sfx.laugh && A.sfx.laugh();
     let i = 0; const chars = [...text], step = mood === "laugh" ? 44 : 34;
     const tick = () => {
