@@ -195,6 +195,15 @@ function mkClueDest(p) {
 
 /* ---------------------------------------------------------------- Eventos y Personajes (tools/extra-data.json) */
 const XL = ["en", "es", "fr", "pt", "de", "it", "zh", "ko", "ja", "ru", "pl"];      // idiomas de contenido de Eventos/Personajes
+/* clave de la Enciclopedia: la del articulo ("queen-victoria"); si esa tarjeta no existe pero si la de la etiqueta
+ * (clave antigua, p. ej. "2004-indian-ocean-earthquake"), se conserva la antigua para no perder tarjetas ya
+ * desbloqueadas (codex.v1 guarda por clave), salvo que choque con un lugar ("victoria" = Victoria de Seychelles) */
+const CODEX_EN = fs.existsSync(path.join(ROOT, "data", "wiki", "en.json")) ? JSON.parse(read("data/wiki/en.json")) : {};
+const PLACE_IDS = new Set(PLACES.filter(p => p[1] !== "history").map(p => p[0]));   // los "history" del banco son los mismos sucesos: su tarjeta vale
+function codexKey(wiki, label) {
+  const k = ckey(wiki || label), old = ckey(label);
+  return CODEX_EN[k] || !CODEX_EN[old] || PLACE_IDS.has(old) ? k : old;
+}
 const BC = { en: "{y} BC", es: "{y} a. C.", fr: "{y} av. J.-C.", pt: "{y} a.C.", de: "{y} v. Chr.", it: "{y} a.C.", zh: "公元前{y}年", ko: "기원전 {y}년", ja: "紀元前{y}年", ru: "{y} до н. э.", pl: "{y} p.n.e." };
 const yr = (y, l) => (y == null ? "" : y < 0 ? BC[l].replace("{y}", -y) : String(y));
 const ucf = s => (s ? s[0].toLocaleUpperCase() + s.slice(1) : s);
@@ -207,13 +216,13 @@ function mkPersonDest(p) {
   const ctry = countryAt(p.lat, p.lon) || p.country;
   const fact = by10(l => [joinTxt(l)(p.place && p.place[l], ctry && (ctry[l] || ctry.en)), short(p.desc[l])].filter(Boolean).join(" · "));
   const name = by10(l => p.name[l]);
-  return { n: name.en, n6: restL(name), ck: ckey(p.wiki || name.en), s6: by10(l => (p.born == null ? "" : `${yr(p.born, l)}–${yr(p.died, l)}`)), lat: p.lat, lon: p.lon, f: fact.en, f6: restL(fact), img: p.img };
+  return { n: name.en, n6: restL(name), ck: codexKey(p.wiki, name.en), s6: by10(l => (p.born == null ? "" : `${yr(p.born, l)}–${yr(p.died, l)}`)), lat: p.lat, lon: p.lon, f: fact.en, f6: restL(fact), img: p.img };
 }
 function mkEventDest(e) {
   const ctry = countryAt(e.lat, e.lon);                                  // nunca el P17 de Wikidata: suele ser el estado de la epoca
   const name = by10(l => ucf(e.name[l]));
   const fact = by10(l => joinTxt(l)(e.place && e.place[l], ctry && (ctry[l] || ctry.en)) || short(e.desc[l]));
-  return { n: name.en, n6: restL(name), ck: ckey(e.wiki || name.en), s6: by10(l => yr(e.year, l)), lat: e.lat, lon: e.lon, f: fact.en, f6: restL(fact) };
+  return { n: name.en, n6: restL(name), ck: codexKey(e.wiki, name.en), s6: by10(l => yr(e.year, l)), lat: e.lat, lon: e.lon, f: fact.en, f6: restL(fact) };
 }
 
 /* ---------------------------------------------------------------- niveles */
