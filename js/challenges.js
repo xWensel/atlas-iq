@@ -6,7 +6,7 @@
  *   - las REGLAS (viento, tormenta, silencio).
  * No tocan la puntuacion: solo hacen mas dificil encontrar el sitio. Los perks los mitigan (ver `fx` en js/relics.js).
  *
- *   A.chal.plan(seed, roundNo, asc)   -> { list:[{id,lv}], boss, combo }   (determinista: la tienda anuncia la ronda siguiente)
+ *   A.chal.plan(seed, roundNo, asc, topic, cjk) -> { list:[{id,lv}], boss, combo }   (determinista: la tienda anuncia la ronda siguiente)
  *   A.chal.begin(list, fx, ctx)       A.chal.question(o, qi)   A.chal.reveal()   A.chal.suspend()   A.chal.end()
  *   A.chal.ptrMods()                  -> parametros del puntero para js/pointer.js
  */
@@ -104,8 +104,10 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
   const pickFrom = (seed, tag, list, r, avoid) => { const ok = list.filter(id => !avoid.includes(famOf(id))), l = ok.length ? ok : list; return A.rng(`${seed}:${tag}:${Math.floor(r / 4)}:${r % 4}`).pick(l); };
   A.chal = {
-    DEFS: D, TEXT, MAPC, PTR, RULE, FLAG, WALL,
-    plan(seed, r, asc = 0, topic) {
+    DEFS: D, TEXT, MAPC, PTR, RULE, FLAG, WALL, noLatin: NOLATIN,
+    /* cjk: sin runas ni sin vocales. v0.4.1: la expedicion lo fija al empezar (run.cjk); con el idioma de cada momento, cambiarlo a media
+       expedicion cambiaba el truco de texto de la ronda y el soborno ya pagado dejaba de coincidir con nada */
+    plan(seed, r, asc = 0, topic, cjk = NOLATIN()) {
       const flagRound = topic === "flag";
       const act = Math.floor(r / 4), pos = r % 4, boss = pos === 3, a = Math.min(act, 2);
       const lv = clamp(a + 1 + (asc >= 3 ? 1 : 0), 1, 3);
@@ -124,7 +126,7 @@ window.AIQ = window.AIQ || {};
       /* v0.35: el Apagon sale si o si en algun momento de la expedicion (asi el Foco del vigilante siempre tiene su momento): en una ronda
          con hueco de mapa elegida por la semilla. Si esa ronda se baraja en el Campamento, el crupier elige otra cosa (el jugador pago por ello) */
       let dark = r === A.rng(`${seed}:dark`).pick([2, 4, 5, 8, 9, 10]);
-      const add = (cat, mild) => { const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT).filter(id => !(NOLATIN() && (id === "runes" || id === "novowels")))) : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPW); let id = pickFrom(seed, cat + list.length, pool, r, used); if (cat === "map" && dark && !used.includes(famOf("dark"))) { id = "dark"; dark = false; } list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); };
+      const add = (cat, mild) => { const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT).filter(id => !(cjk && (id === "runes" || id === "novowels")))) : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPW); let id = pickFrom(seed, cat + list.length, pool, r, used); if (cat === "map" && dark && !used.includes(famOf("dark"))) { id = "dark"; dark = false; } list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); };
       if (act === 0) { if (pos === 1) add("text", true); else if (pos === 2) add("map", true); }
       else if (act === 1) ACT1[pos % 3].forEach(c => add(c, false));
       else ACT2[pos % 3].forEach(c => add(c, false));

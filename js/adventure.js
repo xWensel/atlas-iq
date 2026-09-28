@@ -176,7 +176,7 @@ window.AIQ = window.AIQ || {};
   const chestSkip = () => Math.round(2.5 * inflation());                // dejar el cofre del jefe sin abrir: 3 doblones al empezar el acto II, 4 al empezar el III
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades); pl: otra mano de perks (la tienda valora cada reliquia sin contarla a ella) */
   const chalFor = (r, pl = perkList()) => {
-    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic), boss = r % 4 === 3;
+    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk), boss = r % 4 === 3;
     let list = A.adv._force ? A.adv._force.map(id => ({ id, lv: 2 })) : plan.list.slice();
     const bribed = (run.bribed && run.bribed[r]) || []; if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento
     const sum = f => pl.reduce((n, p) => n + (p[f] || 0), 0), skip = sum("skipFirst"); if (skip) list = list.slice(skip);
@@ -236,8 +236,9 @@ window.AIQ = window.AIQ || {};
   A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null, dailyTry = 0, route = null, gift = null } = {}) {
     const d = DECKS[deck] || DECKS.explorer, bonus = gift && A.RELICS[gift] && !d.perks.includes(gift) ? A.RELICS[gift] : null;
     slot = keyOf(!!board);
+    /* cjk (sin runas ni sin vocales) se fija al empezar: cambiar de idioma a media expedicion no mueve los trucos ni los sobornos (ver A.chal.plan) */
     run = {
-      v: 2, seed: seed || "run-" + Math.random().toString(36).slice(2, 10), deck, asc, ranked, board, dailyTry, route: route ? route.slice(0, 12) : null, gift: bonus ? gift : null,
+      v: 2, seed: seed || "run-" + Math.random().toString(36).slice(2, 10), cjk: A.chal.noLatin(), deck, asc, ranked, board, dailyTry, route: route ? route.slice(0, 12) : null, gift: bonus ? gift : null,
       act: 0, round: 0, attempt: 0, coins: d.coins, lives: d.lives + ascFx(asc).lives, maxLives: d.lives + ascFx(asc).lives,
       perks: d.perks.concat(bonus ? [gift] : []), tools: {}, score: 0, cleared: 0, used: [], rerolls: 0, freeUsed: 0, shopN: 0, phase: "round", qi: 0, qn: 5, qTools: 0, rTools: 0, luckUsed: false, guardUsed: false,
       livesLostAct: 0, shieldAct: -1, leftSum: 0, roundScore: 0, rGood: 0, qTotal: 0, stats: { bulls: 0, best: 0, coinsEarned: 0 }, t0: Date.now(),
@@ -261,6 +262,7 @@ window.AIQ = window.AIQ || {};
     const gone = r.perks.filter(id => !A.RELICS[id]); if (gone.length) { r.perks = r.perks.filter(id => A.RELICS[id]); r.coins += gone.length * 4; }
     const dead = Object.keys(r.tools).filter(id => !TOOLS[id]); dead.forEach(id => { delete r.tools[id]; r.coins += 3; });
     if ((r.stock || []).some(s => (s.k === "perk" && !A.RELICS[s.id]) || (s.k === "tool" && !TOOLS[s.id]))) { r.stock = null; r.stockKey = null; }
+    if (r.cjk == null) r.cjk = A.chal.noLatin();                    // v0.4.1: partidas de antes sin run.cjk: se fija una vez con el idioma de ahora
   }
   A.adv.resume = function (daily = false) {
     slot = keyOf(daily); run = loadSlot(daily);

@@ -4,6 +4,10 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.4.1** - Cambiar de idioma a media expedicion ya no cambia los trucos del crupier ni hace perder los sobornos.
+- **El fallo:** en chino, japones y coreano las rondas normales no sacan Runas ni Sin vocales, pero esa criba miraba el idioma de cada momento, y los trucos de una ronda se recalculan cada vez que se pinta el Campamento o empieza la ronda. Si cambiabas entre un idioma latino y zh/ja/ko a media expedicion (Ajustes se abre en partida), la proxima ronda podia traer otro truco de texto y el soborno ya pagado no quitaba nada: los doblones se perdian (y, desde la v0.3.1, ese soborno encarecia igual los siguientes).
+- **Ahora** cuenta el idioma con el que empieza la expedicion (`run.cjk`), tambien en el Reto diario. Las partidas guardadas de antes lo fijan con el idioma actual al continuarlas.
+
 **v0.3.1** - Sobornos caros: el crupier sube la tarifa.
 - **Mas caros de base:** 3 + 2 por nivel del truco (+1 si es de mapa), el doble en el jefe, y siguen subiendo con el acto y la ascension. Un truco del acto I pasa de 3-4 doblones a 5-6, uno del acto II de 5-6 a 9-10, uno del acto III de 8-9 a 14-15 y cada poder del jefe final de 15-18 a 27-30.
 - **Cada soborno encarece los siguientes** un 50 % de su precio base (el segundo x1,5, el tercero x2, el cuarto x2,5...), en toda la expedicion. Barajar no lo reinicia. El boton de sobornar lo explica al pasar el raton (12 idiomas).
