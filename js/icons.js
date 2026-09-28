@@ -24,6 +24,13 @@ window.AIQ = window.AIQ || {};
     codex_all: "crown", codex_people: "t_person", codex_capitals: "t_capital", codex_events: "t_battle", adv_start: "m_adv", adv_clear1: "boots", adv_boss: "skull",
     adv_act1: "a_sun", adv_act2: "a_peak", adv_win: "a_moai", adv_endless: "a_inf", adv_rich: "hoard", adv_build: "a_pack", adv_flawless: "a_shield", adv_blind: "blindperk", adv_asc: "a_peak",
     daily_1: "t_event", daily_7: "t_event", night: "a_moon", marathon: "boots",
+    codex_nature: "naturalist", codex_water: "t_water", codex_strait: "t_strait", codex_curio: "t_curio", codex_city: "t_city", codex_country: "passport", codex_place: "t_place",
+    classic_world: "globe", classic_capitals: "compass", classic_usa: "k_na", classic_asia: "k_as", classic_latam: "k_sa", classic_oceania: "k_oc",
+    classic_gold1: "medal_gold", classic_goldall: "crown",
+    adv_asc2: "a_peak", adv_ascmax: "a_moai", adv_flawless2: "a_shield", adv_flawless3: "a_shield", adv_rich2: "highroller",
+    adv_boss5: "skull", adv_runs10: "boots", adv_wins3: "lucky7", adv_wins10: "crown",
+    daily_30: "t_event", bull_1000: "royalflush", q_10000: "atlasbook", inside_100: "sail", plays_50: "hourglass",
+    perfect_5: "a_hundred", streak_50: "storm", speed_master: "flash", early_bird: "earlybird", weekend: "tour",
   };
   /* insignia de logro: marco por categoria + icono dentro */
   const ACH_FRAME = { q: "blank_boss", level: "blank_boss", classic: "blank_small", codex: "blank_teal", adv: "blank_big", daily: "blank_gold" };
