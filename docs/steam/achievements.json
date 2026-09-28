@@ -2,8 +2,10 @@
  {
   "id": "first_pin",
   "hidden": 0,
+  "tier": 0,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_pin",
+  "icon": "ach_first_pin",
   "name": {
    "english": "First pin",
    "spanish": "Primer pin",
@@ -36,8 +38,10 @@
  {
   "id": "adv_start",
   "hidden": 0,
+  "tier": 0,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "m_adv",
+  "icon": "ach_adv_start",
   "name": {
    "english": "Setting out",
    "spanish": "Salir de casa",
@@ -70,8 +74,10 @@
  {
   "id": "bull_1",
   "hidden": 0,
+  "tier": 0,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_target",
+  "icon": "ach_bull_1",
   "name": {
    "english": "Bullseye",
    "spanish": "Diana",
@@ -104,8 +110,10 @@
  {
   "id": "codex_10",
   "hidden": 0,
+  "tier": 0,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "a_book",
+  "icon": "ach_codex_10",
   "name": {
    "english": "First pages",
    "spanish": "Primeras páginas",
@@ -138,8 +146,10 @@
  {
   "id": "adv_clear1",
   "hidden": 0,
+  "tier": 0,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "boots",
+  "icon": "ach_adv_clear1",
   "name": {
    "english": "First camp",
    "spanish": "Primer campamento",
@@ -172,8 +182,10 @@
  {
   "id": "adv_blind",
   "hidden": 0,
+  "tier": 0,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "blindperk",
+  "icon": "ach_adv_blind",
   "name": {
    "english": "Blindfolded",
    "spanish": "A ciegas",
@@ -206,8 +218,10 @@
  {
   "id": "streak_5",
   "hidden": 0,
+  "tier": 0,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_flame",
+  "icon": "ach_streak_5",
   "name": {
    "english": "On a roll",
    "spanish": "En racha",
@@ -240,8 +254,10 @@
  {
   "id": "speed",
   "hidden": 0,
+  "tier": 0,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "flash",
+  "icon": "ach_speed",
   "name": {
    "english": "Lightning",
    "spanish": "Relámpago",
@@ -274,8 +290,10 @@
  {
   "id": "codex_50",
   "hidden": 0,
+  "tier": 1,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "bookmark",
+  "icon": "ach_codex_50",
   "name": {
    "english": "Bookworm",
    "spanish": "Rata de biblioteca",
@@ -306,10 +324,48 @@
   }
  },
  {
+  "id": "adv_bribe",
+  "hidden": 0,
+  "tier": 1,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_bribe",
+  "name": {
+   "english": "Under the table",
+   "spanish": "Bajo la mesa",
+   "french": "Sous la table",
+   "brazilian": "Por baixo da mesa",
+   "german": "Unter dem Tisch",
+   "italian": "Sotto banco",
+   "latam": "Bajo la mesa",
+   "schinese": "桌下交易",
+   "koreana": "테이블 밑 거래",
+   "japanese": "テーブルの下で",
+   "russian": "Под столом",
+   "polish": "Pod stołem"
+  },
+  "desc": {
+   "english": "Bribe the dealer to remove a trick.",
+   "spanish": "Soborna al crupier para quitar un truco.",
+   "french": "Soudoie le croupier pour retirer un tour.",
+   "brazilian": "Suborne o crupiê para tirar um truque.",
+   "german": "Besteche den Croupier, damit er einen Trick streicht.",
+   "italian": "Corrompi il croupier per togliere un trucco.",
+   "latam": "Soborna al crupier para quitar un truco.",
+   "schinese": "贿赂荷官，撤掉一个花招。",
+   "koreana": "딜러를 매수해 속임수 하나를 없애세요.",
+   "japanese": "ディーラーを買収してトリックを1つ消そう。",
+   "russian": "Подкупи крупье, чтобы убрать трюк.",
+   "polish": "Przekup krupiera, żeby usunąć sztuczkę."
+  }
+ },
+ {
   "id": "perfect",
   "hidden": 0,
+  "tier": 1,
+  "ev": "level",
   "frame": "blank_boss",
-  "icon": "a_hundred",
+  "icon": "ach_perfect",
   "name": {
    "english": "Perfect round",
    "spanish": "Ronda perfecta",
@@ -342,8 +398,10 @@
  {
   "id": "q_100",
   "hidden": 0,
+  "tier": 1,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "compass",
+  "icon": "ach_q_100",
   "name": {
    "english": "Apprentice",
    "spanish": "Aprendiz",
@@ -374,10 +432,48 @@
   }
  },
  {
+  "id": "km_equator",
+  "hidden": 0,
+  "tier": 1,
+  "ev": "q",
+  "frame": "blank_boss",
+  "icon": "ach_km_equator",
+  "name": {
+   "english": "Equatorial blunder",
+   "spanish": "Despiste ecuatorial",
+   "french": "Bévue équatoriale",
+   "brazilian": "Gafe equatorial",
+   "german": "Äquator-Patzer",
+   "italian": "Svista equatoriale",
+   "latam": "Despiste ecuatorial",
+   "schinese": "赤道级失误",
+   "koreana": "적도급 실수",
+   "japanese": "赤道級のうっかり",
+   "russian": "Экваториальный промах",
+   "polish": "Równikowa gafa"
+  },
+  "desc": {
+   "english": "Rack up 40,075 km of total error: one full lap of the Earth.",
+   "spanish": "Acumula 40.075 km de error: una vuelta entera al mundo.",
+   "french": "Cumule 40 075 km d'erreur : un tour complet de la Terre.",
+   "brazilian": "Acumule 40.075 km de erro: uma volta inteira ao mundo.",
+   "german": "Sammle insgesamt 40.075 km Abweichung: einmal um die ganze Erde.",
+   "italian": "Accumula 40.075 km di errore: un giro completo della Terra.",
+   "latam": "Acumula 40.075 km de error: una vuelta entera al mundo.",
+   "schinese": "累计误差达到 40,075 公里：正好绕地球一整圈。",
+   "koreana": "누적 오차 40,075km: 지구를 한 바퀴 돈 셈입니다.",
+   "japanese": "誤差の合計が40,075km：ちょうど地球一周分。",
+   "russian": "Набери 40 075 км ошибки — целый оборот вокруг Земли.",
+   "polish": "Nazbieraj 40 075 km błędu: pełne okrążenie Ziemi."
+  }
+ },
+ {
   "id": "adv_boss",
   "hidden": 0,
+  "tier": 1,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "skull",
+  "icon": "ach_adv_boss",
   "name": {
    "english": "Boss slayer",
    "spanish": "Cazajefes",
@@ -410,8 +506,10 @@
  {
   "id": "adv_act1",
   "hidden": 0,
+  "tier": 1,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "a_sun",
+  "icon": "ach_adv_act1",
   "name": {
    "english": "The known roads",
    "spanish": "Las rutas conocidas",
@@ -444,8 +542,10 @@
  {
   "id": "codex_100",
   "hidden": 0,
+  "tier": 1,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_landmark",
+  "icon": "ach_codex_100",
   "name": {
    "english": "Scholar",
    "spanish": "Erudito",
@@ -478,8 +578,10 @@
  {
   "id": "streak_10",
   "hidden": 0,
+  "tier": 1,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_comet",
+  "icon": "ach_streak_10",
   "name": {
    "english": "Unstoppable",
    "spanish": "Imparable",
@@ -512,8 +614,10 @@
  {
   "id": "daily_1",
   "hidden": 0,
+  "tier": 1,
+  "ev": "daily",
   "frame": "blank_gold",
-  "icon": "t_event",
+  "icon": "ach_daily_1",
   "name": {
    "english": "Daily challenge",
    "spanish": "Reto del día",
@@ -546,8 +650,10 @@
  {
   "id": "classic_world",
   "hidden": 0,
+  "tier": 1,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "globe",
+  "icon": "ach_classic_world",
   "name": {
    "english": "Round the world",
    "spanish": "Vuelta al mundo",
@@ -580,8 +686,10 @@
  {
   "id": "last_second",
   "hidden": 0,
+  "tier": 2,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_stopwatch",
+  "icon": "ach_last_second",
   "name": {
    "english": "By a whisker",
    "spanish": "Por los pelos",
@@ -614,8 +722,10 @@
  {
   "id": "codex_capitals",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_capital",
+  "icon": "ach_codex_capitals",
   "name": {
    "english": "Diplomat",
    "spanish": "Diplomático",
@@ -648,8 +758,10 @@
  {
   "id": "codex_water",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_water",
+  "icon": "ach_codex_water",
   "name": {
    "english": "Calm waters",
    "spanish": "Aguas tranquilas",
@@ -682,8 +794,10 @@
  {
   "id": "codex_nature",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "naturalist",
+  "icon": "ach_codex_nature",
   "name": {
    "english": "Naturalist",
    "spanish": "Naturalista",
@@ -716,8 +830,10 @@
  {
   "id": "codex_people",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_person",
+  "icon": "ach_codex_people",
   "name": {
    "english": "Historian",
    "spanish": "Historiador",
@@ -750,8 +866,10 @@
  {
   "id": "codex_events",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_battle",
+  "icon": "ach_codex_events",
   "name": {
    "english": "Chronicler",
    "spanish": "Cronista",
@@ -784,8 +902,10 @@
  {
   "id": "codex_place",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_place",
+  "icon": "ach_codex_place",
   "name": {
    "english": "Hidden corners",
    "spanish": "Rincones perdidos",
@@ -818,8 +938,10 @@
  {
   "id": "inside",
   "hidden": 0,
+  "tier": 2,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "t_country",
+  "icon": "ach_inside",
   "name": {
    "english": "Welcome home",
    "spanish": "Bienvenido a casa",
@@ -852,8 +974,10 @@
  {
   "id": "bull_25",
   "hidden": 0,
+  "tier": 2,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "crosshair",
+  "icon": "ach_bull_25",
   "name": {
    "english": "Surgeon's aim",
    "spanish": "Pulso de cirujano",
@@ -886,8 +1010,10 @@
  {
   "id": "adv_rich",
   "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "hoard",
+  "icon": "ach_adv_rich",
   "name": {
    "english": "Dragon's hoard",
    "spanish": "Tesoro de dragón",
@@ -920,8 +1046,10 @@
  {
   "id": "adv_flawless",
   "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "a_shield",
+  "icon": "ach_adv_flawless",
   "name": {
    "english": "Not a scratch",
    "spanish": "Sin un rasguño",
@@ -954,8 +1082,10 @@
  {
   "id": "adv_build",
   "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "a_pack",
+  "icon": "ach_adv_build",
   "name": {
    "english": "Full pack",
    "spanish": "Mochila llena",
@@ -986,10 +1116,120 @@
   }
  },
  {
+  "id": "adv_triangulate",
+  "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_triangulate",
+  "name": {
+   "english": "Triangulation",
+   "spanish": "Triangulación",
+   "french": "Triangulation",
+   "brazilian": "Triangulação",
+   "german": "Triangulation",
+   "italian": "Triangolazione",
+   "latam": "Triangulación",
+   "schinese": "三角定位",
+   "koreana": "삼각측량",
+   "japanese": "三角測量",
+   "russian": "Триангуляция",
+   "polish": "Triangulacja"
+  },
+  "desc": {
+   "english": "Use 3 probes (Sonar or Compass) on a single question.",
+   "spanish": "Lanza 3 sondas (Sonar o Brújula) en una misma pregunta.",
+   "french": "Lance 3 sondes (Sonar ou Boussole) sur une même question.",
+   "brazilian": "Lance 3 sondas (Sonar ou Bússola) em uma mesma pergunta.",
+   "german": "Setze 3 Sonden (Sonar oder Kompass) bei derselben Frage ein.",
+   "italian": "Lancia 3 sonde (Sonar o Bussola) nella stessa domanda.",
+   "latam": "Lanza 3 sondas (Sonar o Brújula) en una misma pregunta.",
+   "schinese": "在同一道题中使用 3 次探测（声呐或指南针）。",
+   "koreana": "한 문제에서 탐지(소나 또는 나침반)를 3번 사용하세요.",
+   "japanese": "1問のうちに探知（ソナーかコンパス）を3回使おう。",
+   "russian": "Используй 3 зонда (Сонар или Компас) в одном вопросе.",
+   "polish": "Użyj 3 sond (Sonar lub Kompas) w jednym pytaniu."
+  }
+ },
+ {
+  "id": "adv_supplies",
+  "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_supplies",
+  "name": {
+   "english": "Well stocked",
+   "spanish": "Bien abastecido",
+   "french": "Bien approvisionné",
+   "brazilian": "Bem abastecido",
+   "german": "Gut versorgt",
+   "italian": "Ben rifornito",
+   "latam": "Bien abastecido",
+   "schinese": "补给充足",
+   "koreana": "보급 완료",
+   "japanese": "準備万端",
+   "russian": "Запасливый",
+   "polish": "Pełne zapasy"
+  },
+  "desc": {
+   "english": "Activate Double espresso, Resupply and Round insurance together.",
+   "spanish": "Activa a la vez Café doble, Refuerzo y Seguro de ronda.",
+   "french": "Active ensemble Double expresso, Réapprovisionnement et Assurance de manche.",
+   "brazilian": "Ative juntos Café duplo, Reforço e Seguro de rodada.",
+   "german": "Aktiviere Doppelten Espresso, Nachschub und Rundenversicherung zugleich.",
+   "italian": "Attiva insieme Espresso doppio, Rifornimento e Assicurazione del round.",
+   "latam": "Activa a la vez Café doble, Refuerzo y Seguro de ronda.",
+   "schinese": "同时启用双份浓缩咖啡、补给和回合保险。",
+   "koreana": "더블 에스프레소, 재보급, 라운드 보험을 한 번에 활성화하세요.",
+   "japanese": "ダブルエスプレッソ、補給、ラウンド保険を同時に有効にしよう。",
+   "russian": "Включи сразу Двойной эспрессо, Пополнение и Страховку раунда.",
+   "polish": "Włącz naraz Podwójne espresso, Zaopatrzenie i Ubezpieczenie rundy."
+  }
+ },
+ {
+  "id": "codex_country50",
+  "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
+  "frame": "blank_teal",
+  "icon": "ach_codex_country50",
+  "name": {
+   "english": "Globetrotter",
+   "spanish": "Trotamundos",
+   "french": "Globe-trotteur",
+   "brazilian": "Viajante do mundo",
+   "german": "Weltenbummler",
+   "italian": "Giramondo",
+   "latam": "Trotamundos",
+   "schinese": "环球旅行者",
+   "koreana": "세계 여행자",
+   "japanese": "世界を股にかける人",
+   "russian": "Путешественник",
+   "polish": "Obieżyświat"
+  },
+  "desc": {
+   "english": "50 countries in the Encyclopedia.",
+   "spanish": "50 países en la Enciclopedia.",
+   "french": "50 pays dans l'Encyclopédie.",
+   "brazilian": "50 países na Enciclopédia.",
+   "german": "50 Länder in der Enzyklopädie.",
+   "italian": "50 paesi nell'Enciclopedia.",
+   "latam": "50 países en la Enciclopedia.",
+   "schinese": "百科全书中收录 50 个国家。",
+   "koreana": "도감에 국가 50개.",
+   "japanese": "図鑑に国を50件。",
+   "russian": "50 стран в энциклопедии.",
+   "polish": "50 krajów w Encyklopedii."
+  }
+ },
+ {
   "id": "codex_250",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "a_cap",
+  "icon": "ach_codex_250",
   "name": {
    "english": "Professor",
    "spanish": "Catedrático",
@@ -1022,8 +1262,10 @@
  {
   "id": "classic_capitals",
   "hidden": 0,
+  "tier": 2,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "t_capital",
+  "icon": "ach_classic_capitals",
   "name": {
    "english": "Capital tour",
    "spanish": "Gira de capitales",
@@ -1056,8 +1298,10 @@
  {
   "id": "classic_europe",
   "hidden": 0,
+  "tier": 2,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "k_eu",
+  "icon": "ach_classic_europe",
   "name": {
    "english": "Grand Tour",
    "spanish": "Grand Tour",
@@ -1090,8 +1334,10 @@
  {
   "id": "classic_latam",
   "hidden": 0,
+  "tier": 2,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "k_sa",
+  "icon": "ach_classic_latam",
   "name": {
    "english": "Latin spirit",
    "spanish": "Tierra latina",
@@ -1124,8 +1370,10 @@
  {
   "id": "classic_usa",
   "hidden": 0,
+  "tier": 2,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "k_na",
+  "icon": "ach_classic_usa",
   "name": {
    "english": "American dream",
    "spanish": "Sueño americano",
@@ -1158,8 +1406,10 @@
  {
   "id": "classic_asia",
   "hidden": 0,
+  "tier": 2,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "k_as",
+  "icon": "ach_classic_asia",
   "name": {
    "english": "Silk road",
    "spanish": "Ruta de la seda",
@@ -1192,8 +1442,10 @@
  {
   "id": "classic_oceania",
   "hidden": 0,
+  "tier": 2,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "k_oc",
+  "icon": "ach_classic_oceania",
   "name": {
    "english": "Down under",
    "spanish": "Al fin del mundo",
@@ -1226,8 +1478,10 @@
  {
   "id": "adv_act2",
   "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "a_peak",
+  "icon": "ach_adv_act2",
   "name": {
    "english": "Beyond the map",
    "spanish": "Más allá del mapa",
@@ -1258,10 +1512,84 @@
   }
  },
  {
+  "id": "adv_lastlife",
+  "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_lastlife",
+  "name": {
+   "english": "On the edge",
+   "spanish": "Al filo",
+   "french": "Sur le fil",
+   "brazilian": "No limite",
+   "german": "Auf Messers Schneide",
+   "italian": "Sul filo del rasoio",
+   "latam": "Al filo",
+   "schinese": "绝境求生",
+   "koreana": "벼랑 끝에서",
+   "japanese": "崖っぷち",
+   "russian": "На грани",
+   "polish": "Na krawędzi"
+  },
+  "desc": {
+   "english": "Defeat a boss with a single provision left.",
+   "spanish": "Derrota a un jefe con una sola provisión.",
+   "french": "Vaincs un boss avec une seule provision restante.",
+   "brazilian": "Derrote um chefe com só uma provisão restante.",
+   "german": "Besiege einen Boss mit nur noch einem Proviant.",
+   "italian": "Sconfiggi un boss con una sola provvista rimasta.",
+   "latam": "Derrota a un jefe con una sola provisión.",
+   "schinese": "仅剩 1 份补给时击败一个首领。",
+   "koreana": "식량이 하나만 남은 상태로 보스를 처치하세요.",
+   "japanese": "プロビジョン残り1つでボスを倒そう。",
+   "russian": "Победи босса, когда остался всего один запас.",
+   "polish": "Pokonaj bossa, mając tylko jeden zapas."
+  }
+ },
+ {
+  "id": "classic_clean",
+  "hidden": 0,
+  "tier": 2,
+  "ev": "classic",
+  "frame": "blank_small",
+  "icon": "ach_classic_clean",
+  "name": {
+   "english": "No safety net",
+   "spanish": "Sin red",
+   "french": "Sans filet",
+   "brazilian": "Sem rede",
+   "german": "Ohne Netz",
+   "italian": "Senza rete",
+   "latam": "Sin red",
+   "schinese": "没有安全网",
+   "koreana": "안전망 없이",
+   "japanese": "命綱なし",
+   "russian": "Без страховки",
+   "polish": "Bez siatki"
+  },
+  "desc": {
+   "english": "Finish a Classic campaign from level 1 without failing a single level.",
+   "spanish": "Termina una campaña del Clásico desde el nivel 1 sin fallar ninguno.",
+   "french": "Termine une campagne du Classique depuis le niveau 1 sans rater un seul niveau.",
+   "brazilian": "Termine uma campanha do Clássico desde o nível 1 sem falhar nenhum nível.",
+   "german": "Beende eine Klassik-Kampagne ab Level 1, ohne ein einziges Level zu verpatzen.",
+   "italian": "Termina una campagna del Classico dal livello 1 senza fallire nessun livello.",
+   "latam": "Termina una campaña del Clásico desde el nivel 1 sin fallar ninguno.",
+   "schinese": "从第 1 关开始完成一场经典战役，且一关都不失败。",
+   "koreana": "1레벨부터 한 번도 실패하지 않고 클래식 캠페인을 완료하세요.",
+   "japanese": "レベル1から一度も失敗せずにクラシックのキャンペーンを完了しよう。",
+   "russian": "Пройди кампанию классики с 1-го уровня, не провалив ни одного.",
+   "polish": "Ukończ kampanię Klasyczną od poziomu 1 bez oblania żadnego poziomu."
+  }
+ },
+ {
   "id": "perfect_5",
   "hidden": 0,
+  "tier": 2,
+  "ev": "level",
   "frame": "blank_boss",
-  "icon": "combo",
+  "icon": "ach_perfect_5",
   "name": {
    "english": "Perfect streak",
    "spanish": "Racha perfecta",
@@ -1294,8 +1622,10 @@
  {
   "id": "adv_boss5",
   "hidden": 0,
+  "tier": 2,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "chest",
+  "icon": "ach_adv_boss5",
   "name": {
    "english": "Bounty hunter",
    "spanish": "Cazarrecompensas",
@@ -1328,8 +1658,10 @@
  {
   "id": "codex_city",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_city",
+  "icon": "ach_codex_city",
   "name": {
    "english": "World traveler",
    "spanish": "Turista empedernido",
@@ -1362,8 +1694,10 @@
  {
   "id": "codex_curio",
   "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_curio",
+  "icon": "ach_codex_curio",
   "name": {
    "english": "Trivia buff",
    "spanish": "Culturilla general",
@@ -1396,8 +1730,10 @@
  {
   "id": "pixel",
   "hidden": 0,
+  "tier": 2,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_lens",
+  "icon": "ach_pixel",
   "name": {
    "english": "To the millimetre",
    "spanish": "Al milímetro",
@@ -1430,8 +1766,10 @@
  {
   "id": "q_1000",
   "hidden": 0,
+  "tier": 2,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "mapper",
+  "icon": "ach_q_1000",
   "name": {
    "english": "Cartographer",
    "spanish": "Cartógrafo",
@@ -1464,8 +1802,10 @@
  {
   "id": "daily_7",
   "hidden": 0,
+  "tier": 2,
+  "ev": "daily",
   "frame": "blank_gold",
-  "icon": "coupon",
+  "icon": "ach_daily_7",
   "name": {
    "english": "Consistency",
    "spanish": "Constancia",
@@ -1498,8 +1838,10 @@
  {
   "id": "adv_runs10",
   "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "hat",
+  "icon": "ach_adv_runs10",
   "name": {
    "english": "Veteran",
    "spanish": "Curtido",
@@ -1532,8 +1874,10 @@
  {
   "id": "codex_500",
   "hidden": 0,
+  "tier": 3,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "a_medal",
+  "icon": "ach_codex_500",
   "name": {
    "english": "Encyclopedist",
    "spanish": "Enciclopedista",
@@ -1566,8 +1910,10 @@
  {
   "id": "classic_flags",
   "hidden": 0,
+  "tier": 3,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "t_country",
+  "icon": "ach_classic_flags",
   "name": {
    "english": "Standard-bearer",
    "spanish": "Abanderado",
@@ -1600,8 +1946,10 @@
  {
   "id": "classic_clues",
   "hidden": 0,
+  "tier": 3,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "t_curio",
+  "icon": "ach_classic_clues",
   "name": {
    "english": "Sleuth",
    "spanish": "Detective",
@@ -1634,8 +1982,10 @@
  {
   "id": "classic_events",
   "hidden": 0,
+  "tier": 3,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "t_event",
+  "icon": "ach_classic_events",
   "name": {
    "english": "Witness to history",
    "spanish": "Testigo de la historia",
@@ -1668,8 +2018,10 @@
  {
   "id": "classic_people",
   "hidden": 0,
+  "tier": 3,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "t_person",
+  "icon": "ach_classic_people",
   "name": {
    "english": "Biographer",
    "spanish": "Biógrafo",
@@ -1702,8 +2054,10 @@
  {
   "id": "codex_strait",
   "hidden": 0,
+  "tier": 3,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "t_strait",
+  "icon": "ach_codex_strait",
   "name": {
    "english": "Narrow passage",
    "spanish": "Paso estrecho",
@@ -1736,8 +2090,10 @@
  {
   "id": "streak_20",
   "hidden": 0,
+  "tier": 3,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_volcano",
+  "icon": "ach_streak_20",
   "name": {
    "english": "Eruption",
    "spanish": "Erupción",
@@ -1770,8 +2126,10 @@
  {
   "id": "adv_win",
   "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "a_moai",
+  "icon": "ach_adv_win",
   "name": {
    "english": "Terra Incognita",
    "spanish": "Terra Incognita",
@@ -1804,8 +2162,10 @@
  {
   "id": "adv_asc",
   "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "s_peak",
+  "icon": "ach_adv_asc",
   "name": {
    "english": "Ascension",
    "spanish": "Ascensión",
@@ -1838,8 +2198,10 @@
  {
   "id": "classic_gold1",
   "hidden": 0,
+  "tier": 3,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "medal_gold",
+  "icon": "ach_classic_gold1",
   "name": {
    "english": "First gold",
    "spanish": "Oro a la vista",
@@ -1872,8 +2234,10 @@
  {
   "id": "bull_100",
   "hidden": 0,
+  "tier": 3,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "eagle",
+  "icon": "ach_bull_100",
   "name": {
    "english": "Hawk eye",
    "spanish": "Ojo de halcón",
@@ -1906,8 +2270,10 @@
  {
   "id": "inside_100",
   "hidden": 0,
+  "tier": 3,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "sail",
+  "icon": "ach_inside_100",
   "name": {
    "english": "Well-traveled",
    "spanish": "Bien viajado",
@@ -1940,8 +2306,10 @@
  {
   "id": "adv_flawless2",
   "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "heart",
+  "icon": "ach_adv_flawless2",
   "name": {
    "english": "Flawless II",
    "spanish": "Impecable II",
@@ -1974,8 +2342,10 @@
  {
   "id": "adv_endless",
   "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "a_inf",
+  "icon": "ach_adv_endless",
   "name": {
    "english": "Legend",
    "spanish": "Leyenda",
@@ -2006,10 +2376,156 @@
   }
  },
  {
+  "id": "adv_fullhouse",
+  "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_fullhouse",
+  "name": {
+   "english": "Clean sweep",
+   "spanish": "Pleno",
+   "french": "Carton plein",
+   "brazilian": "Gabarito",
+   "german": "Volle Punktzahl",
+   "italian": "Filotto",
+   "latam": "Pleno",
+   "schinese": "五发全中",
+   "koreana": "싹쓸이",
+   "japanese": "全弾命中",
+   "russian": "Все в яблочко",
+   "polish": "Komplet"
+  },
+  "desc": {
+   "english": "5 bullseyes in a single Adventure round.",
+   "spanish": "5 dianas en una misma ronda de la Aventura.",
+   "french": "5 mille dans une même manche de l'Aventure.",
+   "brazilian": "5 moscas em uma mesma rodada da Aventura.",
+   "german": "5 Volltreffer in einer einzigen Abenteuer-Runde.",
+   "italian": "5 centri in un solo round dell'Avventura.",
+   "latam": "5 blancos perfectos en una misma ronda de Aventura.",
+   "schinese": "在同一个冒险回合中正中靶心 5 次。",
+   "koreana": "모험 한 라운드에서 명중 5번.",
+   "japanese": "アドベンチャーの1ラウンドで5回命中。",
+   "russian": "5 яблочек за один раунд Приключения.",
+   "polish": "5 dziesiątek w jednej rundzie Przygody."
+  }
+ },
+ {
+  "id": "adv_legendary",
+  "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_legendary",
+  "name": {
+   "english": "Legendary loot",
+   "spanish": "Botín legendario",
+   "french": "Butin légendaire",
+   "brazilian": "Espólio lendário",
+   "german": "Legendäre Beute",
+   "italian": "Bottino leggendario",
+   "latam": "Botín legendario",
+   "schinese": "传说战利品",
+   "koreana": "전설의 전리품",
+   "japanese": "伝説の戦利品",
+   "russian": "Легендарная добыча",
+   "polish": "Legendarny łup"
+  },
+  "desc": {
+   "english": "Get a legendary relic from a boss chest.",
+   "spanish": "Consigue una reliquia legendaria en un cofre de jefe.",
+   "french": "Obtiens une relique légendaire dans un coffre du boss.",
+   "brazilian": "Consiga uma relíquia lendária em um baú do chefe.",
+   "german": "Erhalte ein legendäres Relikt aus einer Boss-Truhe.",
+   "italian": "Ottieni una reliquia leggendaria da un forziere del boss.",
+   "latam": "Consigue una reliquia legendaria en un cofre de jefe.",
+   "schinese": "从首领宝箱中获得一件传说遗物。",
+   "koreana": "보스 상자에서 전설 유물을 얻으세요.",
+   "japanese": "ボスの宝箱から伝説のレリックを手に入れよう。",
+   "russian": "Получи легендарную реликвию из сундука босса.",
+   "polish": "Zdobądź legendarną relikwię ze skrzyni bossa."
+  }
+ },
+ {
+  "id": "codex_1000",
+  "hidden": 0,
+  "tier": 3,
+  "ev": "codex",
+  "frame": "blank_teal",
+  "icon": "ach_codex_1000",
+  "name": {
+   "english": "Librarian",
+   "spanish": "Bibliotecario",
+   "french": "Bibliothécaire",
+   "brazilian": "Bibliotecário",
+   "german": "Bibliothekar",
+   "italian": "Bibliotecario",
+   "latam": "Bibliotecario",
+   "schinese": "图书管理员",
+   "koreana": "사서",
+   "japanese": "司書",
+   "russian": "Библиотекарь",
+   "polish": "Bibliotekarz"
+  },
+  "desc": {
+   "english": "1,000 cards.",
+   "spanish": "1.000 tarjetas.",
+   "french": "1 000 cartes.",
+   "brazilian": "1.000 cartas.",
+   "german": "1.000 Karten.",
+   "italian": "1.000 carte.",
+   "latam": "1.000 cartas.",
+   "schinese": "1,000 张卡片。",
+   "koreana": "카드 1,000장.",
+   "japanese": "カード1,000枚。",
+   "russian": "1000 карточек.",
+   "polish": "1000 kart."
+  }
+ },
+ {
+  "id": "adv_score100k",
+  "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_score100k",
+  "name": {
+   "english": "Jackpot",
+   "spanish": "Premio gordo",
+   "french": "Jackpot",
+   "brazilian": "Bolada",
+   "german": "Jackpot",
+   "italian": "Jackpot",
+   "latam": "Premio mayor",
+   "schinese": "头奖",
+   "koreana": "잭팟",
+   "japanese": "ジャックポット",
+   "russian": "Джекпот",
+   "polish": "Jackpot"
+  },
+  "desc": {
+   "english": "100,000 points in a single expedition.",
+   "spanish": "100.000 puntos en una sola expedición.",
+   "french": "100 000 points en une seule expédition.",
+   "brazilian": "100.000 pontos em uma única expedição.",
+   "german": "100.000 Punkte in einer einzigen Expedition.",
+   "italian": "100.000 punti in una sola spedizione.",
+   "latam": "100.000 puntos en una sola expedición.",
+   "schinese": "单次远征获得 100,000 分。",
+   "koreana": "한 번의 탐험에서 100,000점.",
+   "japanese": "1回の遠征で100,000ポイント。",
+   "russian": "100 000 очков за одну экспедицию.",
+   "polish": "100 000 punktów w jednej wyprawie."
+  }
+ },
+ {
   "id": "adv_rich2",
   "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "highroller",
+  "icon": "ach_adv_rich2",
   "name": {
    "english": "High roller",
    "spanish": "Altas apuestas",
@@ -2042,8 +2558,10 @@
  {
   "id": "speed_master",
   "hidden": 0,
+  "tier": 3,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "momentum",
+  "icon": "ach_speed_master",
   "name": {
    "english": "Dealer reflexes",
    "spanish": "Reflejos de crupier",
@@ -2076,8 +2594,10 @@
  {
   "id": "adv_wins3",
   "hidden": 0,
+  "tier": 3,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "lucky7",
+  "icon": "ach_adv_wins3",
   "name": {
    "english": "Hat trick",
    "spanish": "Triplete",
@@ -2110,8 +2630,10 @@
  {
   "id": "classic_all",
   "hidden": 0,
+  "tier": 3,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "m_compete",
+  "icon": "ach_classic_all",
   "name": {
    "english": "Classic master",
    "spanish": "Maestro del Clásico",
@@ -2144,8 +2666,10 @@
  {
   "id": "plays_50",
   "hidden": 0,
+  "tier": 3,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "hourglass",
+  "icon": "ach_plays_50",
   "name": {
    "english": "Regular",
    "spanish": "Cliente habitual",
@@ -2178,8 +2702,10 @@
  {
   "id": "q_5000",
   "hidden": 0,
+  "tier": 4,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "worldmap",
+  "icon": "ach_q_5000",
   "name": {
    "english": "Geographer",
    "spanish": "Geógrafo",
@@ -2210,10 +2736,48 @@
   }
  },
  {
+  "id": "classic_gold5",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "classic",
+  "frame": "blank_small",
+  "icon": "ach_classic_gold5",
+  "name": {
+   "english": "Gold rush",
+   "spanish": "Cinco de oros",
+   "french": "Ruée vers l'or",
+   "brazilian": "Corrida do ouro",
+   "german": "Goldrausch",
+   "italian": "Corsa all'oro",
+   "latam": "Cinco de oros",
+   "schinese": "淘金热",
+   "koreana": "골드 러시",
+   "japanese": "ゴールドラッシュ",
+   "russian": "Золотая лихорадка",
+   "polish": "Gorączka złota"
+  },
+  "desc": {
+   "english": "Gold medal in 5 Classic campaigns.",
+   "spanish": "Medalla de oro en 5 campañas del Clásico.",
+   "french": "Médaille d'or dans 5 campagnes du Classique.",
+   "brazilian": "Medalha de ouro em 5 campanhas do Clássico.",
+   "german": "Goldmedaille in 5 Klassik-Kampagnen.",
+   "italian": "Medaglia d'oro in 5 campagne del Classico.",
+   "latam": "Medalla de oro en 5 campañas del Clásico.",
+   "schinese": "在 5 场经典战役中获得金牌。",
+   "koreana": "클래식 캠페인 5개에서 금메달.",
+   "japanese": "クラシックの5キャンペーンで金メダル。",
+   "russian": "Золото в 5 кампаниях классики.",
+   "polish": "Złoty medal w 5 kampaniach Klasycznych."
+  }
+ },
+ {
   "id": "adv_asc2",
   "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "kite",
+  "icon": "ach_adv_asc2",
   "name": {
    "english": "Ascension II",
    "spanish": "Ascensión II",
@@ -2244,10 +2808,48 @@
   }
  },
  {
+  "id": "adv_asc3",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_asc3",
+  "name": {
+   "english": "Ascension III",
+   "spanish": "Ascensión III",
+   "french": "Ascension III",
+   "brazilian": "Ascensão III",
+   "german": "Aufstieg III",
+   "italian": "Ascensione III",
+   "latam": "Ascensión III",
+   "schinese": "飞升 III",
+   "koreana": "어센션 III",
+   "japanese": "アセンションIII",
+   "russian": "Восхождение III",
+   "polish": "Wniebowstąpienie III"
+  },
+  "desc": {
+   "english": "Win an expedition at Ascension 3 or higher.",
+   "spanish": "Gana una expedición en Ascensión 3 o más.",
+   "french": "Gagne une expédition en Ascension 3 ou plus.",
+   "brazilian": "Vença uma expedição na Ascensão 3 ou mais.",
+   "german": "Gewinne eine Expedition ab Aufstieg 3.",
+   "italian": "Vinci una spedizione all'Ascensione 3 o superiore.",
+   "latam": "Gana una expedición en Ascensión 3 o más.",
+   "schinese": "在飞升 3 级或以上赢得远征。",
+   "koreana": "어센션 3 이상에서 탐험에서 승리하세요.",
+   "japanese": "アセンション3以上で遠征に勝利しよう。",
+   "russian": "Выиграй экспедицию на Восхождении 3 или выше.",
+   "polish": "Wygraj wyprawę na Wniebowstąpieniu 3 lub wyższym."
+  }
+ },
+ {
   "id": "adv_flawless3",
   "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "talisman",
+  "icon": "ach_adv_flawless3",
   "name": {
    "english": "Flawless legend",
    "spanish": "Leyenda intachable",
@@ -2280,8 +2882,10 @@
  {
   "id": "daily_30",
   "hidden": 0,
+  "tier": 4,
+  "ev": "daily",
   "frame": "blank_gold",
-  "icon": "almanac",
+  "icon": "ach_daily_30",
   "name": {
    "english": "Daily ritual",
    "spanish": "Ritual diario",
@@ -2314,8 +2918,10 @@
  {
   "id": "codex_country",
   "hidden": 0,
+  "tier": 4,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "passport",
+  "icon": "ach_codex_country",
   "name": {
    "english": "Full passport",
    "spanish": "Pasaporte completo",
@@ -2346,10 +2952,48 @@
   }
  },
  {
+  "id": "adv_asc4",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_asc4",
+  "name": {
+   "english": "Ascension IV",
+   "spanish": "Ascensión IV",
+   "french": "Ascension IV",
+   "brazilian": "Ascensão IV",
+   "german": "Aufstieg IV",
+   "italian": "Ascensione IV",
+   "latam": "Ascensión IV",
+   "schinese": "飞升 IV",
+   "koreana": "어센션 IV",
+   "japanese": "アセンションIV",
+   "russian": "Восхождение IV",
+   "polish": "Wniebowstąpienie IV"
+  },
+  "desc": {
+   "english": "Win an expedition at Ascension 4 or higher.",
+   "spanish": "Gana una expedición en Ascensión 4 o más.",
+   "french": "Gagne une expédition en Ascension 4 ou plus.",
+   "brazilian": "Vença uma expedição na Ascensão 4 ou mais.",
+   "german": "Gewinne eine Expedition ab Aufstieg 4.",
+   "italian": "Vinci una spedizione all'Ascensione 4 o superiore.",
+   "latam": "Gana una expedición en Ascensión 4 o más.",
+   "schinese": "在飞升 4 级或以上赢得远征。",
+   "koreana": "어센션 4 이상에서 탐험에서 승리하세요.",
+   "japanese": "アセンション4以上で遠征に勝利しよう。",
+   "russian": "Выиграй экспедицию на Восхождении 4 или выше.",
+   "polish": "Wygraj wyprawę na Wniebowstąpieniu 4 lub wyższym."
+  }
+ },
+ {
   "id": "bull_500",
   "hidden": 0,
+  "tier": 4,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "crown",
+  "icon": "ach_bull_500",
   "name": {
    "english": "Map legend",
    "spanish": "Leyenda del mapa",
@@ -2382,8 +3026,10 @@
  {
   "id": "streak_50",
   "hidden": 0,
+  "tier": 4,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "storm",
+  "icon": "ach_streak_50",
   "name": {
    "english": "Invincible",
    "spanish": "Invencible",
@@ -2414,10 +3060,120 @@
   }
  },
  {
+  "id": "adv_endless2",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_endless2",
+  "name": {
+   "english": "Myth",
+   "spanish": "Mito",
+   "french": "Mythe",
+   "brazilian": "Mito",
+   "german": "Mythos",
+   "italian": "Mito",
+   "latam": "Mito",
+   "schinese": "神话",
+   "koreana": "신화",
+   "japanese": "神話",
+   "russian": "Миф",
+   "polish": "Mit"
+  },
+  "desc": {
+   "english": "Survive 50 questions in infinite mode.",
+   "spanish": "Aguanta 50 preguntas en el modo infinito.",
+   "french": "Tiens bon pendant 50 questions en mode infini.",
+   "brazilian": "Aguente 50 perguntas no modo infinito.",
+   "german": "Überstehe 50 Fragen im Endlosmodus.",
+   "italian": "Resisti per 50 domande in modalità infinita.",
+   "latam": "Aguanta 50 preguntas en el modo infinito.",
+   "schinese": "在无尽模式中坚持答完 50 道题。",
+   "koreana": "무한 모드에서 50문제를 버티세요.",
+   "japanese": "エンドレスモードで50問を耐え抜こう。",
+   "russian": "Продержись 50 вопросов в бесконечном режиме.",
+   "polish": "Przetrwaj 50 pytań w trybie nieskończonym."
+  }
+ },
+ {
+  "id": "codex_2500",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "codex",
+  "frame": "blank_teal",
+  "icon": "ach_codex_2500",
+  "name": {
+   "english": "Great Library",
+   "spanish": "Gran Biblioteca",
+   "french": "Grande Bibliothèque",
+   "brazilian": "Grande Biblioteca",
+   "german": "Große Bibliothek",
+   "italian": "Grande Biblioteca",
+   "latam": "Gran Biblioteca",
+   "schinese": "大图书馆",
+   "koreana": "대도서관",
+   "japanese": "大図書館",
+   "russian": "Великая библиотека",
+   "polish": "Wielka Biblioteka"
+  },
+  "desc": {
+   "english": "2,500 cards.",
+   "spanish": "2.500 tarjetas.",
+   "french": "2 500 cartes.",
+   "brazilian": "2.500 cartas.",
+   "german": "2.500 Karten.",
+   "italian": "2.500 carte.",
+   "latam": "2.500 cartas.",
+   "schinese": "2,500 张卡片。",
+   "koreana": "카드 2,500장.",
+   "japanese": "カード2,500枚。",
+   "russian": "2500 карточек.",
+   "polish": "2500 kart."
+  }
+ },
+ {
+  "id": "codex_capitals_all",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "codex",
+  "frame": "blank_teal",
+  "icon": "ach_codex_capitals_all",
+  "name": {
+   "english": "Ambassador",
+   "spanish": "Embajador",
+   "french": "Ambassadeur",
+   "brazilian": "Embaixador",
+   "german": "Botschafter",
+   "italian": "Ambasciatore",
+   "latam": "Embajador",
+   "schinese": "大使",
+   "koreana": "대사",
+   "japanese": "大使",
+   "russian": "Посол",
+   "polish": "Ambasador"
+  },
+  "desc": {
+   "english": "Every world capital in the Encyclopedia.",
+   "spanish": "Todas las capitales del mundo en la Enciclopedia.",
+   "french": "Toutes les capitales du monde dans l'Encyclopédie.",
+   "brazilian": "Todas as capitais do mundo na Enciclopédia.",
+   "german": "Alle Hauptstädte der Welt in der Enzyklopädie.",
+   "italian": "Tutte le capitali del mondo nell'Enciclopedia.",
+   "latam": "Todas las capitales del mundo en la Enciclopedia.",
+   "schinese": "百科全书中收录世界上所有首都。",
+   "koreana": "도감에 세계의 모든 수도.",
+   "japanese": "図鑑に世界のすべての首都。",
+   "russian": "Все столицы мира в энциклопедии.",
+   "polish": "Wszystkie stolice świata w Encyklopedii."
+  }
+ },
+ {
   "id": "adv_wins10",
   "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "crown",
+  "icon": "ach_adv_wins10",
   "name": {
    "english": "House regular",
    "spanish": "Habitual de la casa",
@@ -2448,10 +3204,84 @@
   }
  },
  {
+  "id": "adv_blindwin",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_blindwin",
+  "name": {
+   "english": "Blind faith",
+   "spanish": "Fe ciega",
+   "french": "Foi aveugle",
+   "brazilian": "Fé cega",
+   "german": "Blinder Glaube",
+   "italian": "Fede cieca",
+   "latam": "Fe ciega",
+   "schinese": "盲目的信念",
+   "koreana": "맹목적인 믿음",
+   "japanese": "盲信",
+   "russian": "Слепая вера",
+   "polish": "Ślepa wiara"
+  },
+  "desc": {
+   "english": "Win an expedition with the Blind adventurer deck.",
+   "spanish": "Gana una expedición con la baraja Aventurero ciego.",
+   "french": "Gagne une expédition avec le paquet Aventurier aveugle.",
+   "brazilian": "Vença uma expedição com o baralho Aventureiro cego.",
+   "german": "Gewinne eine Expedition mit dem Deck Blinder Abenteurer.",
+   "italian": "Vinci una spedizione con il mazzo Avventuriero cieco.",
+   "latam": "Gana una expedición con la baraja Aventurero ciego.",
+   "schinese": "使用「盲眼冒险者」套牌赢得一次远征。",
+   "koreana": "눈먼 모험가 덱으로 탐험에서 승리하세요.",
+   "japanese": "「盲目の冒険者」デッキで遠征に勝利しよう。",
+   "russian": "Выиграй экспедицию с колодой «Слепой авантюрист».",
+   "polish": "Wygraj wyprawę talią Ślepy awanturnik."
+  }
+ },
+ {
+  "id": "adv_alldecks",
+  "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
+  "frame": "blank_big",
+  "icon": "ach_adv_alldecks",
+  "name": {
+   "english": "Four suits",
+   "spanish": "Cuatro palos",
+   "french": "Quatre couleurs",
+   "brazilian": "Quatro naipes",
+   "german": "Vier Farben",
+   "italian": "Quattro semi",
+   "latam": "Cuatro palos",
+   "schinese": "四种花色",
+   "koreana": "네 가지 문양",
+   "japanese": "4つのスート",
+   "russian": "Четыре масти",
+   "polish": "Cztery kolory"
+  },
+  "desc": {
+   "english": "Win an expedition with each of the 4 decks.",
+   "spanish": "Gana una expedición con cada una de las 4 barajas.",
+   "french": "Gagne une expédition avec chacun des 4 paquets.",
+   "brazilian": "Vença uma expedição com cada um dos 4 baralhos.",
+   "german": "Gewinne mit jedem der 4 Decks eine Expedition.",
+   "italian": "Vinci una spedizione con ciascuno dei 4 mazzi.",
+   "latam": "Gana una expedición con cada una de las 4 barajas.",
+   "schinese": "用 4 种套牌各赢得一次远征。",
+   "koreana": "4가지 덱으로 각각 탐험에서 승리하세요.",
+   "japanese": "4つのデッキそれぞれで遠征に勝利しよう。",
+   "russian": "Выиграй экспедицию каждой из 4 колод.",
+   "polish": "Wygraj wyprawę każdą z 4 talii."
+  }
+ },
+ {
   "id": "q_10000",
   "hidden": 0,
+  "tier": 4,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "atlasbook",
+  "icon": "ach_q_10000",
   "name": {
    "english": "Map sage",
    "spanish": "Sabio de los mapas",
@@ -2484,8 +3314,10 @@
  {
   "id": "bull_1000",
   "hidden": 0,
+  "tier": 4,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "royalflush",
+  "icon": "ach_bull_1000",
   "name": {
    "english": "Ace shot",
    "spanish": "As de diana",
@@ -2518,8 +3350,10 @@
  {
   "id": "classic_goldall",
   "hidden": 0,
+  "tier": 4,
+  "ev": "classic",
   "frame": "blank_small",
-  "icon": "crown",
+  "icon": "ach_classic_goldall",
   "name": {
    "english": "Solid gold",
    "spanish": "Oro puro",
@@ -2552,8 +3386,10 @@
  {
   "id": "adv_ascmax",
   "hidden": 0,
+  "tier": 4,
+  "ev": "adv",
   "frame": "blank_big",
-  "icon": "pyramid",
+  "icon": "ach_adv_ascmax",
   "name": {
    "english": "The summit",
    "spanish": "La cumbre",
@@ -2586,8 +3422,10 @@
  {
   "id": "codex_all",
   "hidden": 0,
+  "tier": 4,
+  "ev": "codex",
   "frame": "blank_teal",
-  "icon": "crown",
+  "icon": "ach_codex_all",
   "name": {
    "english": "Completionist",
    "spanish": "Completista",
@@ -2620,8 +3458,10 @@
  {
   "id": "marathon",
   "hidden": 1,
+  "tier": 5,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "boots",
+  "icon": "ach_marathon",
   "name": {
    "english": "Marathon",
    "spanish": "Maratón",
@@ -2654,8 +3494,10 @@
  {
   "id": "night",
   "hidden": 1,
+  "tier": 5,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "a_moon",
+  "icon": "ach_night",
   "name": {
    "english": "Night owl",
    "spanish": "Búho",
@@ -2688,8 +3530,10 @@
  {
   "id": "early_bird",
   "hidden": 1,
+  "tier": 5,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "earlybird",
+  "icon": "ach_early_bird",
   "name": {
    "english": "Early bird",
    "spanish": "Madrugador",
@@ -2722,8 +3566,10 @@
  {
   "id": "weekend",
   "hidden": 1,
+  "tier": 5,
+  "ev": "q",
   "frame": "blank_boss",
-  "icon": "tour",
+  "icon": "ach_weekend",
   "name": {
    "english": "Weekender",
    "spanish": "Findesemanero",
