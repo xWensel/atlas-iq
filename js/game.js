@@ -10,7 +10,7 @@
     quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, booting: true, skin: "casino",
     hub: "home", ranked: null, run: null, tool: null, hits: 0,
     cursor: true, tips: true, songToast: true, setTab: "general",
-    panSens: 100, zoomSens: 100, units: "km", contrast: false, colorblind: "off", qSize: "n",
+    panSens: 100, zoomSens: 100, units: "km", contrast: false, colorblind: "off", qSize: "n", shake: true,
   };
   const prog = id => (S.prog[id] = S.prog[id] || { unlocked: 1, best: 0, bestIq: 0 });
   function load() {
@@ -23,10 +23,11 @@
       S.prog = d.prog || {}; S.mode = d.mode || "classic"; S.campId = d.campId || null; S.quality = d.quality || "auto";
       S.panSens = d.panSens || 100; S.zoomSens = d.zoomSens || 100; S.units = d.units === "mi" ? "mi" : "km";
       S.contrast = !!d.contrast; S.colorblind = ["protan", "deutan", "tritan"].includes(d.colorblind) ? d.colorblind : "off"; S.qSize = ["l", "xl"].includes(d.qSize) ? d.qSize : "n";
+      S.shake = d.shake !== false; A.haptic.on = S.shake;
     } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab, panSens: S.panSens, zoomSens: S.zoomSens, units: S.units, contrast: S.contrast, colorblind: S.colorblind, qSize: S.qSize })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab, panSens: S.panSens, zoomSens: S.zoomSens, units: S.units, contrast: S.contrast, colorblind: S.colorblind, qSize: S.qSize, shake: S.shake })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
@@ -47,7 +48,7 @@
   A.codex.init(world, map); A.pointer.init(map);
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
-  applySens(); applyVisualFX(); applyQSize();
+  applySens(); applyVisualFX(); applyQSize(); applyShake();
   map.animateTo(map.home(), 0);
   A.cursor.set(S.cursor); A.tt.enable(S.tips);
 
@@ -186,7 +187,7 @@
     segSet(document.querySelector('[data-seg="cb"]'), S.colorblind);
     segSet(document.querySelector('[data-seg="qsize"]'), S.qSize);
     refreshLangUIs(); if (A.syncWin) A.syncWin();
-    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast, contrast: S.contrast };
+    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast, contrast: S.contrast, shake: S.shake };
     for (const k in st) { const el = document.querySelector('.sw[data-sw="' + k + '"]'); if (el) el.setAttribute("aria-checked", !!st[k]); }
     const sg = document.querySelector('.sw[data-sw="songs"]'); if (sg) sg.closest(".row-sw").classList.toggle("off", !A.audio.musicOn);
     $("rowCursor").classList.toggle("hidden", !A.cursor.available);
@@ -278,6 +279,9 @@
   document.addEventListener("pointerdown", e => { if (!e.target.closest("#langPop, #menuLang")) $("langPop").classList.add("hidden"); }, true);
   function applyMotion() { document.documentElement.classList.toggle("reduce-motion", S.reduce); map.fxOn = !S.reduce; }
   function applySens() { A.mapSens.pan = S.panSens / 100; A.mapSens.zoom = S.zoomSens / 100; }
+  /* Vibracion = no: html.no-shake quita en CSS todos los temblores de pantalla (rachas, rabieta y golpes del crupier; ver uikit.css),
+     jpShake no arranca y el movil no vibra. Los retos que tiemblan (Terremoto, letras...) son el propio reto y siguen */
+  function applyShake() { document.documentElement.classList.toggle("no-shake", !S.shake); A.haptic.on = S.shake; }
   /* daltonismo (filtro SVG, ver index.html #cbDefs) + alto contraste: se combinan en un solo filter CSS */
   function applyVisualFX() {
     const cb = S.colorblind !== "off" ? `url(#cbFix_${S.colorblind})` : "";
@@ -291,6 +295,7 @@
     cursor: () => { S.cursor = !S.cursor; A.cursor.set(S.cursor); }, tips: () => { S.tips = !S.tips; A.tt.enable(S.tips); }, tour: () => { S.tour = !S.tour; if (S.tour && A.tour) A.tour.reset(); },
     songs: () => { S.songToast = !S.songToast; if (!S.songToast && A.jukebox) A.jukebox.hide(); },
     contrast: () => { S.contrast = !S.contrast; applyVisualFX(); },
+    shake: () => { S.shake = !S.shake; applyShake(); if (S.shake) { jpShake(1); A.haptic([40]); } },   // al encenderla, un temblor flojo de muestra
   };
   for (const sw of document.querySelectorAll(".sw[data-sw]")) if (TOG[sw.dataset.sw]) sw.addEventListener("click", () => { TOG[sw.dataset.sw](); A.sfx.flip(true); save(); syncSettings(); });
   /* pestanas de Ajustes */
@@ -306,7 +311,7 @@
       if (!rs.classList.contains("armed")) { rs.classList.add("armed"); rs.textContent = A.t("set.reset.ask"); A.sfx.ui(); clearTimeout(tm); tm = setTimeout(() => { rs.classList.remove("armed"); syncSettings(); }, 4000); return; }
       clearTimeout(tm); rs.classList.remove("armed");
       A.audio.setVol("master", 0.85); A.audio.setVol("music", 0.7); A.audio.setVol("sfx", 0.9); A.audio.sfxOn = true; A.audio.setMusic(true); A.audio.unlock();
-      S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.tour = true; if (A.tour) A.tour.reset(); S.songToast = true; A.cursor.set(true); A.tt.enable(true);
+      S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.tour = true; if (A.tour) A.tour.reset(); S.songToast = true; S.shake = true; applyShake(); A.cursor.set(true); A.tt.enable(true);
       S.panSens = 100; S.zoomSens = 100; applySens(); S.units = "km"; S.contrast = false; S.colorblind = "off"; applyVisualFX(); S.qSize = "n"; applyQSize();
       save(); A.sfx.card(); syncSettings(); rs.textContent = A.t("set.reset.done"); setTimeout(syncSettings, 2200);
     }; }
@@ -454,6 +459,30 @@
     let h = "<i></i><i></i><i></i>"; for (let k = 0; k < 10; k++) { const a = (k / 10) * Math.PI * 2 + Math.random() * 0.4, d = 34 + Math.random() * 46; h += `<u style="--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d}px;--r:${Math.random() * 360}deg"></u>`; }
     el.innerHTML = h; $("app").appendChild(el); setTimeout(() => el.remove(), 900);
   }
+  /* la pantalla entera tiembla con cada jackpot de la Enciclopedia, de menos a mas: 1 flojo (<=300 km), 2 mas (<=150), 3 bastante mas (<=75).
+     Nunca sale igual: cada temblor toma una direccion al azar (a mas de ~60 grados de la anterior), abre su propia elipse, gira hacia
+     un lado u otro y rebota como un muelle que se apaga, con fuerza, ritmo y duracion un pelin distintos. Se apaga con Vibracion = no
+     o con "reducir movimiento" */
+  const SHAKE = [
+    { a: 3, r: 0, ms: 300, k: 4, ease: "ease-out" },
+    { a: 6.5, r: 0.15, ms: 420, k: 6, ease: "ease-out" },
+    { a: 13, r: 0.45, ms: 640, k: 8, ease: "cubic-bezier(.36, .07, .19, .97)" },
+  ];
+  let jpAnim = null, jpAng = Math.random() * Math.PI * 2;
+  function jpShake(n) {
+    if (!S.shake || S.reduce || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const P = SHAKE[n - 1], rnd = (a, b) => a + Math.random() * (b - a);
+    jpAng += rnd(1.1, 5.2);
+    const k = P.k + (Math.random() < 0.5 ? 0 : 1), turn = Math.random() < 0.5 ? -1 : 1, oval = rnd(0.25, 0.55), frames = [{ transform: "none", offset: 0, easing: P.ease }];
+    for (let i = 0; i < k; i++) {
+      const f = Math.pow(1 - i / k, 1.35) * rnd(0.82, 1.12), s = i % 2 ? -1 : 1, along = s * P.a * f, side = P.a * f * oval * rnd(-1, 1);
+      const x = along * Math.cos(jpAng) - side * Math.sin(jpAng), y = along * Math.sin(jpAng) + side * Math.cos(jpAng);
+      frames.push({ transform: `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${(s * turn * P.r * f).toFixed(3)}deg)`, offset: (i + 0.6 + rnd(-0.2, 0.2)) / (k + 0.6), easing: P.ease });
+    }
+    frames.push({ transform: "none", offset: 1 });
+    if (jpAnim) jpAnim.cancel();
+    jpAnim = document.documentElement.animate(frames, { duration: P.ms * rnd(0.92, 1.1) });
+  }
   function coinFx(n) {
     if (S.reduce || !n) return; const to = $("abCoins") && $("abCoins").getBoundingClientRect(); if (!to) return;
     for (let k = 0; k < Math.min(n, 8); k++) setTimeout(() => {
@@ -512,8 +541,16 @@
     const title = !guess ? A.t("res.timeout") : isC && km === 0 ? A.t("res.inside") : A.t(["res.t5", "res.t4", "res.t3", "res.t2", "res.t1"][tier]);
     setTimeout(() => A.sfx.reveal(tier), 480);
     const cxr = guess ? A.codexUnlock(o, km) : { added: [], level: 0 };
+    /* Enciclopedia: 1, 2 o 3 jackpots segun el nivel, en cuanto el total termina de rodar. Con cada uno tiembla la pantalla (mas cuanto
+       mas cerca) y vibra el movil, y las casillas del ticket se encienden al mismo ritmo. Si ya has pasado a la siguiente pregunta, no empiezan */
+    const JP_AT = 1850, JP_MS = Math.round(A.audio.jpGap * 1000), jpTok = S.jpTok = (S.jpTok || 0) + 1, jpAt = i => JP_AT + i * JP_MS + "ms";
+    if (cxr.level) setTimeout(() => {
+      if (S.jpTok !== jpTok || S.phase !== "reveal") return;
+      A.sfx.jackpot(cxr.level); A.haptic.jackpot(cxr.level);
+      for (let k = 1; k <= cxr.level; k++) setTimeout(() => jpShake(k), (k - 1) * JP_MS);
+    }, JP_AT);
     if (adv && adv.coins) coinFx(adv.coins);
-    if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
+    if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce && S.shake) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
 
     const last = S.qi === S.qs.length - 1 || (S.run && A.adv.infDone && A.adv.infDone());
     const place = o.answer ? A.tx(o.answer) : A.tx(o.name) + (A.tx(o.sub) ? ", " + A.tx(o.sub) : "");
@@ -535,7 +572,7 @@
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
       ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${A.T("doblones", "doubloons")}</div>` : ""}
       ${guess ? `<div class="tk-cx l${cxr.level}" data-tt="${A.t("codex.title")}
-${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km su historia y a menos de 75 km su dato clave.", "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.")}"><span>${A.t("codex.title")}</span><i><u></u><u></u><u></u></i><b>${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;300 km"}</b></div>` : ""}
+${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km su historia y a menos de 75 km su dato clave.", "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.")}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style="--jd:${jpAt(i)}"></u>`).join("")}</i><b style="--jd:${jpAt(Math.max(0, cxr.level - 1))}">${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;300 km"}</b></div>` : ""}
       <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });

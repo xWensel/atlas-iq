@@ -95,6 +95,25 @@ window.AIQ = window.AIQ || {};
     }));
     g.connect(lp); lp.connect(bus); send(lp, 0.5);
   }
+  /* tragaperras (jackpot de la Enciclopedia) */
+  /* monedas que caen: tintineos metalicos agudos al azar (pentatonica, asi nunca desafinan); muy seguidas al principio y luego se posan */
+  function coins(t, n, span, vol = 0.03) {
+    for (let i = 0; i < n; i++) {
+      const d = t + span * Math.pow(i / n, 1.4) + Math.random() * 0.025;
+      bell(scaleNote(10 + Math.floor(Math.random() * 8), 60), d, { vol: vol * (0.5 + Math.random() * 0.7), dur: 0.08 + Math.random() * 0.2, rev: 0.2 });
+      if (i % 2 === 0) noise(d, 0.012, { hp: 6500, vol: vol * 0.8 });
+    }
+  }
+  /* el timbre de la maquina: dos notas alternando muy deprisa que se van apagando ("rrring") */
+  function ring(a, b, t, n, vol = 0.05) {
+    for (let i = 0; i < n; i++) bell(i % 2 ? b : a, t + i * 0.042, { vol: vol * (1 - 0.75 * i / n), dur: 0.13, rev: 0.4 });
+  }
+  /* pitido arcade de onda cuadrada: el brillo de maquinita que se suma a las campanas */
+  function chirp(m, t, vol = 0.025, dur = 0.09) {
+    const os = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+    os.type = "square"; os.frequency.value = mtof(m); lp.type = "lowpass"; lp.frequency.value = Math.min(9000, mtof(m) * 5);
+    os.connect(lp).connect(g).connect(sfxBus); env(g, t, 0.003, vol, dur); os.start(t); os.stop(t + dur + 0.05);
+  }
 
 
   /* voz arcade del crupier: silabas cortas de onda cuadrada/diente de sierra, el tono cambia con el humor */
@@ -205,6 +224,17 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ efectos */
   const go = fn => (...a) => { if (!A.audio.sfxOn || !init()) return; fn(ctx.currentTime + 0.005, ...a); };
+  const JP_GAP = 0.46;                    // segundos entre jackpots de la Enciclopedia: el ticket enciende sus casillas y el movil vibra a este mismo ritmo
+  A.audio.jpGap = JP_GAP;
+  /* vibracion del movil (Android; en iPhone y en escritorio no existe y no hace nada). Va aparte del sonido: tambien vibra con los efectos
+     apagados. La apaga el ajuste Vibracion (game.js pone A.haptic.on), el mismo que quita el temblor de pantalla */
+  A.haptic = p => { try { if (A.haptic.on !== false && navigator.vibrate && !document.hidden) navigator.vibrate(p); } catch (e) { /* sin vibracion */ } };
+  /* jackpots: un pulso por jackpot, cada uno mas largo que el anterior (se nota mas fuerte) */
+  A.haptic.jackpot = level => {
+    const P = [40, 70, 150], p = [];
+    for (let k = 0; k < Math.max(1, Math.min(3, level)); k++) { if (k) p.push(Math.round(JP_GAP * 1000) - P[k - 1]); p.push(P[k]); }
+    A.haptic(p);
+  };
 
   A.sfx = {
     ui: go(t => pluck(84, t, { vol: 0.05, dur: 0.12, bright: 3, rev: 0.1 })),
@@ -313,7 +343,33 @@ window.AIQ = window.AIQ || {};
     clear: go(t => { thump(t, { vol: 0.3, f0: 130, f1: 40, dur: 0.25 }); [72, 76, 79, 84, 88].forEach((m, i) => pluck(m, t + 0.08 + i * 0.075, { vol: 0.13, dur: 0.9, rev: 0.5 })); bell(96, t + 0.5, { vol: 0.08, dur: 1.4, rev: 0.7 }); A.music.duck(0.35, 1800); }),
     lose: go(t => { thump(t, { vol: 0.4, f0: 80, f1: 28, dur: 0.6 }); [57, 53, 50, 45].forEach((m, i) => pluck(m, t + i * 0.16, { vol: 0.12, dur: 1.3, bright: 1.5, rev: 0.7 })); noise(t, 0.6, { lp: 500, vol: 0.08 }); A.music.duck(0.25, 2400); }),
     ach: go(t => { [79, 83, 86, 91].forEach((m, i) => bell(m, t + i * 0.08, { vol: 0.09, dur: 1.2, rev: 0.6 })); pluck(67, t, { vol: 0.12, dur: 0.6, rev: 0.4 }); noise(t + 0.25, 0.5, { hp: 5000, vol: 0.03, sweepTo: 12000, type: "highpass" }); }),
-    unlock: go(t => { noise(t, 0.08, { lp: 2400, vol: 0.09, type: "bandpass", q: 0.8 }); [76, 83, 88].forEach((m, i) => bell(m, t + 0.05 + i * 0.07, { vol: 0.07, dur: 0.8, rev: 0.4 })); }),
+    /* Enciclopedia: 1, 2 o 3 jackpots segun el nivel (300 / 150 / 75 km). Cada jackpot es palanca + arpegio de campanas y pitidos
+       + timbre + monedas, y el siguiente sube un peldano del mismo acorde de Do mayor (el bajo hace do-mi-sol) y pega mas fuerte.
+       Tras el ultimo cae la lluvia de monedas, mas larga cuanto mas alto el nivel; el 3 es el premio gordo: golpe grave, acorde de fondo y destellos */
+    jackpot: go((t, level = 1) => {
+      const n = Math.max(1, Math.min(3, level | 0));
+      const ARP = [[72, 76, 79, 84], [76, 79, 84, 88], [76, 79, 84, 88, 91]], RING = [[84, 79], [88, 84], [91, 88]];
+      const P = [1.15, 1.3, 1.5], KICK = [[0.24, 160, 50, 0.14], [0.3, 145, 44, 0.2], [0.45, 110, 30, 0.6]];
+      for (let k = 0; k < n; k++) {
+        const t0 = t + k * JP_GAP, a = ARP[k], p = P[k], [kv, f0, f1, kd] = KICK[k];
+        thump(t0, { vol: kv, f0, f1, dur: kd }); noise(t0, 0.04, { hp: 3000, vol: 0.08 * p });            // la palanca
+        a.forEach((m, i) => {
+          const tt = t0 + 0.012 + i * 0.034, fin = i === a.length - 1;
+          bell(m, tt, { vol: 0.075 * p * (fin ? 1.3 : 1), dur: fin ? 0.9 : 0.32, rev: 0.4 }); chirp(m + 12, tt, 0.022 * p);
+        });
+        pluck(a[a.length - 1] - 24, t0, { vol: 0.1 * p, dur: 0.55, bright: 3, rev: 0.3 });
+        ring(RING[k][0], RING[k][1], t0 + 0.19, k === n - 1 ? [9, 11, 17][k] : 5, 0.045 * p);
+        coins(t0 + 0.05, 3 + k * 2, 0.28, 0.026 * p);
+      }
+      const tl = t + (n - 1) * JP_GAP;
+      coins(tl + 0.22, [8, 14, 28][n - 1], [0.5, 0.8, 1.5][n - 1], 0.03);
+      if (n === 3) {
+        noise(tl + 0.02, 1.1, { hp: 2600, vol: 0.045, sweepTo: 12000, type: "highpass" });
+        pad([48, 55, 60, 64, 67, 72], tl + 0.05, 2.8, 0.065, sfxBus);
+        [96, 100, 103, 108].forEach((m, i) => bell(m, tl + 0.78 + i * 0.07, { vol: 0.035, dur: 0.9, rev: 0.7 }));
+      }
+      A.music.duck([0.5, 0.38, 0.25][n - 1], [1300, 1900, 3200][n - 1]);
+    }),
     /* v0.33 retos premium: lluvia continua, corte de corriente, cristal roto, huellas, ventanas de error, bateria y contra de perk */
     rain: (() => {
       let src = null, gain = null;

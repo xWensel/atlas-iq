@@ -815,7 +815,7 @@ window.AIQ = window.AIQ || {};
     if (p == null || Math.random() > p) return;
     const reduced = A.core && A.core.S && A.core.S.reduce;
     if (kind === "roundWin" && !reduced && Math.random() < 0.22) {
-      const fx = rand(["shake", "blackout"]), line = D.line(fx === "shake" ? "tantrumShake" : "tantrumBlackout");   // Vibracion = no: solo el apagon (la frase no promete un temblor que no llega)
+      const fx = A.core.S.shake === false ? "blackout" : rand(["shake", "blackout"]), line = D.line(fx === "shake" ? "tantrumShake" : "tantrumBlackout");   // Vibracion = no: solo el apagon (la frase no promete un temblor que no llega)
       if (line) { D.say(line, { mood: "angry" }); D.fx(fx); return; }
     }
     const mood = { bull: "shock", miss: "laugh", timeout: "laugh", good: "sly", streak: "angry", counter: "angry", roundWin: "angry", roundFail: "laugh", runWin: "shock", runLose: "laugh" }[kind];

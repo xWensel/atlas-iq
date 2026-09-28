@@ -418,17 +418,50 @@ window.AIQ = window.AIQ || {};
   function close() { const r = $("codex"); if (r) r.classList.add("hidden"); document.body.classList.remove("cx-on"); ui.cur = null; A.sfx.ui(); if (A.codexOnClose) A.codexOnClose(); }
   const isOpen = () => !!$("codex") && !$("codex").classList.contains("hidden");
 
-  let toastT = 0;
+  /* aviso de tarjeta nueva: un carrete con todo lo conseguido, tarjeta a tarjeta, como el rodillo de una tragaperras.
+     Todas van superpuestas en la misma celda, asi el aviso mide lo que la mas alta y no da saltos al cambiar. La primera
+     se queda un poco, las del medio pasan mas deprisa cuantas mas son y la ultima aguanta hasta ~7 s; con el raton encima se para */
+  let toastT = 0, reelT = 0;
+  function toastItem(id) {
+    const e = E[id], it = document.createElement("span"); it.className = "cx-ri";
+    it.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, memOf(id))}</b></span>`;
+    loadContent(e, A.wlang()).then(rec => {
+      if (rec.none) return;
+      it.querySelector("b").textContent = nameOf(e, rec);
+      if (rec.img) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => it.querySelector(".cx-art").prepend(im)); }
+    }).catch(() => {});
+    return it;
+  }
   function toast(ids) {
     if (!ids.length) return;
     let el = $("cxToast"); if (!el) { el = document.createElement("button"); el.id = "cxToast"; el.type = "button"; el.className = "cx-toast hidden"; (document.getElementById("leftCol") || $("app")).appendChild(el); }
-    const e = E[ids[0]], more = ids.length - 1;
-    el.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, memOf(ids[0]))}</b>${more > 0 ? `<i>${A.t("codex.newmore", { n: more })}</i>` : ""}</span>`;
-    el.onclick = () => { el.classList.add("hidden"); open(ids[0]); };
-    el.classList.remove("hidden", "in"); void el.offsetWidth; el.classList.add("in"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.add("hidden"), 7000);
-    loadContent(e, A.wlang()).then(rec => { if (rec && rec.img && el.isConnected) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const a = el.querySelector(".cx-art"); if (a) a.prepend(im); }); } }).catch(() => {});
+    clearTimeout(toastT); clearTimeout(reelT);
+    const n = ids.length, FIRST = 1300, END = 7000, step = Math.max(240, Math.min(900, 3800 / Math.max(1, n - 1)));
+    const hold = k => n === 1 ? END : k === 0 ? FIRST : k < n - 1 ? step : Math.max(1600, END - FIRST - (n - 2) * step);
+    const calm = document.documentElement.classList.contains("reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.innerHTML = `<span class="cx-reel"></span>${n > 1 ? `<span class="cx-rbar">${"<u></u>".repeat(n)}</span>` : ""}`;
+    const items = ids.map(toastItem), pips = el.querySelectorAll(".cx-rbar u");
+    items.forEach(it => el.firstElementChild.appendChild(it));
+    let i = 0;
+    const show = (k, from) => {
+      items.forEach((it, j) => { if (j !== k && j !== from) { it.classList.remove("on"); it.getAnimations().forEach(an => an.cancel()); } });   // por si alguna salida no llego a terminar (pestana en segundo plano)
+      items[k].classList.add("on"); pips.forEach((u, j) => u.classList.toggle("on", j <= k));
+      if (from == null) return;
+      const p = items[from], d = Math.min(380, step - 60);
+      if (calm) { p.classList.remove("on"); return; }
+      const out = p.animate([{ transform: "none", opacity: 1 }, { transform: "translateY(-100%)", opacity: 0 }], { duration: d, easing: "cubic-bezier(.5, 0, .75, 0)", fill: "forwards" });
+      out.onfinish = () => { p.classList.remove("on"); out.cancel(); };
+      items[k].animate([{ transform: "translateY(100%)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: d + 60, easing: "cubic-bezier(.2, .9, .3, 1.15)" });   // entra con un pelin de rebote: el "clac" del rodillo
+    };
+    const leave = () => { el.classList.remove("in"); el.classList.add("out"); toastT = setTimeout(() => el.classList.add("hidden"), 340); };
+    const next = () => { if (i < n - 1) { const from = i++; show(i, from); reelT = setTimeout(next, hold(i)); } else leave(); };
+    el.onpointerenter = () => clearTimeout(reelT);
+    el.onpointerleave = () => { clearTimeout(reelT); reelT = setTimeout(next, 700); };
+    el.onclick = () => { clearTimeout(reelT); el.classList.add("hidden"); open(ids[i]); };
+    el.classList.remove("hidden", "in", "out"); void el.offsetWidth; el.classList.add("in");
+    show(0); reelT = setTimeout(next, hold(0));
   }
-  listeners.push(added => { setTimeout(() => { A.sfx.unlock(); toast(added); }, 1700); });
+  listeners.push(added => { setTimeout(() => toast(added), 1700); });   // sin sonido propio: lo celebran los jackpots del ticket (A.sfx.jackpot)
 
   A.codex = {
     init(w, m) { world = w; map = m; load(); build(); },

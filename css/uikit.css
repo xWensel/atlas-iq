@@ -50,6 +50,11 @@
 /* rabieta del crupier: temblor de toda la pantalla (juego + dialogo, via el truco de transform en html) y apagon total con luz de vuelta */
 html.dl-tantrum { animation: dl-tantrum .7s cubic-bezier(.36, .07, .19, .97) both; }
 @keyframes dl-tantrum { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, -3px, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 4px, 0); } 40%, 60% { transform: translate3d(8px, -4px, 0); } }
+/* Ajustes > Vibracion = no (html.no-shake, js/game.js applyShake): fuera todos los temblores de pantalla. La racha y la rabieta no se mueven,
+   el puñetazo de Cristal roto tampoco, y el glitch del crupier al tocar el mapa se queda solo en color. Los retos que tiemblan (Terremoto...) siguen */
+html.no-shake.dl-tantrum, html.no-shake #app.shake, html.no-shake #app.chx-punch { animation: none; }
+html.no-shake #app.ch-glitch #map, html.no-shake #app.ch-glitch #fx { animation-name: ch-glitch-still; }
+@keyframes ch-glitch-still { 16% { filter: hue-rotate(80deg) saturate(2.2) contrast(1.3); } 33% { filter: brightness(1.6); } 50% { filter: hue-rotate(-70deg) saturate(1.8); } 75% { filter: contrast(1.4); } }
 #dlBlackout { position: fixed; inset: 0; z-index: 9000; background: #000; opacity: 0; pointer-events: none; }
 #dlBlackout.go { animation: dl-blackout 1.3s ease both; }
 @keyframes dl-blackout { 0% { opacity: 0; } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
@@ -300,6 +305,7 @@ html body .tour-txt { font-size: 19px; } html body .dl-bubble p { font-size: inh
 /* aviso de enciclopedia: tambien a la izquierda (antes tapaba el marcador y el ticket a la derecha) */
 #leftCol .cx-toast { position: relative; width: 100%; max-width: none; right: auto; bottom: auto; top: auto; margin: 0; z-index: 8; }
 #leftCol .cx-toast.in { animation: cx-in-l .6s var(--spring) both; } @keyframes cx-in-l { from { transform: translateX(-130%) rotate(0); opacity: 0; } }
+#leftCol .cx-toast.out { animation: cx-out-l .34s ease-in both; } @keyframes cx-out-l { to { transform: translateX(-130%); opacity: 0; } }
 body:not(.title-on) .brand-sh { display: none; }
 @media (max-width: 900px) { #leftCol { top: 8px; left: 8px; width: calc(calc(100 * var(--vw)) - 92px); } body:not(.title-on) .brand-sh { display: none; } }
 @media (max-height: 520px) and (orientation: landscape) { #leftCol { top: 6px; left: 8px; width: min(calc(46 * var(--vw)), 440px); gap: 6px; } #leftCol .adv-bar { min-width: 0; } }

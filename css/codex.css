@@ -84,6 +84,12 @@
 .cx-toast.hidden { display: none; } .cx-toast.in { animation: cx-toast .7s var(--spring) both; } @keyframes cx-toast { from { transform: translateX(120%) rotate(6deg); opacity: 0; } }
 .cx-tcard { --rc: #9aa7a0; flex: none; width: 46px; aspect-ratio: 5 / 7; padding: 3px; background: var(--paper-2); box-shadow: inset 0 0 0 2px var(--rc); } .cx-tcard.r1 { --rc: #4c9fb0; } .cx-tcard.r2 { --rc: #a85bc4; } .cx-tcard.r3 { --rc: #e8b23a; }
 .cx-tcard .cx-art { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; background: var(--ink); color: rgba(242,233,214,.5); } .cx-tcard .cx-ic { width: 60%; }
+/* carrete del aviso: todas las tarjetas conseguidas en la misma celda (solo se ve la actual) y una barra fina con una marca por tarjeta */
+.cx-reel { flex: 1; min-width: 0; display: grid; overflow: hidden; }
+.cx-ri { grid-area: 1 / 1; display: flex; gap: 12px; align-items: center; min-width: 0; visibility: hidden; } .cx-ri.on { visibility: visible; }
+.cx-rbar { position: absolute; left: 10px; right: 16px; bottom: 4px; height: 2px; display: flex; gap: 3px; pointer-events: none; }
+.cx-rbar u { flex: 1; background: rgba(20, 35, 43, .16); text-decoration: none; transition: background .25s; } .cx-rbar u.on { background: var(--red); }
+.cx-toast.out { animation: cx-toast-out .34s ease-in both; } @keyframes cx-toast-out { to { transform: translateX(120%); opacity: 0; } }
 .cx-tt { display: grid; gap: 2px; min-width: 0; } .cx-tt em { font-style: normal; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: var(--red-deep); } .cx-tt b { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 800; font-size: 20px; line-height: 1.05; } .cx-tt i { font-style: normal; font-family: var(--mono); font-size: 14px; color: var(--ink-2); }
 
 /* ---------- entrada en el menu ---------- */
