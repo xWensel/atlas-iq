@@ -21,6 +21,9 @@ try {
 } catch (e) {
   console.warn("Steamworks no disponible (¿Steam esta abierto?):", e.message);
 }
+/* sabor del build: steam-flavor.json ({"demo":true}) lo escribe tools/steam-pack.mjs --demo; sin el fichero es el juego completo */
+let flavor = {}; try { flavor = JSON.parse(fs.readFileSync(path.join(__dirname, "steam-flavor.json"), "utf8")); } catch (e) { /* juego completo */ }
+ipcMain.on("host:demo", (e) => { e.returnValue = !!flavor.demo; });
 ipcMain.handle("steam:available", () => !!steamClient);
 ipcMain.handle("steam:unlock", (e, id) => {   // si ya esta activo no se vuelve a guardar (profile.js reenvia todos los logros al arrancar)
   if (!steamClient || typeof id !== "string") return false;

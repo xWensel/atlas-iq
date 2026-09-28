@@ -7,6 +7,8 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("geoliteHost", {
+  /* true en el build de la demo de Steam (tools/steam-pack.mjs --demo); el juego lo usa para limitar contenido */
+  demo: ipcRenderer.sendSync("host:demo"),
   steamAvailable: () => ipcRenderer.invoke("steam:available"),
   steamUnlock: (id) => ipcRenderer.invoke("steam:unlock", id),
   /* sincrono a proposito: el renderer lo usa para pintar el selector de

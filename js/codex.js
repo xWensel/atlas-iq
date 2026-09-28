@@ -453,6 +453,7 @@ window.AIQ = window.AIQ || {};
   function lightbox(id) {
     const rec = memOf(id), L = $("cxLight"); if (!rec || !rec.img) return;
     L.innerHTML = `<img alt="" src="${esc(rec.img.hd)}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">${A.icon("u_close")}</button><p>${rec.credit ? esc((rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "")) : ""}</p>`;
+    const im = L.querySelector("img"); im.onerror = () => { im.onerror = null; im.src = rec.img.card; };   // build de Steam "ligero"/demo sin fotos HD: se ve la tarjeta
     L.classList.remove("hidden"); L.onclick = () => L.classList.add("hidden"); A.sfx.card();
   }
 

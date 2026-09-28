@@ -18,3 +18,9 @@ tools/bundle-media.log
 # vistas previas de 256 px de los iconos de logros (python tools/steam_icons.py las regenera)
 docs/steam/icons/preview/
 tools/cache-tiers/
+
+# builds de Steam (node tools/steam-pack.mjs)
+dist/
+steam-flavor.json
+steam/*.local.*
+steam-output/

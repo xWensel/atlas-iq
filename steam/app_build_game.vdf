@@ -1,0 +1,20 @@
+"AppBuild"
+{
+	"AppID" "REEMPLAZA_APPID_JUEGO"
+	"Desc" "Geolite - build subida con SteamPipe"
+	"BuildOutput" "..\steam-output\"
+	"ContentRoot" "..\dist\Geolite-win32-x64\"
+	"SetLive" ""
+	"Depots"
+	{
+		"REEMPLAZA_DEPOT_JUEGO"
+		{
+			"FileMapping"
+			{
+				"LocalPath" "*"
+				"DepotPath" "."
+				"recursive" "1"
+			}
+		}
+	}
+}
