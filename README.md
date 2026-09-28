@@ -2,6 +2,23 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.35.1** - Contra para todos los trucos, el Apagon siempre sale y el crupier comenta el botin.
+- **Todos los trucos tienen contra**, ampliando reliquias que ya existian (sin cartas nuevas). Antes 16 de 55 no tenian ninguna:
+  - Foco del vigilante: + Luces parpadeantes (aviso y corte a medias) y Bandera a oscuras.
+  - Paraguas de coctel: + Rayos.
+  - Sello de la casa: + Chinchetas trampa, Negativo y Colores invertidos.
+  - Lupa del tasador: + Pixeles gordos, Luces de neon y Sin colores.
+  - Gafas de sol de crupier: + Miopia y Punto ciego (a la mitad).
+  - Mano de crupier: + Marquesina (se queda quieta).
+  - Chuleta de crupier: + Anagrama y Letras cambiadas (a su sitio a los 2 s) y Torre de Babel.
+  - Libro de la casa: + Adivinanza (se desvela a los 3 s).
+  - Espejo del ilusionista: + Mundo del reves.
+  Las descripciones lo cuentan todo en los 12 idiomas: leerlas es la unica pista. `js/challenges.js` gana tres compuertas: el Sur arriba, la bandera invertida y `colorMul`/`darkR` en las banderas de neon, sin color y a oscuras.
+- **Precios:** Mano de crupier, Gafas de sol y Espejo del ilusionista pasan de 4 a 5, y la Chuleta de crupier de 5 a 6, porque ahora frenan 5 o 6 trucos.
+- **El Apagon sale si o si** una vez por expedicion, en una ronda con hueco de mapa elegida por la semilla (si la barajas, el crupier elige otra cosa). Asi el Foco del vigilante siempre tiene su momento.
+- **El crupier comenta el botin:** frases nuevas cuando aplastas la meta (+50 % o mas, con los doblones y el %) y cuando fallas pero cobras el consuelo.
+- Fuera las reliquias apagadas de la mochila: saber cuando vender tambien es cosa del jugador.
+
 **v0.35.0** - Economia del Campamento: la tienda solo ofrece lo que te va a servir y los doblones salen de como juegas.
 - **Tienda relevante:** los retos salen de la semilla, asi que el Campamento sabe que trucos quedan por venir. Una contra solo se ofrece si su truco aparece en alguna de las rondas que quedan (con barajados, sobornos y tus reliquias ya aplicados); Sonar trucado, Ruleta de 16 rumbos, Catalejo y Refuerzo solo si llevas su herramienta; Cajero, Banquero, Ficha de propina, Vale y Toque de Midas solo si quedan al menos 3 rondas; Por cuenta de la casa solo si queda algun acto por empezar; con 4 herramientas distintas solo salen cargas de las tuyas. Antes, en 4.000 partidas simuladas, el Foco del vigilante no servia en el 44 % (nunca habia apagon) y un experto veia unas 13 cartas inutiles por expedicion.
 - **Sin pistas mascadas:** la carta solo cuenta lo que hace; ya no lleva la etiqueta "Ayuda contra X", la proxima ronda del Campamento ya no dice que reliquia frena cada truco y las fichas de los retos en partida ya no muestran (ni hacen brillar) el perk que las frena. El jugador tiene que leer y atar cabos; solo quedan la "contra" sonora al empezar la ronda y la queja del crupier. En el reparto, una contra pesa mas cuantas mas rondas frena (sin decirlo).

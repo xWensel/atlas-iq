@@ -222,7 +222,6 @@ window.AIQ = window.AIQ || {};
   A.adv.loot = loot;
   /* textos nuevos de la economia (es|en|fr|pt|de|it|es-419|zh|ko|ja|ru|pl) */
   const ETX = {
-    idle: L6("Ya no te sirve en esta expedición: véndela.|No longer useful this expedition: sell it.|Ne te sert plus dans cette expédition : vends-la.|Já não serve nesta expedição: venda-a.|Bringt dir auf dieser Expedition nichts mehr: verkauf sie.|Non ti serve più in questa spedizione: vendila.||本次远征已用不上：卖掉吧。|이번 원정에서는 더 이상 쓸모없어요: 파세요.|この遠征ではもう役に立たない：売ろう。|В этой экспедиции уже не пригодится: продай.|W tej wyprawie już się nie przyda: sprzedaj."),
     margin: L6("Margen +{p} %|Margin +{p}%|Marge +{p} %|Margem +{p}%|Vorsprung +{p} %|Margine +{p}%||超额 +{p}%|초과 달성 +{p}%|上乗せ +{p}%|Запас +{p}%|Nadwyżka +{p}%"),
     conso: L6("Consuelo ({p} % del objetivo)|Consolation ({p}% of target)|Consolation ({p} % de l'objectif)|Consolação ({p}% da meta)|Trostpreis ({p} % des Ziels)|Consolazione ({p}% dell'obiettivo)||安慰奖（达成目标的 {p}%）|위로금 (목표의 {p}%)|残念賞（目標の{p}%）|Утешительный приз ({p}% цели)|Nagroda pocieszenia ({p}% celu)"),
     retry: L6("Revancha: la casa te deja una carta a mitad de precio.|Rematch: the house lets you have one card at half price.|Revanche : la maison te laisse une carte à moitié prix.|Revanche: a casa te deixa uma carta pela metade do preço.|Revanche: Das Haus überlässt dir eine Karte zum halben Preis.|Rivincita: la casa ti lascia una carta a metà prezzo.||复仇之战：庄家让你半价买一张牌。|설욕전: 하우스가 카드 한 장을 반값에 줘요.|リベンジ：ハウスがカードを1枚半額にしてくれる。|Реванш: заведение уступает тебе одну карту за полцены.|Rewanż: kasyno oddaje ci jedną kartę za pół ceny."),   // no dice cual ni por que: el jugador lee la carta rebajada y ata cabos
@@ -622,7 +621,8 @@ window.AIQ = window.AIQ || {};
         stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : "win",
         buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => afterVerdict(boss) }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
       });
-      setTimeout(() => A.dealer.react("roundWin"), 700);                    // el crupier protesta (antes estas frases nunca se decian)
+      const wb = { big: lt.margin >= 3, c: got, p: Math.floor((lt.q - 1) * 100) };   // aplastar la meta (+50 %) tiene sus propias frases
+      setTimeout(() => A.dealer.react("roundWin", wb), 700);                // el crupier protesta (antes estas frases nunca se decian)
     } else {
       const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
       if (shielded && !insured) run.shieldAct = run.act; else if (!shielded) { run.lives--; run.livesLostAct++; }
@@ -640,7 +640,7 @@ window.AIQ = window.AIQ || {};
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), Lv.advance], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives), art: "lose",
         buttons: [{ id: "rtBtn", cls: "btn-ink", label: A.T("Reintentar con lugares nuevos", "Retry with new places"), arrow: true, primary: true, onclick: () => openShop(false) }, { id: "abBtn", cls: "btn-line", label: A.T("Abandonar", "Abandon"), onclick: () => endRun(false) }],
       });
-      const lives = run.lives; setTimeout(() => A.dealer.react("roundFail", { lives }), 700);
+      const lives = run.lives; setTimeout(() => A.dealer.react("roundFail", { lives, conso }), 700);
       A.dealer.hover($("abBtn"), "hoverAbandon");                            // si el cursor va hacia Abandonar, el crupier lo ve
     }
     if (run.sup && run.sup.seguro) run.segN = (run.segN || 0) + 1;         // Seguro gastado: el siguiente cuesta 2 mas
@@ -751,11 +751,8 @@ window.AIQ = window.AIQ || {};
   function renderShop(chest) {
     const slots = 5, info = actInfo(run.act), rc = rerollCost();
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
-    const relicSlots = Array.from({ length: slots }, (_, k) => {
-      const id = run.perks[k]; if (!id) return `<span class="inv-empty"></span>`;
-      const idle = !chest && !useful(id);                                  // ya no le queda nada que frenar (o que cobrar) en esta expedicion: mejor venderla
-      return `<button class="inv-perk${idle ? " idle" : ""}" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}${idle ? " · " + A.tx(ETX.idle) : ""}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b>${chest ? "" : `<em>${A.T("vender", "sell")} ${sellValue(id)}</em>`}</button>`;
-    }).join("");
+    /* la mochila no avisa de que una reliquia ya no sirve: saber cuando venderla tambien es cosa del jugador */
+    const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b>${chest ? "" : `<em>${A.T("vender", "sell")} ${sellValue(id)}</em>`}</button>` : `<span class="inv-empty"></span>`; }).join("");
     const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));   // revancha: queda la carta a mitad de precio que frena los trucos de la ronda que repites
     C().dialog(`<div class="table${chest ? " chest" : ""}">
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>

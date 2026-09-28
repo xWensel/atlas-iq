@@ -286,9 +286,6 @@ html.reduce-motion .ch-chip.ctr-pop, html.reduce-motion #app.chx-punch { animati
 .lg-loot i { margin-left: auto; font-style: normal; }
 @media (max-width: 900px) { .ledger .lg-loot { display: none; } }
 @media (max-height: 520px) and (orientation: landscape) { .ledger .lg-loot { display: none; } }
-/* reliquia que ya no sirve en esta expedicion (sus retos ya pasaron): apagada, para venderla */
-.table .inv-perk.idle { filter: grayscale(.9) brightness(.82); box-shadow: 0 0 0 2px #16241c, inset 0 0 0 3px #9a9a9a; }
-.table .inv-perk.idle:hover { filter: none; }
 /* revancha: la carta que frena los trucos de la ronda que repites, a mitad de precio (precio de antes tachado) */
 .offer .buy .of-was { margin: 0 5px 0 1px; opacity: .6; font-size: .86em; text-decoration-thickness: 2px; }
 /* cofre del jefe: dejarlo sin abrir tambien paga */
