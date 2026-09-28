@@ -297,7 +297,7 @@ window.AIQ = window.AIQ || {};
       return `<div class="intro-in adv"><div class="intro-left"><div class="intro-num blind">${A.blind("small", "s_compass")}</div><div class="intro-body">
         <span class="tag">${A.tx(actInfo(run.act).n)} · ${A.T("Modo infinito", "Infinite mode")}</span><h2>${A.tx(Lv.topicName)}</h2>
         <p class="intro-sub">${A.T("De todo tipo: mapas, países, monumentos, historia… Cada pregunta, menos tiempo.", "Every kind of question: maps, countries, landmarks, history… Less time on every question.")}</p>
-        <p class="adv-goal">${Lv.seconds.toFixed(1)} s</p></div></div>
+        <p class="adv-goal">${Lv.seconds.toFixed(1)} s</p></div></div>
         <div class="intro-art">${A.pic("topic_mixed")}<div class="intro-dealer" id="introDealer"></div></div></div>`;
     }
     const info = actInfo(run.act), def = rdef(), list = run.chal || [];
@@ -307,7 +307,7 @@ window.AIQ = window.AIQ || {};
       <span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${A.tx(Lv.topicName)}</h2>
       ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
       <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}</p>
-      <p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
+      <p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
       ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
       <div class="intro-art">${A.pic("topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
   };
@@ -606,8 +606,8 @@ window.AIQ = window.AIQ || {};
       const head = `<div class="nx-head">${ic(cf.boss ? "skull" : "dice")}<span class="nx-t">${main ? A.T("Próxima ronda", "Next round") + " · " : A.T("Después", "Then") + " · "}${title}</span>${cf.boss && cf.combo ? `<b class="nx-name">${A.tx(cf.combo.n)}</b>` : ""}<span class="nx-n">${n ? n + " " + (n === 1 ? A.T("truco", "trick") : A.T("trucos", "tricks")) : A.T("Sin trucos", "No tricks")}</span>${main && n ? `<button class="chipbtn ch-reroll" id="chalReroll" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : ""}</div>`;
       if (!main) return `<div class="nx-card far${cf.boss ? " boss" : ""}">${head}<div class="nx-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div></div>`;
       const lis = cf.list.map(c => { const d = A.CHAL[c.id];
-        return `<li class="nx-row k-${d.kind}"><span class="nx-ic">${ic(d.ico)}</span><div class="nx-body"><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><p>${A.tx(d.d)}</p>${counterInfo(c.id)}</div>
-          <button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este truco de la próxima ronda", "Bribe the dealer: removes this trick from the next round")}">${A.T("Sobornar", "Bribe")} <span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button></li>`; }).join("")
+        return `<li class="nx-row k-${d.kind}"><span class="nx-ic">${ic(d.ico)}</span><div class="nx-body"><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><p>${A.tx(d.d)}</p><div class="nx-foot">${counterInfo(c.id)}
+          <button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este truco de la próxima ronda", "Bribe the dealer: removes this trick from the next round")}">${A.T("Sobornar", "Bribe")} <span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button></div></div></li>`; }).join("")
         + done.map(id => `<li class="nx-row done"><span class="nx-ic">${ic(A.CHAL[id].ico)}</span><div class="nx-body"><b>${A.tx(A.CHAL[id].n)}</b><em class="nx-have">${A.T("Sobornado", "Bribed")}</em></div></li>`).join("");
       return `<div class="nx-card${cf.boss ? " boss" : ""}">${head}${lis ? `<ul class="nx-list">${lis}</ul>` : `<p class="nx-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
     }).join("");
@@ -632,7 +632,7 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : price(p.cost), ctr = chalFor(roundNo()).list.find(ch => (A.CHAL[ch.id].counters || []).includes(p.id));
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}${ctr ? " counter" : ""}" data-i="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ctr ? `<span class="of-ctr" ${A.ttAttr(A.tx(A.CHAL[ctr.id].n), A.tx(A.CHAL[ctr.id].d))}>${ic(A.CHAL[ctr.id].ico)}<em>${A.T("Ayuda contra", "Helps against")} ${A.tx(A.CHAL[ctr.id].n)}</em></span>` : ""}${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`;
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}${ctr ? " counter" : ""}" data-i="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ctr ? `<span class="of-ctr sq-fit" ${A.ttAttr(A.tx(A.CHAL[ctr.id].n), A.tx(A.CHAL[ctr.id].d))}>${ic(A.CHAL[ctr.id].ico)}<em><span class="ctr-pre sq-pre">${A.T("Ayuda contra", "Helps against")} </span>${A.tx(A.CHAL[ctr.id].n)}</em></span>` : ""}${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : CN() + c}</button></div>`;
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], c = price(t.cost), have = run.tools[s.id];

@@ -369,16 +369,24 @@
   /* ajuste fino: si una pantalla escalada (inicio, campamento, veredicto...) no cabe en la ventana, se baja SU k hasta que quepa entera (nunca hay que desplazarse: esto es un juego de escritorio) */
   const FIT = ".hh, .scr, .table, .vd";
   const fitK = () => {
-    const d = $("dlg"), el = d && d.querySelector(":scope > " + FIT.split(", ").join(", :scope > ")); if (!el) return;
+    const d = $("dlg"), el = d && d.querySelector(":scope > " + FIT.split(", ").join(", :scope > ")); if (!el) { if (d && A.squeeze) A.squeeze(d); return; }
     const base = uiK(); el.style.removeProperty("--k");
     const over = () => {
       const b = el.querySelector(".scr-body");
       if (b) { const ch = b.clientHeight, sh = b.scrollHeight; return sh > ch * 1.015 ? ch / sh : 1; }
       const ch = d.clientHeight, sh = el.getBoundingClientRect().height;                                 // sin .scr-body: el propio bloque (min-height:100%) puede salirse del dialogo, no de si mismo
-      return sh > ch * 1.015 ? ch / sh : 1;
+      let r = sh > ch * 1.015 ? ch / sh : 1;
+      if (innerWidth < 900 || innerHeight < 520) return r;                                               // movil: ahi si se desplaza (encoger lo dejaria ilegible)
+      /* bloque de alto fijo (Campamento: height 100%): el contenido se sale por abajo. Se mide la maqueta (offsetTop/Height), no scrollHeight,
+         que tambien cuenta las cartas mientras entran animadas desde abajo y encogia la pantalla sin motivo */
+      const top0 = el.offsetTop, need = Math.max(0, ...[...el.children].map(c => (c.offsetParent === el ? c.offsetTop : c.offsetTop - top0) + c.offsetHeight)) + (parseFloat(getComputedStyle(el).paddingBottom) || 0);
+      if (need > el.clientHeight + 1) r = Math.min(r, el.clientHeight / need);
+      el.querySelectorAll(".offer.pc").forEach(c => { const room = c.parentElement.clientHeight; if (c.scrollHeight > c.clientHeight + 2 && c.offsetHeight >= room * 0.8) r = Math.min(r, Math.max(0.9, c.clientHeight / c.scrollHeight)); });   // cartas aplastadas por falta de sitio que recortan su boton
+      return r;
     };
     let k = base;
-    for (let i = 0; i < 8; i++) { const r = over(); if (r >= 1) break; k = Math.max(0.55, k * r * 0.985); el.style.setProperty("--k", k.toFixed(3)); if (k <= 0.55) break; }
+    /* primero se quitan las lineas "de 3 letras" (A.squeeze), luego se mide */
+    for (let i = 0; i < 8; i++) { if (A.squeeze) A.squeeze(el); const r = over(); if (r >= 1) break; k = Math.max(0.55, k * r * 0.985); el.style.setProperty("--k", k.toFixed(3)); if (k <= 0.55) break; }
   };
   let fitT = 0; const fitSoon = () => { clearTimeout(fitT); fitT = setTimeout(() => { requestAnimationFrame(fitK); }, 60); };
   setK(); A.uiK = uiK; A.fitK = fitK;

@@ -88,7 +88,7 @@ body.ptr-on #map { cursor: none; }
 .offer.counter { box-shadow: 0 0 0 3px #5fd6b8, 0 0 26px rgba(95, 214, 184, .55); z-index: 4; }
 /* la carta recorta su contenido (overflow: hidden en premium.css): si hace counter, deja que la etiqueta sobresalga por arriba */
 .table .offer.pc.counter { overflow: visible; }
-.offer .of-ctr { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); z-index: 6; display: inline-flex; align-items: center; gap: 6px; padding: 2px 12px 2px 4px; border-radius: 999px; background: #16241c; box-shadow: inset 0 0 0 2px #5fd6b8; color: #9ff3dc; font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: .04em; white-space: nowrap; max-width: 94%; overflow: hidden; text-overflow: ellipsis; }
+.offer .of-ctr { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); z-index: 6; display: inline-flex; align-items: center; gap: 6px; padding: 2px 12px 2px 4px; border-radius: 999px; background: #16241c; box-shadow: inset 0 0 0 2px #5fd6b8; color: #9ff3dc; font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: .04em; white-space: nowrap; max-width: calc(100% + 20px); overflow: hidden; text-overflow: ellipsis; }
 .offer .of-ctr .ic { width: 22px; height: 22px; } .offer.pc .of-ctr em { font-style: normal; color: inherit; }
 
 /* sacudida de "glitch" cuando el crupier toca la mesa */
@@ -143,6 +143,21 @@ body.ptr-on #map { cursor: none; }
 .nx-row.done { opacity: .5; grid-template-columns: 40px 1fr; }
 .nx-clean { margin: 0; font-family: var(--mono); font-size: 15.5px; opacity: .7; } .nx-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 @media (max-width: 700px) { .nx-list { grid-template-columns: 1fr; } .nx-row { grid-template-columns: 34px 1fr; } .nx-row .ch-buy { grid-column: 1 / -1; justify-self: end; } .nx-name { font-size: 20px; } }
+
+/* ---- Campamento compacto: cada truco es una ficha (nombre + Sobornar arriba; descripcion y reliquia que ayuda a todo el ancho).
+   Antes Sobornar ocupaba una columna propia y el texto quedaba en columnas de ~80px: con 4-5 trucos todo bajaba y habia que desplazarse. */
+.nx-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 172px), 1fr)); gap: 6px; }
+.nx-row { min-width: 0; grid-template-columns: 28px minmax(0, 1fr); grid-template-rows: auto auto 1fr; column-gap: 7px; row-gap: 3px; align-items: start; padding: 5px 7px 6px; }
+.nx-body { display: contents; }
+.nx-row > .nx-ic { grid-column: 1; grid-row: 1; width: 28px; height: 28px; } .nx-row > .nx-ic .ic { width: 20px; height: 20px; }
+.nx-body > b { grid-column: 2; grid-row: 1; align-self: center; line-height: 1.05; }
+.nx-body > p { grid-column: 1 / -1; grid-row: 2; line-height: 1.12; }
+.nx-foot, .nx-row.done .nx-body > em { grid-column: 1 / -1; grid-row: 3; align-self: end; }
+.nx-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 3px 8px; min-width: 0; }
+.nx-foot > em { flex: 1 1 110px; min-width: 0; letter-spacing: .01em; line-height: 1.1; }
+.nx-row .nx-foot .ch-buy { flex: none; margin-left: auto; padding: 3px 7px; letter-spacing: .03em; white-space: nowrap; }
+.nx-row.done { grid-template-rows: auto auto; } .nx-row.done .nx-body > em { grid-row: 2; }
+@media (max-width: 700px) { .nx-row { grid-template-columns: 28px minmax(0, 1fr); } }
 
 /* Vendaval: flecha pegada al puntero, en la direccion en que el viento lo empuja */
 .ptr-wind { position: absolute; left: 0; top: 0; width: 92px; height: 22px; margin: -11px 0 0 10px; transform-origin: -10px 50%; opacity: 0; pointer-events: none; transition: opacity .25s; }
@@ -256,3 +271,10 @@ body.ptr-on #map { cursor: none; }
 /* puntero: neon moribundo (Cursor parpadeante) */
 .ptr-cv.neon { filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 5px rgba(255, 80, 200, .95)) drop-shadow(0 0 14px rgba(255, 80, 200, .5)); }
 html.reduce-motion .ch-chip.ctr-pop, html.reduce-motion #app.chx-punch { animation: none; }
+/* etiqueta "Ayuda contra X": si no cabe en la carta, A.squeeze (uikit.js) quita "Ayuda contra" y deja icono + nombre del reto; nunca "..." */
+.sq-short .sq-pre { display: none; }
+.offer .of-ctr.sq-wrap { white-space: normal; hyphens: auto; overflow-wrap: anywhere; text-align: center; line-height: 1.02; border-radius: 12px; padding-top: 3px; padding-bottom: 3px; }
+/* "vender N" de las reliquias del Campamento: encima de la reliquia (debajo se salia de la pantalla y quedaba cortado) */
+.table .inv-perk em { bottom: auto; top: -21px; padding: 1px 6px; border-radius: 6px; background: #16241c; box-shadow: 0 0 0 1px rgba(255, 217, 138, .5); z-index: 3; }
+/* fichas de "Despues" (Ojo en el cielo): un nombre largo parte linea en vez de salirse de la pantalla */
+.nx-chips .ch-chip { max-width: 100%; min-width: 0; } .nx-chips .ch-chip > b { white-space: normal; overflow-wrap: anywhere; min-width: 0; }

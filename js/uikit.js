@@ -141,6 +141,59 @@
     setInterval(() => { if (cur && !cur.isConnected) { hide(); cur = null; } }, 400);
   }
 
-  const boot = () => { initCursor(); initTips(); };
+  /* ------------------------------------------------------------------ textos sin "huerfanos"
+     Si un texto necesita una linea mas solo por unas pocas letras (la ultima linea es muy corta), se aprieta un poco
+     (primero el interletrado, luego como mucho un 8 % de tamano) para que quepa en una linea menos. Si ni asi cabe, se deja
+     como estaba y `text-wrap: pretty` (CSS) reparte las lineas para que no quede una palabra sola. Lo llama A.fitK (menus,
+     Campamento, veredicto) y la presentacion de ronda. La placa de la pregunta no se toca nunca. */
+  const SQ_SKIP = "#plate, [data-nosq], .ch-marq, .tt, svg, input, textarea";
+  function lineBoxes(el) {
+    const rg = document.createRange(); rg.selectNodeContents(el);
+    const rs = [...rg.getClientRects()].filter(r => r.width > 0.5 && r.height > 0.5).sort((a, b) => a.top - b.top), lines = [];
+    for (const r of rs) { const l = lines[lines.length - 1]; if (l && r.top < l.bottom - Math.min(r.height, l.bottom - l.top) * 0.5) { l.left = Math.min(l.left, r.left); l.right = Math.max(l.right, r.right); l.bottom = Math.max(l.bottom, r.bottom); } else lines.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom }); }
+    return lines;
+  }
+  function squeezeOne(el) {
+    const cs = getComputedStyle(el); if (cs.display === "inline" || cs.display === "none" || /nowrap|pre/.test(cs.whiteSpace)) return;
+    const lines = lineBoxes(el); if (lines.length < 2 || lines.length > 6) return;
+    const box = el.getBoundingClientRect(), sc = el.offsetWidth ? box.width / el.offsetWidth : 1;
+    const w = box.width - (parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) * sc, last = lines[lines.length - 1];
+    if (!(w > 0) || last.right - last.left > w * 0.25) return;                  // la ultima linea ya es "de verdad": no se toca
+    const fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0, keep = { ls: el.style.letterSpacing, fs: el.style.fontSize };
+    const tries = []; if (ls > 0.4) tries.push([ls * 0.5, 1], [0, 1]); [0.96, 0.92].forEach(k => tries.push([ls > 0.4 ? 0 : ls, k]));
+    for (const [l, k] of tries) {
+      el.style.letterSpacing = l + "px"; el.style.fontSize = (fs * k).toFixed(2) + "px";
+      if (lineBoxes(el).length < lines.length) { el.dataset.sq = JSON.stringify(keep); return; }
+    }
+    el.style.letterSpacing = keep.ls; el.style.fontSize = keep.fs;
+  }
+  A.squeeze = root => {
+    if (!root || !root.isConnected) return;
+    root.querySelectorAll("[data-sq]").forEach(el => { try { const k = JSON.parse(el.dataset.sq); el.style.letterSpacing = k.ls; el.style.fontSize = k.fs; } catch (e) { /* nada */ } delete el.dataset.sq; });
+    root.classList.add("sq-measure");                                            // se mide con el reparto normal de lineas (sin `pretty`)
+    const els = [root, ...root.querySelectorAll("*")].filter(el => !el.closest(SQ_SKIP) && [...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim().length > 1) && el.getClientRects().length);
+    els.forEach(squeezeOne);
+    root.classList.remove("sq-measure");
+    /* etiquetas de una sola linea (.sq-fit): si no caben, primero se quita el prefijo (.sq-pre, p. ej. "Ayuda contra") y luego se aprietan como arriba */
+    root.querySelectorAll(".sq-fit").forEach(el => {
+      el.classList.remove("sq-short", "sq-wrap"); el.style.letterSpacing = el.style.fontSize = "";
+      const over = () => el.scrollWidth > el.clientWidth + 1; if (!over()) return;
+      el.classList.add("sq-short"); if (!over()) return;
+      const cs = getComputedStyle(el), fs = parseFloat(cs.fontSize);
+      for (const k of [1, 0.95, 0.9, 0.86]) { el.style.letterSpacing = "0px"; el.style.fontSize = (fs * k).toFixed(2) + "px"; if (!over()) return; }
+      el.classList.add("sq-wrap");                                               // ultimo recurso: dos lineas (y un poco mas pequena si una palabra sola no cabe), nunca cortado
+      for (const k of [1, 0.9, 0.8]) { el.style.fontSize = (fs * k).toFixed(2) + "px"; if (!over()) return; }
+    });
+  };
+
+  const boot = () => {
+    initCursor(); initTips();
+    /* presentacion de ronda y pie de pagina: se ajustan cada vez que cambia su contenido (el Campamento y los menus los ajusta A.fitK) */
+    ["intro", "note"].forEach(id => {
+      const el = document.getElementById(id); let t = 0; if (!el || !window.MutationObserver) return;
+      new MutationObserver(() => { clearTimeout(t); t = setTimeout(() => requestAnimationFrame(() => A.squeeze(el)), 40); }).observe(el, { childList: true, subtree: true, characterData: true });
+    });
+    addEventListener("resize", () => ["intro", "note"].forEach(id => A.squeeze(document.getElementById(id))));
+  };
   if (document.body) boot(); else document.addEventListener("DOMContentLoaded", boot);
 })();

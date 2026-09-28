@@ -338,3 +338,21 @@ body.tk-on .rail-sh { display: none; }
 .dealer.home .dl-face { width: 190px; height: 190px; }
 .dealer.home .dl-bubble { max-width: min(300px, calc(44 * var(--vw))); font-size: 15px; margin-bottom: 38px; }
 @media (max-width: 900px), (max-height: 560px) { .dealer.home { display: none; } }   /* movil: la pantalla ya va justa, sin distracciones extra */
+
+/* ==== textos sin huerfanos: nunca una palabra sola en la ultima linea (A.squeeze ademas aprieta un poco los que se pasan por pocas letras) ==== */
+#dlg, #intro, #tt, #note, #leftCol > :not(.plate-sh) { text-wrap: pretty; }
+#dlg h1, #dlg h2, #dlg h3, #dlg h4, #intro h1, #intro h2 { text-wrap: balance; }
+.sq-measure, .sq-measure * { text-wrap: wrap !important; }
+
+/* ==== Campamento sin desplazarse (escritorio): las cartas SIEMPRE en una fila (con 4-5 cartas se estrechan en vez de bajar a otra fila),
+   y la bandeja de reliquias/herramientas tampoco se parte en dos lineas. A.fitK encoge el conjunto si aun asi no cabe. ==== */
+@media (min-width: 900px) and (min-height: 520px) {
+  .table .offers { flex-wrap: nowrap; }
+  .table .offer.pc { flex: 0 1 var(--w); min-width: 0; }
+  .table .tray-row { flex-wrap: nowrap; }
+}
+/* mientras se reparten, las cartas entran desde abajo: en escritorio no deben hacer aparecer (y parpadear) una barra de desplazamiento */
+@media (min-width: 900px) and (min-height: 520px) { #dlg.tablewrap { overflow: hidden; } }
+/* movil: el cofre usaba el ancho de escritorio (21vw = cartas de ~80 px con el texto recortado) */
+@media (max-width: 700px) { .table.chest .offer.pc { --w: min(calc(44 * var(--vw)), 260px); } }
+@media (max-width: 1000px) { .table .offer .of-ctr { max-width: calc(100% + 8px); } }
