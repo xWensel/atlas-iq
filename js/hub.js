@@ -21,9 +21,9 @@ window.AIQ = window.AIQ || {};
     const dMeta = dLive ? A.pick6("Intento {k}/3|Attempt {k}/3|Essai {k}/3|Tentativa {k}/3|Versuch {k}/3|Tentativo {k}/3||尝试 {k}/3|도전 {k}/3|挑戦 {k}/3|Попытка {k}/3|Podejście {k}/3").replace("{k}", dsv.dailyTry || 1)
       : dst.done ? `${A.fmt(dst.total)} · ${dst.done}/3`
       : A.pick6("Nuevo reto|New today|Nouveau défi|Novo desafio|Neue Runde|Nuova sfida||新挑战|새 도전|新しい挑戦|Новый день|Nowe dziś");
-    /* cada modo es una carta (sin indices de baraja: el marco y la ilustracion bastan) */
-    const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}">
-      ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-desc">${desc}</span><span class="mc-stat">${meta}</span></button>`;
+    /* cada modo es una carta (sin indices de baraja: el marco y la ilustracion bastan); la descripcion solo sale al pasar el raton (ficha data-tt) */
+    const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}" ${A.ttAttr(title, desc)} aria-description="${esc(desc)}">
+      ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-stat">${meta}</span></button>`;
     c.dialog(`<div class="hh">
       <div class="hh-top"><img class="hh-logo" src="assets/logo.png" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
       <p class="hh-tag">${A.t("title.tag")}</p>
