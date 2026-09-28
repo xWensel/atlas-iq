@@ -336,5 +336,20 @@ window.AIQ = window.AIQ || {};
     lowbat: go(t => { [0, 0.16].forEach((d, i) => { const os = ctx.createOscillator(), g = ctx.createGain(); os.type = "square"; os.frequency.value = i ? 660 : 880; os.connect(g).connect(sfxBus); env(g, t + d, 0.004, 0.035, 0.12); os.start(t + d); os.stop(t + d + 0.16); }); }),
     charge: go(t => { [72, 79, 84].forEach((m, i) => pluck(m, t + i * 0.07, { vol: 0.07, dur: 0.3, bright: 3, rev: 0.3 })); noise(t, 0.3, { hp: 800, sweepTo: 6000, vol: 0.025, type: "highpass" }); }),
     counter: go((t, k = 0) => { bell(88 + k * 3, t, { vol: 0.06, dur: 0.6, rev: 0.5 }); bell(95 + k * 3, t + 0.05, { vol: 0.04, dur: 0.8, rev: 0.6 }); noise(t, 0.25, { hp: 5000, sweepTo: 11000, vol: 0.025, type: "highpass" }); }),
+    /* v0.36 marcador (js/marcador.js): el ticket sale del marcador (avance de papel, flojito), se arranca al pasar de pregunta,
+       la barra toca la meta (la firma sol-do-re, rapida y una octava arriba) y cada escalon de botin (una moneda, mas aguda cada vez) */
+    feed: go(t => { for (let i = 0; i < 5; i++) { noise(t + i * 0.05, 0.014, { hp: 2800 + i * 250, vol: 0.026 }); thump(t + i * 0.05, { vol: 0.035, f0: 520, f1: 260, dur: 0.025 }); } noise(t + 0.02, 0.26, { lp: 1800, sweepTo: 3600, vol: 0.02, type: "bandpass", q: 0.9 }); }),
+    tear: go(t => { noise(t, 0.13, { lp: 1100, sweepTo: 5600, vol: 0.075, type: "bandpass", q: 1.3 }); for (let i = 0; i < 6; i++) noise(t + 0.008 + i * 0.016 + Math.random() * 0.006, 0.009, { hp: 3800, vol: 0.045 }); thump(t, { vol: 0.06, f0: 240, f1: 120, dur: 0.05 }); }),
+    goal: go(t => {
+      thump(t, { vol: 0.26, f0: 150, f1: 48, dur: 0.18 }); noise(t, 0.05, { hp: 2600, vol: 0.06 });
+      MOTIF.forEach((m, i) => { pluck(m + 12, t + 0.02 + i * 0.075, { vol: 0.13, dur: 0.75, rev: 0.5 }); bell(m + 24, t + 0.02 + i * 0.075, { vol: 0.03, dur: 0.3, rev: 0.3 }); });
+      bell(91, t + 0.2, { vol: 0.07, dur: 1.2, rev: 0.6 }); bell(98, t + 0.26, { vol: 0.04, dur: 1, rev: 0.6 });
+      noise(t + 0.16, 0.5, { hp: 4500, vol: 0.028, sweepTo: 12000, type: "highpass" }); A.music.duck(0.5, 1000);
+    }),
+    lootStep: go((t, k = 1) => {
+      const n = scaleNote(5 + Math.min(4, Math.max(1, k)), 60) + 12;
+      bell(n, t, { vol: 0.08, dur: 0.4, rev: 0.3 }); bell(n + 7, t + 0.05, { vol: 0.06, dur: 0.6, rev: 0.35 }); noise(t, 0.012, { hp: 6000, vol: 0.05 });
+      for (let i = 0; i < 1 + k; i++) bell(n + 12 + (i % 2) * 5, t + 0.09 + i * 0.045, { vol: 0.025, dur: 0.18, rev: 0.25 });
+    }),
   };
 })(window.AIQ);

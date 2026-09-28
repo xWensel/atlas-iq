@@ -2,6 +2,13 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.36.0** - Marcador y ticket en una sola pieza: el ticket de cada respuesta sale del marcador y sus puntos suben a el.
+- **Una sola pieza (escritorio):** al hacer clic, el marcador de puntos se ensancha y de su borde inferior se despliega el ticket (mismo ancho, mismo borde, una sola sombra). Antes el ticket era una ventana aparte con un margen fijo y, cuando el marcador crecia (el botin de la Aventura), se montaba encima. Mientras hay ticket el marcador deja de balancearse para que el texto pixel quede nitido. Todo en `js/marcador.js` y `css/marcador.css`.
+- **El cobro:** mientras rueda el TOTAL del ticket, fichas de pixel suben del total a las cifras del marcador, asoma "+1.243" y las cifras, la barra y el total de la partida suben a su compas (antes el marcador saltaba antes de que el ticket contara nada).
+- **Meta:** si ese cobro alcanza el objetivo, la barra se pone verde justo al tocar la marca, cae el sello "¡META!" (12 idiomas), suena la firma del juego (sol-do-re) y el movil vibra. En la Aventura la linea de botin se despliega en ese momento y cada escalon de margen suena una moneda mas aguda con un pulso de vibracion mas largo. Todo llega antes de los jackpots de la Enciclopedia, sin pisarse; si pasas de pregunta antes, no suena encima de la siguiente.
+- **Siguiente:** el ticket se arranca (borde de arriba dentado, sonido de papel) y cae girando mientras el marcador vuelve a su tamano.
+- **Nunca hay que desplazarse:** entre 901 y 1100 px de ancho la nota de campo se aparta a la izquierda mientras hay ticket; si aun asi falta alto, el ticket se compacta y, en ultimo caso, se encoge solo el (la cabecera no se toca: sus cifras son un odometro). En movil y tablet el ticket sigue siendo la hoja inferior, con el mismo cobro.
+
 **v0.35.1** - Contra para todos los trucos, el Apagon siempre sale y el crupier comenta el botin.
 - **Todos los trucos tienen contra**, ampliando reliquias que ya existian (sin cartas nuevas). Antes 16 de 55 no tenian ninguna:
   - Foco del vigilante: + Luces parpadeantes (aviso y corte a medias) y Bandera a oscuras.

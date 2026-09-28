@@ -86,6 +86,13 @@
 
   /* ------------------------------------------------------------ utilidades de interfaz */
   function dialog(html, cls) {
+    /* escritorio: el ticket de la respuesta sale del propio marcador (js/marcador.js); cualquier otra pantalla lo recoge al instante */
+    if (cls === "side" && A.marcador.docked()) {
+      $("layer").classList.add("hidden"); $("dlg").classList.remove("in"); document.body.classList.remove("vd-on");
+      if (A.dealer && A.dealer.homeTease) A.dealer.homeTease(false);
+      return A.marcador.show(html);
+    }
+    A.marcador.close(true);
     const d = $("dlg"); d.className = cls; d.innerHTML = html;
     document.body.classList.toggle("vd-on", cls === "verdict" || cls === "tablewrap"); document.body.classList.toggle("tk-on", cls === "side");
     if (A.dealer && A.dealer.homeTease) A.dealer.homeTease(cls === "home");   // el crupier asoma de vez en cuando SOLO en la pantalla de inicio
@@ -93,7 +100,7 @@
     requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add("in")));
     const b = d.querySelector("[data-primary]"); if (b) setTimeout(() => b.focus({ preventScroll: true }), 60);
   }
-  function closeDialog() { $("layer").classList.add("hidden"); $("dlg").classList.remove("in"); document.body.classList.remove("vd-on", "tk-on"); }
+  function closeDialog() { A.marcador.close(); $("layer").classList.add("hidden"); $("dlg").classList.remove("in"); document.body.classList.remove("vd-on", "tk-on"); }   // el ticket del marcador se arranca y cae
   /* control segmentado con indicador deslizante */
   function segSet(seg, value) {
     const btns = [...seg.querySelectorAll("button")], idx = Math.max(0, btns.findIndex(b => b.dataset.v === value));
@@ -110,13 +117,15 @@
     syncSettings();
   }
   function levelTitle(L) { return A.tx(L.name) + (L.diff ? " · " + A.t("diff." + L.diff) : ""); }
-  function updateHud() {
+  /* cash (solo al revelar): las cifras ruedan al compas del TOTAL del ticket y la barra arranca a la vez (el resto del cobro, en js/marcador.js) */
+  function updateHud(cash) {
     const L = lv(), inf = S.run && A.adv.isInfinite && A.adv.isInfinite();
     $("lvlText").textContent = S.run ? A.adv.hudTitle() : A.t("lvl", { n: S.level + 1, m: S.camp.levels.length, name: levelTitle(L) });
     if (S.run) A.adv.refresh();
-    odoSet($("scLevel"), S.levelScore, { ms: 900 });
+    odoSet($("scLevel"), S.levelScore, cash ? { ms: cash.ms, delay: cash.delay } : { ms: 900 });
     $("scTotal").textContent = A.fmt(S.runTotal + S.levelScore);
     $("scNeed").textContent = L.advance > 1 ? A.fmt(L.advance) : "—";
+    $("scBar").style.transition = cash ? `width ${cash.gauge}ms cubic-bezier(.2, .8, .2, 1) ${cash.delay}ms` : "";
     $("scBar").style.width = Math.min(100, (S.levelScore / Math.max(1, L.advance)) * 100) + "%";
     $("scBar").classList.toggle("done", L.advance > 1 && S.levelScore >= L.advance);
     $("scMark").style.display = L.advance > 1 ? "" : "none";
@@ -536,7 +545,11 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
 
     $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}${A.tx(o.fact) ? " — " + A.tx(o.fact) : ""}` : A.tx(o.fact) || A.factOf(o);
     $("plate").classList.remove("hurry");
-    updateHud();
+    /* el cobro: los puntos del ticket suben al marcador al compas de su TOTAL (700 + 1100 ms); la barra llega en 450 ms y, si cruza la meta
+       o un escalon de botin, lo celebra (js/marcador.js) */
+    const cash = { from: S.levelScore - total, to: S.levelScore, total, delay: 700, ms: 1100, gauge: 450 };
+    updateHud(cash);
+    A.marcador.cashIn({ ...cash, advance: L.advance, runTotal: S.runTotal, lootOn: !!(S.run && S.camp.mode === "adventure" && !(A.adv.isInfinite && A.adv.isInfinite())) });
   }
 
   /* ------------------------------------------------------------ veredictos */
@@ -704,7 +717,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     else if (k === "0") $("zoomHome").click();
     else if (k === "enter" || (k === " " && document.activeElement === document.body)) {
       if (S.phase === "intro" && S.skipIntro) { e.preventDefault(); S.skipIntro(); return; }
-      const b = document.querySelector("#layer:not(.hidden) [data-primary]") || document.querySelector("#veil:not(.hidden) [data-primary]");
+      const b = document.querySelector("#layer:not(.hidden) [data-primary]") || document.querySelector("#veil:not(.hidden) [data-primary]") || A.marcador.primary();
       if (b && document.activeElement !== b) { e.preventDefault(); b.click(); }
     }
   });

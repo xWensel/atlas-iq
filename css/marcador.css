@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Geolite v0.36 - marcador y ticket en una sola pieza (js/marcador.js)
+   En escritorio el ticket sale del propio marcador: el marcador se ensancha, cuadra sus esquinas de abajo y del
+   borde inferior se despliega el ticket (mismo ancho, mismo borde, una sola sombra). Clases en #ledgerSh:
+     mc-live  hueco del ticket montado (sin balanceo: el texto pixel queda nitido)
+     mc-open  ancho de ticket (--mc-w) y hueco desplegado
+     mc-c1/2  compacto si falta alto (y, en ultimo caso, --mc-z encoge solo el ticket); nunca hay que desplazarse
+   ========================================================================== */
+:root { --mc-w: 352px; }
+#ledgerSh { transition: width .36s cubic-bezier(.25, 1.18, .4, 1); }
+#ledgerSh.mc-open { width: var(--mc-w); }
+#ledgerSh.mc-live { animation: none; }
+html[data-skin="casino"] #ledgerSh .ledger, html[data-skin="casino"] #ledgerSh .ledger::before { transition: border-radius .16s ease; }
+html[data-skin="casino"] #ledgerSh.mc-live .ledger { border-radius: 14px 14px 0 0; }
+html[data-skin="casino"] #ledgerSh.mc-live .ledger::before { border-radius: 11px 11px 0 0; }
+
+/* el hueco: crece de 0 al alto del ticket (filas 0fr -> 1fr) y lo que asoma es el borde redondeado del papel, que baja */
+.mc-slot { display: none; }
+#ledgerSh.mc-live .mc-slot { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .62s cubic-bezier(.2, .9, .25, 1);
+  width: 0; min-width: 100%; }   /* el ticket (ancho fijo) no estira el marcador: el ancho lo lleva la transicion */
+#ledgerSh.mc-live.mc-open .mc-slot { grid-template-rows: 1fr; }
+.mc-in { position: relative; min-height: 0; overflow: hidden; display: flex; justify-content: flex-end; align-items: flex-start;
+  background: var(--paper); border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 14px 14px; box-shadow: inset 0 -5px 0 rgba(120, 90, 40, .13); }
+/* el papel tiene ya el ancho final y va anclado a la derecha: al ensancharse el marcador el ticket no se recoloca, solo se destapa */
+:is(#ledgerSh .mc-in, .mc-ghost) > .ticket { flex: none; width: calc((var(--mc-w) - 6px) / var(--mc-z, 1)); zoom: var(--mc-z, 1);
+  background: none; box-shadow: none; border-radius: 0; -webkit-mask: none; mask: none; padding: 0 23px 16px; }
+:is(#ledgerSh .mc-in, .mc-ghost) > .ticket .tk-band { margin: 0 -23px; border-radius: 0; box-shadow: inset 0 3px 0 rgba(0, 0, 0, .28); }
+:is(#ledgerSh .mc-in, .mc-ghost) > .ticket .tk-perf { margin-left: -23px; margin-right: -23px; }
+/* el papel sale de la ranura: baja un poco mientras se destapa */
+#ledgerSh.mc-live .mc-in > .ticket { animation: mc-feed .62s cubic-bezier(.2, .9, .25, 1) both; }
+@keyframes mc-feed { from { transform: translateY(-24px); } }
+
+/* falta alto (ventanas de 720-800 px, Aventura con muchas reliquias...): primero se aprieta, luego se encoge el ticket (--mc-z) */
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-title { font-size: 25px; margin-top: 8px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-km { font-size: 46px; margin-top: 3px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-from { margin-top: 3px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-answer { margin-top: 6px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-perf { margin-top: 9px; margin-bottom: 9px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-rows { gap: 3px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-perks { margin-top: 5px; gap: 2px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-mult { margin: 6px 0 2px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-mult > div { padding: 4px 12px 5px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-mult b { font-size: 21px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-total { margin: 7px 0 9px; padding-top: 6px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-total .odo { font-size: 38px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-cx { margin-bottom: 9px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .btn-ink { padding-top: 10px; padding-bottom: 10px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-band { padding-top: 5px; padding-bottom: 4px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-title { font-size: 22px; margin-top: 6px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-km { font-size: 38px; margin-top: 1px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-perf { margin-top: 6px; margin-bottom: 6px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-total { margin: 4px 0 7px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-total .odo { font-size: 32px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-cx { margin-bottom: 7px; padding-top: 4px; padding-bottom: 3px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .btn-ink { padding-top: 8px; padding-bottom: 8px; }
+/* (la cabecera no se toca nunca: sus cifras son un odometro en "em" y cambiarle el tamano las haria rodar otra vez) */
+
+/* 901-1100 px: la nota de campo ocupa todo el ancho; mientras hay ticket se aparta a la izquierda del marcador para que este
+   pueda bajar hasta el borde (antes el ticket se quedaba encima de la nota y habia que desplazarlo) */
+@media (min-width: 901px) and (max-width: 1100px) {
+  html body.mc-on .note-sh, html[data-skin="casino"] body.mc-on .note-sh { left: 14px; transform: rotate(.4deg); width: calc(calc(100 * var(--vw)) - var(--mc-w) - 46px); }
+}
+
+/* ---------------------------------------------------------------- el cobro */
+/* fichas de pixel del TOTAL del ticket a las cifras del marcador (las doradas son el brillo) */
+.mc-chip { position: absolute; z-index: 30; left: 0; top: 0; width: 10px; height: 10px; margin: -5px 0 0 -5px; background: #2f7bf5; pointer-events: none; will-change: transform;
+  box-shadow: 0 0 0 2px #16241c, inset 3px 3px 0 rgba(255, 255, 255, .45); }
+.mc-chip.g { background: #f8b449; }
+/* "+1.473" que asoma junto a las cifras del marcador */
+.mc-plus { position: absolute; z-index: 3; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: 26px; line-height: 1; color: #2f7bf5;
+  text-shadow: 2px 2px 0 #16241c; white-space: nowrap; pointer-events: none; animation: mc-plus 1.3s cubic-bezier(.2, .9, .3, 1) both; }
+@keyframes mc-plus { 0% { opacity: 0; transform: translateY(10px) scale(.5); } 16% { opacity: 1; transform: translateY(0) scale(1.18); } 28% { transform: none; } 66% { opacity: 1; transform: translateY(-8px); } 100% { opacity: 0; transform: translateY(-26px); } }
+/* sello de meta: cae sobre el marcador justo encima de la marca de la barra */
+.mc-stamp { position: absolute; z-index: 4; right: 18px; top: 40px; padding: 6px 11px 5px; font-family: var(--mono); font-size: 17px; letter-spacing: .05em; line-height: 1; white-space: nowrap;
+  color: #fff; text-shadow: 2px 2px 0 #16241c; background: var(--green); border-radius: 7px; box-shadow: 0 0 0 3px var(--ink), 0 5px 0 3px var(--ink); transform: rotate(-7deg); pointer-events: none;
+  animation: mc-stamp .5s cubic-bezier(.3, 1.6, .4, 1) both; }
+@keyframes mc-stamp { 0% { opacity: 0; transform: rotate(-7deg) scale(2.4); } 45% { opacity: 1; } 100% { transform: rotate(-7deg); } }
+/* botin de la Aventura: si esta respuesta alcanza el objetivo, la linea espera plegada y se despliega cuando la barra llega */
+#scLoot { max-height: 30px; transition: max-height .4s cubic-bezier(.2, .9, .25, 1), opacity .3s ease .08s, margin-top .4s cubic-bezier(.2, .9, .25, 1); }
+#scLoot.mc-hold { max-height: 0; opacity: 0; margin-top: 0; overflow: hidden; }
+
+/* ---------------------------------------------------------------- el ticket arrancado: una copia suelta que cae con el borde de arriba dentado */
+.mc-drop { position: absolute; z-index: 5; pointer-events: none; transform-origin: 50% 0; filter: drop-shadow(0 6px 0 rgba(5, 11, 7, .55)); will-change: transform, opacity; }
+.mc-drop > .mc-ghost { width: 100%; height: 100%;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6' shape-rendering='crispEdges'%3E%3Cpath d='M0 4h12v2H0zM2 2h8v2H2zM4 0h4v2H4z'/%3E%3C/svg%3E") 0 0 / 12px 6px repeat-x, linear-gradient(#000 0 0) 0 6px / 100% calc(100% - 6px) no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6' shape-rendering='crispEdges'%3E%3Cpath d='M0 4h12v2H0zM2 2h8v2H2zM4 0h4v2H4z'/%3E%3C/svg%3E") 0 0 / 12px 6px repeat-x, linear-gradient(#000 0 0) 0 6px / 100% calc(100% - 6px) no-repeat; }
+.mc-drop *, .mc-drop *::before, .mc-drop *::after { animation: none !important; transition: none !important; }   /* la copia, tal cual estaba (sin repetir sus entradas) */
+
+html.reduce-motion #ledgerSh, html.reduce-motion #ledgerSh .mc-slot, html.reduce-motion #scLoot { transition: none; }
+html.reduce-motion #ledgerSh .mc-in > .ticket, html.reduce-motion .mc-stamp { animation: none; }
+@media (prefers-reduced-motion: reduce) { .mc-chip, .mc-plus, .mc-drop { display: none; } }
