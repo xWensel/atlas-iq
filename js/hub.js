@@ -156,11 +156,30 @@ window.AIQ = window.AIQ || {};
       crown: A.tip6("Tu mejor puntuación en una expedición.|Your best score in an expedition.|Ton meilleur score en expédition.|Sua melhor pontuação em uma expedição.|Deine beste Punktzahl in einer Expedition.|Il tuo miglior punteggio in una spedizione.||你在一次远征中的最高分。|탐험 한 번에서 거둔 최고 점수.|1回の遠征での最高スコア。|Твой лучший результат за экспедицию.|Twój najlepszy wynik w wyprawie."),
     };
     const cell = (l, v, ico) => `<div class="pf-cell" ${A.ttAttr(l, CELL_TIP[ico] || "")}>${A.icon(ico)}<span>${l}</span><b>${v}</b></div>`;
-    const ach = A.ACH.map(a => { const got = P.ach[a.id]; return `<div class="ach${got ? " got" : ""}" ${got || !a.secret ? A.ttAttr(A.tx(a.name), A.tx(a.desc) + (got ? "" : "\n" + A.tip6("Aún sin conseguir.|Not unlocked yet.|Pas encore obtenu.|Ainda não conquistado.|Noch nicht erreicht.|Non ancora ottenuto.||尚未解锁。|아직 잠겨 있습니다.|まだ解除されていない。|Ещё не открыто.|Jeszcze nieodblokowane."))) : A.ttAttr("???", A.tip6("Logro secreto: juega para descubrirlo.|Secret achievement: play to discover it.|Succès secret : joue pour le découvrir.|Conquista secreta: jogue para descobri-la.|Geheimer Erfolg: spiele, um ihn zu entdecken.|Obiettivo segreto: gioca per scoprirlo.||隐藏成就：玩游戏来发现它。|비밀 업적: 플레이해서 발견하세요.|シークレット実績：遊んで見つけよう。|Секретное достижение: играй, чтобы его открыть.|Sekretne osiągnięcie: graj, żeby je odkryć."))}><span class="ach-i">${got || !a.secret ? A.badge(a.id) : A.icon("lock")}</span><b>${got || !a.secret ? A.tx(a.name) : "???"}</b><i>${got || !a.secret ? A.tx(a.desc) : T("Logro secreto", "Secret achievement")}</i></div>`; }).join("");
+    /* Logros: la UNICA pantalla que se desplaza (game.js no la encoge: clase .scrolls). A todo el ancho, por tramos de dificultad,
+       con la ilustracion de cada logro, su progreso ("37 / 100", como en Steam) o la fecha en que se consiguio */
+    const ROMAN = ["I", "II", "III", "IV", "V", "✦"], prog = A.ach.progress(), got = a => !!P.ach[a.id];
+    const LOC = { pt: "pt-BR", zh: "zh-CN" }[A.lang] || A.lang || "es";
+    const day = ts => { try { return new Intl.DateTimeFormat(LOC, { day: "numeric", month: "short", year: "numeric" }).format(ts); } catch (e) { return new Date(ts).toLocaleDateString(); } };
+    const pct = (n, d) => Math.round((100 * n) / Math.max(1, d));
+    const card = a => {
+      const g = got(a), hid = a.secret && !g, pr = !g && prog[a.id];
+      const badge = hid ? `<span class="ic badge">${A.icon(A.ACH_FRAME[a.ev] || "blank_boss", "bd-base")}${A.icon("lock", "bd-in")}</span>` : A.badge(a.id);
+      const foot = g ? `<span class="ac-f is-got">${A.icon("u_star", "sm")}<em>${day(P.ach[a.id])}</em></span>`
+        : pr ? `<span class="ac-f"><span class="ac-pb"><s style="width:${pct(pr[0], pr[1])}%"></s></span><em>${A.fmt(pr[0])} / ${A.fmt(pr[1])}</em></span>` : "";
+      return `<article class="ac${g ? " got" : ""}${hid ? " hid" : ""}"><span class="ac-b">${badge}</span><span class="ac-t"><b>${hid ? "???" : A.tx(a.name)}</b><i>${hid ? T("Logro secreto", "Secret achievement") : A.tx(a.desc)}</i></span>${foot}</article>`;
+    };
+    const tiers = A.ACH_TIERS.map((t, i) => { const list = A.ACH.filter(a => a.tier === i); return { t, i, list, n: list.filter(got).length }; }).filter(x => x.list.length);
+    const total = A.ach.total(), done = A.ach.count();
+    const jump = tiers.map(x => `<button class="ac-jump-b${x.n === x.list.length ? " full" : ""}" data-t="${x.i}" type="button"><span class="ac-rn">${ROMAN[x.i]}</span><span class="ac-jn"><b>${A.tx(x.t.n)}</b><em>${x.n}/${x.list.length}</em></span></button>`).join("");
+    const secs = tiers.map(x => `<section class="ac-sec" id="acSec${x.i}"><header class="ac-th"><span class="ac-rn">${ROMAN[x.i]}</span><span class="ac-tn"><b>${A.tx(x.t.n)}</b><i>${A.tx(x.t.t)}</i></span><span class="ac-tc"><b>${x.n}<i>/${x.list.length}</i></b><u><s style="width:${pct(x.n, x.list.length)}%"></s></u></span></header>
+      <div class="ac-grid">${x.list.map(card).join("")}</div></section>`).join("");
     c.dialog(scr(T("Perfil", "Profile"), `
       <div class="pf-grid">${cell(T("Preguntas", "Questions"), A.fmt(s.questions), "a_pin")}${cell(T("Dianas", "Bullseyes"), A.fmt(s.bulls), "a_target")}${cell(T("Error medio", "Avg. error"), A.fmtDist(avg), "a_lens")}${cell(T("Mejor racha", "Best streak"), s.bestStreak, "a_flame")}${cell(T("Enciclopedia", "Encyclopedia"), st.u + "/" + st.t, "m_codex")}${cell(T("Récord aventura", "Adventure best"), A.fmt(P.adv.bestScore), "crown")}</div>
-      <h4 class="hub-sub">${T("Logros", "Achievements")} ${A.ach.count()}/${A.ach.total()}</h4><div class="ach-grid">${ach}</div>`, "s-prof"), "tablewrap");
+      <section class="ac-sum"><span class="ac-sum-l"><span class="ac-k">${T("Logros", "Achievements")}</span><b>${done}<i>/${total}</i></b></span><span class="ac-bar"><s style="width:${pct(done, total)}%"></s></span><em class="ac-pct">${pct(done, total)}%</em><nav class="ac-jump">${jump}</nav></section>
+      ${secs}`, "s-prof scrolls"), "tablewrap");
     wireTools(); $("hubBack").onclick = () => screen("home");
+    document.querySelectorAll(".ac-jump-b").forEach(b => (b.onclick = () => { const el = $("acSec" + b.dataset.t); if (el) { A.sfx.card(); el.scrollIntoView({ behavior: "smooth", block: "start" }); } }));
   }
 
   function screen(id) {

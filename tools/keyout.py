@@ -4,7 +4,7 @@ import sys
 from collections import deque
 from PIL import Image, ImageFilter
 
-def keyout(src, dst, size=256, tol=62, square=True):
+def keyout(src, dst, size=256, tol=62, square=True, holes=False, min_hole=60):
     im = Image.open(src).convert("RGB")
     w, h = im.size
     px = im.load()
@@ -28,6 +28,23 @@ def keyout(src, dst, size=256, tol=62, square=True):
         for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
             if 0 <= nx < w and 0 <= ny < h and not mask[ny * w + nx] and near(px[nx, ny], tol):
                 mask[ny * w + nx] = 1; dq.append((nx, ny))
+    # huecos: el fondo tambien asoma por zonas cerradas (dentro de un 8, entre trofeos...) que la inundacion no alcanza.
+    # Solo se quitan manchas grandes del color de fondo exacto (tol): la paleta no usa magenta, asi que no se come el dibujo.
+    if holes:
+        seen = bytearray(w * h)
+        for y0 in range(h):
+            for x0 in range(w):
+                i0 = y0 * w + x0
+                if mask[i0] or seen[i0] or not near(px[x0, y0], tol): continue
+                comp, q2 = [], deque([(x0, y0)]); seen[i0] = 1
+                while q2:
+                    x, y = q2.popleft(); comp.append(y * w + x)
+                    for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                        if 0 <= nx < w and 0 <= ny < h:
+                            j = ny * w + nx
+                            if not seen[j] and not mask[j] and near(px[nx, ny], tol): seen[j] = 1; q2.append((nx, ny))
+                if len(comp) >= min_hole:
+                    for j in comp: mask[j] = 1
     alpha = Image.new("L", (w, h), 255)
     ap = alpha.load()
     for y in range(h):

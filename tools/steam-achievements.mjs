@@ -17,15 +17,15 @@ const OUT = path.join(ROOT, "docs", "steam"); fs.mkdirSync(OUT, { recursive: tru
 const A = { icon: () => "", iconize() {}, T: (es, en) => en, tx: o => o.en };
 const ctx = { window: { AIQ: A }, document: {}, localStorage: { getItem: () => null, setItem() {} } }; vm.createContext(ctx);
 for (const f of ["js/i18n2.js", "js/i18n3.js", "js/i18n4.js", "js/i18n5.js", "js/profile.js"]) if (fs.existsSync(path.join(ROOT, f))) vm.runInContext(read(f), ctx);
-const ICON = vm.runInContext("(" + read("js/icons.js").match(/A\.ACH_ICON = (\{[\s\S]*?\});/)[1] + ")", ctx);
-const FRAME = { q: "blank_boss", level: "blank_boss", classic: "blank_small", codex: "blank_teal", adv: "blank_big", daily: "blank_gold" };
+const ICON = vm.runInContext("(" + read("js/icons.js").match(/A\.ACH_ICON = (\{[\s\S]*?\});/)[1] + ")", ctx);      // excepciones; sin entrada: ach_<id>
+const FRAME = vm.runInContext("(" + read("js/icons.js").match(/A\.ACH_FRAME = (\{[\s\S]*?\});/)[1] + ")", ctx);
 
 /* orden de A.TR: [fr, pt, de, it, es-419, zh, ko, ja, ru, pl] -> idioma de Steam */
 const STEAM = [["en", "english"], ["es", "spanish"], ["fr", "french", 0], ["pt", "brazilian", 1], ["de", "german", 2], ["it", "italian", 3], ["es-419", "latam", 4], ["zh", "schinese", 5], ["ko", "koreana", 6], ["ja", "japanese", 7], ["ru", "russian", 8], ["pl", "polish", 9]];
 const tr = (o, l) => { if (l === "en" || l === "es") return o[l]; const i = STEAM.find(s => s[0] === l)[2], t = (A.TR || {})[o.en]; return (t && t[i]) || (l === "es-419" ? o.es : null); };
 
 const rows = A.ACH.map(a => {
-  const r = { id: a.id, hidden: a.secret ? 1 : 0, frame: FRAME[a.ev] || "blank_boss", icon: ICON[a.id] || "a_medal", name: {}, desc: {} };
+  const r = { id: a.id, hidden: a.secret ? 1 : 0, tier: a.tier, ev: a.ev, frame: FRAME[a.ev] || "blank_boss", icon: ICON[a.id] || "ach_" + a.id, name: {}, desc: {} };
   for (const [l, s] of STEAM) { r.name[s] = tr(a.name, l); r.desc[s] = tr(a.desc, l); }
   return r;
 });

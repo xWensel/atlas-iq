@@ -251,7 +251,7 @@ window.AIQ = window.AIQ || {};
   }
   function startRound(keep) {
     run.phase = "round";
-    if (!keep) { run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
+    if (!keep) { run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.rBulls = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
     const Lv = roundLevel(), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
@@ -280,7 +280,7 @@ window.AIQ = window.AIQ || {};
   }
   function startInfinite(keep) {
     run.inf = true; run.phase = "round"; run.topic = "mixed"; run.tier = 2; run.chal = []; run.chalName = null; run.chalHalve = 1; run.boss = []; run.wind = null;
-    if (!keep) { run.infOver = false; run.infSeconds = 12; run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
+    if (!keep) { run.infOver = false; run.infSeconds = 12; run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.rBulls = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
     const Lv = infiniteLevel(), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
@@ -356,7 +356,7 @@ window.AIQ = window.AIQ || {};
   let reactT = 0;                                                     // reaccion pendiente del crupier a la ultima respuesta
   A.adv.afterQuestion = function (res) {
     clearTimers();
-    run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) run.stats.bulls++; run.stats.best = Math.max(run.stats.best, res.total);
+    run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) { run.stats.bulls++; run.rBulls = (run.rBulls || 0) + 1; } run.stats.best = Math.max(run.stats.best, res.total);
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
     run.streak = res.streak || 0; run.qi++; run.qTools = 0;
     if (run.inf && !run.infOver) {
@@ -473,6 +473,7 @@ window.AIQ = window.AIQ || {};
       A.sfx.sonar(clamp(1 - km / 8000, 0, 1));
     } else { const brg = bearing(lat, lon, latlon(o)), step = has("compass16") ? 22.5 : 45, snap = Math.round(brg / step) * step; P.bearing = snap; P.label = dirName(snap); A.sfx.sonar(0.8); }
     list.push(P); C().map.setProbes(list); persist(); note(hints.join("  ·  ")); renderBars();
+    if (list.length >= 3) A.ach.emit("adv", { kind: "probe", n: list.length });
   };
   function bearing(la1, lo1, p2) { const D = Math.PI / 180, la2 = p2[0] * D, dl = (p2[1] - lo1) * D, y = Math.sin(dl) * Math.cos(la2), x = Math.cos(la1 * D) * Math.sin(la2) - Math.sin(la1 * D) * Math.cos(la2) * Math.cos(dl); return (Math.atan2(y, x) / D + 360) % 360; }
 
@@ -518,7 +519,7 @@ window.AIQ = window.AIQ || {};
       if (run.bet) { const win = S.levelScore >= Lv.advance * 1.3; if (win) { const pay = Math.round(run.bet * 2.5); x.coins += pay; lines.push([A.T("Apuesta ganada", "Bet won"), "+" + pay]); } else lines.push([A.T("Apuesta perdida", "Bet lost"), "−" + run.bet]); }
       const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins)]);
       run.coins += got; run.stats.coinsEarned += got;
-      A.ach.emit("adv", { kind: "clear", tools: run.rTools }); if (boss) { A.ach.emit("adv", { kind: "boss" }); A.profile.get().adv.boss++; }
+      A.ach.emit("adv", { kind: "clear", tools: run.rTools, bulls: run.rBulls || 0 }); if (boss) { A.ach.emit("adv", { kind: "boss", lives: run.lives }); A.profile.get().adv.boss++; }
       A.sfx.stamp(); setTimeout(A.sfx.clear, 300);
       const actDone = boss, winAct = actDone ? run.act + 1 : 0;
       if (actDone) { const flawless = run.livesLostAct === 0; A.ach.emit("adv", { kind: "act", act: winAct, flawless, asc: run.asc }); run.livesLostAct = 0; A.profile.get().adv.bestAct = Math.max(A.profile.get().adv.bestAct || 0, winAct); }
@@ -556,7 +557,8 @@ window.AIQ = window.AIQ || {};
   }
   function winScreen() {
     run.won = true; run.act++; run.round = 0; run.attempt = 0; run.phase = "win"; persist(); A.sfx.victory();
-    A.profile.get().adv.wins++; A.profile.save();
+    const PA = A.profile.get().adv; PA.wins++; PA.deckWins = PA.deckWins || {}; PA.deckWins[run.deck] = (PA.deckWins[run.deck] || 0) + 1; A.profile.save();
+    A.ach.emit("adv", { kind: "win", deck: run.deck });
     showWinChoice();
   }
   /* ronda 12 es la ultima: desde aqui solo se puede cobrar o pasar al modo infinito (nunca mas rondas numeradas) */
@@ -620,7 +622,7 @@ window.AIQ = window.AIQ || {};
   function bribe(id) {
     const r = roundNo(), cf = chalFor(r), c = cf.list.find(x => x.id === id); if (!c) return; const cost = bribePrice(c, cf.boss);
     if (run.coins < cost) { A.sfx.deny(); flash(A.T("No te alcanzan los doblones.", "Not enough doubloons.")); return; }
-    run.coins -= cost; run.bribed = run.bribed || {}; (run.bribed[r] = run.bribed[r] || []).push(id); A.sfx.buy(); persist();
+    run.coins -= cost; run.bribed = run.bribed || {}; (run.bribed[r] = run.bribed[r] || []).push(id); A.sfx.buy(); persist(); A.ach.emit("adv", { kind: "bribe" });
     A.dealer.enable(true); A.dealer.say(A.dealer.line("bribe"), { mood: "angry", hold: 1800 }); renderShop(run.phase === "chest");
   }
   function rerollChal() {
@@ -683,7 +685,7 @@ window.AIQ = window.AIQ || {};
     document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {
       const s = SUPS.find(x => x.id === b.dataset.sup), c = price(s.cost); run.sup = run.sup || {};
       if (run.sup[s.id]) { run.sup[s.id] = false; run.coins += c; A.sfx.sell(); }
-      else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = true; A.sfx.buy(); }
+      else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = true; A.sfx.buy(); if (SUPS.every(x => run.sup[x.id])) A.ach.emit("adv", { kind: "supplies" }); }
       persist(); renderShop(false);
     }));
   }
@@ -695,7 +697,7 @@ window.AIQ = window.AIQ || {};
       const p = A.RELICS[s.id], c = chest ? 0 : price(p.cost);
       if (run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
       if (run.coins < c) { A.sfx.deny(); shake(el); return; }
-      run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run);
+      run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run); if (p.r === 3) A.ach.emit("adv", { kind: "legend" });
     } else {
       const t = TOOLS[s.id], c = price(t.cost);
       if (!run.tools[s.id] && Object.keys(run.tools).length >= 4) { A.sfx.deny(); shake(el); flash(A.T("Solo 4 herramientas distintas.", "Only 4 different tools.")); return; }
@@ -717,6 +719,7 @@ window.AIQ = window.AIQ || {};
     A.profile.save();
     const hadBest = (P.records["adv-all"] || 0) > 0, rec = A.profile.record("adv-all", final);   // la primera expedicion siempre es "record": el crupier solo lo celebra si habia uno que batir
     A.rank.submit("adv-all", { score: final, extra: { deck: run.deck, asc: run.asc, r: run.cleared } });
+    A.ach.emit("adv", { kind: "end", score: final, won: !!run.won });
     if (wasRanked && board) { P.daily[board] = { score: final, ts: Date.now() }; A.profile.save(); A.rank.submit(board, { score: final, extra: { deck: run.deck, r: run.cleared } }); A.ach.emit("daily", {}); }
     const r = run; run = null; persist(); C().S.run = null; A.chal.end(); A.dealer.enable(true);
     const fell = { r: r.cleared + 1, won: !!r.won, record: rec && hadBest };           // {r}: la ronda en la que caiste

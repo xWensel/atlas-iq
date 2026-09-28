@@ -6,7 +6,7 @@
 img.ic { display: block; object-fit: contain; image-rendering: auto; filter: drop-shadow(0 2px 0 rgba(8, 20, 14, .55)); user-select: none; -webkit-user-drag: none; }
 .ic.sm { width: 22px; height: 22px; display: inline-block; vertical-align: middle; margin-right: 6px; } .ic.cn { display: inline-block; width: 1.25em; height: 1.25em; vertical-align: -.28em; margin-right: .25em; }
 .ic.blindchip { position: relative; display: block; } .ic.blindchip .bc-base { position: absolute; inset: 0; width: 100%; height: 100%; } .ic.blindchip .bc-in { position: absolute; left: 22%; top: 22%; width: 56%; height: 56%; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .5)); }
-.ic.badge { position: relative; display: block; width: 100%; height: 100%; } .ic.badge .bd-base { position: absolute; inset: 0; width: 100%; height: 100%; } .ic.badge .bd-in { position: absolute; left: 24%; top: 24%; width: 52%; height: 52%; }
+.ic.badge { position: relative; display: block; width: 100%; height: 100%; } .ic.badge .bd-base { position: absolute; inset: 0; width: 100%; height: 100%; } .ic.badge .bd-in { position: absolute; left: 14%; top: 14%; width: 72%; height: 72%;}
 .ach:not(.got) .ic { filter: grayscale(1) brightness(.55); }
 
 /* ---------- pantalla de inicio: cuatro cartas sobre el mapa ---------- */
@@ -213,6 +213,68 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .s-prof .ach:not(.got) b, .s-prof .ach:not(.got) i { color: rgba(242, 233, 214, .5); }
 .s-prof .ach.got { background: linear-gradient(135deg, rgba(90, 60, 14, .92), rgba(20, 42, 30, .94) 70%); box-shadow: inset 0 0 0 2px var(--brass), 0 0 18px rgba(248, 180, 73, .18); }
 .s-prof .ach.got b { color: #ffe9b0; }
+
+/* ---------- Perfil v0.34: logros a pantalla completa. Es la UNICA pantalla que se desplaza (js/game.js no la encoge: .scrolls),
+   asi que todo va a tamano real y ocupa todo el ancho; las tarjetas crecen con el texto (nunca se recorta en ningun idioma) ---------- */
+.s-prof .scr-body { padding-bottom: 56px; scroll-padding-top: 8px; }
+.s-prof .scr-body::before, .s-prof .scr-body::after { content: none; }
+.s-prof .pf-grid { margin-bottom: 18px; }
+/* estadisticas: fichas verticales iguales (icono, cifra y el nombre centrado abajo a todo el ancho: ENCICLOPEDIA/ENZYKLOPÄDIE no caben al lado del icono) */
+.s-prof .pf-cell { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px; text-align: center; padding: 14px 10px 12px; }
+.s-prof .pf-cell .ic { order: 1; width: 46px; height: 46px; }
+.s-prof .pf-cell b { order: 2; white-space: nowrap; line-height: 1; }
+.s-prof .pf-cell span { order: 3; margin-top: auto; font-size: 14px; letter-spacing: .03em; line-height: 1.2; }
+@media (max-width: 1279px) { .s-prof .pf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .s-prof .ac-jump { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ac-sum { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px 24px; padding: 18px 26px 16px; border-radius: 18px;
+  background: linear-gradient(120deg, rgba(96, 62, 12, .94), rgba(14, 32, 22, .95) 58%); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .6), 0 8px 0 rgba(0, 0, 0, .35), 0 0 34px rgba(248, 180, 73, .12); }
+.ac-sum-l { display: grid; gap: 4px; }
+.ac-k { font-family: var(--mono); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--brass-lt); }
+.ac-sum-l b { font-family: var(--serif); font-weight: 900; font-size: 50px; line-height: .86; color: #ffe9b0; text-shadow: 0 4px 0 rgba(5, 12, 8, .6); white-space: nowrap; }
+.ac-sum-l b i { font-style: normal; font-size: 28px; color: rgba(242, 233, 214, .55); margin-left: 4px; }
+.ac-bar { display: block; height: 18px; border-radius: 999px; background: rgba(0, 0, 0, .5); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .28); overflow: hidden; }
+.ac-bar s, .ac-tc u s, .ac-pb s { display: block; height: 100%; border-radius: inherit; text-decoration: none; }
+.ac-bar s { background: linear-gradient(90deg, #f8b449, #ffe08a); box-shadow: 0 0 14px rgba(248, 180, 73, .7); }
+.ac-pct { font-family: var(--serif); font-weight: 900; font-size: 40px; font-style: normal; color: #ffe08a; text-shadow: 0 4px 0 rgba(5, 12, 8, .6); }
+.ac-jump { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }        /* rejilla pareja: nunca un tramo suelto en otra linea */
+.ac-jump-b { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 7px 12px 7px 7px; border: 0; border-radius: 14px; cursor: pointer; font: inherit; color: var(--paper); text-align: left;
+  background: rgba(8, 20, 14, .78); box-shadow: inset 0 0 0 1.5px rgba(255, 224, 138, .35); transition: background .15s, box-shadow .15s; }
+.ac-jn { display: grid; gap: 2px; min-width: 0; }
+.ac-jn b { font-family: var(--serif); font-weight: 800; font-size: 16px; line-height: 1.05; overflow-wrap: anywhere; }   /* "Завсегдатай", "Meisterschaft": una sola palabra larga nunca se sale del chip */
+.ac-jn em { font-style: normal; font-family: var(--mono); font-size: 14px; color: var(--brass-lt); }
+.ac-jump-b:hover { background: rgba(28, 58, 44, .92); box-shadow: inset 0 0 0 2px #ffe08a; }
+.ac-jump-b.full { box-shadow: inset 0 0 0 2px var(--brass), 0 0 14px rgba(248, 180, 73, .3); }
+.ac-jump-b .ac-rn { width: 32px; height: 32px; font-size: 16px; }
+.ac-rn { flex: none; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; font-family: var(--serif); font-weight: 900; font-size: 24px; color: #2a1a06;
+  background: radial-gradient(circle at 35% 30%, #fff1b8, #f8b449 62%, #b87a1c); box-shadow: 0 3px 0 rgba(0, 0, 0, .45), inset 0 0 0 2px rgba(255, 244, 201, .9); }
+.ac-sec { margin-top: 30px; scroll-margin-top: 8px; }
+.ac-th { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 6px 18px; padding: 0 4px 12px; margin-bottom: 16px; border-bottom: 2px solid rgba(255, 224, 138, .3); }
+.ac-tn { display: grid; gap: 4px; min-width: 0; }
+.ac-tn b { font-family: var(--serif); font-weight: 900; font-size: 34px; line-height: 1; color: var(--paper); text-shadow: 0 4px 0 rgba(5, 12, 8, .6); }
+.ac-tn i { font-style: normal; font-family: var(--mono); font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: rgba(242, 233, 214, .6); }
+.ac-tc { display: grid; justify-items: end; gap: 8px; }
+.ac-tc b { font-family: var(--serif); font-weight: 900; font-size: 30px; line-height: 1; color: #ffe08a; white-space: nowrap; } .ac-tc b i { font-style: normal; font-size: 20px; color: rgba(242, 233, 214, .55); }
+.ac-tc u { display: block; width: 150px; height: 8px; border-radius: 999px; background: rgba(0, 0, 0, .5); overflow: hidden; } .ac-tc u s { background: var(--brass); }
+.ac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.ac { display: grid; grid-template-columns: 84px minmax(0, 1fr); grid-template-rows: 1fr auto; column-gap: 16px; row-gap: 10px; align-items: start; padding: 14px 18px 14px 14px; border-radius: 16px;
+  background: rgba(10, 24, 17, .93); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .1), 0 6px 0 rgba(0, 0, 0, .28); }
+.ac-b { grid-row: 1 / 3; align-self: center; width: 84px; height: 84px; }
+.ac-t { display: grid; gap: 5px; align-content: center; min-width: 0; min-height: 100%; }
+.ac-t b { font-family: var(--serif); font-weight: 900; font-size: 22px; line-height: 1.05; color: rgba(242, 233, 214, .78); overflow-wrap: break-word; }
+.ac-t i { font-style: normal; font-size: 16px; line-height: 1.3; color: rgba(242, 233, 214, .58); overflow-wrap: break-word; }
+.ac-f { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ac-f em { font-style: normal; font-family: var(--mono); font-size: 13px; letter-spacing: .04em; white-space: nowrap; color: rgba(242, 233, 214, .62); }
+.ac-pb { flex: 1; min-width: 40px; height: 8px; border-radius: 999px; background: rgba(0, 0, 0, .5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); overflow: hidden; } .ac-pb s { background: linear-gradient(90deg, #22a699, #6fe0c8); }
+.ac-f.is-got .ic { width: 18px; height: 18px; } .ac-f.is-got em { color: var(--brass-lt); }
+.ac:not(.got) .ac-b img { filter: grayscale(1) brightness(.55); }
+.ac.got { background: linear-gradient(135deg, rgba(96, 62, 12, .96), rgba(18, 40, 28, .95) 68%); box-shadow: inset 0 0 0 2px var(--brass), 0 6px 0 rgba(0, 0, 0, .3), 0 0 24px rgba(248, 180, 73, .16); }
+.ac.got .ac-t b { color: #ffe9b0; } .ac.got .ac-t i { color: rgba(242, 233, 214, .86); }
+.ac.hid .ac-t b { letter-spacing: .25em; }
+@media (max-width: 700px) {
+  .ac-sum { grid-template-columns: minmax(0, 1fr) auto; padding: 14px 16px; } .ac-bar { grid-column: 1 / -1; order: 3; } .s-prof .ac-jump { order: 4; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s-prof .pf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ac-th { grid-template-columns: auto minmax(0, 1fr); } .ac-tc { grid-column: 1 / -1; justify-items: start; } .ac-tn b { font-size: 26px; }
+  .ac { grid-template-columns: 64px minmax(0, 1fr); } .ac-b { width: 64px; height: 64px; }
+}
 
 /* el aviso de tarjeta nueva no debe tapar los botones inferiores de la tienda ni del mapa */
 .cx-toast { bottom: auto; top: 150px; right: 16px; }

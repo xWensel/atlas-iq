@@ -164,6 +164,116 @@ icons({
  "spareeye": "a golden jeweler's loupe eyepiece with a spare violet lens clipped beside it on a small velvet tray",
 })
 
+# ---------------------------------------------------------------- v0.34: una ilustracion propia por logro (Steam pide un icono por logro; cada una con personalidad)
+icons({
+ # I. primeros pasos
+ "ach_first_pin": "a cheerful red map pin character with big shiny eyes and a tiny golden crown, planted proudly in a small green felt world map disc",
+ "ach_adv_start": "a brown leather explorer suitcase covered with colorful travel stickers, a brown fedora hat on top and a tiny poker chip luggage tag",
+ "ach_bull_1": "a red map pin shaped dart stuck dead center in a red and white bullseye target with a golden star burst",
+ "ach_codex_10": "a small blue encyclopedia book opening with glowing golden pages and a tiny globe bookmark popping out",
+ "ach_adv_clear1": "a small red and white striped camping tent with a crackling campfire and a tiny poker chip flag on top",
+ "ach_adv_blind": "a cheeky round red poker chip character wearing a black blindfold with a confident grin",
+ "ach_streak_5": "a lit firecracker rocket made of stacked poker chips with a bright orange flame on its fuse",
+ "ach_speed": "a golden lightning bolt zapping a red map pin, crackling sparks and speed lines",
+ # II. primera sesion
+ "ach_codex_50": "a cute grey mouse wearing round golden spectacles reading a thick blue encyclopedia book",
+ "ach_adv_bribe": "a white gloved hand slipping a golden poker chip under the edge of a green felt card table",
+ "ach_perfect": "a golden award rosette ribbon with a perfect red bullseye in the center and small stars",
+ "ach_q_100": "a small student backpack with a rolled map, a pencil and a brass compass sticking out",
+ "ach_km_equator": "a golden measuring tape wrapped all the way around a small world globe along its equator",
+ "ach_adv_boss": "a cream skull wearing a jester hat knocked out with dizzy stars circling, a golden sword stuck beside it",
+ "ach_adv_act1": "a golden sun rising behind a winding road paved with poker chips through green hills",
+ "ach_codex_100": "a stack of three thick leather books with a glowing little world globe on top",
+ "ach_streak_10": "a blazing golden comet with a long fiery tail made of tiny poker chips",
+ "ach_daily_1": "a golden alarm clock with a world globe face ringing with motion lines",
+ "ach_classic_world": "a tiny red propeller airplane flying a full loop around a small world globe with a dotted trail",
+ # III. unas horas
+ "ach_last_second": "a nervous white stopwatch character sweating with its hand at the very last tick",
+ "ach_codex_capitals": "a grand white capitol building with a golden dome and a red star flag waving on top",
+ "ach_codex_water": "a calm turquoise lagoon around a tiny tropical island with a floating poker chip buoy",
+ "ach_codex_nature": "a naturalist green butterfly net holding a bright blue butterfly, in front of a small snowy mountain peak with a pine tree",
+ "ach_codex_people": "a vintage explorer bust portrait with a feathered tricorn hat inside an oval golden picture frame",
+ "ach_codex_events": "an old parchment scroll with a red wax seal and two crossed swords behind it",
+ "ach_codex_place": "the torn corner of a treasure map with a red X spot and a brass magnifying glass peeking at it",
+ "ach_inside": "a small cozy house with a red roof and a doormat sitting inside a golden country shaped border outline",
+ "ach_bull_25": "a steady silver surgeon scalpel pointing precisely at a tiny red map pin inside a golden target ring",
+ "ach_adv_rich": "a small purple dragon greedily hugging a pile of gold coins and poker chips",
+ "ach_adv_flawless": "a shining blue shield with a golden star, perfectly polished with sparkles and no scratches",
+ "ach_adv_build": "an overstuffed brown adventurer backpack bursting with relics: a brass lamp, a compass, a playing card and a red gem",
+ "ach_adv_triangulate": "three small brass radar dishes on tripods around a red map pin, linked by glowing teal beams that form a triangle",
+ "ach_adv_supplies": "a wooden camp supply crate topped with a steaming coffee cup, a red first aid kit and a small shield",
+ "ach_codex_country50": "an open teal passport with both pages covered in overlapping colorful round ink visa stamps and a red rubber stamp pressing down on it",
+ "ach_codex_250": "a wise owl professor wearing a black graduation cap with a golden tassel perched on a book",
+ "ach_classic_capitals": "a red double decker tour bus driving past a golden domed palace",
+ "ach_classic_europe": "a vintage green steam train crossing a stone arch bridge toward a castle with red towers",
+ "ach_classic_latam": "a colorful stepped stone temple in a green jungle with a bright red macaw parrot on top",
+ "ach_classic_usa": "a golden bald eagle flying over a tall green torch of liberty with sparkles",
+ "ach_classic_asia": "a camel carrying silk bales on a desert road in front of a red pagoda",
+ "ach_classic_oceania": "a surfboard stuck in golden sand next to a small kangaroo and a big blue wave",
+ "ach_adv_act2": "a small wooden ship sailing off the torn edge of a parchment world map into a starry void",
+ "ach_adv_lastlife": "a single cracked red heart balancing on the edge of a rocky cliff",
+ "ach_classic_clean": "a circus tightrope walker in a red and gold costume balancing with a long pole on a thin rope high above a small world globe, no safety net",
+ "ach_perfect_5": "a fan of five golden playing cards each showing a red bullseye target",
+ "ach_adv_boss5": "a pile of five tiny cream skulls wearing jester hats next to a sack of gold coins",
+ "ach_codex_city": "a vintage tourist camera with a strap in front of a stack of city skyline postcards",
+ "ach_codex_curio": "a glowing lightbulb with a curly question mark filament and golden sparkles",
+ "ach_pixel": "a brass jeweler loupe magnifying a tiny red map pin standing exactly on one pixel of a grid",
+ "ach_q_1000": "a cartographer drafting table with an unrolled map, a brass compass divider and an inkwell",
+ "ach_daily_7": "a neat tower of seven golden poker chips with a small green pennant flag on top",
+ # IV. jugador habitual
+ "ach_adv_runs10": "a pair of battered brown explorer boots with patches, mud and a bandage, still ready to go",
+ "ach_codex_500": "a tall wooden bookshelf packed with colorful encyclopedias and a small globe on top",
+ "ach_classic_flags": "a golden pole bearing many small colorful waving flags like a bouquet",
+ "ach_classic_clues": "a detective brown fedora and a magnifying glass over a riddle card with a big question mark",
+ "ach_classic_events": "an antique hourglass whose sand holds tiny scenes: a pyramid, a sailing ship and a castle",
+ "ach_classic_people": "a feather quill writing in an open leather biography book with a small portrait silhouette on the page",
+ "ach_codex_strait": "a tiny sailboat squeezing through a very narrow sea channel between two tall green cliffs",
+ "ach_streak_20": "an erupting volcano spewing lava and colorful poker chips into the air",
+ "ach_adv_win": "a grey moai stone head wearing a golden crown on a glowing mysterious island with a treasure chest",
+ "ach_adv_asc": "a snowy mountain peak with a small red flag planted on the summit and a coiled climbing rope",
+ "ach_classic_gold1": "a shining gold medal engraved with a world globe hanging from a blue ribbon, sparkles",
+ "ach_bull_100": "a fierce golden hawk head with a red crosshair reflected in its sharp eye",
+ "ach_inside_100": "a well traveled suitcase completely covered in dozens of colorful country travel stickers",
+ "ach_adv_flawless2": "a glossy red heart inside an ornate golden locket, flawless shine",
+ "ach_adv_endless": "a golden infinity symbol shaped like a winding road with a tiny explorer walking on it",
+ "ach_adv_fullhouse": "a red slot machine hitting the jackpot with bullseye targets on every reel and coins bursting out",
+ "ach_adv_legendary": "a glowing golden treasure chest bursting open with purple magic light and a big red legendary gem",
+ "ach_codex_1000": "a librarian brass stamp next to a tall tidy stack of books with a globe shaped bookend",
+ "ach_adv_score100k": "an explosion of golden coins, poker chips and confetti bursting out of a slot machine with a globe on top",
+ "ach_adv_rich2": "a black top hat overflowing with stacks of black and gold poker chips",
+ "ach_speed_master": "white gloved croupier hands snatching a flying poker chip in mid air with speed lines",
+ "ach_adv_wins3": "three small golden trophy cups lined up on a green felt podium",
+ "ach_classic_all": "a golden trophy cup shaped like a vintage desk globe on a brass stand",
+ "ach_plays_50": "a golden casino membership card with a world globe emblem hanging on a red lanyard",
+ # V. maestria
+ "ach_q_5000": "an ornate world map scroll unrolling with a compass rose and a small sea serpent",
+ "ach_classic_gold5": "five shiny gold coins fanned out like a winning hand, each coin engraved with a small world globe, golden sparkles",
+ "ach_adv_asc2": "a red and gold kite flying high above snowy mountain peaks",
+ "ach_adv_asc3": "a tall colorful carved totem pole standing on a snowy mountain summit",
+ "ach_adv_flawless3": "a golden amulet with a red gem glowing inside a protective blue shield aura",
+ "ach_daily_30": "an ornate golden almanac book with a sun and moon emblem and a red ribbon",
+ "ach_codex_country": "a thick teal passport overflowing with extra pages and colorful stamps, golden globe emblem",
+ "ach_adv_asc4": "a red and white striped lighthouse on a lonely rocky summit above the clouds",
+ "ach_bull_500": "a golden legendary bow with a glowing arrow pinned in the center of a world map target",
+ "ach_streak_50": "a raging tornado made of spinning colorful poker chips and blank playing cards without letters",
+ "ach_adv_endless2": "a majestic phoenix of golden and red flames rising from a golden infinity symbol",
+ "ach_codex_2500": "a grand ancient library facade with white columns and a glowing globe dome on top",
+ "ach_codex_capitals_all": "a diplomat black top hat with a golden ribbon surrounded by a ring of tiny colorful flags",
+ "ach_adv_wins10": "a smug casino high roller bust portrait in a black tuxedo with a golden globe lapel pin, holding a stack of chips",
+ "ach_adv_blindwin": "a rugged adventurer bust portrait wearing a black blindfold and a golden crown, victorious grin, miner headlamp",
+ "ach_adv_alldecks": "four big playing card suit symbols: a red map pin, a red compass star, a purple mountain and a purple palm tree, arranged in a golden frame",
+ "ach_q_10000": "a wise old cartographer wizard bust portrait with a long white beard, starry blue hat and a glowing map scroll",
+ "ach_bull_1000": "a red and white bullseye target packed with many golden arrows all stuck in its exact center, golden sparkles",
+ "ach_classic_goldall": "a solid gold world globe on an ornate golden stand radiating light rays",
+ "ach_adv_ascmax": "a golden flag planted on the highest snowy summit above a sea of clouds at sunrise",
+ "ach_codex_all": "a golden crown resting on a glowing blue encyclopedia book with a globe emblem",
+ # secretos
+ "ach_marathon": "a pair of red running shoes breaking through a golden finish line ribbon",
+ "ach_night": "a sleepy owl wearing a tiny green croupier visor under a golden crescent moon",
+ "ach_early_bird": "a small blue bird holding a tiny alarm clock on a branch at sunrise",
+ "ach_weekend": "a striped beach chair with a cocktail glass topped with a tiny umbrella and a poker chip",
+})
+
 # ---------------------------------------------------------------- ESCENAS (wide 16:9 salvo indicacion)
 S = {}
 def scene(id, desc, w=1024, h=576): S[id] = (desc, w, h)
@@ -235,7 +345,7 @@ def post(kind, id):
     raw = RAW / f"{id}.jpg"
     if not raw.exists(): return
     if kind == "logo" or id == "logo_mark": return                  # la marca ya no se genera: se dibuja pixel a pixel (tools/make_brand.py + make_icons.py)
-    if kind == "icon": keyout(raw, ICONS / f"{id}.webp", 512 if id.startswith("dealer_") else 256)
+    if kind == "icon": keyout(raw, ICONS / f"{id}.webp", 512 if id.startswith("dealer_") else 256, holes=id.startswith("ach_"))   # logros: tambien los huecos magenta encerrados
     else:
         im = Image.open(raw).convert("RGB"); w, h = im.size
         if w > 1280: im = im.resize((1280, round(h * 1280 / w)), Image.LANCZOS)

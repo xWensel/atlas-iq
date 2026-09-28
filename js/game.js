@@ -371,6 +371,7 @@
   const fitK = () => {
     const d = $("dlg"), el = d && d.querySelector(":scope > " + FIT.split(", ").join(", :scope > ")); if (!el) { if (d && A.squeeze) A.squeeze(d); return; }
     const base = uiK(); el.style.removeProperty("--k");
+    if (el.classList.contains("scrolls")) { if (A.squeeze) A.squeeze(el); return; }                    // pantalla con desplazamiento (solo el Perfil): a tamano completo
     const over = () => {
       const b = el.querySelector(".scr-body");
       if (b) { const ch = b.clientHeight, sh = b.scrollHeight; return sh > ch * 1.015 ? ch / sh : 1; }
@@ -402,7 +403,7 @@
   function prepareRun() { S.run = null; S.tool = null; openSettings(false); A.audio.unlock(); A.music.mode(1); A.profile.get().stats.plays++; A.profile.save(); }
   function newRun() {
     S.camp = A.CAMPAIGNS.find(c => c.id === S.campId);
-    S.runTotal = 0; S.runMax = 0; S.completed = 0; save(); prepareRun();
+    S.runTotal = 0; S.runMax = 0; S.completed = 0; S.clean = S.startLevel === 0; save(); prepareRun();   // clean: desde el nivel 1 y sin fallar ninguno (logro Sin red)
     map.setHome(S.camp.home);
     startLevel_(S.startLevel);
   }
@@ -564,7 +565,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     const levelPerfect = S.qs.length >= 5 && S.hits === S.qs.length;
     if (levelPerfect) { A.profile.get().stats.perfectRounds++; A.profile.save(); }
     A.ach.emit("level", { perfect: levelPerfect });
-    const L = lv(), pass = S.levelScore >= L.advance, p = prog(S.camp.id);
+    const L = lv(), pass = S.levelScore >= L.advance, p = prog(S.camp.id); if (!pass) S.clean = false;
     map.clearMarks(); map.animateTo(map.home(), 900); map.setPick(false);
     $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("factText").textContent = ""; $("streakChip").classList.add("hidden");
     S.phase = "levelEnd";
@@ -587,7 +588,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     const L = lv(), tier = A.iqTier(iq), tierName = A.t("tier." + tier);
     const shown = win ? S.runTotal : S.runTotal + S.levelScore;
     if (S.camp.mode === "classic") {
-      if (win) { A.profile.record("classic:" + S.camp.id + ":win", 1); const r = shown / Math.max(1, S.runMax); A.profile.medal(S.camp.id, r >= 0.85 ? "gold" : r >= 0.7 ? "silver" : "bronze"); A.ach.emit("classic", { win: true }); }
+      if (win) { A.profile.record("classic:" + S.camp.id + ":win", 1); const r = shown / Math.max(1, S.runMax); A.profile.medal(S.camp.id, r >= 0.85 ? "gold" : r >= 0.7 ? "silver" : "bronze"); A.ach.emit("classic", { win: true, clean: !!S.clean }); }
       if (S.ranked) A.rank.submit("classic-" + S.camp.id, { score: shown, extra: { win, lv: S.level + 1 } });
     }
     if (win) { A.sfx.stamp(); setTimeout(A.sfx.victory, 380); }
