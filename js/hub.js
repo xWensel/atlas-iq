@@ -15,7 +15,12 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ pantalla principal */
   function home() {
-    const c = C(), P = A.profile.get(), adv = P.adv, today = A.rank.boards.daily(), done = P.daily[today], saved = A.adv.hasSave(), sm = saved && A.adv.summary();
+    const c = C(), P = A.profile.get(), adv = P.adv, saved = A.adv.hasSave(), sm = saved && A.adv.summary();
+    /* carta del Reto diario: intento a medias, puntuacion global de hoy o los 3 intentos por estrenar */
+    const today = A.rank.daily.board(), dst = A.rank.daily.get(today), dsv = A.adv.summary(true), dLive = dsv && dsv.board === today;
+    const dMeta = dLive ? A.pick6("Intento {k}/3|Attempt {k}/3|Essai {k}/3|Tentativa {k}/3|Versuch {k}/3|Tentativo {k}/3||尝试 {k}/3|도전 {k}/3|挑戦 {k}/3|Попытка {k}/3|Podejście {k}/3").replace("{k}", dsv.dailyTry || 1)
+      : dst.done ? `${A.fmt(dst.total)} · ${dst.done}/3`
+      : A.pick6("Nuevo reto|New today|Nouveau défi|Novo desafio|Neue Runde|Nuova sfida||新挑战|새 도전|新しい挑戦|Новый день|Nowe dziś");
     /* cada modo es una carta (sin indices de baraja: el marco y la ilustracion bastan) */
     const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}">
       ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-desc">${desc}</span><span class="mc-stat">${meta}</span></button>`;
@@ -25,7 +30,7 @@ window.AIQ = window.AIQ || {};
       <div class="hh-cards">
         ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Regiones del mundo, banderas, pistas, eventos y personajes, contra el reloj.", "Regions of the world, flags, clues, events and famous people, against the clock."), T("Directo al grano", "No frills"))}
         ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: el crupier cambia las reglas. Mapa a oscuras, del revés, letras que tiemblan… y perks para vencerlo.", "Roguelike: the dealer changes the rules. Dark maps, upside-down worlds, shaky letters… and perks to beat him."), saved ? T("▶ Partida guardada", "▶ Saved run") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
-        ${mc("daily", "Q", "s_compass", "card_compete", T("Reto diario", "Daily challenge"), T("La misma expedición para todos, una vez al día. Compara tu puntuación.", "The same expedition for everyone, once a day. Compare your score."), done ? T("Hoy: ", "Today: ") + A.fmt(done.score) : T("El de hoy te espera", "Today's is waiting"))}
+        ${mc("daily", "Q", "s_compass", "card_compete", T("Reto diario", "Daily challenge"), A.pick6("Una expedición al azar, la misma para todos. 3 intentos que suman.|A random expedition, the same for all. 3 attempts that add up.|Une expédition au hasard, la même pour tous. 3 essais cumulés.|Expedição aleatória, igual para todos. 3 tentativas que somam.|Zufällige Expedition, für alle gleich. 3 Versuche, eine Summe.|Spedizione a caso, uguale per tutti. 3 tentativi che si sommano.||随机远征，人人相同。3 次尝试，分数累加。|모두에게 똑같은 무작위 탐험. 도전 3번의 점수를 합산.|全員共通のランダム遠征。3回の挑戦を合計。|Случайная экспедиция, одна на всех. 3 попытки в сумме.|Losowa wyprawa, ta sama dla wszystkich. 3 podejścia w sumie."), dMeta)}
       </div>
       <div class="hh-bottom">
       ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${T("Acto", "Act")} ${sm.act} · ${T("Ronda", "Round")} ${sm.round} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
@@ -74,6 +79,7 @@ window.AIQ = window.AIQ || {};
   const TOPIC_ICON = { capital: "t_capital", landmark: "t_landmark", city: "t_city", country: "t_country", history: "t_battle", nature: "t_nature", clue: "t_curio", mixed: "slot", flag: "t_country" };
   const DECK_CARD = { explorer: ["A", "s_compass"], historian: ["K", "s_peak"], navigator: ["Q", "s_palm"], blind: ["J", "s_pin"] };
   const STAKE_CHIP = ["blank_small", "blank_teal", "blank_gold", "blank_big", "blank_boss", "blank_boss"];
+  const ascTexts = () => [T("Estándar", "Standard"), T("Objetivos +10 %, −1 s, tienda +10 %", "Targets +10%, −1 s, shop +10%"), T("+20 %, −2 s. Desde el acto 2, un reto de regla (viento, tormenta o silencio) en cada ronda", "+20%, −2 s. From act 2, a rule challenge (wind, storm or silence) every round"), T("+30 %, −3 s, retos un nivel más fuertes y una provisión menos", "+30%, −3 s, challenges one level stronger and one fewer provision"), T("+40 %, −4 s. Los jefes traen un poder extra", "+40%, −4 s. Bosses bring one extra power"), T("+50 %, −5 s. Solo para leyendas", "+50%, −5 s. Legends only")];
   function adventure() {
     const c = C(), P = A.profile.get(), adv = P.adv, D = A.ADV.DECKS, saved = A.adv.hasSave(), TN = A.ADV.TOPIC_NAMES, R = A.RELICS;
     let runInfo = ""; if (saved) { try { const r = JSON.parse(localStorage.getItem("atlasiq.run.v2")); runInfo = `${T("Acto", "Act")} ${r.act + 1} · ${T("Ronda", "Round")} ${r.round + 1} · ${r.coins} ${T("doblones", "doubloons")} · ${A.fmt(r.score)} ${T("pts", "pts")}`; } catch (e) { /* sin datos */ } }
@@ -83,7 +89,7 @@ window.AIQ = window.AIQ || {};
       const stat = `<em><span class="dc-stat">${A.icon("coin", "dc-ic")}${d.coins}</span><span class="dc-stat">${A.icon("heart", "dc-ic")}${d.lives}</span></em>`;
       return `<button class="dcard${advSel.deck === id ? " sel" : ""}${locked ? " lock" : ""}" data-deck="${id}" ${locked ? "disabled" : ""} data-suit="${su === "s_pin" || su === "s_compass" ? "red" : "blk"}"><span class="dc-art felt">${A.icon(d.ico)}${locked ? `<i class="dc-lock">${A.icon("lock")}</i>` : ""}</span><b class="dc-n">${A.tx(d.n)}</b><span class="dc-d">${locked ? T("Logro: ", "Achievement: ") + A.tx(lockTxt) : A.tx(d.d)}</span><span class="dc-kit">${locked ? "" : kit}${stat}</span></button>`;
     }).join("");
-    const ASC_TXT = [T("Estándar", "Standard"), T("Objetivos +10 %, −1 s, tienda +10 %", "Targets +10%, −1 s, shop +10%"), T("+20 %, −2 s. Desde el acto 2, un reto de regla (viento, tormenta o silencio) en cada ronda", "+20%, −2 s. From act 2, a rule challenge (wind, storm or silence) every round"), T("+30 %, −3 s, retos un nivel más fuertes y una provisión menos", "+30%, −3 s, challenges one level stronger and one fewer provision"), T("+40 %, −4 s. Los jefes traen un poder extra", "+40%, −4 s. Bosses bring one extra power"), T("+50 %, −5 s. Solo para leyendas", "+50%, −5 s. Legends only")];
+    const ASC_TXT = ascTexts();
     let stakes = ""; for (let i = 0; i <= 5; i++) stakes += `<button class="stake${advSel.asc === i ? " sel" : ""}" data-asc="${i}" ${i > adv.asc ? "disabled" : ""} ${A.ttAttr(T("Ascensión", "Ascension") + " " + i, i > adv.asc ? A.tip6("Bloqueada: supera la ascensión anterior para desbloquearla.|Locked: beat the previous ascension to unlock it.|Verrouillée : réussis l'ascension précédente pour la débloquer.|Bloqueada: vença a ascensão anterior para desbloqueá-la.|Gesperrt: schließe die vorige Stufe ab, um sie freizuschalten.|Bloccata: supera l'ascensione precedente per sbloccarla.||已锁定：通过上一级飞升即可解锁。|잠김: 이전 어센션을 클리어하면 열립니다.|ロック中：前のアセンションをクリアすると解除。|Заблокировано: пройди предыдущее восхождение, чтобы открыть.|Zablokowane: pokonaj poprzednie wniebowstąpienie, żeby odblokować.") : ASC_TXT[i])}>${A.icon(STAKE_CHIP[i])}<b>${i}</b></button>`;
     const ascTxt = ASC_TXT[advSel.asc];
     const road = A.ADV.ROUNDS.map((r, i) => `<span class="rm-node${r.boss ? " boss" : ""}" ${A.roundTip(i)}><span class="rm-ic">${A.icon(r.boss ? "skull" : TOPIC_ICON[r.topic])}</span><em>${i + 1}</em></span>`).join("");
@@ -113,35 +119,91 @@ window.AIQ = window.AIQ || {};
   }
   function enterRun(fn) { const c = C(); c.S.ranked = null; c.prepareRun(); fn(); }
 
-  /* ------------------------------------------------------------------ Reto diario (una Aventura con semilla comun) */
-  let board = null;
+  /* ------------------------------------------------------------------ Reto diario: una expedicion al azar cada dia, la misma para todo el mundo.
+     La MANO DEL DIA (baraja, ascension, regalo y ruta) sale de la semilla del dia; 3 intentos con lugares nuevos que suman la puntuacion global (A.rank.daily) */
+  let board = "today", tickT = 0;
+  const P6 = s => A.pick6(s);
+  const locOf = () => (A.LANGS.find(l => l.code === A.lang) || A.LANGS[0]).loc;
+  const hms = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(v => String(v).padStart(2, "0")).join(":"); };
+  const actRound = sv => `${T("Acto", "Act")} ${sv.act} · ${T("Ronda", "Round")} ${sv.round}`;
   function daily() {
-    const c = C(), P = A.profile.get(), day = A.rank.boards.daily(), done = P.daily[day];
-    const boards = [{ id: day, title: T("Reto de hoy", "Today's challenge") }, { id: "adv-all", title: T("Aventura · histórico", "Adventure · all time") }];
-    if (!board || !boards.find(b => b.id === board)) board = day;
-    const dstr = String(A.rank.ymd()).replace(/(\d{4})(\d\d)(\d\d)/, "$3/$2/$1");
-    c.dialog(scr(T("Reto diario", "Daily challenge"), `<div class="cp-grid">
-      <section class="cp-main">
-        <p class="mode-d">${T("Todos juegan la misma expedición hoy: mismas preguntas, mismos retos, mismas ofertas. Gana quien la juegue mejor.", "Everyone plays the same expedition today: same questions, same challenges, same offers. Best play wins.")}</p>
-        <label class="nick"><span>${T("Tu nombre en la clasificación", "Your leaderboard name")}</span><input id="nickIn" maxlength="16" value="${esc(P.name)}" placeholder="${T("Aventurero", "Adventurer")}"></label>
-        <div class="daily"><div class="dy-art">${A.pic("card_compete")}</div><div class="dy-body"><span class="tag">${T("Reto diario", "Daily challenge")} · ${dstr}</span><b>${T("Aventura con semilla común", "Adventure with a shared seed")}</b>
-          <i>${T("Baraja Explorador, Ascensión 1. Un intento puntúa; después puedes practicar.", "Explorer deck, Ascension 1. One attempt counts; then you can practise.")}</i>
-          <div>${done ? `<span class="daily-done">${T("Hoy: ", "Today: ")} <b>${A.fmt(done.score)}</b></span><button class="btn-line" id="dailyGo">${T("Practicar (no puntúa)", "Practise (unranked)")}</button>` : startBtn("dailyGo", T("Jugar el reto de hoy", "Play today's challenge"), T("Todos, la misma semilla", "Everyone, the same seed"), true)}</div></div></div>
+    const c = C(), P = A.profile.get(), DY = A.rank.daily, day = DY.board();
+    clearInterval(tickT);
+    /* intentos a medias: el de otro dia se cierra con los puntos que llevaba; el de hoy sin partida guardada (se perdio) se cierra a cero */
+    let sv = A.adv.summary(true);
+    if (sv && sv.board !== day) { A.adv.abandon(true); sv = null; }
+    let st = DY.get(day);
+    if (st.live && !sv) { DY.finish(day, st.live, 0); st = DY.get(day); }
+    const h = DY.hand(day), deck = A.ADV.DECKS[h.deck], gift = h.gift && A.RELICS[h.gift], next = st.tries.length + 1, locked = deck.unlock && !P.ach[deck.unlock], hist = DY.stats();
+    const kit = (ico, lbl, val, tip) => `<div class="dr-k" ${tip}><span class="dr-ki">${ico}</span><span class="dr-kt"><i class="sq-fit">${lbl}</i><b class="sq-fit">${val}</b></span></div>`;
+    const road = h.route.map((ri, i) => { const boss = i % 4 === 3; return `<span class="rm-node${boss ? " boss" : ""}" ${A.roundTip(i, h.route)}><span class="rm-ic">${A.icon(boss ? "skull" : TOPIC_ICON[A.ADV.ROUNDS[ri].topic])}</span><em>${i + 1}</em></span>`; }).join("");
+    const tries = [1, 2, 3].map(k => {
+      const t = st.tries[k - 1], live = !!(t && t.live), cls = live ? "live" : t ? "done" : k === next && !st.live ? "next" : "free";
+      const big = live ? A.fmt(sv ? sv.score : 0) : t ? A.fmt(t.s || 0) : "—";
+      const small = live ? (sv ? actRound(sv) : "…") : t ? P6("Rondas: {r}|Rounds: {r}|Manches : {r}|Rodadas: {r}|Runden: {r}|Round: {r}||回合：{r}|라운드: {r}|ラウンド：{r}|Раунды: {r}|Rundy: {r}").replace("{r}", t.r || 0)
+        : P6("Por jugar|To play|À jouer|A jogar|Offen|Da giocare||待进行|남은 도전|未挑戦|Не сыграна|Do rozegrania");
+      return `<div class="dr-try ${cls}"><span class="dr-tn">${P6("Intento|Attempt|Essai|Tentativa|Versuch|Tentativo||尝试|도전|挑戦|Попытка|Podejście")} ${k}</span><b>${big}</b><i>${small}</i></div>`;
+    }).join("");
+    const go = sv ? startBtn("dailyGo", P6("Continuar el intento {k}|Continue attempt {k}|Reprendre l'essai {k}|Continuar a tentativa {k}|Versuch {k} fortsetzen|Riprendi il tentativo {k}||继续第 {k} 次尝试|{k}번째 도전 계속하기|挑戦{k}回目を続ける|Продолжить попытку {k}|Kontynuuj podejście {k}").replace("{k}", sv.dailyTry || st.live), actRound(sv), true)
+      : st.left > 0 ? startBtn("dailyGo", P6("Jugar el intento {k}|Play attempt {k}|Jouer l'essai {k}|Jogar a tentativa {k}|Versuch {k} spielen|Gioca il tentativo {k}||开始第 {k} 次尝试|{k}번째 도전 시작|挑戦{k}回目へ|Сыграть попытку {k}|Zagraj podejście {k}").replace("{k}", next), P6("Lugares y retos nuevos|New places, new tricks|Nouveaux lieux et défis|Novos lugares e desafios|Neue Orte, neue Tricks|Nuovi luoghi e sfide||全新地点与挑战|새로운 장소와 도전|新しい場所とチャレンジ|Новые места и испытания|Nowe miejsca i wyzwania"), true)
+      : `<div class="dr-done">${A.icon("u_star")}<span><b>${P6("¡Reto completado!|Challenge complete!|Défi terminé !|Desafio concluído!|Herausforderung geschafft!|Sfida completata!||挑战完成！|도전 완료!|チャレンジ達成！|Испытание пройдено!|Wyzwanie ukończone!")}</b><i>${P6("Mañana, otra mano|Tomorrow, a new hand|Demain, une nouvelle main|Amanhã, uma nova mão|Morgen ein neues Blatt|Domani, una nuova mano|Mañana, otra mano|明天发新牌|내일은 새로운 패|明日は新しい手札|Завтра новая раздача|Jutro nowe rozdanie")}</i></span></div>`;
+    const clock = `<p class="dr-next" ${A.ttAttr(P6("Nuevo reto en|New challenge in|Nouveau défi dans|Novo desafio em|Neue Herausforderung in|Nuova sfida tra||新挑战倒计时|새 도전까지|次のチャレンジまで|Новое испытание через|Nowe wyzwanie za"), P6("El reto cambia a tu medianoche. Los intentos que no juegues hoy se pierden.|The challenge changes at your midnight. Attempts you don't play today are lost.|Le défi change à ton minuit. Les essais non joués aujourd'hui sont perdus.|O desafio muda à sua meia-noite. As tentativas que você não jogar hoje se perdem.|Die Herausforderung wechselt um deine Mitternacht. Nicht gespielte Versuche verfallen.|La sfida cambia alla tua mezzanotte. I tentativi non giocati oggi vanno persi.||挑战在你当地的午夜更换。今天没用掉的尝试会作废。|도전은 네 현지 시간 자정에 바뀌어요. 오늘 안 한 도전은 사라져요.|チャレンジはあなたの時間の深夜0時に切り替わる。今日使わなかった挑戦は消える。|Испытание меняется в твою полночь. Несыгранные сегодня попытки сгорают.|Wyzwanie zmienia się o twojej północy. Niezagrane dziś podejścia przepadają."))}>${A.icon("hourglass", "sm")}<span>${P6("Nuevo reto en|Next one in|Prochain dans|Próximo em|Nächstes in|Prossima tra||下次挑战|다음 도전까지|次の挑戦まで|Новое через|Następne za")}</span><b id="drClock">${hms(DY.msToNext())}</b></p>`;
+    const tabs = [["today", P6("Hoy|Today|Aujourd'hui|Hoje|Heute|Oggi||今天|오늘|今日|Сегодня|Dziś")], ["yday", P6("Ayer|Yesterday|Hier|Ontem|Gestern|Ieri||昨天|어제|昨日|Вчера|Wczoraj")], ["adv", T("Aventura", "Adventure")]];
+    const seedTip = A.ttAttr(P6("Semilla del día|Seed of the day|Graine du jour|Semente do dia|Seed des Tages|Seme del giorno||今日种子|오늘의 시드|今日のシード|Зерно дня|Ziarno dnia") + " · " + DY.code(day), P6("La mano de hoy sale al azar de esta semilla y todo el mundo juega con ella: la misma mano y, en cada intento, los mismos lugares, retos y cartas.|Today's hand is dealt at random from this seed and everyone plays with it: the same hand and, in each attempt, the same places, challenges and cards.|La main du jour est tirée au hasard de cette graine et tout le monde joue avec : la même main et, à chaque essai, les mêmes lieux, défis et cartes.|A mão de hoje sai ao acaso desta semente e todo mundo joga com ela: a mesma mão e, em cada tentativa, os mesmos lugares, desafios e cartas.|Das heutige Blatt wird zufällig aus diesem Seed gezogen, und alle spielen damit: dasselbe Blatt und in jedem Versuch dieselben Orte, Herausforderungen und Karten.|La mano di oggi esce a caso da questo seme e tutti giocano con lei: la stessa mano e, a ogni tentativo, gli stessi luoghi, sfide e carte.||今日手牌由这个种子随机发出，所有人都用它：同一手牌，每次尝试的地点、挑战和卡牌也都相同。|오늘의 패는 이 시드로 무작위로 나오고 모두가 같이 써요. 같은 패, 그리고 도전마다 같은 장소·도전·카드.|今日の手札はこのシードからランダムに配られ、全員がそれで遊ぶ。同じ手札、そして各挑戦で同じ場所・チャレンジ・カード。|Раздача дня выпадает случайно из этого зерна, и все играют с ней: одна раздача и в каждой попытке одни и те же места, испытания и карты.|Dzisiejsze rozdanie jest losowane z tego ziarna i wszyscy nim grają: to samo rozdanie i w każdym podejściu te same miejsca, wyzwania i karty."));
+    c.dialog(scr(T("Reto diario", "Daily challenge"), `<div class="dr">
+      <section class="dr-main">
+        <div class="dr-hand">
+          <div class="dr-art">${A.pic("card_compete")}</div>
+          <div class="dr-hb">
+            <div class="dr-top"><span class="tag">${DY.date(day).toLocaleDateString(locOf(), { weekday: "long", day: "numeric", month: "long" })}</span><span class="dr-seed" ${seedTip}>${A.icon("dice", "sm")}<i>${P6("Semilla|Seed|Graine|Semente|Seed|Seme||种子|시드|シード|Зерно|Ziarno")}</i><b>${DY.code(day)}</b></span></div>
+            <h3 class="dr-h">${P6("La mano de hoy|Today's hand|La main du jour|A mão de hoje|Das Blatt von heute|La mano di oggi||今日手牌|오늘의 패|今日の手札|Раздача дня|Dzisiejsze rozdanie")}</h3>
+            <p class="dr-d">${P6("Sale al azar de la semilla del día y es la misma para todo el mundo.|Dealt at random from the day's seed, and the same for everyone.|Tirée au hasard de la graine du jour, et la même pour tout le monde.|Sai ao acaso da semente do dia e é a mesma para todo mundo.|Zufällig aus dem Seed des Tages gezogen und für alle gleich.|Esce a caso dal seme del giorno ed è la stessa per tutti.||由今日种子随机发出，所有人都一样。|오늘의 시드로 무작위로 나오며, 모두에게 똑같아요.|今日のシードからランダムに配られ、全員共通。|Выпадает случайно из зерна дня и одинакова для всех.|Losowane z ziarna dnia i takie samo dla wszystkich.")}</p>
+            <div class="dr-kit">
+              ${kit(A.icon(deck.ico), P6("Baraja|Deck|Paquet|Baralho|Deck|Mazzo||牌组|덱|デッキ|Колода|Talia"), A.tx(deck.n), A.ttAttr(A.tx(deck.n), A.tx(deck.d) + (locked ? "\n" + P6("Hoy la juegas aunque aún no la hayas desbloqueado.|Today you play it even if you haven't unlocked it yet.|Aujourd'hui, tu la joues même sans l'avoir débloquée.|Hoje você joga com ele mesmo sem tê-lo desbloqueado.|Heute spielst du es, auch wenn du es noch nicht freigeschaltet hast.|Oggi lo giochi anche se non l'hai ancora sbloccato.||即使尚未解锁，今天也能使用。|아직 잠금 해제하지 않았어도 오늘은 쓸 수 있어요.|まだ解放していなくても、今日は使える。|Сегодня играешь ею, даже если ещё не открыл.|Dziś grasz nią, nawet jeśli jeszcze jej nie odblokowałeś.") : "")))}
+              ${kit(A.icon(STAKE_CHIP[h.asc]) + `<em>${h.asc}</em>`, T("Ascensión", "Ascension"), h.asc ? String(h.asc) : T("Estándar", "Standard"), A.ttAttr(T("Ascensión", "Ascension") + " " + h.asc, ascTexts()[h.asc]))}
+              ${gift ? kit(A.icon(h.gift), P6("Regalo|Gift|Cadeau|Presente|Geschenk|Regalo||赠礼|선물|贈り物|Подарок|Prezent"), A.tx(gift.n), A.ttAttr(P6("Regalo del día|Gift of the day|Cadeau du jour|Presente do dia|Geschenk des Tages|Regalo del giorno||今日赠礼|오늘의 선물|今日の贈り物|Подарок дня|Prezent dnia") + ": " + A.tx(gift.n), A.tx(gift.d))) : ""}
+            </div>
+          </div>
+          <div class="dr-rt"><h4 class="hub-sub">${P6("Ruta del día|Today's route|Route du jour|Rota do dia|Route des Tages|Percorso del giorno||今日路线|오늘의 경로|今日のルート|Маршрут дня|Trasa dnia")}</h4><div class="roadmap dr-road">${road}</div></div>
+        </div>
+        <div class="dr-play">
+          <div class="dr-sum"><i>${P6("Puntuación global|Global score|Score global|Pontuação global|Gesamtpunktzahl|Punteggio globale||总分|총점|総合スコア|Общий счёт|Wynik łączny")}</i><b>${A.fmt(st.total)}</b><em>${P6("Suma de tus 3 intentos|Sum of your 3 attempts|Somme de tes 3 essais|Soma das suas 3 tentativas|Summe deiner 3 Versuche|Somma dei tuoi 3 tentativi||你 3 次尝试的总和|도전 3번의 합계|3回の挑戦の合計|Сумма трёх попыток|Suma twoich 3 podejść")}</em></div>
+          <div class="dr-tries">${tries}</div>
+          <div class="dr-go">${go}${clock}</div>
+        </div>
       </section>
-      <aside class="cp-board"><h4 class="hub-sub">${T("Clasificación", "Leaderboard")}</h4>
-        <select id="boardSel" class="board-sel">${boards.map(b => `<option value="${b.id}" ${b.id === board ? "selected" : ""}>${b.title}</option>`).join("")}</select>
-        <div class="lb" id="lb"><p class="lb-load">…</p></div></aside></div>`, "s-comp"), "tablewrap");
-    wireTools(); $("hubBack").onclick = () => screen("home");
-    $("nickIn").onchange = e => A.profile.setName(e.target.value);
-    $("boardSel").onchange = e => { board = e.target.value; loadBoard(); };
-    $("dailyGo").onclick = () => { A.profile.setName($("nickIn").value); A.sfx.depart(); if (A.adv.hasSave()) A.adv.abandon(); enterRun(() => A.adv.begin({ deck: "explorer", asc: 1, seed: day, ranked: !done, board: day })); };
+      <aside class="dr-board">
+        <h4 class="hub-sub">${T("Clasificación", "Leaderboard")}</h4>
+        <div class="dr-tabs">${tabs.map(([id, l]) => `<button type="button" class="sq-fit${id === board ? " on" : ""}" data-b="${id}">${l}</button>`).join("")}</div>
+        <div class="lb" id="lb"><p class="lb-load">…</p></div>
+        <div class="dr-stats"><span><b class="sq-fit">${A.fmt(hist.days)}</b><i>${P6("Días jugados|Days played|Jours joués|Dias jogados|Gespielte Tage|Giorni giocati||已玩天数|플레이한 날|プレイ日数|Дней сыграно|Dni gry")}</i></span><span><b class="sq-fit">${A.fmt(hist.streak)}</b><i>${P6("Días seguidos|Days in a row|Jours d'affilée|Dias seguidos|Tage in Folge|Giorni di fila||连续天数|연속 일수|連続日数|Дней подряд|Dni z rzędu")}</i></span><span><b class="sq-fit">${A.fmt(hist.best)}</b><i>${P6("Mejor día|Best day|Meilleur jour|Melhor dia|Bester Tag|Giorno migliore||最佳一天|최고의 날|ベストの日|Лучший день|Najlepszy dzień")}</i></span></div>
+        <label class="nick"><span>${T("Tu nombre en la clasificación", "Your leaderboard name")}</span><input id="nickIn" maxlength="16" value="${esc(P.name)}" placeholder="${T("Aventurero", "Adventurer")}"></label>
+      </aside></div>`, "s-daily"), "tablewrap");
+    wireTools(); $("hubBack").onclick = () => { clearInterval(tickT); screen("home"); };
+    /* el nombre se puede cambiar despues de jugar: se reenvia la puntuacion (el servidor no deja cambiar los intentos ya guardados) */
+    $("nickIn").onchange = e => { A.profile.setName(e.target.value); if (st.done) DY.submit(day).then(() => loadBoard()); };
+    document.querySelectorAll(".dr-tabs button").forEach(b => (b.onclick = () => { board = b.dataset.b; document.querySelectorAll(".dr-tabs button").forEach(x => x.classList.toggle("on", x === b)); A.sfx.ui(); loadBoard(); }));
+    if ($("dailyGo")) $("dailyGo").onclick = () => { A.profile.setName($("nickIn").value); A.sfx.depart(); clearInterval(tickT); enterRun(() => (sv ? A.adv.resume(true) : A.adv.beginDaily(day))); };
+    /* cuenta atras hasta tu medianoche; al cambiar de dia, la pantalla se reparte sola */
+    tickT = setInterval(() => {
+      const el = $("drClock"); if (!el) return clearInterval(tickT);
+      if (DY.board() !== day) { clearInterval(tickT); if (C().S.phase === "title" && C().S.hub === "daily") daily(); return; }
+      el.textContent = hms(DY.msToNext());
+    }, 1000);
     loadBoard();
   }
   async function loadBoard() {
-    const el = $("lb"); if (!el) return; el.innerHTML = `<p class="lb-load">…</p>`; const my = A.profile.get().id, b = board;
-    const { global, rows } = await A.rank.top(b, 20); if (b !== board || !$("lb")) return;
-    el.innerHTML = `<p class="lb-src">${global ? A.icon("globe", "sm") + T("Clasificación global", "Global leaderboard") : T("Clasificación local (este equipo)", "Local leaderboard (this device)")}</p>` +
-      (rows.length ? `<ol>${rows.map((r, i) => `<li class="${r.id === my ? "me" : ""}"><span class="lb-n">${i < 3 ? A.icon("medal_" + ["gold", "silver", "bronze"][i], "sm") : i + 1}</span><span class="lb-name">${esc(r.name || "—")}</span><b>${A.fmt(r.score)}</b></li>`).join("")}</ol>` : `<p class="lb-empty">${T("Aún no hay puntuaciones. ¡Sé el primero!", "No scores yet. Be the first!")}</p>`);
+    const el = $("lb"); if (!el) return; const DY = A.rank.daily, P = A.profile.get(), my = P.id, tab = board;
+    const b = tab === "yday" ? DY.yesterday() : tab === "adv" ? "adv-all" : DY.board(), isDay = b !== "adv-all";
+    el.innerHTML = `<p class="lb-load">…</p>`;
+    const res = await A.rank.top(b, 8); if (tab !== board || !$("lb")) return;                     // 8 + tu puesto: cabe entero sin encoger la pantalla
+    const rows = res.rows || [], inTop = rows.some(r => r.id === my);
+    const dots = r => (isDay ? `<span class="lb-tries">${[0, 1, 2].map(i => `<i class="${r.tries && i < r.tries.length ? "on" : ""}"></i>`).join("")}</span>` : "");
+    const li = (r, n) => `<li class="${r.id === my ? "me" : ""}"><span class="lb-n">${n <= 3 ? A.icon("medal_" + ["gold", "silver", "bronze"][n - 1], "sm") : A.fmt(n)}</span><span class="lb-name">${esc(r.name || "—")}</span>${dots(r)}<b>${A.fmt(r.score)}</b></li>`;
+    const mine = res.global && res.me && !inTop ? `<li class="lb-gap" aria-hidden="true">···</li>` + li({ id: my, name: P.name || A.T("Anónimo", "Anonymous"), score: res.me.score, tries: isDay ? DY.get(b).tries.filter(t => !t.live) : null }, res.me.rank) : "";
+    const src = res.global ? `${A.icon("globe", "sm")}<span>${P6("Mundial|Worldwide|Mondial|Mundial|Weltweit|Mondiale||全球|전 세계|世界|Мировая|Światowy")}</span><em>${P6("Jugadores: {n}|Players: {n}|Joueurs : {n}|Jogadores: {n}|Spieler: {n}|Giocatori: {n}||玩家：{n}|플레이어: {n}|プレイヤー：{n}|Игроков: {n}|Graczy: {n}").replace("{n}", A.fmt(res.count))}</em>`
+      : `<span>${P6("Solo este equipo|This device only|Cet appareil uniquement|Só este aparelho|Nur dieses Gerät|Solo questo dispositivo||仅限本设备|이 기기만|この端末のみ|Только это устройство|Tylko to urządzenie")}</span>`;
+    el.innerHTML = `<p class="lb-src">${src}</p>` + (rows.length ? `<ol class="${isDay ? "dy" : ""}">${rows.map((r, i) => li(r, i + 1)).join("")}${mine}</ol>` : `<p class="lb-empty">${T("Aún no hay puntuaciones. ¡Sé el primero!", "No scores yet. Be the first!")}</p>`);
   }
 
   /* ------------------------------------------------------------------ Perfil y logros */

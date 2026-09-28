@@ -2,6 +2,14 @@
 
 > Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
+**v0.34.0** - Reto diario nuevo: todo al azar cada día, 3 intentos y puntuación global.
+- **Una semilla por día** (`daily-AAAAMMDD`, cambia a la medianoche de cada jugador) con su código corto a la vista (p. ej. `D26-85C`, sin letras que se confundan). Todo sale de ella y es igual para todo el mundo: la **mano del día** (baraja de las 4, aunque aún no la hayas desbloqueado; ascensión 0-3; una reliquia común o poco común de regalo) y la **ruta del día** (las rondas de cada acto se barajan; el Jackpot sigue cerrando la expedición). `js/rank.js` (`A.rank.daily`).
+- **3 intentos:** cada uno tiene su propia sub-semilla (`…#1`, `#2`, `#3`), así que reparte lugares, retos y cartas nuevos (los mismos para todos en el mismo intento) y un intento no chiva las respuestas del siguiente. El intento se gasta al empezarlo; si sales, se guarda en su propia ranura (`atlasiq.daily.v1`, ya no borra tu Aventura guardada) y se continúa desde el Reto diario; "Terminar el intento aquí" lo cierra con los puntos que llevas.
+- **Puntuación global** = suma de los 3 intentos. El veredicto de cada intento la muestra (y tu puesto mundial si hay servidor) y ofrece jugar el siguiente sin volver al menú.
+- **Pantalla nueva:** mano del día con su ruta, los 3 intentos, la puntuación global y la cuenta atrás hasta el siguiente reto; clasificación Hoy / Ayer / Aventura con el desglose de intentos, tu fila aunque estés fuera del top 8, y tus días jugados, días seguidos y mejor día. Cabe entera sin desplazarse en 1024x768, 1280x720, 1366x768 y 1920x1080 en los 12 idiomas, en todos sus estados.
+- **El crupier sabe en qué intento vas:** frases nuevas para el segundo y el último intento del día (con la puntuación que ya llevas), en los 12 idiomas. La etiqueta de la ronda y del Campamento dice "Reto diario 2/3".
+- **API** (`api/submit.js`, `api/top.js`): ver "Clasificación global" más abajo.
+
 **v0.33.0** - Retos (debuffs) y perks (buffs) de la Aventura, nivel premium.
 - **Motor de efectos nuevo** (`js/chfx.js`): un lienzo WebGL a pantalla completa y otro 2D nitido sobre el mapa, mas capas con `backdrop-filter` donde hay que emborronar lo de debajo de verdad. Solo trabaja mientras hay un reto activo; sin WebGL2 vuelven las capas CSS de siempre.
 - **Rehechos:** *Humo de sala* (humo de puro volumetrico iluminado por las lamparas, calibrado para tapar ~20/30/42 % del mapa segun nivel; antes eran bolas lilas), *Apagon* (linterna viva con borde que respira, grano y motas de polvo en el haz; con el Foco del vigilante es un foco de escenario con aro dorado), *Punto ciego* (vacio opaco con borde organico y aura centelleante), *Lluvia* (estelas en 4 profundidades, salpicaduras, gotas en el cristal que hacen de lente y regueros; ahora si "emborrona" el mapa como dice su descripcion), *Rayos* (rayo ramificado de verdad con doble destello y trueno desfasado), *Luces parpadeantes* (corte de luz con zumbido, caida de corriente y piloto rojo de emergencia), *Miopia* (desenfoque en dos capas que cae de forma optica), *Mapa borroso* (con la Lupa del tasador: bisel dorado con cristal y reflejo), *Negativo* (negativo de verdad: antes el giro de tono devolvia los colores; ahora con bordes de pelicula perforada), *Pixeles gordos* (las fronteras ya no manchan de tinta los pixeles: se ve una imagen pixelada limpia).
@@ -211,7 +219,10 @@
 - Efectos y sonidos nuevos: pin que cae con ondas y chispas, monedas que vuelan, sonar, jefe, compra, logro.
 
 ### Clasificación global (opcional)
-`api/top.js` y `api/submit.js` guardan las tablas en Upstash Redis. En Vercel: *Storage → Marketplace → Upstash Redis* (crea `KV_REST_API_URL` y `KV_REST_API_TOKEN`) y vuelve a desplegar. Sin eso, el juego usa la clasificación local.
+`api/top.js` y `api/submit.js` guardan las tablas en Upstash Redis. En Vercel: *Storage → Marketplace → Upstash Redis* (crea `KV_REST_API_URL` y `KV_REST_API_TOKEN`) y vuelve a desplegar. Sin eso, el juego usa la clasificación local (y la pantalla del Reto diario dice "Solo este equipo").
+- **Reto diario** (`daily-AAAAMMDD`, fecha local del jugador; el servidor acepta hoy ±1 día en UTC): el cliente manda `{ board, id, name, tries:[s1, s2, s3] }`. Cada intento se guarda una sola vez (`HSETNX tr:<tablero>:<id>`), así que reenviar no puede subir un intento ya guardado; la tabla `lb:<tablero>` ordena por la suma (puntuación global del día) y `tries:<tablero>` guarda el desglose para los puntitos de la tabla.
+- `GET /api/top?board=…&n=8&me=<id>` devuelve también `count` (jugadores) y `me` (tu puesto aunque no estés entre los primeros).
+- Resto de tablas (`adv-all`, `classic-…`): igual que antes, la mejor puntuación de cada jugador (`ZADD GT`).
 **Antitrampas:** hoy la puntuación es de confianza (límites de plausibilidad y de frecuencia). Antes de Steam hay que reproducir cada partida en servidor a partir de la semilla y los clics.
 
 Herramienta de desarrollo: `dev/bot.js` (jugador automático para equilibrar la Aventura: `bot2(errorKm)`).

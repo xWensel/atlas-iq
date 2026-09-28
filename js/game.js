@@ -620,20 +620,24 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
   /* menu de la partida (pausa): reanudar, guardar y salir, o empezar otra. Se abre desde el boton de pausa, con P/Esc o desde el Campamento */
   function closeVeil() { $("veil").classList.add("hidden"); $("veil").innerHTML = ""; }
   function veilMenu(onResume) {
-    const adv = !!S.run || A.adv.active(), v = $("veil"); v.classList.remove("hidden");
+    const adv = !!S.run || A.adv.active(), daily = adv && A.adv.isDaily(), v = $("veil"); v.classList.remove("hidden");
+    /* intento del Reto diario: se guarda en su propia ranura y vuelve a su pantalla; no se "empieza otra", se termina aqui (cuenta lo que lleva) */
+    const newLbl = daily ? A.pick6("Terminar el intento aquí|End the attempt here|Terminer l'essai ici|Encerrar a tentativa aqui|Versuch hier beenden|Chiudi qui il tentativo||在此结束本次尝试|여기서 도전 끝내기|ここで挑戦を終える|Закончить попытку здесь|Zakończ podejście tutaj") : A.T("Empezar una partida nueva", "Start a new run");
     v.innerHTML = `<div class="pv"><h2>${A.t("pause.h")}</h2>
-      <p>${adv ? A.T("Tu expedición se guarda sola. Puedes salir y continuarla desde Aventura.", "Your expedition saves itself. You can leave and pick it up again from Adventure.") : A.t("pause.p")}</p>
+      <p>${daily ? A.pick6("Tu intento se guarda solo. Puedes salir y continuarlo desde el Reto diario.|Your attempt saves itself. You can leave and pick it up again from the Daily challenge.|Ton essai s'enregistre tout seul. Tu peux partir et le reprendre depuis le Défi du jour.|Sua tentativa é salva sozinha. Você pode sair e continuá-la no Desafio diário.|Dein Versuch speichert sich selbst. Du kannst gehen und ihn in der Tagesherausforderung fortsetzen.|Il tuo tentativo si salva da solo. Puoi uscire e riprenderlo dalla Sfida giornaliera.||你的尝试会自动保存。可以离开，稍后在每日挑战中继续。|도전은 자동으로 저장됩니다. 나갔다가 일일 도전에서 이어서 할 수 있어요.|挑戦は自動で保存されます。抜けても、デイリーチャレンジから続きができます。|Попытка сохраняется сама. Можно выйти и продолжить её в Испытании дня.|Podejście zapisuje się samo. Możesz wyjść i dokończyć je w Wyzwaniu dnia.")
+        : adv ? A.T("Tu expedición se guarda sola. Puedes salir y continuarla desde Aventura.", "Your expedition saves itself. You can leave and pick it up again from Adventure.") : A.t("pause.p")}</p>
       <div class="pv-btns"><button class="btn-ink" id="resBtn" data-primary><span>${A.t("btn.resume")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button>
-      ${adv ? `<button class="btn-line" id="saveExitBtn">${A.T("Guardar y salir al menú", "Save and exit to menu")}</button><button class="btn-line danger" id="newRunBtn">${A.T("Empezar una partida nueva", "Start a new run")}</button>`
+      ${adv ? `<button class="btn-line" id="saveExitBtn">${A.T("Guardar y salir al menú", "Save and exit to menu")}</button><button class="btn-line danger" id="newRunBtn">${newLbl}</button>`
             : `<button class="btn-line" id="exitBtn">${A.T("Salir al menú", "Exit to menu")}</button>`}</div></div>`;
     $("resBtn").onclick = onResume; $("resBtn").focus();
     const leave = to => { closeVeil(); S.paused = false; A.music.muffle(false); if (adv) A.adv.leave(); showTitle(to); };
     if (adv) {
-      $("saveExitBtn").onclick = () => { A.sfx.ui(); leave("adventure"); };
+      const home = daily ? "daily" : "adventure";
+      $("saveExitBtn").onclick = () => { A.sfx.ui(); leave(home); };
       let armed = false, tm = 0; const nb = $("newRunBtn");
       nb.onclick = () => {
-        if (!armed) { armed = true; nb.classList.add("armed"); nb.textContent = A.T("¿Seguro? Se pierde esta partida. Pulsa otra vez", "Sure? This run is lost. Press again"); A.sfx.deny(); tm = setTimeout(() => { armed = false; nb.classList.remove("armed"); nb.textContent = A.T("Empezar una partida nueva", "Start a new run"); }, 4000); return; }
-        clearTimeout(tm); A.adv.abandon(); A.sfx.deny(); leave("adventure");
+        if (!armed) { armed = true; nb.classList.add("armed"); nb.textContent = daily ? A.pick6("¿Seguro? El intento se cierra con los puntos que llevas. Pulsa otra vez|Sure? The attempt closes with the points you have. Press again|Sûr ? L'essai se clôt avec tes points actuels. Appuie encore|Certeza? A tentativa fecha com os pontos que você tem. Aperte de novo|Sicher? Der Versuch endet mit deinen jetzigen Punkten. Nochmal drücken|Sicuro? Il tentativo si chiude con i punti che hai. Premi ancora|¿Seguro? El intento se cierra con los puntos que llevas. Presiona otra vez|确定吗？本次尝试将以当前分数结束。再按一次|정말요? 지금 점수로 도전이 끝나요. 한 번 더 누르세요|本当に？今の点数で挑戦が終わります。もう一度押して|Точно? Попытка закроется с нынешними очками. Нажми ещё раз|Na pewno? Podejście zamknie się z obecnymi punktami. Naciśnij jeszcze raz") : A.T("¿Seguro? Se pierde esta partida. Pulsa otra vez", "Sure? This run is lost. Press again"); A.sfx.deny(); tm = setTimeout(() => { armed = false; nb.classList.remove("armed"); nb.textContent = newLbl; }, 4000); return; }
+        clearTimeout(tm); A.adv.abandon(); A.sfx.deny(); leave(home);
       };
     } else $("exitBtn").onclick = () => { A.sfx.ui(); leave(); };
   }

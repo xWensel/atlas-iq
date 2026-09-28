@@ -8,9 +8,9 @@
   const tip = (t, d) => () => pick(t) + "\n" + pick(d);
   const run = () => (A.adv && A.adv.run) || null;
 
-  /* atributo data-tt de una ronda del mapa de ruta */
-  A.roundTip = i => {
-    const R = A.ADV && A.ADV.ROUNDS && A.ADV.ROUNDS[i]; if (!R) return "";
+  /* atributo data-tt de una ronda del mapa de ruta (route: la ruta barajada del Reto diario, hueco -> ronda original; el jefe sigue en el 4.o hueco) */
+  A.roundTip = (i, route) => {
+    const R0 = A.ADV && A.ADV.ROUNDS && A.ADV.ROUNDS[route && i < 12 ? route[i] : i], R = R0 && route && i < 12 ? { ...R0, boss: i % 4 === 3 } : R0; if (!R) return "";
     const TN = A.ADV.TOPIC_NAMES, topic = A.tx(TN[R.topic][Math.min(R.tier, TN[R.topic].length - 1)]);
     const boss = pick("Jefe del acto: varios retos a la vez.|Act boss: several challenges at once.|Boss de l'acte : plusieurs défis à la fois.|Chefe do ato: vários desafios ao mesmo tempo.|Akt-Boss: mehrere Herausforderungen gleichzeitig.|Boss dell'atto: più sfide insieme.||本幕首领：多个挑战同时出现。|막 보스: 여러 도전이 한꺼번에.|幕のボス：複数のチャレンジが同時に。|Босс акта: несколько испытаний сразу.|Boss aktu: kilka wyzwań naraz.");
     return A.ttAttr(pick("Ronda|Round|Manche|Rodada|Runde|Round||回合|라운드|ラウンド|Раунд|Runda") + " " + (i + 1) + (R.boss ? " · " + pick("Jefe|Boss|Boss|Chefe|Boss|Boss||首领|보스|ボス|Босс|Boss") : ""), (R.boss ? boss + "\n" : "") + topic);

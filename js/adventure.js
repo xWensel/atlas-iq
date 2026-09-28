@@ -7,7 +7,7 @@
 window.AIQ = window.AIQ || {};
 (function (A) {
   const T = A.T, L = A.L, $ = id => document.getElementById(id), C = () => A.core;
-  const RUNKEY = "atlasiq.run.v2";
+  const RUNKEY = "atlasiq.run.v2", DAILYKEY = "atlasiq.daily.v1";   // el intento del Reto diario va en su propia ranura: no pisa la expedicion guardada
   const ic = (id, cls) => A.icon(id, cls), CN = () => A.icon("coin", "cn");
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const L6 = A.L6;
@@ -145,16 +145,22 @@ window.AIQ = window.AIQ || {};
   A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, roundDefOf, chalFor: r => chalFor(r) };
 
   /* ------------------------------------------------------------------ partida (run) */
-  let run = null;
-  A.adv = { get run() { return run; }, hasSave() { try { return !!localStorage.getItem(RUNKEY); } catch (e) { return false; } } };
+  let run = null, slot = RUNKEY;                                     // slot: ranura de la partida activa (expedicion normal o intento del Reto diario)
+  const keyOf = daily => (daily ? DAILYKEY : RUNKEY);
+  const loadSlot = daily => { try { return JSON.parse(localStorage.getItem(keyOf(daily)) || "null"); } catch (e) { return null; } };
+  A.adv = { get run() { return run; }, hasSave(daily) { try { return !!localStorage.getItem(keyOf(daily)); } catch (e) { return false; } } };
   A.adv.poolStats = () => Object.fromEntries(Object.entries(pools()).map(([k, v]) => [k, v.length]));
   A.adv.roundPlaces = r => poolFor(r);
   A.adv.roundPool = r => poolFor(r).length;
-  const persist = () => { try { if (run) localStorage.setItem(RUNKEY, JSON.stringify(run)); else localStorage.removeItem(RUNKEY); } catch (e) { /* sin almacenamiento */ } };
+  const persist = () => { try { if (run) localStorage.setItem(slot, JSON.stringify(run)); else localStorage.removeItem(slot); } catch (e) { /* sin almacenamiento */ } };
 
   const ascFx = a => ({ target: 1 + 0.1 * a, secs: -a, lives: a >= 3 ? -1 : 0, price: 1 + 0.1 * a, boss2: a >= 4 });
   const roundNo = () => run.act * 4 + run.round;
-  const rdef = () => roundDefOf(roundNo());
+  /* Reto diario: la ruta del dia baraja las rondas de cada acto (run.route[hueco] = ronda original); el jefe sigue siendo el 4.o hueco de cada acto */
+  const slotOf = r => (run && run.route && r < 12 ? run.route[r] : r);
+  const defAt = r => (run && run.route && r < 12 ? { ...roundDefOf(run.route[r]), boss: r % 4 === 3 } : roundDefOf(r));
+  A.adv.roundDef = defAt;
+  const rdef = () => defAt(roundNo());
   const isBoss = () => run.round === 3;
   const perkList = () => run.perks.map(id => A.RELICS[id]).filter(Boolean);
   const has = flag => perkList().some(p => p[flag]);
@@ -169,7 +175,7 @@ window.AIQ = window.AIQ || {};
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades) */
   const chalFor = r => {
-    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, roundDefOf(r).topic), boss = r % 4 === 3;
+    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic), boss = r % 4 === 3;
     let list = A.adv._force ? A.adv._force.map(id => ({ id, lv: 2 })) : plan.list.slice();
     const bribed = (run.bribed && run.bribed[r]) || []; if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento
     const skip = sumFlag("skipFirst"); if (skip) list = list.slice(skip);
@@ -178,26 +184,37 @@ window.AIQ = window.AIQ || {};
     return { list, combo: plan.combo, boss };
   };
 
-  A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null } = {}) {
-    const d = DECKS[deck] || DECKS.explorer;
+  A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null, dailyTry = 0, route = null, gift = null } = {}) {
+    const d = DECKS[deck] || DECKS.explorer, bonus = gift && A.RELICS[gift] && !d.perks.includes(gift) ? A.RELICS[gift] : null;
+    slot = keyOf(!!board);
     run = {
-      v: 2, seed: seed || "run-" + Math.random().toString(36).slice(2, 10), deck, asc, ranked, board,
+      v: 2, seed: seed || "run-" + Math.random().toString(36).slice(2, 10), deck, asc, ranked, board, dailyTry, route: route ? route.slice(0, 12) : null, gift: bonus ? gift : null,
       act: 0, round: 0, attempt: 0, coins: d.coins, lives: d.lives + ascFx(asc).lives, maxLives: d.lives + ascFx(asc).lives,
-      perks: d.perks.slice(), tools: {}, score: 0, cleared: 0, used: [], rerolls: 0, freeUsed: 0, shopN: 0, phase: "round", qi: 0, qn: 5, qTools: 0, rTools: 0, luckUsed: false, guardUsed: false,
+      perks: d.perks.concat(bonus ? [gift] : []), tools: {}, score: 0, cleared: 0, used: [], rerolls: 0, freeUsed: 0, shopN: 0, phase: "round", qi: 0, qn: 5, qTools: 0, rTools: 0, luckUsed: false, guardUsed: false,
       livesLostAct: 0, shieldAct: -1, leftSum: 0, roundScore: 0, rGood: 0, qTotal: 0, stats: { bulls: 0, best: 0, coinsEarned: 0 }, t0: Date.now(),
     };
-    d.tools.forEach(t => addTool(t));
+    d.tools.forEach(t => addTool(t)); if (bonus && bonus.buy) bonus.buy(run);
     persist(); A.ach.emit("adv", { kind: "start" }); A.profile.get().adv.runs++; A.profile.save();
     startRound();
   };
+  /* Reto diario: gasta uno de los 3 intentos de hoy y empieza con la mano del dia (baraja, ascension, regalo y ruta) y la semilla de ESE intento */
+  A.adv.beginDaily = board => {
+    const DY = A.rank.daily, k = DY.start(board); if (!k) return false;
+    const h = DY.hand(board);
+    A.adv.begin({ deck: h.deck, asc: h.asc, seed: DY.trySeed(board, k), ranked: true, board, dailyTry: k, route: h.route, gift: h.gift });
+    return true;
+  };
+  /* puntos de una expedicion al cerrarla: lo sumado en las rondas + 1.000 por ronda superada + 2.500 si conquisto los tres actos */
+  const finalOf = r => r.score + r.cleared * 1000 + (r.won ? 2500 : 0);
+  A.adv.finalOf = finalOf;
   /* v0.13: partidas guardadas con reliquias o herramientas que ya no existen: se quitan y se devuelve su valor en doblones */
   function migrate(r) {
     const gone = r.perks.filter(id => !A.RELICS[id]); if (gone.length) { r.perks = r.perks.filter(id => A.RELICS[id]); r.coins += gone.length * 4; }
     const dead = Object.keys(r.tools).filter(id => !TOOLS[id]); dead.forEach(id => { delete r.tools[id]; r.coins += 3; });
     if ((r.stock || []).some(s => (s.k === "perk" && !A.RELICS[s.id]) || (s.k === "tool" && !TOOLS[s.id]))) { r.stock = null; r.stockKey = null; }
   }
-  A.adv.resume = function () {
-    try { run = JSON.parse(localStorage.getItem(RUNKEY)); } catch (e) { run = null; }
+  A.adv.resume = function (daily = false) {
+    slot = keyOf(daily); run = loadSlot(daily);
     if (!run) return false;
     migrate(run); resumedIntro = true;
     if (run.phase === "shop" || run.phase === "chest") openShop(run.phase === "chest");
@@ -209,11 +226,19 @@ window.AIQ = window.AIQ || {};
     else startRound();
     return true;
   };
-  A.adv.abandon = () => { run = null; persist(); };
+  /* descarta la partida guardada de una ranura (por defecto, la de la partida activa si la hay; si no, la expedicion normal).
+     Un intento del Reto diario no se tira: se cierra con los puntos que llevaba y cuenta para la puntuacion global del dia. */
+  A.adv.abandon = (daily = !!(run && run.board)) => {
+    const act = !!run && !!run.board === daily, r = act ? run : loadSlot(daily), key = act ? slot : keyOf(daily);
+    if (daily && r && r.board && r.dailyTry) A.rank.daily.finish(r.board, r.dailyTry, finalOf(r), { r: r.cleared, won: !!r.won });
+    if (act) run = null;
+    try { localStorage.removeItem(key); } catch (e) { /* sin almacenamiento */ }
+  };
   A.adv.save = () => persist();
   A.adv.leave = () => { if (run) { persist(); A.dealer.noteLeave(); } clearTimers(); A.chal.end(); A.dealer.enable(false); run = null; };
-  A.adv.summary = () => { try { const r = run || JSON.parse(localStorage.getItem(RUNKEY)); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives } : null; } catch (e) { return null; } };
+  A.adv.summary = (daily = false) => { const r = (run && !!run.board === daily && run) || loadSlot(daily); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives, board: r.board || null, dailyTry: r.dailyTry || 0, inf: !!r.inf } : null; };
   A.adv.active = () => !!run;
+  A.adv.isDaily = () => !!(run && run.board);
 
   function toolMax(id) { const t = run.tools[id]; if (!t) return 0; const plus = perkList().reduce((n, p) => n + (p.toolBonus || 0), 0) + (run.sup && run.sup.kit ? 1 : 0); return t.max + plus; }
   function addTool(id) { const t = run.tools[id]; if (t) t.max++; else run.tools[id] = { max: TOOLS[id].uses, left: TOOLS[id].uses }; }
@@ -223,7 +248,7 @@ window.AIQ = window.AIQ || {};
   /* el pais siempre a la vista: si el lugar no tiene pais (mares, desiertos, cordilleras...), se muestra su continente */
   const withSub = q => { if (q.t === "p" && !q.clue && !(q.sub && (q.sub.en || q.sub.es))) { const c = CONT[continentOf(q)]; if (c) q.sub = { es: c.es, en: c.en }; } return q; };
   function pickQuestions(n) {
-    const def = rdef(), list = poolFor(roundNo()), rr = A.rng(`${run.seed}:q:${roundNo()}:${run.attempt}`), used = new Set(run.used);
+    const def = rdef(), list = poolFor(slotOf(roundNo())), rr = A.rng(`${run.seed}:q:${roundNo()}:${run.attempt}`), used = new Set(run.used);
     let cand = list.filter(q => !used.has(q.cid[0]));
     if (cand.length < n) { run.used = []; cand = list.slice(); }
     const out = rr.shuffle(cand).slice(0, n);
@@ -294,6 +319,9 @@ window.AIQ = window.AIQ || {};
   function mapStyleFor() { return A.MAPSTYLES[A.skin] || A.MAPSTYLES.casino; }
   const DIRS16 = [["N", "N"], ["NNE", "NNE"], ["NE", "NE"], ["ENE", "ENE"], ["E", "E"], ["ESE", "ESE"], ["SE", "SE"], ["SSE", "SSE"], ["S", "S"], ["SSW", "SSO"], ["SW", "SO"], ["WSW", "OSO"], ["W", "O"], ["WNW", "ONO"], ["NW", "NO"], ["NNW", "NNO"]];
   const dirName = brg => { const idx = Math.round((((brg % 360) + 360) % 360) / 22.5) % 16, d = has("compass16") ? DIRS16[idx] : DIRS16[Math.round(idx / 2) % 8 * 2]; return A.lang === "es" ? d[1] : d[0]; };
+  /* en el Reto diario, la etiqueta del acto dice en que intento vas (en lugar del subtitulo del acto) */
+  const dailyLbl = k => A.pick6("Reto diario {k}/3|Daily {k}/3|Défi du jour {k}/3|Desafio diário {k}/3|Tagesherausforderung {k}/3|Sfida giornaliera {k}/3||每日挑战 {k}/3|일일 도전 {k}/3|デイリーチャレンジ {k}/3|Испытание дня {k}/3|Wyzwanie dnia {k}/3").replace("{k}", k);
+  const actSub = info => (run && run.board && run.dailyTry ? dailyLbl(run.dailyTry) : A.tx(info.t));
   A.adv.introHtml = Lv => {
     if (run.inf) {
       return `<div class="intro-in adv"><div class="intro-left"><div class="intro-num blind">${A.blind("small", "s_compass")}</div><div class="intro-body">
@@ -306,7 +334,7 @@ window.AIQ = window.AIQ || {};
     const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${run.wind.km} km</em>` : ""}</div></div>`; }).join("");
     const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? "skull" : run.round === 0 ? "s_pin" : "s_compass";
     return `<div class="intro-in adv${Lv.boss ? " is-boss" : ""}"><div class="intro-left"><div class="intro-num blind">${A.blind(kind, inner)}</div><div class="intro-body">
-      <span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${A.tx(Lv.topicName)}</h2>
+      <span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${A.tx(Lv.topicName)}</h2>
       ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
       <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}</p>
       <p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
@@ -322,6 +350,7 @@ window.AIQ = window.AIQ || {};
     const counters = list.some(c => (A.CHAL[c.id].counters || []).some(id => owned(id)));
     const seq = D.introSeq({
       boss: !!Lv.boss, last: roundNo() === 11, inf: !!run.inf, fresh: run.act === 0 && run.round === 0 && !run.qTotal && !run.attempt, resumed: resumedIntro, ranked: !!run.ranked,
+      dailyTry: run.dailyTry || 0, dailyTotal: run.board && run.dailyTry ? A.rank.daily.get(run.board).total : 0,
       act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), counters,
     });
     resumedIntro = false;
@@ -453,7 +482,7 @@ window.AIQ = window.AIQ || {};
   };
   /* Carta de cambio: otro lugar de la ronda en vez del actual */
   function swapQuestion() {
-    const S = C().S, list = poolFor(roundNo()), used = new Set(run.used), cand = list.filter(q => !used.has(q.cid[0]));
+    const S = C().S, list = poolFor(slotOf(roundNo())), used = new Set(run.used), cand = list.filter(q => !used.has(q.cid[0]));
     if (!cand.length) { noteH(A.T("No quedan lugares para cambiar.", "No places left to swap.")); return false; }
     const q = withSub({ ...A.rng(`${run.seed}:swap:${roundNo()}:${S.qi}:${run.qTotal}`).pick(cand) });
     if (run.curQ) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]); S.qs[S.qi] = q;
@@ -630,7 +659,7 @@ window.AIQ = window.AIQ || {};
     run.coins -= cost; run.salt = run.salt || {}; run.salt[r] = (run.salt[r] || 0) + 1; if (run.bribed) run.bribed[r] = []; A.sfx.reroll(); persist();
     A.dealer.enable(true); A.dealer.say(A.dealer.line("reroll"), { mood: "laugh", hold: 1800 }); renderShop(run.phase === "chest");
   }
-  const routeHtml = () => { let h = ""; const cur = roundNo(); for (let i = Math.max(0, cur - 3); i < Math.max(0, cur - 3) + 12; i++) h += `<i class="${i < cur ? "done" : i === cur ? "cur" : ""}${i % 4 === 3 ? " boss" : ""}" ${A.roundTip(i)}>${i % 4 === 3 ? ic("skull") : ""}</i>`; return h; };
+  const routeHtml = () => { let h = ""; const cur = roundNo(); for (let i = Math.max(0, cur - 3); i < Math.max(0, cur - 3) + 12; i++) h += `<i class="${i < cur ? "done" : i === cur ? "cur" : ""}${i % 4 === 3 ? " boss" : ""}" ${A.roundTip(i, run.route)}>${i % 4 === 3 ? ic("skull") : ""}</i>`; return h; };
   const rerollCost = () => { const sx = shopCtx(); return run.freeUsed < sx.freeReroll ? 0 : 3 + run.rerolls; };
   function cardHtml(s, i, chest) {
     const bought = run.bought.includes(i);
@@ -649,7 +678,7 @@ window.AIQ = window.AIQ || {};
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b>${chest ? "" : `<em>${A.T("vender", "sell")} ${sellValue(id)}</em>`}</button>` : `<span class="inv-empty"></span>`; }).join("");
     C().dialog(`<div class="table${chest ? " chest" : ""}">
-      <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${A.tx(info.t)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
+      <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
         <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
       ${nextHtml()}
       ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${A.T("Tres cartas sobre la mesa. ¿Compras una o pides otras?", "Three cards on the table. Buy one, or ask for new ones?")}</p>${supHtml()}`}
@@ -713,26 +742,51 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------- fin de la expedicion ---------------- */
   function endRun(win) {
-    const P = A.profile.get(), bonus = run.cleared * 1000 + (run.won ? 2500 : 0), final = run.score + bonus, wasRanked = run.ranked, board = run.board;
+    const P = A.profile.get(), bonus = run.cleared * 1000 + (run.won ? 2500 : 0), final = finalOf(run), wasRanked = run.ranked, board = run.board;
     P.adv.bestScore = Math.max(P.adv.bestScore, final); P.adv.coins += run.stats.coinsEarned;
     if (win && run.won) P.adv.asc = Math.max(P.adv.asc, Math.min(5, run.asc + 1));
     A.profile.save();
     const hadBest = (P.records["adv-all"] || 0) > 0, rec = A.profile.record("adv-all", final);   // la primera expedicion siempre es "record": el crupier solo lo celebra si habia uno que batir
     A.rank.submit("adv-all", { score: final, extra: { deck: run.deck, asc: run.asc, r: run.cleared } });
     A.ach.emit("adv", { kind: "end", score: final, won: !!run.won });
-    if (wasRanked && board) { P.daily[board] = { score: final, ts: Date.now() }; A.profile.save(); A.rank.submit(board, { score: final, extra: { deck: run.deck, r: run.cleared } }); A.ach.emit("daily", {}); }
+    /* Reto diario: el intento se cierra y suma a la puntuacion global del dia (las partidas del formato antiguo, sin numero de intento, cuentan como el primero) */
+    let day = null, sent = null;
+    if (wasRanked && board) {
+      const DY = A.rank.daily, k = run.dailyTry || (DY.get(board).tries.length ? 0 : 1);
+      if (k) { sent = DY.finish(board, k, final, { r: run.cleared, won: !!run.won }); day = { k, ...DY.get(board) }; }
+      A.ach.emit("daily", {});
+    }
     const r = run; run = null; persist(); C().S.run = null; A.chal.end(); A.dealer.enable(true);
     const fell = { r: r.cleared + 1, won: !!r.won, record: rec && hadBest };           // {r}: la ronda en la que caiste
     A.dealer.noteRun(fell); setTimeout(() => A.dealer.react(win ? "runWin" : "runLose", fell), 900);
     A.sfx.stamp(); setTimeout(win ? A.sfx.victory : A.sfx.lose, 300);
-    C().verdict({
-      kind: win ? "win" : "", level: r.cleared, tag: A.T("Expedición", "Expedition"), title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
-      text: (r.won ? A.tf("Superaste {r} rondas y conquistaste los tres actos. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and conquered all three acts. Points: {p} + bonus {b}.", { r: r.cleared, p: A.fmt(r.score), b: A.fmt(bonus) })
-        : A.tf("Superaste {r} rondas y llegaste al {act}. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and reached {act}. Points: {p} + bonus {b}.", { r: r.cleared, act: A.tx(actInfo(r.act).n), p: A.fmt(r.score), b: A.fmt(bonus) })) + (rec ? A.T(" ¡Nuevo récord personal!", " New personal best!") : ""),
-      stats: [[A.T("Puntuación final", "Final score"), final], [A.T("Rondas superadas", "Rounds cleared"), r.cleared], [A.T("Doblones ganados", "Doubloons earned"), r.stats.coinsEarned]],
-      stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
-      buttons: [{ id: "nrBtn", cls: "btn-ink", label: A.T("Otra expedición", "Another expedition"), arrow: true, primary: true, onclick: () => C().showHub("adventure") }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],
-    });
+    const summary = (r.won ? A.tf("Superaste {r} rondas y conquistaste los tres actos. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and conquered all three acts. Points: {p} + bonus {b}.", { r: r.cleared, p: A.fmt(r.score), b: A.fmt(bonus) })
+      : A.tf("Superaste {r} rondas y llegaste al {act}. Puntos: {p} + bonus {b}.", "You cleared {r} rounds and reached {act}. Points: {p} + bonus {b}.", { r: r.cleared, act: A.tx(actInfo(r.act).n), p: A.fmt(r.score), b: A.fmt(bonus) })) + (rec ? A.T(" ¡Nuevo récord personal!", " New personal best!") : "");
+    if (day) {
+      const sp = /^(zh|ja)$/.test(A.lang) ? "" : " ", again = day.left > 0 && board === A.rank.daily.board();   // el siguiente intento solo si sigue siendo el mismo dia
+      const toBoard = () => C().showHub("daily"), next = () => { A.sfx.depart(); C().S.ranked = null; C().prepareRun(); if (!A.adv.beginDaily(board)) toBoard(); };
+      C().verdict({
+        kind: win ? "win" : "", level: r.cleared, tag: dailyLbl(day.k),
+        title: (win ? A.pick6("Intento {k} cobrado|Attempt {k} cashed out|Essai {k} encaissé|Tentativa {k} recolhida|Versuch {k} ausgezahlt|Tentativo {k} incassato||第 {k} 次尝试已兑现|{k}번째 도전 현금화 완료|挑戦{k}回目をキャッシュアウト|Попытка {k} обналичена|Podejście {k} spieniężone")
+          : A.pick6("Fin del intento {k}|Attempt {k} over|Fin de l'essai {k}|Fim da tentativa {k}|Versuch {k} beendet|Fine del tentativo {k}||第 {k} 次尝试结束|{k}번째 도전 종료|挑戦{k}回目終了|Попытка {k} окончена|Koniec podejścia {k}")).replace("{k}", day.k),
+        text: summary + sp + A.pick6("Puntuación global de hoy: {t} ({n} de 3 intentos).|Today's global score: {t} ({n} of 3 attempts).|Score global du jour : {t} ({n} essais sur 3).|Pontuação global de hoje: {t} ({n} de 3 tentativas).|Gesamtpunktzahl heute: {t} ({n} von 3 Versuchen).|Punteggio globale di oggi: {t} ({n} tentativi su 3).||今日总分：{t}（已用 {n}/3 次尝试）。|오늘의 총점: {t} (3번 중 {n}번 도전).|今日の総合スコア：{t}（3回中{n}回）。|Общий счёт за сегодня: {t} ({n} из 3 попыток).|Dzisiejszy wynik łączny: {t} ({n} z 3 podejść).").replace("{t}", A.fmt(day.total)).replace("{n}", day.done) + `<span id="vdRank"></span>`,
+        stats: [[A.pick6("Puntos del intento|Attempt score|Score de l'essai|Pontos da tentativa|Punkte des Versuchs|Punti del tentativo||本次尝试得分|이번 도전 점수|今回の挑戦スコア|Очки попытки|Wynik podejścia"), final], [A.pick6("Puntuación global|Global score|Score global|Pontuação global|Gesamtpunktzahl|Punteggio globale||总分|총점|総合スコア|Общий счёт|Wynik łączny"), day.total], [A.T("Rondas superadas", "Rounds cleared"), r.cleared]],
+        stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
+        buttons: again ? [{ id: "nrBtn", cls: "btn-ink", label: A.pick6("Jugar el intento {k}|Play attempt {k}|Jouer l'essai {k}|Jogar a tentativa {k}|Versuch {k} spielen|Gioca il tentativo {k}||开始第 {k} 次尝试|{k}번째 도전 시작|挑戦{k}回目へ|Сыграть попытку {k}|Zagraj podejście {k}").replace("{k}", day.k + 1), arrow: true, primary: true, onclick: next },
+          { id: "lbBtn", cls: "btn-line", label: A.T("Clasificación", "Leaderboard"), onclick: toBoard }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }]
+          : [{ id: "nrBtn", cls: "btn-ink", label: A.pick6("Ver la clasificación|See the leaderboard|Voir le classement|Ver o placar|Rangliste ansehen|Vedi la classifica|Ver la tabla de posiciones|查看排行榜|리더보드 보기|ランキングを見る|Смотреть таблицу|Zobacz ranking"), arrow: true, primary: true, onclick: toBoard }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],
+      });
+      /* con la clasificacion global activa, el puesto llega en cuanto responde el servidor */
+      if (sent) sent.then(res => { const el = $("vdRank"), g = res && res.global; if (el && g && g.rank) el.textContent = sp + A.pick6("Puesto {r} de {n} en el mundo.|Rank {r} of {n} worldwide.|Rang {r} sur {n} dans le monde.|Posição {r} de {n} no mundo.|Platz {r} von {n} weltweit.|Posizione {r} su {n} nel mondo.||全球第 {r} 名（共 {n} 人）。|전 세계 {n}명 중 {r}위.|世界{n}人中{r}位。|Место {r} из {n} в мире.|Miejsce {r} na {n} na świecie.").replace("{r}", A.fmt(g.rank)).replace("{n}", A.fmt(g.total)); }).catch(() => {});
+    } else {
+      C().verdict({
+        kind: win ? "win" : "", level: r.cleared, tag: A.T("Expedición", "Expedition"), title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
+        text: summary,
+        stats: [[A.T("Puntuación final", "Final score"), final], [A.T("Rondas superadas", "Rounds cleared"), r.cleared], [A.T("Doblones ganados", "Doubloons earned"), r.stats.coinsEarned]],
+        stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
+        buttons: [{ id: "nrBtn", cls: "btn-ink", label: A.T("Otra expedición", "Another expedition"), arrow: true, primary: true, onclick: () => C().showHub("adventure") }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],
+      });
+    }
     A.dealer.hover($("hubBtn"), "hoverQuit");                              // si el cursor va hacia Menu en vez de a otra expedicion, el crupier lo ve
     C().map.setStyle(mapStyleFor()); A.adv.hideBars();
   }

@@ -1,5 +1,5 @@
 /*
- * Geolite - reto diario (v0.6): semillas del reto diario, tablas de clasificacion y envio de puntuaciones.
+ * Geolite - reto diario (v0.34): semillas del reto diario, tablas de clasificacion y envio de puntuaciones.
  * Si el servidor tiene la API activada (/api/*, ver README), la clasificacion es GLOBAL; si no, es local en este equipo.
  */
 window.AIQ = window.AIQ || {};
@@ -14,8 +14,8 @@ window.AIQ = window.AIQ || {};
 
   const R = A.rank = {
     hash, ymd, week,
-    dailySeed: () => "daily-" + ymd(), weeklySeed: () => "weekly-" + week(),
-    boards: { daily: () => "daily-" + ymd(), weekly: () => "weekly-" + week(), adv: "adv-all" },
+    dailySeed: () => R.daily.board(), weeklySeed: () => "weekly-" + week(),
+    boards: { daily: () => R.daily.board(), weekly: () => "weekly-" + week(), adv: "adv-all" },   // el reto diario va por la fecha LOCAL (ver R.daily)
     remote: null,                                                   // null = sin comprobar, true/false = servidor disponible
   };
 
@@ -28,8 +28,9 @@ window.AIQ = window.AIQ || {};
 
   /* ---------- tablas ---------- */
   R.localTop = (board, n = 20) => ((A.profile.get().boards[board] || []).slice().sort((a, b) => b.score - a.score).slice(0, n));
+  /* {global, rows:[{id,name,score,tries?}], me?:{rank,score}, count?}: con el servidor, tu puesto aunque no estes entre los n primeros */
   R.top = async (board, n = 20) => {
-    if (await R.check()) { try { const r = await fetch(`/api/top?board=${encodeURIComponent(board)}&n=${n}`); const j = await r.json(); if (j.ok) return { global: true, rows: j.rows }; } catch (e) { /* cae a local */ } }
+    if (await R.check()) { try { const r = await fetch(`/api/top?board=${encodeURIComponent(board)}&n=${n}&me=${encodeURIComponent(A.profile.get().id)}`); const j = await r.json(); if (j.ok) return { global: true, rows: j.rows, me: j.me || null, count: j.count || j.rows.length }; } catch (e) { /* cae a local */ } }
     return { global: false, rows: R.localTop(board, n) };
   };
   /* entrada: {score, extra:{...}}. Devuelve {rank?, record}. */
@@ -44,4 +45,67 @@ window.AIQ = window.AIQ || {};
     return { record: rec, global };
   };
   R.myRank = board => { const P = A.profile.get(), rows = R.localTop(board, 50), i = rows.findIndex(r => r.id === P.id); return i < 0 ? null : i + 1; };
+
+  /* ---------- RETO DIARIO: una semilla por dia de calendario (cambia a tu medianoche), la misma para todo el mundo ----------
+     La semilla del dia reparte la MANO DEL DIA (baraja, ascension, reliquia de regalo y orden de las rondas de cada acto) y cada uno de
+     los 3 intentos tiene su propia sub-semilla: lugares, retos y cartas nuevos en cada intento (los mismos para todos en el mismo intento),
+     asi que un intento no chiva las respuestas del siguiente. El intento se gasta al empezarlo; la PUNTUACION GLOBAL del dia es la suma
+     de los tres. En el perfil: P.daily[tablero] = { v:2, tries:[{ s, r, won, ts, live? }] } (una entrada por dia: los logros cuentan dias). */
+  const TRIES = 3, DECK_IDS = ["explorer", "historian", "navigator", "blind"], ASC_BAG = [0, 0, 1, 1, 1, 2, 2, 3];
+  const dayNum = (d = new Date()) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  const DY = R.daily = {
+    TRIES,
+    board: (d = new Date()) => "daily-" + dayNum(d),
+    yesterday: () => { const d = new Date(); d.setDate(d.getDate() - 1); return DY.board(d); },
+    date: board => new Date(+board.slice(6, 10), +board.slice(10, 12) - 1, +board.slice(12, 14)),
+    /* codigo corto de la semilla para ensenarlo (y compararlo entre amigos): "K7Q-2XD", sin letras que se confunden (0/O, 1/I/L) */
+    code: board => { const AB = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", rr = A.rng(board + ":code"); let s = ""; for (let i = 0; i < 6; i++) s += AB[rr.int(AB.length)]; return s.slice(0, 3) + "-" + s.slice(3); },
+    trySeed: (board, k) => board + "#" + k,
+    msToNext: () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1) - n; },
+    hand(board) {
+      const rr = A.rng(board + ":hand"), REL = A.RELICS || {}, deck = rr.pick(DECK_IDS), asc = rr.pick(ASC_BAG);
+      const own = ((A.ADV && A.ADV.DECKS[deck]) || { perks: [] }).perks;
+      const gifts = Object.keys(REL).filter(id => REL[id].r <= 1 && !own.includes(id)).sort(), gift = gifts.length ? rr.pick(gifts) : null;
+      const route = []; [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10]].forEach(act => route.push(...rr.shuffle(act))); route.push(11);   // el Jackpot sigue cerrando la expedicion
+      return { deck, asc, gift, route };
+    },
+    /* estado del dia en el perfil (sin crear la entrada: solo los dias jugados cuentan para los logros) */
+    get(board) {
+      const P = A.profile.get(); let d = P.daily[board];
+      if (d && d.v !== 2) d = P.daily[board] = { v: 2, tries: [{ s: d.score || 0, ts: d.ts || 0 }] };   // formato antiguo: un solo intento
+      d = d || { v: 2, tries: [] };
+      const done = d.tries.filter(t => !t.live);
+      return { tries: d.tries, done: done.length, live: d.tries.findIndex(t => t.live) + 1, left: TRIES - d.tries.length, total: done.reduce((n, t) => n + (t.s || 0), 0) };
+    },
+    /* historial propio: dias jugados, dias seguidos hasta hoy (o hasta ayer si hoy aun no has cerrado ningun intento) y mejor puntuacion global de un dia */
+    stats() {
+      const P = A.profile.get(), played = b => DY.get(b).done > 0, keys = Object.keys(P.daily).filter(k => /^daily-\d{8}$/.test(k) && played(k));
+      const d = new Date(); if (!played(DY.board(d))) d.setDate(d.getDate() - 1);
+      let streak = 0; while (played(DY.board(d))) { streak++; d.setDate(d.getDate() - 1); }
+      return { days: keys.length, streak, best: keys.reduce((m, k) => Math.max(m, DY.get(k).total), 0) };
+    },
+    /* gasta un intento: devuelve su numero (1..3) o 0 si ya no quedan */
+    start(board) {
+      const P = A.profile.get(); DY.get(board); const d = (P.daily[board] = P.daily[board] || { v: 2, tries: [] });
+      if (d.tries.length >= TRIES) return 0;
+      d.tries.push({ s: 0, live: true, ts: Date.now() }); A.profile.save(); return d.tries.length;
+    },
+    /* cierra el intento k con su puntuacion y lo manda a la clasificacion */
+    finish(board, k, s, info = {}) {
+      const P = A.profile.get(); DY.get(board); const d = (P.daily[board] = P.daily[board] || { v: 2, tries: [] });
+      while (d.tries.length < k) d.tries.push({ s: 0, ts: Date.now() });
+      d.tries[k - 1] = { s: Math.max(0, Math.round(s || 0)), r: info.r || 0, won: !!info.won, ts: Date.now() }; A.profile.save();
+      return DY.submit(board);
+    },
+    /* la puntuacion global (suma de los intentos cerrados) va a la tabla local y, si hay servidor, a la global */
+    async submit(board) {
+      const P = A.profile.get(), st = DY.get(board), tries = st.tries.filter(t => !t.live).map(t => t.s || 0);
+      const row = { id: P.id, name: P.name || A.T("Anónimo", "Anonymous"), score: st.total, tries, ts: Date.now() };
+      P.boards[board] = (P.boards[board] || []).filter(r => r.id !== P.id).concat(row).sort((a, b) => b.score - a.score).slice(0, 50);
+      A.profile.record(board, st.total); A.profile.save();
+      let global = null;
+      if (await R.check()) { try { const r = await fetch("/api/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ board, id: row.id, name: row.name, tries }) }); const j = await r.json(); if (j.ok) global = j; } catch (e) { /* solo local */ } }
+      return { total: st.total, global };
+    },
+  };
 })(window.AIQ);
