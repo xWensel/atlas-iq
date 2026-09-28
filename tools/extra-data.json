@@ -2,6 +2,7 @@
  "people": [
   {
    "id": "Q937",
+   "wiki": "Albert Einstein",
    "name": {
     "en": "Albert Einstein",
     "es": "Albert Einstein",
@@ -63,6 +64,7 @@
   },
   {
    "id": "Q935",
+   "wiki": "Isaac Newton",
    "name": {
     "en": "Isaac Newton",
     "es": "Isaac Newton",
@@ -124,6 +126,7 @@
   },
   {
    "id": "Q762",
+   "wiki": "Leonardo da Vinci",
    "name": {
     "en": "Leonardo da Vinci",
     "es": "Leonardo da Vinci",
@@ -185,6 +188,7 @@
   },
   {
    "id": "Q517",
+   "wiki": "Napoleon",
    "name": {
     "en": "Napoleon",
     "es": "Napoleón Bonaparte",
@@ -246,6 +250,7 @@
   },
   {
    "id": "Q635",
+   "wiki": "Cleopatra",
    "name": {
     "en": "Cleopatra",
     "es": "Cleopatra",
@@ -307,6 +312,7 @@
   },
   {
    "id": "Q1001",
+   "wiki": "Mahatma Gandhi",
    "name": {
     "en": "Mahatma Gandhi",
     "es": "Mahatma Gandhi",
@@ -368,6 +374,7 @@
   },
   {
    "id": "Q8023",
+   "wiki": "Nelson Mandela",
    "name": {
     "en": "Nelson Mandela",
     "es": "Nelson Mandela",
@@ -429,6 +436,7 @@
   },
   {
    "id": "Q5588",
+   "wiki": "Frida Kahlo",
    "name": {
     "en": "Frida Kahlo",
     "es": "Frida Kahlo",
@@ -490,6 +498,7 @@
   },
   {
    "id": "Q5593",
+   "wiki": "Pablo Picasso",
    "name": {
     "en": "Pablo Picasso",
     "es": "Pablo Picasso",
@@ -551,6 +560,7 @@
   },
   {
    "id": "Q5682",
+   "wiki": "Miguel de Cervantes",
    "name": {
     "en": "Miguel de Cervantes",
     "es": "Miguel de Cervantes",
@@ -612,6 +622,7 @@
   },
   {
    "id": "Q692",
+   "wiki": "William Shakespeare",
    "name": {
     "en": "William Shakespeare",
     "es": "William Shakespeare",
@@ -673,6 +684,7 @@
   },
   {
    "id": "Q254",
+   "wiki": "Wolfgang Amadeus Mozart",
    "name": {
     "en": "Wolfgang Amadeus Mozart",
     "es": "Wolfgang Amadeus Mozart",
@@ -734,6 +746,7 @@
   },
   {
    "id": "Q255",
+   "wiki": "Ludwig van Beethoven",
    "name": {
     "en": "Ludwig van Beethoven",
     "es": "Ludwig van Beethoven",
@@ -795,6 +808,7 @@
   },
   {
    "id": "Q7186",
+   "wiki": "Marie Curie",
    "name": {
     "en": "Marie Curie",
     "es": "Marie Curie",
@@ -856,6 +870,7 @@
   },
   {
    "id": "Q1035",
+   "wiki": "Charles Darwin",
    "name": {
     "en": "Charles Darwin",
     "es": "Charles Darwin",
@@ -917,6 +932,7 @@
   },
   {
    "id": "Q307",
+   "wiki": "Galileo Galilei",
    "name": {
     "en": "Galileo Galilei",
     "es": "Galileo Galilei",
@@ -978,6 +994,7 @@
   },
   {
    "id": "Q7322",
+   "wiki": "Christopher Columbus",
    "name": {
     "en": "Christopher Columbus",
     "es": "Cristóbal Colón",
@@ -1039,6 +1056,7 @@
   },
   {
    "id": "Q1496",
+   "wiki": "Ferdinand Magellan",
    "name": {
     "en": "Ferdinand Magellan",
     "es": "Fernando de Magallanes",
@@ -1100,6 +1118,7 @@
   },
   {
    "id": "Q8605",
+   "wiki": "Simón Bolívar",
    "name": {
     "en": "Simón Bolívar",
     "es": "Simón Bolívar",
@@ -1161,6 +1180,7 @@
   },
   {
    "id": "Q134160",
+   "wiki": "José de San Martín",
    "name": {
     "en": "José de San Martín",
     "es": "José de San Martín",
@@ -1222,6 +1242,7 @@
   },
   {
    "id": "Q5809",
+   "wiki": "Che Guevara",
    "name": {
     "en": "Che Guevara",
     "es": "Che Guevara",
@@ -1283,6 +1304,7 @@
   },
   {
    "id": "Q4604",
+   "wiki": "Confucius",
    "name": {
     "en": "Confucius",
     "es": "Confucio",
@@ -1344,6 +1366,7 @@
   },
   {
    "id": "Q720",
+   "wiki": "Genghis Khan",
    "name": {
     "en": "Genghis Khan",
     "es": "Gengis Kan",
@@ -1405,6 +1428,7 @@
   },
   {
    "id": "Q5816",
+   "wiki": "Mao Zedong",
    "name": {
     "en": "Mao Zedong",
     "es": "Mao Zedong",
@@ -1466,6 +1490,7 @@
   },
   {
    "id": "Q91",
+   "wiki": "Abraham Lincoln",
    "name": {
     "en": "Abraham Lincoln",
     "es": "Abraham Lincoln",
@@ -1527,6 +1552,7 @@
   },
   {
    "id": "Q23",
+   "wiki": "George Washington",
    "name": {
     "en": "George Washington",
     "es": "George Washington",
@@ -1588,6 +1614,7 @@
   },
   {
    "id": "Q8027",
+   "wiki": "Martin Luther King Jr.",
    "name": {
     "en": "Martin Luther King Jr.",
     "es": "Martin Luther King",
@@ -1649,6 +1676,7 @@
   },
   {
    "id": "Q303",
+   "wiki": "Elvis Presley",
    "name": {
     "en": "Elvis Presley",
     "es": "Elvis Presley",
@@ -1710,6 +1738,7 @@
   },
   {
    "id": "Q4616",
+   "wiki": "Marilyn Monroe",
    "name": {
     "en": "Marilyn Monroe",
     "es": "Marilyn Monroe",
@@ -1771,6 +1800,7 @@
   },
   {
    "id": "Q882",
+   "wiki": "Charlie Chaplin",
    "name": {
     "en": "Charlie Chaplin",
     "es": "Charles Chaplin",
@@ -1832,6 +1862,7 @@
   },
   {
    "id": "Q5582",
+   "wiki": "Vincent van Gogh",
    "name": {
     "en": "Vincent van Gogh",
     "es": "Vincent van Gogh",
@@ -1893,6 +1924,7 @@
   },
   {
    "id": "Q5598",
+   "wiki": "Rembrandt",
    "name": {
     "en": "Rembrandt",
     "es": "Rembrandt",
@@ -1954,6 +1986,7 @@
   },
   {
    "id": "Q5577",
+   "wiki": "Salvador Dalí",
    "name": {
     "en": "Salvador Dalí",
     "es": "Salvador Dalí",
@@ -2015,6 +2048,7 @@
   },
   {
    "id": "Q25328",
+   "wiki": "Antoni Gaudí",
    "name": {
     "en": "Antoni Gaudí",
     "es": "Antoni Gaudí",
@@ -2076,6 +2110,7 @@
   },
   {
    "id": "Q7243",
+   "wiki": "Leo Tolstoy",
    "name": {
     "en": "Leo Tolstoy",
     "es": "León Tolstói",
@@ -2137,6 +2172,7 @@
   },
   {
    "id": "Q991",
+   "wiki": "Fyodor Dostoevsky",
    "name": {
     "en": "Fyodor Dostoyevsky",
     "es": "Fiódor Dostoyevski",
@@ -2198,6 +2234,7 @@
   },
   {
    "id": "Q7315",
+   "wiki": "Pyotr Ilyich Tchaikovsky",
    "name": {
     "en": "Pyotr Ilyich Tchaikovsky",
     "es": "Piotr Ilich Chaikovski",
@@ -2259,6 +2296,7 @@
   },
   {
    "id": "Q7200",
+   "wiki": "Alexander Pushkin",
    "name": {
     "en": "Alexander Pushkin",
     "es": "Aleksandr Pushkin",
@@ -2320,6 +2358,7 @@
   },
   {
    "id": "Q7327",
+   "wiki": "Yuri Gagarin",
    "name": {
     "en": "Yuri Gagarin",
     "es": "Yuri Gagarin",
@@ -2381,6 +2420,7 @@
   },
   {
    "id": "Q1615",
+   "wiki": "Neil Armstrong",
    "name": {
     "en": "Neil Armstrong",
     "es": "Neil Armstrong",
@@ -2442,6 +2482,7 @@
   },
   {
    "id": "Q3355",
+   "wiki": "Amelia Earhart",
    "name": {
     "en": "Amelia Earhart",
     "es": "Amelia Earhart",
@@ -2503,6 +2544,7 @@
   },
   {
    "id": "Q9036",
+   "wiki": "Nikola Tesla",
    "name": {
     "en": "Nikola Tesla",
     "es": "Nikola Tesla",
@@ -2564,6 +2606,7 @@
   },
   {
    "id": "Q8743",
+   "wiki": "Thomas Edison",
    "name": {
     "en": "Thomas Edison",
     "es": "Thomas Alva Edison",
@@ -2625,6 +2668,7 @@
   },
   {
    "id": "Q9215",
+   "wiki": "Sigmund Freud",
    "name": {
     "en": "Sigmund Freud",
     "es": "Sigmund Freud",
@@ -2686,6 +2730,7 @@
   },
   {
    "id": "Q905",
+   "wiki": "Franz Kafka",
    "name": {
     "en": "Franz Kafka",
     "es": "Franz Kafka",
@@ -2747,6 +2792,7 @@
   },
   {
    "id": "Q5879",
+   "wiki": "Johann Wolfgang von Goethe",
    "name": {
     "en": "Johann Wolfgang von Goethe",
     "es": "Johann Wolfgang von Goethe",
@@ -2808,6 +2854,7 @@
   },
   {
    "id": "Q1339",
+   "wiki": "Johann Sebastian Bach",
    "name": {
     "en": "Johann Sebastian Bach",
     "es": "Johann Sebastian Bach",
@@ -2869,6 +2916,7 @@
   },
   {
    "id": "Q1268",
+   "wiki": "Frédéric Chopin",
    "name": {
     "en": "Frédéric Chopin",
     "es": "Frédéric Chopin",
@@ -2930,6 +2978,7 @@
   },
   {
    "id": "Q619",
+   "wiki": "Nicolaus Copernicus",
    "name": {
     "en": "Nicolaus Copernicus",
     "es": "Nicolás Copérnico",
@@ -2991,6 +3040,7 @@
   },
   {
    "id": "Q8963",
+   "wiki": "Johannes Kepler",
    "name": {
     "en": "Johannes Kepler",
     "es": "Johannes Kepler",
@@ -3052,6 +3102,7 @@
   },
   {
    "id": "Q8409",
+   "wiki": "Alexander the Great",
    "name": {
     "en": "Alexander the Great",
     "es": "Alejandro Magno",
@@ -3113,6 +3164,7 @@
   },
   {
    "id": "Q1048",
+   "wiki": "Julius Caesar",
    "name": {
     "en": "Julius Caesar",
     "es": "Julio César",
@@ -3174,6 +3226,7 @@
   },
   {
    "id": "Q36456",
+   "wiki": "Hannibal",
    "name": {
     "en": "Hannibal",
     "es": "Aníbal Barca",
@@ -3235,6 +3288,7 @@
   },
   {
    "id": "Q7226",
+   "wiki": "Joan of Arc",
    "name": {
     "en": "Joan of Arc",
     "es": "Juana de Arco",
@@ -3296,6 +3350,7 @@
   },
   {
    "id": "Q535",
+   "wiki": "Victor Hugo",
    "name": {
     "en": "Victor Hugo",
     "es": "Victor Hugo",
@@ -3357,6 +3412,7 @@
   },
   {
    "id": "Q33977",
+   "wiki": "Jules Verne",
    "name": {
     "en": "Jules Verne",
     "es": "Julio Verne",
@@ -3418,6 +3474,7 @@
   },
   {
    "id": "Q6101",
+   "wiki": "Marco Polo",
    "name": {
     "en": "Marco Polo",
     "es": "Marco Polo",
@@ -3479,6 +3536,7 @@
   },
   {
    "id": "Q1067",
+   "wiki": "Dante Alighieri",
    "name": {
     "en": "Dante Alighieri",
     "es": "Dante Alighieri",
@@ -3540,6 +3598,7 @@
   },
   {
    "id": "Q5592",
+   "wiki": "Michelangelo",
    "name": {
     "en": "Michelangelo",
     "es": "Miguel Ángel",
@@ -3601,6 +3660,7 @@
   },
   {
    "id": "Q5597",
+   "wiki": "Raphael",
    "name": {
     "en": "Raphael",
     "es": "Rafael Sanzio",
@@ -3662,6 +3722,7 @@
   },
   {
    "id": "Q1340",
+   "wiki": "Antonio Vivaldi",
    "name": {
     "en": "Antonio Vivaldi",
     "es": "Antonio Vivaldi",
@@ -3723,6 +3784,7 @@
   },
   {
    "id": "Q7317",
+   "wiki": "Giuseppe Verdi",
    "name": {
     "en": "Giuseppe Verdi",
     "es": "Giuseppe Verdi",
@@ -3784,6 +3846,7 @@
   },
   {
    "id": "Q539",
+   "wiki": "Giuseppe Garibaldi",
    "name": {
     "en": "Giuseppe Garibaldi",
     "es": "Giuseppe Garibaldi",
@@ -3845,6 +3908,7 @@
   },
   {
    "id": "Q23434",
+   "wiki": "Ernest Hemingway",
    "name": {
     "en": "Ernest Hemingway",
     "es": "Ernest Hemingway",
@@ -3906,6 +3970,7 @@
   },
   {
    "id": "Q7245",
+   "wiki": "Mark Twain",
    "name": {
     "en": "Mark Twain",
     "es": "Mark Twain",
@@ -3967,6 +4032,7 @@
   },
   {
    "id": "Q8704",
+   "wiki": "Walt Disney",
    "name": {
     "en": "Walt Disney",
     "es": "Walt Disney",
@@ -4028,6 +4094,7 @@
   },
   {
    "id": "Q19837",
+   "wiki": "Steve Jobs",
    "name": {
     "en": "Steve Jobs",
     "es": "Steve Jobs",
@@ -4089,6 +4156,7 @@
   },
   {
    "id": "Q5878",
+   "wiki": "Gabriel García Márquez",
    "name": {
     "en": "Gabriel García Márquez",
     "es": "Gabriel García Márquez",
@@ -4150,6 +4218,7 @@
   },
   {
    "id": "Q34189",
+   "wiki": "Pablo Neruda",
    "name": {
     "en": "Pablo Neruda",
     "es": "Pablo Neruda",
@@ -4211,6 +4280,7 @@
   },
   {
    "id": "Q909",
+   "wiki": "Jorge Luis Borges",
    "name": {
     "en": "Jorge Luis Borges",
     "es": "Jorge Luis Borges",
@@ -4272,6 +4342,7 @@
   },
   {
    "id": "Q12897",
+   "wiki": "Pelé",
    "name": {
     "en": "Pelé",
     "es": "Pelé",
@@ -4333,6 +4404,7 @@
   },
   {
    "id": "Q17515",
+   "wiki": "Diego Maradona",
    "name": {
     "en": "Diego Maradona",
     "es": "Diego Maradona",
@@ -4394,6 +4466,7 @@
   },
   {
    "id": "Q409",
+   "wiki": "Bob Marley",
    "name": {
     "en": "Bob Marley",
     "es": "Bob Marley",
@@ -4455,6 +4528,7 @@
   },
   {
    "id": "Q7241",
+   "wiki": "Rabindranath Tagore",
    "name": {
     "en": "Rabindranath Tagore",
     "es": "Rabindranath Tagore",
@@ -4516,6 +4590,7 @@
   },
   {
    "id": "Q8006",
+   "wiki": "Akira Kurosawa",
    "name": {
     "en": "Akira Kurosawa",
     "es": "Akira Kurosawa",
@@ -4577,6 +4652,7 @@
   },
   {
    "id": "Q5586",
+   "wiki": "Hokusai",
    "name": {
     "en": "Katsushika Hokusai",
     "es": "Katsushika Hokusai",
@@ -4638,6 +4714,7 @@
   },
   {
    "id": "Q36014",
+   "wiki": "Ho Chi Minh",
    "name": {
     "en": "Ho Chi Minh",
     "es": "Ho Chi Minh",
@@ -4699,6 +4776,7 @@
   },
   {
    "id": "Q5152",
+   "wiki": "Mustafa Kemal Atatürk",
    "name": {
     "en": "Mustafa Kemal Atatürk",
     "es": "Mustafa Kemal Atatürk",
@@ -4760,6 +4838,7 @@
   },
   {
    "id": "Q8581",
+   "wiki": "Saladin",
    "name": {
     "en": "Saladin",
     "es": "Saladino",
@@ -4821,6 +4900,7 @@
   },
   {
    "id": "Q7331",
+   "wiki": "Ibn Battuta",
    "name": {
     "en": "Ibn Battuta",
     "es": "Ibn Battuta",
@@ -4882,6 +4962,7 @@
   },
   {
    "id": "Q8011",
+   "wiki": "Avicenna",
    "name": {
     "en": "Avicenna",
     "es": "Avicena",
@@ -4943,6 +5024,7 @@
   },
   {
    "id": "Q35900",
+   "wiki": "Omar Khayyam",
    "name": {
     "en": "Omar Khayyám",
     "es": "Omar Jayam",
@@ -5004,6 +5086,7 @@
   },
   {
    "id": "Q43347",
+   "wiki": "Rumi",
    "name": {
     "en": "Rumi",
     "es": "Yalal ad-Din Muhammad Rumi",
@@ -5065,6 +5148,7 @@
   },
   {
    "id": "Q41178",
+   "wiki": "Haile Selassie",
    "name": {
     "en": "Haile Selassie I",
     "es": "Haile Selassie",
@@ -5126,6 +5210,7 @@
   },
   {
    "id": "Q8620",
+   "wiki": "Kwame Nkrumah",
    "name": {
     "en": "Kwame Nkrumah",
     "es": "Kwame Nkrumah",
@@ -5187,6 +5272,7 @@
   },
   {
    "id": "Q46795",
+   "wiki": "Wangarĩ Maathai",
    "name": {
     "en": "Wangari Muta Maathai",
     "es": "Wangari Maathai",
@@ -5248,6 +5334,7 @@
   },
   {
    "id": "Q171128",
+   "wiki": "Diego Rivera",
    "name": {
     "en": "Diego Rivera",
     "es": "Diego Rivera",
@@ -5309,6 +5396,7 @@
   },
   {
    "id": "Q182276",
+   "wiki": "Benito Juárez",
    "name": {
     "en": "Benito Juárez",
     "es": "Benito Juárez",
@@ -5370,6 +5458,7 @@
   },
   {
    "id": "Q41718",
+   "wiki": "Emiliano Zapata",
    "name": {
     "en": "Emiliano Zapata",
     "es": "Emiliano Zapata",
@@ -5431,6 +5520,7 @@
   },
   {
    "id": "Q7324",
+   "wiki": "James Cook",
    "name": {
     "en": "James Cook",
     "es": "James Cook",
@@ -5492,6 +5582,7 @@
   },
   {
    "id": "Q33817",
+   "wiki": "Edmund Hillary",
    "name": {
     "en": "Edmund Hillary",
     "es": "Edmund Hillary",
@@ -5553,6 +5644,7 @@
   },
   {
    "id": "Q80732",
+   "wiki": "Tenzing Norgay",
    "name": {
     "en": "Tenzing Norgay",
     "es": "Tenzing Norgay",
@@ -5614,6 +5706,7 @@
   },
   {
    "id": "Q926",
+   "wiki": "Roald Amundsen",
    "name": {
     "en": "Roald Amundsen",
     "es": "Roald Amundsen",
@@ -5663,6 +5756,7 @@
   },
   {
    "id": "Q5673",
+   "wiki": "Hans Christian Andersen",
    "name": {
     "en": "Hans Christian Andersen",
     "es": "Hans Christian Andersen",
@@ -5712,6 +5806,7 @@
   },
   {
    "id": "Q23810",
+   "wiki": "Alfred Nobel",
    "name": {
     "en": "Alfred Nobel",
     "es": "Alfred Nobel",
@@ -5761,6 +5856,7 @@
   },
   {
    "id": "Q45682",
+   "wiki": "Jean Sibelius",
    "name": {
     "en": "Jean Sibelius",
     "es": "Jean Sibelius",
@@ -5810,6 +5906,7 @@
   },
   {
    "id": "Q80621",
+   "wiki": "Edvard Grieg",
    "name": {
     "en": "Edvard Grieg",
     "es": "Edvard Grieg",
@@ -5859,6 +5956,7 @@
   },
   {
    "id": "Q36661",
+   "wiki": "Henrik Ibsen",
    "name": {
     "en": "Henrik Ibsen",
     "es": "Henrik Ibsen",
@@ -5908,6 +6006,7 @@
   },
   {
    "id": "Q1043",
+   "wiki": "Carl Linnaeus",
    "name": {
     "en": "Carl Linnaeus",
     "es": "Carlos Linneo",
@@ -5957,6 +6056,7 @@
   },
   {
    "id": "Q6512",
+   "wiki": "Søren Kierkegaard",
    "name": {
     "en": "Søren Kierkegaard",
     "es": "Søren Kierkegaard",
@@ -6006,6 +6106,7 @@
   },
   {
    "id": "Q8016",
+   "wiki": "Winston Churchill",
    "name": {
     "en": "Winston Churchill",
     "es": "Winston Churchill",
@@ -6067,6 +6168,7 @@
   },
   {
    "id": "Q9439",
+   "wiki": "Queen Victoria",
    "name": {
     "en": "Victoria",
     "es": "Victoria del Reino Unido",
@@ -6128,6 +6230,7 @@
   },
   {
    "id": "Q7207",
+   "wiki": "Elizabeth I",
    "name": {
     "en": "Elizabeth I of England",
     "es": "Isabel I de Inglaterra",
@@ -6189,6 +6292,7 @@
   },
   {
    "id": "Q38370",
+   "wiki": "Henry VIII",
    "name": {
     "en": "Henry VIII of England",
     "es": "Enrique VIII de Inglaterra",
@@ -6250,6 +6354,7 @@
   },
   {
    "id": "Q36450",
+   "wiki": "Catherine the Great",
    "name": {
     "en": "Catherine II of Russia",
     "es": "Catalina II de Rusia",
@@ -6311,6 +6416,7 @@
   },
   {
    "id": "Q8479",
+   "wiki": "Peter the Great",
    "name": {
     "en": "Peter the Great",
     "es": "Pedro I de Rusia",
@@ -6372,6 +6478,7 @@
   },
   {
    "id": "Q1394",
+   "wiki": "Vladimir Lenin",
    "name": {
     "en": "Vladimir Lenin",
     "es": "Lenin",
@@ -6433,6 +6540,7 @@
   },
   {
    "id": "Q9061",
+   "wiki": "Karl Marx",
    "name": {
     "en": "Karl Marx",
     "es": "Karl Marx",
@@ -6494,6 +6602,7 @@
   },
   {
    "id": "Q9358",
+   "wiki": "Friedrich Nietzsche",
    "name": {
     "en": "Friedrich Nietzsche",
     "es": "Friedrich Nietzsche",
@@ -6555,6 +6664,7 @@
   },
   {
    "id": "Q9312",
+   "wiki": "Immanuel Kant",
    "name": {
     "en": "Immanuel Kant",
     "es": "Immanuel Kant",
@@ -6616,6 +6726,7 @@
   },
   {
    "id": "Q868",
+   "wiki": "Aristotle",
    "name": {
     "en": "Aristotle",
     "es": "Aristóteles",
@@ -6677,6 +6788,7 @@
   },
   {
    "id": "Q859",
+   "wiki": "Plato",
    "name": {
     "en": "Plato",
     "es": "Platón",
@@ -6738,6 +6850,7 @@
   },
   {
    "id": "Q8739",
+   "wiki": "Archimedes",
    "name": {
     "en": "Archimedes",
     "es": "Arquímedes",
@@ -6787,6 +6900,7 @@
   },
   {
    "id": "Q1405",
+   "wiki": "Augustus",
    "name": {
     "en": "Augustus",
     "es": "Augusto",
@@ -6848,6 +6962,7 @@
   },
   {
    "id": "Q3044",
+   "wiki": "Charlemagne",
    "name": {
     "en": "Charlemagne",
     "es": "Carlomagno",
@@ -6909,6 +7024,7 @@
   },
   {
    "id": "Q8442",
+   "wiki": "Otto von Bismarck",
    "name": {
     "en": "Otto von Bismarck",
     "es": "Otto von Bismarck",
@@ -6970,6 +7086,7 @@
   },
   {
    "id": "Q37103",
+   "wiki": "Florence Nightingale",
    "name": {
     "en": "Florence Nightingale",
     "es": "Florence Nightingale",
@@ -7031,6 +7148,7 @@
   },
   {
    "id": "Q4583",
+   "wiki": "Anne Frank",
    "name": {
     "en": "Anne Frank",
     "es": "Ana Frank",
@@ -7092,6 +7210,7 @@
   },
   {
    "id": "Q45661",
+   "wiki": "Coco Chanel",
    "name": {
     "en": "Coco Chanel",
     "es": "Coco Chanel",
@@ -7153,6 +7272,7 @@
   },
   {
    "id": "Q1631",
+   "wiki": "Édith Piaf",
    "name": {
     "en": "Édith Piaf",
     "es": "Édith Piaf",
@@ -7214,6 +7334,7 @@
   },
   {
    "id": "Q529",
+   "wiki": "Louis Pasteur",
    "name": {
     "en": "Louis Pasteur",
     "es": "Louis Pasteur",
@@ -7275,6 +7396,7 @@
   },
   {
    "id": "Q296",
+   "wiki": "Claude Monet",
    "name": {
     "en": "Claude Monet",
     "es": "Claude Monet",
@@ -7336,6 +7458,7 @@
   },
   {
    "id": "Q30755",
+   "wiki": "Auguste Rodin",
    "name": {
     "en": "Auguste Rodin",
     "es": "Auguste Rodin",
@@ -7397,6 +7520,7 @@
   },
   {
    "id": "Q40933",
+   "wiki": "Eva Perón",
    "name": {
     "en": "Eva Perón",
     "es": "Eva Perón",
@@ -7458,6 +7582,7 @@
   },
   {
    "id": "Q229613",
+   "wiki": "Carlos Gardel",
    "name": {
     "en": "Carlos Gardel",
     "es": "Carlos Gardel",
@@ -7519,6 +7644,7 @@
   },
   {
    "id": "Q11256",
+   "wiki": "Fidel Castro",
    "name": {
     "en": "Fidel Castro",
     "es": "Fidel Castro",
@@ -7568,6 +7694,7 @@
   },
   {
    "id": "Q103285",
+   "wiki": "José Martí",
    "name": {
     "en": "José Martí",
     "es": "José Marti",
@@ -7617,6 +7744,7 @@
   },
   {
    "id": "Q173767",
+   "wiki": "Rubén Darío",
    "name": {
     "en": "Rubén Darío",
     "es": "Rubén Darío",
@@ -7666,6 +7794,7 @@
   },
   {
    "id": "Q80871",
+   "wiki": "Gabriela Mistral",
    "name": {
     "en": "Gabriela Mistral",
     "es": "Gabriela Mistral",
@@ -7727,6 +7856,7 @@
   },
   {
    "id": "Q39803",
+   "wiki": "Mario Vargas Llosa",
    "name": {
     "en": "Mario Vargas Llosa",
     "es": "Mario Vargas Llosa",
@@ -7776,6 +7906,7 @@
   },
   {
    "id": "Q46739",
+   "wiki": "Octavio Paz",
    "name": {
     "en": "Octavio Paz",
     "es": "Octavio Paz",
@@ -7837,6 +7968,7 @@
   },
   {
    "id": "Q183074",
+   "wiki": "Juana Inés de la Cruz",
    "name": {
     "en": "Sor Juana Inés de la Cruz",
     "es": "Juana Inés de la Cruz",
@@ -7898,6 +8030,7 @@
   },
   {
    "id": "Q315937",
+   "wiki": "Túpac Amaru II",
    "name": {
     "en": "Túpac Amaru II",
     "es": "Túpac Amaru II",
@@ -7947,6 +8080,7 @@
   },
   {
    "id": "Q7326",
+   "wiki": "Hernán Cortés",
    "name": {
     "en": "Hernán Cortés",
     "es": "Hernán Cortés",
@@ -8008,6 +8142,7 @@
   },
   {
    "id": "Q44741",
+   "wiki": "Francisco Pizarro",
    "name": {
     "en": "Francisco Pizarro",
     "es": "Francisco Pizarro",
@@ -8069,6 +8204,7 @@
   },
   {
    "id": "Q7328",
+   "wiki": "Vasco da Gama",
    "name": {
     "en": "Vasco da Gama",
     "es": "Vasco da Gama",
@@ -8130,6 +8266,7 @@
   },
   {
    "id": "Q173481",
+   "wiki": "Fernando Pessoa",
    "name": {
     "en": "Fernando Pessoa",
     "es": "Fernando Pessoa",
@@ -8191,6 +8328,7 @@
   },
   {
    "id": "Q214813",
+   "wiki": "Amália Rodrigues",
    "name": {
     "en": "Amália Rodrigues",
     "es": "Amália Rodrigues",
@@ -8252,6 +8390,7 @@
   },
   {
    "id": "Q162043",
+   "wiki": "Eusébio",
    "name": {
     "en": "Eusébio",
     "es": "Eusébio da Silva Ferreira",
@@ -8301,6 +8440,7 @@
   },
   {
    "id": "Q155845",
+   "wiki": "Chinua Achebe",
    "name": {
     "en": "Chinua Achebe",
     "es": "Chinua Achebe",
@@ -8362,6 +8502,7 @@
   },
   {
    "id": "Q313868",
+   "wiki": "Fela Kuti",
    "name": {
     "en": "Fela Kuti",
     "es": "Fela Kuti",
@@ -8423,6 +8564,7 @@
   },
   {
    "id": "Q43033",
+   "wiki": "Desmond Tutu",
    "name": {
     "en": "Desmond Tutu",
     "es": "Desmond Tutu",
@@ -8484,6 +8626,7 @@
   },
   {
    "id": "Q39524",
+   "wiki": "Gamal Abdel Nasser",
    "name": {
     "en": "Gamal Abdel Nasser",
     "es": "Gamal Abdel Nasser",
@@ -8545,6 +8688,7 @@
   },
   {
    "id": "Q42013",
+   "wiki": "Anwar Sadat",
    "name": {
     "en": "Anwar Sadat",
     "es": "Anwar el-Sadat",
@@ -8606,6 +8750,7 @@
   },
   {
    "id": "Q7176",
+   "wiki": "Naguib Mahfouz",
    "name": {
     "en": "Naguib Mahfouz",
     "es": "Naguib Mahfuz",
@@ -8667,6 +8812,7 @@
   },
   {
    "id": "Q1110560",
+   "wiki": "Umm Kulthum",
    "name": {
     "en": "Umm Kulthum",
     "es": "Umm Kalzum",
@@ -8728,6 +8874,7 @@
   },
   {
    "id": "Q47737",
+   "wiki": "Kahlil Gibran",
    "name": {
     "en": "Kahlil Gibran",
     "es": "Yibrán Jalil Yibrán",
@@ -8789,6 +8936,7 @@
   },
   {
    "id": "Q6240",
+   "wiki": "Hafez",
    "name": {
     "en": "Hafez",
     "es": "Hafez de Shiraz",
@@ -8850,6 +8998,7 @@
   },
   {
    "id": "Q797848",
+   "wiki": "Babur",
    "name": {
     "en": "Babur",
     "es": "Babur",
@@ -8911,6 +9060,7 @@
   },
   {
    "id": "Q8597",
+   "wiki": "Akbar",
    "name": {
     "en": "Akbar",
     "es": "Akbar",
@@ -8972,6 +9122,7 @@
   },
   {
    "id": "Q83672",
+   "wiki": "Shah Jahan",
    "name": {
     "en": "Shah Jahan",
     "es": "Sha Jahan",
@@ -9033,6 +9184,7 @@
   },
   {
    "id": "Q83163",
+   "wiki": "Srinivasa Ramanujan",
    "name": {
     "en": "Srinivasa Ramanujan",
     "es": "Srinivasa Avdula Ramanujan",
@@ -9094,6 +9246,7 @@
   },
   {
    "id": "Q1047",
+   "wiki": "Jawaharlal Nehru",
    "name": {
     "en": "Jawaharlal Nehru",
     "es": "Jawaharlal Nehru",
@@ -9155,6 +9308,7 @@
   },
   {
    "id": "Q30547",
+   "wiki": "Mother Teresa",
    "name": {
     "en": "Mother Teresa",
     "es": "Teresa de Calcuta",
@@ -9216,6 +9370,7 @@
   },
   {
    "id": "Q8573",
+   "wiki": "Sun Yat-sen",
    "name": {
     "en": "Sun Yat-sen",
     "es": "Sun Yat-sen",
@@ -9277,6 +9432,7 @@
   },
   {
    "id": "Q16397",
+   "wiki": "Bruce Lee",
    "name": {
     "en": "Bruce Lee",
     "es": "Bruce Lee",
@@ -9338,6 +9494,7 @@
   },
   {
    "id": "Q23114",
+   "wiki": "Lu Xun",
    "name": {
     "en": "Lu Xun",
     "es": "Lu Xun",
@@ -9399,6 +9556,7 @@
   },
   {
    "id": "Q7333",
+   "wiki": "Zheng He",
    "name": {
     "en": "Zheng He",
     "es": "Zheng He",
@@ -9460,6 +9618,7 @@
   },
   {
    "id": "Q7192",
+   "wiki": "Qin Shi Huang",
    "name": {
     "en": "Qin Shi Huang",
     "es": "Qin Shi Huang",
@@ -9521,6 +9680,7 @@
   },
   {
    "id": "Q171977",
+   "wiki": "Tokugawa Ieyasu",
    "name": {
     "en": "Tokugawa Ieyasu",
     "es": "Tokugawa Ieyasu",
@@ -9582,6 +9742,7 @@
   },
   {
    "id": "Q134456",
+   "wiki": "Yukio Mishima",
    "name": {
     "en": "Yukio Mishima",
     "es": "Yukio Mishima",
@@ -9643,6 +9804,7 @@
   },
   {
    "id": "Q37682",
+   "wiki": "Sejong the Great",
    "name": {
     "en": "Sejong the Great",
     "es": "Sejong el Grande",
@@ -9704,6 +9866,7 @@
   },
   {
    "id": "Q50184",
+   "wiki": "Yi Sun-sin",
    "name": {
     "en": "Yi Sun-sin",
     "es": "Yi Sun Sin Son",
@@ -9765,6 +9928,7 @@
   },
   {
    "id": "Q1500",
+   "wiki": "José Rizal",
    "name": {
     "en": "José Rizal",
     "es": "José Rizal",
@@ -9826,6 +9990,7 @@
   },
   {
    "id": "Q313591",
+   "wiki": "Don Bradman",
    "name": {
     "en": "Don Bradman",
     "es": "Donald Bradman",
@@ -9887,6 +10052,7 @@
   },
   {
    "id": "Q301816",
+   "wiki": "Ned Kelly",
    "name": {
     "en": "Ned Kelly",
     "es": "Ned Kelly",
@@ -9948,6 +10114,7 @@
   },
   {
    "id": "Q455072",
+   "wiki": "Kate Sheppard",
    "name": {
     "en": "Kate Sheppard",
     "es": "Kate Sheppard",
@@ -10009,6 +10176,7 @@
   },
   {
    "id": "Q9123",
+   "wiki": "Ernest Rutherford",
    "name": {
     "en": "Ernest Rutherford",
     "es": "Ernest Rutherford",
@@ -10070,6 +10238,7 @@
   },
   {
    "id": "Q42838",
+   "wiki": "Leif Erikson",
    "name": {
     "en": "Leif Erikson",
     "es": "Leif Erikson",
@@ -10131,6 +10300,7 @@
   },
   {
    "id": "Q28975",
+   "wiki": "Christopher Marlowe",
    "name": {
     "en": "Christopher Marlowe",
     "es": "Christopher Marlowe",
@@ -10192,6 +10362,7 @@
   },
   {
    "id": "Q36322",
+   "wiki": "Jane Austen",
    "name": {
     "en": "Jane Austen",
     "es": "Jane Austen",
@@ -10253,6 +10424,7 @@
   },
   {
    "id": "Q5686",
+   "wiki": "Charles Dickens",
    "name": {
     "en": "Charles Dickens",
     "es": "Charles Dickens",
@@ -10314,6 +10486,7 @@
   },
   {
    "id": "Q207380",
+   "wiki": "Isambard Kingdom Brunel",
    "name": {
     "en": "Isambard Kingdom Brunel",
     "es": "Isambard Kingdom Brunel",
@@ -10375,6 +10548,7 @@
   },
   {
    "id": "Q7251",
+   "wiki": "Alan Turing",
    "name": {
     "en": "Alan Turing",
     "es": "Alan Turing",
@@ -10436,6 +10610,7 @@
   },
   {
    "id": "Q7259",
+   "wiki": "Ada Lovelace",
    "name": {
     "en": "Ada Lovelace",
     "es": "Ada Lovelace",
@@ -10497,6 +10672,7 @@
   },
   {
    "id": "Q17714",
+   "wiki": "Stephen Hawking",
    "name": {
     "en": "Stephen Hawking",
     "es": "Stephen Hawking",
@@ -10558,6 +10734,7 @@
   },
   {
    "id": "Q1511",
+   "wiki": "Richard Wagner",
    "name": {
     "en": "Richard Wagner",
     "es": "Richard Wagner",
@@ -10619,6 +10796,7 @@
   },
   {
    "id": "Q7312",
+   "wiki": "Franz Schubert",
    "name": {
     "en": "Franz Schubert",
     "es": "Franz Schubert",
@@ -10680,6 +10858,7 @@
   },
   {
    "id": "Q83309",
+   "wiki": "Johann Strauss II",
    "name": {
     "en": "Johann Strauss II",
     "es": "Johann Strauss II",
@@ -10741,6 +10920,7 @@
   },
   {
    "id": "Q34661",
+   "wiki": "Gustav Klimt",
    "name": {
     "en": "Gustav Klimt",
     "es": "Gustav Klimt",
@@ -10802,6 +10982,7 @@
   },
   {
    "id": "Q35149",
+   "wiki": "Wilhelm Röntgen",
    "name": {
     "en": "Wilhelm Röntgen",
     "es": "Wilhelm Röntgen",
@@ -10863,6 +11044,7 @@
   },
   {
    "id": "Q37970",
+   "wiki": "Gregor Mendel",
    "name": {
     "en": "Gregor Mendel",
     "es": "Gregor Mendel",
@@ -10924,6 +11106,7 @@
   },
   {
    "id": "Q7298",
+   "wiki": "Antonín Dvořák",
    "name": {
     "en": "Antonín Dvořák",
     "es": "Antonín Dvořák",
@@ -10985,6 +11168,7 @@
   },
   {
    "id": "Q83326",
+   "wiki": "Béla Bartók",
    "name": {
     "en": "Béla Bartók",
     "es": "Béla Bartók",
@@ -11046,6 +11230,7 @@
   },
   {
    "id": "Q41309",
+   "wiki": "Franz Liszt",
    "name": {
     "en": "Franz Liszt",
     "es": "Franz Liszt",
@@ -11107,6 +11292,7 @@
   },
   {
    "id": "Q131545",
+   "wiki": "Harry Houdini",
    "name": {
     "en": "Harry Houdini",
     "es": "Harry Houdini",
@@ -11168,6 +11354,7 @@
   },
   {
    "id": "Q5603",
+   "wiki": "Andy Warhol",
    "name": {
     "en": "Andy Warhol",
     "es": "Andy Warhol",
@@ -11229,6 +11416,7 @@
   },
   {
    "id": "Q1779",
+   "wiki": "Louis Armstrong",
    "name": {
     "en": "Louis Armstrong",
     "es": "Louis Armstrong",
@@ -11290,6 +11478,7 @@
   },
   {
    "id": "Q1203",
+   "wiki": "John Lennon",
    "name": {
     "en": "John Lennon",
     "es": "John Lennon",
@@ -11351,6 +11540,7 @@
   },
   {
    "id": "Q15869",
+   "wiki": "Freddie Mercury",
    "name": {
     "en": "Freddie Mercury",
     "es": "Freddie Mercury",
@@ -11412,6 +11602,7 @@
   },
   {
    "id": "Q2831",
+   "wiki": "Michael Jackson",
    "name": {
     "en": "Michael Jackson",
     "es": "Michael Jackson",
@@ -11473,6 +11664,7 @@
   },
   {
    "id": "Q10490",
+   "wiki": "Ayrton Senna",
    "name": {
     "en": "Ayrton Senna",
     "es": "Ayrton Senna",
@@ -11534,6 +11726,7 @@
   },
   {
    "id": "Q2069",
+   "wiki": "Juan Manuel Fangio",
    "name": {
     "en": "Juan Manuel Fangio",
     "es": "Juan Manuel Fangio",
@@ -11595,6 +11788,7 @@
   },
   {
    "id": "Q36107",
+   "wiki": "Muhammad Ali",
    "name": {
     "en": "Muhammad Ali",
     "es": "Muhammad Ali",
@@ -11656,6 +11850,7 @@
   },
   {
    "id": "Q52651",
+   "wiki": "Jesse Owens",
    "name": {
     "en": "Jesse Owens",
     "es": "Jesse Owens",
@@ -11717,6 +11912,7 @@
   },
   {
    "id": "Q213812",
+   "wiki": "Babe Ruth",
    "name": {
     "en": "Babe Ruth",
     "es": "Babe Ruth",
@@ -11778,6 +11974,7 @@
   },
   {
    "id": "Q41921",
+   "wiki": "Rosa Parks",
    "name": {
     "en": "Rosa Parks",
     "es": "Rosa Parks",
@@ -11839,6 +12036,7 @@
   },
   {
    "id": "Q102870",
+   "wiki": "Harriet Tubman",
    "name": {
     "en": "Harriet Tubman",
     "es": "Harriet Tubman",
@@ -11900,6 +12098,7 @@
   },
   {
    "id": "Q215562",
+   "wiki": "Frederick Douglass",
    "name": {
     "en": "Frederick Douglass",
     "es": "Frederick Douglass",
@@ -11961,6 +12160,7 @@
   },
   {
    "id": "Q34969",
+   "wiki": "Benjamin Franklin",
    "name": {
     "en": "Benjamin Franklin",
     "es": "Benjamin Franklin",
@@ -12022,6 +12222,7 @@
   },
   {
    "id": "Q11812",
+   "wiki": "Thomas Jefferson",
    "name": {
     "en": "Thomas Jefferson",
     "es": "Thomas Jefferson",
@@ -12083,6 +12284,7 @@
   },
   {
    "id": "Q9696",
+   "wiki": "John F. Kennedy",
    "name": {
     "en": "John F. Kennedy",
     "es": "John F. Kennedy",
@@ -12144,6 +12346,7 @@
   },
   {
    "id": "Q33866",
+   "wiki": "Theodore Roosevelt",
    "name": {
     "en": "Theodore Roosevelt",
     "es": "Theodore Roosevelt",
@@ -12205,6 +12408,7 @@
   },
   {
    "id": "Q43527",
+   "wiki": "Sitting Bull",
    "name": {
     "en": "Sitting Bull",
     "es": "Toro Sentado",
@@ -12266,6 +12470,7 @@
   },
   {
    "id": "Q193406",
+   "wiki": "Pocahontas",
    "name": {
     "en": "Pocahontas",
     "es": "Pocahontas",
@@ -12327,6 +12532,7 @@
   },
   {
    "id": "Q141791",
+   "wiki": "Moctezuma II",
    "name": {
     "en": "Moctezuma II",
     "es": "Motecuhzoma Xocoyotzin",
@@ -12388,6 +12594,7 @@
   },
   {
    "id": "Q179577",
+   "wiki": "Atahualpa",
    "name": {
     "en": "Atahualpa",
     "es": "Atahualpa",
@@ -12449,6 +12656,7 @@
   },
   {
    "id": "Q453156",
+   "wiki": "Lautaro",
    "name": {
     "en": "Lautaro",
     "es": "Lautaro",
@@ -12510,6 +12718,7 @@
   },
   {
    "id": "Q28930",
+   "wiki": "Bernardo O'Higgins",
    "name": {
     "en": "Bernardo O'Higgins",
     "es": "Bernardo O'Higgins",
@@ -12571,6 +12780,7 @@
   },
   {
    "id": "Q252847",
+   "wiki": "José Gervasio Artigas",
    "name": {
     "en": "José Gervasio Artigas",
     "es": "José Gervasio Artigas",
@@ -12632,6 +12842,7 @@
   },
   {
    "id": "Q93330",
+   "wiki": "Juan Perón",
    "name": {
     "en": "Juan Perón",
     "es": "Juan Domingo Perón",
@@ -12693,6 +12904,7 @@
   },
   {
    "id": "Q8440",
+   "wiki": "Hugo Chávez",
    "name": {
     "en": "Hugo Chávez",
     "es": "Hugo Chávez",
@@ -12756,6 +12968,7 @@
  "events": [
   {
    "id": "Q48314",
+   "wiki": "Battle of Waterloo",
    "name": {
     "en": "Battle of Waterloo",
     "es": "Batalla de Waterloo",
@@ -12803,6 +13016,7 @@
   },
   {
    "id": "Q83224",
+   "wiki": "Battle of Hastings",
    "name": {
     "en": "Battle of Hastings",
     "es": "batalla de Hastings",
@@ -12862,6 +13076,7 @@
   },
   {
    "id": "Q33132",
+   "wiki": "Battle of Gettysburg",
    "name": {
     "en": "Battle of Gettysburg",
     "es": "Batalla de Gettysburg",
@@ -12921,6 +13136,7 @@
   },
   {
    "id": "Q31900",
+   "wiki": "Battle of Marathon",
    "name": {
     "en": "Battle of Marathon",
     "es": "batalla de Maratón",
@@ -12980,6 +13196,7 @@
   },
   {
    "id": "Q171416",
+   "wiki": "Battle of Trafalgar",
    "name": {
     "en": "Battle of Trafalgar",
     "es": "batalla de Trafalgar",
@@ -13039,6 +13256,7 @@
   },
   {
    "id": "Q38789",
+   "wiki": "Battle of Stalingrad",
    "name": {
     "en": "Battle of Stalingrad",
     "es": "Batalla de Stalingrado",
@@ -13098,6 +13316,7 @@
   },
   {
    "id": "Q131969",
+   "wiki": "Battle of Thermopylae",
    "name": {
     "en": "Battle of Thermopylae",
     "es": "Batalla de las Termópilas",
@@ -13157,6 +13376,7 @@
   },
   {
    "id": "Q188495",
+   "wiki": "Battle of Agincourt",
    "name": {
     "en": "Battle of Agincourt",
     "es": "Batalla de Azincourt",
@@ -13216,6 +13436,7 @@
   },
   {
    "id": "Q205422",
+   "wiki": "Battle of the Little Bighorn",
    "name": {
     "en": "Battle of the Little Bighorn",
     "es": "Batalla de Little Big Horn",
@@ -13275,6 +13496,7 @@
   },
   {
    "id": "Q459447",
+   "wiki": "Siege of Yorktown",
    "name": {
     "en": "Siege of Yorktown",
     "es": "Batalla de Yorktown",
@@ -13334,6 +13556,7 @@
   },
   {
    "id": "Q934157",
+   "wiki": "Battle of Ayacucho",
    "name": {
     "en": "Battle of Ayacucho",
     "es": "Batalla de Ayacucho",
@@ -13381,6 +13604,7 @@
   },
   {
    "id": "Q1150410",
+   "wiki": "Battle of Boyacá",
    "name": {
     "en": "Battle of Boyacá",
     "es": "Batalla de Boyacá",
@@ -13440,6 +13664,7 @@
   },
   {
    "id": "Q165425",
+   "wiki": "Battle of Lepanto",
    "name": {
     "en": "Battle of Lepanto",
     "es": "batalla de Lepanto",
@@ -13499,6 +13724,7 @@
   },
   {
    "id": "Q178850",
+   "wiki": "Battle of Salamis",
    "name": {
     "en": "Battle of Salamis",
     "es": "batalla de Salamina",
@@ -13558,6 +13784,7 @@
   },
   {
    "id": "Q179670",
+   "wiki": "Battle of Gaugamela",
    "name": {
     "en": "Battle of Gaugamela",
     "es": "batalla de Gaugamela",
@@ -13605,6 +13832,7 @@
   },
   {
    "id": "Q179591",
+   "wiki": "Battle of Cannae",
    "name": {
     "en": "Battle of Cannae",
     "es": "batalla de Cannas",
@@ -13652,6 +13880,7 @@
   },
   {
    "id": "Q173077",
+   "wiki": "Battle of Tours",
    "name": {
     "en": "Battle of Tours",
     "es": "Batalla de Poitiers",
@@ -13711,6 +13940,7 @@
   },
   {
    "id": "Q134114",
+   "wiki": "Battle of Austerlitz",
    "name": {
     "en": "Battle of Austerlitz",
     "es": "Batalla de Austerlitz",
@@ -13770,6 +14000,7 @@
   },
   {
    "id": "Q151005",
+   "wiki": "Battle of Leipzig",
    "name": {
     "en": "Battle of Leipzig",
     "es": "Batalla de Leipzig",
@@ -13829,6 +14060,7 @@
   },
   {
    "id": "Q184320",
+   "wiki": "Battle of Borodino",
    "name": {
     "en": "Battle of Borodino",
     "es": "Batalla de Borodinó",
@@ -13888,6 +14120,7 @@
   },
   {
    "id": "Q130847",
+   "wiki": "Battle of Verdun",
    "name": {
     "en": "Battle of Verdun",
     "es": "Batalla de Verdún",
@@ -13947,6 +14180,7 @@
   },
   {
    "id": "Q132568",
+   "wiki": "Battle of the Somme",
    "name": {
     "en": "Battle of the Somme",
     "es": "Batalla del Somme",
@@ -14006,6 +14240,7 @@
   },
   {
    "id": "Q164983",
+   "wiki": "Gallipoli campaign",
    "name": {
     "en": "Gallipoli Campaign",
     "es": "Batalla de Galípoli",
@@ -14065,6 +14300,7 @@
   },
   {
    "id": "Q16470",
+   "wiki": "Normandy landings",
    "name": {
     "en": "Normandy landings",
     "es": "desembarco de Normandía",
@@ -14124,6 +14360,7 @@
   },
   {
    "id": "Q173034",
+   "wiki": "Battle of Midway",
    "name": {
     "en": "Battle of Midway",
     "es": "Batalla de Midway",
@@ -14171,6 +14408,7 @@
   },
   {
    "id": "Q52418",
+   "wiki": "Attack on Pearl Harbor",
    "name": {
     "en": "Attack on Pearl Harbor",
     "es": "ataque a Pearl Harbor",
@@ -14230,6 +14468,7 @@
   },
   {
    "id": "Q130861",
+   "wiki": "Battle of Kursk",
    "name": {
     "en": "Battle of Kursk",
     "es": "Batalla de Kursk",
@@ -14289,6 +14528,7 @@
   },
   {
    "id": "Q151860",
+   "wiki": "Siege of Leningrad",
    "name": {
     "en": "Siege of Leningrad",
     "es": "Sitio de Leningrado",
@@ -14348,6 +14588,7 @@
   },
   {
    "id": "Q604897",
+   "wiki": "Battle of Dien Bien Phu",
    "name": {
     "en": "Battle of Dien Bien Phu",
     "es": "Batalla de Dien Bien Phu",
@@ -14407,6 +14648,7 @@
   },
   {
    "id": "Q747589",
+   "wiki": "Battle of Isandlwana",
    "name": {
     "en": "Battle of Isandlwana",
     "es": "Batalla de Isandhlwana",
@@ -14466,6 +14708,7 @@
   },
   {
    "id": "Q302519",
+   "wiki": "Battle of Adwa",
    "name": {
     "en": "Battle of Adwa",
     "es": "batalla de Adua",
@@ -14525,6 +14768,7 @@
   },
   {
    "id": "Q203233",
+   "wiki": "Battle of Plassey",
    "name": {
     "en": "Battle of Plassey",
     "es": "batalla de Plassey",
@@ -14584,6 +14828,7 @@
   },
   {
    "id": "Q605321",
+   "wiki": "First Battle of Panipat",
    "name": {
     "en": "Battle of Panipat",
     "es": "Batalla de Panipat",
@@ -14643,6 +14888,7 @@
   },
   {
    "id": "Q830059",
+   "wiki": "Battle of Red Cliffs",
    "name": {
     "en": "Battle of Red Cliffs",
     "es": "Batalla de los Acantilados Rojos",
@@ -14702,6 +14948,7 @@
   },
   {
    "id": "Q492415",
+   "wiki": "Battle of Talas",
    "name": {
     "en": "Battle of Talas",
     "es": "batalla del Talas",
@@ -14761,6 +15008,7 @@
   },
   {
    "id": "Q200032",
+   "wiki": "Battle of Manzikert",
    "name": {
     "en": "Battle of Manzikert",
     "es": "batalla de Manzikert",
@@ -14820,6 +15068,7 @@
   },
   {
    "id": "Q160077",
+   "wiki": "Fall of Constantinople",
    "name": {
     "en": "Fall of Constantinople",
     "es": "Caída de Constantinopla",
@@ -14879,6 +15128,7 @@
   },
   {
    "id": "Q593267",
+   "wiki": "Fall of Tenochtitlan",
    "name": {
     "en": "Fall of Tenochtitlan",
     "es": "sitio de Tenochtitlan",
@@ -14938,6 +15188,7 @@
   },
   {
    "id": "Q1061228",
+   "wiki": "Battle of Puebla",
    "name": {
     "en": "Battle of Puebla",
     "es": "Batalla de Puebla",
@@ -14997,6 +15248,7 @@
   },
   {
    "id": "Q235344",
+   "wiki": "Battle of the Alamo",
    "name": {
     "en": "Battle of the Alamo",
     "es": "Batalla de El Álamo",
@@ -15056,6 +15308,7 @@
   },
   {
    "id": "Q1425658",
+   "wiki": "Battle of Chacabuco",
    "name": {
     "en": "Battle of Chacabuco",
     "es": "Batalla de Chacabuco",
@@ -15115,6 +15368,7 @@
   },
   {
    "id": "Q1073849",
+   "wiki": "Battle of Maipú",
    "name": {
     "en": "Battle of Maipú",
     "es": "Batalla de Maipú",
@@ -15174,6 +15428,7 @@
   },
   {
    "id": "Q1402751",
+   "wiki": "Battle of Pichincha",
    "name": {
     "en": "Battle of Pichincha",
     "es": "batalla de Pichincha",
@@ -15233,6 +15488,7 @@
   },
   {
    "id": "Q388210",
+   "wiki": "Battle of Carabobo",
    "name": {
     "en": "Battle of Carabobo",
     "es": "Batalla de Carabobo",
@@ -15292,6 +15548,7 @@
   },
   {
    "id": "Q1508820",
+   "wiki": "Battle of Junín",
    "name": {
     "en": "Battle of Junín",
     "es": "Batalla de Junín",
@@ -15339,6 +15596,7 @@
   },
   {
    "id": "Q33570",
+   "wiki": "Battle of Grunwald",
    "name": {
     "en": "Battle of Grunwald",
     "es": "batalla de Grunwald",
@@ -15386,6 +15644,7 @@
   },
   {
    "id": "Q200855",
+   "wiki": "Battle of Vienna",
    "name": {
     "en": "Battle of Vienna",
     "es": "batalla de Kahlenberg",
@@ -15433,6 +15692,7 @@
   },
   {
    "id": "Q152486",
+   "wiki": "Battle of Poltava",
    "name": {
     "en": "Battle of Poltava",
     "es": "Batalla de Poltava",
@@ -15492,6 +15752,7 @@
   },
   {
    "id": "Q154635",
+   "wiki": "Battle of Blenheim",
    "name": {
     "en": "Battle of Blenheim",
     "es": "Batalla de Höchstädt",
@@ -15551,6 +15812,7 @@
   },
   {
    "id": "Q334029",
+   "wiki": "Battle of Bunker Hill",
    "name": {
     "en": "Battle of Bunker Hill",
     "es": "Batalla de Bunker Hill",
@@ -15610,6 +15872,7 @@
   },
   {
    "id": "Q719252",
+   "wiki": "Battle of Antietam",
    "name": {
     "en": "Battle of Antietam",
     "es": "Batalla de Antietam",
@@ -15669,6 +15932,7 @@
   },
   {
    "id": "Q192660",
+   "wiki": "Battle of Okinawa",
    "name": {
     "en": "Battle of Okinawa",
     "es": "Batalla de Okinawa",
@@ -15728,6 +15992,7 @@
   },
   {
    "id": "Q180182",
+   "wiki": "Battle of Iwo Jima",
    "name": {
     "en": "Battle of Iwo Jima",
     "es": "Batalla de Iwo Jima",
@@ -15787,6 +16052,7 @@
   },
   {
    "id": "Q153376",
+   "wiki": "Second Battle of El Alamein",
    "name": {
     "en": "Second Battle of El Alamein",
     "es": "Segunda batalla de El Alamein",
@@ -15846,6 +16112,7 @@
   },
   {
    "id": "Q160387",
+   "wiki": "Battle of Actium",
    "name": {
     "en": "Battle of Actium",
     "es": "batalla de Accio",
@@ -15905,6 +16172,7 @@
   },
   {
    "id": "Q131386",
+   "wiki": "Battle of Alesia",
    "name": {
     "en": "Battle of Alesia",
     "es": "Batalla de Alesia",
@@ -15964,6 +16232,7 @@
   },
   {
    "id": "Q233568",
+   "wiki": "Battle of Hattin",
    "name": {
     "en": "Battle of Hattin",
     "es": "batalla de los Cuernos de Hattin",
@@ -16023,6 +16292,7 @@
   },
   {
    "id": "Q957186",
+   "wiki": "Battle of Covadonga",
    "name": {
     "en": "Battle of Covadonga",
     "es": "batalla de Covadonga",
@@ -16082,6 +16352,7 @@
   },
   {
    "id": "Q219697",
+   "wiki": "Battle of Las Navas de Tolosa",
    "name": {
     "en": "Battle of Las Navas de Tolosa",
     "es": "batalla de Las Navas de Tolosa",
@@ -16141,6 +16412,7 @@
   },
   {
    "id": "Q203729",
+   "wiki": "Battle of Kadesh",
    "name": {
     "en": "Battle of Kadesh",
     "es": "batalla de Qadesh",
@@ -16200,6 +16472,7 @@
   },
   {
    "id": "Q200056",
+   "wiki": "Battle of Zama",
    "name": {
     "en": "Battle of Zama",
     "es": "Batalla de Zama",
@@ -16247,6 +16520,7 @@
   },
   {
    "id": "Q651919",
+   "wiki": "Battle of Culloden",
    "name": {
     "en": "Battle of Culloden",
     "es": "Batalla de Culloden",
@@ -16306,6 +16580,7 @@
   },
   {
    "id": "Q464512",
+   "wiki": "Battle of Balaclava",
    "name": {
     "en": "Battle of Balaclava",
     "es": "Batalla de Balaclava",
@@ -16365,6 +16640,7 @@
   },
   {
    "id": "Q222013",
+   "wiki": "Battle of Bosworth Field",
    "name": {
     "en": "Battle of Bosworth Field",
     "es": "Batalla de Bosworth",
@@ -16412,6 +16688,7 @@
   },
   {
    "id": "Q203225",
+   "wiki": "Battle of Stamford Bridge",
    "name": {
     "en": "Battle of Stamford Bridge",
     "es": "Batalla de Stamford Bridge",
@@ -16471,6 +16748,7 @@
   },
   {
    "id": "Q87779",
+   "wiki": "Battle of the Teutoburg Forest",
    "name": {
     "en": "Battle of the Teutoburg Forest",
     "es": "Batalla del bosque de Teutoburgo",
@@ -16530,6 +16808,7 @@
   },
   {
    "id": "Q178510",
+   "wiki": "Battle of Mohács",
    "name": {
     "en": "Battle of Mohács",
     "es": "batalla de Mohács",
@@ -16589,6 +16868,7 @@
   },
   {
    "id": "Q208127",
+   "wiki": "Battle of Tsushima",
    "name": {
     "en": "Battle of Tsushima",
     "es": "Batalla de Tsushima",
@@ -16648,6 +16928,7 @@
   },
   {
    "id": "Q234188",
+   "wiki": "Battle of Sekigahara",
    "name": {
     "en": "Battle of Sekigahara",
     "es": "Batalla de Sekigahara",
@@ -16707,6 +16988,7 @@
   },
   {
    "id": "Q716562",
+   "wiki": "Battle of Hakodate",
    "name": {
     "en": "Battle of Hakodate",
     "es": "Batalla de Hakodate",
@@ -16766,6 +17048,7 @@
   },
   {
    "id": "Q222520",
+   "wiki": "Battle of Bannockburn",
    "name": {
     "en": "Battle of Bannockburn",
     "es": "Batalla de Bannockburn",
@@ -16825,6 +17108,7 @@
   },
   {
    "id": "Q179288",
+   "wiki": "Battle of Kosovo",
    "name": {
     "en": "Battle of Kosovo",
     "es": "Batalla de Kosovo",
@@ -16884,6 +17168,7 @@
   },
   {
    "id": "Q745110",
+   "wiki": "Battle of Chaldiran",
    "name": {
     "en": "Battle of Chaldiran",
     "es": "batalla de Chaldiran",
@@ -16943,6 +17228,7 @@
   },
   {
    "id": "Q244356",
+   "wiki": "Battle of Ain Jalut",
    "name": {
     "en": "Battle of Ain Jalut",
     "es": "batalla de Ain Yalut",
@@ -17002,6 +17288,7 @@
   },
   {
    "id": "Q283364",
+   "wiki": "Battle of Legnano",
    "name": {
     "en": "Battle of Legnano",
     "es": "batalla de Legnano",
@@ -17061,6 +17348,7 @@
   },
   {
    "id": "Q644960",
+   "wiki": "Battle of the Boyne",
    "name": {
     "en": "Battle of the Boyne",
     "es": "batalla del Boyne",
@@ -17120,6 +17408,7 @@
   },
   {
    "id": "Q728480",
+   "wiki": "Battle of Rocroi",
    "name": {
     "en": "Battle of Rocroi",
     "es": "batalla de Rocroi",
@@ -17179,6 +17468,7 @@
   },
   {
    "id": "Q63468",
+   "wiki": "Battle of Pavia",
    "name": {
     "en": "Battle of Pavia",
     "es": "batalla de Pavía",
@@ -17238,6 +17528,7 @@
   },
   {
    "id": "Q154426",
+   "wiki": "Battle of Jena–Auerstedt",
    "name": {
     "en": "Battle of Jena–Auerstedt",
     "es": "Batalla de Jena",
@@ -17297,6 +17588,7 @@
   },
   {
    "id": "Q324916",
+   "wiki": "Battle of Solferino",
    "name": {
     "en": "Battle of Solferino",
     "es": "Batalla de Solferino",
@@ -17344,6 +17636,7 @@
   },
   {
    "id": "Q156681",
+   "wiki": "Battle of Sedan",
    "name": {
     "en": "Battle of Sedan",
     "es": "Batalla de Sedán",
@@ -17403,6 +17696,7 @@
   },
   {
    "id": "Q190712",
+   "wiki": "First Battle of the Marne",
    "name": {
     "en": "First Battle of the Marne",
     "es": "Batalla del Marne",
@@ -17462,6 +17756,7 @@
   },
   {
    "id": "Q426227",
+   "wiki": "Battle of Passchendaele",
    "name": {
     "en": "Third Battle of Ypres",
     "es": "Tercera batalla de Ypres",
@@ -17521,6 +17816,7 @@
   },
   {
    "id": "Q217145",
+   "wiki": "Guadalcanal campaign",
    "name": {
     "en": "Guadalcanal campaign",
     "es": "Campaña de Guadalcanal",
@@ -17580,6 +17876,7 @@
   },
   {
    "id": "Q151018",
+   "wiki": "Battle of the Bulge",
    "name": {
     "en": "Battle of the Bulge",
     "es": "Batalla de las Ardenas",
@@ -17639,6 +17936,7 @@
   },
   {
    "id": "Q483039",
+   "wiki": "Battle of Inchon",
    "name": {
     "en": "Battle of Inchon",
     "es": "Batalla de Incheon",
@@ -17698,6 +17996,7 @@
   },
   {
    "id": "Q2484240",
+   "wiki": "Battle of Vertières",
    "name": {
     "en": "Battle of Vertières",
     "es": "Batalla de Vertières",
@@ -17757,6 +18056,7 @@
   },
   {
    "id": "Q841278",
+   "wiki": "Battle of San Jacinto",
    "name": {
     "en": "Battle of San Jacinto",
     "es": "Batalla de San Jacinto",
@@ -17816,6 +18116,7 @@
   },
   {
    "id": "Q2890270",
+   "wiki": "Battle of Tucumán",
    "name": {
     "en": "Battle of Tucumán",
     "es": "Batalla de Tucumán",
@@ -17875,6 +18176,7 @@
   },
   {
    "id": "Q2236812",
+   "wiki": "Battle of Riachuelo",
    "name": {
     "en": "Battle of Riachuelo",
     "es": "Batalla del Riachuelo",
@@ -17934,6 +18236,7 @@
   },
   {
    "id": "Q2305019",
+   "wiki": "Battle of Curupayty",
    "name": {
     "en": "Battle of Curupaity",
     "es": "Batalla de Curupayty",
@@ -17993,6 +18296,7 @@
   },
   {
    "id": "Q2887897",
+   "wiki": "Battle of Arica",
    "name": {
     "en": "Battle of Arica",
     "es": "Batalla de Arica",
@@ -18052,6 +18356,7 @@
   },
   {
    "id": "Q69163529",
+   "wiki": "Fall of the Berlin Wall",
    "name": {
     "en": "fall of the Berlin Wall",
     "es": "Caída del muro de Berlín",
@@ -18111,6 +18416,7 @@
   },
   {
    "id": "Q486",
+   "wiki": "Chernobyl disaster",
    "name": {
     "en": "Chernobyl disaster",
     "es": "accidente de Chernóbil",
@@ -18170,6 +18476,7 @@
   },
   {
    "id": "Q6539",
+   "wiki": "Storming of the Bastille",
    "name": {
     "en": "Storming of the Bastille",
     "es": "Toma de la Bastilla",
@@ -18229,6 +18536,7 @@
   },
   {
    "id": "Q2577588",
+   "wiki": "Sinking of the Titanic",
    "name": {
     "en": "sinking of the RMS Titanic",
     "es": "hundimiento del RMS Titanic",
@@ -18276,6 +18584,7 @@
   },
   {
    "id": "Q8094772",
+   "wiki": "1883 eruption of Krakatoa",
    "name": {
     "en": "1883 eruption of Krakatoa",
     "es": "Erupción del volcán Krakatoa en 1883",
@@ -18335,6 +18644,7 @@
   },
   {
    "id": "Q2411998",
+   "wiki": "Eruption of Mount Vesuvius in 79 AD",
    "name": {
     "en": "eruption of Mount Vesuvius in 79",
     "es": "erupción del Vesubio en 79",
@@ -18394,6 +18704,7 @@
   },
   {
    "id": "Q193484",
+   "wiki": "Assassination of John F. Kennedy",
    "name": {
     "en": "assassination of John F. Kennedy",
     "es": "asesinato de John F. Kennedy",
@@ -18453,6 +18764,7 @@
   },
   {
    "id": "Q192050",
+   "wiki": "Assassination of Archduke Franz Ferdinand",
    "name": {
     "en": "assassination of Archduke Franz Ferdinand",
     "es": "atentado de Sarajevo",
@@ -18512,6 +18824,7 @@
   },
   {
    "id": "Q164679",
+   "wiki": "Great Fire of London",
    "name": {
     "en": "Great Fire of London",
     "es": "Gran Incendio de Londres",
@@ -18571,6 +18884,7 @@
   },
   {
    "id": "Q211386",
+   "wiki": "1906 San Francisco earthquake",
    "name": {
     "en": "1906 San Francisco earthquake",
     "es": "terremoto de 1906",
@@ -18630,6 +18944,7 @@
   },
   {
    "id": "Q130754",
+   "wiki": "2004 Indian Ocean earthquake and tsunami",
    "name": {
     "en": "2004 Indian Ocean earthquake",
     "es": "Terremoto y tsunami del Océano Índico de 2004",
@@ -18677,6 +18992,7 @@
   },
   {
    "id": "Q125953",
+   "wiki": "Tunguska event",
    "name": {
     "en": "Tunguska event",
     "es": "Evento de Tunguska",
@@ -18736,6 +19052,7 @@
   },
   {
    "id": "Q171178",
+   "wiki": "Fukushima nuclear accident",
    "name": {
     "en": "Fukushima Daiichi nuclear disaster",
     "es": "Accidente nuclear de Fukushima",
@@ -18795,6 +19112,7 @@
   },
   {
    "id": "Q8736",
+   "wiki": "Treaty of Versailles",
    "name": {
     "en": "Treaty of Versailles",
     "es": "Tratado de Versalles",
@@ -18854,6 +19172,7 @@
   },
   {
    "id": "Q180897",
+   "wiki": "Treaty of Tordesillas",
    "name": {
     "en": "Treaty of Tordesillas",
     "es": "Tratado de Tordesillas",
@@ -18913,6 +19232,7 @@
   },
   {
    "id": "Q19024",
+   "wiki": "Boston Tea Party",
    "name": {
     "en": "Boston Tea Party",
     "es": "Motín del té",
@@ -18960,6 +19280,7 @@
   },
   {
    "id": "Q129029",
+   "wiki": "Bhopal disaster",
    "name": {
     "en": "Bhopal disaster",
     "es": "desastre de Bhopal",
@@ -19019,6 +19340,7 @@
   },
   {
    "id": "Q239344",
+   "wiki": "Salt March",
    "name": {
     "en": "Salt March",
     "es": "Marcha de la sal",
@@ -19066,6 +19388,7 @@
   },
   {
    "id": "Q164815",
+   "wiki": "Woodstock",
    "name": {
     "en": "Woodstock Festival",
     "es": "Festival de Woodstock",
@@ -19125,6 +19448,7 @@
   },
   {
    "id": "Q191055",
+   "wiki": "1755 Lisbon earthquake",
    "name": {
     "en": "1755 Lisbon earthquake",
     "es": "Terremoto de Lisboa de 1755",
@@ -19184,6 +19508,7 @@
   },
   {
    "id": "Q1798567",
+   "wiki": "1985 Mexico City earthquake",
    "name": {
     "en": "1985 Mexico City earthquake",
     "es": "terremoto de México de 1985",
@@ -19243,6 +19568,7 @@
   },
   {
    "id": "Q43777",
+   "wiki": "2010 Haiti earthquake",
    "name": {
     "en": "2010 Haiti earthquake",
     "es": "terremoto de Haití de 2010",
@@ -19290,6 +19616,7 @@
   },
   {
    "id": "Q212618",
+   "wiki": "1960 Valdivia earthquake",
    "name": {
     "en": "1960 Valdivia earthquake",
     "es": "Terremoto de Valdivia de 1960",
@@ -19349,6 +19676,7 @@
   },
   {
    "id": "Q778218",
+   "wiki": "1980 eruption of Mount St. Helens",
    "name": {
     "en": "1980 eruption of Mount St. Helens",
     "es": "Erupción del Monte Santa Helena en 1980",
@@ -19408,6 +19736,7 @@
   },
   {
    "id": "Q4735638",
+   "wiki": "Deepwater Horizon oil spill",
    "name": {
     "en": "Deepwater Horizon oil spill",
     "es": "Derrame de petróleo de Deepwater Horizon",
@@ -19467,6 +19796,7 @@
   },
   {
    "id": "Q1196587",
+   "wiki": "Exxon Valdez oil spill",
    "name": {
     "en": "Exxon Valdez disaster",
     "es": "Desastre del Exxon Valdez",
@@ -19526,6 +19856,7 @@
   },
   {
    "id": "Q3182723",
+   "wiki": "Hindenburg disaster",
    "name": {
     "en": "Hindenburg disaster",
     "es": "Desastre del dirigible Hindenburg",
@@ -19573,6 +19904,7 @@
   },
   {
    "id": "Q70520",
+   "wiki": "Great Chicago Fire",
    "name": {
     "en": "Great Chicago Fire",
     "es": "Gran incendio de Chicago",
@@ -19632,6 +19964,7 @@
   },
   {
    "id": "Q3555020",
+   "wiki": "Siege of Masada",
    "name": {
     "en": "Siege of Masada",
     "es": "sitio de Masada",
@@ -19691,6 +20024,7 @@
   },
   {
    "id": "Q46362",
+   "wiki": "Congress of Vienna",
    "name": {
     "en": "Congress of Vienna",
     "es": "Congreso de Viena",
@@ -19750,6 +20084,7 @@
   },
   {
    "id": "Q161227",
+   "wiki": "Yalta Conference",
    "name": {
     "en": "Yalta Conference",
     "es": "conferencia de Yalta",
@@ -19809,6 +20144,7 @@
   },
   {
    "id": "Q151187",
+   "wiki": "Potsdam Conference",
    "name": {
     "en": "Potsdam Conference",
     "es": "Conferencia de Potsdam",
@@ -19868,6 +20204,7 @@
   },
   {
    "id": "Q172991",
+   "wiki": "Council of Trent",
    "name": {
     "en": "Council of Trent",
     "es": "Concilio de Trento",
@@ -19927,6 +20264,7 @@
   },
   {
    "id": "Q150995",
+   "wiki": "Peace of Westphalia",
    "name": {
     "en": "Peace of Westphalia",
     "es": "Paz de Westfalia",
@@ -19974,6 +20312,7 @@
   },
   {
    "id": "Q472802",
+   "wiki": "Treaty of Waitangi",
    "name": {
     "en": "Treaty of Waitangi",
     "es": "Tratado de Waitangi",
@@ -20021,6 +20360,7 @@
   },
   {
    "id": "Q193689",
+   "wiki": "Easter Rising",
    "name": {
     "en": "Easter Rising",
     "es": "Alzamiento de Pascua",
@@ -20080,6 +20420,7 @@
   },
   {
    "id": "Q170351",
+   "wiki": "Bombing of Guernica",
    "name": {
     "en": "Bombing of Guernica",
     "es": "bombardeo de Guernica",
@@ -20139,6 +20480,7 @@
   },
   {
    "id": "Q152142",
+   "wiki": "Bombing of Dresden",
    "name": {
     "en": "Bombing of Dresden",
     "es": "Bombardeo de Dresde",
@@ -20198,6 +20540,7 @@
   },
   {
    "id": "Q175653",
+   "wiki": "Siege of Sarajevo",
    "name": {
     "en": "Siege of Sarajevo",
     "es": "Sitio de Sarajevo",
@@ -20257,6 +20600,7 @@
   },
   {
    "id": "Q191721",
+   "wiki": "Bay of Pigs Invasion",
    "name": {
     "en": "Bay of Pigs invasion",
     "es": "Invasión de Bahía de Cochinos",
@@ -20304,6 +20648,7 @@
   },
   {
    "id": "Q1144693",
+   "wiki": "Minoan eruption",
    "name": {
     "en": "Minoan eruption",
     "es": "Erupción minoica",
@@ -20363,6 +20708,7 @@
   },
   {
    "id": "Q269442",
+   "wiki": "2010 eruptions of Eyjafjallajökull",
    "name": {
     "en": "2010 eruptions of Eyjafjallajökull",
     "es": "Erupción del Eyjafjallajökull de 2010",
@@ -20422,6 +20768,7 @@
   },
   {
    "id": "Q8080",
+   "wiki": "1896 Summer Olympics",
    "name": {
     "en": "1896 Summer Olympics",
     "es": "Juegos Olímpicos de Atenas 1896",
@@ -20481,6 +20828,7 @@
   },
   {
    "id": "Q8150",
+   "wiki": "1936 Summer Olympics",
    "name": {
     "en": "1936 Summer Olympics",
     "es": "Juegos Olímpicos de Berlín 1936",
@@ -20540,6 +20888,7 @@
   },
   {
    "id": "Q8429",
+   "wiki": "1968 Summer Olympics",
    "name": {
     "en": "1968 Summer Olympics",
     "es": "Juegos Olímpicos de México 1968",
@@ -20599,6 +20948,7 @@
   },
   {
    "id": "Q8488",
+   "wiki": "1992 Summer Olympics",
    "name": {
     "en": "1992 Summer Olympics",
     "es": "Juegos Olímpicos de Barcelona 1992",
@@ -20658,6 +21008,7 @@
   },
   {
    "id": "Q80130",
+   "wiki": "Nuremberg trials",
    "name": {
     "en": "Nuremberg trials",
     "es": "Juicios de Nüremberg",
@@ -20717,6 +21068,7 @@
   },
   {
    "id": "Q133331",
+   "wiki": "First Council of Nicaea",
    "name": {
     "en": "First Council of Nicaea",
     "es": "Concilio de Nicea I",
@@ -20776,6 +21128,7 @@
   },
   {
    "id": "Q1457989",
+   "wiki": "Congress of Tucumán",
    "name": {
     "en": "Congress of Tucumán deputies",
     "es": "Congreso de Tucumán",
@@ -20835,6 +21188,7 @@
   },
   {
    "id": "Q1145411",
+   "wiki": "Grito de Dolores",
    "name": {
     "en": "Grito de Dolores",
     "es": "Grito de Dolores",
@@ -20894,6 +21248,7 @@
   },
   {
    "id": "Q2294549",
+   "wiki": "Proclamation of the Republic (Brazil)",
    "name": {
     "en": "Proclamation of the Republic",
     "es": "Proclamación de la República de Brasil",
@@ -20941,6 +21296,7 @@
   },
   {
    "id": "Q858145",
+   "wiki": "Space Shuttle Challenger disaster",
    "name": {
     "en": "Space Shuttle Challenger disaster",
     "es": "accidente del transbordador espacial Challenger",
@@ -21000,6 +21356,7 @@
   },
   {
    "id": "Q1348910",
+   "wiki": "1908 Messina earthquake",
    "name": {
     "en": "1908 Messina earthquake",
     "es": "Terremoto de Mesina de 1908",
@@ -21047,6 +21404,7 @@
   },
   {
    "id": "Q274498",
+   "wiki": "Great Kantō Earthquake",
    "name": {
     "en": "1923 Great Kantō Earthquake",
     "es": "Gran terremoto de Kantō",
@@ -21094,6 +21452,7 @@
   },
   {
    "id": "Q214866",
+   "wiki": "1995 Hanshin earthquake",
    "name": {
     "en": "Great Hanshin Earthquake",
     "es": "Gran terremoto de Hanshin-Awaji",
@@ -21153,6 +21512,7 @@
   },
   {
    "id": "Q3245204",
+   "wiki": "1970 Ancash earthquake",
    "name": {
     "en": "1970 Ancash earthquake",
     "es": "terremoto de Áncash de 1970",
@@ -21188,6 +21548,7 @@
   },
   {
    "id": "Q2532815",
+   "wiki": "Armero tragedy",
    "name": {
     "en": "Armero tragedy",
     "es": "Tragedia de Armero",
@@ -21247,6 +21608,7 @@
   },
   {
    "id": "Q386230",
+   "wiki": "1902 eruption of Mount Pelée",
    "name": {
     "en": "1902 eruption of Mount Pelée",
     "es": "Erupción del Monte Pelée de 1902",
@@ -21306,6 +21668,7 @@
   },
   {
    "id": "Q3591483",
+   "wiki": "1815 eruption of Mount Tambora",
    "name": {
     "en": "1815 eruption of Mount Tambora",
     "es": "Erupción del Tambora de 1815",
@@ -21365,6 +21728,7 @@
   },
   {
    "id": "Q502073",
+   "wiki": "Halifax Explosion",
    "name": {
     "en": "Halifax explosion",
     "es": "explosión de Halifax",
@@ -21424,6 +21788,7 @@
   },
   {
    "id": "Q840847",
+   "wiki": "Three Mile Island accident",
    "name": {
     "en": "Three Mile Island accident",
     "es": "Accidente de Three Mile Island",
@@ -21483,6 +21848,7 @@
   },
   {
    "id": "Q7827087",
+   "wiki": "Torrey Canyon oil spill",
    "name": {
     "en": "Torrey Canyon oil spill",
     "es": "Torrey Canyon oil spill",
@@ -21530,6 +21896,7 @@
   },
   {
    "id": "Q384291",
+   "wiki": "Aberfan disaster",
    "name": {
     "en": "Aberfan disaster",
     "es": "Catástrofe de Aberfan",
@@ -21589,6 +21956,7 @@
   },
   {
    "id": "Q308923",
+   "wiki": "Munich air disaster",
    "name": {
     "en": "Munich air disaster",
     "es": "Desastre aéreo de Múnich",
@@ -21648,6 +22016,7 @@
   },
   {
    "id": "Q737967",
+   "wiki": "Uruguayan Air Force Flight 571",
    "name": {
     "en": "1972 Andes flight disaster",
     "es": "Vuelo 571 de la Fuerza Aérea Uruguaya",
@@ -21707,6 +22076,7 @@
   },
   {
    "id": "Q214790",
+   "wiki": "2010 Copiapó mining accident",
    "name": {
     "en": "2010 Copiapó mining accident",
     "es": "derrumbe de la mina San Francisco",
@@ -21766,6 +22136,7 @@
   },
   {
    "id": "Q55301634",
+   "wiki": "Tham Luang cave rescue",
    "name": {
     "en": "Tham Luang cave rescue",
     "es": "Rescate de la cueva Tham Luang",
@@ -21813,6 +22184,7 @@
   },
   {
    "id": "Q2533735",
+   "wiki": "Discovery of the tomb of Tutankhamun",
    "name": {
     "en": "discovery of Tutankhamun's grave",
     "es": "descubrimiento de la tumba de Tutankamón",
@@ -21872,6 +22244,7 @@
   },
   {
    "id": "Q167457",
+   "wiki": "Treaty of Rome",
    "name": {
     "en": "Treaty of Rome",
     "es": "Tratados de Roma",
@@ -21931,6 +22304,7 @@
   },
   {
    "id": "Q11146",
+   "wiki": "Maastricht Treaty",
    "name": {
     "en": "Maastricht Treaty",
     "es": "Tratado de Maastricht",
@@ -21990,6 +22364,7 @@
   },
   {
    "id": "Q309204",
+   "wiki": "Camp David Accords",
    "name": {
     "en": "Camp David Accords",
     "es": "Acuerdos de Camp David",

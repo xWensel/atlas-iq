@@ -22,6 +22,8 @@ const read = f => fs.readFileSync(path.join(ROOT, f), "utf8");
 
 const ctx = { window: {} }; vm.createContext(ctx);
 vm.runInContext(read("data/places.js"), ctx);
+vm.runInContext(read("data/codex.js"), ctx);
+const ckey = ctx.window.AIQ.ckey;             // la misma clave de la Enciclopedia que usa el juego
 const PLACES = ctx.window.AIQ.PLACES;      // [id, kind, tier, lat, lon, countryQID, names{en..it}, fame0-99]
 const PCOUNTRY = ctx.window.AIQ.PCOUNTRY;  // {QID: {en, es, ...}}
 const FACTS_EN = JSON.parse(read("data/wiki/en-s.json"));
@@ -205,13 +207,13 @@ function mkPersonDest(p) {
   const ctry = countryAt(p.lat, p.lon) || p.country;
   const fact = by10(l => [joinTxt(l)(p.place && p.place[l], ctry && (ctry[l] || ctry.en)), short(p.desc[l])].filter(Boolean).join(" · "));
   const name = by10(l => p.name[l]);
-  return { n: name.en, n6: restL(name), s6: by10(l => (p.born == null ? "" : `${yr(p.born, l)}–${yr(p.died, l)}`)), lat: p.lat, lon: p.lon, f: fact.en, f6: restL(fact), img: p.img };
+  return { n: name.en, n6: restL(name), ck: ckey(p.wiki || name.en), s6: by10(l => (p.born == null ? "" : `${yr(p.born, l)}–${yr(p.died, l)}`)), lat: p.lat, lon: p.lon, f: fact.en, f6: restL(fact), img: p.img };
 }
 function mkEventDest(e) {
   const ctry = countryAt(e.lat, e.lon);                                  // nunca el P17 de Wikidata: suele ser el estado de la epoca
   const name = by10(l => ucf(e.name[l]));
   const fact = by10(l => joinTxt(l)(e.place && e.place[l], ctry && (ctry[l] || ctry.en)) || short(e.desc[l]));
-  return { n: name.en, n6: restL(name), s6: by10(l => yr(e.year, l)), lat: e.lat, lon: e.lon, f: fact.en, f6: restL(fact) };
+  return { n: name.en, n6: restL(name), ck: ckey(e.wiki || name.en), s6: by10(l => yr(e.year, l)), lat: e.lat, lon: e.lon, f: fact.en, f6: restL(fact) };
 }
 
 /* ---------------------------------------------------------------- niveles */

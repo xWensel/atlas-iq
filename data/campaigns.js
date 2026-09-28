@@ -136,7 +136,7 @@ window.AIQ = window.AIQ || {};
         const kind = L.kind || (L.bonus ? "clue" : kindOf(L.name));
         const mk = d => {
             if (d.n6) return {                                                              // Eventos/Personajes: textos ya traducidos por tools/build-classic.mjs
-              t: "p", lat: d.lat, lon: d.lon, cid: [A.ckey(d.n)], img: d.img || null,
+              t: "p", lat: d.lat, lon: d.lon, cid: [d.ck || A.ckey(d.n)], img: d.img || null,
               name: { en: d.n, ...d.n6 }, sub: d.s6 || same(""), clue: false, answer: null, fact: { en: d.f, ...d.f6 },
             };
             const clue = L.bonus && d.f;
