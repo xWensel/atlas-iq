@@ -14,8 +14,8 @@ window.AIQ = window.AIQ || {};
 
   const R = A.rank = {
     hash, ymd, week,
-    dailySeed: () => R.daily.board(), weeklySeed: () => "weekly-" + week(),
-    boards: { daily: () => R.daily.board(), weekly: () => "weekly-" + week(), adv: "adv-all" },   // el reto diario va por la fecha LOCAL (ver R.daily)
+    dailySeed: () => R.daily.board(),
+    boards: { daily: () => R.daily.board(), adv: "adv-all" },   // solo hay tres tablas: el reto de hoy y el de ayer (fecha LOCAL, ver R.daily) y la Aventura de siempre
     remote: null,                                                   // null = sin comprobar, true/false = servidor disponible
   };
 

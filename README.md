@@ -228,10 +228,10 @@
 - Efectos y sonidos nuevos: pin que cae con ondas y chispas, monedas que vuelan, sonar, jefe, compra, logro.
 
 ### Clasificación global (opcional)
-`api/top.js` y `api/submit.js` guardan las tablas en Upstash Redis. En Vercel: *Storage → Marketplace → Upstash Redis* (crea `KV_REST_API_URL` y `KV_REST_API_TOKEN`) y vuelve a desplegar. Sin eso, el juego usa la clasificación local (y la pantalla del Reto diario dice "Solo este equipo").
+`api/top.js` y `api/submit.js` guardan las tablas en Upstash Redis (activado el 2026-09-28: base `geolite-clasification`, plan Free, región `iad1` junto a las funciones). En Vercel: *Storage → Marketplace → Upstash Redis* (crea `KV_REST_API_URL` y `KV_REST_API_TOKEN`) y vuelve a desplegar. Sin eso, el juego usa la clasificación local (y la pantalla del Reto diario dice "Solo este equipo"). Solo hay tres clasificaciones: **Hoy** y **Ayer** (el reto de cada día) y **Aventura** (las expediciones del modo Aventura de siempre; los intentos del reto no cuentan ahí). El servidor rechaza cualquier otra tabla.
 - **Reto diario** (`daily-AAAAMMDD`, fecha local del jugador; el servidor acepta hoy ±1 día en UTC): el cliente manda `{ board, id, name, tries:[s1, s2, s3] }`. Cada intento se guarda una sola vez (`HSETNX tr:<tablero>:<id>`), así que reenviar no puede subir un intento ya guardado; la tabla `lb:<tablero>` ordena por la suma (puntuación global del día) y `tries:<tablero>` guarda el desglose para los puntitos de la tabla.
 - `GET /api/top?board=…&n=8&me=<id>` devuelve también `count` (jugadores) y `me` (tu puesto aunque no estés entre los primeros).
-- Resto de tablas (`adv-all`, `classic-…`): igual que antes, la mejor puntuación de cada jugador (`ZADD GT`).
+- **Aventura** (`adv-all`): la mejor expedición de cada jugador (`ZADD GT`).
 **Antitrampas:** hoy la puntuación es de confianza (límites de plausibilidad y de frecuencia). Antes de Steam hay que reproducir cada partida en servidor a partir de la semilla y los clics.
 
 Herramienta de desarrollo: `dev/bot.js` (jugador automático para equilibrar la Aventura: `bot2(errorKm)`).
