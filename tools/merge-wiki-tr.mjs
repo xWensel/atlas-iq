@@ -27,7 +27,7 @@ for (const f of fs.readdirSync(TR).filter(f => /^[a-z]{2}\.json$/.test(f))) {
   let n = 0, kept = 0;
   for (const [id, r] of Object.entries(T)) {
     if (W[id] && !W[id][4]) { kept++; continue; }                          // ya hay articulo propio en ese idioma
-    W[id] = [r[0], r[1] || "", r[2] || "", r[3] || "", "en"]; n++;
+    W[id] = [r[0], r[1] || "", r[2] || "", r[3] || "", "en", ...(W[id] || []).slice(5)]; n++;   // conserva r[5]/r[6] (tiers de codex-tiers.mjs)
     const p = byId[id];
     if (p) {
       const d = r[1] ? r[1][0].toUpperCase() + r[1].slice(1) + (CJK(L) ? "。" : ". ") : "", s = (d + firstSentence(r[2] || "", L)).slice(0, 240);

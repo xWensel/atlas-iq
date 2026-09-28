@@ -383,8 +383,9 @@ window.AIQ = window.AIQ || {};
     const par = t => String(t || "").split(/\n{2,}|\n/).filter(x => x.trim()).map(x => `<p>${x.replace(/</g, "&lt;")}</p>`).join("");
     const heroWanted = rec.img && !$("cxHero");
     const T = tiers(rec), body = e.parent ? (e.tier === 2 ? T.hist : T.key) : T.intro, head = e.parent ? A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : A.t("codex.about");
+    const ttr = e.parent && rec.tierTr && rec.tierTr[e.tier === 2 ? "h" : "k"];   // este tier se tradujo a mano: se acredita y enlaza el original
     box().innerHTML = `<h3>${head}</h3>${par(body || rec.extract)}
-      <p class="cx-src">${A.t(rec.tr ? "codex.license.tr" : "codex.license")} ·<a href="${rec.url || "#"}" target="_blank" rel="noopener">${A.t("codex.wiki")} ↗</a></p>`;
+      <p class="cx-src">${A.t(rec.tr || ttr ? "codex.license.tr" : "codex.license")} ·<a href="${(ttr && ttr.url) || rec.url || "#"}" target="_blank" rel="noopener">${A.t("codex.wiki")} ↗</a></p>`;
     if (heroWanted) renderDetail(id);
   }
   /* 3 textos a partir del articulo del lugar: generico (descripcion + inicio), historia y dato clave (el resto del texto de cabecera) */
@@ -395,6 +396,7 @@ window.AIQ = window.AIQ || {};
     const J = /^(zh|ja)$/.test(rec.lang) ? "" : " ";                  // chino y japones: las frases van pegadas, sin espacio
     let n = 0, len = 0; while (n < sents.length && (n < 2 || len < 200) && n < 3) len += sents[n++].length;
     const intro = sents.slice(0, n).join(J), rest = sents.slice(n);
+    if (rec.key) return (tierMem[k] = { intro: intro || A.cleanText(rec.extract), hist: hist.join("\n"), key: A.cleanText(rec.key) });   // tiers propios (r[5]): sin recortes
     let histP = hist, key = rest.join(J);
     if (key.length < 90 && hist.length > 1) { const h = Math.ceil(hist.length / 2); histP = hist.slice(0, h); key = (key ? key + "\n" : "") + hist.slice(h).join("\n"); }   // extractos muy cortos: la historia se reparte
     if (!histP.length && rest.length > 2) { const h = Math.ceil(rest.length / 2); histP = [rest.slice(0, h).join(J)]; key = rest.slice(h).join(J); }
