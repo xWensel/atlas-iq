@@ -19,25 +19,36 @@ window.AIQ = window.AIQ || {};
     remote: null,                                                   // null = sin comprobar, true/false = servidor disponible
   };
 
-  /* comprobacion unica de la API global (si no existe, todo sigue en local) */
+  /* peticion JSON con tiempo maximo: sin red o con el servidor colgado nada se queda esperando (ni la fila de envios) */
+  const fetchJ = (url, opt = {}, ms = 8000) => { const c = new AbortController(), t = setTimeout(() => c.abort(), ms); return fetch(url, { ...opt, signal: c.signal }).then(r => r.json()).finally(() => clearTimeout(t)); };
+  /* comprobacion de la API global (si no existe, todo sigue en local). Si falla (sin red, servidor dormido) se vuelve a probar al minuto:
+     antes un primer fallo dejaba toda la sesion en local y las puntuaciones de esa sesion no llegaban nunca a la clasificacion */
   R.check = () => R._chk || (R._chk = (async () => {
     if (!/^https?:$/.test(location.protocol) || /localhost|127\.0\.0\.1/.test(location.hostname)) { R.remote = false; return false; }
-    try { const c = new AbortController(); setTimeout(() => c.abort(), 2500); const r = await fetch("/api/top?board=ping", { signal: c.signal }); const j = await r.json(); R.remote = !!(j && j.ok); } catch (e) { R.remote = false; }
+    try { const j = await fetchJ("/api/top?board=ping", {}, 2500); R.remote = !!(j && j.ok); } catch (e) { R.remote = false; }
+    if (!R.remote) setTimeout(() => { R._chk = null; }, 60000);
     return R.remote;
   })());
 
   /* ---------- tablas ---------- */
   /* nombre con el que rankeas (sin nombre, "Anonimo" en tu idioma) */
   R.name = () => A.profile.get().name || A.T("Anónimo", "Anonymous");
-  /* los envios al servidor van en fila: si cambias el nombre justo al acabar la partida, el "Anonimo" que iba de camino no pisa al nombre nuevo */
+  /* los envios al servidor van en fila: si cambias el nombre justo al acabar la partida, el "Anonimo" que iba de camino no pisa al nombre nuevo
+     (se abandona a los 20 s, mas de lo que puede tardar el servidor: 4 llamadas a Redis de 4 s como mucho; uno abandonado no llega detras del siguiente) */
   let line = Promise.resolve();
   const post = body => (line = line.catch(() => null).then(async () => {
-    try { const r = await fetch("/api/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); const j = await r.json(); return j && j.ok ? j : null; } catch (e) { return null; }
+    try { const j = await fetchJ("/api/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }, 20000); return j && j.ok ? j : null; } catch (e) { return null; }
   }));
   R.localTop = (board, n = 20) => ((A.profile.get().boards[board] || []).slice().sort((a, b) => b.score - a.score).slice(0, n));
-  /* {global, rows:[{id,name,score,tries?}], me?:{rank,score}, count?}: con el servidor, tu puesto aunque no estes entre los n primeros */
-  R.top = async (board, n = 20) => {
-    if (await R.check()) { try { const r = await fetch(`/api/top?board=${encodeURIComponent(board)}&n=${n}&me=${encodeURIComponent(A.profile.get().id)}`); const j = await r.json(); if (j.ok) return { global: true, rows: j.rows, me: j.me || null, count: j.count || j.rows.length }; } catch (e) { /* cae a local */ } }
+  /* {global, rows:[{id?,name,score,tries?}], me?:{rank,score}, count?}: con el servidor, tu puesto aunque no estes entre los n primeros
+     (el servidor solo devuelve el id de tu propia fila: los de los demas no se ensenan) */
+  R.top = async (board, n = 20, again) => {
+    if (await R.check()) { try { const j = await fetchJ(`/api/top?board=${encodeURIComponent(board)}&n=${n}&me=${encodeURIComponent(A.profile.get().id)}`); if (j.ok) {
+      /* tus intentos del dia no llegaron (jugaste sin red, servidor dormido, limite de envios): se reenvian una vez y se vuelve a pedir la tabla */
+      const st = !again && /^daily-\d{8}$/.test(board) && R.daily.get(board);
+      if (st && st.done && (!j.me || j.me.score < st.total)) { await R.daily.submit(board); return R.top(board, n, true); }
+      return { global: true, rows: j.rows, me: j.me || null, count: j.count || j.rows.length };
+    } } catch (e) { /* cae a local */ } }
     return { global: false, rows: R.localTop(board, n) };
   };
   /* entrada: {score, extra:{...}}. Devuelve {rank?, record}. */

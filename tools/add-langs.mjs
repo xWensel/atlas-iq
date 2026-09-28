@@ -144,7 +144,8 @@ function assemble(all, vts, CL) {
     const names = p[6];
     for (const L of NEW) { const r = all[L][p[0]]; if (r) names[L] = clean((vts[L] || {})[r[0]] || r[0]); if (NFIX[p[0]] && NFIX[p[0]][L]) names[L] = NFIX[p[0]][L]; }
   }
-  for (const q of Object.keys(PCOUNTRY)) for (const L of NEW) { const v = CL[q] && CL[q][L]; if (v) PCOUNTRY[q][L] = v; }
+  const CLAB = fs.existsSync(path.join(ROOT, "tools", "country-labels.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "country-labels.json"), "utf8")) : {};   // nombres corregidos a mano: mandan sobre Wikidata
+  for (const q of Object.keys(PCOUNTRY)) for (const L of NEW) { const v = (CLAB[q] && CLAB[q][L]) || (CL[q] && CL[q][L]); if (v) PCOUNTRY[q][L] = v; }
   fs.writeFileSync(path.join(ROOT, "data", "places.js"), "/* Generado por tools/build-places.mjs + tools/add-langs.mjs - no editar. [id, tipo, tier, lat, lon, pais(QID), nombres{en,es,fr,pt,de,it,zh,ko,ja,ru,pl}, dificultad 0-99 (0 = el mas famoso)] */\nwindow.AIQ = window.AIQ || {};\nwindow.AIQ.PLACES = " + JSON.stringify(PLACES) + ";\nwindow.AIQ.PCOUNTRY = " + JSON.stringify(PCOUNTRY) + ";\n");
   console.log("places.js actualizado:", PLACES.length, "lugares");
 }

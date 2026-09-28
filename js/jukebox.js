@@ -12,7 +12,7 @@
     el.innerHTML = `<button type="button" class="np-b" data-d="-1" data-tf="songprev"><i class="np-tri l"></i></button>
       <span class="np-t"><i class="np-note">♪</i><b id="npT"></b><em id="npN"></em></span>
       <button type="button" class="np-b" data-d="1" data-tf="songnext"><i class="np-tri r"></i></button>`;
-    document.body.appendChild(el);
+    document.body.appendChild(el); if (A.ariaSync) A.ariaSync();                  // nombre accesible de las flechas, en el idioma del juego
     el.addEventListener("click", e => { const b = e.target.closest(".np-b"); if (b) step(+b.dataset.d); });
     el.addEventListener("pointerenter", () => { hover = true; clearTimeout(tm); });
     el.addEventListener("pointerleave", () => { hover = false; arm(1600); });

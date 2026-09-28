@@ -36,12 +36,12 @@
   /* distancia mostrada al jugador: respeta S.units. Publica en A porque hub.js y adventure.js tambien muestran distancias. */
   A.fmtDist = km => {
     const mi = S.units === "mi", v = mi ? km / 1.609344 : km;
-    return (v < 10 ? v.toFixed(1) : A.fmt(v)) + " " + (mi ? "mi" : "km");
+    return (v < 10 ? A.fmt1(v) : A.fmt(v)) + " " + (mi ? "mi" : "km");
   };
   const fmtKm = A.fmtDist;
 
   /* ------------------------------------------------------------ arranque */
-  load(); A.wiki.loadShort(A.lang);
+  load(); A.wiki.loadShort(A.wlang());                                    // es-419 usa las notas de es (no hay es-419-s.json)
   const world = A.geo.buildWorld();
   { const col = $("leftCol"), pl = document.querySelector(".plate-sh"); if (col && pl) col.appendChild(pl); }        // columna izquierda: placa, marcador de partida y logros (el mapa queda libre)
   const map = A.createMap($("map"), world, onPick);
@@ -76,12 +76,12 @@
     }
     el.style.setProperty("--t", instant ? "0s" : ms + "ms"); el.style.setProperty("--dl", instant ? "0ms" : delay + "ms");
     el._cols.forEach((c, i) => c.style.setProperty("--d", digits[i]));
-    if (tick && !instant && value > 0) rollSound(ms, delay);
+    if (tick && !instant && value > 0) rollSound(ms, delay, el);
   }
-  function rollSound(ms, delay) {
-    const n = 12;
-    for (let i = 0; i < n; i++) setTimeout(() => A.sfx.count(i / (n - 1)), delay + (ms * 0.85 * i) / n);
-    setTimeout(A.sfx.countEnd, delay + ms * 0.9);
+  function rollSound(ms, delay, el) {
+    const n = 12, live = () => el.isConnected && el.getClientRects().length > 0;   // si el ticket o el veredicto ya se han ido, la maquinita calla
+    for (let i = 0; i < n; i++) setTimeout(() => { if (live()) A.sfx.count(i / (n - 1)); }, delay + (ms * 0.85 * i) / n);
+    setTimeout(() => { if (live()) A.sfx.countEnd(); }, delay + ms * 0.9);
   }
   const odoNow = (el, v) => odoSet(el, v, { instant: true });
 
@@ -112,7 +112,7 @@
   /* ------------------------------------------------------------ HUD */
   function applyLang() {
     document.documentElement.lang = A.lang;
-    document.querySelectorAll("[data-i]").forEach(el => (el.textContent = A.t(el.dataset.i)));
+    document.querySelectorAll("[data-i]").forEach(el => (el.textContent = A.t(el.dataset.i))); if (S.settingsOpen) fitSetSoon();
     if (S.camp) updateHud();
     if (S.phase === "asking") setPrompt();
     syncSettings();
@@ -147,10 +147,10 @@
     $("askName").classList.toggle("ask-flag-wrap", flagRound);
     $("askName").classList.toggle("ask-person-wrap", portrait);
     if (flagRound && A.adv.renderFlag) { A.adv.renderFlag(o); }
-    else if (portrait) {                                                   // Personajes: retrato (Wikimedia Commons, como las banderas) + nombre
+    else if (portrait) {                                                   // Personajes: retrato (la foto empaquetada de su tarjeta) + nombre
       const el = $("askName"), img = document.createElement("img"), nm = document.createElement("b");
       img.className = "ask-portrait"; img.alt = ""; img.draggable = false;
-      img.src = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(o.img)}?width=240`;
+      img.src = A.media(`assets/wiki/card/${A.mediaKey(o.cid[0])}.webp`);   // la foto ya va empaquetada (antes se pedia en vivo a Commons: nada de Wikipedia al jugar)
       img.onerror = () => img.remove();
       nm.textContent = A.tx(o.name); el.replaceChildren(img, nm);
       A.renderBlanks($("askSub"), A.tx(o.sub));
@@ -158,11 +158,13 @@
     else { $("askName").textContent = A.tx(o.name); A.renderBlanks($("askSub"), A.tx(o.sub)); if (S.run && A.adv.decorate) A.adv.decorate(o); }
     $("plate").classList.toggle("clue", !!o.clue);
   }
+  /* nota de campo al revelar (y al cambiar de idioma con el ticket abierto: antes ahi se perdia el dato de la Wikipedia y el de las pistas) */
+  const factLine = o => (o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}${A.tx(o.fact) ? " — " + A.tx(o.fact) : ""}` : A.tx(o.fact) || A.factOf(o));
   function setTimer(left) {
     const f = Math.max(0, left / S.limit);
     $("timeFill").style.transform = `scaleX(${f})`;
     const str = Math.max(0, left).toFixed(1);
-    if (str !== S.lastTimeStr) { S.lastTimeStr = str; $("timeTxt").textContent = str; $("plate").classList.toggle("hurry", f < 0.3 && left > 0); }
+    if (str !== S.lastTimeStr) { S.lastTimeStr = str; $("timeTxt").textContent = A.fmt1(+str); $("plate").classList.toggle("hurry", f < 0.3 && left > 0); }
   }
   function setStreak() {
     const c = $("streakChip");
@@ -193,8 +195,8 @@
     $("rowCursor").classList.toggle("hidden", !A.cursor.available);
     setTab(S.setTab, true); if (A.jukebox) A.jukebox.sync();
     const rs = $("resetSet"); if (rs && !rs.classList.contains("armed")) rs.textContent = A.t("set.reset"); $("resetSetNote").textContent = A.t("set.reset.d");
-    const ra = $("resetAll"); if (ra && !ra.classList.contains("armed")) ra.textContent = A.T("Reiniciar TODO desde cero (desarrollo)", "Reset EVERYTHING from scratch (dev)");
-    if ($("resetAllNote")) $("resetAllNote").textContent = A.T("Borra partida guardada, perfil, logros, barajas y ascensiones desbloqueadas, récords, Enciclopedia, tutorial y ajustes. Solo para desarrollo.", "Deletes the saved run, profile, achievements, unlocked decks and ascensions, records, Encyclopedia, tutorial and settings. Dev only.");
+    const ra = $("resetAll"); if (ra && !ra.classList.contains("armed")) ra.textContent = A.pick6("Borrar todos mis datos y empezar de cero|Delete all my data and start over|Effacer toutes mes données et repartir de zéro|Apagar todos os meus dados e começar do zero|Alle meine Daten löschen und neu anfangen|Cancella tutti i miei dati e ricomincia da zero|Borrar todos mis datos y empezar de cero|删除我的全部数据，从头开始|내 데이터를 모두 지우고 처음부터 시작|すべてのデータを消して最初から始める|Удалить все мои данные и начать заново|Usuń wszystkie moje dane i zacznij od nowa");   // antes "(desarrollo)": es un borrado completo para cualquier jugador, con doble confirmacion
+    if ($("resetAllNote")) $("resetAllNote").textContent = A.pick6("Borra de este dispositivo tu partida guardada, perfil, logros, barajas y ascensiones, récords, Enciclopedia, tutorial y ajustes. No se puede deshacer.|Deletes your saved run, profile, achievements, decks and ascensions, records, Encyclopedia, tutorial and settings from this device. It can’t be undone.|Efface de cet appareil ta partie sauvegardée, ton profil, tes succès, paquets et ascensions, records, Encyclopédie, tutoriel et réglages. C’est irréversible.|Apaga deste dispositivo sua partida salva, perfil, conquistas, baralhos e ascensões, recordes, Enciclopédia, tutorial e configurações. Não dá para desfazer.|Löscht auf diesem Gerät deinen Spielstand, dein Profil, Erfolge, Decks und Aufstiege, Rekorde, Enzyklopädie, Tutorial und Einstellungen. Kann nicht rückgängig gemacht werden.|Cancella da questo dispositivo la partita salvata, il profilo, gli obiettivi, mazzi e ascensioni, record, Enciclopedia, tutorial e impostazioni. Non si può annullare.|Borra de este dispositivo tu partida guardada, perfil, logros, barajas y ascensiones, récords, Enciclopedia, tutorial y ajustes. No se puede deshacer.|删除此设备上的存档、档案、成就、牌组与飞升、纪录、百科全书、教程和设置。无法撤销。|이 기기에서 저장된 게임, 프로필, 업적, 덱과 어센션, 기록, 도감, 튜토리얼, 설정을 지웁니다. 되돌릴 수 없습니다.|この端末のセーブデータ、プロフィール、実績、デッキとアセンション、記録、図鑑、チュートリアル、設定を消去します。元に戻せません。|Удаляет с этого устройства сохранённую игру, профиль, достижения, колоды и восхождения, рекорды, энциклопедию, обучение и настройки. Отменить нельзя.|Usuwa z tego urządzenia zapisaną grę, profil, osiągnięcia, talie i wniebowstąpienia, rekordy, encyklopedię, samouczek i ustawienia. Tego nie da się cofnąć.");
     const rc = $("resetCodex"); if (rc && !rc.classList.contains("armed")) rc.textContent = A.T("Restablecer Enciclopedia", "Reset Encyclopedia");
     $("resetCodexNote").textContent = A.T("Borra todas las tarjetas desbloqueadas. Tu perfil, logros y récords no cambian.", "Deletes every unlocked card. Your profile, achievements and records stay.");
     if (A.nombre) A.nombre.sync();                                          // v0.37: "Tu nombre" (js/nombre.js)
@@ -216,16 +218,30 @@
       try { navigator.serviceWorker && navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())); caches && caches.keys().then(ks => ks.forEach(k => caches.delete(k))); } catch (e) { /* sin SW */ }
       ra.textContent = A.T("Reiniciado. Recargando…", "Reset. Reloading…"); setTimeout(() => location.reload(), 500);
     }; }
+  /* Ajustes no se escala con --k: si en una ventana pequena (1024x768 en ruso o japones) su panel no cabe, se encoge con zoom hasta que quepa
+     (en escritorio nunca hay que desplazarse); en movil se desplaza como siempre */
+  const fitSet = () => {
+    const b = document.querySelector("#settings .set-body"), p = document.querySelector("#settings .set-panes"); if (!b || !p) return;
+    b.style.zoom = ""; if (!S.settingsOpen || innerWidth < 900 || innerHeight < 520) return;
+    let z = 1; for (let i = 0; i < 6 && p.scrollHeight > p.clientHeight + 2; i++) { z = Math.max(0.7, z * p.clientHeight / p.scrollHeight * 0.99); b.style.zoom = z.toFixed(3); if (z <= 0.7) break; }
+  };
+  const fitSetSoon = () => requestAnimationFrame(fitSet);
+  addEventListener("resize", fitSetSoon);
+  let setFocusBack = null;
   function openSettings(on) {
-    S.settingsOpen = on; const sh = $("setSh"), sv = $("setVeil");
+    if (on && S.phase === "asking" && !S.paused) togglePause();           // Ajustes tapa el mapa: la pregunta queda en pausa (antes el reloj seguia corriendo detras y se perdia)
+    const was = S.settingsOpen; S.settingsOpen = on; const sh = $("setSh"), sv = $("setVeil");
     sh.classList.toggle("hidden", !on);
     if (sv) sv.classList.toggle("hidden", !on);
     $("setBtn").setAttribute("aria-expanded", on);
     if (A.dealer && A.dealer.homeTease) {
-      if (on) { S._dealerWasHome = A.dealer.onHome; A.dealer.homeTease(false); }
-      else if (S._dealerWasHome) A.dealer.homeTease(true);
+      if (on) { if (!was) S._dealerWasHome = A.dealer.onHome; A.dealer.homeTease(false); }
+      else if (was && S._dealerWasHome) A.dealer.homeTease(true);            // solo al cerrar Ajustes de verdad (prepareRun y showTitle lo llaman cerrado: no reactiva al crupier del inicio al empezar partida)
     }
-    if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; }
+    if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; fitSetSoon(); }
+    /* foco (teclado y lectores de pantalla): al abrir va al panel y al cerrar vuelve a donde estaba (boton de ajustes, "Continuar" de la pausa...) */
+    if (on && !was) { setFocusBack = document.activeElement; const p = $("settings"); if (p) { p.tabIndex = -1; p.focus({ preventScroll: true }); } }
+    else if (!on && was) { const b = setFocusBack; setFocusBack = null; if (b && b !== document.body && b.isConnected && b.focus) b.focus({ preventScroll: true }); }
   }
   let blipT = 0;
   for (const f of document.querySelectorAll(".fader[data-k]")) {
@@ -266,7 +282,7 @@
     if (code === A.lang || !A.STR[code]) return;
     A.lang = code; save(); A.sfx.ui(); A.wiki.loadShort(A.wlang()); applyLang(); refreshLangUIs();
     if (S.phase === "title" && !S.booting) renderMenu();
-    else if (S.phase === "reveal") { const o = q(); $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}` : A.tx(o.fact); }
+    else if (S.phase === "reveal") { const o = q(); if (o) $("factText").textContent = factLine(o); }
     if (S.camp) updateHud();
     A.codex.refresh();
   }
@@ -303,7 +319,7 @@
   function setTab(t, silent) {
     S.setTab = t; segSet(document.querySelector('[data-seg="settab"]'), t);
     document.querySelectorAll(".set-pane").forEach(p => p.classList.toggle("hidden", p.dataset.pane !== t));
-    if (!silent) { save(); A.sfx.ui(); }
+    if (!silent) { save(); A.sfx.ui(); } fitSetSoon();
   }
   document.querySelector('[data-seg="settab"]').addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.dataset.v !== S.setTab) { setTab(b.dataset.v); if (A.jukebox) A.jukebox.sync(); } });
   /* restablecer ajustes: doble pulsacion */
@@ -365,7 +381,7 @@
   let zT = 0;
   map.onView = () => {
     const now = performance.now(); if (now - zT < 90) return; zT = now;
-    const z = Math.log(Math.max(1, map.zoomLevel())) / Math.log(120);
+    const z = Math.log(Math.max(1, map.zoomLevel())) / Math.log(Math.max(2, map.maxS / map.minS));   // zoom maximo real de cada motor (GL x70, 2D x120): antes el indicador del mapa GL nunca llegaba arriba
     $("zoomFill").style.setProperty("--z", Math.round(Math.min(1, z) * 94) + "%");
   };
 
@@ -389,7 +405,7 @@
     if (el.classList.contains("scrolls")) { if (A.squeeze) A.squeeze(el); return; }                    // pantalla con desplazamiento (solo el Perfil): a tamano completo
     const over = () => {
       const b = el.querySelector(".scr-body");
-      if (b) { const ch = b.clientHeight, sh = b.scrollHeight; return sh > ch * 1.015 ? ch / sh : 1; }
+      if (b) { const ch = b.clientHeight, sh = b.scrollHeight; return sh > ch + 2 ? ch / sh : 1; }      // en px, no en %: con un 1,5 % de margen quedaba una barra de desplazamiento de unos pocos px
       const ch = d.clientHeight, sh = el.getBoundingClientRect().height;                                 // sin .scr-body: el propio bloque (min-height:100%) puede salirse del dialogo, no de si mismo
       let r = sh > ch * 1.015 ? ch / sh : 1;
       if (innerWidth < 900 || innerHeight < 520) return r;                                               // movil: ahi si se desplaza (encoger lo dejaria ilegible)
@@ -415,7 +431,7 @@
     if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
   /* ------------------------------------------------------------ partida */
-  function prepareRun() { S.run = null; S.tool = null; openSettings(false); A.audio.unlock(); A.music.mode(1); A.profile.get().stats.plays++; A.profile.save(); }
+  function prepareRun(resume) { S.run = null; S.tool = null; openSettings(false); A.audio.unlock(); A.music.mode(1); if (!resume) { A.profile.get().stats.plays++; A.profile.save(); } }   // resume: seguir una partida guardada no suma partida (logro de 50 partidas)
   function newRun() {
     S.camp = A.CAMPAIGNS.find(c => c.id === S.campId);
     S.runTotal = 0; S.runMax = 0; S.completed = 0; S.clean = S.startLevel === 0; save(); prepareRun();   // clean: desde el nivel 1 y sin fallar ninguno (logro Sin red)
@@ -450,6 +466,7 @@
     $("plate").classList.remove("hidden", "hurry"); $("pauseBtn").classList.remove("hidden"); $("factText").textContent = "";
     if (S.run) A.adv.onQuestion();
     updateHud();
+    if (document.hidden && !S.paused) togglePause();                        // la intro acabo con la pestana oculta: la pregunta empieza en pausa
   }
   /* efectos del clic: pin que cae, ondas y chispas donde pulsas */
   let lastPtr = { x: innerWidth / 2, y: innerHeight / 2 };
@@ -494,9 +511,11 @@
   }
   function onPick(lon, lat) {
     if (S.phase !== "asking" || S.paused) return;
-    if (S.run && S.tool) { pingFx(lastPtr.x, lastPtr.y, "probe"); A.adv.probe(lon, lat); return; }
-    if (S.run && !(A.pointer && A.pointer.effective && A.pointer.effective())) ({ lon, lat } = A.adv.adjust(lon, lat));   // con puntero propio, el viento ya lo ha movido
-    pingFx(lastPtr.x, lastPtr.y); A.sfx.tap(); A.sfx.pin(S.streak);
+    if (performance.now() - S.t0 < 350) return;                             // doble clic en "Siguiente": el segundo clic caia en el mapa y respondia la pregunta nueva sin verla
+    const ef = A.pointer && A.pointer.effective && A.pointer.effective(), at = ef ? { x: ef[0], y: ef[1] } : lastPtr;   // el destello sale donde cae el pin (con el cursor invertido, con retraso o con viento no es donde esta el raton)
+    if (S.run && S.tool) { pingFx(at.x, at.y, "probe"); A.adv.probe(lon, lat); return; }
+    if (S.run && !ef) ({ lon, lat } = A.adv.adjust(lon, lat));   // con puntero propio, el viento ya lo ha movido
+    pingFx(at.x, at.y); A.sfx.tap(); A.sfx.pin(S.streak);
     reveal({ lon, lat }, Math.max(0, S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000));
   }
   const padForDialog = () => { return window.innerWidth > 900 ? { l: 60, r: 410, t: 170, b: 130 } : { l: 30, r: 30, t: 240, b: 410 }; };
@@ -540,18 +559,19 @@
 
     const tier = !guess ? 5 : isC && km === 0 ? 4 : ratio >= 0.96 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.4 ? 2 : ratio >= 0.05 ? 1 : 0;
     const title = !guess ? A.t("res.timeout") : isC && km === 0 ? A.t("res.inside") : A.t(["res.t5", "res.t4", "res.t3", "res.t2", "res.t1"][tier]);
-    setTimeout(() => A.sfx.reveal(tier), 480);
     const cxr = guess ? A.codexUnlock(o, km) : { added: [], level: 0 };
     /* Enciclopedia: 1, 2 o 3 jackpots segun el nivel, en cuanto el total termina de rodar. Con cada uno tiembla la pantalla (mas cuanto
        mas cerca) y vibra el movil, y las casillas del ticket se encienden al mismo ritmo. Si ya has pasado a la siguiente pregunta, no empiezan */
     const JP_AT = 1850, JP_MS = Math.round(A.audio.jpGap * 1000), jpTok = S.jpTok = (S.jpTok || 0) + 1, jpAt = i => JP_AT + i * JP_MS + "ms";
+    const still = () => S.jpTok === jpTok && S.phase === "reveal";          // sigue en pantalla este ticket (si ya has pasado, sus sonidos no pisan la pregunta siguiente)
+    setTimeout(() => { if (still()) A.sfx.reveal(tier); }, 480);
     if (cxr.level) setTimeout(() => {
-      if (S.jpTok !== jpTok || S.phase !== "reveal") return;
+      if (!still()) return;
       A.sfx.jackpot(cxr.level); A.haptic.jackpot(cxr.level);
       for (let k = 1; k <= cxr.level; k++) setTimeout(() => jpShake(k), (k - 1) * JP_MS);
     }, JP_AT);
     if (adv && adv.coins) coinFx(adv.coins);
-    if (S.streak >= 2) setTimeout(() => { A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce && S.shake) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
+    if (S.streak >= 2) setTimeout(() => { if (!still()) { if (S.phase === "asking") setStreak(); return; } A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce && S.shake) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
 
     const last = S.qi === S.qs.length - 1 || (S.run && A.adv.infDone && A.adv.infDone());
     const place = o.answer ? A.tx(o.answer) : A.tx(o.name) + (A.tx(o.sub) ? ", " + A.tx(o.sub) : "");
@@ -561,7 +581,7 @@
       <div class="tk-band"><span>${S.run && A.adv.isInfinite && A.adv.isInfinite() ? A.t("ask.inf", { n: pad2(S.qi + 1) }) : A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : o.kind || L.kind))}</span></div>
       <div class="tk-title">${title}</div>
       ${showKm ? `<div class="tk-km"><span class="odo" id="kmNum"></span><span>${S.units === "mi" ? "mi" : "km"}</span></div>` : ""}
-      <div class="tk-from">${[from, guess ? A.t("res.clicked", { t: (S.limit - left).toFixed(1) }) : ""].filter(Boolean).join(" · ")}</div>
+      <div class="tk-from">${[from, guess ? A.t("res.clicked", { t: A.fmt1(S.limit - left) }) : ""].filter(Boolean).join(" · ")}</div>
       ${o.clue ? `<div class="tk-answer"><span>${A.t("res.was")}</span>${A.tx(o.answer)}</div>` : ""}
       <div class="tk-perf"></div>
       <dl class="tk-rows">
@@ -571,17 +591,17 @@
       ${adv && adv.lines.length ? `<div class="tk-perks">${adv.lines.map(l => `<div><span>${A.icon(l[0])}</span><i>${l[1]}</i><b>${l[2]}</b></div>`).join("")}</div>` : ""}
       ${mult > 1 ? `<div class="tk-mult"><div class="c"><span>${A.t("res.chips")}</span><b>${A.fmt(chips)}</b></div><div class="m"><span>${A.t("res.streak")} ${S.streak}</span><b>×${mult.toFixed(1)}</b></div></div>` : ""}
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
-      ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${A.T("doblones", "doubloons")}</div>` : ""}
+      ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${adv.coins === 1 ? A.pick6("doblón|doubloon|doublon|dobrão|Dublone|doblone||枚金币|도블론|ダブロン|дублон|dublon") : A.T("doblones", "doubloons")}</div>` : ""}
       ${guess ? `<div class="tk-cx l${cxr.level}" data-tt="${A.t("codex.title")}
-${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km su historia y a menos de 75 km su dato clave.", "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.")}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style="--jd:${jpAt(i)}"></u>`).join("")}</i><b style="--jd:${jpAt(Math.max(0, cxr.level - 1))}">${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;300 km"}</b></div>` : ""}
-      <button class="btn-ink" id="nextBtn" data-primary><span>${last ? A.t("btn.finish") : A.t("btn.next")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
+${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km su historia y a menos de 75 km su dato clave.", "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.")}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style="--jd:${jpAt(i)}"></u>`).join("")}</i><b style="--jd:${jpAt(Math.max(0, cxr.level - 1))}">${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;" + fmtKm(A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0] })[0] : 300)}</b></div>` : ""}
+      <button class="btn-ink" id="nextBtn" data-primary><span>${!last ? A.t("btn.next") : S.run ? A.pick6("Terminar ronda|Finish round|Terminer la manche|Concluir rodada|Runde beenden|Termina il round||结束本回合|라운드 종료|ラウンドを終了|Завершить раунд|Zakończ rundę") : A.t("btn.finish")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });
     if (showKm) { const kmEl = $("kmNum"); odoNow(kmEl, 0); requestAnimationFrame(() => odoSet(kmEl, Math.round(S.units === "mi" ? km / 1.609344 : km), { ms: 1100, delay: 560 })); }
     const totEl = $("totNum"); odoNow(totEl, 0); requestAnimationFrame(() => odoSet(totEl, total, { ms: 1100, delay: 700, tick: total > 0 }));
     $("nextBtn").onclick = () => { last ? finishLevel() : (S.qi++, nextQuestion()); };
 
-    $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}${A.tx(o.fact) ? " — " + A.tx(o.fact) : ""}` : A.tx(o.fact) || A.factOf(o);
+    $("factText").textContent = factLine(o);
     $("plate").classList.remove("hurry");
     /* el cobro: los puntos del ticket suben al marcador al compas de su TOTAL (700 + 1100 ms); la barra llega en 450 ms y, si cruza la meta
        o un escalon de botin, lo celebra (js/marcador.js) */
@@ -649,7 +669,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     if (!win) btns.push({ id: "retryBtn", cls: "btn-ink", label: A.t("btn.retry"), arrow: true, primary: true, onclick: () => startLevel_(S.level) });
     btns.push({ id: "newBtn", cls: win ? "btn-ink" : "btn-line", label: A.t("btn.newGame"), primary: win, onclick: () => { S.startLevel = 0; showTitle(); } });
     btns.push({ id: "shareBtn", cls: "btn-line", label: A.t("share"), onclick: async () => {
-      const text = A.t("share.text", { iq, tier: tierName, s: A.fmt(shown) }), url = location.href.split("#")[0];
+      const text = A.t("share.text", { iq, tier: tierName, s: A.fmt(shown) }), url = A.shareUrl();
       try {
         if (navigator.share) await navigator.share({ title: "Geolite", text, url });
         else { await navigator.clipboard.writeText(text + " " + url); const sp = $("shareBtn").querySelector("span"); sp.textContent = A.t("share.copied"); setTimeout(() => (sp.textContent = A.t("share")), 1600); }
@@ -699,6 +719,8 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     if (S.paused) { S.pauseAt = performance.now(); map.setPick(false); veilMenu(togglePause); }
     else { S.pausedAcc += performance.now() - S.pauseAt; map.setPick(true); closeVeil(); }
   }
+  /* pestana oculta o ventana minimizada: la pregunta se pausa (antes el reloj seguia corriendo y al volver ya se habia agotado) */
+  document.addEventListener("visibilitychange", () => { if (document.hidden && S.phase === "asking" && !S.paused) togglePause(); });
   function runMenu() {
     if (S.booting || !(S.run || S.camp || A.adv.active()) || S.phase === "title" || S.phase === "intro") return;
     if (S.phase === "asking") return togglePause();
@@ -745,6 +767,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     if (S.booting) return;
     const k = e.key.toLowerCase();
     if (k === "escape") { if (S.settingsOpen) openSettings(false); else if (S.run && S.tool) A.adv.cancelTool(); else if (S.phase === "title" && S.hub !== "home") A.hub.screen("home"); else runMenu(); }
+    else if (S.settingsOpen && !["f", "m", "n"].includes(k)) return;       // con Ajustes abierto solo valen sus atajos: Intro pulsaba el boton de la pantalla de debajo (p. ej. Jugar) y P reanudaba la pregunta tapada
     else if (S.run && S.phase === "asking" && /^[1-4]$/.test(k)) A.adv.toolKey(+k - 1);
     else if (k === "f") toggleFs();
     else if (k === "c" && S.phase === "title") (A.codex.isOpen() ? A.codex.close() : A.codex.open());
@@ -755,14 +778,15 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     else if (k === "-") map.zoomBy(1 / 1.6);
     else if (k === "0") $("zoomHome").click();
     else if (k === "enter" || (k === " " && document.activeElement === document.body)) {
+      if (e.repeat) { e.preventDefault(); return; }                         // dejar Intro pulsado no se salta el veredicto ni la intro siguientes
       if (S.phase === "intro" && S.skipIntro) { e.preventDefault(); S.skipIntro(); return; }
-      const b = document.querySelector("#layer:not(.hidden) [data-primary]") || document.querySelector("#veil:not(.hidden) [data-primary]") || A.marcador.primary();
+      const b = document.querySelector("#veil:not(.hidden) [data-primary]") || document.querySelector("#layer:not(.hidden) [data-primary]") || A.marcador.primary();   // la pausa va encima de todo: antes Intro pulsaba el ticket o el veredicto de debajo
       if (b && document.activeElement !== b) { e.preventDefault(); b.click(); }
     }
   });
 
   /* ------------------------------------------------------------ entrada + intro del estudio */
-  function requestFs() { const el = document.documentElement; try { (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el); } catch (e) { /* denegado */ } }
+  function requestFs() { if (window.geoliteHost) return; const el = document.documentElement; try { (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el); } catch (e) { /* denegado */ } }   // en Electron el modo (Ventana / Sin bordes / Pantalla completa) ya lo pone main.js: antes "Entrar" forzaba pantalla completa en cada arranque
   function playStudio(done) {
     const st = $("studio"); st.classList.remove("hidden"); $("stLogo").innerHTML = ""; A.buildLogo($("stLogo"), { animated: true }); $("stLogo").classList.remove("has-png");
     A.sfx.studio();
@@ -788,7 +812,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
     if (S.intro) playStudio(showGate); else showGate();
   }
 
-  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, refreshPrompt: () => { setPrompt(); }, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
+  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, refreshPrompt: () => { setPrompt(); }, updateHud, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
 
   applyLang(); syncSettings();
   const start = () => {

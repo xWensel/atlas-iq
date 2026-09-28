@@ -30,9 +30,10 @@ const FACTS_EN = JSON.parse(read("data/wiki/en-s.json"));
 const LANGS6 = ["en", "es", "fr", "pt", "de", "it"];
 const SHORT = Object.fromEntries(LANGS6.map(l => [l, JSON.parse(read(`data/wiki/${l}-s.json`))]));  // cada resumen empieza por una descripcion corta estilo Wikidata
 const EXTRA = fs.existsSync(path.join(ROOT, "tools", "extra-data.json")) ? JSON.parse(read("tools/extra-data.json")) : { people: [], events: [], countries: {}, continents: {} };
-/* tools/extra-fix.json: nombres, lugares y descripciones traducidos a mano donde Wikidata cae al ingles o no tiene nada ({QID: {name|place|desc: {idioma: texto}}}) */
+/* tools/extra-fix.json: nombres, lugares y descripciones traducidos a mano donde Wikidata cae al ingles o no tiene nada ({QID: {name|place|desc: {idioma: texto}}});
+ * tambien datos corregidos: lat/lon, year y country (nombre Natural Earth del pais cuando el mapa de baja resolucion lo pone al otro lado de la frontera) */
 const EXTRA_FIX = fs.existsSync(path.join(ROOT, "tools", "extra-fix.json")) ? JSON.parse(read("tools/extra-fix.json")) : {};
-for (const e of [...(EXTRA.people || []), ...(EXTRA.events || [])]) { const fx = EXTRA_FIX[e.id]; if (fx) for (const k of ["name", "place", "desc"]) if (fx[k]) e[k] = { ...(e[k] || {}), ...fx[k] }; }
+for (const e of [...(EXTRA.people || []), ...(EXTRA.events || [])]) { const fx = EXTRA_FIX[e.id]; if (fx) { if (fx.name && fx.name.en && e.name) e.ckName = e.name.en; /* la clave de la Enciclopedia sigue con el nombre original: no se pierden tarjetas ya desbloqueadas */ for (const k of ["name", "place", "desc"]) if (fx[k]) e[k] = { ...(e[k] || {}), ...fx[k] }; for (const k of ["lat", "lon", "year"]) if (fx[k] != null) e[k] = fx[k]; if (fx.country) e.ctryFix = fx.country; } }
 
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 /* dificultad = menos Wikipedias con articulo (fama real, tools/build-extra.mjs); a igualdad, el orden de la
@@ -43,8 +44,11 @@ const diffOf = p => (PFAME[p[0]] != null ? -PFAME[p[0]] * 1000 : 0) + p[2] * 100
 /* ---------------------------------------------------------------- mapa y paises */
 vm.runInContext(read("js/vendor/topojson-client.min.js"), ctx);
 vm.runInContext(read("data/world.js"), ctx);
+/* anillos "desenrollados" como en js/geo.js: los que cruzan +-180 (Chukotka, Fiyi) daban la vuelta al mundo y cualquier punto de su
+ * franja de latitud caia "dentro" (Leif Erikson salia nacido en Rusia) */
+const unwrap = ring => { const out = []; let off = 0, prev = null; for (const [lo, la] of ring) { let x = lo + off; if (prev !== null) { if (x - prev > 180) { off -= 360; x -= 360; } else if (x - prev < -180) { off += 360; x += 360; } } out.push([x, la]); prev = x; } return out; };
 const WORLD = ctx.topojson.feature(ctx.window.ATLAS_TOPO, ctx.window.ATLAS_TOPO.objects.countries).features.map(f => ({
-  name: f.properties.name, polys: f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates,
+  name: f.properties.name, polys: (f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates).map(p => p.map(unwrap)),
 }));
 const inRing = (x, y, r) => { let c = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const [xi, yi] = r[i], [xj, yj] = r[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
 const QID_BY_EN = {}; for (const [q, n] of Object.entries(PCOUNTRY)) QID_BY_EN[n.en] = q;
@@ -53,10 +57,10 @@ for (const p of PLACES) if (p[1] === "country") COUNTRY6[p[0].slice(2)] = { ...(
 /* el mapa es de baja resolucion: una ciudad costera (Copenhague, Lisboa) puede caer "en el mar";
  * entonces vale el pais con el borde mas cercano a menos de 60 km */
 function countryAt(lat, lon) {
-  let f = WORLD.find(w => w.polys.some(poly => inRing(lon, lat, poly[0]) && !poly.slice(1).some(h => inRing(lon, lat, h))));
+  let f = WORLD.find(w => w.polys.some(poly => [lon, lon + 360, lon - 360].some(x => inRing(x, lat, poly[0]) && !poly.slice(1).some(h => inRing(x, lat, h)))));
   if (!f) {
     let best = 60; const kx = 111.32 * Math.cos(lat * Math.PI / 180);
-    for (const w of WORLD) for (const poly of w.polys) for (const [x, y] of poly[0]) { const d = Math.hypot((x - lon) * kx, (y - lat) * 110.57); if (d < best) { best = d; f = w; } }
+    for (const w of WORLD) for (const poly of w.polys) for (const [x, y] of poly[0]) { const d = Math.hypot((((x - lon) % 360 + 540) % 360 - 180) * kx, (y - lat) * 110.57); if (d < best) { best = d; f = w; } }
   }
   return f && COUNTRY6[f.name] ? COUNTRY6[f.name] : null;
 }
@@ -98,6 +102,8 @@ const kindOf = p => (p[1] === "history" && EVENTISH.test(p[6].en) ? "event" : p[
 /* ---------------------------------------------------------------- textos de cada destino */
 const FACT_OVERRIDES = {
   "puebla": "Founded by the Spanish in 1531 to secure the trade route between Mexico City and the port of Veracruz.",
+  "hawaii": "U.S. state. Hawaii consists of 137 volcanic islands that make up almost the entire Hawaiian archipelago (the exception is Midway Atoll).",   // el resumen se cortaba a media palabra
+  "cusco": "City in Peru. In 1983, Cusco was declared a World Heritage Site by UNESCO with the title \"City of Cusco\".",
 };
 const ABBR = /\b(?:U\.S|U\.K|U\.N|St|Mt|Mr|Mrs|Dr|vs|approx|no)\./g; // estas abreviaturas nunca cierran la frase (evita cortes tipo "St." o "U.S.")
 function firstSentence(s) {
@@ -157,9 +163,9 @@ function mkDest(p) {
 const NAME_STOP = new Set(["city", "ciudad", "ville", "cidade", "stadt", "citta", "national", "nacional", "parque", "park", "island", "isla", "lake", "lago", "mount", "monte", "river", "saint", "santa", "santo", "great", "grand", "grande", "palace", "palacio", "temple", "templo", "tower", "torre", "castle", "castillo", "church", "iglesia", "cathedral", "catedral", "bridge", "puente", "north", "south", "old", "new", "nueva", "nuevo", "battle", "batalla", "desert", "desierto", "falls", "cataratas"]);
 function descOf(s) {
   s = String(s || "").trim();
-  const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?[.!?](?=\s|$)/);
+  const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?(?:[.!?](?=\s|$)|[。！？])/);   // zh/ja: sin cortar en 。 salia el articulo entero, nombre incluido ("霍巴特（英语：Hobart）...")
   const d = m ? m[0].replace(/\u0001/g, ".") : (s.length < 120 ? s : "");
-  return d.length >= 12 && d.length <= 140 ? d : null;
+  return (d.length >= 12 || (d.length >= 5 && /[぀-ヿ一-鿿]/.test(d))) && d.length <= 140 ? d : null;   // en chino/japones una pista corta ("メキシコの都市。") ya vale
 }
 const DEMONYM_EN = /^[A-Z][a-z]+(?:ian|ean|an|ese|ish|ch|ic|i|ss|k)$/;
 const DE_GENERIC = new Set(["Stadt", "Großstadt", "Hauptstadt", "Hafenstadt", "Kreisstadt", "Kleinstadt", "Millionenstadt", "Metropole", "Gemeinde", "Kommune", "Ortschaft", "Ort", "Staat", "Land", "Region", "Provinz", "Bezirk", "Departement", "Präfektur", "Insel", "Inseln", "Inselgruppe", "Berg", "Gebirge", "See", "Fluss", "Wasserfall", "Nationalpark", "Park", "Denkmal", "Bauwerk", "Turm", "Kirche", "Kathedrale", "Moschee", "Tempel", "Palast", "Schloss", "Burg", "Festung", "Brücke", "Platz", "Museum", "Ruine", "Ruinenstätte", "Stätte", "Welterbe", "Sitz", "Verwaltungssitz", "Großregion", "Kanton", "Bundesstaat", "Bundesland", "Verwaltungseinheit", "Ruinen", "Siedlung", "Wüste", "Küste", "Vulkan", "Halbinsel", "Wolkenkratzer", "Seeschlacht", "Schlacht", "Nord", "Süd", "Ost", "West"]);
@@ -195,13 +201,16 @@ function clueOf(p) { const c = clueRaw(p); return c && LANGS6.every(l => !CLUE_D
  * en esos idiomas mientras no nombre el lugar; si no, el juego cae al ingles */
 const CLUE_MORE = ["zh", "ko", "ja", "ru", "pl"].filter(l => fs.existsSync(path.join(ROOT, "data", "wiki", `${l}-s.json`)));
 for (const l of CLUE_MORE) SHORT[l] = JSON.parse(read(`data/wiki/${l}-s.json`));
+/* tools/classic-clue-fix.json: pistas corregidas a mano ({id: {idioma: texto}}; "en" es la propia pregunta) */
+const CLUE_FIX = fs.existsSync(path.join(ROOT, "tools", "classic-clue-fix.json")) ? JSON.parse(read("tools/classic-clue-fix.json")) : {};
 function mkClueDest(p) {
   const c = clueOf(p), c6 = { es: c.es, fr: c.fr, pt: c.pt, de: c.de, it: c.it };
   for (const l of CLUE_MORE) {
     const d = descOf(SHORT[l][p[0]]), nm = p[6][l];
     if (d && !(nm && d.toLowerCase().includes(String(nm).toLowerCase()))) c6[l] = d;
   }
-  return { n: c.en, c6, ck: p[0], lat: p[3], lon: p[4], f: destName(p) };
+  const fx = CLUE_FIX[p[0]] || {}; for (const l in fx) if (l !== "en") c6[l] = fx[l];
+  return { n: fx.en || c.en, c6, ck: p[0], lat: p[3], lon: p[4], f: destName(p) };
 }
 
 /* ---------------------------------------------------------------- Eventos y Personajes (tools/extra-data.json) */
@@ -231,16 +240,16 @@ const joinTxt = l => (...xs) => xs.filter(Boolean).join(SEP[l] || ", ");
 /* descripcion corta: fuera el parentesis final con años, tambien el de ancho completo ("（Thomas Edison，1847—1931）") */
 const short = s => { s = ucf(String(s || "").replace(/\s*[(（][^)）]*\d{3,4}[^)）]*[)）]\s*$/, "")); if (s.length <= 90) return s; const c = s.slice(0, 90), i = Math.max(c.lastIndexOf(","), c.lastIndexOf("，"), c.lastIndexOf("、")); return (i > 40 ? c.slice(0, i) : c.slice(0, c.lastIndexOf(" ") > 40 ? c.lastIndexOf(" ") : 90)) + "…"; };
 function mkPersonDest(p) {
-  const ctry = countryAt(p.lat, p.lon) || p.country;
+  const ctry = (p.ctryFix && COUNTRY6[p.ctryFix]) || countryAt(p.lat, p.lon) || p.country;
   const fact = by10(l => [joinTxt(l)(p.place && p.place[l], ctry && (ctry[l] || ctry.en)), short(p.desc[l])].filter(Boolean).join(" · "));
   const name = by10(l => p.name[l]);
-  return { n: name.en, n6: restL(name), ck: codexKey(p.wiki, name.en), s6: by10(l => (p.born == null ? "" : `${yr(p.born, l)}–${yr(p.died, l)}`)), lat: p.lat, lon: p.lon, f: fact.en, f6: restL(fact), img: p.img };
+  return { n: name.en, n6: restL(name), ck: codexKey(p.wiki, p.ckName || name.en), s6: by10(l => (p.born == null ? "" : `${yr(p.born, l)}–${yr(p.died, l)}`)), lat: p.lat, lon: p.lon, f: fact.en, f6: restL(fact), img: p.img };
 }
 function mkEventDest(e) {
-  const ctry = countryAt(e.lat, e.lon);                                  // nunca el P17 de Wikidata: suele ser el estado de la epoca
+  const ctry = (e.ctryFix && COUNTRY6[e.ctryFix]) || countryAt(e.lat, e.lon);   // nunca el P17 de Wikidata: suele ser el estado de la epoca
   const name = by10(l => ucf(e.name[l]));
   const fact = by10(l => joinTxt(l)(e.place && e.place[l], ctry && (ctry[l] || ctry.en)) || short(e.desc[l]));
-  return { n: name.en, n6: restL(name), ck: codexKey(e.wiki, name.en), s6: by10(l => yr(e.year, l)), lat: e.lat, lon: e.lon, f: fact.en, f6: restL(fact) };
+  return { n: name.en, n6: restL(name), ck: codexKey(e.wiki, e.ckName || name.en), s6: by10(l => yr(e.year, l)), lat: e.lat, lon: e.lon, f: fact.en, f6: restL(fact) };
 }
 
 /* ---------------------------------------------------------------- niveles */
@@ -257,7 +266,7 @@ function level(k, { kind, region, picks, mk, tpq, bonus, label }) {
 }
 /* una lista ya ordenada de facil a dificil -> 10 niveles de <= cap preguntas (lo que sobre queda libre) */
 function tenLevels(pool, opt) {
-  const cap = opt.cap || 15, per = Math.max(MIN_Q, Math.min(cap, Math.floor(pool.length / NLEV)));
+  const cap = opt.cap || 15, per = opt.all ? Math.ceil(pool.length / NLEV) : Math.max(MIN_Q, Math.min(cap, Math.floor(pool.length / NLEV)));   // all: que no sobre ninguno (Banderas)
   if (pool.length < NLEV * MIN_Q) console.warn(`Aviso [${opt.label}]: solo ${pool.length} elementos para 10 niveles.`);
   const levels = [];
   for (let k = 0; k < NLEV; k++) {
@@ -299,7 +308,7 @@ function mixedCampaign(region, prefix, { cap = 12, filter = () => true } = {}) {
 
 /* 1. Banderas: los 196 paises (unico sitio donde salen los paises) */
 const countries = PLACES.filter(p => p[1] === "country" && free(p)).sort((a, b) => diffOf(a) - diffOf(b));
-const LV_flags = tenLevels(countries, { kind: "flag", region: "world", mk: mkDest, tpq: 10, label: "Flags", cap: 20 }).levels;
+const LV_flags = tenLevels(countries, { kind: "flag", region: "world", mk: mkDest, tpq: 10, label: "Flags", cap: 20, all: true }).levels;
 claim(countries);
 
 /* 2. Capitales del mundo: todas las capitales (unico sitio donde salen) */
@@ -349,6 +358,11 @@ const GAMES = {
   people: { title: "Historical Figures", levels: LV_people },
 };
 
+/* limpieza final de todos los textos: caracteres invisibles de Wikipedia (espacios de ancho cero, marcas LTR), saltos de linea,
+ * dobles espacios y signos duplicados (",.", ".." que no sea "...", " ,") */
+const tidyTxt = s => s.replace(/[​‎‏﻿]/g, "").replace(/\s*\n\s*/g, " ").replace(/ {2,}/g, " ").replace(/,\./g, ".").replace(/(?<!\.)\.\.(?!\.)/g, ".").replace(/ ,/g, ",");
+const tidyAll = o => { if (typeof o === "string") return tidyTxt(o); if (Array.isArray(o)) return o.map(tidyAll); if (o && typeof o === "object") { for (const k in o) o[k] = tidyAll(o[k]); return o; } return o; };
+for (const g of Object.values(GAMES)) tidyAll(g.levels);
 const arr = Object.entries(GAMES).map(([id, g]) => ({ id, title: g.title, home: { lat: 0.0, lon: 0.0, zoom: 1.0 }, levels: g.levels }));
 const header = `/* Modo Clasico: contenido propio, generado por tools/build-classic.mjs desde data/places.js + data/wiki (Wikipedia/Wikidata). No copia lugares, puntuacion ni datos del Traveler IQ Challenge original. */\n`;
 fs.writeFileSync(path.join(ROOT, "data", "classic.js"), header + "window.AIQ = window.AIQ || {};\nwindow.AIQ.CLASSIC = " + JSON.stringify(arr) + ";\n");

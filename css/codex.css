@@ -37,7 +37,7 @@
 .cx-card:hover { transform: translateY(-5px) rotateX(var(--rx)) rotateY(var(--ry)) scale(1.03); z-index: 2; } .cx-card:focus-visible { outline: 3px solid var(--brass-lt); outline-offset: 2px; }
 .cx-card .cx-art, .cx-bigcard .cx-art { position: relative; flex: 1; min-height: 0; overflow: hidden; display: grid; place-items: center; background: linear-gradient(160deg, var(--ink-2), var(--ink)); color: rgba(242,233,214,.35); }
 .cx-art .cx-ic { width: 46%; height: auto; } .cx-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: cx-fade .5s both; } @keyframes cx-fade { from { opacity: 0; } }
-.cx-card.has-img .cx-art .cx-ic { display: none; }
+.cx-card.has-img .cx-art .cx-ic { display: none; } .cx-art.flag > img:not(.cx-ph) { object-fit: contain; background: var(--ink); }   /* banderas enteras, sin recortar el centro */
 .cx-card .cx-nm { display: block; margin-top: 7px; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 700; font-size: 16px; line-height: 1.05; min-height: 2.1em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .cx-mt { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; }
 .cx-mt em { font-style: normal; color: var(--ink-2); } .cx-mt i { font-style: normal; color: var(--rc); letter-spacing: 1px; filter: brightness(.85); }
@@ -53,10 +53,10 @@
 .cx-card.fresh { animation: cx-pop .7s var(--spring) both; } @keyframes cx-pop { from { transform: scale(.7) rotate(-6deg); } }
 
 /* ---------- detalle ---------- */
-.cx-detail { flex: 1; overflow-y: auto; padding: 8px 4px 70px; scrollbar-width: thin; scrollbar-color: var(--brass) transparent; } .cx-detail.hidden { display: none; }
+.cx-detail { flex: 1; overflow-y: auto; padding: 8px 4px 70px; scrollbar-width: thin; scrollbar-color: var(--brass) transparent; container-type: size; } .cx-detail.hidden { display: none; }
 .cx-d-wrap { display: grid; grid-template-columns: minmax(240px, 340px) 1fr; gap: clamp(22px, calc(4 * var(--vw)), 54px); align-items: start; max-width: 1050px; margin: 0 auto; animation: cx-up .45s var(--spring) both; } @keyframes cx-up { from { opacity: 0; transform: translateY(18px); } }
 .cx-d-card { position: sticky; top: 8px; perspective: 1000px; }
-.cx-bigcard { width: 100%; cursor: default; padding: 12px 12px 14px; box-shadow: inset 0 0 0 4px var(--rc), 0 30px 50px -20px #000; --cxc: 20px; }
+.cx-bigcard { width: 100%; width: min(100%, calc((100cqh - 60px) * 5 / 7));   /* la carta, su credito y "Ver en alta definicion" caben en el alto del panel */ cursor: default; padding: 12px 12px 14px; box-shadow: inset 0 0 0 4px var(--rc), 0 30px 50px -20px #000; --cxc: 20px; }
 .cx-bigcard .cx-art { border: 1.5px solid var(--ink); } .cx-bigcard .cx-art img { cursor: zoom-in; } .cx-bigcard .cx-art .cx-ic { width: 30%; }
 .cx-bigcard .cx-cap { padding-top: 12px; display: grid; gap: 5px; } .cx-bigcard .cx-nm { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 800; font-size: 24px; line-height: 1; }
 .cx-bigcard .cx-mt { font-size: 14px; margin: 0; } .cx-bigcard .cx-no { top: 18px; left: 19px; font-size: 14px; }

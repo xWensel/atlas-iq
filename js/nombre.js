@@ -2,7 +2,8 @@
  * Geolite - TU NOMBRE (v0.37). Al acabar tu primera partida sin nombre (Clasico, Aventura o Reto diario), la sala se apaga, el crupier se asoma
  * bajo un foco y te pregunta "¿Como quieres que te llame?": su tarjeta de socio, con hueco para 20 caracteres. Ese es tu nombre en la
  * clasificacion (A.rank.rename lo lleva a las tablas) y el crupier lo usa, muy de vez en cuando, para llamarte (js/dealer.js, "tu nombre").
- * Se cambia en Ajustes > General (o en el Reto diario). Si prefieres no darlo, vuelve a preguntar al acabar otra partida (como mucho 3 veces).
+ * Despues solo se cambia en Ajustes > General (el Reto diario no tiene casilla de nombre). Si prefieres no darlo, pregunta como mucho una vez por sesion:
+ * vuelve a preguntar al acabar una partida en otra sesion, y tras 3 "Ahora no" ya no pregunta mas.
  *   A.nombre.maybeAsk({ won, after })  -> true si va a preguntar: el veredicto se ahorra la reaccion del crupier (la pregunta la tapa)
  *   A.nombre.set(nombre)                -> guarda, lo lleva a las tablas y se lo cuenta al crupier (promesa con el nombre ya limpio)
  */
@@ -58,8 +59,8 @@ window.AIQ = window.AIQ || {};
       </div>`;
     $("app").appendChild(root);
     const inp = $("nmIn");
-    inp.addEventListener("input", e => { if (!e.isComposing) typed(); });
-    inp.addEventListener("compositionend", typed);
+    inp.addEventListener("input", e => typed(e.isComposing));              // en movil (Gboard) se escribe "componiendo" la palabra entera: las bombillas se encienden igual
+    inp.addEventListener("compositionend", () => typed(false));
     $("nmCard").addEventListener("submit", e => { e.preventDefault(); confirm(); });
     $("nmSkip").onclick = skip; $("nmNext").onclick = early;
     /* fuera de la tarjeta: mientras pregunta, vuelve a la casilla; cuando ya ha contestado, cierra antes */
@@ -76,16 +77,16 @@ window.AIQ = window.AIQ || {};
     [...dots.children].forEach((d, i) => d.classList.toggle("on", i < n));
     dots.classList.toggle("full", n >= MAX); $("nmN").textContent = n + "/" + MAX; $("nmCard").classList.toggle("empty", !n);
   }
-  function typed() {
+  function typed(composing) {
     if (!st || st.phase !== "ask") return;
     const inp = $("nmIn"), raw = inp.value, v = clean(raw);
-    if (v !== raw) { const at = Math.max(0, (inp.selectionStart || 0) - (raw.length - v.length)); inp.value = v; try { inp.setSelectionRange(at, at); } catch (e) { /* sin seleccion */ } }
-    const n = len(inp.value), grew = n > st.len;
+    if (v !== raw && !composing) { const at = Math.max(0, (inp.selectionStart || 0) - (raw.length - v.length)); inp.value = v; try { inp.setSelectionRange(at, at); } catch (e) { /* sin seleccion */ } }
+    const n = len(composing ? v : inp.value), grew = n > st.len;               // mientras se compone no se toca la casilla (romperia el teclado): solo se cuenta
     if (n !== st.len) {
       A.sfx.key(grew ? n : -1);
       const f = $("nmField"); f.classList.remove("bump"); void f.offsetWidth; f.classList.add("bump");
       if (grew) { const d = $("nmDots").children[n - 1]; if (d) { d.classList.remove("pop"); void d.offsetWidth; d.classList.add("pop"); } }
-    } else if (v !== raw) nope();                                            // un caracter que no vale (emoji, simbolo): no entra
+    } else if (v !== raw && !composing) nope();                                            // un caracter que no vale (emoji, simbolo): no entra
     st.len = n; meter(n);
   }
   function nope() { const d = $("nmDots"); d.classList.remove("nope"); void d.offsetWidth; d.classList.add("nope"); A.sfx.key(-1); }
@@ -183,7 +184,7 @@ window.AIQ = window.AIQ || {};
       setTimeout(go, ctx.delay || 1500);
       return true;
     },
-    /* Ajustes, Reto diario: guarda, lo lleva a las tablas y se lo cuenta al crupier (lo comenta la proxima vez que asome) */
+    /* Ajustes: guarda, lo lleva a las tablas y se lo cuenta al crupier (lo comenta la proxima vez que asome) */
     set(v) {
       const prev = P().name || "", name = clean(v).trim();
       if (name === prev) return Promise.resolve(name);

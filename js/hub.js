@@ -12,6 +12,8 @@ window.AIQ = window.AIQ || {};
   const wireTools = () => { const c = C(); $("menuGear").onclick = () => c.openSettings(!c.S.settingsOpen); };
   const top = (back) => `<div class="menu-top">${back ? `<button class="hub-back" id="hubBack">${A.icon("u_back", "sm")}${T("Menú", "Menu")}</button>` : `<img class="menu-rose" src="assets/icons/logo_mark.png" alt="" draggable="false">`}${tools()}</div>`;
   const shell = (inner, back) => `<div class="menu-in hub">${top(back)}${inner}<p class="menu-foot">Geolite · v${A.VERSION}</p></div>`;
+  /* donde va una partida guardada (A.adv.summary): tras el Acto III ya no hay rondas numeradas (antes decia "Acto 4 · Ronda 1") */
+  const where = sv => (sv.inf ? T("Modo infinito", "Infinite mode") : sv.act > 3 ? T("Tres actos completados", "Three acts completed") : `${T("Acto", "Act")} ${sv.act} · ${T("Ronda", "Round")} ${sv.round}`);
 
   /* ------------------------------------------------------------------ pantalla principal */
   function home() {
@@ -29,11 +31,11 @@ window.AIQ = window.AIQ || {};
       <p class="hh-tag">${A.t("title.tag")}</p>
       <div class="hh-cards">
         ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Regiones del mundo, banderas, pistas, eventos y personajes, contra el reloj.", "Regions of the world, flags, clues, events and famous people, against the clock."), T("Directo al grano", "No frills"))}
-        ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: el crupier cambia las reglas. Mapa a oscuras, del revés, letras que tiemblan… y perks para vencerlo.", "Roguelike: the dealer changes the rules. Dark maps, upside-down worlds, shaky letters… and perks to beat him."), saved ? T("▶ Partida guardada", "▶ Saved run") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
+        ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: el crupier cambia las reglas. Mapa a oscuras, del revés, letras que tiemblan… y reliquias para vencerlo.", "Roguelike: the dealer changes the rules. Dark maps, upside-down worlds, shaky letters… and relics to beat him."), saved ? T("▶ Partida guardada", "▶ Saved run") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
         ${mc("daily", "Q", "s_compass", "card_compete", T("Reto diario", "Daily challenge"), A.pick6("Una expedición al azar, la misma para todos. 3 intentos que suman.|A random expedition, the same for all. 3 attempts that add up.|Une expédition au hasard, la même pour tous. 3 essais cumulés.|Expedição aleatória, igual para todos. 3 tentativas que somam.|Zufällige Expedition, für alle gleich. 3 Versuche, eine Summe.|Spedizione a caso, uguale per tutti. 3 tentativi che si sommano.||随机远征，人人相同。3 次尝试，分数累加。|모두에게 똑같은 무작위 탐험. 도전 3번의 점수를 합산.|全員共通のランダム遠征。3回の挑戦を合計。|Случайная экспедиция, одна на всех. 3 попытки в сумме.|Losowa wyprawa, ta sama dla wszystkich. 3 podejścia w sumie."), dMeta)}
       </div>
       <div class="hh-bottom">
-      ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${T("Acto", "Act")} ${sm.act} · ${T("Ronda", "Round")} ${sm.round} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
+      ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${where(sm)} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
         <button class="codex-shelf" id="codexBtn" type="button" ${A.ttAttr(A.t("codex.title"), A.tip6("Fichas de lugares, historia y datos clave: se descubren acertando cerca.|Cards for places, history and key facts: found by pinning close.|Fiches de lieux, d'histoire et de faits clés : on les découvre en visant juste.|Fichas de lugares, história e dados-chave: descobertas ao acertar perto.|Karten zu Orten, Geschichte und Kernfakten: entdeckt durch genaue Treffer.|Schede di luoghi, storia e dati chiave: si scoprono colpendo vicino.||地点、历史与关键信息的卡片：准确标出即可发现。|장소, 역사, 핵심 정보 카드: 가깝게 맞히면 발견됩니다.|場所・歴史・重要な事実のカード：近くに当てると見つかる。|Карточки мест, истории и ключевых фактов: открываются точными попаданиями.|Karty miejsc, historii i kluczowych faktów: odkrywasz je celnymi trafieniami."))}>
           <span class="cs-ic">${A.icon("m_codex")}</span>
           <span class="cs-t"><b>${A.t("codex.title")}</b><i>${A.fmt(A.codexStats().u)} / ${A.fmt(A.codexStats().t)}</i><u><s style="width:${(100 * A.codexStats().u / Math.max(1, A.codexStats().t)).toFixed(1)}%"></s></u></span>
@@ -43,7 +45,7 @@ window.AIQ = window.AIQ || {};
       </div></div>`, "home");
     wireTools(); $("codexBtn").onclick = () => A.codex.open(); $("profBtn").onclick = () => screen("profile");
     document.querySelectorAll(".mcard").forEach(b => (b.onclick = () => { A.sfx.card(); screen(b.dataset.mode); }));
-    if ($("homeCont")) { $("homeCont").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume()); }; $("homeNew").onclick = () => { A.sfx.card(); screen("adventure"); }; }
+    if ($("homeCont")) { $("homeCont").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume(), true); }; $("homeNew").onclick = () => { A.sfx.card(); screen("adventure"); }; }
   }
 
   /* ------------------------------------------------------------------ marco comun de las sub-pantallas (a pantalla completa, sobre el mapa) */
@@ -51,6 +53,9 @@ window.AIQ = window.AIQ || {};
   const startBtn = (id, big, small, primary) => `<button class="startbtn" id="${id}" ${primary ? "data-primary" : ""}><span class="sb-ic">${A.icon("chip_r")}</span><span class="sb-t"><b>${big}</b><i>${small}</i></span><span class="sb-ar">${A.icon("u_next", "sm")}</span></button>`;
 
   /* ------------------------------------------------------------------ Clasico: campanas */
+  /* miniatura de cada campana: su region (antes todas usaban home = 0,0: el mismo mundo con un punto rojo en el golfo de Guinea) */
+  const THUMB = { usa: { lat: 38, lon: -97, zoom: 5.2 }, europe: { lat: 50, lon: 14, zoom: 5.4 }, asia: { lat: 27, lon: 92, zoom: 2.9 }, latam: { lat: -14, lon: -74, zoom: 2.6 }, oceania: { lat: -27, lon: 152, zoom: 3.2 }, world: { lat: 22, lon: 12, zoom: 1 } };
+  const campThumb = x => ({ ...(THUMB[(x.levels[0] || {}).region] || THUMB.world), mark: false });
   function campaigns(mode) {
     const c = C(), S = c.S; S.mode = mode; const camps = A.CAMPAIGNS.filter(x => x.mode === mode);
     if (!camps.find(x => x.id === S.campId)) { S.campId = camps[0].id; S.startLevel = 0; }
@@ -71,7 +76,7 @@ window.AIQ = window.AIQ || {};
     document.querySelectorAll(".camp").forEach(b => (b.onclick = () => { S.campId = b.dataset.id; S.startLevel = 0; c.save(); campaigns(mode); }));
     document.querySelectorAll(".lv").forEach(b => (b.onclick = () => { S.startLevel = +b.dataset.lv; campaigns(mode); }));
     $("goBtn").onclick = () => { A.sfx.depart(); S.ranked = null; c.newRun(); };
-    requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => c.map.drawThumb(b.querySelector("canvas"), camps[i].home)));
+    requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => c.map.drawThumb(b.querySelector("canvas"), campThumb(camps[i]))));
   }
 
   /* ------------------------------------------------------------------ Aventura */
@@ -82,7 +87,7 @@ window.AIQ = window.AIQ || {};
   const ascTexts = () => [T("Estándar", "Standard"), T("Objetivos +10 %, −1 s, tienda +10 %", "Targets +10%, −1 s, shop +10%"), T("+20 %, −2 s. Desde el acto 2, un reto de regla (viento, tormenta o silencio) en cada ronda", "+20%, −2 s. From act 2, a rule challenge (wind, storm or silence) every round"), T("+30 %, −3 s, retos un nivel más fuertes y una provisión menos", "+30%, −3 s, challenges one level stronger and one fewer provision"), T("+40 %, −4 s. Los jefes traen un poder extra", "+40%, −4 s. Bosses bring one extra power"), T("+50 %, −5 s. Solo para leyendas", "+50%, −5 s. Legends only")];
   function adventure() {
     const c = C(), P = A.profile.get(), adv = P.adv, D = A.ADV.DECKS, saved = A.adv.hasSave(), TN = A.ADV.TOPIC_NAMES, R = A.RELICS;
-    let runInfo = ""; if (saved) { try { const r = JSON.parse(localStorage.getItem("atlasiq.run.v2")); runInfo = `${T("Acto", "Act")} ${r.act + 1} · ${T("Ronda", "Round")} ${r.round + 1} · ${r.coins} ${T("doblones", "doubloons")} · ${A.fmt(r.score)} ${T("pts", "pts")}`; } catch (e) { /* sin datos */ } }
+    const sm = saved && A.adv.summary(), runInfo = sm ? `${where(sm)} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}` : "";
     const decks = Object.keys(D).map(id => {
       const d = D[id], locked = d.unlock && !P.ach[d.unlock], lockTxt = locked ? (A.ACH.find(a => a.id === d.unlock) || { name: T("?", "?") }).name : "", [rk, su] = DECK_CARD[id];
       const kit = [...d.tools.map(t => `<span class="kt" ${A.kitTip("tool", t)}>${A.icon(A.ADV.TOOLS[t].ico, "kit")}</span>`), ...d.perks.map(p => `<span class="kt" ${A.kitTip("perk", p)}>${A.icon(p, "kit")}</span>`)].join("");
@@ -110,14 +115,14 @@ window.AIQ = window.AIQ || {};
     document.querySelectorAll(".stake").forEach(b => (b.onclick = () => { advSel.asc = +b.dataset.asc; A.sfx.ui(); adventure(); }));
     const confirm2 = (btn, msg, act) => { let armed = false, tm = 0; const html = btn.innerHTML; btn.addEventListener("click", e => { if (armed) { clearTimeout(tm); return act(); } e.stopImmediatePropagation(); armed = true; btn.classList.add("armed"); (btn.querySelector("b") || btn).textContent = msg; A.sfx.deny(); tm = setTimeout(() => { armed = false; btn.classList.remove("armed"); btn.innerHTML = html; }, 4000); }, true); };
     if (saved) {
-      $("contBtn").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume()); };
+      $("contBtn").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume(), true); };
       $("abandonBtn").onclick = () => { A.adv.abandon(); A.sfx.deny(); adventure(); };
       confirm2($("abandonBtn"), T("¿Seguro? Pulsa otra vez", "Sure? Press again"), () => {});
     }
     $("goBtn").onclick = () => { A.sfx.depart(); if (saved) A.adv.abandon(); enterRun(() => A.adv.begin({ deck: advSel.deck, asc: advSel.asc })); };
     if (saved) confirm2($("goBtn"), T("Esto borra tu partida guardada. Pulsa otra vez", "This deletes your saved run. Press again"), () => {});
   }
-  function enterRun(fn) { const c = C(); c.S.ranked = null; c.prepareRun(); fn(); }
+  function enterRun(fn, resume) { const c = C(); c.S.ranked = null; c.prepareRun(resume); fn(); }   // resume: seguir una partida guardada no es una partida nueva (stats.plays, ver game.js prepareRun)
 
   /* ------------------------------------------------------------------ Reto diario: una expedicion al azar cada dia, la misma para todo el mundo.
      La MANO DEL DIA (baraja, ascension, regalo y ruta) sale de la semilla del dia; 3 intentos con lugares nuevos que suman la puntuacion global (A.rank.daily) */
@@ -125,7 +130,7 @@ window.AIQ = window.AIQ || {};
   const P6 = s => A.pick6(s);
   const locOf = () => (A.LANGS.find(l => l.code === A.lang) || A.LANGS[0]).loc;
   const hms = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(v => String(v).padStart(2, "0")).join(":"); };
-  const actRound = sv => `${T("Acto", "Act")} ${sv.act} · ${T("Ronda", "Round")} ${sv.round}`;
+  const actRound = where;
   function daily() {
     const c = C(), P = A.profile.get(), DY = A.rank.daily, day = DY.board();
     clearInterval(tickT);
@@ -177,15 +182,11 @@ window.AIQ = window.AIQ || {};
         <div class="dr-tabs">${tabs.map(([id, l]) => `<button type="button" class="sq-fit${id === board ? " on" : ""}" data-b="${id}">${l}</button>`).join("")}</div>
         <div class="lb" id="lb"><p class="lb-load">…</p></div>
         <div class="dr-stats"><span><b class="sq-fit">${A.fmt(hist.days)}</b><i>${P6("Días jugados|Days played|Jours joués|Dias jogados|Gespielte Tage|Giorni giocati||已玩天数|플레이한 날|プレイ日数|Дней сыграно|Dni gry")}</i></span><span><b class="sq-fit">${A.fmt(hist.streak)}</b><i>${P6("Días seguidos|Days in a row|Jours d'affilée|Dias seguidos|Tage in Folge|Giorni di fila||连续天数|연속 일수|連続日数|Дней подряд|Dni z rzędu")}</i></span><span><b class="sq-fit">${A.fmt(hist.best)}</b><i>${P6("Mejor día|Best day|Meilleur jour|Melhor dia|Bester Tag|Giorno migliore||最佳一天|최고의 날|ベストの日|Лучший день|Najlepszy dzień")}</i></span></div>
-        <label class="nick"><span>${T("Tu nombre en la clasificación", "Your leaderboard name")}</span><input id="nickIn" maxlength="${A.profile.NAME_MAX}" value="${esc(P.name)}" placeholder="${T("Aventurero", "Adventurer")}" spellcheck="false" autocomplete="off"></label>
       </aside></div>`, "s-daily"), "tablewrap");
     wireTools(); $("hubBack").onclick = () => { clearInterval(tickT); screen("home"); };
-    /* el nombre se puede cambiar despues de jugar: A.nombre.set lo reenvia a las tablas (el servidor no deja cambiar los intentos ya guardados) */
-    const nick = $("nickIn");
-    nick.oninput = e => { if (e.isComposing) return; const v = A.profile.clean(nick.value); if (v !== nick.value) nick.value = v; };
-    nick.onchange = () => { A.nombre.set(nick.value).then(() => loadBoard()); nick.value = P.name; };
+    /* el nombre NO se cambia aqui: te lo pide el crupier al acabar tu primera partida y despues solo en Ajustes > General (js/nombre.js) */
     document.querySelectorAll(".dr-tabs button").forEach(b => (b.onclick = () => { board = b.dataset.b; document.querySelectorAll(".dr-tabs button").forEach(x => x.classList.toggle("on", x === b)); A.sfx.ui(); loadBoard(); }));
-    if ($("dailyGo")) $("dailyGo").onclick = () => { A.nombre.set(nick.value); A.sfx.depart(); clearInterval(tickT); enterRun(() => (sv ? A.adv.resume(true) : A.adv.beginDaily(day))); };
+    if ($("dailyGo")) $("dailyGo").onclick = () => { A.sfx.depart(); clearInterval(tickT); enterRun(() => (sv ? A.adv.resume(true) : A.adv.beginDaily(day)), !!sv); };
     /* cuenta atras hasta tu medianoche; al cambiar de dia, la pantalla se reparte sola */
     tickT = setInterval(() => {
       const el = $("drClock"); if (!el) return clearInterval(tickT);
@@ -216,7 +217,7 @@ window.AIQ = window.AIQ || {};
       a_target: A.tip6("Respuestas casi perfectas, clavadas sobre el lugar.|Near-perfect answers, right on the spot.|Réponses quasi parfaites, en plein sur le lieu.|Respostas quase perfeitas, bem em cima do lugar.|Fast perfekte Antworten, direkt auf dem Ort.|Risposte quasi perfette, proprio sul luogo.||近乎完美的回答，正中目标。|거의 완벽한 답, 바로 그 자리.|ほぼ完璧な回答、まさにその場所。|Почти идеальные ответы — точно в цель.|Niemal idealne odpowiedzi, prosto w cel."),
       a_lens: A.tip6("Distancia media entre tu pin y el lugar real.|Average distance between your pin and the real place.|Distance moyenne entre ton épingle et le vrai lieu.|Distância média entre seu pino e o lugar real.|Durchschnittliche Entfernung zwischen deinem Pin und dem echten Ort.|Distanza media tra il tuo pin e il luogo reale.||你的图钉与真实地点之间的平均距离。|핀과 실제 장소 사이의 평균 거리.|ピンと実際の場所との平均距離。|Среднее расстояние между твоей меткой и настоящим местом.|Średnia odległość między twoją pinezką a prawdziwym miejscem."),
       a_flame: A.tip6("Más aciertos seguidos que has logrado.|Longest run of correct answers in a row.|Plus longue série de bonnes réponses.|Maior sequência de acertos seguidos.|Längste Serie richtiger Antworten.|Serie più lunga di risposte giuste.||最长的连续答对纪录。|가장 긴 연속 정답 기록.|最長の連続正解記録。|Самая длинная серия правильных ответов подряд.|Najdłuższa seria dobrych odpowiedzi z rzędu."),
-      m_codex: A.tip6("Lugares descubiertos en la enciclopedia.|Places discovered in the encyclopedia.|Lieux découverts dans l'encyclopédie.|Lugares descobertos na enciclopédia.|In der Enzyklopädie entdeckte Orte.|Luoghi scoperti nell'enciclopedia.||百科全书中已发现的地点。|도감에서 발견한 장소.|図鑑で発見した場所。|Места, открытые в энциклопедии.|Miejsca odkryte w encyklopedii."),
+      m_codex: A.tip6("Tarjetas que has descubierto en la Enciclopedia: lugares, historia, personajes y curiosidades.|Cards you've discovered in the Encyclopedia: places, history, people and curiosities.|Cartes découvertes dans l'Encyclopédie : lieux, histoire, personnages et curiosités.|Cartas que você descobriu na Enciclopédia: lugares, história, personagens e curiosidades.|In der Enzyklopädie entdeckte Karten: Orte, Geschichte, Persönlichkeiten und Kuriositäten.|Carte scoperte nell'Enciclopedia: luoghi, storia, personaggi e curiosità.|Tarjetas que descubriste en la Enciclopedia: lugares, historia, personajes y curiosidades.|百科全书中已发现的卡片：地点、历史、人物和趣闻。|도감에서 발견한 카드: 장소, 역사, 인물, 흥미로운 사실.|図鑑で発見したカード：場所、歴史、人物、豆知識。|Карточки, открытые в энциклопедии: места, история, личности и любопытные факты.|Karty odkryte w Encyklopedii: miejsca, historia, postacie i ciekawostki."),   // cuenta todas las tarjetas, no solo lugares
       crown: A.tip6("Tu mejor puntuación en una expedición.|Your best score in an expedition.|Ton meilleur score en expédition.|Sua melhor pontuação em uma expedição.|Deine beste Punktzahl in einer Expedition.|Il tuo miglior punteggio in una spedizione.||你在一次远征中的最高分。|탐험 한 번에서 거둔 최고 점수.|1回の遠征での最高スコア。|Твой лучший результат за экспедицию.|Twój najlepszy wynik w wyprawie."),
     };
     const cell = (l, v, ico) => `<div class="pf-cell" ${A.ttAttr(l, CELL_TIP[ico] || "")}>${A.icon(ico)}<span>${l}</span><b>${v}</b></div>`;

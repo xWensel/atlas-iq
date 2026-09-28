@@ -4,7 +4,7 @@ const URL_ = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 exports.configured = !!(URL_ && TOKEN);
 exports.pipeline = async cmds => {
-  const r = await fetch(URL_ + "/pipeline", { method: "POST", headers: { Authorization: "Bearer " + TOKEN, "content-type": "application/json" }, body: JSON.stringify(cmds) });
+  const r = await fetch(URL_ + "/pipeline", { method: "POST", headers: { Authorization: "Bearer " + TOKEN, "content-type": "application/json" }, body: JSON.stringify(cmds), signal: AbortSignal.timeout(4000) });   // Redis colgado: 502 en vez de dejar la funcion esperando
   if (!r.ok) throw new Error("kv " + r.status);
   return (await r.json()).map(x => x.result);
 };

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#16241c">
+<meta name="theme-color" content="#0f3b3a">
 <title>Geolite</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <meta name="description" content="Geolite: ¿sabes dónde queda? Haz clic lo más cerca posible del lugar que te piden. Roguelike de geografía con estética casino pixel art.">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Geolite"><meta property="og:title" content="Geolite · ¿Sabes dónde queda?">
-<meta property="og:description" content="Roguelike de geografía: haz clic lo más cerca posible del lugar que te piden. Casino pixel art, 6 idiomas.">
+<meta property="og:description" content="Roguelike de geografía: haz clic lo más cerca posible del lugar que te piden. Casino pixel art, 12 idiomas.">
 <meta property="og:image" content="https://geolite-game.vercel.app/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:url" content="https://geolite-game.vercel.app/">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Geolite · ¿Sabes dónde queda?"><meta name="twitter:image" content="https://geolite-game.vercel.app/assets/og.png">
 <link rel="preload" as="image" href="assets/logo.png">
@@ -95,10 +95,10 @@
 
   <!-- panel de ajustes: pantalla completa, la sala de control del casino -->
   <div class="set-veil hidden" id="setVeil"></div>
-  <div class="set-sh hidden" id="setSh"><section id="settings" role="dialog" aria-label="Ajustes">
+  <div class="set-sh hidden" id="setSh"><section id="settings" role="dialog" aria-labelledby="setH1">
     <header class="set-top">
       <button class="set-back" id="setClose"><i class="uic" data-ic="u_back"></i><span data-i="set.close"></span></button>
-      <div class="set-title"><i class="set-h-ic" data-ic="chips"></i><h1 data-i="set.title"></h1></div>
+      <div class="set-title"><i class="set-h-ic" data-ic="chips"></i><h1 id="setH1" data-i="set.title"></h1></div>
       <div class="set-ver">GEOLITE · V<span id="setVer"></span></div>
     </header>
 

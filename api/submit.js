@@ -10,6 +10,7 @@ module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).json({ ok: false });
   if (!kv.configured) return res.status(503).json({ ok: false, reason: "no-backend" });
   let b; try { b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {}; } catch (e) { return res.status(400).json({ ok: false, reason: "json" }); }
+  if (!b || typeof b !== "object") b = {};                             // "null", un numero...: se rechaza abajo como invalido (antes b.board reventaba)
   const board = String(b.board || ""), id = String(b.id || "").replace(/[^a-z0-9]/gi, "").slice(0, 24), daily = /^daily-/.test(board);
   const name = [...String(b.name || "").normalize("NFC").replace(/[^\p{L}\p{N} _.'\-]/gu, "").replace(/\s+/g, " ").trim()].slice(0, 20).join("").trim() || "Anonymous";   // el mismo filtro que A.profile.clean (hasta 20)
   const tries = daily ? (Array.isArray(b.tries) ? b.tries : [b.score]).slice(0, 3).map(v => Math.floor(+v)) : [];
@@ -20,19 +21,19 @@ module.exports = async (req, res) => {
     const d = new Date(), ymd = x => x.getUTCFullYear() * 10000 + (x.getUTCMonth() + 1) * 100 + x.getUTCDate(), v = +board.slice(6);
     if (![ymd(d), ymd(new Date(d - 864e5)), ymd(new Date(+d + 864e5))].includes(v)) return res.status(400).json({ ok: false, reason: "day" });
   }
-  const ip = String((req.headers["x-forwarded-for"] || "").split(",")[0] || "x").slice(0, 45), win = Math.floor(Date.now() / 60000);
+  const ip = String((req.headers["x-forwarded-for"] || "").split(",")[0] || "x").slice(0, 45), rl = "rl:" + ip + ":" + Math.floor(Date.now() / 60000);
   try {
-    const [n] = await kv.pipeline([["INCR", "rl:" + ip + ":" + win]]);
+    const [n] = await kv.pipeline([["INCR", rl], ["EXPIRE", rl, 120]]);  // el contador caduca siempre (antes, si fallaba el resto, se quedaba para siempre)
     if (n > 20) return res.status(429).json({ ok: false, reason: "rate" });
     const lb = "lb:" + board, names = "names:" + board;
     let total = score, mine = null;
     if (daily) {
       const tk = "tr:" + board + ":" + id;
-      const got = await kv.pipeline([["EXPIRE", "rl:" + ip + ":" + win, 120], ...tries.map((v, i) => ["HSETNX", tk, String(i + 1), v]), ["EXPIRE", tk, TTL], ["HMGET", tk, "1", "2", "3"]]);
+      const got = await kv.pipeline([...tries.map((v, i) => ["HSETNX", tk, String(i + 1), v]), ["EXPIRE", tk, TTL], ["HMGET", tk, "1", "2", "3"]]);
       mine = got[got.length - 1].filter(v => v != null).map(Number); total = mine.reduce((a, v) => a + v, 0);
       await kv.pipeline([["ZADD", lb, total, id], ["HSET", names, id, name], ["HSET", "tries:" + board, id, mine.join(",")], ["EXPIRE", lb, TTL], ["EXPIRE", names, TTL], ["EXPIRE", "tries:" + board, TTL]]);
-    } else {
-      await kv.pipeline([["EXPIRE", "rl:" + ip + ":" + win, 120], ["ZADD", lb, "GT", score, id], ["HSET", names, id, name], ["EXPIRE", lb, TTL], ["EXPIRE", names, TTL]]);
+    } else {                                                           // la Aventura es "de siempre": no caduca (con EXPIRE se borraba entera si nadie jugaba en 40 dias)
+      await kv.pipeline([["ZADD", lb, "GT", score, id], ["HSET", names, id, name], ["PERSIST", lb], ["PERSIST", names]]);
     }
     const [rank, count] = await kv.pipeline([["ZREVRANK", lb, id], ["ZCARD", lb]]);
     res.status(200).json({ ok: true, rank: rank == null ? null : rank + 1, total: count, ...(mine ? { score: total, tries: mine } : {}) });

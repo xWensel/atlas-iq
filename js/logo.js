@@ -1,6 +1,6 @@
 /*
  * Vault Raiders - logo vectorial (recreacion del logotipo del estudio).
- * Si existe assets/vault-raiders.png se usa ese archivo original; si no, este dibujo.
+ * Si se indica el archivo original (VR_PNG, abajo) y existe, se usa ese; si no, este dibujo.
  * Cada letra es un path (evenodd) para poder animarlas una a una.
  */
 window.AIQ = window.AIQ || {};
@@ -44,8 +44,10 @@ window.AIQ = window.AIQ || {};
     svg.appendChild(g);
     if (animated) { const sg = el("g", { "clip-path": "url(#vrClip)" }); sg.appendChild(el("rect", { x: "0", y: "-20", width: "230", height: "660", fill: "url(#vrShine)", class: "vr-shine" })); svg.appendChild(sg); }
     host.appendChild(svg);
-    // si el archivo original esta disponible, sustituye el dibujo (se comprueba una sola vez)
-    A._vrProbe = A._vrProbe || new Promise(res => { const i = new Image(); i.onload = () => res(i.src); i.onerror = () => res(null); i.src = "assets/vault-raiders.png"; });
+    // si el archivo original esta disponible, sustituye el dibujo (se comprueba una sola vez). Hoy no existe: sin ruta no se pide nada
+    // (antes se pedia igualmente y cada arranque dejaba un 404 en la consola). Para usarlo, poner su ruta en VR_PNG.
+    const VR_PNG = "";   // p. ej. "assets/vault-raiders.png"
+    A._vrProbe = A._vrProbe || (VR_PNG ? new Promise(res => { const i = new Image(); i.onload = () => res(i.src); i.onerror = () => res(null); i.src = VR_PNG; }) : Promise.resolve(null));
     A._vrProbe.then(src => { if (!src || !svg.isConnected) return; const im = document.createElement("img"); im.src = src; im.alt = "Vault Raiders"; im.className = className + " vr-img"; svg.replaceWith(im); host.style.setProperty("--vr-url", `url(${src})`); host.classList.add("has-png"); });
     return svg;
   };

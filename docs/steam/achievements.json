@@ -135,7 +135,7 @@
    "brazilian": "10 cartas da Enciclopédia.",
    "german": "10 Enzyklopädie-Karten.",
    "italian": "10 carte dell'Enciclopedia.",
-   "latam": "10 cartas de la Enciclopedia.",
+   "latam": "10 tarjetas de la Enciclopedia.",
    "schinese": "获得 10 张百科全书卡片。",
    "koreana": "백과사전 카드 10장.",
    "japanese": "図鑑カード10枚。",
@@ -315,7 +315,7 @@
    "brazilian": "50 cartas.",
    "german": "50 Karten.",
    "italian": "50 carte.",
-   "latam": "50 cartas.",
+   "latam": "50 tarjetas.",
    "schinese": "50 张卡片。",
    "koreana": "카드 50장.",
    "japanese": "カード50枚。",
@@ -567,7 +567,7 @@
    "brazilian": "100 cartas.",
    "german": "100 Karten.",
    "italian": "100 carte.",
-   "latam": "100 cartas.",
+   "latam": "100 tarjetas.",
    "schinese": "100 张卡片。",
    "koreana": "카드 100장.",
    "japanese": "カード100枚。",
@@ -623,9 +623,9 @@
    "spanish": "Reto del día",
    "french": "Défi quotidien",
    "brazilian": "Desafio diário",
-   "german": "Tagesherausforderung",
+   "german": "Tages­heraus­forderung",
    "italian": "Sfida giornaliera",
-   "latam": "Desafío diario",
+   "latam": "Reto diario",
    "schinese": "每日挑战",
    "koreana": "일일 도전",
    "japanese": "デイリーチャレンジ",
@@ -633,18 +633,18 @@
    "polish": "Wyzwanie dnia"
   },
   "desc": {
-   "english": "Complete a Daily challenge.",
-   "spanish": "Completa un Reto diario.",
-   "french": "Termine un défi quotidien.",
-   "brazilian": "Complete um desafio diário.",
-   "german": "Schließe eine Tagesherausforderung ab.",
-   "italian": "Completa una sfida giornaliera.",
-   "latam": "Completa un desafío diario.",
-   "schinese": "完成一次每日挑战。",
-   "koreana": "일일 도전을 완료하세요.",
-   "japanese": "デイリーチャレンジを完了しよう。",
-   "russian": "Заверши ежедневное испытание.",
-   "polish": "Ukończ Wyzwanie dnia."
+   "english": "Play the Daily challenge.",
+   "spanish": "Juega el Reto diario.",
+   "french": "Joue le défi quotidien.",
+   "brazilian": "Jogue o desafio diário.",
+   "german": "Spiele die Tagesherausforderung.",
+   "italian": "Gioca la sfida giornaliera.",
+   "latam": "Juega el Reto diario.",
+   "schinese": "玩一次每日挑战。",
+   "koreana": "일일 도전을 플레이하세요.",
+   "japanese": "デイリーチャレンジをプレイしよう。",
+   "russian": "Сыграй в ежедневное испытание.",
+   "polish": "Zagraj w Wyzwanie dnia."
   }
  },
  {
@@ -720,6 +720,42 @@
   }
  },
  {
+  "id": "codex_place",
+  "hidden": 0,
+  "tier": 2,
+  "ev": "codex",
+  "frame": "blank_teal",
+  "icon": "ach_codex_place",
+  "name": {
+   "english": "Hidden corners",
+   "spanish": "Rincones perdidos",
+   "french": "Coins perdus",
+   "brazilian": "Cantos escondidos",
+   "german": "Versteckte Winkel",
+   "italian": "Angoli nascosti",
+   "latam": "Rincones perdidos",
+   "schinese": "隐秘角落",
+   "koreana": "숨겨진 구석",
+   "japanese": "秘境めぐり",
+   "russian": "Затерянные уголки",
+   "polish": "Zakamarki świata"
+  },
+  "desc": {
+   "english": "20 landmarks in the Encyclopedia.",
+   "spanish": "20 monumentos en la Enciclopedia.",
+   "french": "20 monuments dans l'Encyclopédie.",
+   "brazilian": "20 monumentos na Enciclopédia.",
+   "german": "20 Wahrzeichen in der Enzyklopädie.",
+   "italian": "20 monumenti nell'Enciclopedia.",
+   "latam": "20 monumentos en la Enciclopedia.",
+   "schinese": "百科全书中收录 20 个地标。",
+   "koreana": "도감에 명소 20곳.",
+   "japanese": "図鑑に名所を20件。",
+   "russian": "20 достопримечательностей в энциклопедии.",
+   "polish": "20 zabytków w Encyklopedii."
+  }
+ },
+ {
   "id": "codex_capitals",
   "hidden": 0,
   "tier": 2,
@@ -777,18 +813,18 @@
    "polish": "Spokojne wody"
   },
   "desc": {
-   "english": "15 seas, lakes or islands.",
-   "spanish": "15 mares, lagos o islas.",
-   "french": "15 mers, lacs ou îles.",
-   "brazilian": "15 mares, lagos ou ilhas.",
-   "german": "15 Meere, Seen oder Inseln.",
-   "italian": "15 mari, laghi o isole.",
-   "latam": "15 mares, lagos o islas.",
-   "schinese": "15 个海洋、湖泊或岛屿。",
-   "koreana": "바다, 호수, 섬 15곳.",
-   "japanese": "海・湖・島を15件。",
-   "russian": "15 морей, озёр или островов.",
-   "polish": "15 mórz, jezior lub wysp."
+   "english": "15 seas or oceans.",
+   "spanish": "15 mares u océanos.",
+   "french": "15 mers ou océans.",
+   "brazilian": "15 mares ou oceanos.",
+   "german": "15 Meere oder Ozeane.",
+   "italian": "15 mari o oceani.",
+   "latam": "15 mares u océanos.",
+   "schinese": "15 片海洋。",
+   "koreana": "바다 또는 대양 15곳.",
+   "japanese": "海・大洋を15件。",
+   "russian": "15 морей или океанов.",
+   "polish": "15 mórz lub oceanów."
   }
  },
  {
@@ -900,42 +936,6 @@
   }
  },
  {
-  "id": "codex_place",
-  "hidden": 0,
-  "tier": 2,
-  "ev": "codex",
-  "frame": "blank_teal",
-  "icon": "ach_codex_place",
-  "name": {
-   "english": "Hidden corners",
-   "spanish": "Rincones perdidos",
-   "french": "Coins perdus",
-   "brazilian": "Cantos escondidos",
-   "german": "Versteckte Winkel",
-   "italian": "Angoli nascosti",
-   "latam": "Rincones perdidos",
-   "schinese": "隐秘角落",
-   "koreana": "숨겨진 구석",
-   "japanese": "秘境めぐり",
-   "russian": "Затерянные уголки",
-   "polish": "Zakamarki świata"
-  },
-  "desc": {
-   "english": "10 uncategorized places.",
-   "spanish": "10 lugares sin categoría propia.",
-   "french": "10 lieux sans catégorie.",
-   "brazilian": "10 lugares sem categoria.",
-   "german": "10 Orte ohne Kategorie.",
-   "italian": "10 luoghi senza categoria.",
-   "latam": "10 lugares sin categoría propia.",
-   "schinese": "10 个未分类的地点。",
-   "koreana": "분류되지 않은 장소 10곳.",
-   "japanese": "分類のない場所を10件。",
-   "russian": "10 мест без категории.",
-   "polish": "10 miejsc bez kategorii."
-  }
- },
- {
   "id": "inside",
   "hidden": 0,
   "tier": 2,
@@ -957,18 +957,18 @@
    "polish": "Witaj w domu"
   },
   "desc": {
-   "english": "Click inside 25 countries.",
-   "spanish": "Haz clic dentro de 25 países.",
-   "french": "Clique dans 25 pays.",
-   "brazilian": "Clique dentro de 25 países.",
-   "german": "Klicke in 25 Länder.",
-   "italian": "Clicca dentro 25 paesi.",
-   "latam": "Haz clic dentro de 25 países.",
-   "schinese": "在 25 个国家境内点击过。",
-   "koreana": "25개 국가 안을 클릭하세요.",
-   "japanese": "25か国の中をクリックしよう。",
-   "russian": "Кликни внутри 25 стран.",
-   "polish": "Kliknij w granicach 25 krajów."
+   "english": "Click inside a country 25 times.",
+   "spanish": "Haz clic 25 veces dentro de un país.",
+   "french": "Clique 25 fois à l'intérieur d'un pays.",
+   "brazilian": "Clique 25 vezes dentro de um país.",
+   "german": "Klicke 25-mal innerhalb eines Landes.",
+   "italian": "Clicca 25 volte dentro un paese.",
+   "latam": "Haz clic 25 veces dentro de un país.",
+   "schinese": "在国家境内点击 25 次。",
+   "koreana": "국가 안을 25번 클릭하세요.",
+   "japanese": "国の中を25回クリックしよう。",
+   "russian": "Кликни внутри страны 25 раз.",
+   "polish": "Kliknij 25 razy w granicach kraju."
   }
  },
  {
@@ -1065,7 +1065,7 @@
    "polish": "Ani draśnięcia"
   },
   "desc": {
-   "english": "Complete an act without losing a life.",
+   "english": "Complete an act without losing a provision.",
    "spanish": "Completa un acto sin perder provisiones.",
    "french": "Termine un acte sans perdre une provision.",
    "brazilian": "Complete um ato sem perder uma provisão.",
@@ -1251,7 +1251,7 @@
    "brazilian": "250 cartas.",
    "german": "250 Karten.",
    "italian": "250 carte.",
-   "latam": "250 cartas.",
+   "latam": "250 tarjetas.",
    "schinese": "250 张卡片。",
    "koreana": "카드 250장.",
    "japanese": "カード250枚。",
@@ -1735,7 +1735,7 @@
   "frame": "blank_boss",
   "icon": "ach_pixel",
   "name": {
-   "english": "To the millimetre",
+   "english": "To the millimeter",
    "spanish": "Al milímetro",
    "french": "Au millimètre",
    "brazilian": "Ao milímetro",
@@ -1821,18 +1821,18 @@
    "polish": "Wytrwałość"
   },
   "desc": {
-   "english": "Complete 7 Daily challenges.",
-   "spanish": "Completa 7 Retos diarios.",
-   "french": "Termine 7 défis quotidiens.",
-   "brazilian": "Complete 7 desafios diários.",
-   "german": "Schließe 7 Tagesherausforderungen ab.",
-   "italian": "Completa 7 sfide giornaliere.",
-   "latam": "Completa 7 desafíos diarios.",
-   "schinese": "完成 7 次每日挑战。",
-   "koreana": "일일 도전 7개를 완료하세요.",
-   "japanese": "デイリーチャレンジを7回完了しよう。",
-   "russian": "Заверши 7 ежедневных испытаний.",
-   "polish": "Ukończ 7 Wyzwań dnia."
+   "english": "Play the Daily challenge on 7 different days.",
+   "spanish": "Juega el Reto diario 7 días distintos.",
+   "french": "Joue le défi quotidien 7 jours différents.",
+   "brazilian": "Jogue o desafio diário em 7 dias diferentes.",
+   "german": "Spiele die Tagesherausforderung an 7 verschiedenen Tagen.",
+   "italian": "Gioca la sfida giornaliera in 7 giorni diversi.",
+   "latam": "Juega el Reto diario 7 días distintos.",
+   "schinese": "在 7 个不同的日子玩每日挑战。",
+   "koreana": "서로 다른 7일에 일일 도전을 플레이하세요.",
+   "japanese": "デイリーチャレンジを別々の7日にプレイしよう。",
+   "russian": "Сыграй в ежедневное испытание в 7 разных дней.",
+   "polish": "Zagraj w Wyzwanie dnia w 7 różnych dni."
   }
  },
  {
@@ -1899,7 +1899,7 @@
    "brazilian": "500 cartas.",
    "german": "500 Karten.",
    "italian": "500 carte.",
-   "latam": "500 cartas.",
+   "latam": "500 tarjetas.",
    "schinese": "500 张卡片。",
    "koreana": "카드 500장.",
    "japanese": "カード500枚。",
@@ -2289,18 +2289,18 @@
    "polish": "Obyty w świecie"
   },
   "desc": {
-   "english": "Click inside 100 countries.",
-   "spanish": "Haz clic dentro de 100 países.",
-   "french": "Clique dans 100 pays.",
-   "brazilian": "Clique dentro de 100 países.",
-   "german": "Klicke in 100 Länder.",
-   "italian": "Clicca dentro 100 paesi.",
-   "latam": "Haz clic dentro de 100 países.",
-   "schinese": "在 100 个国家境内点击过。",
-   "koreana": "100개 국가 안을 클릭하세요.",
-   "japanese": "100か国の中をクリックしよう。",
-   "russian": "Кликни внутри 100 стран.",
-   "polish": "Kliknij w granicach 100 krajów."
+   "english": "Click inside a country 100 times.",
+   "spanish": "Haz clic 100 veces dentro de un país.",
+   "french": "Clique 100 fois à l'intérieur d'un pays.",
+   "brazilian": "Clique 100 vezes dentro de um país.",
+   "german": "Klicke 100-mal innerhalb eines Landes.",
+   "italian": "Clicca 100 volte dentro un paese.",
+   "latam": "Haz clic 100 veces dentro de un país.",
+   "schinese": "在国家境内点击 100 次。",
+   "koreana": "국가 안을 100번 클릭하세요.",
+   "japanese": "国の中を100回クリックしよう。",
+   "russian": "Кликни внутри страны 100 раз.",
+   "polish": "Kliknij 100 razy w granicach kraju."
   }
  },
  {
@@ -2325,7 +2325,7 @@
    "polish": "Bez skazy II"
   },
   "desc": {
-   "english": "Complete Act II without losing a life.",
+   "english": "Complete Act II without losing a provision.",
    "spanish": "Completa el Acto II sin perder provisiones.",
    "french": "Termine l'Acte II sans perdre de provision.",
    "brazilian": "Complete o Ato II sem perder provisões.",
@@ -2475,7 +2475,7 @@
    "brazilian": "1.000 cartas.",
    "german": "1.000 Karten.",
    "italian": "1.000 carte.",
-   "latam": "1.000 cartas.",
+   "latam": "1.000 tarjetas.",
    "schinese": "1,000 张卡片。",
    "koreana": "카드 1,000장.",
    "japanese": "カード1,000枚。",
@@ -2865,7 +2865,7 @@
    "polish": "Nieskazitelna legenda"
   },
   "desc": {
-   "english": "Complete Act III without losing a life.",
+   "english": "Complete Act III without losing a provision.",
    "spanish": "Completa el Acto III sin perder provisiones.",
    "french": "Termine l'Acte III sans perdre de provision.",
    "brazilian": "Complete o Ato III sem perder provisões.",
@@ -2901,18 +2901,18 @@
    "polish": "Codzienny rytuał"
   },
   "desc": {
-   "english": "Complete 30 Daily challenges.",
-   "spanish": "Completa 30 Retos diarios.",
-   "french": "Termine 30 défis quotidiens.",
-   "brazilian": "Complete 30 desafios diários.",
-   "german": "Schließe 30 Tagesherausforderungen ab.",
-   "italian": "Completa 30 sfide giornaliere.",
-   "latam": "Completa 30 Retos diarios.",
-   "schinese": "完成 30 次每日挑战。",
-   "koreana": "일일 도전 30개를 완료하세요.",
-   "japanese": "デイリーチャレンジを30回完了しよう。",
-   "russian": "Заверши 30 ежедневных испытаний.",
-   "polish": "Ukończ 30 Wyzwań dnia."
+   "english": "Play the Daily challenge on 30 different days.",
+   "spanish": "Juega el Reto diario 30 días distintos.",
+   "french": "Joue le défi quotidien 30 jours différents.",
+   "brazilian": "Jogue o desafio diário em 30 dias diferentes.",
+   "german": "Spiele die Tagesherausforderung an 30 verschiedenen Tagen.",
+   "italian": "Gioca la sfida giornaliera in 30 giorni diversi.",
+   "latam": "Juega el Reto diario 30 días distintos.",
+   "schinese": "在 30 个不同的日子玩每日挑战。",
+   "koreana": "서로 다른 30일에 일일 도전을 플레이하세요.",
+   "japanese": "デイリーチャレンジを別々の30日にプレイしよう。",
+   "russian": "Сыграй в ежедневное испытание в 30 разных дней.",
+   "polish": "Zagraj w Wyzwanie dnia w 30 różnych dni."
   }
  },
  {
@@ -3123,7 +3123,7 @@
    "brazilian": "2.500 cartas.",
    "german": "2.500 Karten.",
    "italian": "2.500 carte.",
-   "latam": "2.500 cartas.",
+   "latam": "2.500 tarjetas.",
    "schinese": "2,500 张卡片。",
    "koreana": "카드 2,500장.",
    "japanese": "カード2,500枚。",
@@ -3325,7 +3325,7 @@
    "brazilian": "Mira de ás",
    "german": "Meisterschütze",
    "italian": "Tiratore scelto",
-   "latam": "As de diana",
+   "latam": "As de la puntería",
    "schinese": "神射手",
    "koreana": "명사수",
    "japanese": "名射手",
@@ -3339,7 +3339,7 @@
    "brazilian": "1.000 moscas no total.",
    "german": "1.000 Volltreffer insgesamt.",
    "italian": "1.000 centri in totale.",
-   "latam": "1.000 dianas en total.",
+   "latam": "1.000 blancos perfectos en total.",
    "schinese": "累计正中靶心 1000 次。",
    "koreana": "총 1,000번 명중.",
    "japanese": "合計1,000回命中。",
@@ -3447,7 +3447,7 @@
    "brazilian": "Desbloqueie todas as cartas.",
    "german": "Schalte jede Karte frei.",
    "italian": "Sblocca tutte le carte.",
-   "latam": "Desbloquea todas las cartas.",
+   "latam": "Desbloquea todas las tarjetas.",
    "schinese": "解锁所有卡片。",
    "koreana": "모든 카드를 잠금 해제하세요.",
    "japanese": "すべてのカードを解除しよう。",

@@ -48,23 +48,27 @@ window.AIQ = window.AIQ || {};
   function segDistKm(lon, lat, a, b) {
     const midLat = (a[1] + b[1]) / 2;
     const kx = 111.32 * Math.cos(((lat + midLat) / 2) * D2R), ky = 110.574;
-    const ax = wrap(a[0] - lon) * kx, ay = (a[1] - lat) * ky;
-    const bx = wrap(b[0] - lon) * kx, by = (b[1] - lat) * ky;
+    const ox = wrap(a[0] - lon), ax = ox * kx, ay = (a[1] - lat) * ky;
+    const bx = (ox + b[0] - a[0]) * kx, by = (b[1] - lat) * ky;       // b relativo a a (anillos desenrollados): antes b se envolvia por su cuenta y un tramo que cruzaba el meridiano opuesto al clic daba la vuelta al mundo (distancia ~0 en las antipodas)
     const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
     let t = l2 ? -(ax * dx + ay * dy) / l2 : 0;
     t = Math.max(0, Math.min(1, t));
-    return Math.hypot(ax + t * dx, ay + t * dy);
+    return haversine(lat, lon, a[1] + t * (b[1] - a[1]), a[0] + t * (b[0] - a[0]));   // punto mas cercano (aprox. local) y distancia real sobre la esfera
   }
-  function distToFeature(lon, lat, f) {
+  /* caja para medir distancias: con TODOS los anillos (en la Antartida el primero es solo el tramo del polo, caja [-540,-90,-180,-90], y la costa
+     va en otro); si da la vuelta al mundo, de -180 a 180. La bbox de siempre no se toca: la usan el dibujo y la colocacion de continentes */
+  const dboxOf = p => p.dbox || (p.dbox = (() => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const r of p.rings) for (const [lo, la] of r) { if (lo < x0) x0 = lo; if (lo > x1) x1 = lo; if (la < y0) y0 = la; if (la > y1) y1 = la; } return x1 - x0 >= 360 ? [-180, y0, 180, y1] : [x0, y0, x1, y1]; })());
+  /* distancia (aprox.) a una caja [lon0, lat0, lon1, lat1], tambien dando la vuelta por el antimeridiano */
+  const boxKm = (lon, lat, b) => { const cy = Math.max(b[1], Math.min(lat, b[3])); let m = Infinity; for (const l of [lon, lon - 360, lon + 360]) m = Math.min(m, haversine(lat, lon, cy, Math.max(b[0], Math.min(l, b[2])))); return m; };
+  /* cap (opcional): solo interesa si esta mas cerca que eso; si no, devuelve cap (asi buscar el pais mas cercano en todo el mundo es barato) */
+  function distToFeature(lon, lat, f, cap = Infinity) {
+    let best = cap;
+    if (best < Infinity && !f.polys.some(p => boxKm(lon, lat, dboxOf(p)) <= best * 1.3 + 100)) return best;
     if (inFeature(lon, lat, f)) return 0;
-    let best = Infinity;
     for (const p of f.polys) {
       // descarte rapido por caja: distancia minima posible a la bbox
-      const b = p.bbox;
-      const cx = Math.max(b[0], Math.min(lon, b[2])), cy = Math.max(b[1], Math.min(lat, b[3]));
-      if (haversine(lat, lon, cy, cx) > best) continue;
-      const ring = p.rings[0];
-      for (let i = 0; i < ring.length - 1; i++) {
+      if (boxKm(lon, lat, dboxOf(p)) > best * 1.3 + 100) continue;   // con margen: a miles de km la esquina de la caja no es una cota exacta sobre la esfera
+      for (const ring of p.rings) for (let i = 0; i < ring.length - 1; i++) {   // tambien los huecos: desde Lesoto, Sudafrica esta en su borde (antes contaba solo la costa: 323 km desde Maseru)
         const d = segDistKm(lon, lat, ring[i], ring[i + 1]);
         if (d < best) best = d;
       }

@@ -302,7 +302,8 @@
  },
  "c:eSwatini": {
   "es": "Esuatini",
-  "en": "Eswatini"
+  "en": "Eswatini",
+  "it": "Eswatini"
  },
  "kuwait-city": {
   "es": "Ciudad de Kuwait",
@@ -342,7 +343,8 @@
   "de": "Ausbruch des Krakatau (1883)"
  },
  "battle-of-arnhem": {
-  "it": "Battaglia di Arnhem"
+  "it": "Battaglia di Arnhem",
+  "pl": "Bitwa o Arnhem"
  },
  "battle-of-puebla": {
   "it": "Battaglia di Puebla"
@@ -352,5 +354,72 @@
  },
  "hoi-an": {
   "pt": "Hội An"
+ },
+ "alamo-mission": {
+  "pl": "Misja Alamo"
+ },
+ "annapurna": {
+  "ja": "アンナプルナ",
+  "pl": "Annapurna"
+ },
+ "biltmore-estate": {
+  "pl": "Biltmore Estate"
+ },
+ "carthage": {
+  "ja": "カルタゴ"
+ },
+ "eruption-of-mount-vesuvius-in-79-ad": {
+  "pl": "Erupcja Wezuwiusza w 79 roku"
+ },
+ "fall-of-the-berlin-wall": {
+  "pl": "Upadek muru berlińskiego"
+ },
+ "griffith-observatory": {
+  "pl": "Obserwatorium Griffitha"
+ },
+ "karnak": {
+  "pl": "Karnak"
+ },
+ "lake-louise": {
+  "pl": "Jezioro Louise"
+ },
+ "merlion": {
+  "pl": "Merlion"
+ },
+ "parliament-hill": {
+  "pl": "Wzgórze Parlamentarne"
+ },
+ "peterhof-palace": {
+  "ja": "ペテルゴフ"
+ },
+ "siege-of-numantia": {
+  "pl": "Oblężenie Numancji"
+ },
+ "sinking-of-the-titanic": {
+  "pl": "Katastrofa Titanica",
+  "de": "Untergang der Titanic"
+ },
+ "torres-del-paine": {
+  "ja": "パイネ山群"
+ },
+ "troms": {
+  "pl": "Tromsø"
+ },
+ "universal-studios-hollywood": {
+  "pl": "Universal Studios Hollywood"
+ },
+ "dubrovnik": {
+  "it": "Dubrovnik"
+ },
+ "c:Taiwan": {
+  "es": "Taiwán",
+  "de": "Taiwan"
+ },
+ "c:Nauru": {
+  "zh": "瑙鲁",
+  "ko": "나우루"
+ },
+ "c:Tonga": {
+  "zh": "汤加"
  }
 }

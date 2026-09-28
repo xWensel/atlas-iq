@@ -14,7 +14,11 @@ window.AIQ = window.AIQ || {};
     medals: {},
   });
   let P = defaults();
-  try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d && d.v === 1) { P = Object.assign(defaults(), d); P.stats = Object.assign(defaults().stats, d.stats); P.adv = Object.assign(defaults().adv, d.adv); } } catch (e) { /* perfil nuevo */ }
+  try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d && d.v === 1) { P = Object.assign(defaults(), d); P.stats = Object.assign(defaults().stats, d.stats); P.adv = Object.assign(defaults().adv, d.adv); } }
+  catch (e) { try { localStorage.setItem(KEY + ".bad", localStorage.getItem(KEY)); } catch (e2) { /* sin almacenamiento */ } }   // JSON roto: se aparta antes de que el perfil nuevo lo pise
+  /* piezas con otra forma (perfil a medio escribir o tocado a mano): se reponen para que nada casque al leerlas (P.ach[id], P.daily[b]...) */
+  { const D0 = defaults(), obj = v => !!v && typeof v === "object" && !Array.isArray(v); ["records", "ach", "boards", "daily", "medals", "stats", "adv"].forEach(k => { if (!obj(P[k])) P[k] = D0[k]; });
+    if (!Array.isArray(P.nameLog)) P.nameLog = []; if (typeof P.name !== "string") P.name = ""; if (!P.id || typeof P.id !== "string") P.id = D0.id; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) { /* sin almacenamiento */ } };
 
   /* nombre con el que rankeas (v0.37): letras de cualquier alfabeto, cifras, espacio y _ . - ' (lo mismo que acepta api/submit.js), hasta 20 */
@@ -42,6 +46,9 @@ window.AIQ = window.AIQ || {};
   const golds = () => classicIds().filter(id => P.medals[id] === "gold").length;
   const DECKS = ["explorer", "historian", "navigator", "blind"];
   const deckWins = () => DECKS.filter(d => ((ADV().deckWins || {})[d] || 0) > 0).length;
+  /* Retos diarios completados = dias con algun intento cerrado (los "Dias jugados" del Reto diario). Contar las claves de P.daily sumaba
+     dias con el intento a medias y las tablas "weekly-" del formato antiguo */
+  const dailyDays = () => (A.rank && A.rank.daily ? A.rank.daily.stats().days : 0);
   /* Tramos de dificultad (secciones del Perfil): de menos a mas dificil y de menos a mas horas de juego; los secretos, al final.
    * El orden no importa a Steam (el "API name" es el id). Todos comprobados como alcanzables (v0.34, 100 logros: el tope de Steam). */
   A.ACH_TIERS = [
@@ -76,22 +83,23 @@ window.AIQ = window.AIQ || {};
       AD("adv_act1", "🌅", "Las rutas conocidas", "The known roads", "Completa el Acto I.", "Complete Act I.", "adv", c => c.kind === "act" && c.act >= 1),
       AD("codex_100", "🏛️", "Erudito", "Scholar", "100 tarjetas.", "100 cards.", "codex", c => c.u >= 100),
       AD("streak_10", "☄️", "Imparable", "Unstoppable", "Racha de 10 aciertos.", "10-hit streak.", "q", () => S().bestStreak >= 10),
-      AD("daily_1", "📅", "Reto del día", "Daily challenge", "Completa un Reto diario.", "Complete a Daily challenge.", "daily", () => true),
+      AD("daily_1", "📅", "Reto del día", "Daily challenge", "Juega el Reto diario.", "Play the Daily challenge.", "daily", () => true),
       AD("classic_world", "🌍", "Vuelta al mundo", "Round the world", "Termina la campaña Mundo.", "Finish the World campaign.", "classic", () => won("c-game1")),
     ]),
     /* ---- III. unas horas (1-5 h) ---- */
     ...tier(2, [
       AD("last_second", "⏱️", "Por los pelos", "By a whisker", "Acierta bien con menos de 1 segundo restante.", "Nail it with under 1 second left.", "q", c => c.ratio >= 0.75 && c.left != null && c.left < 1 && c.left > 0),
+      /* antes "10 lugares sin categoria propia": desde que la Enciclopedia solo tiene tarjetas alcanzables no queda ninguna de tipo "place" (era imposible) */
+      AD("codex_place", "🧭", "Rincones perdidos", "Hidden corners", "20 monumentos en la Enciclopedia.", "20 landmarks in the Encyclopedia.", "codex", c => (c.by.landmark || [0])[0] >= 20),
       AD("codex_capitals", "🏙️", "Diplomático", "Diplomat", "40 capitales.", "40 capitals.", "codex", c => (c.by.capital || [0])[0] >= 40),
-      AD("codex_water", "🌊", "Aguas tranquilas", "Calm waters", "15 mares, lagos o islas.", "15 seas, lakes or islands.", "codex", c => (c.by.water || [0])[0] >= 15),
+      AD("codex_water", "🌊", "Aguas tranquilas", "Calm waters", "15 mares u océanos.", "15 seas or oceans.", "codex", c => (c.by.water || [0])[0] >= 15),
       AD("codex_nature", "🌋", "Naturalista", "Naturalist", "30 lugares de naturaleza en la Enciclopedia.", "30 nature entries in the Encyclopedia.", "codex", c => (c.by.nature || [0])[0] >= 30),
       AD("codex_people", "🧑‍🎨", "Historiador", "Historian", "25 personajes históricos.", "25 historical figures.", "codex", c => (c.by.person || [0])[0] >= 25),
       AD("codex_events", "⚔️", "Cronista", "Chronicler", "20 batallas y sucesos.", "20 battles and events.", "codex", c => ((c.by.battle || [0])[0] + (c.by.event || [0])[0]) >= 20),
-      AD("codex_place", "🧭", "Rincones perdidos", "Hidden corners", "10 lugares sin categoría propia.", "10 uncategorized places.", "codex", c => (c.by.place || [0])[0] >= 10),
-      AD("inside", "🏳️", "Bienvenido a casa", "Welcome home", "Haz clic dentro de 25 países.", "Click inside 25 countries.", "q", () => S().inside >= 25),
+      AD("inside", "🏳️", "Bienvenido a casa", "Welcome home", "Haz clic 25 veces dentro de un país.", "Click inside a country 25 times.", "q", () => S().inside >= 25),   // cuenta clics, no paises distintos
       AD("bull_25", "🎯", "Pulso de cirujano", "Surgeon's aim", "25 dianas en total.", "25 bullseyes in total.", "q", () => S().bulls >= 25),
       AD("adv_rich", "💰", "Tesoro de dragón", "Dragon's hoard", "Ten 40 doblones a la vez.", "Hold 40 doubloons at once.", "adv", c => c.coins >= 40),
-      AD("adv_flawless", "🛡️", "Sin un rasguño", "Not a scratch", "Completa un acto sin perder provisiones.", "Complete an act without losing a life.", "adv", c => c.kind === "act" && c.flawless),
+      AD("adv_flawless", "🛡️", "Sin un rasguño", "Not a scratch", "Completa un acto sin perder provisiones.", "Complete an act without losing a provision.", "adv", c => c.kind === "act" && c.flawless),
       AD("adv_build", "🧰", "Mochila llena", "Full pack", "Ten 5 reliquias a la vez.", "Hold 5 relics at once.", "adv", c => c.perks >= 5),
       AD("adv_triangulate", "📡", "Triangulación", "Triangulation", "Lanza 3 sondas (Sonar o Brújula) en una misma pregunta.", "Use 3 probes (Sonar or Compass) on a single question.", "adv", c => c.kind === "probe" && c.n >= 3),
       AD("adv_supplies", "☕", "Bien abastecido", "Well stocked", "Activa a la vez Café doble, Refuerzo y Seguro de ronda.", "Activate Double espresso, Resupply and Round insurance together.", "adv", c => c.kind === "supplies"),
@@ -111,9 +119,9 @@ window.AIQ = window.AIQ || {};
       AD("adv_boss5", "☠️", "Cazarrecompensas", "Bounty hunter", "Derrota a 5 jefes en total.", "Defeat 5 bosses in total.", "adv", () => ADV().boss >= 5),
       AD("codex_city", "🏙️", "Turista empedernido", "World traveler", "100 ciudades.", "100 cities.", "codex", c => (c.by.city || [0])[0] >= 100),
       AD("codex_curio", "🎲", "Culturilla general", "Trivia buff", "100 curiosidades.", "100 curiosities.", "codex", c => (c.by.curiosity || [0])[0] >= 100),
-      AD("pixel", "🔬", "Al milímetro", "To the millimetre", "Acierta a menos de 5 km.", "Land within 5 km.", "q", c => c.km != null && c.km <= 5),
+      AD("pixel", "🔬", "Al milímetro", "To the millimeter", "Acierta a menos de 5 km.", "Land within 5 km.", "q", c => c.km != null && c.km <= 5 && !c.inside),   // dentro del pais es km 0: eso ya es Diana, no punteria de 5 km
       AD("q_1000", "🗺️", "Cartógrafo", "Cartographer", "1.000 preguntas respondidas.", "1,000 questions answered.", "q", () => S().questions >= 1000),
-      AD("daily_7", "🗓️", "Constancia", "Consistency", "Completa 7 Retos diarios.", "Complete 7 Daily challenges.", "daily", () => Object.keys(P.daily).length >= 7),
+      AD("daily_7", "🗓️", "Constancia", "Consistency", "Juega el Reto diario 7 días distintos.", "Play the Daily challenge on 7 different days.", "daily", () => dailyDays() >= 7),
     ]),
     /* ---- IV. jugador habitual (5-20 h) ---- */
     ...tier(3, [
@@ -129,8 +137,8 @@ window.AIQ = window.AIQ || {};
       AD("adv_asc", "⛰️", "Ascensión", "Ascension", "Gana una expedición en Ascensión 1 o más.", "Win an expedition at Ascension 1 or higher.", "adv", c => c.kind === "act" && c.act >= 3 && c.asc >= 1),
       AD("classic_gold1", "🥇", "Oro a la vista", "First gold", "Consigue tu primera medalla de oro en el Clásico.", "Earn your first Classic gold medal.", "classic", () => golds() >= 1),
       AD("bull_100", "🏹", "Ojo de halcón", "Hawk eye", "100 dianas en total.", "100 bullseyes in total.", "q", () => S().bulls >= 100),
-      AD("inside_100", "⛴️", "Bien viajado", "Well-traveled", "Haz clic dentro de 100 países.", "Click inside 100 countries.", "q", () => S().inside >= 100),
-      AD("adv_flawless2", "🛡️", "Impecable II", "Flawless II", "Completa el Acto II sin perder provisiones.", "Complete Act II without losing a life.", "adv", c => c.kind === "act" && c.flawless && c.act >= 2),
+      AD("inside_100", "⛴️", "Bien viajado", "Well-traveled", "Haz clic 100 veces dentro de un país.", "Click inside a country 100 times.", "q", () => S().inside >= 100),
+      AD("adv_flawless2", "🛡️", "Impecable II", "Flawless II", "Completa el Acto II sin perder provisiones.", "Complete Act II without losing a provision.", "adv", c => c.kind === "act" && c.flawless && c.act === 2),
       /* tras ganar, el modo infinito no tiene actos: "Llega al Acto V" era imposible; se cuentan preguntas aguantadas (js/adventure.js, afterQuestion) */
       AD("adv_endless", "♾️", "Leyenda", "Legend", "Aguanta 25 preguntas en el modo infinito.", "Survive 25 questions in infinite mode.", "adv", c => c.kind === "hold" && c.inf >= 25),
       AD("adv_fullhouse", "🎰", "Pleno", "Clean sweep", "5 dianas en una misma ronda de la Aventura.", "5 bullseyes in a single Adventure round.", "adv", c => c.kind === "clear" && c.bulls >= 5),
@@ -149,8 +157,8 @@ window.AIQ = window.AIQ || {};
       AD("classic_gold5", "🪙", "Cinco de oros", "Gold rush", "Medalla de oro en 5 campañas del Clásico.", "Gold medal in 5 Classic campaigns.", "classic", () => golds() >= 5),
       AD("adv_asc2", "⛰️", "Ascensión II", "Ascension II", "Gana una expedición en Ascensión 2 o más.", "Win an expedition at Ascension 2 or higher.", "adv", c => c.kind === "act" && c.act >= 3 && c.asc >= 2),
       AD("adv_asc3", "⛰️", "Ascensión III", "Ascension III", "Gana una expedición en Ascensión 3 o más.", "Win an expedition at Ascension 3 or higher.", "adv", c => c.kind === "act" && c.act >= 3 && c.asc >= 3),
-      AD("adv_flawless3", "🏵️", "Leyenda intachable", "Flawless legend", "Completa el Acto III sin perder provisiones.", "Complete Act III without losing a life.", "adv", c => c.kind === "act" && c.flawless && c.act >= 3),
-      AD("daily_30", "🎟️", "Ritual diario", "Daily ritual", "Completa 30 Retos diarios.", "Complete 30 Daily challenges.", "daily", () => Object.keys(P.daily).length >= 30),
+      AD("adv_flawless3", "🏵️", "Leyenda intachable", "Flawless legend", "Completa el Acto III sin perder provisiones.", "Complete Act III without losing a provision.", "adv", c => c.kind === "act" && c.flawless && c.act >= 3),
+      AD("daily_30", "🎟️", "Ritual diario", "Daily ritual", "Juega el Reto diario 30 días distintos.", "Play the Daily challenge on 30 different days.", "daily", () => dailyDays() >= 30),
       AD("codex_country", "🛂", "Pasaporte completo", "Full passport", "190 países en la Enciclopedia.", "190 countries in the Encyclopedia.", "codex", c => (c.by.country || [0])[0] >= 190),
       AD("adv_asc4", "⛰️", "Ascensión IV", "Ascension IV", "Gana una expedición en Ascensión 4 o más.", "Win an expedition at Ascension 4 or higher.", "adv", c => c.kind === "act" && c.act >= 3 && c.asc >= 4),
       AD("bull_500", "🦅", "Leyenda del mapa", "Map legend", "500 dianas en total.", "500 bullseyes in total.", "q", () => S().bulls >= 500),
@@ -186,14 +194,14 @@ window.AIQ = window.AIQ || {};
     streak_5: () => [S().bestStreak, 5], streak_10: () => [S().bestStreak, 10], streak_20: () => [S().bestStreak, 20], streak_50: () => [S().bestStreak, 50],
     km_equator: () => [Math.floor(S().km), 40075],
     adv_boss5: () => [ADV().boss, 5], adv_runs10: () => [ADV().runs, 10], adv_wins3: () => [ADV().wins, 3], adv_wins10: () => [ADV().wins, 10], adv_alldecks: () => [deckWins(), 4],
-    daily_7: () => [Object.keys(P.daily).length, 7], daily_30: () => [Object.keys(P.daily).length, 30],
+    daily_7: () => [dailyDays(), 7], daily_30: () => [dailyDays(), 30],
     classic_all: () => [classicIds().filter(won).length, classicIds().length], classic_gold5: () => [golds(), 5], classic_goldall: () => [golds(), classicIds().length],
     codex_10: c => c && [c.u, 10], codex_50: c => c && [c.u, 50], codex_100: c => c && [c.u, 100], codex_250: c => c && [c.u, 250], codex_500: c => c && [c.u, 500],
     codex_1000: c => c && [c.u, 1000], codex_2500: c => c && [c.u, 2500], codex_all: c => c && [c.u, c.t],
     codex_people: c => c && [cx(c)("person"), 25], codex_capitals: c => c && [cx(c)("capital"), 40], codex_capitals_all: c => c && [cx(c)("capital"), (c.by.capital || [0, 0])[1]],
     codex_events: c => c && [cx(c)("battle") + cx(c)("event"), 20], codex_nature: c => c && [cx(c)("nature"), 30], codex_water: c => c && [cx(c)("water"), 15],
     codex_strait: c => c && [cx(c)("strait"), 8], codex_curio: c => c && [cx(c)("curiosity"), 100], codex_city: c => c && [cx(c)("city"), 100],
-    codex_country50: c => c && [cx(c)("country"), 50], codex_country: c => c && [cx(c)("country"), 190], codex_place: c => c && [cx(c)("place"), 10],
+    codex_country50: c => c && [cx(c)("country"), 50], codex_country: c => c && [cx(c)("country"), 190], codex_place: c => c && [cx(c)("landmark"), 20],
   };
 
   const queue = []; let showing = false;
@@ -236,4 +244,7 @@ window.AIQ = window.AIQ || {};
     s.bestStreak = Math.max(s.bestStreak, streak);
     save(); A.ach.emit("q", { km, ratio, bull, used: limit - left, left, inside });
   };
+
+  /* Steam: al arrancar se reenvia lo ya conseguido (activar un logro ya activo no hace nada): si Steam no estaba abierto cuando lo ganaste, no se pierde */
+  if (A.steam && A.steam.unlock) A.ACH.forEach(a => { if (P.ach[a.id]) try { Promise.resolve(A.steam.unlock(a.id)).catch(() => {}); } catch (e) { /* sin Steam */ } });
 })(window.AIQ);

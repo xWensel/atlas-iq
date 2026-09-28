@@ -174,7 +174,7 @@ window.AIQ = window.AIQ || {};
       const ok = map.pickEnabled && e.target === map.cv; if (!ok) return show(false);
       const r = map.cv.getBoundingClientRect(); P.rx = e.clientX - r.left; P.ry = e.clientY - r.top; if (!P.on) { sx = P.rx; sy = P.ry; } show(true); const t = performance.now(); eff(t); apply(t);
     }, { passive: true });
-    window.addEventListener("pointerdown", e => { if (P.on && e.target === map.cv) P.press = 100; }, true);
+    window.addEventListener("pointerdown", e => { if (P.on && e.target === map.cv && e.button === 0) P.press = 100; }, true);   // solo el boton principal (el mapa ignora el derecho)
     document.addEventListener("pointerleave", () => show(false));
     new MutationObserver(() => { if (!map.pickEnabled) show(false); }).observe(map.cv, { attributes: true, attributeFilter: ["class"] });
     raf = requestAnimationFrame(frame);

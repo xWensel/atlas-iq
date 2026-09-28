@@ -1,7 +1,7 @@
 /* Geolite - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.5.1";
+  A.VERSION = "0.6.1";
   A.lang = "es";
   /* fotos de la Enciclopedia: en la web salen de GitHub Pages (pesan ~1 GB y Vercel no las admite), repartidas en dos webs para no pasar
      del limite de 1 GB de cada una; en local y en Electron (127.0.0.1) salen de la carpeta del juego. Las publica tools/publish-media.mjs.
@@ -9,6 +9,9 @@ window.AIQ = window.AIQ || {};
   const MEDIA = { "assets/wiki/card/": "https://xwensel.github.io/geolite-media/", "assets/wiki/hd/": "https://xwensel.github.io/geolite-media-hd/" };
   const LOCAL = typeof location === "undefined" || !/^https?:$/.test(location.protocol) || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   A.media = p => { if (!LOCAL) for (const k in MEDIA) if (p.startsWith(k)) return MEDIA[k] + p; return p; };
+  /* enlace para compartir: en Electron (y en local) la direccion es 127.0.0.1:puerto, que no le sirve a nadie: se comparte la web publica */
+  const SITE = "https://geolite-game.vercel.app/";
+  A.shareUrl = () => (LOCAL ? SITE : location.href.split("#")[0]);
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
     if (p) for (const k in p) s = s.replaceAll("{" + k + "}", p[k]);
@@ -16,6 +19,7 @@ window.AIQ = window.AIQ || {};
   };
   const locOf = () => (A.LANGS.find(l => l.code === A.lang) || A.LANGS[0]).loc;
   A.fmt = n => Math.round(n).toLocaleString(locOf());
+  A.fmt1 = n => (+n).toLocaleString(locOf(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });   // un decimal con la coma o el punto de cada idioma ("3,4 km" en espanol, no "3.4")
   /* texto multilingue: objeto {en,es,...} o cadena. Si falta el idioma, ingles y luego espanol */
   /* texto {es, en, ...}: idioma propio -> traduccion del ingles (js/i18n2.js) -> idioma base (p.ej. es-419 -> es) -> ingles -> espanol */
   const TRI = { fr: 0, pt: 1, de: 2, it: 3, "es-419": 4, zh: 5, ko: 6, ja: 7, ru: 8, pl: 9 };
@@ -83,7 +87,7 @@ window.AIQ = window.AIQ || {};
     c.font = "400 34px 'Jersey 15', sans-serif"; c.fillStyle = "#ffe08a"; c.fillText(subtitle, x0, 452, W - x0 - 80);
     c.font = "700 18px Silkscreen, monospace"; c.fillStyle = "rgba(243,237,220,.7)";
     c.fillText(new Date().toLocaleDateString(locOf(), { year: "numeric", month: "long", day: "numeric" }).toUpperCase(), x0, 500);
-    c.fillText(location.host || "geolite", x0, 540);
+    c.fillText(LOCAL ? SITE.replace(/^https:\/\/|\/$/g, "") : location.host || "geolite", x0, 540);
     return cv;
   };
 })(window.AIQ);

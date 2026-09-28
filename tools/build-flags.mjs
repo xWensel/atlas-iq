@@ -2,8 +2,8 @@
  * Geolite - constructor de datos de banderas (solo desarrollo, requiere red a Wikidata y Wikimedia Commons).
  *   node tools/build-flags.mjs   resuelve la bandera (Wikidata P41) y el credito (Commons) de cada pais de data/places.js y escribe data/flags.js
  * Formato data/flags.js: window.AIQ.FLAGS = { "<nombre en ingles del pais>": [archivo, ancho, alto, [autor, licencia, pagina] | null] }
- * Las imagenes NO se descargan: el juego las carga en vivo desde Wikimedia Commons, igual que las fotos de la Enciclopedia (ver js/wiki.js, A.wiki.get / fp()).
- * Si un pais no encaja por nombre (Wikidata usa un nombre oficial distinto al del juego), anadelo a tools/flag-name-fix.json: { "<nombre del juego>": "<nombre a buscar en Wikidata>" }.
+ * Las imagenes no se descargan aqui: las empaqueta despues `python tools/bundle-media.py --flags` en assets/flags/<pais>.svg (salta las que ya existen: borra la vieja si cambia el archivo).
+ * Si un pais no encaja por nombre (Wikidata usa un nombre oficial distinto al del juego), anadelo a tools/flag-name-fix.json: { "<nombre del juego>": "<nombre a buscar en Wikidata>" | "<QID>" }.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -43,6 +43,7 @@ const enc = encodeURIComponent;
 /* ---- Wikidata: nombre en ingles -> QID -> archivo de bandera (propiedad P41 "flag image") ---- */
 const FIX = fs.existsSync(path.join(ROOT, "tools", "flag-name-fix.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "tools", "flag-name-fix.json"), "utf8")) : {};
 async function qidOf(name) {
+  if (/^Q\d+$/.test(FIX[name] || "")) return FIX[name];               // alias con QID directo: la busqueda de "Georgia" devolvia el estado de EE. UU.
   const j = await jget(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${enc(FIX[name] || name)}&language=en&type=item&limit=1&format=json`);
   return j && j.search && j.search[0] && j.search[0].id;
 }
@@ -76,7 +77,7 @@ async function main() {
     if (++done % 20 === 0) console.log(`  ${done}/${COUNTRIES.length}...`);
   })()));
   const js = "/* Generado por tools/build-flags.mjs - no editar. Bandera (Wikidata P41) y credito (Commons) por pais.\n" +
-    " * Las imagenes se cargan en vivo desde Wikimedia Commons (mismo patron que data/wiki/img.json, ver js/wiki.js). */\n" +
+    " * Las imagenes van empaquetadas en assets/flags/<pais>.svg (tools/bundle-media.py) y las pinta A.adv.renderFlag (js/adventure.js). */\n" +
     "window.AIQ = window.AIQ || {};\nwindow.AIQ.FLAGS = " + JSON.stringify(out) + ";\n";
   fs.writeFileSync(path.join(ROOT, "data", "flags.js"), js);
   console.log(`OK: ${Object.keys(out).length}/${COUNTRIES.length} paises con bandera.`);

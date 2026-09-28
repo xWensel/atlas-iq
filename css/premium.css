@@ -32,7 +32,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .mc-win { flex: 1 1 auto; min-height: 0; margin: 4px 2px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 3px #16241c; position: relative; } .mc-win .pic { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; } .mc-win .pic-frame, .mc-win .marq { display: none; }
 .mc-name { font-family: var(--serif); font-weight: 900; font-size: clamp(24px, calc(2.4 * var(--vw)), 36px); line-height: 1; padding: 0 30px 0 2px; color: #16241c; }
 .mc-desc { font-size: clamp(13px, calc(1.05 * var(--vw)), 16px); line-height: 1.2; color: #3a4a3e; min-height: 3.6em; padding-right: 26px; }
-.mc-stat { align-self: flex-start; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: #f6efdc; background: #16241c; padding: 5px 9px 4px; }
+.mc-stat { align-self: flex-start; max-width: 100%; box-sizing: border-box; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: #f6efdc; background: #16241c; padding: 5px 9px 4px; }
 .mc-ribbon { position: absolute; z-index: 4; top: -6px; left: 50%; transform: translateX(-50%) rotate(-2deg); font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: #fff; background: var(--red); padding: 6px 12px 5px; box-shadow: 0 4px 0 rgba(0, 0, 0, .45), 0 0 0 2px #16241c; white-space: nowrap;
   text-shadow: 0 0 6px #fff, 0 0 14px var(--red), 0 0 26px var(--red); animation: neon-flicker 3.2s linear infinite; }
 @keyframes neon-flicker {
@@ -143,7 +143,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 
 /* ==================================================================== premium4.css */
 /* Geolite v0.9 - premium (parte 4): sub-pantallas a pantalla completa (Aventura, Clasico, Competitivo, Perfil). */
-.scr { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); padding: clamp(12px, calc(2.4 * var(--vh)), 28px) clamp(16px, calc(4 * var(--vw)), 64px); gap: clamp(8px, calc(1.6 * var(--vh)), 18px); color: var(--paper); max-width: min(96vw, 2100px); margin: 0 auto; }
+.scr { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); padding: clamp(12px, calc(2.4 * var(--vh)), 28px) clamp(16px, calc(4 * var(--vw)), 64px); gap: clamp(8px, calc(1.6 * var(--vh)), 18px); color: var(--paper); max-width: min(calc(96 * var(--vw)), 2100px); margin: 0 auto; }   /* --vw (1vw / k): con 96vw, al encoger k para que quepa, la pantalla tambien estrechaba (a 1024 usaba la mitad del ancho) */
 .scr-head { position: relative; display: flex; align-items: center; gap: clamp(12px, calc(2 * var(--vw)), 28px); }
 .scr-head h2 { margin: 0; flex: 1; font-family: var(--serif); font-weight: 900; font-size: clamp(34px, calc(6 * var(--vh)), 72px); line-height: .95; text-shadow: 0 5px 0 rgba(5, 12, 8, .7); }
 .scr-head .menu-tools { position: static; }
@@ -185,9 +185,10 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 .resume { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 12px 16px; margin-bottom: 8px; background: rgba(254, 95, 85, .18); border-radius: 14px; box-shadow: inset 0 0 0 3px var(--red); } .resume b { flex: 1; font-family: var(--mono); font-size: 15.5px; letter-spacing: .04em; } .resume .btn-ink { width: auto; } .resume > div { display: flex; gap: 8px; }
 
 /* ---------- Clasico / Extendido ---------- */
-.s-camps .camps { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: clamp(12px, calc(1.6 * var(--vw)), 24px); margin-bottom: 18px; }
-.s-camps .camp { grid-template-columns: clamp(120px, calc(12 * var(--vw)), 190px) 1fr; padding: 14px; border-radius: 16px; background: rgba(10, 26, 18, .82); border: 0; box-shadow: inset 0 0 0 3px rgba(242, 233, 214, .25), 0 10px 0 rgba(0, 0, 0, .35); } .s-camps .camp.sel { box-shadow: inset 0 0 0 4px #ffd06b, 0 10px 0 rgba(0, 0, 0, .35), 0 0 40px rgba(255, 208, 107, .35); }
-.s-camps .camp-thumb { width: 100%; height: clamp(84px, calc(11 * var(--vh)), 130px); border-radius: 10px; } .s-camps .camp-t { font-size: clamp(24px, calc(3.2 * var(--vh)), 34px); } .s-camps .camp-d { font-size: clamp(13px, calc(1.8 * var(--vh)), 16px); }
+.s-camps .camps { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: clamp(10px, calc(1.2 * var(--vw)), 18px); margin-bottom: 12px; }
+@media (min-width: 901px) { .s-camps .camps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }   /* escritorio: siempre 2 columnas (a 1024 caia a 1 y las 11 campanas pedian scroll) */
+.s-camps .camp { grid-template-columns: clamp(104px, calc(10 * var(--vw)), 160px) 1fr; padding: 11px 14px; border-radius: 16px; background: rgba(10, 26, 18, .82); border: 0; box-shadow: inset 0 0 0 3px rgba(242, 233, 214, .25), 0 10px 0 rgba(0, 0, 0, .35); } .s-camps .camp.sel { box-shadow: inset 0 0 0 4px #ffd06b, 0 10px 0 rgba(0, 0, 0, .35), 0 0 40px rgba(255, 208, 107, .35); }
+.s-camps .camp-thumb { width: 100%; height: clamp(76px, calc(9 * var(--vh)), 104px); border-radius: 10px; } .s-camps .camp-t { font-size: clamp(24px, calc(3.2 * var(--vh)), 34px); } .s-camps .camp-d { font-size: clamp(13px, calc(1.8 * var(--vh)), 16px); }
 .camp-foot { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; position: sticky; bottom: 0; padding: 12px 0; background: linear-gradient(180deg, transparent, rgba(5, 12, 8, .9) 40%); } .camp-foot .startbtn { width: min(100%, 480px); margin-left: auto; }
 
 /* ---------- Competitivo ---------- */
@@ -301,7 +302,7 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
 /* banner de partida guardada en la portada */
 .hh-resume { display: flex; align-items: center; gap: 16px; flex: 1 0 100%; max-width: 1000px; margin: 0 auto; padding: 12px 18px; border-radius: 16px; background: linear-gradient(90deg, rgba(90, 60, 14, .9), rgba(14, 28, 20, .92) 70%); box-shadow: inset 0 0 0 2px var(--brass), 0 0 24px rgba(248, 180, 73, .2); }
 .hh-resume .hr-ic .ic { width: 44px; height: 44px; } .hh-resume .hr-t { flex: 1; display: grid; gap: 2px; }
-.hh-resume .hr-t b { font-size: 20px; color: #ffe9b0; } .hh-resume .hr-t i { font-style: normal; font-size: 17px; opacity: .85; }
+.hh-resume .hr-t b { font-size: 20px; color: #ffe9b0; } .hh-resume .hr-t i { font-style: normal; font-size: 17px; color: var(--paper); opacity: .8; }   /* heredaba la tinta oscura: marron sobre marron, casi ilegible */
 @media (max-width: 720px) { .hh-resume { flex-wrap: wrap; } .hh-resume .hr-t { flex-basis: 100%; } }
 #veil { z-index: 60; }
 html[data-skin] .btn-line.danger { background: #201512; color: #ffb4a8; box-shadow: inset 0 0 0 2px rgba(254, 95, 85, .7), 0 5px 0 rgba(0, 0, 0, .35); }

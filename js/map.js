@@ -451,7 +451,7 @@ void main(){
     }
     _toWorld(px, py, v = this.viewJ || this.view) { [px, py] = this._outToScene(px, py); return [v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s]; }
     toScreen(x, y, v = this.viewJ || this.view) { return this._sceneToOut(this.W / 2 + (x - v.cx) * v.s, this.H / 2 - (y - v.cy) * v.s); }
-    lonLatToScreen(lon, lat) { let [x, y] = project(lon, lat); [x, y] = this._dispFwd(x, y, this._ctOf(lon, lat)); return this.toScreen(x, y); }
+    lonLatToScreen(lon, lat) { let [x, y] = project(lon, lat); if (this.dist.spec) [x, y] = this._dispFwd(x, y, this._ctOf(lon, lat)); return this.toScreen(x, y); }   // _ctOf solo con el mapa deformado: en el mar recorre el mundo entero y las sondas (97 puntos por anillo) vaciaban su cache en cada fotograma
 
     /* ---------- continentes, deformaciones y orientacion (retos) ---------- */
     _initContinents() {
@@ -460,7 +460,7 @@ void main(){
       for (const f of this.world.features) {
         const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a));
         const lo = (big.bbox[0] + big.bbox[2]) / 2, la = (big.bbox[1] + big.bbox[3]) / 2;
-        const k = A.continent ? A.continent(la, lo) : null; f.ct = k in IDX ? IDX[k] : 6; this.contFeat[f.ct].push(f);
+        const cf = A.continentMap || A.continent, k = cf ? cf(la, lo) : null; f.ct = k in IDX ? IDX[k] : 6; this.contFeat[f.ct].push(f);
         const [x, y] = project(lo, clamp(la, -85, 85)), w = (big.bbox[2] - big.bbox[0]) * (big.bbox[3] - big.bbox[1]) + 1; acc[f.ct][0] += x * w; acc[f.ct][1] += y * w; acc[f.ct][2] += w;
       }
       this.contCen = acc.map(a => (a[2] ? [a[0] / a[2], a[1] / a[2]] : [0, 0])); this.contCen.push([0, 0]);
@@ -474,8 +474,8 @@ void main(){
       const key = lon.toFixed(2) + "," + lat.toFixed(2), C = this._ctCache = this._ctCache || new Map(); if (C.has(key)) return C.get(key);
       let ct = null;
       for (const f of this.world.features) { let near = false; for (const p of f.polys) if (lon >= p.bbox[0] - 0.5 && lon <= p.bbox[2] + 0.5 && lat >= p.bbox[1] - 0.5 && lat <= p.bbox[3] + 0.5) { near = true; break; } if (near && A.geo.inFeature(lon, lat, f)) { ct = f.ct; break; } }
-      if (ct === null) { let best = 150; for (const f of this.world.features) { const d = A.geo.distToFeature(lon, lat, f); if (d < best) { best = d; ct = f.ct; } } }
-      if (ct === null) { const IDX = { af: 0, na: 1, sa: 2, as: 3, eu: 4, oc: 5 }, k = A.continent ? A.continent(lat, lon) : null; ct = k in IDX ? IDX[k] : 6; }
+      if (ct === null) { let best = 150; for (const f of this.world.features) { const d = A.geo.distToFeature(lon, lat, f, best); if (d < best) { best = d; ct = f.ct; } } }
+      if (ct === null) { const IDX = { af: 0, na: 1, sa: 2, as: 3, eu: 4, oc: 5 }, cf = A.continentMap || A.continent, k = cf ? cf(lat, lon) : null; ct = k in IDX ? IDX[k] : 6; }
       if (C.size > 400) C.clear(); C.set(key, ct); return ct;
     }
     /* valores efectivos (mezcla entre "sin deformar" y el reto segun k) */
@@ -648,7 +648,9 @@ void main(){
     /* ---------- interaccion ---------- */
     _bind() {
       const cv = this.cv; cv.style.touchAction = "none";
+      cv.addEventListener("contextmenu", e => e.preventDefault());
       cv.addEventListener("pointerdown", e => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;                   // solo el boton principal: el derecho o la rueda ya no marcan respuesta al soltar
         cv.setPointerCapture(e.pointerId); this.drift = null; this.inertia = null; this.tv = null; this.samples = [];
         this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false });
         if (this.pointers.size === 2) this._pinch = this._pinchState();
@@ -928,7 +930,7 @@ void main(){
       const age = now - m.t0;
       if (m.guess || m.answer || m.labelAt) {
         const G = m.guess && this.lonLatToScreen(m.guess[0], m.guess[1]), Aa = m.answer && this.lonLatToScreen(m.answer[0], m.answer[1]);
-        if (G && Aa) this._line(c, m, G, Aa, age);
+        const ds = G && Aa ? this._line(c, m, G, Aa, age) : null;
         if (Aa) {
           const k = clamp((age - 480) / 600, 0, 1);
           if (age > 480) {
@@ -939,6 +941,7 @@ void main(){
           this._pin(c, Aa[0], Aa[1], sk.red, sk.paper, age - 480, k);
         }
         if (G) this._pin(c, G[0], G[1], sk.ink, sk.paper, age, 1);
+        if (ds) this._distChip(c, m, ds, age);                            // encima de las chinchetas (antes quedaba debajo y la tapaba el pin de la respuesta)
         const at = Aa || (m.labelAt && this.lonLatToScreen(m.labelAt[0], m.labelAt[1]));
         if (at && m.label && age > 520) this._chip(c, m.label, at[0], at[1] - (Aa ? 66 : 10), { center: true, font: `italic 700 17px ${this._fd()}`, alpha: Math.min(1, (age - 520) / 300) });
         if (G && m.pop && age > 700) {
@@ -997,7 +1000,12 @@ void main(){
       }
       const trace = () => { c.beginPath(); for (const [a, b] of segs) { c.moveTo(a[0], a[1]); c.lineTo(a[0] + (b[0] - a[0]) * e, a[1] + (b[1] - a[1]) * e); } c.stroke(); };
       trace(); c.lineWidth = 1.5; c.strokeStyle = this._rgba(this.sk.paper, 0.7); c.lineDashOffset = 5; trace(); c.restore();
-      if (m.dist && k >= 1) { const [a, b] = segs[0]; this._chip(c, m.dist, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, { font: `500 12px ${this._fm()}`, center: true, alpha: Math.min(1, (age - 800) / 250) }); }
+      return m.dist && k >= 1 ? segs[0] : null;
+    }
+    /* etiqueta de distancia: en medio de la linea; si las dos chinchetas quedan cerca (la cabeza del pin sube ~40 px), debajo de las dos puntas */
+    _distChip(c, m, [a, b], age) {
+      const near = Math.hypot(b[0] - a[0], b[1] - a[1]) < 130, x = (a[0] + b[0]) / 2, y = near ? Math.max(a[1], b[1]) + 26 : (a[1] + b[1]) / 2;
+      this._chip(c, m.dist, x, y, { font: `500 12px ${this._fm()}`, center: true, alpha: Math.min(1, (age - 800) / 250) });
     }
     _chip(c, text, x, y, o = {}) {
       c.save(); c.globalAlpha = o.alpha == null ? 1 : o.alpha; c.font = o.font || "600 14px sans-serif";
@@ -1047,7 +1055,7 @@ void main(){
       for (const f of this.world.features) { c.fillStyle = st.land[f.ci] || st.land[0]; c.fill(f.path); }
       c.setTransform(1, 0, 0, 1, 0, 0);
       const px = cv.width / 2, py = cv.height / 2;
-      c.strokeStyle = st.red; c.lineWidth = 2 * dpr; c.beginPath(); c.arc(px, py, 6 * dpr, 0, Math.PI * 2); c.stroke(); c.fillStyle = st.red; c.beginPath(); c.arc(px, py, 2 * dpr, 0, Math.PI * 2); c.fill();
+      if (spec.mark !== false) { c.strokeStyle = st.red; c.lineWidth = 2 * dpr; c.beginPath(); c.arc(px, py, 6 * dpr, 0, Math.PI * 2); c.stroke(); c.fillStyle = st.red; c.beginPath(); c.arc(px, py, 2 * dpr, 0, Math.PI * 2); c.fill(); }   // mark:false = miniatura de region (campanas), sin punto
     }
   }
   A.MapViewGL = MapViewGL;

@@ -34,6 +34,9 @@ window.AIQ = window.AIQ || {};
     return n * (t -= 2.625 / d) * t + 0.984375;
   };
   const fmtCoord = (v, pos, neg) => Math.abs(v).toFixed(2) + "°" + (v >= 0 ? pos : neg);
+  /* las fuentes pixel del juego (como map.js): Fraunces y DM Mono ya no vienen en fonts/ y caian a Georgia, sin pixel */
+  const FD = () => getComputedStyle(document.documentElement).getPropertyValue("--serif") || "'Jersey 15', sans-serif";
+  const FM = () => getComputedStyle(document.documentElement).getPropertyValue("--mono") || "Silkscreen, monospace";
 
   class MapView2D {
     constructor(canvas, world, onPick) {
@@ -170,7 +173,9 @@ window.AIQ = window.AIQ || {};
     /* ---------- interaccion ---------- */
     _bind() {
       const cv = this.cv; cv.style.touchAction = "none";
+      cv.addEventListener("contextmenu", e => e.preventDefault());
       cv.addEventListener("pointerdown", e => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;                   // solo el boton principal (el derecho marcaba respuesta al soltar)
         cv.setPointerCapture(e.pointerId); this.drift = null;
         this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false });
         if (this.pointers.size === 2) this._pinch = this._pinchState();
@@ -269,7 +274,7 @@ window.AIQ = window.AIQ || {};
       const { W, H, view: v } = this;
       const pxDeg = (v.s * Math.PI) / 180;
       const step = [30, 15, 10, 5, 2, 1, 0.5, 0.25].find(s => s * pxDeg >= 84) || 0.25;
-      ctx.lineWidth = 1; ctx.font = "500 10px 'DM Mono', monospace"; ctx.textBaseline = "top";
+      ctx.lineWidth = 1; ctx.font = `500 10px ${FM()}`; ctx.textBaseline = "top";
       const [wx0, wyTop] = this._toWorld(0, 0), [wx1, wyBot] = this._toWorld(W, H);
       const lon0 = Math.max(-180, Math.floor(wx0 / D2R / step) * step), lon1 = Math.min(180, Math.ceil(wx1 / D2R / step) * step);
       const latTop = unproject(0, wyTop)[1], latBot = unproject(0, wyBot)[1];
@@ -362,7 +367,7 @@ window.AIQ = window.AIQ || {};
       if (m.guess || m.answer || m.labelAt) {
         const G = m.guess && this.lonLatToScreen(m.guess[0], m.guess[1]);
         const Aa = m.answer && this.lonLatToScreen(m.answer[0], m.answer[1]);
-        if (G && Aa) this._line(c, m, G, Aa, age);
+        const ds = G && Aa ? this._line(c, m, G, Aa, age) : null;
         if (Aa) {
           const k = clamp((age - 480) / 600, 0, 1);
           if (age > 480) {
@@ -373,12 +378,13 @@ window.AIQ = window.AIQ || {};
           this._pin(c, Aa[0], Aa[1], RED, PAPER, age - 480, k);
         }
         if (G) this._pin(c, G[0], G[1], INK, PAPER, age, 1);
+        if (ds) this._distChip(c, m, ds, age);                            // encima de las chinchetas (antes quedaba debajo y la tapaba el pin de la respuesta)
         const at = Aa || (m.labelAt && this.lonLatToScreen(m.labelAt[0], m.labelAt[1]));
-        if (at && m.label && age > 520) this._chip(c, m.label, at[0], at[1] - (Aa ? 66 : 10), { center: true, font: "italic 700 17px Fraunces, Georgia, serif", alpha: Math.min(1, (age - 520) / 300) });
+        if (at && m.label && age > 520) this._chip(c, m.label, at[0], at[1] - (Aa ? 66 : 10), { center: true, font: `italic 700 17px ${FD()}`, alpha: Math.min(1, (age - 520) / 300) });
         if (G && m.pop && age > 700) {
           const t = Math.min(1, (age - 700) / 1700), y = G[1] - 52 - easeIO(t) * 46;
           c.save(); c.globalAlpha = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
-          c.font = "900 34px Fraunces, Georgia, serif"; c.textAlign = "center"; c.lineJoin = "round";
+          c.font = `900 34px ${FD()}`; c.textAlign = "center"; c.lineJoin = "round";
           c.lineWidth = 7; c.strokeStyle = INK; c.strokeText(m.pop, G[0], y); c.fillStyle = PAPER; c.fillText(m.pop, G[0], y); c.restore();
         }
       }
@@ -397,9 +403,12 @@ window.AIQ = window.AIQ || {};
       const trace = () => { c.beginPath(); for (const [a, b] of segs) { c.moveTo(a[0], a[1]); c.lineTo(a[0] + (b[0] - a[0]) * e, a[1] + (b[1] - a[1]) * e); } c.stroke(); };
       trace();
       c.lineWidth = 1.5; c.strokeStyle = "rgba(242,233,214,.7)"; c.lineDashOffset = 5; trace(); c.restore();
-      if (m.dist && k >= 1) {
-        const [a, b] = segs[0]; this._chip(c, m.dist, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, { font: "500 12px 'DM Mono', monospace", center: true, alpha: Math.min(1, (age - 800) / 250) });
-      }
+      return m.dist && k >= 1 ? segs[0] : null;
+    }
+    /* etiqueta de distancia: en medio de la linea; si las dos chinchetas quedan cerca (la cabeza del pin sube ~40 px), debajo de las dos puntas */
+    _distChip(c, m, [a, b], age) {
+      const near = Math.hypot(b[0] - a[0], b[1] - a[1]) < 130, x = (a[0] + b[0]) / 2, y = near ? Math.max(a[1], b[1]) + 26 : (a[1] + b[1]) / 2;
+      this._chip(c, m.dist, x, y, { font: `500 12px ${FM()}`, center: true, alpha: Math.min(1, (age - 800) / 250) });
     }
 
     /* etiqueta de papel con esquinas cortadas */
@@ -437,7 +446,7 @@ window.AIQ = window.AIQ || {};
       const [wx, wy] = this._toWorld(x, y), [lon, lat] = unproject(wx, wy);
       if (Math.abs(lon) <= 180 && Math.abs(lat) <= 90) {
         const txt = fmtCoord(lat, "N", "S") + "  " + fmtCoord(lon, "E", "W");
-        c.font = "500 11px 'DM Mono', monospace"; const w = c.measureText(txt).width + 14;
+        c.font = `500 11px ${FM()}`; const w = c.measureText(txt).width + 14;
         let bx = x + 20, by = y + 18; if (bx + w > this.W - 6) bx = x - 20 - w; if (by + 22 > this.H - 6) by = y - 40;
         c.fillStyle = "rgba(20,35,43,.9)"; c.fillRect(bx, by, w, 22);
         c.fillStyle = PAPER; c.textBaseline = "middle"; c.fillText(txt, bx + 7, by + 12);
@@ -458,7 +467,8 @@ window.AIQ = window.AIQ || {};
       const sw = uw * sc, sh = uh * sc, texH = this.landTex.height;
       const sx = clamp((x - uw / 2 - BX0) * sc, 0, this.landTex.width - sw), sy = clamp((BY1 - (y + uh / 2)) * sc, 0, Math.max(0, texH - sh));
       c.imageSmoothingQuality = "high"; c.drawImage(this.landTex, sx, sy, sw, Math.min(sh, texH), 0, 0, cv.width, cv.height);
-      // marca de la region
+      // marca del lugar (mark:false = miniatura de region, sin punto)
+      if (spec.mark === false) return;
       const px = ((x - BX0) * sc - sx) / sw * cv.width, py = ((BY1 - y) * sc - sy) / sh * cv.height;
       c.strokeStyle = RED; c.lineWidth = 2 * dpr; c.beginPath(); c.arc(px, py, 6 * dpr, 0, Math.PI * 2); c.stroke();
       c.fillStyle = RED; c.beginPath(); c.arc(px, py, 2 * dpr, 0, Math.PI * 2); c.fill();

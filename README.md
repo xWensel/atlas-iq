@@ -4,6 +4,20 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.6.1** - Revisión completa del juego: bugs, incoherencias y erratas fuera, en los 12 idiomas.
+- **Partida:** en las preguntas de país, pinchar en las antípodas a la latitud justa daba casi 0 km (un tramo de frontera "daba la vuelta al mundo"); ahora la distancia es la real sobre la esfera y cuenta también los huecos (desde Lesoto, Sudáfrica está en su borde). El clic derecho o la rueda ya no responden la pregunta; un doble clic en "Siguiente" no gasta la pregunta siguiente; la pregunta se pausa sola al abrir Ajustes, cambiar de pestaña o minimizar; los sonidos del ticket no pisan la pregunta siguiente; los decimales usan la coma de cada idioma ("3,4 km"); "+1 doblón" en singular; en la Aventura el botón dice "Terminar ronda". La etiqueta de distancia del mapa ya no queda tapada por el pin.
+- **Aventura:** guardar y salir en el último ticket ya no permite repetir la ronda gratis, ni volver en la primera pregunta cambia los lugares; la Chuleta de bolsillo ilumina de verdad a los 5 s aunque pauses; el botín en vivo ya no pide un punto de más y los % de margen y consuelo son exactos; con el Toque de Midas el cofre cerrado también paga el doble; el crupier ya no pone trucos que no hacen nada. Al vender el Corazón de explorador se va su provisión máxima; en la revancha solo hay una carta a mitad de precio; barajar ya no hace perder los sobornos pagados; la Chuleta de crupier ya no descifra runas (no lo decía). Textos al día: Mano de crupier (también el baile), Visera (qué trucos exactos), Gafas de sol (también la bandera borrosa), Vale de la casa y Interruptor (qué no hacen), barajas con los nombres actuales de sus cartas, "¡El seguro te salva!", "Te queda 1 provisión", "Superaste 1 ronda". Con "reducir movimiento" los trucos que se mueven (marquesina, letras) siguen funcionando.
+- **Reto diario:** ya no desbloquea ascensiones de la Aventura (sigue sumando victorias, jefes y logros) ni tiene casilla de nombre: te lo pide el crupier al acabar tu primera partida y después solo se cambia en Ajustes; si lo juegas sin red, tus intentos suben a la clasificación mundial la próxima vez que la abras.
+- **Crupier:** nunca se corta a sí mismo a media frase (la nueva espera su turno más su segundo de más); al saltar la intro o cambiar de pantalla ya no sigue hablando "fantasma"; no habla del sábado en domingo ni de botones que no están; 35 frases nuevas en los 12 idiomas: variantes para ganar o perder ronda, tiempo agotado, rachas, dianas y fallos (ya no repite "Esta vez ganas tú…" en cada ronda) y anuncio propio para los 9 trucos que no lo tenían (cuarta pared y banderas). Español latinoamericano sin modismos de España.
+- **Logros:** "Rincones perdidos" era imposible (no queda ninguna tarjeta sin categoría): ahora pide 20 monumentos. "Completista" también lo era: el monte Erebus y el macizo Vinson quedaban por debajo del borde del mapa y salen del juego. "Al milímetro" ya no salta al hacer clic dentro de un país; "Impecable II" exige el Acto II; los textos de clics, Reto diario y "mares u océanos" dicen lo que se cuenta; continuar una partida no suma para "50 partidas"; los logros ganados con Steam cerrado se sincronizan al volver. Exportación de Steam al día.
+- **Enciclopedia:** los continentes ya no mandan Egipto a Asia, el Magreb a Europa ni Tahití o Panamá a Sudamérica; las tarjetas se llaman como en la pregunta y en tu idioma; la búsqueda ignora tildes; las banderas se ven enteras; fuera restos de Wikipedia (bibliografías, "== Referencias ==", plantillas, "..") y 2.400 notas de campo rehechas (las rusas y polacas salían cortadas); Cleopatra, Pericles, Gaudí, Pedro el Grande y otras tarjetas vuelven a desbloquearse desde sus lugares (36 enlaces apuntaban a lugares retirados). Los retratos de Personajes salen de las fotos empaquetadas (antes se pedían en vivo a Wikimedia).
+- **Datos:** la bandera de Georgia era la del estado de EE. UU.; Leif Erikson, San Martín, Benito Juárez, el Sepik, Live Aid y el sitio de Sarajevo tenían el país, el punto o el año mal; el océano Ártico ya se puede acertar; Crimea aparece en el mapa como parte de Ucrania; nombres de lugares completados o corregidos en varios idiomas; erratas del Clásico en español, inglés y otros idiomas; subtítulos de Irlanda, Aruba, Curazao e Islas Cook traducidos. Los arreglos quedan en `tools/` para que una regeneración no los deshaga.
+- **Pantallas sin scroll ni solapes:** la de campañas del Clásico pedía scroll hasta 1366x768 y su pie tapaba la última carta: ahora cabe en todas las resoluciones y 12 idiomas (y a 1024x768 se ve más grande: al encoger ya no se estrecha a la mitad). Cada campaña tiene su miniatura de región (antes todas eran el mundo con un punto en el golfo de Guinea). Ajustes cabe a 1024x768 en los 12 idiomas (idiomas en 3 columnas con la bandera al lado). En alemán, "Tagesherausforderung" y "Schnickschnack" se parten con guion dentro de su carta; la línea de la expedición guardada ya se lee.
+- **Textos:** "tarjetas", "reliquias", "Reto diario" y "provisión" en todas partes (también en inglés: "provision", "relics", "charge"); decenas de erratas y concordancias; es-419 con voz latinoamericana en menús, tutorial y crupier; el idioma del navegador es-US va a español latinoamericano.
+- **Ajustes > Datos:** el botón "Reiniciar TODO desde cero (desarrollo)" pasa a ser "Borrar todos mis datos y empezar de cero", para cualquier jugador y con su doble confirmación (12 idiomas).
+- **Clasificación y servidor:** la API ya no devuelve el id de los demás jugadores (con él se les podía cambiar el nombre); límites de tiempo en todas las llamadas; la tabla de Aventura ya no caduca; si el servidor no responde al abrir, se vuelve a probar al minuto.
+- **Web, audio y escritorio:** la app instalada abre sin conexión y ya no guarda la clasificación vieja; la música se pausa con la pestaña oculta y la intro del estudio ya no suena de golpe encima al entrar; el silbido del zoom no se queda sonando; tooltips por encima del crupier; etiquetas accesibles en tu idioma. Electron: modo Ventana respetado al entrar, enlaces externos en el navegador del sistema, una sola instancia, servidor local cerrado a lo que no es el juego (nunca `.env.local`).
+
 **v0.5.1** - Veredicto en movil vertical: se ve entero, en una sola columna.
 - **El fallo:** `css/premium.css` fijaba el veredicto en dos columnas sin media query y, al cargarse despues de `style.css`, anulaba la columna unica de movil. En vertical (360-430 px) la ficha, la tarjeta IQ y el crupier se quedaban a la izquierda y el titulo, el texto, las cifras y los botones ("Reintentar nivel", "Otra expedicion"...) se salian por la derecha, en el Clasico, la Aventura y el Reto diario.
 - **Ahora** las dos columnas son solo para escritorio y movil horizontal, que no cambian. En vertical, arriba y compactos, la ficha y la tarjeta IQ en una fila y el crupier en la suya (cara a la izquierda y globo a la derecha); debajo, titulo y cifras a tamano de movil y botones que se reparten las filas (el principal a todo el ancho). En 360x740 y 390x844 cabe todo sin encoger ni desplazarse (probado en es, de y ru), tambien con las frases mas largas del crupier; en pantallas de 700 px de alto o menos se aprieta un poco mas y en tablet vertical la columna se centra (600 px como mucho).
@@ -305,25 +319,27 @@ Herramienta de desarrollo: `dev/bot.js` (jugador automático para equilibrar la 
 - Ajustes con faders (general / música / efectos), palancas de silencio, idioma y modo de gráficos (Auto / Alto / Ahorro).
 
 Juego de geografía: haz clic lo más cerca posible del lugar que te piden, cuanto más rápido mejor.
-Sin dependencias ni servidor: abre `index.html` (o `JUGAR.bat`). ES/EN.
+Sin build ni dependencias para jugar: abre `index.html` (o `JUGAR.bat`); en la web lo sirve Vercel y en escritorio Electron (`main.js`). 12 idiomas: es, en, fr, pt (Brasil), de, it, es-419, zh, ko, ja, ru y pl.
 
 ## Modos
-- **Clásico** – 6 partidas con las preguntas, el orden, los tiempos y la puntuación **exactos** del juego original
-  (Mundo, Capitales del mundo, EE. UU., Asia, Latinoamérica, Oceanía; 536 destinos, rondas bonus de pistas incluidas).
-  Textos en inglés, como el original. Datos en `data/classic.js` (uso interno).
-- **Extendido** – contenido propio: *Vuelta al mundo Atlas* (12 niveles) e *Historia y pistas* (batallas, eventos, apodos de ciudades).
+- **Clásico** – 11 campañas (Mundo, Capitales del mundo, EE. UU., Europa, Asia, Latinoamérica, Oceanía, Banderas, Pistas, Eventos históricos y Personajes históricos), 10 niveles cada una, con la puntuación del juego original. Datos en `data/classic.js` (uso interno).
+- **Aventura** – el modo principal: roguelike de 12 rondas en 3 actos con jefe, trucos del crupier, reliquias, herramientas y Campamento con doblones; ascensiones 0-5 y modo infinito al ganar.
+- **Reto diario** – una mano al azar por día (misma semilla para todos), 3 intentos y puntuación global = suma; clasificación Hoy / Ayer / Aventura.
+- **Enciclopedia** – 4.960 tarjetas que se desbloquean acertando cerca (300 / 150 / 75 km), con textos, fotos y banderas empaquetados (nunca Wikipedia en vivo).
 
 ## Puntuación
+- Solo precisión y rapidez: las reliquias no multiplican los puntos.
 - Clásico (idéntica al original): `distancia = floor(KMBase − km·KMDist)` · `velocidad = floor((1 − t/(TPQ − corte)) · SpeedBonus)`.
-- Extendido: `1000·e^(−km/escala)` + hasta 400 por velocidad; racha de aciertos con bonus (+5 % por peldaño).
+- En las preguntas de país, estar dentro del país es 0 km; si no, cuenta la distancia real sobre la esfera hasta su frontera más cercana.
 
 ## Estructura
-- `index.html`, `css/style.css` – interfaz (cuaderno de expedición: papel, tinta, sellos)
-- `js/game.js` – niveles, campañas, pantallas, ajustes · `js/map.js` – mapa: texturas, capa nítida, resalte y efectos en capas separadas
-- `js/audio.js` – identidad sonora sintetizada (motivo de tres notas, música generativa, sonidos por resultado)
-- `js/geo.js`, `js/support.js` – geografía, textos, IQ e insignia
-- `data/campaigns.js` – une los modos · `data/locations.js`, `data/history.js` – **aquí se añaden preguntas propias**
-- `fonts/` – Fraunces, Bricolage Grotesque y DM Mono (SIL OFL)
+- `index.html` + `css/` – interfaz (casino en pixel art nítido; `uikit.css` escala cada pantalla para que nunca haya que desplazarse en escritorio)
+- `js/game.js` – núcleo: rondas, marcador, ajustes, escalado · `js/map.js` / `js/map2d.js` – mapa WebGL y de respaldo · `js/geo.js` – geografía y distancias
+- `js/adventure.js`, `js/relics.js`, `js/challenges.js`, `js/chfx.js` – Aventura, reliquias y trucos · `js/dealer.js` – el crupier y su guion
+- `js/hub.js`, `js/profile.js`, `js/rank.js`, `api/` – menús, logros, clasificación (Upstash) · `js/codex.js`, `js/wiki.js` – Enciclopedia
+- `js/audio.js`, `js/jukebox.js` – efectos sintetizados y la BSO del autor (`assets/music/`) · `js/i18n*.js` – textos en 12 idiomas
+- `data/` – mundo, lugares, preguntas, Enciclopedia (`data/wiki/`) · `tools/` – generadores (lugares nuevos: `tools/add-places.mjs`) · `dev/` – pruebas en consola (`smoke`, `bot2`, `ovCheck`, `layoutTest`)
+- `fonts/` – Silkscreen, Jersey 15, Pixelify Sans y Fusion Pixel (SIL OFL) más subconjuntos propios para CJK, cirílico y polaco
 
 ## Créditos de datos
 Fronteras: Natural Earth (dominio público) vía `world-atlas` (ISC). `topojson-client` (ISC).

@@ -16,7 +16,7 @@ window.AIQ = window.AIQ || {};
   const X = A.chfx = {};
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), rnd = Math.random, TAU = Math.PI * 2;
   const say = (k, ...a) => { try { A.sfx[k] && A.sfx[k](...a); } catch (e) { /* audio no listo */ } };
-  const reduce = () => document.documentElement.classList.contains("reduce-motion");
+  const reduce = () => document.documentElement.classList.contains("reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;   // el ajuste del juego o el del sistema, como el resto del juego
   const game = () => (A.core && A.core.S) || {};
   const seeded = s => (A.rng ? A.rng(String(s)) : Math.random);
   const L6 = s => (A.L6 ? A.L6(s) : { es: s.split("|")[0] });

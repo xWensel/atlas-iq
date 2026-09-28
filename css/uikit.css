@@ -1,5 +1,5 @@
-/* Geolite · uikit: tooltips propios y destello del puntero */
-.tt { position: fixed; left: 0; top: 0; z-index: 100002; max-width: min(300px, calc(86 * var(--vw))); padding: 8px 12px 9px; pointer-events: none; opacity: 0; transition: opacity .12s ease;
+/* Geolite · uikit: tooltips propios y destello del puntero (los tooltips van por encima de todo, tambien del crupier: z-index 100030) */
+.tt { position: fixed; left: 0; top: 0; z-index: 100030; max-width: min(300px, calc(86 * var(--vw))); padding: 8px 12px 9px; pointer-events: none; opacity: 0; transition: opacity .12s ease;
   background: linear-gradient(#123424, #0c2018); color: #e9f5ec; font-family: var(--mono); font-size: 15.5px; line-height: 1.4; letter-spacing: .01em;
   clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
   filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .45)); will-change: transform; }
@@ -53,6 +53,7 @@ html.dl-tantrum { animation: dl-tantrum .7s cubic-bezier(.36, .07, .19, .97) bot
 /* Ajustes > Vibracion = no (html.no-shake, js/game.js applyShake): fuera todos los temblores de pantalla. La racha y la rabieta no se mueven,
    el puñetazo de Cristal roto tampoco, y el glitch del crupier al tocar el mapa se queda solo en color. Los retos que tiemblan (Terremoto...) siguen */
 html.no-shake.dl-tantrum, html.no-shake #app.shake, html.no-shake #app.chx-punch { animation: none; }
+html.reduce-motion.dl-tantrum { animation: none; }   /* "reducir movimiento" (html.reduce-motion *) no alcanza al propio <html>, que es quien tiembla en la rabieta */
 html.no-shake #app.ch-glitch #map, html.no-shake #app.ch-glitch #fx { animation-name: ch-glitch-still; }
 @keyframes ch-glitch-still { 16% { filter: hue-rotate(80deg) saturate(2.2) contrast(1.3); } 33% { filter: brightness(1.6); } 50% { filter: hue-rotate(-70deg) saturate(1.8); } 75% { filter: contrast(1.4); } }
 #dlBlackout { position: fixed; inset: 0; z-index: 9000; background: #000; opacity: 0; pointer-events: none; }

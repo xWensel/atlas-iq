@@ -3,7 +3,7 @@
  * HTTP local (no file://) para que Service Worker, fetch relativo y rutas
  * funcionen exactamente igual que en el navegador.
  */
-const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const { app, BrowserWindow, ipcMain, screen, shell, session } = require("electron");
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -22,9 +22,9 @@ try {
   console.warn("Steamworks no disponible (¿Steam esta abierto?):", e.message);
 }
 ipcMain.handle("steam:available", () => !!steamClient);
-ipcMain.handle("steam:unlock", (e, id) => {
+ipcMain.handle("steam:unlock", (e, id) => {   // si ya esta activo no se vuelve a guardar (profile.js reenvia todos los logros al arrancar)
   if (!steamClient || typeof id !== "string") return false;
-  try { return steamClient.achievement.activate(id); } catch (err) { console.warn("steam:unlock", id, err.message); return false; }
+  try { if (steamClient.achievement.isActivated(id)) return true; return steamClient.achievement.activate(id); } catch (err) { console.warn("steam:unlock", id, err.message); return false; }
 });
 
 /* Modo de ventana: "window" (con bordes, tamano normal), "border" (sin
@@ -47,18 +47,26 @@ function wireWindow(w) {
     w.webContents.executeJavaScript("innerWidth + 'x' + innerHeight").then(s => console.log("Tamano de contenido:", s));
   });
   w.webContents.on("did-fail-load", (e, code, desc) => console.error("Fallo al cargar:", code, desc));
-  w.webContents.on("console-message", (e, level, message, line, sourceId) => console.log("[renderer]", level, message, sourceId + ":" + line));
+  w.webContents.on("console-message", e => console.log("[renderer]", e.level, e.message, e.sourceId + ":" + e.lineNumber));   // Electron 35+: los datos van en el evento (los argumentos sueltos estan obsoletos)
   w.webContents.on("render-process-gone", (e, details) => console.error("Renderer crash:", details));
-  const notify = () => w.webContents.send("win:mode-changed", currentMode);
+  /* si la ventana entra o sale de pantalla completa por otra via (API de pantalla completa del navegador, el SO), el modo en memoria
+     sigue al estado real para que Ajustes y la tecla F no se desincronicen (no se guarda: lo guardado es lo que elige el jugador) */
+  const notify = () => { if (w !== win) return; if (hasFrame(currentMode)) currentMode = w.isFullScreen() ? "full" : "window"; w.webContents.send("win:mode-changed", currentMode); };
   w.on("enter-full-screen", notify); w.on("leave-full-screen", notify);
+  /* seguridad: la ventana del juego solo muestra el juego. Los enlaces externos (creditos de fotos, Wikipedia) se abren en el navegador
+     del sistema; nada se abre en otra ventana de Electron (heredaria el puente geoliteHost) ni navega fuera del servidor local */
+  const local = u => { try { const x = new URL(u); return x.hostname === "127.0.0.1" && x.port === String(serverPort); } catch (e) { return false; } };
+  const external = u => { if (/^https?:\/\//i.test(u)) shell.openExternal(u).catch(() => {}); };
+  w.webContents.setWindowOpenHandler(({ url }) => { external(url); return { action: "deny" }; });
+  w.webContents.on("will-navigate", (e, url) => { if (!local(url)) { e.preventDefault(); external(url); } });
 }
 
 function buildWindow(mode, url) {
   const frame = hasFrame(mode);
   const opts = {
     minWidth: 960, minHeight: 600, useContentSize: true, autoHideMenuBar: true,
-    backgroundColor: "#0b2a44", frame, show: false, icon: path.join(ROOT, "assets", "desktop", "icon.ico"),
-    webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(ROOT, "preload.js") },
+    backgroundColor: "#0a140f", frame, show: false, icon: path.join(ROOT, "assets", "desktop", "icon.ico"),
+    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, preload: path.join(ROOT, "preload.js") },
   };
   if (mode === "border") {
     const b = screen.getPrimaryDisplay().bounds; Object.assign(opts, b, { resizable: true, fullscreen: false });
@@ -113,9 +121,12 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css
 function startServer() {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
-      const urlPath = decodeURIComponent(req.url.split("?")[0]);
+      /* solo el propio juego: Host local (contra DNS rebinding desde una web), nada fuera de la carpeta (tampoco carpetas hermanas
+         que empiecen igual) y nada oculto (.env.local con la clave de Pollinations, .git...). Una URL mal codificada ya no tumba la app */
+      if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/i.test(req.headers.host || "")) { res.writeHead(403); res.end(); return; }
+      let urlPath; try { urlPath = decodeURIComponent(req.url.split("?")[0]); } catch (e) { res.writeHead(400); res.end(); return; }
       let filePath = path.join(ROOT, urlPath === "/" ? "index.html" : urlPath);
-      if (!filePath.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
+      if (!filePath.startsWith(ROOT + path.sep) || path.relative(ROOT, filePath).split(path.sep).some(p => p.startsWith("."))) { res.writeHead(403); res.end(); return; }
       fs.readFile(filePath, (err, data) => {
         if (err) { res.writeHead(404); res.end("Not found"); return; }
         res.writeHead(200, { "Content-Type": MIME[path.extname(filePath)] || "application/octet-stream", "Cache-Control": "no-cache" });   // siempre la ultima version de los archivos
@@ -131,12 +142,24 @@ function startServer() {
   });
 }
 
+let serverPort = 0, serverP = null;
 async function createWindow() {
-  const port = await startServer();
-  console.log("Servidor local en el puerto", port);
+  const first = !serverP;
+  const port = serverPort = await (serverP = serverP || startServer());   // un solo servidor: en macOS, reabrir la ventana no debe cambiar de puerto (ni de guardado)
+  if (first) console.log("Servidor local en el puerto", port);
   win = buildWindow(currentMode, `http://127.0.0.1:${port}/index.html`);
 }
 
-app.whenReady().then(createWindow);
+/* una sola instancia: una segunda abriria otro puerto (otro origen) y mostraria el juego sin partidas ni perfil; se trae al frente la primera */
+if (!app.requestSingleInstanceLock()) app.quit();
+else {
+  app.on("second-instance", () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
+  app.whenReady().then(() => {
+    /* permisos: solo lo que el juego usa (pantalla completa, copiar el resultado al portapapeles, bloqueo del puntero); el resto se deniega */
+    const OK = new Set(["fullscreen", "clipboard-sanitized-write", "pointerLock"]);
+    session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(OK.has(perm)));
+    createWindow();
+  });
+}
 app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });
 app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });

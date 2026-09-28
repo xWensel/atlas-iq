@@ -174,7 +174,7 @@
     const els = [root, ...root.querySelectorAll("*")].filter(el => !el.closest(SQ_SKIP) && [...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim().length > 1) && el.getClientRects().length);
     els.forEach(squeezeOne);
     root.classList.remove("sq-measure");
-    /* etiquetas de una sola linea (.sq-fit): si no caben, primero se quita el prefijo (.sq-pre, p. ej. "Ayuda contra") y luego se aprietan como arriba */
+    /* etiquetas de una sola linea (.sq-fit): si no caben, primero se quita el prefijo prescindible (.sq-pre, si lo hay) y luego se aprietan como arriba */
     root.querySelectorAll(".sq-fit").forEach(el => {
       el.classList.remove("sq-short", "sq-wrap"); el.style.letterSpacing = el.style.fontSize = "";
       const over = () => el.scrollWidth > el.clientWidth + 1; if (!over()) return;
@@ -186,8 +186,17 @@
     });
   };
 
+  /* etiquetas accesibles en el idioma del juego (index.html solo trae las de espanol): los botones con data-tip usan su texto, los interruptores
+     y deslizadores de Ajustes el nombre de su fila, y las flechas de cancion el de su tooltip. Se rehacen cada vez que cambia <html lang> */
+  A.ariaSync = () => {
+    document.querySelectorAll("button[data-tip][aria-label]").forEach(el => { const s = A.t ? A.t(el.dataset.tip) : ""; if (s && s !== el.dataset.tip) el.setAttribute("aria-label", s); });
+    document.querySelectorAll(".row-sw .sw[aria-label], .fader .sw[aria-label], .fader input[aria-label]").forEach(el => { const l = el.closest(".row-sw, .fader").querySelector("label"), s = l && l.textContent.trim(); if (s) el.setAttribute("aria-label", s); });
+    document.querySelectorAll(".np-b[data-tf]").forEach(el => { const f = A.tips[el.dataset.tf]; if (f) el.setAttribute("aria-label", String(f(el) || "").split("\n")[0]); });
+    const mp = document.getElementById("map"); if (mp && A.pick6) mp.setAttribute("aria-label", A.pick6("Mapa del mundo|World map|Carte du monde|Mapa-múndi|Weltkarte|Mappa del mondo|Mapa del mundo|世界地图|세계 지도|世界地図|Карта мира|Mapa świata"));
+  };
   const boot = () => {
     initCursor(); initTips();
+    if (window.MutationObserver) new MutationObserver(() => A.ariaSync()).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     /* presentacion de ronda y pie de pagina: se ajustan cada vez que cambia su contenido (el Campamento y los menus los ajusta A.fitK) */
     ["intro", "note"].forEach(id => {
       const el = document.getElementById(id); let t = 0; if (!el || !window.MutationObserver) return;

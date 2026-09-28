@@ -1,7 +1,7 @@
 /*
  * Geolite - identidad sonora.
- * Los efectos se sintetizan en el navegador; la musica son 21 pistas fijas (assets/music/*.mp3),
- * bounced desde el motor generativo original (que ahora vive como herramienta de composicion en tools/render/).
+ * Los efectos se sintetizan en el navegador; la musica son las 21 pistas fijas de la BSO (assets/music/*.mp3),
+ * obra del autor del juego (creada con AKAI): aqui solo se integran y reproducen.
  *  - Firma: motivo de tres notas ascendentes (sol-do-re) que suena al empezar, al superar niveles y en la victoria.
  *  - Escala pentatonica de Do mayor: cualquier nota que suene "encaja", asi nada choca.
  *  - La intensidad de "tension" (ultimos segundos) abre el filtro de la musica; no cambia de pista.
@@ -24,7 +24,7 @@ window.AIQ = window.AIQ || {};
     return buf;
   }
   function init() {
-    if (ctx) { if (ctx.state === "suspended") ctx.resume(); return true; }
+    if (ctx) { if (ctx.state === "suspended" && !document.hidden) ctx.resume(); return true; }   // con la pestana oculta sigue callado (un efecto suelto no lo despierta)
     try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return false; }
     master = ctx.createGain(); master.gain.value = A.audio.vol.master;
     const comp = ctx.createDynamicsCompressor();
@@ -36,7 +36,13 @@ window.AIQ = window.AIQ || {};
     const rv = ctx.createConvolver(); rv.buffer = impulse(1.9, 2.8);
     const rvOut = ctx.createGain(); rvOut.gain.value = 0.42;
     revIn = ctx.createGain(); revIn.connect(rv); rv.connect(rvOut).connect(master);
-    document.addEventListener("visibilitychange", () => { if (!ctx) return; document.hidden ? ctx.suspend() : ctx.resume(); });
+    /* pestana oculta: se suspende el audio y se pausa la cancion (si no, seguiria avanzando en silencio y encadenando pistas sin que nadie las oiga) */
+    let hidPlay = false;
+    document.addEventListener("visibilitychange", () => {
+      if (!ctx) return;
+      if (document.hidden) { hidPlay = !!(mediaEl && !mediaEl.paused); if (hidPlay) mediaEl.pause(); ctx.suspend(); }
+      else { ctx.resume(); if (hidPlay && mediaEl && A.audio.musicOn) mediaEl.play().catch(() => {}); hidPlay = false; }
+    });
     return true;
   }
 
@@ -64,6 +70,7 @@ window.AIQ = window.AIQ || {};
     const { vol = 0.1, dur = 1.1, bus = sfxBus, rev = 0.5 } = o;
     const f = mtof(m), g = ctx.createGain();
     [[1, 1], [2.756, 0.32], [5.404, 0.12]].forEach(([r, a]) => {
+      if (f * r > 20000) return;                                         // armonicos por encima de lo audible (y del limite del oscilador): fuera
       const os = ctx.createOscillator(), ga = ctx.createGain();
       os.type = "sine"; os.frequency.value = f * r; ga.gain.value = a; os.connect(ga).connect(g); os.start(t); os.stop(t + dur + 0.1);
     });
@@ -130,10 +137,9 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ musica: 21 pistas fijas ("BSO" del casino) */
   /*
-   * Cada pista es un archivo real en assets/music/ (bounced offline desde el motor generativo original;
-   * ese motor sigue vivo como herramienta de composicion en tools/render/, fuera del bundle del juego).
+   * Cada pista es un archivo real en assets/music/ (la BSO del autor del juego, creada con AKAI).
    * Aqui solo se reproducen, se encadenan solas al terminar y se anuncian con una pequena transicion.
-   * Titulos: terminos de apuestas [es, en, fr, pt, de, it].
+   * Titulos: terminos de apuestas en los 12 idiomas (es|en|fr|pt|de|it|es-419|zh|ko|ja|ru|pl).
    */
   const NAMES = [
     ["Apuesta segura", "Sure Bet", "Pari sûr", "Aposta segura", "Sichere Wette", "Scommessa sicura", "Apuesta segura", "稳赢之注", "확실한 베팅", "鉄板の賭け", "Верная ставка", "Pewny zakład"],
@@ -172,7 +178,7 @@ window.AIQ = window.AIQ || {};
 
   function ensureMedia() {
     if (mediaEl) return;
-    mediaEl = new Audio(); mediaEl.crossOrigin = "anonymous"; mediaEl.preload = "auto"; mediaEl.loop = false;   // en la web viene de R2: sin CORS, WebAudio la silenciaria
+    mediaEl = new Audio(); mediaEl.crossOrigin = "anonymous"; mediaEl.preload = "auto"; mediaEl.loop = false;   // si algun dia sale de otro dominio: sin CORS, WebAudio la silenciaria
     mediaSrc = ctx.createMediaElementSource(mediaEl); mediaSrc.connect(musBus);
     mediaEl.addEventListener("ended", () => useTrack(autoIdx(), true));
   }
@@ -223,12 +229,20 @@ window.AIQ = window.AIQ || {};
   A.audio.setMusic = on => { A.audio.musicOn = on; if (on) A.music.start(); else A.music.stop(); };
 
   /* ------------------------------------------------------------------ efectos */
-  const go = fn => (...a) => { if (!A.audio.sfxOn || !init()) return; fn(ctx.currentTime + 0.005, ...a); };
+  /* antes del primer clic, en la web el navegador puede no dejar sonar: el AudioContext se queda suspendido y lo que se programara en el
+     (la intro del estudio) sonaria de golpe, tarde y encima de la musica al pulsar "entrar". Sin gesto todavia, el efecto solo suena si el
+     audio arranca de verdad en unos instantes (Electron, o navegador que ya lo permite); si no, se descarta */
+  const go = fn => (...a) => {
+    if (!A.audio.sfxOn || document.hidden || !init()) return;                         // con la pestana oculta no se oye: ni se programa (sonaria de golpe al volver)
+    if (ctx.state === "running" || window.geoliteHost || !navigator.userActivation || navigator.userActivation.hasBeenActive) return fn(ctx.currentTime + 0.005, ...a);
+    const t0 = performance.now(), wait = () => { if (ctx.state === "running") fn(ctx.currentTime + 0.005, ...a); else if (performance.now() - t0 < 300) setTimeout(wait, 30); };
+    wait();
+  };
   const JP_GAP = 0.46;                    // segundos entre jackpots de la Enciclopedia: el ticket enciende sus casillas y el movil vibra a este mismo ritmo
   A.audio.jpGap = JP_GAP;
   /* vibracion del movil (Android; en iPhone y en escritorio no existe y no hace nada). Va aparte del sonido: tambien vibra con los efectos
      apagados. La apaga el ajuste Vibracion (game.js pone A.haptic.on), el mismo que quita el temblor de pantalla */
-  A.haptic = p => { try { if (A.haptic.on !== false && navigator.vibrate && !document.hidden) navigator.vibrate(p); } catch (e) { /* sin vibracion */ } };
+  A.haptic = p => { try { if (A.haptic.on !== false && navigator.vibrate && !document.hidden && !(navigator.userActivation && !navigator.userActivation.hasBeenActive)) navigator.vibrate(p); } catch (e) { /* sin vibracion */ } };
   /* jackpots: un pulso por jackpot, cada uno mas largo que el anterior (se nota mas fuerte) */
   A.haptic.jackpot = level => {
     const P = [40, 70, 150], p = [];
@@ -312,7 +326,8 @@ window.AIQ = window.AIQ || {};
     zoomVel: (() => {
       let src = null, gain = null, filt = null;
       return (zv, pan) => {
-        if (!A.audio.sfxOn || !ctx) return;
+        if (!ctx) return;
+        if (!A.audio.sfxOn) { if (gain) gain.gain.setTargetAtTime(0, ctx.currentTime, 0.06); return; }   // efectos apagados (tecla M) a media rueda: el silbido no se queda sonando
         if (!src) {
           const n = ctx.sampleRate * 2, buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
           for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;

@@ -24,7 +24,43 @@ window.AIQ = window.AIQ || {};
   const ixs = () => "";                                              // las tarjetas ya no llevan indices de baraja
   const iconSvg = t => A.icon(TYPE_IC[t] || "t_place", "cx-ic");
 
+  /* continente de un punto (etiqueta de la ficha, pista del Pasaporte en la Aventura y continentes de los retos del mapa, js/map.js).
+     Antes Egipto salia en Asia, el Magreb, Siria, Irak e Iran en Europa y Tahiti, Samoa, Tonga, Costa Rica o Panama en Sudamerica */
+  const AEG = [[40.0, 26.2], [39.2, 26.65], [38.6, 26.2], [38.3, 26.3], [37.75, 27.05], [37.0, 27.36], [36.7, 27.9], [36.55, 29.1]];   // islas griegas frente a Anatolia
+  const aeg = lat => { for (let i = 1; i < AEG.length; i++) if (lat >= AEG[i][0]) { const [a, x] = AEG[i - 1], [b, y] = AEG[i]; return y + (x - y) * (lat - b) / (a - b); } return 99; };
+  const isAf = (lat, lon) => {
+    if (lat < -45 || lat > 37.6 || lon < -26 || lon > 64) return false;
+    if (lat < 0) return true;                                                           // con Madagascar, Mauricio, Seychelles, Reunion y Santa Elena
+    if (lon > 51.5) return false;                                                       // Socotra, Oman y el golfo Persico
+    if (lat >= 12.5 && lon > (lat > 29.9 ? 32.6 - (lat - 29.9) * 0.2 : 32.6 + (30 - lat) * 0.615)) return false;   // Sinai, Levante y Arabia: al otro lado del canal de Suez y del mar Rojo
+    if (lat <= 30) return true;
+    return lon < -2 ? lat < 35.95 : lon < -0.6 ? lat < 36.4 : lon < 11.3 ? lat < 37.5 : lat < 34;   // costa mediterranea: Gibraltar, Argelia y Tunez / Lampedusa, Malta y Creta
+  };
+  const isEu = (lat, lon) => {
+    if (lat > 58) return lon < 60 + (lat - 58) * 0.6;                                  // Urales del norte y Nueva Zembla
+    if (lat > 51.3) return lon < 59.5;                                                  // Urales
+    if (lat > 47) return lon < 51.6;                                                    // rio Ural hasta el Caspio
+    if (lon >= 48.5) return false;                                                      // Caspio y Asia central
+    if (lon >= 37.5) return lat > Math.min(43.4, 43.4 - (lon - 40) * 0.22);             // Caucaso: Sochi y el Elbrus en Europa; Georgia, Armenia y Azerbaiyan en Asia
+    if (lon >= 29.02) return lat > 42.3 || (lat > 34.5 && lat < 35.8 && lon < 34.7);    // mar Negro (Crimea y Ucrania en Europa, Anatolia en Asia) y Chipre
+    if (lon < 26.2) return true;
+    if (lat > 40) return lat > (lon < 26.73 ? 40 + (lon - 26.18) * 0.78 : 40.75);       // Dardanelos y mar de Marmara: Tracia y el Estambul europeo en Europa
+    return lon < aeg(lat);
+  };
   const continent = (lat, lon) => {
+    if (lat == null) return "sea";
+    if (lat < -60 || (lat < -45 && lon > -30 && lon < 110)) return "an";              // y las islas subantarticas del Indico
+    if (lat < 12 && (lon > 165 || lon < (lat < 0 ? -125 : -140))) return "oc";         // Polinesia, Micronesia y Melanesia del Pacifico (Hawai sigue con Norteamerica)
+    if (lat > 62 && lon < -168.97) return "as";                                       // Chukotka, al otro lado del antimeridiano
+    if (lon < -30 || (lat > 66.6 && lon < -12)) return lat > 12 || (lat > 7 && lon < -77.3) ? "na" : "sa";   // America (y Groenlandia); Centroamerica hasta Panama, con Norteamerica
+    if (isAf(lat, lon)) return "af";
+    if (lat < 0 ? lon >= 140.9 || (lat < -10.5 && lon > 112) : lon >= 130 && lat < 23) return "oc";   // Australia, Nueva Guinea oriental, Palaos, Guam, Micronesia (Indonesia y Timor, en Asia)
+    return isEu(lat, lon) ? "eu" : "as";
+  };
+
+  /* continentes del MAPA (los retos que mueven continentes): la division de siempre, con la que estan afinadas las colocaciones sin solapes (dev/layouttest.js).
+     La de arriba es la geografica (etiquetas y pista del Pasaporte); con ella el reto "hold" pisaba continentes */
+  const continentMap = (lat, lon) => {
     if (lat == null) return "sea";
     if (lat < -60) return "an";
     if (lon < -30 && lat > 12) return "na"; if (lon < -30) return "sa";
@@ -83,6 +119,7 @@ window.AIQ = window.AIQ || {};
       if (!cur.fact.en && e.fact && e.fact.en) cur.fact = e.fact;
       if (cur.lat == null && e.lat != null) { cur.lat = e.lat; cur.lon = e.lon; }
       if (!cur.country && e.country) cur.country = e.country;
+      if (!cur.triggers && e.triggers) cur.triggers = e.triggers;     // Napoleon del Clasico + la tarjeta curada: sigue enlazando Paris, Waterloo...
       return cur;
     };
     /* 0) banco de lugares empaquetado (data/places.js): capitales, ciudades, monumentos, naturaleza, historia y paises */
@@ -90,8 +127,8 @@ window.AIQ = window.AIQ || {};
       const neBy = {}; A.PLACES.forEach(r => { if (r[1] === "country") neBy[r[6].en] = r[0].slice(2); });
       A.PLACES.forEach(([id, kind, tier, lat, lon, qc, names]) => {
         const cnEn = qc && A.PCOUNTRY && A.PCOUNTRY[qc] && A.PCOUNTRY[qc].en, ne = (cnEn && (neBy[cnEn] || (world.byName[cnEn] ? cnEn : null))) || null;
-        const type = kind === "history" ? (/^(battle|siege|fall of|.*\bwar\b|bombing|attack)/i.test(names.en) ? "battle" : "event")
-          : kind === "nature" ? (/\b(sea|ocean|gulf|bay)\b/i.test(names.en) ? "water" : /\b(strait|channel|canal|cape|drake|bosporus)\b/i.test(names.en) ? "strait" : "nature") : kind;
+        const type = kind === "history" ? (/^(battle|siege|fall of|.*\bwar\b|bombing|attack|normandy|gallipoli|dunkirk|tet )/i.test(names.en) ? "battle" : "event")   // igual que el tipo de la pregunta (js/adventure.js)
+          : kind === "nature" ? (/\b(sea|ocean|gulf|bay)\b/i.test(names.en) ? "water" : /\b(strait|channel|canal|cape|drake|bosporus|bosphorus)\b/i.test(names.en) ? "strait" : "nature") : kind;
         const rar = Math.min(3, tier + (kind === "history" || kind === "nature" ? 1 : 0));
         add({ id, type, name: { ...names }, wiki: names.en, lat: kind === "country" ? null : lat, lon: kind === "country" ? null : lon, country: ne, fact: { en: "", es: "" }, rarity: rar, src: "places", nogeo: kind === "country" });
       });
@@ -204,7 +241,7 @@ window.AIQ = window.AIQ || {};
   const byType = () => { const cnt = {}; order.forEach(id => { const e = E[id], c = cnt[e.type] || (cnt[e.type] = [0, 0]); c[1]++; if (isUnlocked(id)) c[0]++; }); return cnt; };
   const emitStats = () => { if (A.ach) { const st = stats(); A.ach.emit("codex", { u: st.u, t: st.t, by: byType() }); } };
   A.codexLimits = e => { const sc = (E[(e && e.parent) || (e && e.id)] && SCALE[E[(e && e.parent) || e.id].type]) || 1; return LIM.map(x => x * sc); };
-  A.continent = continent;
+  A.continent = continent; A.continentMap = continentMap;
 
   /* ================================================================== contenido empaquetado (data/wiki + assets/wiki): nunca se consulta Wikipedia al jugar */
   const contentMem = {};
@@ -221,7 +258,9 @@ window.AIQ = window.AIQ || {};
 
   /* ================================================================== interfaz */
   const ui = { built: false, filter: "all", sort: "recent", only: false, q: "", shown: 0, list: [], cur: null, tilt: null };
-  const nameOf = (e, rec) => e.parent ? nameOf(E[e.parent], rec) + " · " + A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : (A.wlang() === "es" && e.name.es) || (rec && rec.title && rec.lang === A.wlang() ? rec.title : "") || (A.wlang() === "es" ? e.name.es || e.name.en : e.name.en);
+  const nameOf = (e, rec) => e.parent ? nameOf(E[e.parent], rec) + " · " + A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : e.name[A.lang] || e.name[A.wlang()] || (rec && rec.title && rec.lang === A.wlang() ? rec.title : "") || e.name.en || e.name.es;
+  const esc = s => A.esc(s);                                           // textos de Wikipedia/Commons dentro de innerHTML
+  const fold = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();   // busqueda sin tildes ni mayusculas
   const rarDots = r => A.icon("g_" + r, "gem").repeat(r + 1);
   const contOf = e => A.t(CONT[continent(e.lat, e.lon)]);
   const fmtNo = n => "Nº " + String(n).padStart(3, "0");
@@ -247,9 +286,12 @@ window.AIQ = window.AIQ || {};
       </div>`;
     $("app").appendChild(root);
     $("cxBack").onclick = () => (ui.cur ? closeDetail() : close());
-    $("cxSearch").oninput = e => { ui.q = e.target.value.trim().toLowerCase(); renderGrid(true); };
+    $("cxSearch").oninput = e => { ui.q = fold(e.target.value.trim()); renderGrid(true); };
     $("cxOnly").onclick = () => { ui.only = !ui.only; $("cxOnly").setAttribute("aria-checked", ui.only); renderGrid(true); A.sfx.flip(ui.only); };
-    root.addEventListener("keydown", e => { if (e.key === "Escape") { e.stopPropagation(); $("cxLight").classList.contains("hidden") ? (ui.cur ? closeDetail() : close()) : $("cxLight").classList.add("hidden"); } });
+    root.addEventListener("keydown", e => {
+      if (e.key === "Escape") { e.stopPropagation(); $("cxLight").classList.contains("hidden") ? (ui.cur ? closeDetail() : close()) : $("cxLight").classList.add("hidden"); }
+      else if (!/^[cfmn]$/i.test(e.key)) e.stopPropagation();          // Intro, espacio, P, 1-4, +/- y 0 no tocan la partida de detras (abierta desde el aviso)
+    });
     const sent = document.createElement("div"); sent.id = "cxSent"; sent.className = "cx-sent"; $("cxGrid").appendChild(sent);
     new IntersectionObserver(en => { if (en.some(x => x.isIntersecting)) more(); }, { root: $("cxGrid"), rootMargin: "600px" }).observe(sent);
     notifiers.push((k, id) => { if (k === "content" && !$("codex").classList.contains("hidden")) { paintThumb(id); if (ui.cur === id) renderDetail(id); } });
@@ -277,7 +319,7 @@ window.AIQ = window.AIQ || {};
     const q = ui.q, list = order.filter(id => {
       const e = E[id]; if (ui.filter !== "all" && e.type !== ui.filter) return false;
       const un = isUnlocked(id); if (ui.only && !un) return false;
-      if (q) { if (!un) return false; const rec = memOf(id); return (nameOf(e, rec) + " " + e.name.en + " " + (e.name.es || "")).toLowerCase().includes(q); }
+      if (q) { if (!un) return false; const rec = memOf(id); return fold(nameOf(e, rec) + " " + e.name.en + " " + (e.name.es || "") + " " + (rec && rec.title || "")).includes(q); }
       return true;
     });
     const nm = id => nameOf(E[id], memOf(id)).toLowerCase();
@@ -287,7 +329,7 @@ window.AIQ = window.AIQ || {};
     return list;
   }
   function renderGrid(reset) {
-    ui.list = sortedList(); if (reset) { $("cxGrid").querySelectorAll(".cx-card, .cx-empty").forEach(n => n.remove()); ui.shown = 0; $("cxGrid").scrollTop = 0; }
+    ui.list = sortedList(); if (reset) { $("cxGrid").querySelectorAll(".cx-card, .cx-empty").forEach(n => { io.unobserve(n); n.remove(); }); ui.shown = 0; $("cxGrid").scrollTop = 0; }
     if (!ui.list.length) { const d = document.createElement("div"); d.className = "cx-empty"; d.textContent = A.t("codex.empty"); $("cxGrid").insertBefore(d, $("cxSent")); return; }
     more();
   }
@@ -303,7 +345,7 @@ window.AIQ = window.AIQ || {};
     b.className = `cx-card r${e.rarity} ${un ? "open" : "locked"}${un && !store.seen[id] ? " fresh" : ""}`;
     const rec = memOf(id);
     b.innerHTML = `<span class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}</span>
-      ${ixs(e)}<span class="cx-nm">${un ? nameOf(e, rec) : "· · ·"}</span>
+      ${ixs(e)}<span class="cx-nm">${un ? esc(nameOf(e, rec)) : "· · ·"}</span>
       <span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span><span class="cx-no">${fmtNo(e.no)}</span>${un && !store.seen[id] ? `<span class="cx-new">${A.t("codex.new")}</span>` : ""}`;
     b.setAttribute("data-tt", un ? nameOf(e, rec) + "\n" + typeLabel(e.type)
       : A.tip6("Sin descubrir|Undiscovered|Non découvert|Não descoberto|Unentdeckt|Non scoperto||未发现|미발견|未発見|Не открыто|Nieodkryte") + "\n" + typeLabel(e.type) + " · " + A.tip6("se descubre al situarlo bien en una partida|found by placing it well in a game|à découvrir en le plaçant bien en partie|descoberto ao posicioná-lo bem numa partida|wird entdeckt, wenn du ihn gut platzierst|si scopre piazzandolo bene in partita||在游戏中准确标出即可发现|게임에서 정확히 맞히면 발견됩니다|ゲームでうまく当てると発見できる|открывается, если точно отметить в игре|odkrywasz, trafiając celnie w grze"));
@@ -317,7 +359,7 @@ window.AIQ = window.AIQ || {};
     try {
       const rec = await loadContent(E[id], A.wlang()); if (rec.none) return;
       b.querySelector(".cx-nm").textContent = nameOf(E[id], rec);
-      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }); }
+      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const art = b.querySelector(".cx-art"); art.classList.toggle("flag", !!rec.img.flag); art.prepend(im); b.classList.add("has-img"); }); }
     } catch (x) { /* sin conexion: se queda el icono */ }
   }
   function tiltMove(el, ev, deg) {
@@ -331,7 +373,7 @@ window.AIQ = window.AIQ || {};
     const ids = new Set();
     if (e.parent) { ids.add(e.parent); ids.add(e.parent + (e.tier === 2 ? "~k" : "~h")); }
     else if (E[e.id + "~h"]) { ids.add(e.id + "~h"); ids.add(e.id + "~k"); }
-    if (e.src === "curated") (e.triggers || []).forEach(t => { if (E[t]) ids.add(t); });
+    (e.triggers || []).forEach(t => { if (E[t]) ids.add(t); });
     (chain[e.id] || []).forEach(x => ids.add(x));
     if (e.country && E["c:" + e.country]) ids.add("c:" + e.country);
     if (e.type === "country") (chain[e.id] || []).forEach(x => ids.add(x));
@@ -348,22 +390,22 @@ window.AIQ = window.AIQ || {};
   }
   async function renderDetail(id) {
     const e = E[id], un = isUnlocked(id), d = $("cxDetail"), rec = un ? memOf(id) : null;
-    const rel = relatedOf(e).map(x => { const o = E[x], u = isUnlocked(x); return `<button class="cx-rel ${u ? "" : "lk"}" data-id="${x}" type="button">${iconSvg(o.type)}<span>${u ? nameOf(o, memOf(x)) : "???"}</span></button>`; }).join("");
+    const rel = relatedOf(e).map(x => { const o = E[x], u = isUnlocked(x); return `<button class="cx-rel ${u ? "" : "lk"}" data-id="${esc(x)}" type="button">${iconSvg(o.type)}<span>${u ? esc(nameOf(o, memOf(x))) : "???"}</span></button>`; }).join("");
     const factLine = un ? A.tx(e.fact) : "";
     d.innerHTML = `
       <div class="cx-d-wrap">
         <div class="cx-d-card"><div class="cx-bigcard r${e.rarity} ${un ? "open" : "locked"}" id="cxBig">
-          <div class="cx-art">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" alt="" src="${rec.img.card}" decoding="async">` : ""}</div>
-          ${ixs(e)}<div class="cx-cap"><span class="cx-nm">${un ? nameOf(e, rec) : A.t("codex.locked")}</span><span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span></div><span class="cx-no">${fmtNo(e.no)}</span><span class="cx-foil"></span>
+          <div class="cx-art${rec && rec.img && rec.img.flag ? " flag" : ""}">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" alt="" src="${esc(rec.img.card)}" decoding="async">` : ""}</div>
+          ${ixs(e)}<div class="cx-cap"><span class="cx-nm">${un ? esc(nameOf(e, rec)) : A.t("codex.locked")}</span><span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span></div><span class="cx-no">${fmtNo(e.no)}</span><span class="cx-foil"></span>
         </div>
-        ${rec && rec.img && rec.credit ? `<p class="cx-credit">${A.t("codex.photo")}: ${rec.credit.artist ? rec.credit.artist + " · " : ""}<a href="${rec.credit.page}" target="_blank" rel="noopener">${rec.credit.license || "Wikimedia Commons"}</a></p>` : ""}
+        ${rec && rec.img && rec.credit ? `<p class="cx-credit">${A.t("codex.photo")}: ${rec.credit.artist ? esc(rec.credit.artist) + " · " : ""}<a href="${esc(rec.credit.page)}" target="_blank" rel="noopener">${esc(rec.credit.license || "Wikimedia Commons")}</a></p>` : ""}
         ${rec && rec.img ? `<button class="cx-hd" id="cxHd" type="button">${A.icon("a_lens", "sm")}${A.t("codex.hd")}</button>` : ""}</div>
         <div class="cx-d-body">
           <div class="cx-d-tags"><span class="tag">${typeLabel(e.type)}</span><span class="tag r">${A.t("rar." + RARITY[e.rarity])} ${rarDots(e.rarity)}</span>${e.lat != null ? `<span class="tag c">${A.icon("k_" + continent(e.lat, e.lon), "sm")}${contOf(e)}</span>` : ""}</div>
-          <h2>${un ? nameOf(e, rec) : "???"}</h2>
-          ${un && rec && rec.desc ? `<p class="cx-desc">${rec.desc}</p>` : ""}
+          <h2>${un ? esc(nameOf(e, rec)) : "???"}</h2>
+          ${un && rec && rec.desc ? `<p class="cx-desc">${esc(rec.desc)}</p>` : ""}
           ${un ? "" : `<p class="cx-hint">${e.parent ? A.t("codex.hint.tier", { km: A.codexLimits(e)[e.tier - 1] }) : e.src === "curated" ? A.t("codex.hint.chain") : A.t("codex.hint.place")}</p>`}
-          ${un && factLine ? `<blockquote class="cx-fact">${factLine}</blockquote>` : ""}
+          ${un && factLine ? `<blockquote class="cx-fact">${esc(factLine)}</blockquote>` : ""}
           ${un ? `<div class="cx-sec" id="cxText"><p class="cx-load">${A.T("Cargando…", "Loading…")}</p></div>` : ""}
           ${rel ? `<div class="cx-sec"><h3>${A.t("codex.related")}</h3><div class="cx-rels">${rel}</div></div>` : ""}
           ${un && e.lat != null ? `<div class="cx-sec"><h3>${A.t("codex.location")}</h3><canvas id="cxMini" class="cx-mini"></canvas><p class="cx-coord">${Math.abs(e.lat).toFixed(2)}°${e.lat >= 0 ? "N" : "S"}  ${Math.abs(e.lon).toFixed(2)}°${e.lon >= 0 ? "E" : "W"}</p></div>` : ""}
@@ -385,26 +427,32 @@ window.AIQ = window.AIQ || {};
     const T = tiers(rec), body = e.parent ? (e.tier === 2 ? T.hist : T.key) : T.intro, head = e.parent ? A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : A.t("codex.about");
     const ttr = e.parent && rec.tierTr && rec.tierTr[e.tier === 2 ? "h" : "k"];   // este tier se tradujo a mano: se acredita y enlaza el original
     box().innerHTML = `<h3>${head}</h3>${par(body || rec.extract)}
-      <p class="cx-src">${A.t(rec.tr || ttr ? "codex.license.tr" : "codex.license")} ·<a href="${(ttr && ttr.url) || rec.url || "#"}" target="_blank" rel="noopener">${A.t("codex.wiki")} ↗</a></p>`;
+      <p class="cx-src">${A.t(rec.tr || ttr ? "codex.license.tr" : "codex.license")} ·<a href="${esc((ttr && ttr.url) || rec.url || "#")}" target="_blank" rel="noopener">${A.t("codex.wiki")} ↗</a></p>`;
     if (heroWanted) renderDetail(id);
   }
   /* 3 textos a partir del articulo del lugar: generico (descripcion + inicio), historia y dato clave (el resto del texto de cabecera) */
-  const tierMem = {};
+  const tierMem = new WeakMap();
+  const dangling = t => /[:：]\s*$/.test(t);                          // "...dijo:" o "son los siguientes:" sin la cita ni la lista que venian detras
+  const undangle = t => { const ls = String(t || "").split("\n"); while (ls.length > 1 && dangling(ls[ls.length - 1])) ls.pop(); return ls.length === 1 && dangling(ls[0]) ? "" : ls.join("\n"); };
   function tiers(rec) {
-    const k = rec.lang + ":" + rec.title; if (tierMem[k]) return tierMem[k];
+    let T = tierMem.get(rec); if (!T) { T = tiers0(rec); T = { intro: undangle(T.intro) || T.intro, hist: undangle(T.hist), key: undangle(T.key) }; tierMem.set(rec, T); }
+    return T;
+  }
+  function tiers0(rec) {
     const sents = A.sentences(A.cleanText(rec.extract)), hist = A.cleanText(rec.history).split(/\n+/).filter(x => x.trim());
+    while (sents.length > 1 && dangling(sents[sents.length - 1])) sents.pop();
     const J = /^(zh|ja)$/.test(rec.lang) ? "" : " ";                  // chino y japones: las frases van pegadas, sin espacio
     let n = 0, len = 0; while (n < sents.length && (n < 2 || len < 200) && n < 3) len += sents[n++].length;
     const intro = sents.slice(0, n).join(J), rest = sents.slice(n);
-    if (rec.key) return (tierMem[k] = { intro: intro || A.cleanText(rec.extract), hist: hist.join("\n"), key: A.cleanText(rec.key) });   // tiers propios (r[5]): sin recortes
+    if (rec.key) return { intro: intro || A.cleanText(rec.extract), hist: hist.join("\n"), key: A.cleanText(rec.key) };   // tiers propios (r[5]): sin recortes
     let histP = hist, key = rest.join(J);
     if (key.length < 90 && hist.length > 1) { const h = Math.ceil(hist.length / 2); histP = hist.slice(0, h); key = (key ? key + "\n" : "") + hist.slice(h).join("\n"); }   // extractos muy cortos: la historia se reparte
     if (!histP.length && rest.length > 2) { const h = Math.ceil(rest.length / 2); histP = [rest.slice(0, h).join(J)]; key = rest.slice(h).join(J); }
-    return (tierMem[k] = { intro: intro || A.cleanText(rec.extract), hist: histP.join("\n"), key });
+    return { intro: intro || A.cleanText(rec.extract), hist: histP.join("\n"), key };
   }
   function lightbox(id) {
     const rec = memOf(id), L = $("cxLight"); if (!rec || !rec.img) return;
-    L.innerHTML = `<img alt="" src="${rec.img.hd}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">${A.icon("u_close")}</button><p>${rec.credit ? (rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "") : ""}</p>`;
+    L.innerHTML = `<img alt="" src="${esc(rec.img.hd)}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">${A.icon("u_close")}</button><p>${rec.credit ? esc((rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "")) : ""}</p>`;
     L.classList.remove("hidden"); L.onclick = () => L.classList.add("hidden"); A.sfx.card();
   }
 
@@ -412,8 +460,8 @@ window.AIQ = window.AIQ || {};
   function open(id) {
     buildUI(); const root = $("codex"); root.classList.remove("hidden"); document.body.classList.add("cx-on"); labels(); ui.cur = null;
     $("cxDetail").classList.add("hidden"); $("cxGrid").classList.remove("hidden"); $("cxFilters").classList.remove("hidden"); document.querySelector("#codex .cx-tools").classList.remove("hidden");
-    renderGrid(true); root.tabIndex = -1; root.focus({ preventScroll: true }); A.sfx.card();
-    if (id && E[id]) openDetail(id);
+    renderGrid(true); root.tabIndex = -1; root.focus({ preventScroll: true });
+    if (id && E[id]) openDetail(id); else A.sfx.card();                 // openDetail ya suena: no montar dos sonidos
   }
   function close() { const r = $("codex"); if (r) r.classList.add("hidden"); document.body.classList.remove("cx-on"); ui.cur = null; A.sfx.ui(); if (A.codexOnClose) A.codexOnClose(); }
   const isOpen = () => !!$("codex") && !$("codex").classList.contains("hidden");
@@ -424,11 +472,11 @@ window.AIQ = window.AIQ || {};
   let toastT = 0, reelT = 0;
   function toastItem(id) {
     const e = E[id], it = document.createElement("span"); it.className = "cx-ri";
-    it.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, memOf(id))}</b></span>`;
+    it.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${esc(nameOf(e, memOf(id)))}</b></span>`;
     loadContent(e, A.wlang()).then(rec => {
       if (rec.none) return;
       it.querySelector("b").textContent = nameOf(e, rec);
-      if (rec.img) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => it.querySelector(".cx-art").prepend(im)); }
+      if (rec.img) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const art = it.querySelector(".cx-art"); art.classList.toggle("flag", !!rec.img.flag); art.prepend(im); }); }
     }).catch(() => {});
     return it;
   }
@@ -457,7 +505,7 @@ window.AIQ = window.AIQ || {};
     const next = () => { if (i < n - 1) { const from = i++; show(i, from); reelT = setTimeout(next, hold(i)); } else leave(); };
     el.onpointerenter = () => clearTimeout(reelT);
     el.onpointerleave = () => { clearTimeout(reelT); reelT = setTimeout(next, 700); };
-    el.onclick = () => { clearTimeout(reelT); el.classList.add("hidden"); open(ids[i]); };
+    el.onclick = () => { clearTimeout(reelT); if (A.core && A.core.S && A.core.S.phase === "asking") { leave(); return; } el.classList.add("hidden"); open(ids[i]); };   // con el reloj corriendo solo se aparta
     el.classList.remove("hidden", "in", "out"); void el.offsetWidth; el.classList.add("in");
     show(0); reelT = setTimeout(next, hold(0));
   }

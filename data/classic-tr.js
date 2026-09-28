@@ -79,6 +79,11 @@ window.AIQ.CLASSIC_TR = {
   "Cocos Island": ["Cocos Island", "Isla del Coco", "Île Cocos", "Ilha do Coco", "Kokosinsel", "Isola del Cocco", null, "科科斯岛", "코코스섬", "ココ島", "Остров Кокос", "Wyspa Kokosowa"],
   "Christmas Island": ["Christmas Island", "Isla de Navidad", "Île Christmas", "Ilha do Natal", "Weihnachtsinsel", "Isola di Natale", null, "圣诞岛", "크리스마스섬", "クリスマス島", "Остров Рождества", "Wyspa Bożego Narodzenia"],
   "Norfolk Island": ["Norfolk Island", "Isla Norfolk", "Île Norfolk", "Ilha Norfolk", "Norfolkinsel", "Isola Norfolk", null, "诺福克岛", "노퍽섬", "ノーフォーク島", "Остров Норфолк", "Norfolk"],
+  /* paises de los subtitulos del Clasico cuyo nombre ingles no coincide con la base ("Republic of Ireland") o que no tienen fila de pais: sin esto salian en ingles en todos los idiomas */
+  "Ireland": ["Ireland", "Irlanda", "Irlande", "Irlanda", "Irland", "Irlanda", null, "爱尔兰", "아일랜드", "アイルランド", "Ирландия", "Irlandia"],
+  "Aruba": ["Aruba", "Aruba", "Aruba", "Aruba", "Aruba", "Aruba", null, "阿鲁巴", "아루바", "アルバ", "Аруба", "Aruba"],
+  "Curaçao": ["Curaçao", "Curazao", "Curaçao", "Curaçau", "Curaçao", "Curaçao", null, "库拉索", "퀴라소", "キュラソー", "Кюрасао", "Curaçao"],
+  "Cook Islands": ["Cook Islands", "Islas Cook", "Îles Cook", "Ilhas Cook", "Cookinseln", "Isole Cook", null, "库克群岛", "쿡 제도", "クック諸島", "Острова Кука", "Wyspy Cooka"],
 
   /* estados de EE. UU. que chocan con paises o ciudades de la base de lugares */
   "Olympia, Washington": ["Olympia, Washington", "Olympia, Washington (estado)", "Olympia, Washington (État)", "Olympia, Washington (estado)", "Olympia, Washington (Bundesstaat)", "Olympia, Washington (stato)", null, "奥林匹亚, 华盛顿州", "올림피아, 워싱턴주", "オリンピア, ワシントン州", "Олимпия, Вашингтон", "Olympia, Waszyngton"],
