@@ -278,3 +278,18 @@ html.reduce-motion .ch-chip.ctr-pop, html.reduce-motion #app.chx-punch { animati
 .table .inv-perk em { bottom: auto; top: -21px; padding: 1px 6px; border-radius: 6px; background: #16241c; box-shadow: 0 0 0 1px rgba(255, 217, 138, .5); z-index: 3; }
 /* fichas de "Despues" (Ojo en el cielo): un nombre largo parte linea en vez de salirse de la pantalla */
 .nx-chips .ch-chip { max-width: 100%; min-width: 0; } .nx-chips .ch-chip > b { white-space: normal; overflow-wrap: anywhere; min-width: 0; }
+
+/* v0.35 economia: botin en vivo en el marcador (al superar el objetivo: lo que cobrarias ya y el siguiente escalon) */
+.lg-loot { display: flex; align-items: center; gap: 6px; margin-top: 5px; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; }
+.lg-loot.hidden { display: none; }
+.lg-loot b { display: inline-flex; align-items: center; gap: 3px; color: var(--ink); font-weight: 700; } .lg-loot b .ic { width: 16px; height: 16px; }
+.lg-loot i { margin-left: auto; font-style: normal; }
+@media (max-width: 900px) { .ledger .lg-loot { display: none; } }
+@media (max-height: 520px) and (orientation: landscape) { .ledger .lg-loot { display: none; } }
+/* reliquia que ya no sirve en esta expedicion (sus retos ya pasaron): apagada, para venderla */
+.table .inv-perk.idle { filter: grayscale(.9) brightness(.82); box-shadow: 0 0 0 2px #16241c, inset 0 0 0 3px #9a9a9a; }
+.table .inv-perk.idle:hover { filter: none; }
+/* revancha: la carta que frena los trucos de la ronda que repites, a mitad de precio (precio de antes tachado) */
+.offer .buy .of-was { margin: 0 5px 0 1px; opacity: .6; font-size: .86em; text-decoration-thickness: 2px; }
+/* cofre del jefe: dejarlo sin abrir tambien paga */
+.go-next .gn-coins { display: inline-flex; align-items: center; gap: 3px; margin-left: 8px; font-style: normal; font-family: var(--mono); font-size: .82em; letter-spacing: .04em; color: #ffe7a8; } .go-next .gn-coins .ic { width: 15px; height: 15px; }

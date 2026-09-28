@@ -129,7 +129,8 @@ window.AIQ = window.AIQ || {};
       return { list, boss, combo };
     },
     info: id => D[id],
-    chip(c, small) { const d = D[c.id], perk = small && counterOf(c.id), pk = perk && A.RELICS && A.RELICS[perk]; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${pk ? " ctr" : ""}" data-ch="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (pk ? " · ✚ " + A.tx(pk.n) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b><i class="ch-lv">${"●".repeat(c.lv || 1)}</i>${pk ? `<i class="ch-ctr">${A.icon(perk, "sm")}</i>` : ""}</span>`; },
+    /* v0.35: la ficha ya no dice que perk frena el reto (ni brilla por ello): el jugador tiene que leer y atar cabos */
+    chip(c, small) { const d = D[c.id]; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}" data-ch="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d)).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b><i class="ch-lv">${"●".repeat(c.lv || 1)}</i></span>`; },
   };
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */
@@ -373,14 +374,12 @@ window.AIQ = window.AIQ || {};
     }, wait);
   }
 
-  /* ------------------------------------------------------------------ perks que contrarrestan retos activos: la ficha brilla con el icono del perk */
+  /* ------------------------------------------------------------------ perks que contrarrestan retos activos: al empezar la ronda suena la "contra"
+     (v0.35: sin marcar que ficha ni con que perk; antes la ficha brillaba con el icono del perk y eso se lo daba mascado al jugador) */
   const counterOf = id => { const ids = (S.on && S.fx && S.fx.ids) || []; return (D[id].counters || []).find(p => ids.includes(p)); };
   function counterFx(qi) {
-    const hit = S.list.filter(c => counterOf(c.id)); if (!hit.length) return;
-    later(() => hit.forEach((c, i) => {
-      document.querySelectorAll(`#advBar .ch-chip[data-ch="${c.id}"]`).forEach(ch => { ch.classList.remove("ctr-pop"); void ch.offsetWidth; ch.classList.add("ctr-pop"); });
-      if (qi === 0) later(() => say("counter", i), i * 140);
-    }), 650);
+    const hit = S.list.filter(c => counterOf(c.id)); if (!hit.length || qi !== 0) return;
+    later(() => hit.forEach((c, i) => later(() => say("counter", i), i * 140)), 650);
   }
 
   /* ------------------------------------------------------------------ puntero: parametros para js/pointer.js */
