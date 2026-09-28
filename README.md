@@ -4,6 +4,10 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.5.1** - Veredicto en movil vertical: se ve entero, en una sola columna.
+- **El fallo:** `css/premium.css` fijaba el veredicto en dos columnas sin media query y, al cargarse despues de `style.css`, anulaba la columna unica de movil. En vertical (360-430 px) la ficha, la tarjeta IQ y el crupier se quedaban a la izquierda y el titulo, el texto, las cifras y los botones ("Reintentar nivel", "Otra expedicion"...) se salian por la derecha, en el Clasico, la Aventura y el Reto diario.
+- **Ahora** las dos columnas son solo para escritorio y movil horizontal, que no cambian. En vertical, arriba y compactos, la ficha y la tarjeta IQ en una fila y el crupier en la suya (cara a la izquierda y globo a la derecha); debajo, titulo y cifras a tamano de movil y botones que se reparten las filas (el principal a todo el ancho). En 360x740 y 390x844 cabe todo sin encoger ni desplazarse (probado en es, de y ru), tambien con las frases mas largas del crupier; en pantallas de 700 px de alto o menos se aprieta un poco mas y en tablet vertical la columna se centra (600 px como mucho).
+
 **v0.4.1** - Cambiar de idioma a media expedicion ya no cambia los trucos del crupier ni hace perder los sobornos.
 - **El fallo:** en chino, japones y coreano las rondas normales no sacan Runas ni Sin vocales, pero esa criba miraba el idioma de cada momento, y los trucos de una ronda se recalculan cada vez que se pinta el Campamento o empieza la ronda. Si cambiabas entre un idioma latino y zh/ja/ko a media expedicion (Ajustes se abre en partida), la proxima ronda podia traer otro truco de texto y el soborno ya pagado no quitaba nada: los doblones se perdian (y, desde la v0.3.1, ese soborno encarecia igual los siguientes).
 - **Ahora** cuenta el idioma con el que empieza la expedicion (`run.cjk`), tambien en el Reto diario. Las partidas guardadas de antes lo fijan con el idioma actual al continuarlas.
