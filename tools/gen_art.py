@@ -86,7 +86,7 @@ icons({
  "a_target": "an archery target with an arrow in the bullseye", "a_flame": "a bright orange flame", "a_comet": "a golden comet with a trail", "a_volcano": "an erupting volcano", "a_stopwatch": "a white stopwatch",
  "a_book": "an open book with a red ribbon", "a_medal": "a golden medal with a star", "a_cap": "a black graduation cap with a golden tassel", "a_moon": "a golden crescent moon with stars", "a_pack": "a brown adventurer backpack",
  "a_shield": "a blue shield with a golden star", "a_sun": "a golden sun rising over the horizon", "a_moai": "a grey moai stone statue", "a_inf": "a golden infinity symbol", "a_peak": "a snowy mountain with a red flag on top",
- "a_hundred": "a golden tag with the number 100", "a_pin": "a glossy red map pin", "a_lens": "a magnifying glass with a star in the lens", "a_house": "a small house with a red roof", "a_spark": "a white four-point sparkle star",
+ "a_hundred": "a golden tag with the number 100", "a_pin": "a glossy red map pin", "a_lens": "a magnifying glass with a star in the lens", "a_house": "a small house with a red roof",
  # interfaz
  "u_set": "a chunky grey cog gear wheel with teeth and a round hole in the middle", "u_plus": "a magnifying glass with a plus sign", "u_minus": "a magnifying glass with a single horizontal minus bar inside the lens", "u_home": "a target crosshair compass", "u_pause": "two chunky golden pause bars",
  "u_fs": "four golden corner brackets", "u_skin": "a painter palette with colorful paint blobs", "u_lang": "two speech bubbles", "u_back": "a chunky cream arrow pointing left", "u_next": "a chunky cream arrow pointing right",

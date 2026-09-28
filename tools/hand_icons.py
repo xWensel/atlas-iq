@@ -565,13 +565,6 @@ def g2(id):   # talla brillante de perfil
 def g3(id):
     I = Icon(); I.add(faceted_star(32, 34, 30, 13, "gold")); I.add(sphere(circle(32, 35, 6), 31, 34, 6, R["red"])); return I
 
-@icon("a_spark")
-def a_spark(id):
-    I = Icon()
-    for cx, cy, ro, ri in ((28, 34, 26, 6), (51, 13, 10, 3), (52, 50, 7, 2.2)):
-        I.add(faceted_star(cx, cy, ro, ri, "gold", n=4))
-    I.put(circle(28, 34, 3), R["gold"][0]); return I
-
 @icon("a_sun")
 def a_sun(id):
     I = Icon(); rays = blank()
