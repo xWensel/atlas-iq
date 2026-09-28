@@ -11,3 +11,4 @@ assets_stage/
 tools/__pycache__/
 tools/cache-codex/
 tools/cache-r2.json
+assets/wiki/

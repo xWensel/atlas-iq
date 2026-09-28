@@ -3,11 +3,12 @@ window.AIQ = window.AIQ || {};
 (function (A) {
   A.VERSION = "0.29.0";
   A.lang = "es";
-  /* fotos de la Enciclopedia y musica: en la web salen de Cloudflare R2 (pesan ~1,2 GB y Vercel no los admite);
-     en local y en Electron (127.0.0.1) salen de la carpeta del juego. Lo sube tools/upload-r2.mjs */
-  const MEDIA_BASE = "";
+  /* fotos de la Enciclopedia: en la web salen de GitHub Pages (pesan ~1 GB y Vercel no las admite), repartidas en dos webs para no pasar
+     del limite de 1 GB de cada una; en local y en Electron (127.0.0.1) salen de la carpeta del juego. Las publica tools/publish-media.mjs.
+     La musica sigue saliendo de la propia web. */
+  const MEDIA = { "assets/wiki/card/": "https://xwensel.github.io/geolite-media/", "assets/wiki/hd/": "https://xwensel.github.io/geolite-media-hd/" };
   const LOCAL = typeof location === "undefined" || !/^https?:$/.test(location.protocol) || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-  A.media = p => (MEDIA_BASE && !LOCAL ? MEDIA_BASE + p : p);
+  A.media = p => { if (!LOCAL) for (const k in MEDIA) if (p.startsWith(k)) return MEDIA[k] + p; return p; };
   A.t = (key, p) => {
     let s = (A.STR[A.lang] && A.STR[A.lang][key]) || A.STR.en[key] || key;
     if (p) for (const k in p) s = s.replaceAll("{" + k + "}", p[k]);
