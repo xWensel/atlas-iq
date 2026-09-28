@@ -65,11 +65,13 @@ window.AIQ = window.AIQ || {};
     for (const camp of A.CAMPAIGNS) {
       if (!camp.levels[0] || !camp.levels[0].all) continue;
       for (const Lv of camp.levels) for (const q of Lv.all()) {
-        const id = q.cid && q.cid[0]; if (!id || seen.has(id)) continue;
+        const id = q.cid && q.cid[0]; if (!id) continue;
         const kind = q.clue ? "clue" : Lv.kind, topic = { capital: "capital", city: "city", landmark: "landmark", country: "country", place: "landmark", nature: "nature", water: "nature", strait: "nature", battle: "history", event: "history", clue: "clue" }[kind];
         if (!topic) continue;
         if (topic !== "clue" && (A.PLACES || []).length > 200) continue;               // con el banco nuevo, solo aportan las pistas
-        seen.add(id); add(topic, clamp(Lv.tier || 0, 0, 2), { ...q, kind, topic, tier: clamp(Lv.tier || 0, 0, 2) });
+        const key = topic === "clue" ? "clue:" + id : id;                              // una pista es otra pregunta aunque su respuesta ya este en el banco (Las Vegas...): antes se descartaban 78 de 80 y la ronda 10 salia con 2 lugares
+        if (seen.has(key)) continue;
+        seen.add(key); add(topic, clamp(Lv.tier || 0, 0, 2), { ...q, kind, topic, tier: clamp(Lv.tier || 0, 0, 2) });
       }
     }
     return POOLS;
@@ -368,7 +370,7 @@ window.AIQ = window.AIQ || {};
         if (run.lives <= 0) run.infOver = true;                                     // se acaban las provisiones: la siguiente pantalla cobra la expedicion
       }
     }
-    persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length });
+    persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length, inf: run.inf ? run.qi : 0 });   // inf: preguntas aguantadas en el modo infinito
     const kind = res.km == null ? "timeout" : res.dist >= 960 ? "bull" : res.dist < 400 ? "miss" : res.streak >= 3 ? "streak" : res.dist >= 750 ? "good" : null;
     clearTimeout(reactT); if (kind) reactT = setTimeout(() => A.dealer.react(kind), 1300);
   };

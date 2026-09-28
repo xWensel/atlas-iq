@@ -156,6 +156,18 @@ window.AIQ = window.AIQ || {};
       add({ id: id + "~h", type: "history", name: p.name, wiki: p.wiki, lat: p.lat, lon: p.lon, country: p.country, fact: { en: "", es: "" }, rarity: 2, src: "tier", tier: 2, parent: id, nogeo: p.nogeo });
       add({ id: id + "~k", type: "curiosity", name: p.name, wiki: p.wiki, lat: p.lat, lon: p.lon, country: p.country, fact: { en: "", es: "" }, rarity: 3, src: "tier", tier: 3, parent: id, nogeo: p.nogeo });
     });
+    // 7) solo existen las tarjetas que alguna pregunta puede desbloquear (A.codexUnlock): los restos del antiguo modo Extendido
+    //    ("New York" junto a "New York City", el pueblo de cada batalla...) no salen en ninguna pregunta y dejaban imposible el logro Completista
+    const asked = new Set();
+    (A.PLACES || []).forEach(([id, kind, , lat]) => { if (kind === "country" ? world.byName[id.slice(2)] : lat != null) asked.add(id); });   // las mismas que acepta placeQ (js/adventure.js)
+    (A.CLASSIC || []).forEach(g => g.levels.forEach(L => L.dests.forEach(d => asked.add(d.ck || A.ckey(L.bonus && d.f ? d.f : d.n)))));
+    const reach = new Set();
+    asked.forEach(id => {
+      const e = E[id]; if (!e) return;
+      [id, id + "~h", id + "~k", e.country ? "c:" + e.country : null].forEach(x => { if (x && E[x]) reach.add(x); });
+      (chain[id] || []).concat(e.country ? chain["c:" + e.country] || [] : []).forEach(x => { if (E[x]) reach.add(x); });
+    });
+    for (let i = order.length - 1; i >= 0; i--) if (!reach.has(order[i])) { delete E[order[i]]; order.splice(i, 1); }
     // los personajes sin nada relacionado no existen; el resto se numera
     order.forEach((id, i) => { E[id].no = i + 1; });
   }
