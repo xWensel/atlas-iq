@@ -1,5 +1,6 @@
-/* Solo para desarrollo: jugador automatico de la Aventura para equilibrar dificultad. Uso (consola): bot2(errKm, deck, asc, seed) -> luego leer window.botLog / window.botDone */
-window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6) {
+/* Solo para desarrollo: jugador automatico de la Aventura para equilibrar dificultad. Uso (consola): bot2(errKm, deck, asc, seed) -> luego leer window.botLog / window.botDone
+   bribe: en el Campamento soborna del truco mas barato al mas caro mientras le alcance. bot2(80, "explorer", 0, null, 0, true) es el jugador que solo soborna */
+window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6, bribe = false) {
   window.botLog = []; window.botDone = false; window.botStop = false;
   const A = window.AIQ, D = A._debug; A.core.prepareRun(); A.adv.begin({ deck, asc, seed: seed || ("bot-" + errKm + Math.random()) });
   const dest = (lat, lon, brg, km) => { const R = Math.PI / 180, d = km / 6371, la = lat * R, lo = lon * R, b = brg * R; const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b)); const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); return { lat: la2 / R, lon: ((lo2 / R + 540) % 360) - 180 }; };
@@ -25,7 +26,8 @@ window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6) {
       else if (S.phase === "shop") {
         const sk = run.act + ":" + run.round + ":" + run.attempt + ":" + run.phase; if (sk !== lastShop) { lastShop = sk; buys = 0; }
         let done = false;
-        if (buys < buyN) for (const of of document.querySelectorAll(".offer:not(.sold):not(.life)")) { const btn = of.querySelector(".buy:not(:disabled)"); if (!btn) continue; const c = parseInt((btn.textContent.match(/\d+/) || [0])[0]); if (run.phase === "chest" || run.coins >= c) { buys++; btn.click(); done = true; break; } }
+        if (bribe) { const b = [...document.querySelectorAll(".ch-buy")].map(el => ({ el, c: parseInt(el.querySelector(".cb-p").textContent.replace(/\D/g, "")) })).filter(x => x.c <= run.coins).sort((x, y) => x.c - y.c)[0]; if (b) { window.botLog.push(`A${run.act + 1}R${run.round + 1} soborno ${b.c}`); b.el.click(); done = true; } }
+        if (!done && buys < buyN) for (const of of document.querySelectorAll(".offer:not(.sold):not(.life)")) { const btn = of.querySelector(".buy:not(:disabled)"); if (!btn) continue; const c = parseInt((btn.textContent.match(/\d+/) || [0])[0]); if (run.phase === "chest" || run.coins >= c) { buys++; btn.click(); done = true; break; } }
         if (!done) document.getElementById("goRound")?.click();
       }
       else if (S.phase === "title") { window.botDone = true; return; }

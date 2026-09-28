@@ -711,19 +711,22 @@ window.AIQ = window.AIQ || {};
       if (!main) return `<div class="nx-card far${cf.boss ? " boss" : ""}">${head}<div class="nx-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div></div>`;
       const lis = cf.list.map(c => { const d = A.CHAL[c.id];
         return `<li class="nx-row k-${d.kind}"><span class="nx-ic">${ic(d.ico)}</span><div class="nx-body"><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><p>${A.tx(d.d)}</p><div class="nx-foot">
-          <button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este truco de la próxima ronda", "Bribe the dealer: removes this trick from the next round")}">${A.T("Sobornar", "Bribe")} <span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button></div></div></li>`; }).join("")
+          <button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este truco de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this trick from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")} <span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button></div></div></li>`; }).join("")
         + done.map(id => `<li class="nx-row done"><span class="nx-ic">${ic(A.CHAL[id].ico)}</span><div class="nx-body"><b>${A.tx(A.CHAL[id].n)}</b><em class="nx-have">${A.T("Sobornado", "Bribed")}</em></div></li>`).join("");
       return `<div class="nx-card${cf.boss ? " boss" : ""}">${head}${lis ? `<ul class="nx-list">${lis}</ul>` : `<p class="nx-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
     }).join("");
     return `<div class="tb-next">${html}</div>`;
   };
-  /* el soborno sube con el acto como todo lo demas: quitar un truco a ultima hora sale caro; la contra comprada a tiempo sale mas a cuenta si el truco se repite */
-  const bribePrice = (c, boss) => { const d = A.CHAL[c.id]; return Math.max(2, Math.round((2 + (c.lv || 1) + (d.kind === "map" ? 1 : 0)) * (boss ? 2 : 1) * ascFx(run.asc).price * inflation())); };
+  /* v0.3.1: sobornar es caro y el crupier sube la tarifa. Base: 3 + 2 por nivel del truco (+1 si es de mapa), el doble en el jefe, y sube con el acto
+     y la ascension como todo lo demas. Cada soborno pagado en la expedicion encarece los siguientes un 50 % del precio base (barajar no lo reinicia).
+     Con dev/bot.js (bribe, sin cartas), quien solo sobornaba quitaba el 58-67 % de los trucos (todos los del acto I); ahora el 17-21 %:
+     los trucos son el juego, y la contra comprada a tiempo sale mucho mas a cuenta */
+  const bribePrice = (c, boss) => { const d = A.CHAL[c.id]; return Math.max(2, Math.round((3 + 2 * (c.lv || 1) + (d.kind === "map" ? 1 : 0)) * (boss ? 2 : 1) * (1 + 0.5 * (run.bribeN || 0)) * ascFx(run.asc).price * inflation())); };
   const chalRerollCost = () => 4 + 2 * ((run.salt && run.salt[roundNo()]) || 0);
   function bribe(id) {
     const r = roundNo(), cf = chalFor(r), c = cf.list.find(x => x.id === id); if (!c) return; const cost = bribePrice(c, cf.boss);
     if (run.coins < cost) { A.sfx.deny(); flash(A.T("No te alcanzan los doblones.", "Not enough doubloons.")); return; }
-    run.coins -= cost; run.bribed = run.bribed || {}; (run.bribed[r] = run.bribed[r] || []).push(id); A.sfx.buy(); persist(); A.ach.emit("adv", { kind: "bribe" });
+    run.coins -= cost; run.bribeN = (run.bribeN || 0) + 1; run.bribed = run.bribed || {}; (run.bribed[r] = run.bribed[r] || []).push(id); A.sfx.buy(); persist(); A.ach.emit("adv", { kind: "bribe" });
     A.dealer.enable(true); A.dealer.say(A.dealer.line("bribe"), { mood: "angry", hold: 1800 }); renderShop(run.phase === "chest");
   }
   function rerollChal() {
