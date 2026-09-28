@@ -396,3 +396,31 @@ body.vd-on #hud, body.vd-on .dock-sh, body.vd-on .rail-sh, body.vd-on .note-sh {
   #dock button, #rail button { width: 38px; height: 38px; } #dock svg:not(.ic), #rail svg:not(.ic) { width: 20px; height: 20px; } #dock .ic, #rail .ic { width: 24px; height: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; } }
+
+/* ---- ajustes sin scroll en escritorio (1280x720 en adelante, 12 idiomas): tarjetas compactas, idiomas 6x2, General en 3 columnas e Imagen en 2 ---- */
+@media (min-width: 901px) {
+  #settings .set-top { padding-block: 12px; }
+  #settings .set-body { padding-block: 12px; }
+  #settings .set-keys { padding-block: 10px 12px; }
+  .set-grid { gap: 14px; }
+  .set-card { padding: 16px 20px 18px; border-radius: 16px; }
+  .set-card h3 { margin-bottom: 10px; }
+  .set-card .row-sw, .set-card .fader { padding: 6px 0; }
+  .set-card > .row-sw:first-child, .set-card > .fader:first-child, .set-card > h3 + .row-sw, .set-card > h3 + .fader { padding-top: 0; }
+  .set-card > .row-sw:last-child, .set-card > .fader:last-child { padding-bottom: 0; }
+  .set-note { margin-top: 8px; }
+  .seg { padding: 4px; } .seg > i { top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / var(--n)); } .seg button { min-height: 34px; padding: 7px 4px; }
+  .set-pane[data-pane="general"] .set-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.3fr); align-items: stretch; }
+  .set-pane[data-pane="general"] .set-card:has(.row-sw) { order: 3; }
+  #settings .langgrid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  #settings .langgrid button { padding: 10px 6px 9px; gap: 6px; }
+  #settings .lang-flag { width: 32px; }
+  .set-2col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .set-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .fader[data-range] { grid-template-columns: minmax(7em, auto) minmax(0, 1fr) auto; grid-template-areas: "l i o" ". t ."; column-gap: 14px; }
+  .fader[data-range] label { grid-area: l; } .fader[data-range] input { grid-area: i; margin: 0; } .fader[data-range] output { grid-area: o; min-width: 52px; } .fader[data-range] .ftrack { grid-area: t; }
+  .row-sw.col { gap: 8px; }
+  .seg.s4 button { font-size: clamp(9px, 2.8cqw, 13px); }
+}
+/* la entrada de cada pestana se desliza en horizontal: en vertical desbordaba 8 px y hacia parpadear la barra de scroll */
+@keyframes set-pane-in { from { opacity: 0; transform: translateX(10px); } }
