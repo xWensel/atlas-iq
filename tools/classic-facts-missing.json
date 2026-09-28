@@ -1,0 +1,556 @@
+{
+ "getty-center": {
+  "en": "Art museum in Los Angeles, California.",
+  "langs": [
+   "it",
+   "pl"
+  ]
+ },
+ "taos-pueblo": {
+  "en": "Tiwa Pueblo in New Mexico; oldest U.S. city.",
+  "langs": [
+   "es",
+   "ko",
+   "pl"
+  ]
+ },
+ "fort-knox": {
+  "en": "United States Army post in Kentucky, United States.",
+  "langs": [
+   "ja"
+  ]
+ },
+ "everglades": {
+  "en": "Flooded grassland in Florida, United States.",
+  "langs": [
+   "de"
+  ]
+ },
+ "sequoia-national-park": {
+  "en": "National park in California, United States.",
+  "langs": [
+   "de"
+  ]
+ },
+ "antelope-canyon": {
+  "en": "Landform in the Navajo Nation, Arizona.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "griffith-observatory": {
+  "en": "Observatory in Los Angeles, California.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "cloud-gate": {
+  "en": "Sculpture by Anish Kapoor in Chicago.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "alamo-mission": {
+  "en": "Fort in San Antonio, Texas, U.S.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "redwood-national-and-state-parks": {
+  "en": "Group of national and state parks in California, United States.",
+  "langs": [
+   "es",
+   "fr",
+   "pt",
+   "de",
+   "it",
+   "pl"
+  ]
+ },
+ "horseshoe-bend": {
+  "en": "Landform in the Colorado River, Coconino County, Arizona.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "pamukkale": {
+  "en": "Natural site in Denizli Province in southwestern Turkey.",
+  "langs": [
+   "ja"
+  ]
+ },
+ "zhangjiajie-national-forest-park": {
+  "en": "National forest in Hunan, China.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "annapurna": {
+  "en": "10th-highest mountain on Earth.",
+  "langs": [
+   "ja",
+   "ru",
+   "pl"
+  ]
+ },
+ "merlion": {
+  "en": "Official mascot of Singapore.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "amazon-rainforest": {
+  "en": "Large rainforest in South America.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "monte-alban": {
+  "en": "Pre-Columbian archaeological site in Mexico.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "perito-moreno-glacier": {
+  "en": "Glacier located in the Patagonian Andes.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "sacsayhuaman": {
+  "en": "Archaeological site near Cusco, Peru.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "tulum": {
+  "en": "Maya site in Quintana Roo, Mexico.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "ollantaytambo": {
+  "en": "Archaeological site in Peru.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "palacio-de-bellas-artes": {
+  "en": "Cultural centre in Mexico City.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "la-boca": {
+  "en": "Barrio in Buenos Aires, Argentina.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "las-lajas-sanctuary": {
+  "en": "Basilica church in Nariño, Colombia.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "frida-kahlo-museum": {
+  "en": "Art museum in Mexico City.",
+  "langs": [
+   "ko",
+   "pl"
+  ]
+ },
+ "jesuit-missions-of-the-guaranis": {
+  "en": "UNESCO World Heritage Site in Misiones Province, Argentina.",
+  "langs": [
+   "zh",
+   "pl"
+  ]
+ },
+ "palacio-barolo": {
+  "en": "Office building in Buenos Aires, Argentina.",
+  "langs": [
+   "ko",
+   "pl"
+  ]
+ },
+ "plaza-de-mayo": {
+  "en": "Public square in Buenos Aires, Argentina.",
+  "langs": [
+   "ja"
+  ]
+ },
+ "vinales-valley": {
+  "en": "Karstic depression in Cuba.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "kaieteur-falls": {
+  "en": "Waterfall in the Essequibo.",
+  "langs": [
+   "ko",
+   "ja"
+  ]
+ },
+ "cano-cristales": {
+  "en": "River in Colombia.",
+  "langs": [
+   "pt",
+   "zh",
+   "ko",
+   "ja",
+   "pl"
+  ]
+ },
+ "laguna-colorada": {
+  "en": "Shallow salt lake in the southwest of the altiplano of Bolivia.",
+  "langs": [
+   "pt",
+   "ko",
+   "pl"
+  ]
+ },
+ "copper-canyon": {
+  "en": "Series of large canyons in Chihuahua, Mexico.",
+  "langs": [
+   "it"
+  ]
+ },
+ "corcovado-national-park": {
+  "en": "National park in Costa Rica.",
+  "langs": [
+   "ko",
+   "ja"
+  ]
+ },
+ "masaya-volcano": {
+  "en": "Active complex volcano in Nicaragua.",
+  "langs": [
+   "pt",
+   "pl"
+  ]
+ },
+ "isla-mujeres": {
+  "en": "Island off the Yucatán Peninsula in Mexico.",
+  "langs": [
+   "ko",
+   "ja"
+  ]
+ },
+ "chapultepec-castle": {
+  "en": "Museum in Mexico City, Mexico.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "recoleta-cemetery": {
+  "en": "Cemetery located in Buenos Aires, Argentina.",
+  "langs": [
+   "zh",
+   "ko",
+   "ja"
+  ]
+ },
+ "basilica-of-our-lady-of-guadalupe": {
+  "en": "Church in Mexico City.",
+  "langs": [
+   "ko",
+   "ja"
+  ]
+ },
+ "obelisco-de-buenos-aires": {
+  "en": "Architectural structure.",
+  "langs": [
+   "ko",
+   "ja"
+  ]
+ },
+ "kuelap": {
+  "en": "Archaeological site in Peru.",
+  "langs": [
+   "it",
+   "ko",
+   "ja",
+   "pl"
+  ]
+ },
+ "puerto-madero": {
+  "en": "Neighbourhood of Buenos Aires, Argentina.",
+  "langs": [
+   "zh",
+   "ko",
+   "ja"
+  ]
+ },
+ "palacio-da-alvorada": {
+  "en": "Official residence of the President of Brazil.",
+  "langs": [
+   "ko",
+   "pl"
+  ]
+ },
+ "torres-del-paine": {
+  "en": "Mountain group in Torres del Paine, Chile.",
+  "langs": [
+   "ja",
+   "ru"
+  ]
+ },
+ "oscar-niemeyer-s-niteroi-museum": {
+  "en": "Art gallery in Rio de Janeiro, Brazil.",
+  "langs": [
+   "zh",
+   "pl"
+  ]
+ },
+ "el-capitolio": {
+  "en": "Former seat of the Congress of Cuba.",
+  "langs": [
+   "ko",
+   "ja",
+   "pl"
+  ]
+ },
+ "fortaleza-ozama": {
+  "en": "UNESCO World Heritage Site in Santo Domingo, Dominican Republic.",
+  "langs": [
+   "it",
+   "ja"
+  ]
+ },
+ "malecon": {
+  "en": "Broad esplanade, roadway and seawall in Havana, Cuba.",
+  "langs": [
+   "ko",
+   "ja"
+  ]
+ },
+ "bondi-beach": {
+  "en": "Suburb of Sydney, New South Wales, Australia.",
+  "langs": [
+   "fr",
+   "ru"
+  ]
+ },
+ "great-ocean-road": {
+  "en": "Road in Victoria, Australia.",
+  "langs": [
+   "es"
+  ]
+ },
+ "port-arthur": {
+  "en": "UNESCO World Heritage Site in Australia.",
+  "langs": [
+   "it"
+  ]
+ },
+ "blue-mountains": {
+  "en": "Mountain range in Australia.",
+  "langs": [
+   "ja"
+  ]
+ },
+ "moorea": {
+  "en": "Island in French Polynesia.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "fiordland-national-park": {
+  "en": "National park on the South Island of New Zealand.",
+  "langs": [
+   "pt"
+  ]
+ },
+ "aitutaki": {
+  "en": "Island in the Cook Islands.",
+  "langs": [
+   "ko"
+  ]
+ },
+ "abel-tasman-national-park": {
+  "en": "National park in New Zealand.",
+  "langs": [
+   "pt"
+  ]
+ },
+ "rottnest-island": {
+  "en": "Island off the coast of Western Australia.",
+  "langs": [
+   "pt",
+   "ko"
+  ]
+ },
+ "rock-islands": {
+  "en": "Collection of reef islands in Palau.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "waitangi-treaty-grounds": {
+  "en": "Locality in the Bay of Islands, North Island, New Zealand.",
+  "langs": [
+   "pt",
+   "zh",
+   "ja"
+  ]
+ },
+ "cockatoo-island": {
+  "en": "Heritage listed island in Sydney Harbour.",
+  "langs": [
+   "pt"
+  ]
+ },
+ "auckland-harbour-bridge": {
+  "en": "Road bridge in Auckland, New Zealand.",
+  "langs": [
+   "ja",
+   "ru",
+   "pl"
+  ]
+ },
+ "queen-victoria-building": {
+  "en": "Building in the central business district of Sydney, Australia.",
+  "langs": [
+   "pt",
+   "ru",
+   "pl"
+  ]
+ },
+ "the-rocks": {
+  "en": "Suburb of Sydney, Australia.",
+  "langs": [
+   "es",
+   "de",
+   "ru"
+  ]
+ },
+ "federation-square": {
+  "en": "Major public space and cultural precinct in Melbourne, Australia.",
+  "langs": [
+   "es",
+   "de",
+   "it",
+   "ja",
+   "pl"
+  ]
+ },
+ "fremantle-prison": {
+  "en": "Former prison in Fremantle, Western Australia.",
+  "langs": [
+   "pt",
+   "it",
+   "ko",
+   "ru"
+  ]
+ },
+ "hyde-park-barracks": {
+  "en": "Heritage-listed building in Sydney, New South Wales, Australia.",
+  "langs": [
+   "pt",
+   "it",
+   "zh",
+   "ko",
+   "ru",
+   "pl"
+  ]
+ },
+ "larnach-castle": {
+  "en": "Mock castle in Dunedin, New Zealand.",
+  "langs": [
+   "fr",
+   "it",
+   "ru",
+   "pl"
+  ]
+ },
+ "hobbiton-movie-set": {
+  "en": "Movie Set / Tourist Attraction in Waikato, New Zealand.",
+  "langs": [
+   "ja",
+   "pl"
+  ]
+ },
+ "rockhampton": {
+  "en": "City in Queensland, Australia.",
+  "langs": [
+   "pt"
+  ]
+ },
+ "franz-josef-glacier": {
+  "en": "Glacier in the Southern Alps, New Zealand.",
+  "langs": [
+   "pl"
+  ]
+ },
+ "sutherland-falls": {
+  "en": "Waterfall in New Zealand.",
+  "langs": [
+   "ja"
+  ]
+ },
+ "tasman-glacier": {
+  "en": "Glacier in New Zealand.",
+  "langs": [
+   "pt"
+  ]
+ },
+ "whitsunday-islands": {
+  "en": "Island group in Queensland, Australia.",
+  "langs": [
+   "es",
+   "ko",
+   "ja"
+  ]
+ },
+ "wave-rock": {
+  "en": "Rock formation in Western Australia.",
+  "langs": [
+   "ja"
+  ]
+ },
+ "bay-of-islands": {
+  "en": "Area in the Far North District, New Zealand.",
+  "langs": [
+   "pt",
+   "ja"
+  ]
+ },
+ "pinnacles-desert": {
+  "en": "Iimestone formation in Western Australia.",
+  "langs": [
+   "de",
+   "zh",
+   "ko",
+   "ja"
+  ]
+ },
+ "jervis-bay": {
+  "en": "Oceanic bay in Jervis Bay Territory, New South Wales.",
+  "langs": [
+   "pt",
+   "ko",
+   "ja",
+   "ru"
+  ]
+ },
+ "cradle-mountain": {
+  "en": "Mountain in Tasmania.",
+  "langs": [
+   "pt",
+   "ko"
+  ]
+ },
+ "daintree-rainforest": {
+  "en": "Rainforest in Australia.",
+  "langs": [
+   "es",
+   "pt",
+   "zh",
+   "ja",
+   "ru",
+   "pl"
+  ]
+ }
+}

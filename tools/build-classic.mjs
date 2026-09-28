@@ -107,18 +107,34 @@ function destName(p) {
   const country = qid && PCOUNTRY[qid] ? PCOUNTRY[qid].en : null;
   return country && country !== en ? `${en}, ${country}` : en;
 }
-/* dato curioso en cada idioma: la misma descripcion corta de data/wiki/<l>-s.json (si falta, el juego cae al ingles) */
+/* dato curioso en cada idioma, corto como el ingles: la descripcion de data/wiki/<l>.json[id][1]; si falta, la
+ * 1.a frase de la nota de <l>-s.json y, si no, la del articulo (<l>.json[id][2]). Los que se queden sin nada caen
+ * al ingles y se listan en tools/classic-facts-missing.json para traducirlos a mano. */
 const FACT_LANGS = ["es", "fr", "pt", "de", "it", "zh", "ko", "ja", "ru", "pl"];
-const SHORT_ALL = Object.fromEntries(FACT_LANGS.filter(l => fs.existsSync(path.join(ROOT, "data", "wiki", `${l}-s.json`))).map(l => [l, JSON.parse(read(`data/wiki/${l}-s.json`))]));
+const wikiFile = f => (fs.existsSync(path.join(ROOT, "data", "wiki", f)) ? JSON.parse(read(`data/wiki/${f}`)) : {});
+const SHORT_ALL = Object.fromEntries(FACT_LANGS.map(l => [l, wikiFile(`${l}-s.json`)]));
+const WIKI_ALL = Object.fromEntries(FACT_LANGS.map(l => [l, wikiFile(`${l}.json`)]));
+const FACT_MISSING = {};
+const FACT_FIX = fs.existsSync(path.join(ROOT, "tools", "classic-facts-fix.json")) ? JSON.parse(read("tools/classic-facts-fix.json")) : {};   // {id: {lang: "texto"}}: traducciones a mano, mandan sobre Wikipedia
 function firstSentenceL(s) {
   s = String(s || "").trim();
   const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?(?:[.!?](?=\s|$)|[。！？])/);
   const cut = (m ? m[0] : s).replace(/\u0001/g, ".");
   return (cut.length < 4 ? s : cut).replace(/\.\.+/g, ".").slice(0, 200);
 }
+const clip = (s, l) => { s = String(s || "").trim(); if (!s) return ""; const cjk = l === "zh" || l === "ja"; s = s.replace(/[.。]$/, ""); return s[0].toLocaleUpperCase() + s.slice(1) + (/[!?！？]$/.test(s) ? "" : cjk ? "。" : "."); };
+function factIn(l, id) {
+  if (FACT_FIX[id] && FACT_FIX[id][l]) return FACT_FIX[id][l];
+  const w = WIKI_ALL[l][id], desc = w && w[1];
+  if (desc && desc.length >= 4) return clip(desc, l);
+  if (SHORT_ALL[l][id]) return firstSentenceL(SHORT_ALL[l][id]);
+  if (w && w[2]) return firstSentenceL(w[2]);
+  return null;
+}
 function mkDest(p) {
   const f6 = {};
-  for (const l in SHORT_ALL) { const t = SHORT_ALL[l][p[0]]; if (t) f6[l] = firstSentenceL(t); }
+  for (const l of FACT_LANGS) { const t = factIn(l, p[0]); if (t) f6[l] = t; else (FACT_MISSING[p[0]] ||= { en: firstSentence(FACTS_EN[p[0]]), langs: [] }).langs.push(l); }
+  if (FACT_FIX[p[0]] && FACT_FIX[p[0]]["es-419"]) f6["es-419"] = FACT_FIX[p[0]]["es-419"];   // solo a mano: si no, el juego usa el de es
   return { n: destName(p), lat: p[3], lon: p[4], f: FACT_OVERRIDES[p[0]] || firstSentence(FACTS_EN[p[0]]), f6 };
 }
 
@@ -307,5 +323,7 @@ const GAMES = {
 const arr = Object.entries(GAMES).map(([id, g]) => ({ id, title: g.title, home: { lat: 0.0, lon: 0.0, zoom: 1.0 }, levels: g.levels }));
 const header = `/* Modo Clasico: contenido propio, generado por tools/build-classic.mjs desde data/places.js + data/wiki (Wikipedia/Wikidata). No copia lugares, puntuacion ni datos del Traveler IQ Challenge original. */\n`;
 fs.writeFileSync(path.join(ROOT, "data", "classic.js"), header + "window.AIQ = window.AIQ || {};\nwindow.AIQ.CLASSIC = " + JSON.stringify(arr) + ";\n");
+fs.writeFileSync(path.join(ROOT, "tools", "classic-facts-missing.json"), JSON.stringify(FACT_MISSING, null, 1));
+console.log(`Datos curiosos sin traduccion propia: ${Object.keys(FACT_MISSING).length} lugares (tools/classic-facts-missing.json)`);
 
 for (const [id, g] of Object.entries(GAMES)) console.log(id.padEnd(20), String(g.levels.length).padStart(2), "niveles,", String(g.levels.reduce((a, l) => a + l.dests.length, 0)).padStart(4), "preguntas:", g.levels.map(l => l.dests.length).join(" "));

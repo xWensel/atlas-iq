@@ -1,4 +1,9 @@
 {
+ "amarillo": [
+  "Amarillo, Texas",
+  0,
+  0
+ ],
  "amazon-rainforest": [
   "Amazon rainforest",
   -3.47,
@@ -8,6 +13,11 @@
   "Ankara",
   39.93,
   32.85
+ ],
+ "annapurna": [
+  "Annapurna",
+  28.5961,
+  83.8203
  ],
  "atlantic-forest-reserves": [
   "Atlantic Forest South-East Reserves",
@@ -24,6 +34,11 @@
   51.178,
   -115.571
  ],
+ "bangor": [
+  "Bangor, Maine",
+  0,
+  0
+ ],
  "bao-ensi": [
   "Porcelain Tower of Nanjing",
   32,
@@ -39,10 +54,20 @@
   50.912,
   0.487
  ],
+ "battle-of-las-navas-de-tolosa": [
+  "Battle of Las Navas de Tolosa",
+  38.2833,
+  -3.5833
+ ],
  "battle-of-megiddo": [
   "Battle of Megiddo (15th century BC)|Battle of Megiddo (1457 BC)",
   32.585,
   35.185
+ ],
+ "battle-of-the-yarmouk": [
+  "Battle of the Yarmuk",
+  32.8141,
+  35.9548
  ],
  "belize-barrier-reef-reserve": [
   "Belize Barrier Reef",
@@ -59,25 +84,40 @@
   4.6019,
   -74.0722
  ],
+ "bomb-dropped-on-hiroshima": [
+  "Atomic bombings of Hiroshima and Nagasaki",
+  0,
+  0
+ ],
+ "bourbon-street": [
+  "Bourbon Street",
+  29.9584,
+  -90.0659
+ ],
  "bucuresci": [
   "Bucharest",
   44.44,
   26.1
+ ],
+ "c:Ireland": [
+  "Republic of Ireland",
+  0,
+  0
  ],
  "canaima-nat-l-park": [
   "Canaima National Park",
   4.48,
   -60.65
  ],
- "cartagena-s-walled-city": [
-  "Port, Fortresses and Group of Monuments, Cartagena|Walled City of Cartagena",
-  10.4236,
-  -75.5507
- ],
  "cartagena": [
   "Cartagena, Colombia",
   10.391,
   -75.479
+ ],
+ "cartagena-s-walled-city": [
+  "Port, Fortresses and Group of Monuments, Cartagena|Walled City of Cartagena",
+  10.4236,
+  -75.5507
  ],
  "carthage": [
   "Carthage",
@@ -89,10 +129,25 @@
   32.7765,
   -79.9311
  ],
+ "chimney-rock": [
+  "Chimney Rock (Nebraska)",
+  0,
+  0
+ ],
  "cinderella-castle": [
   "Cinderella Castle",
   28.4195,
   -81.5812
+ ],
+ "city-of-san-fernando": [
+  "San Fernando, La Union",
+  0,
+  0
+ ],
+ "columbus-s-first-landfall": [
+  "Guanahani",
+  0,
+  0
  ],
  "copacabana": [
   "Copacabana, Rio de Janeiro",
@@ -109,25 +164,55 @@
   -31.4201,
   -64.1888
  ],
+ "corvallis": [
+  "Corvallis, Oregon",
+  0,
+  0
+ ],
+ "cristo-rey": [
+  "Cristo Rey (Mexican statue)",
+  21.012,
+  -101.369
+ ],
  "cuenca": [
   "Cuenca, Spain",
   40.07,
   -2.137
+ ],
+ "darien-nat-l-park": [
+  "Darién National Park|Darién National Park and Biosphere Reserve",
+  7.7361,
+  -77.5472
  ],
  "dead-sea": [
   "Dead Sea",
   31.5,
   35.5
  ],
+ "discovery-of-tutankhamun-s-tomb": [
+  "KV62",
+  0,
+  0
+ ],
  "faro": [
   "Faro, Portugal",
   37.019,
   -7.93
  ],
+ "first-powered-airplane-flight": [
+  "Wright Flyer",
+  0,
+  0
+ ],
  "fortress-of-derbent": [
   "Derbent",
   42.05,
   48.3
+ ],
+ "gettysburg": [
+  "Gettysburg, Pennsylvania",
+  0,
+  0
  ],
  "glacier-bay": [
   "Glacier Bay National Park and Preserve",
@@ -144,20 +229,50 @@
   -2,
   36
  ],
+ "great-smoky-mountains": [
+  "Great Smoky Mountains National Park|Great Smoky Mountains",
+  35.6118,
+  -83.4895
+ ],
+ "guanajuato": [
+  "Guanajuato City|Guanajuato (city)",
+  21.019,
+  -101.2574
+ ],
  "halifax": [
   "Halifax, Nova Scotia",
   44.6488,
   -63.5752
+ ],
+ "hershey-s-chocolate-world": [
+  "Hershey's Chocolate World",
+  0,
+  0
+ ],
+ "hobbiton-movie-set": [
+  "Hobbiton Movie Set",
+  -37.8721,
+  175.6833
  ],
  "hoi-an": [
   "Hội An (city)",
   15.8797,
   108.3319
  ],
+ "hollywood-walk-of-fame": [
+  "Hollywood Walk of Fame",
+  34.1016,
+  -118.3267
+ ],
  "holy-feet-of-sri-gomatheswar": [
   "Gommateshwara statue",
   12.854,
   76.485
+ ],
+ "hyde-park-barracks": [
+  "Hyde Park Barracks, Sydney",
+  -33.8696,
+  151.2128
  ],
  "itsukushima-shrine": [
   "Itsukushima Shrine",
@@ -169,20 +284,50 @@
   29.27,
   47.94
  ],
+ "jesuit-missions": [
+  "Jesuit Reductions",
+  0,
+  0
+ ],
  "jesuit-missions-of-la-santisima": [
   "Jesuit Missions of La Santísima Trinidad de Paraná and Jesús de Tavarangué|Jesuit Missions of La Santísima Trinidad de Paraná|Jesús de Tavarangué",
   -27.13,
   -55.7
+ ],
+ "jesuit-missions-of-the-guaranis": [
+  "Jesuit Missions of the Guaranis|San Ignacio Miní",
+  -27.2556,
+  -55.5322
  ],
  "jonotega": [
   "Jinotega",
   13.09,
   -86
  ],
+ "jumeirah-mosque": [
+  "Jumeirah Mosque",
+  0,
+  0
+ ],
+ "kaabong": [
+  "Kaabong",
+  0,
+  0
+ ],
+ "king-abdul-aziz-mosque": [
+  "King Abdulaziz Mosque",
+  0,
+  0
+ ],
  "kitty-hawk": [
   "Kitty Hawk, North Carolina",
   36.064,
   -75.706
+ ],
+ "kokoda-track": [
+  "Kokoda Track",
+  -9,
+  147.6
  ],
  "koktyube": [
   "Kok Tobe",
@@ -204,10 +349,30 @@
   41.3797,
   2.1746
  ],
+ "lahore-fort": [
+  "Lahore Fort",
+  0,
+  0
+ ],
  "lake-louise": [
   "Lake Louise (Alberta)",
   51.4254,
   -116.1773
+ ],
+ "las-vegas-strip": [
+  "Las Vegas Strip",
+  36.1147,
+  -115.1728
+ ],
+ "levuka": [
+  "Levuka",
+  -17.6833,
+  178.8333
+ ],
+ "lombard-street": [
+  "Lombard Street (San Francisco)",
+  37.8021,
+  -122.4187
  ],
  "maiden-s-tower": [
   "Maiden Tower (Baku)|Maiden Tower|Maiden Tower, Baku",
@@ -234,6 +399,11 @@
   -32.889,
   -68.845
  ],
+ "merida": [
+  "Mérida, Yucatán",
+  20.9672,
+  -89.6236
+ ],
  "mezquita-catedral-de-cordoba": [
   "Mosque–Cathedral of Córdoba",
   37.879,
@@ -243,6 +413,11 @@
   "Moai",
   -27.1127,
   -109.3497
+ ],
+ "montana": [
+  "Montana",
+  0,
+  0
  ],
  "monuments-of-queretaro": [
   "Historic Monuments Zone of Querétaro",
@@ -279,15 +454,35 @@
   19.5667,
   -72.2333
  ],
+ "new-york": [
+  "New York City",
+  0,
+  0
+ ],
  "north-atlantic-ocean": [
   "Atlantic Ocean",
   41.73,
   -49.95
  ],
+ "oaxaca": [
+  "Oaxaca City|Oaxaca de Juárez",
+  17.0606,
+  -96.7253
+ ],
  "odesa": [
   "Odesa",
   46.4825,
   30.7233
+ ],
+ "old-city-of-acre": [
+  "Acre, Israel",
+  0,
+  0
+ ],
+ "old-city-of-sana-a": [
+  "Old City of Sana'a",
+  0,
+  0
  ],
  "opium-wars": [
   "Opium Wars",
@@ -299,6 +494,11 @@
   -22.9078,
   -43.1258
  ],
+ "oshkosh": [
+  "Oshkosh, Wisconsin",
+  0,
+  0
+ ],
  "pantanal-coservation-area": [
   "Pantanal",
   -17.45,
@@ -308,6 +508,11 @@
   "Pantheon, Rome",
   41.8986,
   12.4769
+ ],
+ "penang-bridge": [
+  "Penang Bridge",
+  0,
+  0
  ],
  "petra": [
   "Petra",
@@ -328,6 +533,11 @@
   "Portland, Oregon",
   45.5152,
   -122.6784
+ ],
+ "puebla": [
+  "Puebla (city)|Puebla City",
+  19.0414,
+  -98.2063
  ],
  "queenstown": [
   "Queenstown, New Zealand",
@@ -379,15 +589,15 @@
   -12.9714,
   -38.5014
  ],
- "san-juan-argentina": [
-  "San Juan, Argentina",
-  -31.5375,
-  -68.5364
- ],
  "san-juan": [
   "San Juan, Puerto Rico",
   18.4655,
   -66.1057
+ ],
+ "san-juan-argentina": [
+  "San Juan, Argentina",
+  -31.5375,
+  -68.5364
  ],
  "santa-fe": [
   "Santa Fe, New Mexico",
@@ -399,15 +609,35 @@
   32.0809,
   -81.0912
  ],
+ "selaron-steps": [
+  "Escadaria Selarón|Selarón Steps",
+  -22.9153,
+  -43.1791
+ ],
  "serra-de-capivara-nat-l-park": [
   "Serra da Capivara National Park",
   -8.83,
   -42.55
  ],
+ "siege-of-orleans": [
+  "Siege of Orléans (1428–1429)",
+  47.9025,
+  1.9089
+ ],
+ "sieges-of-saragossa": [
+  "Second Siege of Zaragoza|First Siege of Zaragoza",
+  41.6561,
+  -0.8773
+ ],
  "signing-of-the-magna-carta": [
   "Magna Carta",
   51.4436,
   -0.5636
+ ],
+ "smithsonian-institution": [
+  "Smithsonian Institution",
+  38.8888,
+  -77.026
  ],
  "southern-ocean": [
   "Southern Ocean",
@@ -444,6 +674,16 @@
   -44.7,
   167.75
  ],
+ "temple-of-confucius": [
+  "Temple of Confucius",
+  0,
+  0
+ ],
+ "thean-hou-temple": [
+  "Thean Hou Temple",
+  0,
+  0
+ ],
  "toledo": [
   "Toledo, Spain",
   39.8628,
@@ -459,239 +699,74 @@
   32.8872,
   13.1913
  ],
- "trujillo": [
-  "Trujillo, Peru",
-  -8.1116,
-  -79.0288
- ],
- "walt-disney-world": [
-  "Walt Disney World",
-  28.3852,
-  -81.5639
- ],
- "whale-sanctuary": [
-  "El Vizcaíno",
-  27.38,
-  -114.5
- ],
- "darien-nat-l-park": [
-  "Darién National Park|Darién National Park and Biosphere Reserve",
-  7.7361,
-  -77.5472
- ],
- "annapurna": [
-  "Annapurna",
-  28.5961,
-  83.8203
- ],
- "hobbiton-movie-set": [
-  "Hobbiton Movie Set",
-  -37.8721,
-  175.6833
- ],
  "troms": [
   "Tromsø|Troms",
   69.65,
   18.96
  ],
- "voyages-of-christopher-columbus": [
-  "Voyages of Christopher Columbus|Christopher Columbus",
-  24.12,
-  -74.46
- ],
- "new-york": [
-  "New York City",
-  0,
-  0
- ],
- "waterloo": [
-  "Battle of Waterloo",
-  0,
-  0
- ],
- "gettysburg": [
-  "Gettysburg, Pennsylvania",
-  0,
-  0
- ],
- "montana": [
-  "Montana",
-  0,
-  0
- ],
- "yorktown": [
-  "Yorktown, Virginia",
-  0,
-  0
- ],
- "first-powered-airplane-flight": [
-  "Wright Flyer",
-  0,
-  0
- ],
- "discovery-of-tutankhamun-s-tomb": [
-  "KV62",
-  0,
-  0
- ],
- "columbus-s-first-landfall": [
-  "Guanahani",
-  0,
-  0
- ],
- "kaabong": [
-  "Kaabong",
-  0,
-  0
- ],
- "hershey-s-chocolate-world": [
-  "Hershey's Chocolate World",
-  0,
-  0
- ],
- "oshkosh": [
-  "Oshkosh, Wisconsin",
-  0,
-  0
- ],
- "amarillo": [
-  "Amarillo, Texas",
-  0,
-  0
- ],
- "bangor": [
-  "Bangor, Maine",
-  0,
-  0
- ],
- "chimney-rock": [
-  "Chimney Rock (Nebraska)",
-  0,
-  0
- ],
- "corvallis": [
-  "Corvallis, Oregon",
-  0,
-  0
- ],
- "temple-of-confucius": [
-  "Temple of Confucius",
-  0,
-  0
- ],
- "king-abdul-aziz-mosque": [
-  "King Abdulaziz Mosque",
-  0,
-  0
- ],
- "bomb-dropped-on-hiroshima": [
-  "Atomic bombings of Hiroshima and Nagasaki",
-  0,
-  0
- ],
- "jumeirah-mosque": [
-  "Jumeirah Mosque",
-  0,
-  0
- ],
- "lahore-fort": [
-  "Lahore Fort",
-  0,
-  0
- ],
- "penang-bridge": [
-  "Penang Bridge",
-  0,
-  0
- ],
- "city-of-san-fernando": [
-  "San Fernando, La Union",
-  0,
-  0
- ],
- "old-city-of-acre": [
-  "Acre, Israel",
-  0,
-  0
- ],
- "old-city-of-sana-a": [
-  "Old City of Sana'a",
-  0,
-  0
- ],
- "jesuit-missions": [
-  "Jesuit Reductions",
-  0,
-  0
- ],
- "thean-hou-temple": [
-  "Thean Hou Temple",
-  0,
-  0
- ],
- "c:Ireland": [
-  "Republic of Ireland",
-  0,
-  0
- ],
- "merida": [
-  "Mérida, Yucatán",
-  20.9672,
-  -89.6236
- ],
- "cristo-rey": [
-  "Cristo Rey (Mexican statue)",
-  21.012,
-  -101.369
- ],
- "hyde-park-barracks": [
-  "Hyde Park Barracks, Sydney",
-  -33.8696,
-  151.2128
- ],
- "sieges-of-saragossa": [
-  "Second Siege of Zaragoza|First Siege of Zaragoza",
-  41.6561,
-  -0.8773
- ],
- "siege-of-orleans": [
-  "Siege of Orléans (1428–1429)",
-  47.9025,
-  1.9089
- ],
- "battle-of-the-yarmouk": [
-  "Battle of the Yarmuk",
-  32.8141,
-  35.9548
- ],
- "battle-of-las-navas-de-tolosa": [
-  "Battle of Las Navas de Tolosa",
-  38.2833,
-  -3.5833
- ],
- "wollongong": [
-  "Wollongong",
-  -34.4278,
-  150.8931
- ],
- "levuka": [
-  "Levuka",
-  -17.6833,
-  178.8333
+ "trujillo": [
+  "Trujillo, Peru",
+  -8.1116,
+  -79.0288
  ],
  "twelve-apostles": [
   "The Twelve Apostles (Victoria)",
   -38.6656,
   143.1049
  ],
- "kokoda-track": [
-  "Kokoda Track",
-  -9,
-  147.6
+ "venice-beach": [
+  "Venice Beach|Venice, Los Angeles",
+  33.985,
+  -118.4695
+ ],
+ "veracruz": [
+  "Veracruz (city)|Veracruz, Veracruz",
+  19.1738,
+  -96.1342
+ ],
+ "voyages-of-christopher-columbus": [
+  "Voyages of Christopher Columbus|Christopher Columbus",
+  24.12,
+  -74.46
+ ],
+ "walled-city-of-cartagena": [
+  "Walled city of Cartagena|Cartagena, Colombia",
+  10.4236,
+  -75.55
+ ],
+ "walt-disney-world": [
+  "Walt Disney World",
+  28.3852,
+  -81.5639
+ ],
+ "waterloo": [
+  "Battle of Waterloo",
+  0,
+  0
+ ],
+ "whale-sanctuary": [
+  "El Vizcaíno",
+  27.38,
+  -114.5
  ],
  "whitsunday-islands": [
   "Whitsunday Islands",
   -20.25,
   148.95
+ ],
+ "wollongong": [
+  "Wollongong",
+  -34.4278,
+  150.8931
+ ],
+ "xochimilco": [
+  "Xochimilco",
+  19.2572,
+  -99.103
+ ],
+ "yorktown": [
+  "Yorktown, Virginia",
+  0,
+  0
  ]
 }

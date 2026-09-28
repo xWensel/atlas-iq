@@ -45,6 +45,7 @@ window.AIQ = window.AIQ || {};
   A.cleanText = raw => {
     let s = String(raw || "").replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/[ \t]+/g, " ");
     s = stripParens(s).replace(/\s*\[[^\]]{1,90}\]/g, "").replace(/\s*\/[^\/\n]*[ɐ-˿̀-ͯ]+[^\/\n]*\//g, "").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/\.\.(?!\.)/g, ".");
+    s = s.replace(/[,，、;；:：]\s*([)）])/g, "$1").replace(/\s*[(（]\s*[)）]/g, "");   // "（英语：Bondi Beach，）" tras quitar la pronunciacion
     return s.replace(/\s+([,.;:])/g, "$1").replace(/,\s*\./g, ".").replace(/[ \t]{2,}/g, " ").replace(/ *\n */g, "\n").trim();
   };
   /* frases completas (no parte en abreviaturas ni iniciales) */

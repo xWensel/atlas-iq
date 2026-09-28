@@ -113,14 +113,14 @@ for (const e of people) {
   if (!bp) { drop.push("P: " + lab(e).en + " (sin lugar de nacimiento)"); continue; }
   if (!c) { drop.push("P: " + lab(e).en + " (sin coordenadas de nacimiento)"); continue; }
   const img = val(e, "P18");
-  outP.push({ id: e.id, name: lab(e), desc: desc(e), fame: fame(e), ...c, born: yearOf(e, "P569"), died: yearOf(e, "P570"),
+  outP.push({ id: e.id, wiki: (e.sitelinks.enwiki || {}).title, name: lab(e), desc: desc(e), fame: fame(e), ...c, born: yearOf(e, "P569"), died: yearOf(e, "P570"),
     place: lab(townOf(bp)), country: countryLab(idOf(bp, "P17")), img: typeof img === "string" ? img : null });
 }
 for (const e of E.out) {
   const loc0 = PL[idOf(e, "P276")], locE = isState(loc0) || fixOf(e) ? null : loc0, c = fixOf(e) || coordOf(e) || coordOf(locE);
   const named = locE && (locE.labels || {}).es ? locE : null;              // sin nombre en español ("Waterloo Battlefield"): solo el pais
   if (!c) { drop.push("E: " + lab(e).en + " (sin coordenadas)"); continue; }
-  outE.push({ id: e.id, name: lab(e), desc: desc(e), fame: fame(e), ...c, year: yearOf(e, "P585", "P580", "P571"),
+  outE.push({ id: e.id, wiki: (e.sitelinks.enwiki || {}).title, name: lab(e), desc: desc(e), fame: fame(e), ...c, year: yearOf(e, "P585", "P580", "P571"),
     place: named ? lab(named) : null, country: countryLab(idOf(e, "P17") || (locE && idOf(locE, "P17"))) });
 }
 if (drop.length) console.warn("Descartados:\n  " + drop.join("\n  "));

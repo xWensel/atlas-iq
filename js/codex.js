@@ -30,6 +30,7 @@ window.AIQ = window.AIQ || {};
     if (lon < -30 && lat > 12) return "na"; if (lon < -30) return "sa";
     if (lon >= -30 && lon < 60 && lat > 34) return "eu"; if (lon >= -20 && lon < 52 && lat <= 37 && lat > -36 && !(lon > 34 && lat > 12 && lat < 34 && lon < 60)) return lat > 12 && lon > 26 && lat < 33 && lon < 36.5 ? "as" : "af";
     if (lon > 110 && lat < -8) return "oc"; if (lon > 112 && lon < 180 && lat < 0 && lat > -50) return "oc"; if (lon > 165 || lon < -150) return "oc";
+    if (lon >= 130 && lat > -50 && lat < 23) return "oc";                 // Micronesia, Palau, Guam, Marianas y Marshall (Filipinas, Taiwan y Japon quedan fuera)
     if (lat < -8 && lon > 100) return "oc"; return lon >= 25 ? "as" : "eu";
   };
 
@@ -124,7 +125,7 @@ window.AIQ = window.AIQ || {};
         const clue = L.bonus && d.f, title = clue ? d.f : d.n, id = A.ckey(title), base = title.replace(/\(.*?\)/g, "").split(",")[0].trim();
         let type = /capital/i.test(L.name) ? "capital" : /famous|unesco|heritage|places/i.test(L.name) ? "landmark" : /cit(y|ies)/i.test(L.name) ? "city" : "place";
         if (eventLike.test(base) || /^battle of|bomb dropped/i.test(title)) type = "event";
-        add({ id, type, name: { en: base, es: "" }, wiki: wikiFor(id, title), full: clue ? "" : title.replace(/\(.*?\)/g, "").trim(), lat: d.lat, lon: d.lon, country: countryFrom(title, g.id), fact: { en: clue ? "" : d.f, es: "" }, rarity: r, src: "classic" });
+        add({ id, type, name: { en: base, es: "" }, wiki: wikiFor(id, title), full: clue ? "" : title.replace(/\(.*?\)/g, "").trim(), lat: d.lat, lon: d.lon, country: countryFrom(title, g.id), fact: clue ? { en: "", es: "" } : { en: d.f, es: "", ...(d.f6 || {}) }, rarity: r, src: "classic" });
       });
     }));
 
@@ -376,11 +377,12 @@ window.AIQ = window.AIQ || {};
   function tiers(rec) {
     const k = rec.lang + ":" + rec.title; if (tierMem[k]) return tierMem[k];
     const sents = A.sentences(A.cleanText(rec.extract)), hist = A.cleanText(rec.history).split(/\n+/).filter(x => x.trim());
+    const J = /^(zh|ja)$/.test(rec.lang) ? "" : " ";                  // chino y japones: las frases van pegadas, sin espacio
     let n = 0, len = 0; while (n < sents.length && (n < 2 || len < 200) && n < 3) len += sents[n++].length;
-    const intro = sents.slice(0, n).join(" "), rest = sents.slice(n);
-    let histP = hist, key = rest.join(" ");
+    const intro = sents.slice(0, n).join(J), rest = sents.slice(n);
+    let histP = hist, key = rest.join(J);
     if (key.length < 90 && hist.length > 1) { const h = Math.ceil(hist.length / 2); histP = hist.slice(0, h); key = (key ? key + "\n" : "") + hist.slice(h).join("\n"); }   // extractos muy cortos: la historia se reparte
-    if (!histP.length && rest.length > 2) { const h = Math.ceil(rest.length / 2); histP = [rest.slice(0, h).join(" ")]; key = rest.slice(h).join(" "); }
+    if (!histP.length && rest.length > 2) { const h = Math.ceil(rest.length / 2); histP = [rest.slice(0, h).join(J)]; key = rest.slice(h).join(J); }
     return (tierMem[k] = { intro: intro || A.cleanText(rec.extract), hist: histP.join("\n"), key });
   }
   function lightbox(id) {

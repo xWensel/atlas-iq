@@ -12,3 +12,5 @@ tools/__pycache__/
 tools/cache-codex/
 tools/cache-r2.json
 assets/wiki/
+tools/bundle-media.out
+tools/bundle-media.log

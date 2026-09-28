@@ -59,8 +59,11 @@ const norm = x => String(x).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase
 const BAD_IMG = /flag|bandera|drapeau|coat[_ ]of[_ ]arms|escudo|emblem|seal[_ ]|logo|locator|location|map[_ .]|mapa|blank|symbol|icon[_.]|\.svg|signature|stamp|banner|diagram|montage|(^|[_ ])(chart|graph|table|timeline|scan|page|text|tablet|coin|tree|genealogy)|inscription|distribution|extent|territor|evolution|comparison|constitution/i;
 const fileOf = src => { const parts = String(src).split("?")[0].split("/"); let f = parts.pop(); if (parts.includes("thumb")) f = parts.pop(); else f = f.replace(/^\d+px-/, ""); return decodeURIComponent(f); };
 
+/* articulos que la busqueda automatica no encuentra (titulo distinto o coordenadas del articulo lejos de las del juego) */
+const TITLE_FIX = { "zheng-he": "Zheng He", "congress-of-tucuman-deputies": "Congress of Tucumán", "discovery-of-tutankhamun-s-grave": "KV62" };
 async function findTitle(e) {
   const [id, type, lat, lon, nogeo, nameEn, full, wiki] = e;
+  if (TITLE_FIX[id]) return TITLE_FIX[id];
   const okGeo = s => { if (nogeo || lat == null || !s.coordinates) return true; const lim = ["nature", "water", "strait", "country"].includes(type) ? 1800 : 300; return hav(lat, lon, s.coordinates.lat, s.coordinates.lon) < lim; };
   if (["city", "capital", "place"].includes(type) && lat != null && !nogeo) {
     const g = await jget(`${api("en")}?action=query&list=geosearch&gscoord=${lat}|${lon}&gsradius=10000&gslimit=500&format=json`), nm = norm(nameEn);
