@@ -107,7 +107,20 @@ function destName(p) {
   const country = qid && PCOUNTRY[qid] ? PCOUNTRY[qid].en : null;
   return country && country !== en ? `${en}, ${country}` : en;
 }
-const mkDest = p => ({ n: destName(p), lat: p[3], lon: p[4], f: FACT_OVERRIDES[p[0]] || firstSentence(FACTS_EN[p[0]]) });
+/* dato curioso en cada idioma: la misma descripcion corta de data/wiki/<l>-s.json (si falta, el juego cae al ingles) */
+const FACT_LANGS = ["es", "fr", "pt", "de", "it", "zh", "ko", "ja", "ru", "pl"];
+const SHORT_ALL = Object.fromEntries(FACT_LANGS.filter(l => fs.existsSync(path.join(ROOT, "data", "wiki", `${l}-s.json`))).map(l => [l, JSON.parse(read(`data/wiki/${l}-s.json`))]));
+function firstSentenceL(s) {
+  s = String(s || "").trim();
+  const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?(?:[.!?](?=\s|$)|[。！？])/);
+  const cut = (m ? m[0] : s).replace(/\u0001/g, ".");
+  return (cut.length < 4 ? s : cut).replace(/\.\.+/g, ".").slice(0, 200);
+}
+function mkDest(p) {
+  const f6 = {};
+  for (const l in SHORT_ALL) { const t = SHORT_ALL[l][p[0]]; if (t) f6[l] = firstSentenceL(t); }
+  return { n: destName(p), lat: p[3], lon: p[4], f: FACT_OVERRIDES[p[0]] || firstSentence(FACTS_EN[p[0]]), f6 };
+}
 
 /* Pista = la descripcion corta con la que arranca cada resumen (p. ej. "Ciudad más poblada de Marruecos."),
  * en los 6 idiomas. Se descarta el lugar si en algun idioma falta, si delata el nombre, si es vaga
