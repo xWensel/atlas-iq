@@ -30,6 +30,9 @@ const FACTS_EN = JSON.parse(read("data/wiki/en-s.json"));
 const LANGS6 = ["en", "es", "fr", "pt", "de", "it"];
 const SHORT = Object.fromEntries(LANGS6.map(l => [l, JSON.parse(read(`data/wiki/${l}-s.json`))]));  // cada resumen empieza por una descripcion corta estilo Wikidata
 const EXTRA = fs.existsSync(path.join(ROOT, "tools", "extra-data.json")) ? JSON.parse(read("tools/extra-data.json")) : { people: [], events: [], countries: {}, continents: {} };
+/* tools/extra-fix.json: nombres, lugares y descripciones traducidos a mano donde Wikidata cae al ingles o no tiene nada ({QID: {name|place|desc: {idioma: texto}}}) */
+const EXTRA_FIX = fs.existsSync(path.join(ROOT, "tools", "extra-fix.json")) ? JSON.parse(read("tools/extra-fix.json")) : {};
+for (const e of [...(EXTRA.people || []), ...(EXTRA.events || [])]) { const fx = EXTRA_FIX[e.id]; if (fx) for (const k of ["name", "place", "desc"]) if (fx[k]) e[k] = { ...(e[k] || {}), ...fx[k] }; }
 
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 /* dificultad = menos Wikipedias con articulo (fama real, tools/build-extra.mjs); a igualdad, el orden de la
@@ -214,7 +217,8 @@ const by10 = fn => { const o = {}; for (const l of XL) o[l] = fn(l); return o; }
 const restL = o => Object.fromEntries(XL.slice(1).map(l => [l, o[l]]));
 const SEP = { zh: "，", ja: "、" };
 const joinTxt = l => (...xs) => xs.filter(Boolean).join(SEP[l] || ", ");
-const short = s => { s = ucf(String(s || "").replace(/\s*\([^)]*\d{3,4}[^)]*\)\s*$/, "")); if (s.length <= 90) return s; const c = s.slice(0, 90), i = Math.max(c.lastIndexOf(","), c.lastIndexOf("，"), c.lastIndexOf("、")); return (i > 40 ? c.slice(0, i) : c.slice(0, c.lastIndexOf(" ") > 40 ? c.lastIndexOf(" ") : 90)) + "…"; };
+/* descripcion corta: fuera el parentesis final con años, tambien el de ancho completo ("（Thomas Edison，1847—1931）") */
+const short = s => { s = ucf(String(s || "").replace(/\s*[(（][^)）]*\d{3,4}[^)）]*[)）]\s*$/, "")); if (s.length <= 90) return s; const c = s.slice(0, 90), i = Math.max(c.lastIndexOf(","), c.lastIndexOf("，"), c.lastIndexOf("、")); return (i > 40 ? c.slice(0, i) : c.slice(0, c.lastIndexOf(" ") > 40 ? c.lastIndexOf(" ") : 90)) + "…"; };
 function mkPersonDest(p) {
   const ctry = countryAt(p.lat, p.lon) || p.country;
   const fact = by10(l => [joinTxt(l)(p.place && p.place[l], ctry && (ctry[l] || ctry.en)), short(p.desc[l])].filter(Boolean).join(" · "));

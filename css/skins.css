@@ -22,8 +22,12 @@
 @font-face { font-family: "Lang Name ZH"; src: url("../fonts/lang-name-zh.woff2") format("woff2"); font-display: block; }
 @font-face { font-family: "Lang Name JA"; src: url("../fonts/lang-name-ja.woff2") format("woff2"); font-display: block; }
 @font-face { font-family: "Lang Name KO"; src: url("../fonts/lang-name-ko.woff2") format("woff2"); font-display: block; }
-html { --cjk: system-ui; }
+/* "……" y "——" a la china (puntos y raya a media altura, tools/build_cjk_punct.py): va la PRIMERA en la pila, pero solo en zh/ja/ko;
+   en el resto de idiomas --cjkp apunta a una familia inexistente y el navegador la salta */
+@font-face { font-family: "Geolite CJK Punct"; src: url("../fonts/geolite-cjk-punct.woff2") format("woff2"); font-display: block; unicode-range: U+2014, U+2026; }
+html { --cjk: system-ui; --cjkp: "Geolite No Punct"; }
 html:lang(zh) { --cjk: "Fusion Pixel ZH"; } html:lang(ja) { --cjk: "Fusion Pixel JA"; } html:lang(ko) { --cjk: "Fusion Pixel KO"; }
+html:lang(zh), html:lang(ja), html:lang(ko) { --cjkp: "Geolite CJK Punct"; }
 
 /* selector de skins (comun) */
 .skins { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -35,7 +39,7 @@ body { transition: none; } @keyframes skin-flash { 0% { opacity: .0; } 18% { opa
 html[data-skin="casino"] {
   --ink: #16241c; --ink-2: #4a6b5a; --ink-deep: #0a140f; --paper: #f3eddc; --paper-2: #e4dcc4; --paper-3: #cfc4a4;
   --red: #fe5f55; --red-deep: #b3322a; --brass: #f8b449; --brass-lt: #ffd98a; --teal: #009dff; --green: #4bc292;
-  --serif: "Jersey 15", "Pixelify Sans", var(--cjk), sans-serif; --sans: "Jersey 15", "Pixelify Sans", var(--cjk), system-ui, sans-serif; --mono: "Silkscreen", "Geolite Cyrillic Caps", "Jersey 15", "Pixelify Sans", var(--cjk), sans-serif;
+  --serif: var(--cjkp), "Jersey 15", "Pixelify Sans", var(--cjk), sans-serif; --sans: var(--cjkp), "Jersey 15", "Pixelify Sans", var(--cjk), system-ui, sans-serif; --mono: var(--cjkp), "Silkscreen", "Geolite Cyrillic Caps", "Jersey 15", "Pixelify Sans", var(--cjk), sans-serif;
   --disp: "wght" 700; --paper-grain: none; --spring: cubic-bezier(.3, 1.7, .4, 1);
 }
 html[data-skin="casino"] #app { background: #0d2c33; }
