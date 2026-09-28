@@ -7,24 +7,19 @@ piden antes del 28 de septiembre.
 
 ## Bloqueantes legales
 
-- [x] **Modo Clasico - hecho.** Las 6 campanas (`game1`/Mundo, `worldcapitals`,
-      `usa`, `asia`, `centralsouthamerica`, `oceania`) se regeneran con
-      `node tools/build-classic.mjs` a partir de `data/places.js` + `data/wiki`
-      (el mismo banco de Wikipedia/Wikidata que usan Aventura y la Enciclopedia).
-      Cero lugares, facts o umbrales de puntuacion copiados del Traveler IQ
-      Challenge original; el fichero de datos resultante conserva la forma que
-      espera el motor (`js/game.js`, `data/campaigns.js`), asi que no hizo
-      falta tocar codigo de juego. Los nombres de los lugares se traducen solos
-      via `data/places.js` (no hace falta ampliar `data/classic-tr.js` salvo
-      que se quiera traducir tambien el nombre de cada nivel, que hoy solo
-      esta en ingles). Tambien se actualizaron los textos de la interfaz que
-      decian "las preguntas y la puntuacion exactas del juego original"
-      (`js/hub.js`, `js/i18n.js`, `js/i18n2.js`, `data/campaigns.js`).
-      Pendiente si se quiere pulir mas: `worldcapitals` y `oceania` salen mas
-      pequenas de lo que eran (48 y 21 lugares) porque la reserva propia de
-      lugares para esas regiones es mas limitada - se podria ampliar
-      `tools/places-src.mjs` con mas capitales/ciudades del Pacifico si se
-      quiere un Next Fest con esas campanas mas largas.
+- [x] **Modo Clasico - hecho.** 11 campanas de 10 niveles cada una (Mundo,
+      Capitales del mundo, EE. UU., Europa, Asia, Latinoamerica, Oceania,
+      Banderas, Pistas, Eventos historicos, Personajes historicos), generadas
+      con `node tools/build-classic.mjs` desde `data/places.js` + `data/wiki`
+      y `tools/extra-data.json` (`node tools/build-extra.mjs`, Wikidata, solo
+      si cambian las listas de Eventos/Personajes). Cero lugares, facts o
+      umbrales copiados del Traveler IQ Challenge original. Sin solapes: cada
+      lugar sale en una sola campana; capitales solo en Capitales del mundo,
+      paises solo en Banderas, batallas y sucesos solo en Eventos. Los nombres
+      de nivel se traducen en `data/campaigns.js` (`LEVEL_LABEL`).
+      Pendiente: Oceania necesita los ~100 lugares nuevos anadidos a
+      `tools/places-src.mjs` (resolucion incremental en `data/places.js`);
+      hasta entonces sale con 8 niveles cortos.
 - [x] **Nombre "Geolite" - comprobado.** Busqueda en TMview (100 resultados,
       ~25 oficinas: USPTO, EUIPO, UKIPO, CNIPA, JPO...): ninguna marca
       "GEOLITE" registrada en clase 9 (software) ni 41 (entretenimiento); las
@@ -67,6 +62,16 @@ piden antes del 28 de septiembre.
       propio con los logros de Geolite dados de alta en el panel de
       Steamworks (activar uno de Spacewar con nuestros IDs simplemente no
       hace nada, son logros que no existen para App 480).
+      **Alta de logros:** `node tools/steam-achievements.mjs` y
+      `python tools/steam_icons.py` generan `docs/steam/achievements.csv`
+      (81 logros: API name = id de `js/profile.js`, oculto si/no, nombre y
+      descripcion en los 12 idiomas con el codigo de Steam) y
+      `docs/steam/icons/` (64x64 JPG, conseguido y `_locked`). Cada logro
+      tiene insignia propia. Retirado `classic_win` (se desbloqueaba siempre
+      a la vez que el logro de la campana terminada); anadidos
+      `classic_europe`, `classic_flags`, `classic_clues`, `classic_events` y
+      `classic_people`; `classic_all` y `classic_goldall` cubren todas las
+      campanas del Clasico. Volver a exportar tras cambiar logros o textos.
       Pendiente: Leaderboards (Steam Leaderboards o backend propio con
       validacion en servidor, reproduciendo la partida con la semilla) y
       Cloud save (perfil `atlasiq.profile.v1` y partida `atlasiq.run.v1` ya

@@ -26,7 +26,7 @@
  ],
  "bao-ensi": [
   "Porcelain Tower of Nanjing",
-  32.0,
+  32,
   118.78
  ],
  "battle-of-borodino": [
@@ -132,7 +132,7 @@
  "glacier-bay": [
   "Glacier Bay National Park and Preserve",
   58.5,
-  -136.0
+  -136
  ],
  "golden-pavilion": [
   "Kinkaku-ji",
@@ -141,8 +141,8 @@
  ],
  "great-rift-valley": [
   "Great Rift Valley",
-  -2.0,
-  36.0
+  -2,
+  36
  ],
  "halifax": [
   "Halifax, Nova Scotia",
@@ -150,9 +150,9 @@
   -63.5752
  ],
  "hoi-an": [
-  "Hoi An|Hội An",
-  15.88,
-  108.33
+  "Hội An (city)",
+  15.8797,
+  108.3319
  ],
  "holy-feet-of-sri-gomatheswar": [
   "Gommateshwara statue",
@@ -177,7 +177,7 @@
  "jonotega": [
   "Jinotega",
   13.09,
-  -86.0
+  -86
  ],
  "kitty-hawk": [
   "Kitty Hawk, North Carolina",
@@ -371,8 +371,8 @@
  ],
  "sahel": [
   "Sahel",
-  14.0,
-  0.0
+  14,
+  0
  ],
  "salvador": [
   "Salvador, Bahia",
@@ -411,8 +411,8 @@
  ],
  "southern-ocean": [
   "Southern Ocean",
-  -60.0,
-  90.0
+  -60,
+  90
  ],
  "spanish-civil-war": [
   "Spanish Civil War",
@@ -451,8 +451,8 @@
  ],
  "trans-siberian-railway": [
   "Trans-Siberian Railway",
-  56.0,
-  92.0
+  56,
+  92
  ],
  "tripoli": [
   "Tripoli, Libya|Tripoli",
@@ -633,5 +633,65 @@
   "Republic of Ireland",
   0,
   0
+ ],
+ "merida": [
+  "Mérida, Yucatán",
+  20.9672,
+  -89.6236
+ ],
+ "cristo-rey": [
+  "Cristo Rey (Mexican statue)",
+  21.012,
+  -101.369
+ ],
+ "hyde-park-barracks": [
+  "Hyde Park Barracks, Sydney",
+  -33.8696,
+  151.2128
+ ],
+ "sieges-of-saragossa": [
+  "Second Siege of Zaragoza|First Siege of Zaragoza",
+  41.6561,
+  -0.8773
+ ],
+ "siege-of-orleans": [
+  "Siege of Orléans (1428–1429)",
+  47.9025,
+  1.9089
+ ],
+ "battle-of-the-yarmouk": [
+  "Battle of the Yarmuk",
+  32.8141,
+  35.9548
+ ],
+ "battle-of-las-navas-de-tolosa": [
+  "Battle of Las Navas de Tolosa",
+  38.2833,
+  -3.5833
+ ],
+ "wollongong": [
+  "Wollongong",
+  -34.4278,
+  150.8931
+ ],
+ "levuka": [
+  "Levuka",
+  -17.6833,
+  178.8333
+ ],
+ "twelve-apostles": [
+  "The Twelve Apostles (Victoria)",
+  -38.6656,
+  143.1049
+ ],
+ "kokoda-track": [
+  "Kokoda Track",
+  -9,
+  147.6
+ ],
+ "whitsunday-islands": [
+  "Whitsunday Islands",
+  -20.25,
+  148.95
  ]
 }

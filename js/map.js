@@ -864,11 +864,12 @@ void main(){
       { const e = this._eff(); this._u(P.line, "u_wob", e.wob); this._u(P.line, "u_wt", now / 1400); this._u(P.line, "u_lineA", e.lineA); }
       this._u(P.line, "u_center", v.cx, v.cy); this._u(P.line, "u_scale", sc); this._u(P.line, "u_res", sw, sh);
       const lw = clamp(st.lineW + Math.log2(v.s / this.minS) * 0.06, st.lineW, st.lineW * 1.7) * dpr * RS;
+      const lcov = mos < 0.999 ? clamp((lw - 0.2) / 0.8, 0, 1) : 1;    // pixeles gordos: a tan poca resolucion las fronteras desaparecen como en una foto de verdad (antes se amontonaban y el mapa quedaba en manchas de tinta)
       if (st.lineOff && (st.lineOff[0] || st.lineOff[1])) {           // desregistro (impresion): segunda capa desplazada
-        this._u(P.line, "u_width", lw); this._u(P.line, "u_off", st.lineOff[0] * dpr * RS, st.lineOff[1] * dpr * RS); this._u(P.line, "u_col", ...st.lineOffCol);
+        this._u(P.line, "u_width", lw); this._u(P.line, "u_off", st.lineOff[0] * dpr * RS, st.lineOff[1] * dpr * RS); this._u(P.line, "u_col", st.lineOffCol[0], st.lineOffCol[1], st.lineOffCol[2], st.lineOffCol[3] * lcov);
         gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
       }
-      this._u(P.line, "u_width", lw); this._u(P.line, "u_off", 0, 0); this._u(P.line, "u_col", ...st.line);
+      this._u(P.line, "u_width", lw); this._u(P.line, "u_off", 0, 0); this._u(P.line, "u_col", st.line[0], st.line[1], st.line[2], st.line[3] * lcov);
       const lensOn = this.lens && this.lens.r > 0 && this.dist.spec && (this._eff().wob > 0.002 || this._eff().lineA < 0.98);
       if (lensOn) {                                                     // fuera de la lupa: fronteras deformadas; dentro: las verdaderas
         const [lx, ly] = this._outToScene(this.lens.x, this.lens.y), k = dpr * RS, e = this._eff();

@@ -32,7 +32,6 @@ window.AIQ = window.AIQ || {};
     if (lon > 110 && lat < -8) return "oc"; if (lon > 112 && lon < 180 && lat < 0 && lat > -50) return "oc"; if (lon > 165 || lon < -150) return "oc";
     if (lat < -8 && lon > 100) return "oc"; return lon >= 25 ? "as" : "eu";
   };
-  const hav = (a, b, c, d) => A.geo.haversine(a, b, c, d);
 
   /* ================================================================== datos */
   const E = {}, order = [], chain = {};
@@ -43,7 +42,7 @@ window.AIQ = window.AIQ || {};
   function save() { try { localStorage.setItem(STORE, JSON.stringify(store)); } catch (e) { /* sin almacenamiento */ } }
 
   const WIKI_OVERRIDE = {
-    "hermitage": "Hermitage Museum", "agram": "Zagreb", "davao": "Davao City", "tucuman": "San Miguel de Tucum00e1n", "hanyang": "Seoul", "san-juan-puerto-rico": "San Juan, Puerto Rico", "red-fort": "Red Fort", "pentagon": "The Pentagon", "tea-party": "Boston Tea Party", "trinity-site": "Trinity (nuclear test)", "vegas-strip": "Las Vegas Strip",
+    "hermitage": "Hermitage Museum", "agram": "Zagreb", "davao": "Davao City", "tucuman": "San Miguel de Tucumán", "hanyang": "Seoul", "san-juan-puerto-rico": "San Juan, Puerto Rico", "red-fort": "Red Fort", "pentagon": "The Pentagon", "tea-party": "Boston Tea Party", "trinity-site": "Trinity (nuclear test)", "vegas-strip": "Las Vegas Strip",
     "edison": "Edison, New Jersey", "bam": "Bam, Iran", "natal": "Natal, Rio Grande do Norte", "sparks": "Sparks, Nevada", "reno": "Reno, Nevada", "flint": "Flint, Michigan", "eugene": "Eugene, Oregon",
     "salem": "Salem, Massachusetts", "savannah": "Savannah, Georgia", "elgin": "Elgin, Illinois", "emerald": "Emerald, Queensland", "dubbo": "Dubbo", "troy": "Troy", "ur": "Ur", "area-51": "Area 51",
     "mount-rainier": "Mount Rainier", "k2": "K2", "washington": "Washington, D.C.", "old-city-of-acre": "Acre, Israel", "old-city-of-jerusalem": "Old City of Jerusalem",
@@ -191,128 +190,22 @@ window.AIQ = window.AIQ || {};
   A.codexLimits = e => { const sc = (E[(e && e.parent) || (e && e.id)] && SCALE[E[(e && e.parent) || e.id].type]) || 1; return LIM.map(x => x * sc); };
   A.continent = continent;
 
-  /* ================================================================== Wikipedia (con cache en IndexedDB) */
-  const db = new Promise(res => { try { const r = indexedDB.open("atlasiq-codex", 1); r.onupgradeneeded = () => r.result.createObjectStore("wiki"); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
-  const idb = {
-    get: k => db.then(d => (d ? new Promise(res => { try { const q = d.transaction("wiki").objectStore("wiki").get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch (e) { res(null); } }) : null)),
-    set: (k, v) => db.then(d => d && new Promise(res => { try { const t = d.transaction("wiki", "readwrite"); t.objectStore("wiki").put(v, k); t.oncomplete = res; t.onerror = res; } catch (e) { res(); } })),
-  };
-  const enc = encodeURIComponent;
-  const wait = ms => new Promise(r => setTimeout(r, ms));
-  const getJSON = async url => {                                     // reintenta con espera si Wikipedia pide calma (429/503)
-    for (let i = 0; ; i++) {
-      const r = await fetch(url);
-      if (r.ok) return r.json();
-      if ((r.status === 429 || r.status === 503) && i < 4) { await wait((+r.headers.get("retry-after") || 0) * 1000 || 700 * (i + 1)); continue; }
-      throw new Error(r.status);
-    }
-  };
-  const api = lang => `https://${lang}.wikipedia.org/w/api.php`;
-  const summary = (lang, title) => getJSON(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${enc(title.replace(/ /g, "_"))}?redirect=true`);
-  const queue = { n: 0, q: [] };
-  const run = fn => new Promise((res, rej) => { const go = () => { queue.n++; fn().then(res, rej).finally(() => { queue.n--; const nx = queue.q.shift(); if (nx) nx(); }); }; queue.n < 2 ? go() : queue.q.push(go); });
-  const NOHIST = /etimolog|etymolog|toponym|nombre|name|nom$|referenc|see also|v[eé]ase|notes|externa|external|bibliog|further|gallery|galer/i;
-  const HIST = /^(history|historia|histoire|história|geschichte|storia|early life|biography|biografía|biographie|biografia|biographie|leben)/i;
-  const strip = h => String(h || "").replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
-
-  function okGeo(e, s) {
-    if (e.nogeo || e.lat == null || !s.coordinates) return true;
-    const lim = ["nature", "water", "strait", "country"].includes(e.type) ? 1800 : 300;
-    return hav(e.lat, e.lon, s.coordinates.lat, s.coordinates.lon) < lim;
-  }
-  async function findTitle(e) {
-    const c = await idb.get("t:" + e.id); if (c) return c;
-    const norm = x => String(x).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-    if (["city", "capital", "place"].includes(e.type) && e.lat != null && !e.nogeo && !WIKI_OVERRIDE[e.id]) {   // ciudades: el articulo de ese nombre mas cercano a las coordenadas (evita homonimos)
-      try {
-        const g = await run(() => getJSON(`${api("en")}?action=query&list=geosearch&gscoord=${e.lat}|${e.lon}&gsradius=10000&gslimit=500&format=json&origin=*`)), nm = norm(e.name.en);
-        const hit = (g.query.geosearch || []).find(x => { const t = norm(x.title); return t === nm || (t.startsWith(nm + ", ") && !/\(/.test(t)); });
-        if (hit) { idb.set("t:" + e.id, hit.title); return hit.title; }
-      } catch (x) { /* siguiente */ }
-    }
-    const cands = [...new Set([WIKI_OVERRIDE[e.id] ? "" : e.full, e.wiki, e.name.en].filter(Boolean))];
-    for (const t of cands) {
-      try { const s = await run(() => summary("en", t)); if (s.type === "disambiguation") continue; if (okGeo(e, s)) { idb.set("t:" + e.id, s.title); return s.title; } } catch (x) { /* siguiente candidato */ }
-    }
-    if (e.lat != null && !e.nogeo) {                                   // respaldo: articulo mas cercano cuyo titulo se parezca
-      try {
-        const g = await run(() => getJSON(`${api("en")}?action=query&list=geosearch&gscoord=${e.lat}|${e.lon}&gsradius=10000&gslimit=40&format=json&origin=*`));
-        const first = e.name.en.split(/[ ,]/)[0].toLowerCase(), hit = (g.query.geosearch || []).find(x => x.title.toLowerCase().includes(first));
-        if (hit) { idb.set("t:" + e.id, hit.title); return hit.title; }
-      } catch (x) { /* sin respaldo */ }
-    }
-    return null;
-  }
-  function pickImg(s) {
-    const o = s.originalimage, t = s.thumbnail; if (!o && !t) return null;
-    const mk = w => (o && o.width <= w) || !t ? (o || t).source : t.source.replace(/\/\d+px-/, "/" + w + "px-");
-    return { thumb: mk(500), card: mk(960), hd: mk(o && o.width >= 1920 ? 1920 : 1280), w: (o || t).width, h: (o || t).height };
-  }
-  const BAD_IMG = /flag|bandera|drapeau|coat[_ ]of[_ ]arms|escudo|emblem|seal[_ ]|logo|locator|location|map[_ .]|mapa|blank|symbol|icon[_.]|\.svg|signature|stamp|banner|diagram|montage|(^|[_ ])(chart|graph|table|timeline|scan|page|text|tablet|coin|tree|genealogy)|inscription|distribution|extent|territor|evolution|comparison|constitution/i;
-  const fromFile = (fn, w) => `https://commons.wikimedia.org/wiki/Special:FilePath/${enc(fn)}?width=${w}`;
-  async function betterImage(lang, title, e) {                       // si la foto principal es una bandera/escudo/mapa, busca la primera foto real del articulo
-    if (e && e.type === "country") {                             // un pais se ilustra mejor con su turismo que con su bandera
-      for (const t of ["Tourism in " + e.wiki, "Tourism in the " + e.wiki]) {
-        try { const ts = await run(() => summary("en", t)), src = (ts.originalimage || {}).source || ""; if (/\.jpe?g/i.test(src.split("?")[0]) && !BAD_IMG.test(src.split("?")[0].split("/").pop())) { const im = pickImg(ts); im.file = decodeURIComponent(src.split("?")[0].split("/").pop().replace(/^\d+px-/, "")); return im; } } catch (x) { /* siguiente */ }
-      }
-    }
-    try {
-      const j = await run(() => getJSON(`https://${lang}.wikipedia.org/api/rest_v1/page/media-list/${enc(title.replace(/ /g, "_"))}`));
-      const it = (j.items || []).filter(x => x.type === "image" && x.title && !BAD_IMG.test(x.title) && /\.(jpe?g|png|webp)$/i.test(x.title)).slice(0, 12)[0];
-      if (!it) return null; const fn = it.title.replace(/^[^:]+:/, "").replace(/ /g, "_");
-      return { thumb: fromFile(fn, 500), card: fromFile(fn, 960), hd: fromFile(fn, 1920), file: fn };
-    } catch (x) { return null; }
-  }
-  async function imageCredit(src) {
-    try {
-      let fn = /[\/]/.test(src) ? decodeURIComponent(src.split("?")[0].split("/").pop().replace(/^\d+px-/, "")) : src.replace(/_/g, " "); if (/\.svg\.png$/i.test(fn)) fn = fn.replace(/\.png$/i, "");
-      const j = await run(() => getJSON(`https://commons.wikimedia.org/w/api.php?action=query&titles=File:${enc(fn)}&prop=imageinfo&iiprop=extmetadata&iiextmetadatafilter=Artist|LicenseShortName&format=json&origin=*`));
-      const md = ((Object.values(j.query.pages)[0].imageinfo || [])[0] || {}).extmetadata || {};
-      return { artist: strip(md.Artist && md.Artist.value).slice(0, 90), license: strip(md.LicenseShortName && md.LicenseShortName.value), page: `https://commons.wikimedia.org/wiki/File:${enc(fn)}` };
-    } catch (x) { return null; }
-  }
-  async function sections(lang, title) {
-    try {
-      const j = await run(() => getJSON(`${api(lang)}?action=query&prop=extracts&explaintext=1&exsectionformat=wiki&redirects=1&titles=${enc(title)}&format=json&origin=*`));
-      const text = (Object.values(j.query.pages)[0].extract || "").replace(/\r/g, "");
-      const parts = text.split(/\n(?=={2,}\s*[^=\n]+?\s*={2,}\s*\n)/), intro = parts.shift() || "";
-      const all = parts.map(p => { const m = p.match(/^(={2,})\s*([^=\n]+?)\s*={2,}\s*\n([\s\S]*)$/); return m ? { l: m[1].length, h: m[2], t: m[3].trim() } : null; }).filter(Boolean);
-      const trim = (s, n) => { s = s.replace(/\n{3,}/g, "\n\n").trim(); if (s.length <= n) return s; const cut = s.slice(0, n), i = Math.max(cut.lastIndexOf("\n"), cut.lastIndexOf(". ")); return (i > n * 0.5 ? cut.slice(0, i + 1) : cut).trim() + (i > n * 0.5 ? "" : "…"); };
-      const grab = k => { let txt = all[k].t; for (let m = k + 1; m < all.length && all[m].l > all[k].l; m++) txt += "\n\n" + all[m].t; return txt.trim(); };
-      let k = all.findIndex(x => x.l === 2 && HIST.test(x.h) && grab(all.indexOf(x)).length > 120);
-      if (k < 0) k = all.findIndex(x => x.l === 2 && !NOHIST.test(x.h) && grab(all.indexOf(x)).length > 200);
-      const h = k >= 0 ? { h: all[k].h, t: grab(k) } : null;
-      return { history: h ? trim(h.t, 1500) : "", historyTitle: h ? h.h : "", full: trim(intro.split("\n").slice(1).join("\n") || intro, 2000) };
-    } catch (x) { return { history: "", historyTitle: "", full: "" }; }
-  }
+  /* ================================================================== contenido empaquetado (data/wiki + assets/wiki): nunca se consulta Wikipedia al jugar */
   const contentMem = {};
-  const memOf = id => contentMem[A.lang + ":" + ((E[id] && E[id].parent) || id)];
-  async function loadContent(e, lang, force) {
+  const memOf = id => contentMem[A.wlang() + ":" + ((E[id] && E[id].parent) || id)];
+  async function loadContent(e, lang) {
     if (e.parent) e = E[e.parent];
     const key = lang + ":" + e.id;
-    if (!force && contentMem[key]) return contentMem[key];
-    if (!force) { const pk = await A.wiki.get(e.id, lang); if (pk) return (contentMem[key] = pk); }
-    const c = !force && (await idb.get(key)); if (c && Date.now() - c.t < 30 * 864e5) return (contentMem[key] = c);
-    const enTitle = await findTitle(e); if (!enTitle) return (contentMem[key] = { none: true, t: Date.now(), lang });
-    let title = enTitle, wl = "en";
-    if (lang !== "en") {
-      try { const ll = await run(() => getJSON(`${api("en")}?action=query&prop=langlinks&titles=${enc(enTitle)}&lllang=${lang}&redirects=1&format=json&origin=*`)); const t = (Object.values(ll.query.pages)[0].langlinks || [])[0]; if (t) { title = t["*"]; wl = lang; } } catch (x) { /* ingles */ }
-    }
-    let s; try { s = await run(() => summary(wl, title)); } catch (x) { if (wl !== "en") { wl = "en"; title = enTitle; s = await run(() => summary("en", enTitle)); } else throw x; }
-    let img = pickImg(s), cred = null;
-    const srcName = (s.originalimage || s.thumbnail || {}).source || "";
-    if (!img || BAD_IMG.test(decodeURIComponent(srcName.split("?")[0].split("/").pop())) || ["country", "event"].includes(e.type) && /\.svg/i.test(srcName)) { const bi = await betterImage(wl, s.title, e); if (bi) { img = bi; cred = await imageCredit(bi.file); } }
-    else cred = await imageCredit(srcName);
-    const sec = await sections(wl, s.title);
-    const rec = { t: Date.now(), lang: wl, title: s.title, desc: s.description || "", extract: s.extract || "", history: sec.history, historyTitle: sec.historyTitle, more: sec.full, url: s.content_urls && s.content_urls.desktop && s.content_urls.desktop.page, img, credit: cred };
-    idb.set(key, rec); return (contentMem[key] = rec);
+    if (contentMem[key]) return contentMem[key];
+    const pk = await A.wiki.get(e.id, lang);
+    return (contentMem[key] = pk || { none: true, t: Date.now(), lang });
   }
-  function prefetch(ids) { [...new Set(ids.map(id => E[id].parent || id))].slice(0, 4).forEach(id => loadContent(E[id], A.lang).then(() => notify("content", id)).catch(() => {})); }
+  function prefetch(ids) { [...new Set(ids.map(id => E[id].parent || id))].slice(0, 4).forEach(id => loadContent(E[id], A.wlang()).then(() => notify("content", id)).catch(() => {})); }
   const notifiers = []; const notify = (k, id) => notifiers.forEach(f => f(k, id));
 
   /* ================================================================== interfaz */
   const ui = { built: false, filter: "all", sort: "recent", only: false, q: "", shown: 0, list: [], cur: null, tilt: null };
-  const nameOf = (e, rec) => e.parent ? nameOf(E[e.parent], rec) + " · " + A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : (A.lang === "es" && e.name.es) || (rec && rec.title && rec.lang === A.lang ? rec.title : "") || (A.lang === "en" ? e.name.en : e.name.es || e.name.en);
+  const nameOf = (e, rec) => e.parent ? nameOf(E[e.parent], rec) + " · " + A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : (A.wlang() === "es" && e.name.es) || (rec && rec.title && rec.lang === A.wlang() ? rec.title : "") || (A.wlang() === "es" ? e.name.es || e.name.en : e.name.en);
   const rarDots = r => A.icon("g_" + r, "gem").repeat(r + 1);
   const contOf = e => A.t(CONT[continent(e.lat, e.lon)]);
   const fmtNo = n => "Nº " + String(n).padStart(3, "0");
@@ -397,7 +290,7 @@ window.AIQ = window.AIQ || {};
       ${ixs(e)}<span class="cx-nm">${un ? nameOf(e, rec) : "· · ·"}</span>
       <span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span><span class="cx-no">${fmtNo(e.no)}</span>${un && !store.seen[id] ? `<span class="cx-new">${A.t("codex.new")}</span>` : ""}`;
     b.setAttribute("data-tt", un ? nameOf(e, rec) + "\n" + typeLabel(e.type)
-      : A.tip6("Sin descubrir|Undiscovered|Non découvert|Não descoberto|Unentdeckt|Non scoperto") + "\n" + typeLabel(e.type) + " · " + A.tip6("se descubre al situarlo bien en una partida|found by placing it well in a game|à découvrir en le plaçant bien en partie|descoberto ao posicioná-lo bem numa partida|wird entdeckt, wenn du ihn gut platzierst|si scopre piazzandolo bene in partita"));
+      : A.tip6("Sin descubrir|Undiscovered|Non découvert|Não descoberto|Unentdeckt|Non scoperto||未发现|미발견|未発見|Не открыто|Nieodkryte") + "\n" + typeLabel(e.type) + " · " + A.tip6("se descubre al situarlo bien en una partida|found by placing it well in a game|à découvrir en le plaçant bien en partie|descoberto ao posicioná-lo bem numa partida|wird entdeckt, wenn du ihn gut platzierst|si scopre piazzandolo bene in partita||在游戏中准确标出即可发现|게임에서 정확히 맞히면 발견됩니다|ゲームでうまく当てると発見できる|открывается, если точно отметить в игре|odkrywasz, trafiając celnie w grze"));
     b.onclick = () => openDetail(id);
     b.addEventListener("pointermove", ev => tiltMove(b, ev, 7)); b.addEventListener("pointerleave", () => tiltReset(b));
     if (un) io.observe(b);
@@ -406,7 +299,7 @@ window.AIQ = window.AIQ || {};
   async function paintThumb(id) {
     const b = $("cxGrid") && $("cxGrid").querySelector(`.cx-card[data-id="${CSS.escape(id)}"]`); if (!b || !isUnlocked(id)) return;
     try {
-      const rec = await loadContent(E[id], A.lang); if (rec.none) return;
+      const rec = await loadContent(E[id], A.wlang()); if (rec.none) return;
       b.querySelector(".cx-nm").textContent = nameOf(E[id], rec);
       if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { b.querySelector(".cx-art").prepend(im); b.classList.add("has-img"); }); }
     } catch (x) { /* sin conexion: se queda el icono */ }
@@ -455,7 +348,7 @@ window.AIQ = window.AIQ || {};
           ${un && rec && rec.desc ? `<p class="cx-desc">${rec.desc}</p>` : ""}
           ${un ? "" : `<p class="cx-hint">${e.parent ? A.t("codex.hint.tier", { km: A.codexLimits(e)[e.tier - 1] }) : e.src === "curated" ? A.t("codex.hint.chain") : A.t("codex.hint.place")}</p>`}
           ${un && factLine ? `<blockquote class="cx-fact">${factLine}</blockquote>` : ""}
-          ${un ? `<div class="cx-sec" id="cxText"><p class="cx-load">${A.t("codex.loading")}</p></div>` : ""}
+          ${un ? `<div class="cx-sec" id="cxText"><p class="cx-load">${A.T("Cargando…", "Loading…")}</p></div>` : ""}
           ${rel ? `<div class="cx-sec"><h3>${A.t("codex.related")}</h3><div class="cx-rels">${rel}</div></div>` : ""}
           ${un && e.lat != null ? `<div class="cx-sec"><h3>${A.t("codex.location")}</h3><canvas id="cxMini" class="cx-mini"></canvas><p class="cx-coord">${Math.abs(e.lat).toFixed(2)}°${e.lat >= 0 ? "N" : "S"}  ${Math.abs(e.lon).toFixed(2)}°${e.lon >= 0 ? "E" : "W"}</p></div>` : ""}
         </div>
@@ -466,12 +359,11 @@ window.AIQ = window.AIQ || {};
     if (un && e.lat != null && map && $("cxMini")) requestAnimationFrame(() => { try { map.drawThumb($("cxMini"), { lat: e.lat, lon: e.lon, zoom: e.type === "country" ? 3 : e.type === "water" ? 3.5 : 9 }); } catch (x) { /* sin miniatura */ } });
     if (un) fillText(id);
   }
-  async function fillText(id, force) {
+  async function fillText(id) {
     const e = E[id], box = () => document.getElementById("cxText"); let rec;
-    try { rec = await loadContent(e, A.lang, force); } catch (x) { rec = null; }
+    try { rec = await loadContent(e, A.wlang()); } catch (x) { rec = null; }
     if (ui.cur !== id || !box()) return;
-    if (!rec) { box().innerHTML = `<p class="cx-load err">${A.t("codex.offline")} <button class="cx-retry" type="button">${A.t("codex.retry")}</button></p>`; box().querySelector(".cx-retry").onclick = () => { box().innerHTML = `<p class="cx-load">${A.t("codex.loading")}</p>`; fillText(id, true); }; return; }
-    if (rec.none) { box().innerHTML = `<p class="cx-load">${A.t("codex.nodesc")}</p>`; return; }
+    if (!rec || rec.none) { box().innerHTML = `<p class="cx-load">${A.t("codex.nodesc")}</p>`; return; }
     const par = t => String(t || "").split(/\n{2,}|\n/).filter(x => x.trim()).map(x => `<p>${x.replace(/</g, "&lt;")}</p>`).join("");
     const heroWanted = rec.img && !$("cxHero");
     const T = tiers(rec), body = e.parent ? (e.tier === 2 ? T.hist : T.key) : T.intro, head = e.parent ? A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : A.t("codex.about");
@@ -515,7 +407,7 @@ window.AIQ = window.AIQ || {};
     el.innerHTML = `<span class="cx-tcard r${e.rarity}"><span class="cx-art">${iconSvg(e.type)}</span></span><span class="cx-tt"><em>${A.t("codex.new")} · ${typeLabel(e.type)}</em><b>${nameOf(e, memOf(ids[0]))}</b>${more > 0 ? `<i>${A.t("codex.newmore", { n: more })}</i>` : ""}</span>`;
     el.onclick = () => { el.classList.add("hidden"); open(ids[0]); };
     el.classList.remove("hidden", "in"); void el.offsetWidth; el.classList.add("in"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.add("hidden"), 7000);
-    loadContent(e, A.lang).then(rec => { if (rec && rec.img && el.isConnected) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const a = el.querySelector(".cx-art"); if (a) a.prepend(im); }); } }).catch(() => {});
+    loadContent(e, A.wlang()).then(rec => { if (rec && rec.img && el.isConnected) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const a = el.querySelector(".cx-art"); if (a) a.prepend(im); }); } }).catch(() => {});
   }
   listeners.push(added => { setTimeout(() => { A.sfx.unlock(); toast(added); }, 1700); });
 
@@ -524,7 +416,7 @@ window.AIQ = window.AIQ || {};
     open, close, isOpen, stats, entry: id => E[id], has: id => !!E[id],
     unlocked: () => order.filter(isUnlocked), total: () => order.length,
     isUnlocked: id => !!store.unlocked[id],
-    _load: (id, lang) => loadContent(E[id], lang || A.lang),
+    _load: (id, lang) => loadContent(E[id], lang || A.wlang()),
     ids: () => order.slice(),
     reset() { store = { unlocked: {}, seen: {} }; save(); ui.cur = null; if (isOpen()) { labels(); renderGrid(true); } },
     byType,

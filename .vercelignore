@@ -3,3 +3,5 @@ dev
 assets/raw
 tools
 assets_stage
+assets/wiki
+node_modules

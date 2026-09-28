@@ -132,9 +132,19 @@
     const o = q(); if (!o) return;
     $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : o.kind || lv().kind));
     if (o.clue && o.answer && !(o.sub && (o.sub.en || o.sub.es))) o.sub = A.blankObj(o.answer);        // descripcion: debajo, la casilla de cada letra
-    const flagRound = !!(S.run && o.t === "c" && A.adv.isFlagRound && A.adv.isFlagRound());
+    const flagRound = lv().kind === "flag" || !!(S.run && o.t === "c" && A.adv.isFlagRound && A.adv.isFlagRound());
+    const portrait = !flagRound && !!o.img;
     $("askName").classList.toggle("ask-flag-wrap", flagRound);
+    $("askName").classList.toggle("ask-person-wrap", portrait);
     if (flagRound && A.adv.renderFlag) { A.adv.renderFlag(o); }
+    else if (portrait) {                                                   // Personajes: retrato (Wikimedia Commons, como las banderas) + nombre
+      const el = $("askName"), img = document.createElement("img"), nm = document.createElement("b");
+      img.className = "ask-portrait"; img.alt = ""; img.draggable = false;
+      img.src = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(o.img)}?width=240`;
+      img.onerror = () => img.remove();
+      nm.textContent = A.tx(o.name); el.replaceChildren(img, nm);
+      A.renderBlanks($("askSub"), A.tx(o.sub));
+    }
     else { $("askName").textContent = A.tx(o.name); A.renderBlanks($("askSub"), A.tx(o.sub)); if (S.run && A.adv.decorate) A.adv.decorate(o); }
     $("plate").classList.toggle("clue", !!o.clue);
   }
@@ -243,7 +253,7 @@
   function refreshLangUIs() { for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
   function setLang(code) {
     if (code === A.lang || !A.STR[code]) return;
-    A.lang = code; save(); A.sfx.ui(); A.wiki.loadShort(code); applyLang(); refreshLangUIs();
+    A.lang = code; save(); A.sfx.ui(); A.wiki.loadShort(A.wlang()); applyLang(); refreshLangUIs();
     if (S.phase === "title" && !S.booting) renderMenu();
     else if (S.phase === "reveal") { const o = q(); $("factText").textContent = o.clue ? `${A.t("res.was")}: ${A.tx(o.answer)}` : A.tx(o.fact); }
     if (S.camp) updateHud();

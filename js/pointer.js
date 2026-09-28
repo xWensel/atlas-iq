@@ -61,7 +61,28 @@ window.AIQ = window.AIQ || {};
     for (const [a, b] of pin) for (const [oa, ob] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) px(cx + a + oa, cy + b + ob, INK);
     for (const [a, b] of pin) px(cx + a, cy + b, RED); px(cx - 1, cy - 1, WHITE); px(cx, cy - 1, "#ffb0a8");
     if (P.press > 0) { const k = 1 - P.press / 100; circle(cx, cy, Math.round(R + 2 + k * 8), `rgba(255,247,230,${(1 - k).toFixed(2)})`); }
+    if (P.m && P.m.dizzy) for (let k = 0; k < 3; k++) {                                                 // Mareo: estrellitas que dan vueltas
+      const a = t * 3.1 + (k * Math.PI * 2) / 3, sx = Math.round(cx + Math.cos(a) * (R + 9)), sy = Math.round(cy + Math.sin(a) * (R + 9) * 0.45 - 4), col = k === 1 ? WHITE : GOLD2;
+      for (const [a2, b2] of [[0, -2], [0, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [0, 1], [0, 2]]) px(sx + a2, sy + b2, col);
+    }
+    if (P.m && P.m.cblur) defocus(P.m.cblur.px, t);
   }
+  /* Cursor borroso: desenfoque optico de verdad (vision doble con aberracion cromatica), no una mancha */
+  let tmp = null, tctx = null, tin = null, tinx = null;
+  const tint = col => { tinx.globalCompositeOperation = "source-over"; tinx.clearRect(0, 0, 64, 64); tinx.drawImage(tmp, 0, 0); tinx.globalCompositeOperation = "source-in"; tinx.fillStyle = col; tinx.fillRect(0, 0, 64, 64); return tin; };
+  function defocus(k, t) {
+    if (!tmp) { tmp = document.createElement("canvas"); tmp.width = tmp.height = 64; tctx = tmp.getContext("2d"); tin = document.createElement("canvas"); tin.width = tin.height = 64; tinx = tin.getContext("2d"); }
+    tctx.clearRect(0, 0, 64, 64); tctx.drawImage(cv, 0, 0); c.clearRect(0, 0, 64, 64);
+    const b = (k * 0.2).toFixed(2), o = Math.min(6, k * 0.6) * (1 + Math.sin(t * 2.3) * 0.2);   // px del lienzo (x2 en pantalla)
+    c.save(); c.globalCompositeOperation = "lighter"; c.globalAlpha = 0.62; c.filter = `blur(${b}px)`;
+    c.drawImage(tint("#ff3d6e"), -o, -o * 0.15); c.drawImage(tint("#3de4ff"), o, o * 0.15);
+    c.globalCompositeOperation = "source-over"; c.globalAlpha = 0.9; c.filter = `blur(${(k * 0.14).toFixed(2)}px)`; c.drawImage(tmp, 0, 0);
+    c.restore();
+  }
+  /* Cursor parpadeante: tubo de neon moribundo (tramos irregulares y tartamudeo al encenderse; de media sigue apagado lo mismo) */
+  const hash1 = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+  function neonOn(now, b) { const u = now / 1000 / b.period, n = Math.floor(u), ph = u - n, duty = b.duty + 0.02 + (hash1(n) - 0.5) * 0.3; if (ph >= duty) return false; return ph > 0.08 || Math.floor(now / 25) % 2 === 0; }
+  let ghostWas = true;
 
   /* ---------------------------------------------------------------- bucle */
   function frame(now) {
@@ -117,14 +138,21 @@ window.AIQ = window.AIQ || {};
     const x = P.x, y = P.y, fx = P.st.fx || {}, m = P.m; root.style.transform = `translate(${x}px,${y}px)`;
     if (A.chal && A.chal.pointer) A.chal.pointer(x, y);
     if (map && A.chal) { const r = A.chal.lensRadius ? A.chal.lensRadius() : 0; map.setLens(r > 0 ? { x, y, r } : null); }
-    let a = 1;
+    let a = 1, sc = 1, neon = false;
     if (m) {
-      if (m.blink && !fx.noBlink) a = (((now / 1000) / m.blink.period) % 1) < m.blink.duty ? 1 : 0;
-      if (m.ghost) { const cyc = m.ghost.every + m.ghost.off; if ((now / 1000) % cyc > m.ghost.every) a = 0; }
+      if (m.blink && !fx.noBlink) { a = neonOn(now, m.blink) ? 1 : 0; neon = a === 1; }
+      if (m.ghost) {                                                   // Cursor fantasma: se disuelve en una voluta y reaparece con un destello
+        const cyc = m.ghost.every + m.ghost.off, ph = (now / 1000) % cyc, gone = ph > m.ghost.every;
+        if (gone) a = 0; else if (ph > m.ghost.every - 0.18) { const q = (m.ghost.every - ph) / 0.18; a = Math.min(a, q); sc = 1 + (1 - q) * 0.45; } else if (ph < 0.15) { a = Math.min(a, ph / 0.15); sc = 1.25 - (ph / 0.15) * 0.25; }
+        if (gone && !ghostWas && A.chfx && A.chfx.puff) A.chfx.puff(x, y);
+        ghostWas = gone;
+      }
+      if (m.lag && A.chfx && A.chfx.trail) A.chfx.trail(x, y);        // Cursor con retraso: estela de fantasmas del reticulo
     }
     if (a === 0 && fx.beacon) a = 0.28;
     cv.style.opacity = a; tag.style.opacity = a;
-    cv.style.filter = m && m.cblur ? `blur(${m.cblur.px}px) drop-shadow(0 3px 0 rgba(0,0,0,.45))` : "";
+    cv.style.transform = sc !== 1 ? `scale(${sc.toFixed(3)})` : "";
+    cv.classList.toggle("neon", neon);
   }
   P.mods = () => { P.m = A.chal && A.chal.ptrMods ? A.chal.ptrMods() : null; };
   P.effective = () => (P.on ? [P.x, P.y] : null);

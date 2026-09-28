@@ -57,7 +57,7 @@ function buildWindow(mode, url) {
   const frame = hasFrame(mode);
   const opts = {
     minWidth: 960, minHeight: 600, useContentSize: true, autoHideMenuBar: true,
-    backgroundColor: "#0b2a44", frame, show: false,
+    backgroundColor: "#0b2a44", frame, show: false, icon: path.join(ROOT, "assets", "desktop", "icon.ico"),
     webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(ROOT, "preload.js") },
   };
   if (mode === "border") {
@@ -107,6 +107,7 @@ ipcMain.on("win:setMode", (e, mode) => setWindowMode(mode));
 app.commandLine.appendSwitch("disable-gpu-sandbox");
 
 const ROOT = __dirname;
+const PORT = 47815;
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".ico": "image/x-icon", ".woff2": "font/woff2", ".mp3": "audio/mpeg", ".wasm": "application/wasm", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml" };
 
 function startServer() {
@@ -117,11 +118,16 @@ function startServer() {
       if (!filePath.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
       fs.readFile(filePath, (err, data) => {
         if (err) { res.writeHead(404); res.end("Not found"); return; }
-        res.writeHead(200, { "Content-Type": MIME[path.extname(filePath)] || "application/octet-stream" });
+        res.writeHead(200, { "Content-Type": MIME[path.extname(filePath)] || "application/octet-stream", "Cache-Control": "no-cache" });   // siempre la ultima version de los archivos
         res.end(data);
       });
     });
-    server.listen(0, "127.0.0.1", () => resolve(server.address().port));
+    /* puerto FIJO: el guardado (localStorage) va por origen y el puerto forma parte de el; con un puerto
+       aleatorio cada arranque empezaria sin partidas, perfil ni Enciclopedia. Solo si esta ocupado se prueba el siguiente */
+    let port = PORT;
+    server.on("error", err => { if (err.code === "EADDRINUSE" && port < PORT + 20) server.listen(++port, "127.0.0.1"); else throw err; });
+    server.on("listening", () => resolve(server.address().port));
+    server.listen(port, "127.0.0.1");
   });
 }
 

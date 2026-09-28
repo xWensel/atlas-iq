@@ -10,10 +10,10 @@ window.AIQ = window.AIQ || {};
   const RUNKEY = "atlasiq.run.v2";
   const ic = (id, cls) => A.icon(id, cls), CN = () => A.icon("coin", "cn");
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const L6 = s => { const [es, en, fr, pt, de, it] = s.split("|"); return { es, en, fr, pt, de, it }; };
+  const L6 = A.L6;
   const suitRed = s => s === "s_pin" || s === "s_compass" || s === "heart";
   const ixs = () => "";                                              // las cartas ya no llevan indices (A K Q J, numeros ni palos)
-  const R_NAMES = [L6("Común|Common|Commune|Comum|Gewöhnlich|Comune"), L6("Poco común|Uncommon|Peu commune|Incomum|Ungewöhnlich|Non comune"), L6("Rara|Rare|Rare|Rara|Selten|Rara"), L6("Legendaria|Legendary|Légendaire|Lendária|Legendär|Leggendaria")];
+  const R_NAMES = [L6("Común|Common|Commune|Comum|Gewöhnlich|Comune||普通|일반|コモン|Обычная|Zwykła"), L6("Poco común|Uncommon|Peu commune|Incomum|Ungewöhnlich|Non comune||少见|언커먼|アンコモン|Необычная|Niezwykła"), L6("Rara|Rare|Rare|Rara|Selten|Rara||稀有|레어|レア|Редкая|Rzadka"), L6("Legendaria|Legendary|Légendaire|Lendária|Legendär|Leggendaria||传说|레전더리|レジェンダリー|Легендарная|Legendarna")];
 
   /* ------------------------------------------------------------------ actos */
   const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
@@ -26,15 +26,15 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ temas de ronda (cada uno con un banco enorme) */
   const TOPIC_NAMES = {
-    capital: [L6("Capitales del mundo (fáciles)|World capitals (easy)|Capitales du monde (faciles)|Capitais do mundo (fáceis)|Hauptstädte der Welt (leicht)|Capitali del mondo (facili)"), L6("Capitales del mundo (difíciles)|World capitals (hard)|Capitales du monde (difficiles)|Capitais do mundo (difíceis)|Hauptstädte der Welt (schwer)|Capitali del mondo (difficili)")],
-    landmark: [L6("Monumentos y lugares famosos|Landmarks and famous places|Monuments et lieux célèbres|Monumentos e lugares famosos|Wahrzeichen und berühmte Orte|Monumenti e luoghi famosi"), L6("Maravillas del mundo (difíciles)|World wonders (hard)|Merveilles du monde (difficiles)|Maravilhas do mundo (difíceis)|Weltwunder (schwer)|Meraviglie del mondo (difficili)"), L6("Tesoros escondidos|Hidden treasures|Trésors cachés|Tesouros escondidos|Verborgene Schätze|Tesori nascosti")],
-    city: [L6("Grandes ciudades|Big cities|Grandes villes|Grandes cidades|Große Städte|Grandi città"), L6("Ciudades importantes|Important cities|Villes importantes|Cidades importantes|Wichtige Städte|Città importanti"), L6("Ciudades difíciles|Hard cities|Villes difficiles|Cidades difíceis|Schwere Städte|Città difficili")],
-    country: [L6("Países (haz clic dentro)|Countries (click inside)|Pays (clique dedans)|Países (clique dentro)|Länder (klicke hinein)|Paesi (clicca dentro)"), L6("Países difíciles|Hard countries|Pays difficiles|Países difíceis|Schwere Länder|Paesi difficili")],
-    history: [L6("Batallas y sucesos famosos|Famous battles and events|Batailles et événements célèbres|Batalhas e acontecimentos famosos|Berühmte Schlachten und Ereignisse|Battaglie ed eventi famosi"), L6("Historia (difícil)|History (hard)|Histoire (difficile)|História (difícil)|Geschichte (schwer)|Storia (difficile)")],
-    nature: [L6("Maravillas de la naturaleza|Natural wonders|Merveilles de la nature|Maravilhas da natureza|Naturwunder|Meraviglie della natura"), L6("Mares y montañas|Seas and mountains|Mers et montagnes|Mares e montanhas|Meere und Berge|Mari e montagne")],
-    clue: [L6("Apodos y pistas|Nicknames and clues|Surnoms et indices|Apelidos e pistas|Spitznamen und Hinweise|Soprannomi e indizi")],
-    mixed: [L6("¡Jackpot! De todo un poco|Jackpot! A bit of everything|Jackpot ! Un peu de tout|Jackpot! Um pouco de tudo|Jackpot! Von allem etwas|Jackpot! Un po' di tutto")],
-    flag: [L6("Banderas del mundo|World flags|Drapeaux du monde|Bandeiras do mundo|Flaggen der Welt|Bandiere del mondo"), L6("El coleccionista de banderas|The flag collector|Le collectionneur de drapeaux|O colecionador de bandeiras|Der Flaggensammler|Il collezionista di bandiere")],
+    capital: [L6("Capitales del mundo (fáciles)|World capitals (easy)|Capitales du monde (faciles)|Capitais do mundo (fáceis)|Hauptstädte der Welt (leicht)|Capitali del mondo (facili)||世界首都（简单）|세계의 수도 (쉬움)|世界の首都（かんたん）|Столицы мира (лёгкие)|Stolice świata (łatwe)"), L6("Capitales del mundo (difíciles)|World capitals (hard)|Capitales du monde (difficiles)|Capitais do mundo (difíceis)|Hauptstädte der Welt (schwer)|Capitali del mondo (difficili)||世界首都（困难）|세계의 수도 (어려움)|世界の首都（むずかしい）|Столицы мира (сложные)|Stolice świata (trudne)")],
+    landmark: [L6("Monumentos y lugares famosos|Landmarks and famous places|Monuments et lieux célèbres|Monumentos e lugares famosos|Wahrzeichen und berühmte Orte|Monumenti e luoghi famosi||地标与著名地点|랜드마크와 유명한 장소|名所と有名な場所|Достопримечательности и известные места|Zabytki i słynne miejsca"), L6("Maravillas del mundo (difíciles)|World wonders (hard)|Merveilles du monde (difficiles)|Maravilhas do mundo (difíceis)|Weltwunder (schwer)|Meraviglie del mondo (difficili)||世界奇观（困难）|세계의 경이 (어려움)|世界の驚異（むずかしい）|Чудеса света (сложные)|Cuda świata (trudne)"), L6("Tesoros escondidos|Hidden treasures|Trésors cachés|Tesouros escondidos|Verborgene Schätze|Tesori nascosti||隐藏的宝藏|숨겨진 보물|隠れた名所|Скрытые сокровища|Ukryte skarby")],
+    city: [L6("Grandes ciudades|Big cities|Grandes villes|Grandes cidades|Große Städte|Grandi città||大城市|대도시|大都市|Большие города|Wielkie miasta"), L6("Ciudades importantes|Important cities|Villes importantes|Cidades importantes|Wichtige Städte|Città importanti||重要城市|주요 도시|主要都市|Важные города|Ważne miasta"), L6("Ciudades difíciles|Hard cities|Villes difficiles|Cidades difíceis|Schwere Städte|Città difficili||高难城市|어려운 도시|難しい都市|Сложные города|Trudne miasta")],
+    country: [L6("Países (haz clic dentro)|Countries (click inside)|Pays (clique dedans)|Países (clique dentro)|Länder (klicke hinein)|Paesi (clicca dentro)||国家（点击国境内）|국가 (안쪽을 클릭)|国（国内をクリック）|Страны (кликни внутри)|Kraje (kliknij w środku)"), L6("Países difíciles|Hard countries|Pays difficiles|Países difíceis|Schwere Länder|Paesi difficili||高难国家|어려운 국가|難しい国|Сложные страны|Trudne kraje")],
+    history: [L6("Batallas y sucesos famosos|Famous battles and events|Batailles et événements célèbres|Batalhas e acontecimentos famosos|Berühmte Schlachten und Ereignisse|Battaglie ed eventi famosi||著名战役与事件|유명한 전투와 사건|有名な戦いと出来事|Знаменитые битвы и события|Słynne bitwy i wydarzenia"), L6("Historia (difícil)|History (hard)|Histoire (difficile)|História (difícil)|Geschichte (schwer)|Storia (difficile)||历史（困难）|역사 (어려움)|歴史（むずかしい）|История (сложно)|Historia (trudna)")],
+    nature: [L6("Maravillas de la naturaleza|Natural wonders|Merveilles de la nature|Maravilhas da natureza|Naturwunder|Meraviglie della natura||自然奇观|자연의 경이|自然の驚異|Природные чудеса|Cuda natury"), L6("Mares y montañas|Seas and mountains|Mers et montagnes|Mares e montanhas|Meere und Berge|Mari e montagne||海洋与山脉|바다와 산|海と山|Моря и горы|Morza i góry")],
+    clue: [L6("Apodos y pistas|Nicknames and clues|Surnoms et indices|Apelidos e pistas|Spitznamen und Hinweise|Soprannomi e indizi||别称与线索|별명과 단서|ニックネームとヒント|Прозвища и подсказки|Przydomki i wskazówki")],
+    mixed: [L6("¡Jackpot! De todo un poco|Jackpot! A bit of everything|Jackpot ! Un peu de tout|Jackpot! Um pouco de tudo|Jackpot! Von allem etwas|Jackpot! Un po' di tutto||大奖！样样都有|잭팟! 이것저것 다 있어요|ジャックポット！なんでもあり|Джекпот! Всего понемногу|Jackpot! Wszystkiego po trochu")],
+    flag: [L6("Banderas del mundo|World flags|Drapeaux du monde|Bandeiras do mundo|Flaggen der Welt|Bandiere del mondo||世界国旗|세계의 국기|世界の国旗|Флаги мира|Flagi świata"), L6("El coleccionista de banderas|The flag collector|Le collectionneur de drapeaux|O colecionador de bandeiras|Der Flaggensammler|Il collezionista di bandiere||国旗收藏家|국기 수집가|国旗コレクター|Коллекционер флагов|Kolekcjoner flag")],
   };
   const KIND_FACTOR = { capital: 1, city: 1, landmark: 0.9, nature: 1.5, battle: 0.9, event: 0.9, country: 0.7, clue: 1, water: 1.6, strait: 1.4 };
   /* 12 rondas: 3 actos de 4 (la 4.a es el jefe). Empieza facil y va cambiando de tema y subiendo el nivel. */
@@ -197,7 +197,7 @@ window.AIQ = window.AIQ || {};
   A.adv.resume = function () {
     try { run = JSON.parse(localStorage.getItem(RUNKEY)); } catch (e) { run = null; }
     if (!run) return false;
-    migrate(run);
+    migrate(run); resumedIntro = true;
     if (run.phase === "shop" || run.phase === "chest") openShop(run.phase === "chest");
     else if (run.phase === "verdict") afterVerdict(!!run.vBoss);                            // la ronda ya estaba superada y cobrada: seguimos al campamento
     else if (run.phase === "win") showWinChoice();                                          // ya habias ganado: vuelve a preguntar cobrar o modo infinito
@@ -209,7 +209,7 @@ window.AIQ = window.AIQ || {};
   };
   A.adv.abandon = () => { run = null; persist(); };
   A.adv.save = () => persist();
-  A.adv.leave = () => { if (run) persist(); clearTimers(); A.chal.end(); A.dealer.enable(false); run = null; };
+  A.adv.leave = () => { if (run) { persist(); A.dealer.noteLeave(); } clearTimers(); A.chal.end(); A.dealer.enable(false); run = null; };
   A.adv.summary = () => { try { const r = run || JSON.parse(localStorage.getItem(RUNKEY)); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives } : null; } catch (e) { return null; } };
   A.adv.active = () => !!run;
 
@@ -311,15 +311,18 @@ window.AIQ = window.AIQ || {};
       ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
       <div class="intro-art">${A.pic("topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
   };
-  /* el crupier habla en la intro: saludo o reparto + una frase por reto (y protesta si ya llevas el perk que lo anula) */
+  /* el crupier habla en la intro: lo que toca segun el momento de la expedicion (primera, revancha, reanudada, reintento, nuevo acto, jefe...)
+     + una frase por reto (y protesta si ya llevas el perk que lo anula). El guion vive en js/dealer.js (D.introSeq). */
+  let resumedIntro = false;                                           // la proxima intro es la primera tras reanudar una partida guardada
   A.adv.introReady = Lv => {
     const host = $("introDealer"); if (!host || !run) return 0; const D = A.dealer, list = run.chal || [];
-    D.enable(true); D.dock(host); const seq = [];
-    const first = run.act === 0 && run.round === 0 && !run.qTotal;
-    seq.push(Lv.boss ? { line: D.line("boss"), mood: "boss" } : !list.length ? { line: D.line(first ? "hello" : "calm"), mood: "sly" } : { line: D.line("deal"), mood: "sly" });
-    list.slice(0, Lv.boss ? 3 : 2).forEach(c => { const ln = D.line(c.id); if (ln) seq.push({ line: ln, mood: "sly" }); });
+    D.enable(true); D.dock(host);
     const counters = list.some(c => (A.CHAL[c.id].counters || []).some(id => owned(id)));
-    if (counters) seq.push({ line: D.line("counter"), mood: "angry" });
+    const seq = D.introSeq({
+      boss: !!Lv.boss, last: roundNo() === 11, inf: !!run.inf, fresh: run.act === 0 && run.round === 0 && !run.qTotal && !run.attempt, resumed: resumedIntro, ranked: !!run.ranked,
+      act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), counters,
+    });
+    resumedIntro = false;
     D.sequence(seq); return seq.reduce((n, it) => n + A.tx(it.line).length * 40 + 900, 0);
   };
   A.adv.introEnd = () => { A.dealer.dock(null); A.dealer.hide(); };
@@ -405,13 +408,13 @@ window.AIQ = window.AIQ || {};
   const gust = () => 1 + 0.22 * Math.sin(performance.now() / 1000 * 1.9) + 0.08 * Math.sin(performance.now() / 1000 * 5.3);
   const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat, gust()), p = m.lonLatToScreen(a.lon, a.lat); return [p[0] - px, p[1] - py]; };
   A.adv.decorate = o => A.chal.decorate(o);
-  /* ronda de banderas: la placa muestra la bandera (traida en vivo de Wikimedia Commons, ver data/flags.js) en vez del nombre */
+  /* ronda de banderas: la placa muestra la bandera (SVG empaquetado en assets/flags por tools/bundle-media.py; credito en data/flags.js) en vez del nombre */
   A.adv.isFlagRound = () => !!(run && run.topic === "flag");
   A.adv.renderFlag = o => {
     const el = $("askName"); if (!el) return; const sub = $("askSub"); if (sub) sub.textContent = "";
     const rec = A.FLAGS && o.name && A.FLAGS[o.name.en];
     if (!rec) { el.textContent = A.tx(o.name); return; }                          // sin datos empaquetados todavia: se ve el nombre, nunca un hueco vacio
-    const src = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(rec[0])}?width=480`;
+    const src = `assets/flags/${A.mediaKey(o.name.en)}.svg`;
     el.innerHTML = `<img class="ask-flag" src="${src}" alt="" draggable="false">`;
     const img = el.querySelector(".ask-flag"), fx = A.chal.flagFx && A.chal.flagFx();
     if (img && fx) img.style.filter = fx;
@@ -539,7 +542,8 @@ window.AIQ = window.AIQ || {};
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), Lv.advance]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives), art: "lose",
         buttons: [{ id: "rtBtn", cls: "btn-ink", label: A.T("Reintentar con lugares nuevos", "Retry with new places"), arrow: true, primary: true, onclick: () => openShop(false) }, { id: "abBtn", cls: "btn-line", label: A.T("Abandonar", "Abandon"), onclick: () => endRun(false) }],
       });
-      setTimeout(() => A.dealer.react("roundFail"), 700);
+      const lives = run.lives; setTimeout(() => A.dealer.react("roundFail", { lives }), 700);
+      A.dealer.hover($("abBtn"), "hoverAbandon");                            // si el cursor va hacia Abandonar, el crupier lo ve
     }
     run.sup = {}; run.bet = 0; persist();                                   // los suministros y la apuesta solo valen para una ronda
   };
@@ -709,10 +713,12 @@ window.AIQ = window.AIQ || {};
     P.adv.bestScore = Math.max(P.adv.bestScore, final); P.adv.coins += run.stats.coinsEarned;
     if (win && run.won) P.adv.asc = Math.max(P.adv.asc, Math.min(5, run.asc + 1));
     A.profile.save();
-    const rec = A.profile.record("adv-all", final);
+    const hadBest = (P.records["adv-all"] || 0) > 0, rec = A.profile.record("adv-all", final);   // la primera expedicion siempre es "record": el crupier solo lo celebra si habia uno que batir
     A.rank.submit("adv-all", { score: final, extra: { deck: run.deck, asc: run.asc, r: run.cleared } });
     if (wasRanked && board) { P.daily[board] = { score: final, ts: Date.now() }; A.profile.save(); A.rank.submit(board, { score: final, extra: { deck: run.deck, r: run.cleared } }); A.ach.emit("daily", {}); }
-    const r = run; run = null; persist(); C().S.run = null; A.chal.end(); A.dealer.enable(true); setTimeout(() => A.dealer.react(win ? "runWin" : "runLose"), 900);
+    const r = run; run = null; persist(); C().S.run = null; A.chal.end(); A.dealer.enable(true);
+    const fell = { r: r.cleared + 1, won: !!r.won, record: rec && hadBest };           // {r}: la ronda en la que caiste
+    A.dealer.noteRun(fell); setTimeout(() => A.dealer.react(win ? "runWin" : "runLose", fell), 900);
     A.sfx.stamp(); setTimeout(win ? A.sfx.victory : A.sfx.lose, 300);
     C().verdict({
       kind: win ? "win" : "", level: r.cleared, tag: A.T("Expedición", "Expedition"), title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
@@ -722,6 +728,7 @@ window.AIQ = window.AIQ || {};
       stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
       buttons: [{ id: "nrBtn", cls: "btn-ink", label: A.T("Otra expedición", "Another expedition"), arrow: true, primary: true, onclick: () => C().showHub("adventure") }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],
     });
+    A.dealer.hover($("hubBtn"), "hoverQuit");                              // si el cursor va hacia Menu en vez de a otra expedicion, el crupier lo ve
     C().map.setStyle(mapStyleFor()); A.adv.hideBars();
   }
   A.adv.endRun = endRun; A.adv.startRound = startRound; A.adv.openShop = openShop;

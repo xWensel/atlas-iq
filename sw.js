@@ -1,7 +1,7 @@
 /* Geolite - service worker: funciona sin conexion (cache de la app) y se actualiza solo. */
-const CACHE = "geolite-v0.32.0";
+const CACHE = "geolite-v0.33.0";
 const CORE = [
-  "./", "index.html", "manifest.webmanifest", "css/style.css", "css/boot.css", "css/skins.css", "css/codex.css", "css/hub.css", "css/premium.css", "css/challenges.css", "css/uikit.css", "css/tour.css", "js/uikit.js", "js/tips.js", "js/tour.js", "js/jukebox.js", "js/profile.js", "js/rank.js", "js/relics.js", "js/challenges.js", "js/dealer.js", "js/pointer.js", "js/adventure.js", "js/hub.js", "js/icons.js", "js/i18n2.js", "js/i18n3.js", "js/i18n4.js", "js/i18n5.js", "js/art.js", "data/codex.js", "data/places.js", "js/codex.js", "js/wiki.js",
+  "./", "index.html", "manifest.webmanifest", "css/style.css", "css/boot.css", "css/skins.css", "css/codex.css", "css/hub.css", "css/premium.css", "css/challenges.css", "css/uikit.css", "css/tour.css", "js/uikit.js", "js/tips.js", "js/tour.js", "js/jukebox.js", "js/profile.js", "js/rank.js", "js/relics.js", "js/challenges.js", "js/chfx.js", "js/dealer.js", "js/pointer.js", "js/adventure.js", "js/hub.js", "js/icons.js", "js/i18n2.js", "js/i18n3.js", "js/i18n4.js", "js/i18n5.js", "js/art.js", "data/codex.js", "data/places.js", "js/codex.js", "js/wiki.js",
   "js/vendor/topojson-client.min.js", "js/vendor/earcut.min.js", "data/world.js", "data/classic.js", "data/locations.js", "data/history.js", "data/classic-tr.js", "data/campaigns.js",
   "js/geo.js", "js/i18n.js", "js/logo.js", "js/support.js", "js/audio.js", "js/map2d.js", "js/map.js", "js/skins.js", "js/game.js",
   "assets/icon-192.png", "assets/icon-512.png", "assets/logo.png", "assets/icons/logo_mark.png", "assets/icons/logo_mark_s.png", "favicon.ico",
@@ -16,7 +16,7 @@ self.addEventListener("fetch", e => {
   const isFont = url.pathname.includes("/fonts/");
   e.respondWith(
     (isFont ? caches.match(req) : Promise.resolve(null)).then(hit => hit || fetch(req).then(res => {
-      if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
+      if (res.ok && !url.pathname.includes("/assets/wiki/hd/")) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }   // las fotos HD (~900 MB) no se guardan: solo se piden al ampliar
       return res;
     }).catch(() => caches.match(req).then(r => r || caches.match("index.html"))))
   );

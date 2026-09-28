@@ -234,6 +234,8 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 
 /* cartas de modo sin indices de baraja (K / A / Q): texto a todo el ancho */
 .mcard .mc-name { padding: 0 2px; } .mcard .mc-desc { padding: 0; }
+/* idiomas de palabras largas (ruso, aleman...): partir con guion en vez de desbordar la carta */
+.mcard .mc-name, .mcard .mc-desc { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
 @media (max-height: 520px) and (orientation: landscape) { .mcard .mc-name, .mcard .mc-desc { padding: 0; } }
 
 

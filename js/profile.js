@@ -28,6 +28,8 @@ window.AIQ = window.AIQ || {};
   /* ---------------------------------------------------------------- logros */
   const AD = (id, ico, es, en, de, dn, ev, test, secret) => ({ id, ico, name: { es, en }, desc: { es: de, en: dn }, ev, test, secret: !!secret });
   const S = () => P.stats, ADV = () => P.adv;
+  const won = id => !!P.records["classic:" + id + ":win"];
+  const classicIds = () => (A.CAMPAIGNS || []).filter(c => c.mode === "classic").map(c => c.id);
   A.ACH = [
     AD("first_pin", "📍", "Primer pin", "First pin", "Responde tu primera pregunta.", "Answer your first question.", "q", () => S().questions >= 1),
     AD("bull_1", "🎯", "Diana", "Bullseye", "Acierta a menos de 25 km (o dentro del país).", "Land within 25 km (or inside the country).", "q", c => c.bull),
@@ -45,8 +47,6 @@ window.AIQ = window.AIQ || {};
     AD("q_1000", "🗺️", "Cartógrafo", "Cartographer", "1.000 preguntas respondidas.", "1,000 questions answered.", "q", () => S().questions >= 1000),
     AD("q_5000", "🌍", "Geógrafo", "Geographer", "5.000 preguntas respondidas.", "5,000 questions answered.", "q", () => S().questions >= 5000),
     AD("perfect", "💯", "Ronda perfecta", "Perfect round", "Cinco aciertos buenos en un nivel.", "Five good hits in one level.", "level", c => c.perfect),
-    AD("classic_win", "🏁", "Vuelta completa", "Full circuit", "Termina una partida Clásica.", "Finish a Classic campaign.", "classic", c => c.win),
-    AD("classic_all", "🏆", "Maestro del Clásico", "Classic master", "Termina las seis partidas Clásicas.", "Finish all six Classic campaigns.", "classic", () => ["c-game1", "c-worldcapitals", "c-usa", "c-asia", "c-centralsouthamerica", "c-oceania"].every(id => P.records["classic:" + id + ":win"])),
     AD("codex_10", "📖", "Primeras páginas", "First pages", "10 tarjetas en la Enciclopedia.", "10 Encyclopedia cards.", "codex", c => c.u >= 10),
     AD("codex_50", "📚", "Rata de biblioteca", "Bookworm", "50 tarjetas.", "50 cards.", "codex", c => c.u >= 50),
     AD("codex_100", "🏛️", "Erudito", "Scholar", "100 tarjetas.", "100 cards.", "codex", c => c.u >= 100),
@@ -80,14 +80,22 @@ window.AIQ = window.AIQ || {};
     AD("codex_city", "🏙️", "Turista empedernido", "World traveler", "100 ciudades.", "100 cities.", "codex", c => (c.by.city || [0])[0] >= 100),
     AD("codex_country", "🛂", "Pasaporte completo", "Full passport", "190 países en la Enciclopedia.", "190 countries in the Encyclopedia.", "codex", c => (c.by.country || [0])[0] >= 190),
     AD("codex_place", "🧭", "Rincones perdidos", "Hidden corners", "10 lugares sin categoría propia.", "10 uncategorized places.", "codex", c => (c.by.place || [0])[0] >= 10),
-    AD("classic_world", "🌍", "Vuelta al mundo", "Round the world", "Termina la campaña Mundo.", "Finish the World campaign.", "classic", () => !!P.records["classic:c-game1:win"]),
-    AD("classic_capitals", "🏛️", "Gira de capitales", "Capital tour", "Termina Capitales del mundo.", "Finish World Capitals.", "classic", () => !!P.records["classic:c-worldcapitals:win"]),
-    AD("classic_usa", "🗽", "Sueño americano", "American dream", "Termina Estados Unidos.", "Finish USA.", "classic", () => !!P.records["classic:c-usa:win"]),
-    AD("classic_asia", "🏯", "Ruta de la seda", "Silk road", "Termina Asia.", "Finish Asia.", "classic", () => !!P.records["classic:c-asia:win"]),
-    AD("classic_latam", "💃", "Tierra latina", "Latin spirit", "Termina Latinoamérica.", "Finish Latin America.", "classic", () => !!P.records["classic:c-centralsouthamerica:win"]),
-    AD("classic_oceania", "🏄", "Al fin del mundo", "Down under", "Termina Oceanía.", "Finish Oceania.", "classic", () => !!P.records["classic:c-oceania:win"]),
+    /* Clasico: un logro por campana (las 11), todas, primer oro y oro en todas. Sin "termina una cualquiera":
+     * se desbloqueaba siempre a la vez que el de la campana terminada. */
+    AD("classic_world", "🌍", "Vuelta al mundo", "Round the world", "Termina la campaña Mundo.", "Finish the World campaign.", "classic", () => won("c-game1")),
+    AD("classic_capitals", "🏛️", "Gira de capitales", "Capital tour", "Termina Capitales del mundo.", "Finish World Capitals.", "classic", () => won("c-worldcapitals")),
+    AD("classic_usa", "🗽", "Sueño americano", "American dream", "Termina Estados Unidos.", "Finish USA.", "classic", () => won("c-usa")),
+    AD("classic_europe", "🏰", "Grand Tour", "Grand Tour", "Termina Europa.", "Finish Europe.", "classic", () => won("c-europe")),
+    AD("classic_asia", "🏯", "Ruta de la seda", "Silk road", "Termina Asia.", "Finish Asia.", "classic", () => won("c-asia")),
+    AD("classic_latam", "💃", "Tierra latina", "Latin spirit", "Termina Latinoamérica.", "Finish Latin America.", "classic", () => won("c-centralsouthamerica")),
+    AD("classic_oceania", "🏄", "Al fin del mundo", "Down under", "Termina Oceanía.", "Finish Oceania.", "classic", () => won("c-oceania")),
+    AD("classic_flags", "🚩", "Abanderado", "Standard-bearer", "Termina Banderas.", "Finish Flags.", "classic", () => won("c-flags")),
+    AD("classic_clues", "🕵️", "Detective", "Sleuth", "Termina Pistas.", "Finish Clues.", "classic", () => won("c-clues")),
+    AD("classic_events", "📜", "Testigo de la historia", "Witness to history", "Termina Eventos históricos.", "Finish Historic Events.", "classic", () => won("c-events")),
+    AD("classic_people", "🎭", "Biógrafo", "Biographer", "Termina Personajes históricos.", "Finish Historical Figures.", "classic", () => won("c-people")),
+    AD("classic_all", "🏆", "Maestro del Clásico", "Classic master", "Termina todas las campañas del Clásico.", "Finish every Classic campaign.", "classic", () => classicIds().every(won)),
     AD("classic_gold1", "🥇", "Oro a la vista", "First gold", "Consigue tu primera medalla de oro en el Clásico.", "Earn your first Classic gold medal.", "classic", () => Object.values(P.medals).some(m => m === "gold")),
-    AD("classic_goldall", "👑", "Oro puro", "Solid gold", "Medalla de oro en las seis campañas del Clásico.", "Gold medal in all six Classic campaigns.", "classic", () => ["c-game1", "c-worldcapitals", "c-usa", "c-asia", "c-centralsouthamerica", "c-oceania"].every(id => P.medals[id] === "gold")),
+    AD("classic_goldall", "👑", "Oro puro", "Solid gold", "Medalla de oro en todas las campañas del Clásico.", "Gold medal in every Classic campaign.", "classic", () => classicIds().every(id => P.medals[id] === "gold")),
     AD("adv_asc2", "⛰️", "Ascensión II", "Ascension II", "Gana una expedición en Ascensión 2 o más.", "Win an expedition at Ascension 2 or higher.", "adv", c => c.kind === "act" && c.act >= 3 && c.asc >= 2),
     AD("adv_ascmax", "🗻", "La cumbre", "The summit", "Gana una expedición en la Ascensión máxima.", "Win an expedition at max Ascension.", "adv", c => c.kind === "act" && c.act >= 3 && c.asc >= 5),
     AD("adv_flawless2", "🛡️", "Impecable II", "Flawless II", "Completa el Acto II sin perder provisiones.", "Complete Act II without losing a life.", "adv", c => c.kind === "act" && c.flawless && c.act >= 2),
@@ -130,7 +138,7 @@ window.AIQ = window.AIQ || {};
       }
       if (n) { save(); toast(); }
     },
-    count: () => Object.keys(P.ach).length, total: () => A.ACH.length,
+    count: () => A.ACH.filter(a => P.ach[a.id]).length, total: () => A.ACH.length,          // un logro retirado (classic_win) no cuenta aunque siga en el perfil
   };
 
   /* ---------------------------------------------------------------- registro de una pregunta */

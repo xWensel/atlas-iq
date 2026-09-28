@@ -1,15 +1,16 @@
 /*
- * Geolite - regenera el modo Clasico con contenido propio (sustituye la base
- * copiada del Traveler IQ Challenge original por lugares y datos ya presentes
- * en el banco propio del juego: data/places.js + data/wiki/en-s.json, ambos
- * generados por tools/build-places.mjs a partir de Wikipedia/Wikidata).
- *
- * Regenera las 7 campanas del modo Clasico (game1, worldcapitals, usa, asia,
- * centralsouthamerica, oceania) con lugares/datos propios. classic-tr.js deja
- * de hacer falta para nombres de sitio (se traducen solos via data/places.js)
- * pero se mantiene por si el nombre de algun nivel necesita traduccion manual.
+ * Geolite - regenera el modo Clasico (data/classic.js) con contenido propio: data/places.js + data/wiki
+ * (tools/build-places.mjs) y tools/extra-data.json (tools/build-extra.mjs, Eventos y Personajes).
+ * No usa red: primero `node tools/build-extra.mjs` si cambian las listas de Eventos/Personajes.
  *
  *   node tools/build-classic.mjs
+ *
+ * Reglas del Clasico:
+ *  - Todas las campanas tienen 10 niveles, de mas facil a mas dificil (fama), con las etiquetas
+ *    2 x Easy, 2 x Medium, 2 x Hard, 2 x Very hard, 2 x Hardest.
+ *  - Sin solapes: cada lugar sale en una sola campana; las capitales solo en "Capitales del mundo",
+ *    los paises solo en "Banderas", las batallas y sucesos solo en "Eventos". Mundo y las regiones
+ *    son ciudades, monumentos, naturaleza y sitios historicos.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -24,53 +25,80 @@ vm.runInContext(read("data/places.js"), ctx);
 const PLACES = ctx.window.AIQ.PLACES;      // [id, kind, tier, lat, lon, countryQID, names{en..it}, fame0-99]
 const PCOUNTRY = ctx.window.AIQ.PCOUNTRY;  // {QID: {en, es, ...}}
 const FACTS_EN = JSON.parse(read("data/wiki/en-s.json"));
+const LANGS6 = ["en", "es", "fr", "pt", "de", "it"];
+const SHORT = Object.fromEntries(LANGS6.map(l => [l, JSON.parse(read(`data/wiki/${l}-s.json`))]));  // cada resumen empieza por una descripcion corta estilo Wikidata
+const EXTRA = fs.existsSync(path.join(ROOT, "tools", "extra-data.json")) ? JSON.parse(read("tools/extra-data.json")) : { people: [], events: [], countries: {}, continents: {} };
 
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+/* dificultad = menos Wikipedias con articulo (fama real, tools/build-extra.mjs); a igualdad, el orden de la
+ * lista curada. En data/places.js la "fama" es solo la posicion en tools/places-src.mjs. */
+const PFAME = EXTRA.placeFame || {};
+const diffOf = p => (PFAME[p[0]] != null ? -PFAME[p[0]] * 1000 : 0) + p[2] * 100 + p[7];
 
-const byKindTier = {};
-for (const p of PLACES) (byKindTier[p[1] + "/" + p[2]] ||= []).push(p);
-for (const k in byKindTier) byKindTier[k].sort((a, b) => a[7] - b[7]); // fame 0 = mas famoso primero
+/* ---------------------------------------------------------------- mapa y paises */
+vm.runInContext(read("js/vendor/topojson-client.min.js"), ctx);
+vm.runInContext(read("data/world.js"), ctx);
+const WORLD = ctx.topojson.feature(ctx.window.ATLAS_TOPO, ctx.window.ATLAS_TOPO.objects.countries).features.map(f => ({
+  name: f.properties.name, polys: f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates,
+}));
+const inRing = (x, y, r) => { let c = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const [xi, yi] = r[i], [xj, yj] = r[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
+const QID_BY_EN = {}; for (const [q, n] of Object.entries(PCOUNTRY)) QID_BY_EN[n.en] = q;
+const COUNTRY6 = {};                                                     // nombre Natural Earth -> nombres (6 idiomas de data/places.js + zh/ko/ja/ru de Wikidata)
+for (const p of PLACES) if (p[1] === "country") COUNTRY6[p[0].slice(2)] = { ...(EXTRA.countries || {})[QID_BY_EN[p[6].en]], ...p[6] };
+/* el mapa es de baja resolucion: una ciudad costera (Copenhague, Lisboa) puede caer "en el mar";
+ * entonces vale el pais con el borde mas cercano a menos de 60 km */
+function countryAt(lat, lon) {
+  let f = WORLD.find(w => w.polys.some(poly => inRing(lon, lat, poly[0]) && !poly.slice(1).some(h => inRing(lon, lat, h))));
+  if (!f) {
+    let best = 60; const kx = 111.32 * Math.cos(lat * Math.PI / 180);
+    for (const w of WORLD) for (const poly of w.polys) for (const [x, y] of poly[0]) { const d = Math.hypot((x - lon) * kx, (y - lat) * 110.57); if (d < best) { best = d; f = w; } }
+  }
+  return f && COUNTRY6[f.name] ? COUNTRY6[f.name] : null;
+}
 
-/* Retoques a mano sobre el texto auto-extraido de Wikipedia: casos donde la
- * primera frase salia circular/floja y hay un dato mejor mas adelante en el
- * mismo resumen. */
+/* ---------------------------------------------------------------- regiones
+ * Por el continente del pais (Wikidata P30, tools/extra-data.json). Paises sin continente o
+ * transcontinentales se resuelven a mano o por coordenadas. Norteamerica sin EE. UU. ni Canada
+ * (Mexico, Centroamerica, Caribe) cuenta como Latinoamerica. */
+const REGION_FIX = {
+  "Bosnia and Herzegovina": "europe", "Moldova": "europe", "Cyprus": "europe", "Italy": "europe", "Spain": "europe", "Norway": "europe",
+  "Paraguay": "latam", "Chile": "latam", "Brazil": "latam", "Uruguay": "latam", "Ecuador": "latam", "Saint Lucia": "latam", "Aruba": "latam", "Panama": "latam",
+  "Japan": "asia", "Myanmar": "asia", "Uzbekistan": "asia", "Kazakhstan": "asia", "Azerbaijan": "asia", "Georgia": "asia", "Armenia": "asia", "Yemen": "asia", "Indonesia": "asia",
+  "Cape Verde": "africa", "Egypt": "africa",
+  "Russia": (lat, lon) => (lon < 60 ? "europe" : "asia"),
+  "Turkey": (lat, lon) => (lon < 29.5 && lat > 40.4 ? "europe" : "asia"),                 // Estambul y Tracia
+  "France": (lat, lon) => (lon < -100 || (lat < -10 && lon > 100) ? "oceania" : lon < -30 ? "latam" : lon > 40 ? "africa" : "europe"),
+  "Kingdom of the Netherlands": (lat, lon) => (lon < -30 ? "latam" : "europe"), "Netherlands": (lat, lon) => (lon < -30 ? "latam" : "europe"),
+  "Kingdom of Denmark": (lat, lon) => (lon < -30 ? "namerica" : "europe"), "Denmark": (lat, lon) => (lon < -30 ? "namerica" : "europe"),
+};
+const NORTH_NOT_LATAM = new Set(["Canada", "Greenland", "Bermuda", "Saint Pierre and Miquelon"]);
+function regionOf(p) {
+  let q = p[5];
+  if (!q) { const c = countryAt(p[3], p[4]); q = c && QID_BY_EN[c.en]; }
+  if (!q) return null;
+  if (q === "Q30") return "usa";
+  const en = (PCOUNTRY[q] || {}).en, fx = REGION_FIX[en];
+  if (fx) return typeof fx === "function" ? fx(p[3], p[4]) : fx;
+  const c = ((EXTRA.continents || {})[q] || []).filter(x => x !== "antarctica");
+  if (c.length !== 1) return null;
+  if (c[0] === "samerica") return "latam";
+  if (c[0] === "namerica") return NORTH_NOT_LATAM.has(en) ? "namerica" : "latam";
+  return c[0];
+}
+
+/* batallas, asedios, tratados, catastrofes... van a Eventos: fuera de "Lugares historicos" */
+const EVENTISH = /^(battle|siege|sack|fall|treaty|assassination|sinking|storming|bombing|attack|landing|massacre|conquest|revolt|uprising|raid|campaign|operation|signing|peace|great fire|eruption|explosion|discovery)\b|\b(battle|siege|disaster|earthquake|tsunami|eruption|massacre|landings?|rebellion|revolution|war|conference|congress|council|treaty|trials?|summit|accords?|agreement|declaration|coup|incident|expedition|crisis|flight|spill)\b/i;
+const kindOf = p => (p[1] === "history" && EVENTISH.test(p[6].en) ? "event" : p[1]);
+
+/* ---------------------------------------------------------------- textos de cada destino */
 const FACT_OVERRIDES = {
-  "battle-of-trafalgar": "Nelson's fleet was outnumbered, with only 27 ships of the line against the 33 of Villeneuve's combined French-Spanish fleet.",
   "puebla": "Founded by the Spanish in 1531 to secure the trade route between Mexico City and the port of Veracruz.",
 };
-
-const US_QID = "Q30";
-function regionOf(lat, lon) {
-  if (lat < 25 && (lon > 145 || lon < -140)) return "oceania";                 // Pacifico, incluidas naciones ecuatoriales (Kiribati, Marshall, Nauru...)
-  if (lon < -30) return (lat > -60 && lat < 33) ? "latam" : "namerica";
-  if (lat < 35 && lon < 65) return "africa";                                   // incluye islas del Indico (Mauricio, Seychelles)
-  if (lat >= 35) return "europe";
-  return "asia";
-}
-
-const usedIds = new Set();
-const usedNames = new Set();
-function take(kind, tier, n, { countryCap = 3, region = null } = {}) {
-  let pool = (byKindTier[kind + "/" + tier] || []).filter(p => !usedIds.has(p[0]) && !usedNames.has(norm(p[6].en)) && FACTS_EN[p[0]] && p[3] != null && p[4] != null);
-  if (region) pool = pool.filter(p => (region === "usa" ? p[5] === US_QID : regionOf(p[3], p[4]) === region));
-  const out = [], perCountry = {}, seen = new Set();
-  for (const p of pool) {
-    if (out.length >= n) break;
-    const nm = norm(p[6].en); if (seen.has(nm)) continue;
-    const c = p[5] || "-";
-    if ((perCountry[c] || 0) >= countryCap) continue;
-    out.push(p); seen.add(nm); perCountry[c] = (perCountry[c] || 0) + 1;
-  }
-  if (out.length < n) for (const p of pool) { if (out.length >= n) break; const nm = norm(p[6].en); if (seen.has(nm)) continue; out.push(p); seen.add(nm); } // rellena si el cupo por pais dejo huecos
-  out.forEach(p => { usedIds.add(p[0]); usedNames.add(norm(p[6].en)); });
-  return out;
-}
 const ABBR = /\b(?:U\.S|U\.K|U\.N|St|Mt|Mr|Mrs|Dr|vs|approx|no)\./g; // estas abreviaturas nunca cierran la frase (evita cortes tipo "St." o "U.S.")
 function firstSentence(s) {
   s = String(s || "").trim();
-  const guarded = s.replace(ABBR, m => m.slice(0, -1) + "\u0001");
-  const m = guarded.match(/^.*?[.!?](?=\s|$)/);
-  let cut = (m ? m[0] : guarded).replace(/\u0001/g, ".");
+  const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?[.!?](?=\s|$)/);
+  let cut = (m ? m[0] : s).replace(/\u0001/g, ".");
   if (cut.length < 15) cut = s;                                    // frase demasiado corta (extraccion fallida) -> usa el texto completo
   return cut.replace(/\.\.+/g, ".").slice(0, 200);                  // "U.S.." -> "U.S." (doble punto ya presente en el resumen fuente)
 }
@@ -79,150 +107,192 @@ function destName(p) {
   const country = qid && PCOUNTRY[qid] ? PCOUNTRY[qid].en : null;
   return country && country !== en ? `${en}, ${country}` : en;
 }
-function mkDest(p) {
-  return { n: destName(p), lat: p[3], lon: p[4], f: FACT_OVERRIDES[p[0]] || firstSentence(FACTS_EN[p[0]]) };
+const mkDest = p => ({ n: destName(p), lat: p[3], lon: p[4], f: FACT_OVERRIDES[p[0]] || firstSentence(FACTS_EN[p[0]]) });
+
+/* Pista = la descripcion corta con la que arranca cada resumen (p. ej. "Ciudad más poblada de Marruecos."),
+ * en los 6 idiomas. Se descarta el lugar si en algun idioma falta, si delata el nombre, si es vaga
+ * (solo el pais: "Ciudad de Francia") o si otro lugar tiene la misma pista. */
+const NAME_STOP = new Set(["city", "ciudad", "ville", "cidade", "stadt", "citta", "national", "nacional", "parque", "park", "island", "isla", "lake", "lago", "mount", "monte", "river", "saint", "santa", "santo", "great", "grand", "grande", "palace", "palacio", "temple", "templo", "tower", "torre", "castle", "castillo", "church", "iglesia", "cathedral", "catedral", "bridge", "puente", "north", "south", "old", "new", "nueva", "nuevo", "battle", "batalla", "desert", "desierto", "falls", "cataratas"]);
+function descOf(s) {
+  s = String(s || "").trim();
+  const m = s.replace(ABBR, x => x.slice(0, -1) + "\u0001").match(/^.*?[.!?](?=\s|$)/);
+  const d = m ? m[0].replace(/\u0001/g, ".") : (s.length < 120 ? s : "");
+  return d.length >= 12 && d.length <= 140 ? d : null;
+}
+const DEMONYM_EN = /^[A-Z][a-z]+(?:ian|ean|an|ese|ish|ch|ic|i|ss|k)$/;
+const DE_GENERIC = new Set(["Stadt", "Großstadt", "Hauptstadt", "Hafenstadt", "Kreisstadt", "Kleinstadt", "Millionenstadt", "Metropole", "Gemeinde", "Kommune", "Ortschaft", "Ort", "Staat", "Land", "Region", "Provinz", "Bezirk", "Departement", "Präfektur", "Insel", "Inseln", "Inselgruppe", "Berg", "Gebirge", "See", "Fluss", "Wasserfall", "Nationalpark", "Park", "Denkmal", "Bauwerk", "Turm", "Kirche", "Kathedrale", "Moschee", "Tempel", "Palast", "Schloss", "Burg", "Festung", "Brücke", "Platz", "Museum", "Ruine", "Ruinenstätte", "Stätte", "Welterbe", "Sitz", "Verwaltungssitz", "Großregion", "Kanton", "Bundesstaat", "Bundesland", "Verwaltungseinheit", "Ruinen", "Siedlung", "Wüste", "Küste", "Vulkan", "Halbinsel", "Wolkenkratzer", "Seeschlacht", "Schlacht", "Nord", "Süd", "Ost", "West"]);
+function specific(l, d, p) {
+  const c = p[5] && PCOUNTRY[p[5]], cTok = c ? norm(c[l] || c.en).replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(t => t.length >= 4) : [];
+  return d.replace(/[.,;:()«»"“”]/g, " ").split(/\s+/).filter(Boolean).slice(1).some(w => {
+    if (!/^[A-ZÀ-ÖØ-Þ]/.test(w)) return false;
+    const nw = norm(w).replace(/[^a-z0-9]/g, "");
+    if (nw.length < 4 || cTok.some(t => nw.slice(0, 4) === t.slice(0, 4))) return false;
+    if (l === "en" && DEMONYM_EN.test(w)) return false;
+    if (l === "de" && DE_GENERIC.has(w)) return false;
+    return true;
+  });
+}
+const SPEC_LANGS = new Set(["en", "es"]);                               // la pista debe localizar algo en estos; en el resto basta con que exista y no delate el nombre
+function clueRaw(p) {
+  const out = {};
+  for (const l of LANGS6) {
+    const d = descOf(SHORT[l][p[0]]); if (!d || (SPEC_LANGS.has(l) && !specific(l, d, p))) return null;
+    const txt = " " + norm(d).replace(/[^a-z0-9]+/g, " ") + " ";
+    for (const nm of new Set([p[6][l], p[6].en])) {
+      const toks = norm(nm).replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(t => t.length >= 4 && !NAME_STOP.has(t));
+      if (toks.some(t => txt.includes(" " + t + " "))) return null;
+    }
+    out[l] = d;
+  }
+  return out;
+}
+const CLUE_DUP = new Set();
+{ const cnt = {}; for (const q of PLACES) { const c = clueRaw(q); if (c) for (const l of LANGS6) { const k = l + "|" + norm(c[l]); cnt[k] = (cnt[k] || 0) + 1; } } for (const k in cnt) if (cnt[k] > 1) CLUE_DUP.add(k); }
+function clueOf(p) { const c = clueRaw(p); return c && LANGS6.every(l => !CLUE_DUP.has(l + "|" + norm(c[l]))) ? c : null; }
+/* zh/ko/ja/ru/pl: si ya existen sus resumenes cortos (los genera la sesion de idiomas), la pista sale tambien
+ * en esos idiomas mientras no nombre el lugar; si no, el juego cae al ingles */
+const CLUE_MORE = ["zh", "ko", "ja", "ru", "pl"].filter(l => fs.existsSync(path.join(ROOT, "data", "wiki", `${l}-s.json`)));
+for (const l of CLUE_MORE) SHORT[l] = JSON.parse(read(`data/wiki/${l}-s.json`));
+function mkClueDest(p) {
+  const c = clueOf(p), c6 = { es: c.es, fr: c.fr, pt: c.pt, de: c.de, it: c.it };
+  for (const l of CLUE_MORE) {
+    const d = descOf(SHORT[l][p[0]]), nm = p[6][l];
+    if (d && !(nm && d.toLowerCase().includes(String(nm).toLowerCase()))) c6[l] = d;
+  }
+  return { n: c.en, c6, lat: p[3], lon: p[4], f: destName(p) };
 }
 
-const LABEL = { capital: "Capital Cities", landmark: "Famous Landmarks", city: "Cities", nature: "Natural Wonders", history: "Historic Sites", country: "Countries" };
+/* ---------------------------------------------------------------- Eventos y Personajes (tools/extra-data.json) */
+const XL = ["en", "es", "fr", "pt", "de", "it", "zh", "ko", "ja", "ru", "pl"];      // idiomas de contenido de Eventos/Personajes
+const BC = { en: "{y} BC", es: "{y} a. C.", fr: "{y} av. J.-C.", pt: "{y} a.C.", de: "{y} v. Chr.", it: "{y} a.C.", zh: "公元前{y}年", ko: "기원전 {y}년", ja: "紀元前{y}年", ru: "{y} до н. э.", pl: "{y} p.n.e." };
+const yr = (y, l) => (y == null ? "" : y < 0 ? BC[l].replace("{y}", -y) : String(y));
+const ucf = s => (s ? s[0].toLocaleUpperCase() + s.slice(1) : s);
+const by10 = fn => { const o = {}; for (const l of XL) o[l] = fn(l); return o; };
+const restL = o => Object.fromEntries(XL.slice(1).map(l => [l, o[l]]));
+const SEP = { zh: "，", ja: "、" };
+const joinTxt = l => (...xs) => xs.filter(Boolean).join(SEP[l] || ", ");
+const short = s => { s = ucf(String(s || "").replace(/\s*\([^)]*\d{3,4}[^)]*\)\s*$/, "")); if (s.length <= 90) return s; const c = s.slice(0, 90), i = Math.max(c.lastIndexOf(","), c.lastIndexOf("，"), c.lastIndexOf("、")); return (i > 40 ? c.slice(0, i) : c.slice(0, c.lastIndexOf(" ") > 40 ? c.lastIndexOf(" ") : 90)) + "…"; };
+function mkPersonDest(p) {
+  const ctry = countryAt(p.lat, p.lon) || p.country;
+  const fact = by10(l => [joinTxt(l)(p.place && p.place[l], ctry && (ctry[l] || ctry.en)), short(p.desc[l])].filter(Boolean).join(" · "));
+  const name = by10(l => p.name[l]);
+  return { n: name.en, n6: restL(name), s6: by10(l => (p.born == null ? "" : `${yr(p.born, l)}–${yr(p.died, l)}`)), lat: p.lat, lon: p.lon, f: fact.en, f6: restL(fact), img: p.img };
+}
+function mkEventDest(e) {
+  const ctry = countryAt(e.lat, e.lon);                                  // nunca el P17 de Wikidata: suele ser el estado de la epoca
+  const name = by10(l => ucf(e.name[l]));
+  const fact = by10(l => joinTxt(l)(e.place && e.place[l], ctry && (ctry[l] || ctry.en)) || short(e.desc[l]));
+  return { n: name.en, n6: restL(name), s6: by10(l => yr(e.year, l)), lat: e.lat, lon: e.lon, f: fact.en, f6: restL(fact) };
+}
 
-/* Construye una campana a partir de una lista de niveles [diff, kind, tier, n, opts?].
- * Umbrales (tpq/kmBase/kmDist/speed/cutoff/advance) son una curva propia, no la del
- * original; los niveles cuyo cupo no se pueda llenar del todo se recortan al tamano real,
- * y los que se queden con menos de 3 lugares se descartan (no dan para un nivel de verdad). */
-function buildGame(prefix, spec) {
+/* ---------------------------------------------------------------- niveles */
+const DIFFS = ["Easy", "Easy", "Medium", "Medium", "Hard", "Hard", "Very hard", "Very hard", "Hardest", "Hardest"];
+const NLEV = 10, MIN_Q = 5;
+function level(k, { kind, region, picks, mk, tpq, bonus, label }) {
+  const kmBase = Math.max(1500, 6000 - k * 400), speed = Math.max(300, 600 - k * 25);
+  return {
+    id: k + 1, diff: DIFFS[k], name: `${label} (${DIFFS[k]})`, kind, region, bonus: !!bonus,
+    tpq, kmBase, kmDist: 2, speed, cutoff: 0.5,
+    advance: Math.round((picks.length * kmBase * 0.55) / 100) * 100,
+    dests: picks.map(mk),
+  };
+}
+/* una lista ya ordenada de facil a dificil -> 10 niveles de <= cap preguntas (lo que sobre queda libre) */
+function tenLevels(pool, opt) {
+  const cap = opt.cap || 15, per = Math.max(MIN_Q, Math.min(cap, Math.floor(pool.length / NLEV)));
+  if (pool.length < NLEV * MIN_Q) console.warn(`Aviso [${opt.label}]: solo ${pool.length} elementos para 10 niveles.`);
   const levels = [];
-  spec.forEach(([diff, kind, tier, n, opts], i) => {
-    const picks = take(kind, tier, n, opts);
-    if (picks.length < 3) return;
-    if (picks.length < n) console.warn(`Aviso [${prefix}]: ${diff}/${kind}/t${tier} solo tiene ${picks.length}/${n} lugares.`);
-    const kmBase = Math.max(1500, 6000 - i * 300);
-    const speed = Math.max(300, 600 - i * 15);
-    levels.push({
-      id: levels.length + 1, diff, name: `${prefix} ${LABEL[kind]} (${diff})`, kind, region: (opts && opts.region) || "world", bonus: false,
-      tpq: 10, kmBase, kmDist: 2, speed, cutoff: 0.5,
-      advance: Math.round((picks.length * kmBase * 0.55) / 100) * 100,
-      dests: picks.map(mkDest),
-    });
-  });
-  return levels;
+  for (let k = 0; k < NLEV; k++) {
+    const picks = pool.slice(Math.round((k * Math.min(pool.length, per * NLEV)) / NLEV), Math.round(((k + 1) * Math.min(pool.length, per * NLEV)) / NLEV));
+    levels.push(level(k, { ...opt, picks }));
+  }
+  return { levels, used: pool.slice(0, per * NLEV) };
 }
 
-/* Orden de construccion (no de aparicion en el menu): "World" escoge primero
- * (es la campana principal), luego las regionales, y "World Capitals" al
- * final reparte lo que sobra (si no, se quedaba sin capitales propias). */
-const LV_game1 = buildGame("World", [
-  ["Easy", "city", 0, 6], ["Easy", "capital", 0, 6], ["Easy", "landmark", 0, 6],
-  ["Medium", "city", 0, 10], ["Medium", "landmark", 1, 10], ["Medium", "capital", 1, 10], ["Medium", "nature", 0, 10],
-  ["Hard", "city", 1, 12], ["Hard", "capital", 1, 12], ["Hard", "landmark", 2, 12],
-  ["Very hard", "history", 0, 12], ["Hardest", "city", 2, 15],
-]);
-const LV_usa = buildGame("USA", [
-  ["Easy", "city", 0, 8, { region: "usa" }], ["Easy", "landmark", 0, 8, { region: "usa" }],
-  ["Medium", "landmark", 1, 12, { region: "usa" }], ["Medium", "nature", 1, 12, { region: "usa" }],
-  ["Hard", "city", 2, 15, { region: "usa" }], ["Hard", "history", 1, 12, { region: "usa" }],
-]);
-const LV_europe = buildGame("Europe", [
-  ["Easy", "city", 0, 8, { region: "europe" }], ["Easy", "capital", 0, 10, { region: "europe" }], ["Easy", "landmark", 0, 8, { region: "europe" }],
-  ["Medium", "city", 1, 12, { region: "europe" }], ["Medium", "landmark", 2, 10, { region: "europe" }], ["Medium", "nature", 1, 10, { region: "europe" }],
-  ["Hard", "city", 2, 12, { region: "europe" }], ["Hard", "landmark", 2, 12, { region: "europe" }], ["Hard", "history", 1, 12, { region: "europe" }],
-  ["Very hard", "history", 0, 10, { region: "europe" }],
-]);
-const LV_asia = buildGame("Asia", [
-  ["Easy", "capital", 0, 10, { region: "asia" }], ["Easy", "city", 0, 10, { region: "asia" }],
-  ["Medium", "landmark", 0, 10, { region: "asia" }], ["Medium", "capital", 1, 10, { region: "asia" }],
-  ["Medium", "nature", 1, 10, { region: "asia" }], ["Hard", "landmark", 1, 10, { region: "asia" }],
-  ["Hard", "history", 1, 10, { region: "asia" }], ["Very hard", "city", 1, 9, { region: "asia" }],
-]);
-const LV_latam = buildGame("Latin America", [
-  ["Easy", "capital", 0, 10, { region: "latam" }], ["Easy", "city", 0, 8, { region: "latam" }],
-  ["Medium", "landmark", 0, 5, { region: "latam" }], ["Medium", "capital", 1, 10, { region: "latam" }],
-  ["Medium", "landmark", 1, 10, { region: "latam" }], ["Hard", "landmark", 2, 12, { region: "latam" }],
-  ["Hard", "nature", 1, 12, { region: "latam" }], ["Very hard", "city", 2, 15, { region: "latam" }],
-  ["Very hard", "history", 1, 10, { region: "latam" }],
-]);
-const LV_oceania = buildGame("Oceania", [
-  ["Easy", "capital", 0, 5, { region: "oceania" }], ["Easy", "city", 2, 8, { region: "oceania" }],
-  ["Medium", "nature", 1, 8, { region: "oceania" }], ["Medium", "capital", 1, 6, { region: "oceania" }],
-  ["Hard", "country", 0, 4, { region: "oceania" }],
-]);
-const LV_worldcapitals = [
-  ...buildGame("Europe", [["Easy", "capital", 0, 12, { region: "europe" }], ["Medium", "capital", 1, 12, { region: "europe" }]]),
-  ...buildGame("Asia", [["Easy", "capital", 0, 10, { region: "asia" }], ["Medium", "capital", 1, 10, { region: "asia" }]]),
-  ...buildGame("Africa", [["Easy", "capital", 0, 12, { region: "africa" }], ["Medium", "capital", 1, 12, { region: "africa" }]]),
-  ...buildGame("Latin America", [["Easy", "capital", 0, 10, { region: "latam" }], ["Medium", "capital", 1, 10, { region: "latam" }]]),
-  ...buildGame("Oceania", [["Hard", "capital", 0, 8, { region: "oceania" }]]),
-].map((L, i) => ({ ...L, id: i + 1 }));
+/* ---------------------------------------------------------------- reparto sin solapes */
+const used = new Set(), usedNames = new Set();
+const free = p => !used.has(p[0]) && !usedNames.has(norm(p[6].en)) && FACTS_EN[p[0]] && p[3] != null && p[4] != null;
+const claim = list => list.forEach(p => { used.add(p[0]); usedNames.add(norm(p[6].en)); });
+const LABEL = { capital: "Capital Cities", landmark: "Famous Landmarks", city: "Cities", nature: "Natural Wonders" };
+/* el tipo "history" del banco son batallas y sucesos (asi los clasifica la Enciclopedia, js/codex.js): van a Eventos */
+const MIXED = ["city", "landmark", "nature"];
 
-/* Modo Banderas: las 196 banderas de paises (data/flags.js, casan 1:1 por nombre con
- * las entradas "country" de data/places.js) en 5 tramos por fama. Sin tope por pais
- * (cada entrada YA es un pais, el tope de take() no aplica aqui). */
-function buildFlags() {
-  const pool = [...(byKindTier["country/0"] || []), ...(byKindTier["country/1"] || [])]
-    .filter(p => !usedIds.has(p[0]) && !usedNames.has(norm(p[6].en)) && FACTS_EN[p[0]] && p[3] != null && p[4] != null)
-    .sort((a, b) => a[7] - b[7]);
-  pool.forEach(p => { usedIds.add(p[0]); usedNames.add(norm(p[6].en)); });
-  const BANDS = [["Easy", 30], ["Medium", 40], ["Hard", 40], ["Very hard", 40], ["Hardest", Infinity]];
-  const levels = []; let i = 0;
-  BANDS.forEach(([diff, n], idx) => {
-    const picks = n === Infinity ? pool.slice(i) : pool.slice(i, i + n); i += picks.length;
-    if (picks.length < 3) return;
-    const kmBase = Math.max(1500, 6000 - idx * 300);
-    const speed = Math.max(300, 600 - idx * 15);
-    levels.push({
-      id: levels.length + 1, diff, name: `Flags (${diff})`, kind: "flag", region: "world", bonus: false,
-      tpq: 10, kmBase, kmDist: 2, speed, cutoff: 0.5,
-      advance: Math.round((picks.length * kmBase * 0.55) / 100) * 100,
-      dests: picks.map(mkDest),
-    });
-  });
-  return levels;
+/* Mundo y regiones: los 4 tipos se reparten los 10 niveles segun cuanto haya de cada uno; cada tipo se
+ * trocea por fama y los niveles se ordenan por su dificultad media, asi se alternan y van a mas. */
+function mixedCampaign(region, prefix, { cap = 12, filter = () => true } = {}) {
+  const pools = {};
+  for (const k of MIXED) pools[k] = PLACES.filter(p => kindOf(p) === k && free(p) && filter(p) && (region === "world" || regionOf(p) === region)).sort((a, b) => diffOf(a) - diffOf(b));
+  const total = MIXED.reduce((a, k) => a + pools[k].length, 0);
+  let alloc = {}; MIXED.forEach(k => { alloc[k] = pools[k].length >= MIN_Q ? Math.max(1, Math.round((pools[k].length / total) * NLEV)) : 0; });
+  let sum = () => MIXED.reduce((a, k) => a + alloc[k], 0);
+  while (sum() > NLEV) { const k = MIXED.filter(x => alloc[x] > 1).sort((a, b) => pools[a].length / alloc[a] - pools[b].length / alloc[b])[0]; alloc[k]--; }
+  while (sum() < NLEV) { const k = MIXED.filter(x => pools[x].length >= (alloc[x] + 1) * MIN_Q).sort((a, b) => pools[b].length / (alloc[b] + 1) - pools[a].length / (alloc[a] + 1))[0]; if (!k) break; alloc[k]++; }
+  const chunks = [];
+  for (const k of MIXED) {
+    const n = alloc[k]; if (!n) continue;
+    const per = Math.min(cap, Math.floor(pools[k].length / n)), list = pools[k].slice(0, per * n);
+    for (let i = 0; i < n; i++) chunks.push({ kind: k, picks: list.slice(i * per, (i + 1) * per), d: (i + 0.5) / n, o: MIXED.indexOf(k) });
+  }
+  if (chunks.length < NLEV) console.warn(`Aviso [${prefix}]: solo ${chunks.length} niveles.`);
+  chunks.sort((a, b) => a.d - b.d || a.o - b.o);                           // posicion relativa dentro de su tipo: la fama no se compara entre tipos
+  chunks.forEach(c => claim(c.picks));
+  return chunks.map((c, k) => level(k, { kind: c.kind, region, picks: c.picks, mk: mkDest, tpq: 10, label: `${prefix} ${LABEL[c.kind]}` }));
 }
-const LV_flags = buildFlags();
 
-/* Modo Pistas: ronda "solo dato" (bonus:true, ver campaigns.js) que mezcla ciudades,
- * monumentos, naturaleza e historia de todo el mundo; el nombre se oculta y se revela
- * como respuesta, igual que las rondas bonus del original. */
-function buildClues() {
-  const BANDS = [
-    ["Easy", [["city", 0, 4], ["landmark", 0, 4], ["nature", 0, 3], ["history", 0, 3]]],
-    ["Medium", [["city", 1, 5], ["landmark", 2, 5], ["nature", 1, 4], ["history", 1, 4]]],
-    ["Hard", [["city", 2, 6], ["landmark", 2, 6], ["nature", 1, 5], ["history", 1, 5]]],
-    ["Very hard", [["city", 2, 6], ["landmark", 0, 6], ["history", 0, 6]]],
-  ];
-  const levels = [];
-  BANDS.forEach(([diff, parts], idx) => {
-    let picks = [];
-    parts.forEach(([kind, tier, n]) => { picks = picks.concat(take(kind, tier, n)); });
-    if (picks.length < 3) return;
-    const kmBase = Math.max(1500, 6000 - idx * 300);
-    const speed = Math.max(300, 600 - idx * 15);
-    levels.push({
-      id: levels.length + 1, diff, name: `Clues (${diff})`, kind: "clue", region: "world", bonus: true,
-      tpq: 10, kmBase, kmDist: 2, speed, cutoff: 0.5,
-      advance: Math.round((picks.length * kmBase * 0.55) / 100) * 100,
-      dests: picks.map(mkDest),
-    });
-  });
-  return levels;
-}
-const LV_clues = buildClues();
+/* 1. Banderas: los 196 paises (unico sitio donde salen los paises) */
+const countries = PLACES.filter(p => p[1] === "country" && free(p)).sort((a, b) => diffOf(a) - diffOf(b));
+const LV_flags = tenLevels(countries, { kind: "flag", region: "world", mk: mkDest, tpq: 10, label: "Flags", cap: 20 }).levels;
+claim(countries);
+
+/* 2. Capitales del mundo: todas las capitales (unico sitio donde salen) */
+const capitals = PLACES.filter(p => p[1] === "capital" && free(p)).sort((a, b) => diffOf(a) - diffOf(b));
+const capRes = tenLevels(capitals, { kind: "capital", region: "world", mk: mkDest, tpq: 10, label: "World Capital Cities", cap: 20 });
+claim(capRes.used); claim(capitals);                                      // las que no caben tampoco van a otras campanas
+
+/* 3. Mundo: lo mas conocido de cada tipo */
+const LV_game1 = mixedCampaign("world", "World", { cap: 10 });
+
+/* 4. Pistas: se reserva antes que las regiones (hay pocas pistas buenas: si no, se las llevan ellas).
+ * Se reparte entre regiones para que ninguna se quede sin sus lugares con buena pista. */
+const clueable = PLACES.filter(p => MIXED.includes(kindOf(p)) && free(p) && clueOf(p)).sort((a, b) => diffOf(a) - diffOf(b));
+const CLUE_N = 100, byRegion = {};
+clueable.forEach(p => (byRegion[regionOf(p) || "-"] ||= []).push(p));
+const clueList = []; const cap = Object.fromEntries(Object.entries(byRegion).map(([r, a]) => [r, Math.ceil(a.length * 0.6)]));   // cada region cede como mucho el 60 % de las suyas
+for (let i = 0; clueList.length < CLUE_N && Object.values(byRegion).some(a => i < a.length); i++)
+  for (const [r, a] of Object.entries(byRegion)) if (i < a.length && i < cap[r] && clueList.length < CLUE_N) clueList.push(a[i]);
+clueList.sort((a, b) => diffOf(a) - diffOf(b));
+const cluesRes = tenLevels(clueList, { kind: "clue", region: "world", mk: mkClueDest, tpq: 12, bonus: true, label: "Clues", cap: 10 });
+claim(cluesRes.used);
+
+/* 5. Regiones con lo que queda */
+const LV_usa = mixedCampaign("usa", "USA");
+const LV_europe = mixedCampaign("europe", "Europe");
+const LV_asia = mixedCampaign("asia", "Asia");
+const LV_latam = mixedCampaign("latam", "Latin America");
+const LV_oceania = mixedCampaign("oceania", "Oceania");
+
+/* 6. Eventos (sin los que ya salen como lugar) y Personajes, por fama */
+const byFame = list => list.slice().sort((a, b) => b.fame - a.fame);
+const events = byFame(EXTRA.events).filter(e => !usedNames.has(norm(e.name.en)));
+const LV_events = tenLevels(events, { kind: "event", region: "world", mk: mkEventDest, tpq: 12, label: "Historic Events", cap: 20 }).levels;
+const LV_people = tenLevels(byFame(EXTRA.people), { kind: "character", region: "world", mk: mkPersonDest, tpq: 12, label: "Historical Figures", cap: 25 }).levels;
 
 const GAMES = {
   game1: { title: "World", levels: LV_game1 },
-  worldcapitals: { title: "World Capitals", levels: LV_worldcapitals },
+  worldcapitals: { title: "World Capitals", levels: capRes.levels },
   usa: { title: "USA", levels: LV_usa },
   europe: { title: "Europe", levels: LV_europe },
   asia: { title: "Asia", levels: LV_asia },
   centralsouthamerica: { title: "Latin America", levels: LV_latam },
   oceania: { title: "Oceania", levels: LV_oceania },
   flags: { title: "Flags", levels: LV_flags },
-  clues: { title: "Clues", levels: LV_clues },
+  clues: { title: "Clues", levels: cluesRes.levels },
+  events: { title: "Historic Events", levels: LV_events },
+  people: { title: "Historical Figures", levels: LV_people },
 };
 
 const arr = Object.entries(GAMES).map(([id, g]) => ({ id, title: g.title, home: { lat: 0.0, lon: 0.0, zoom: 1.0 }, levels: g.levels }));
-
 const header = `/* Modo Clasico: contenido propio, generado por tools/build-classic.mjs desde data/places.js + data/wiki (Wikipedia/Wikidata). No copia lugares, puntuacion ni datos del Traveler IQ Challenge original. */\n`;
-fs.writeFileSync(path.join(ROOT, "data", "classic.js"),
-  header + "window.AIQ = window.AIQ || {};\nwindow.AIQ.CLASSIC = " + JSON.stringify(arr) + ";\n");
+fs.writeFileSync(path.join(ROOT, "data", "classic.js"), header + "window.AIQ = window.AIQ || {};\nwindow.AIQ.CLASSIC = " + JSON.stringify(arr) + ";\n");
 
-for (const [id, g] of Object.entries(GAMES)) console.log(id + ":", g.levels.length, "niveles,", g.levels.reduce((a, l) => a + l.dests.length, 0), "lugares.");
+for (const [id, g] of Object.entries(GAMES)) console.log(id.padEnd(20), String(g.levels.length).padStart(2), "niveles,", String(g.levels.reduce((a, l) => a + l.dests.length, 0)).padStart(4), "preguntas:", g.levels.map(l => l.dests.length).join(" "));

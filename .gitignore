@@ -5,6 +5,9 @@ Thumbs.db
 .env*
 assets/raw/
 tools/cache/
+tools/cache-langs/
 tools/*.log
 assets_stage/
 tools/__pycache__/
+tools/cache-codex/
+tools/cache-r2.json

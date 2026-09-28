@@ -117,27 +117,27 @@ window.AIQ = window.AIQ || {};
    * Titulos: terminos de apuestas [es, en, fr, pt, de, it].
    */
   const NAMES = [
-    ["Apuesta segura", "Sure Bet", "Pari sûr", "Aposta segura", "Sichere Wette", "Scommessa sicura"],
-    ["Doble o nada", "Double or Nothing", "Quitte ou double", "Dobro ou nada", "Doppelt oder nichts", "Doppio o niente"],
-    ["Ambos marcan", "Both Teams to Score", "Les deux équipes marquent", "Ambas marcam", "Beide Teams treffen", "Entrambe segnano"],
-    ["Más de 2,5 goles", "Over 2.5 Goals", "Plus de 2,5 buts", "Mais de 2,5 gols", "Über 2,5 Tore", "Over 2,5 gol"],
-    ["Todo al rojo", "All on Red", "Tout sur le rouge", "Tudo no vermelho", "Alles auf Rot", "Tutto sul rosso"],
-    ["Huérfanos", "Orphans", "Orphelins", "Órfãos", "Waisen", "Orfani"],
-    ["All-in", "All In", "Tapis !", "All-in", "All-in", "All-in"],
-    ["Combinada", "Parlay", "Pari combiné", "Múltipla", "Kombiwette", "Multipla"],
-    ["Sube la apuesta", "Raise the Stakes", "Je relance", "Aumenta a aposta", "Einsatz erhöhen", "Rilancio"],
-    ["Retirar ganancias", "Cash Out", "Encaisser", "Retirar ganhos", "Auszahlen", "Incassa"],
-    ["Banca al día", "Bankroll", "Bankroll", "Banca em dia", "Bankroll", "Bankroll"],
-    ["Apuesta en vivo", "Live Bet", "Pari en direct", "Aposta ao vivo", "Live-Wette", "Scommessa live"],
-    ["Pleno al quince", "Straight Up", "Plein au quinze", "Pleno ao quinze", "Volltreffer", "Pieno al quindici"],
-    ["Hándicap asiático", "Asian Handicap", "Handicap asiatique", "Handicap asiático", "Asiatisches Handicap", "Handicap asiatico"],
-    ["Gran apostador", "High Roller", "Flambeur", "Grande apostador", "Großspieler", "Giocatore d'alto bordo"],
-    ["Bote acumulado", "Progressive Jackpot", "Jackpot progressif", "Jackpot progressivo", "Progressiver Jackpot", "Jackpot progressivo"],
-    ["Ventaja de la casa", "House Edge", "Avantage de la maison", "Vantagem da casa", "Hausvorteil", "Vantaggio del banco"],
-    ["Mano caliente", "Hot Hand", "Main chaude", "Mão quente", "Heiße Hand", "Mano calda"],
-    ["Ganador y colocado", "Each Way", "Pari gagnant-placé", "Ganhador e colocado", "Sieg-Platz-Wette", "Vincente e piazzato"],
-    ["Empate no vale", "Draw No Bet", "Match nul remboursé", "Empate anula aposta", "Unentschieden, Geld zurück", "Pareggio rimborsato"],
-    ["Apuesta máxima", "Max Bet", "Mise maximale", "Aposta máxima", "Höchsteinsatz", "Puntata massima"],
+    ["Apuesta segura", "Sure Bet", "Pari sûr", "Aposta segura", "Sichere Wette", "Scommessa sicura", "Apuesta segura", "稳赢之注", "확실한 베팅", "鉄板の賭け", "Верная ставка", "Pewny zakład"],
+    ["Doble o nada", "Double or Nothing", "Quitte ou double", "Dobro ou nada", "Doppelt oder nichts", "Doppio o niente", "Doble o nada", "加倍或归零", "더블 오어 낫싱", "倍か無か", "Всё или ничего", "Podwójnie albo nic"],
+    ["Ambos marcan", "Both Teams to Score", "Les deux équipes marquent", "Ambas marcam", "Beide Teams treffen", "Entrambe segnano", "Ambos anotan", "双方都进球", "양 팀 득점", "両チーム得点", "Обе забьют", "Obie strzelą"],
+    ["Más de 2,5 goles", "Over 2.5 Goals", "Plus de 2,5 buts", "Mais de 2,5 gols", "Über 2,5 Tore", "Over 2,5 gol", "Más de 2.5 goles", "大于 2.5 球", "2.5골 이상", "2.5ゴール以上", "Тотал больше 2,5", "Powyżej 2,5 gola"],
+    ["Todo al rojo", "All on Red", "Tout sur le rouge", "Tudo no vermelho", "Alles auf Rot", "Tutto sul rosso", "Todo al rojo", "全押红色", "레드에 올인", "すべて赤に", "Всё на красное", "Wszystko na czerwone"],
+    ["Huérfanos", "Orphans", "Orphelins", "Órfãos", "Waisen", "Orfani", "Huérfanos", "孤儿注", "오르펠랭", "オーファン", "Сироты", "Sieroty"],
+    ["All-in", "All In", "Tapis !", "All-in", "All-in", "All-in", "All-in", "全押", "올인", "オールイン", "Ва-банк", "All-in"],
+    ["Combinada", "Parlay", "Pari combiné", "Múltipla", "Kombiwette", "Multipla", "Parlay", "串关", "팔레이", "パーレー", "Экспресс", "Kupon łączony"],
+    ["Sube la apuesta", "Raise the Stakes", "Je relance", "Aumenta a aposta", "Einsatz erhöhen", "Rilancio", "Sube la apuesta", "加注", "판돈을 올려라", "レイズ", "Поднять ставки", "Podbij stawkę"],
+    ["Retirar ganancias", "Cash Out", "Encaisser", "Retirar ganhos", "Auszahlen", "Incassa", "Cobrar ganancias", "兑现离场", "캐시 아웃", "キャッシュアウト", "Забрать выигрыш", "Wypłata"],
+    ["Banca al día", "Bankroll", "Bankroll", "Banca em dia", "Bankroll", "Bankroll", "Banca al día", "资金池", "뱅크롤", "バンクロール", "Банкролл", "Kasa w porządku"],
+    ["Apuesta en vivo", "Live Bet", "Pari en direct", "Aposta ao vivo", "Live-Wette", "Scommessa live", "Apuesta en vivo", "现场投注", "라이브 베팅", "ライブベット", "Ставка по ходу игры", "Zakład na żywo"],
+    ["Pleno al quince", "Straight Up", "Plein au quinze", "Pleno ao quinze", "Volltreffer", "Pieno al quindici", "Pleno al quince", "单号直注", "스트레이트 업", "ストレートアップ", "Ставка на число", "Pełny na piętnastkę"],
+    ["Hándicap asiático", "Asian Handicap", "Handicap asiatique", "Handicap asiático", "Asiatisches Handicap", "Handicap asiatico", "Hándicap asiático", "亚洲让球", "아시안 핸디캡", "アジアンハンディキャップ", "Азиатская фора", "Handicap azjatycki"],
+    ["Gran apostador", "High Roller", "Flambeur", "Grande apostador", "Großspieler", "Giocatore d'alto bordo", "Gran apostador", "豪赌客", "하이 롤러", "ハイローラー", "Хайроллер", "Gruba ryba"],
+    ["Bote acumulado", "Progressive Jackpot", "Jackpot progressif", "Jackpot progressivo", "Progressiver Jackpot", "Jackpot progressivo", "Pozo acumulado", "累积奖池", "누적 잭팟", "プログレッシブ・ジャックポット", "Прогрессивный джекпот", "Kumulacja"],
+    ["Ventaja de la casa", "House Edge", "Avantage de la maison", "Vantagem da casa", "Hausvorteil", "Vantaggio del banco", "Ventaja de la casa", "庄家优势", "하우스 엣지", "ハウスエッジ", "Преимущество казино", "Przewaga kasyna"],
+    ["Mano caliente", "Hot Hand", "Main chaude", "Mão quente", "Heiße Hand", "Mano calda", "Mano caliente", "手气正旺", "핫 핸드", "ホットハンド", "Горячая рука", "Gorąca ręka"],
+    ["Ganador y colocado", "Each Way", "Pari gagnant-placé", "Ganhador e colocado", "Sieg-Platz-Wette", "Vincente e piazzato", "Ganador y colocado", "独赢位置", "이치 웨이", "単勝・複勝", "Победа и место", "Wygrana i miejsce"],
+    ["Empate no vale", "Draw No Bet", "Match nul remboursé", "Empate anula aposta", "Unentschieden, Geld zurück", "Pareggio rimborsato", "Empate no cuenta", "平局退款", "무승부 환불", "引き分け返金", "Ничья — возврат", "Remis bez zakładu"],
+    ["Apuesta máxima", "Max Bet", "Mise maximale", "Aposta máxima", "Höchsteinsatz", "Puntata massima", "Apuesta máxima", "最大注", "최대 베팅", "マックスベット", "Максимальная ставка", "Maksymalna stawka"],
   ];
   const FILES = [
     "assets/music/01-lounge-nocturno.mp3", "assets/music/02-ragtime-roulette.mp3", "assets/music/03-bossa-de-medianoche.mp3",
@@ -153,7 +153,7 @@ window.AIQ = window.AIQ || {};
 
   function ensureMedia() {
     if (mediaEl) return;
-    mediaEl = new Audio(); mediaEl.preload = "auto"; mediaEl.loop = false;
+    mediaEl = new Audio(); mediaEl.crossOrigin = "anonymous"; mediaEl.preload = "auto"; mediaEl.loop = false;   // en la web viene de R2: sin CORS, WebAudio la silenciaria
     mediaSrc = ctx.createMediaElementSource(mediaEl); mediaSrc.connect(musBus);
     mediaEl.addEventListener("ended", () => useTrack(autoIdx(), true));
   }
@@ -165,7 +165,7 @@ window.AIQ = window.AIQ || {};
   }
   function useTrack(i, announce) {
     ensureMedia(); cur = i; recent.push(i); if (recent.length > 4) recent.shift();
-    mediaEl.src = FILES[i]; mediaEl.currentTime = 0; mediaEl.play().catch(() => {});
+    mediaEl.src = A.media(FILES[i]); mediaEl.currentTime = 0; mediaEl.play().catch(() => {});
     if (announce) { transition(ctx.currentTime); if (A.music.onChange) A.music.onChange(i); }
   }
   A.music = {
@@ -177,7 +177,7 @@ window.AIQ = window.AIQ || {};
     prev() { if (cur < 0) return; useTrack(prevIdx(), true); },
     index() { return cur; },
     count() { return FILES.length; },
-    title(i = cur) { const n = NAMES[i]; if (!n) return ""; const k = ["es", "en", "fr", "pt", "de", "it"].indexOf(A.lang); return n[k < 0 ? 1 : k]; },
+    title(i = cur) { const n = NAMES[i]; if (!n) return ""; const k = A.LANGS.findIndex(l => l.code === A.lang); return n[k] || n[1]; },
     go(i) { if (FILES[i] != null) useTrack(i, true); },   // dev: salta a una cancion
     now() { return A.music.title(); },
     stop() { if (mediaEl) mediaEl.pause(); },
@@ -314,5 +314,27 @@ window.AIQ = window.AIQ || {};
     lose: go(t => { thump(t, { vol: 0.4, f0: 80, f1: 28, dur: 0.6 }); [57, 53, 50, 45].forEach((m, i) => pluck(m, t + i * 0.16, { vol: 0.12, dur: 1.3, bright: 1.5, rev: 0.7 })); noise(t, 0.6, { lp: 500, vol: 0.08 }); A.music.duck(0.25, 2400); }),
     ach: go(t => { [79, 83, 86, 91].forEach((m, i) => bell(m, t + i * 0.08, { vol: 0.09, dur: 1.2, rev: 0.6 })); pluck(67, t, { vol: 0.12, dur: 0.6, rev: 0.4 }); noise(t + 0.25, 0.5, { hp: 5000, vol: 0.03, sweepTo: 12000, type: "highpass" }); }),
     unlock: go(t => { noise(t, 0.08, { lp: 2400, vol: 0.09, type: "bandpass", q: 0.8 }); [76, 83, 88].forEach((m, i) => bell(m, t + 0.05 + i * 0.07, { vol: 0.07, dur: 0.8, rev: 0.4 })); }),
+    /* v0.33 retos premium: lluvia continua, corte de corriente, cristal roto, huellas, ventanas de error, bateria y contra de perk */
+    rain: (() => {
+      let src = null, gain = null;
+      return (dens = 0) => {
+        if (!ctx) return;
+        if (!src && dens > 0 && A.audio.sfxOn) {
+          const n = ctx.sampleRate * 3, buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+          let b = 0; for (let i = 0; i < n; i++) { const w = Math.random() * 2 - 1; b = 0.97 * b + 0.03 * w; d[i] = w * 0.55 + b * 2.2 + (Math.random() < 0.0009 ? (Math.random() - 0.5) * 3 : 0); }   // siseo + cuerpo grave + gotas sueltas
+          src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+          const hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 380; lp.type = "lowpass"; lp.frequency.value = 5200;
+          gain = ctx.createGain(); gain.gain.value = 0; src.connect(hp).connect(lp).connect(gain).connect(sfxBus); src.start();
+        }
+        if (gain) gain.gain.setTargetAtTime(A.audio.sfxOn ? dens * 0.055 : 0, ctx.currentTime, dens ? 0.5 : 0.25);
+      };
+    })(),
+    powerdown: go(t => { noise(t, 0.5, { lp: 4000, sweepTo: 90, vol: 0.08, type: "bandpass", q: 0.8 }); thump(t + 0.04, { vol: 0.32, f0: 90, f1: 26, dur: 0.45 }); const os = ctx.createOscillator(), g = ctx.createGain(); os.type = "sawtooth"; os.frequency.setValueAtTime(120, t); os.frequency.exponentialRampToValueAtTime(30, t + 0.45); os.connect(g).connect(sfxBus); env(g, t, 0.005, 0.05, 0.45); os.start(t); os.stop(t + 0.55); }),
+    glass: go(t => { thump(t, { vol: 0.5, f0: 140, f1: 38, dur: 0.22 }); noise(t, 0.09, { hp: 1800, vol: 0.22 }); noise(t + 0.01, 0.35, { hp: 4500, vol: 0.07, sweepTo: 9000, type: "highpass" }); for (let i = 0; i < 9; i++) bell(96 + Math.round(Math.random() * 14), t + 0.02 + Math.random() * 0.32, { vol: 0.02 + Math.random() * 0.02, dur: 0.2 + Math.random() * 0.25, rev: 0.35 }); }),
+    smear: go(t => { for (const [d, f0, f1] of [[0, 1100, 1500], [0.16, 1300, 950]]) { const os = ctx.createOscillator(), g = ctx.createGain(), bp = ctx.createBiquadFilter(); os.type = "triangle"; os.frequency.setValueAtTime(f0, t + d); os.frequency.linearRampToValueAtTime(f1, t + d + 0.12); bp.type = "bandpass"; bp.frequency.value = 1400; bp.Q.value = 2; os.connect(bp).connect(g).connect(sfxBus); env(g, t + d, 0.01, 0.035, 0.12); os.start(t + d); os.stop(t + d + 0.2); } noise(t, 0.3, { lp: 2500, vol: 0.02, type: "bandpass", q: 1.5 }); }),
+    ding: go(t => { bell(81, t, { vol: 0.09, dur: 0.6, rev: 0.25 }); bell(76, t + 0.09, { vol: 0.08, dur: 0.8, rev: 0.3 }); }),
+    lowbat: go(t => { [0, 0.16].forEach((d, i) => { const os = ctx.createOscillator(), g = ctx.createGain(); os.type = "square"; os.frequency.value = i ? 660 : 880; os.connect(g).connect(sfxBus); env(g, t + d, 0.004, 0.035, 0.12); os.start(t + d); os.stop(t + d + 0.16); }); }),
+    charge: go(t => { [72, 79, 84].forEach((m, i) => pluck(m, t + i * 0.07, { vol: 0.07, dur: 0.3, bright: 3, rev: 0.3 })); noise(t, 0.3, { hp: 800, sweepTo: 6000, vol: 0.025, type: "highpass" }); }),
+    counter: go((t, k = 0) => { bell(88 + k * 3, t, { vol: 0.06, dur: 0.6, rev: 0.5 }); bell(95 + k * 3, t + 0.05, { vol: 0.04, dur: 0.8, rev: 0.6 }); noise(t, 0.25, { hp: 5000, sweepTo: 11000, vol: 0.025, type: "highpass" }); }),
   };
 })(window.AIQ);
