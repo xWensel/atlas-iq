@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
   if (!kv.configured) return res.status(503).json({ ok: false, reason: "no-backend" });
   let b; try { b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {}; } catch (e) { return res.status(400).json({ ok: false, reason: "json" }); }
   const board = String(b.board || ""), id = String(b.id || "").replace(/[^a-z0-9]/gi, "").slice(0, 24), daily = /^daily-/.test(board);
-  const name = String(b.name || "").replace(/[^\p{L}\p{N} _.\-]/gu, "").trim().slice(0, 16) || "Anonymous";
+  const name = [...String(b.name || "").normalize("NFC").replace(/[^\p{L}\p{N} _.'\-]/gu, "").replace(/\s+/g, " ").trim()].slice(0, 20).join("").trim() || "Anonymous";   // el mismo filtro que A.profile.clean (hasta 20)
   const tries = daily ? (Array.isArray(b.tries) ? b.tries : [b.score]).slice(0, 3).map(v => Math.floor(+v)) : [];
   const score = daily ? 0 : Math.floor(+b.score);
   if (!kv.BOARD.test(board) || !id) return res.status(400).json({ ok: false, reason: "invalid" });

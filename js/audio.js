@@ -407,5 +407,23 @@ window.AIQ = window.AIQ || {};
       bell(n, t, { vol: 0.08, dur: 0.4, rev: 0.3 }); bell(n + 7, t + 0.05, { vol: 0.06, dur: 0.6, rev: 0.35 }); noise(t, 0.012, { hp: 6000, vol: 0.05 });
       for (let i = 0; i < 1 + k; i++) bell(n + 12 + (i % 2) * 5, t + 0.09 + i * 0.045, { vol: 0.025, dur: 0.18, rev: 0.25 });
     }),
+    /* v0.37 tu nombre (js/nombre.js): la sala se apaga (rele, golpe del interruptor general y la luz que cae) y se enciende el foco (clonc
+       metalico y el zumbido del filamento); cada tecla es una ficha que sube por la pentatonica; al firmar, el sello y la firma sol-do-re */
+    spot: go(t => {
+      [0, 0.045].forEach(d => noise(t + d, 0.018, { hp: 3400, vol: 0.06 })); thump(t + 0.05, { vol: 0.34, f0: 92, f1: 30, dur: 0.42 });
+      noise(t + 0.05, 0.75, { lp: 2600, sweepTo: 150, vol: 0.05, type: "bandpass", q: 0.9 });
+      thump(t + 0.56, { vol: 0.26, f0: 190, f1: 64, dur: 0.1 }); noise(t + 0.56, 0.035, { hp: 2600, vol: 0.09 }); bell(69, t + 0.58, { vol: 0.045, dur: 1, rev: 0.6 });
+      noise(t + 0.6, 1.3, { hp: 4800, vol: 0.016, sweepTo: 8800, type: "highpass" }); A.music.duck(0.35, 2600);
+    }),
+    key: go((t, k = 0) => {
+      if (k < 0) { pluck(55, t, { vol: 0.06, dur: 0.12, bright: 2, rev: 0.05 }); noise(t, 0.02, { lp: 1400, vol: 0.04 }); return; }   // borrar: mas grave y apagado
+      pluck(scaleNote(3 + Math.min(k, 19), 60), t, { vol: 0.055, dur: 0.12, bright: 4, rev: 0.1 }); noise(t, 0.012, { hp: 4200, vol: 0.035 }); thump(t, { vol: 0.05, f0: 420, f1: 190, dur: 0.03 });
+    }),
+    sign: go(t => {
+      thump(t, { vol: 0.44, f0: 128, f1: 32, dur: 0.32 }); noise(t, 0.11, { lp: 1700, vol: 0.13 });
+      MOTIF.forEach((m, i) => { pluck(m + 12, t + 0.14 + i * 0.1, { vol: 0.14, dur: 1.1, rev: 0.6 }); bell(m + 24, t + 0.14 + i * 0.1, { vol: 0.03, dur: 0.4, rev: 0.4 }); });
+      [84, 88, 91, 96, 100].forEach((m, i) => bell(m, t + 0.46 + i * 0.055, { vol: 0.045, dur: 1.2, rev: 0.65 }));
+      noise(t + 0.4, 0.7, { hp: 5000, vol: 0.025, sweepTo: 12000, type: "highpass" }); A.music.duck(0.4, 2000);
+    }),
   };
 })(window.AIQ);

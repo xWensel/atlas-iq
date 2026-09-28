@@ -27,6 +27,13 @@ window.AIQ = window.AIQ || {};
   })());
 
   /* ---------- tablas ---------- */
+  /* nombre con el que rankeas (sin nombre, "Anonimo" en tu idioma) */
+  R.name = () => A.profile.get().name || A.T("Anónimo", "Anonymous");
+  /* los envios al servidor van en fila: si cambias el nombre justo al acabar la partida, el "Anonimo" que iba de camino no pisa al nombre nuevo */
+  let line = Promise.resolve();
+  const post = body => (line = line.catch(() => null).then(async () => {
+    try { const r = await fetch("/api/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); const j = await r.json(); return j && j.ok ? j : null; } catch (e) { return null; }
+  }));
   R.localTop = (board, n = 20) => ((A.profile.get().boards[board] || []).slice().sort((a, b) => b.score - a.score).slice(0, n));
   /* {global, rows:[{id,name,score,tries?}], me?:{rank,score}, count?}: con el servidor, tu puesto aunque no estes entre los n primeros */
   R.top = async (board, n = 20) => {
@@ -36,13 +43,24 @@ window.AIQ = window.AIQ || {};
   /* entrada: {score, extra:{...}}. Devuelve {rank?, record}. */
   R.submit = async (board, entry) => {
     const P = A.profile.get(), rec = A.profile.record(board, entry.score);
-    const row = { id: P.id, name: P.name || A.T("Anónimo", "Anonymous"), score: entry.score, ts: Date.now(), extra: entry.extra || {} };
+    const row = { id: P.id, name: R.name(), score: entry.score, ts: Date.now(), extra: entry.extra || {} };
     const list = (P.boards[board] = P.boards[board] || []);
     const mine = list.find(r => r.id === P.id); if (mine) { if (row.score > mine.score) Object.assign(mine, row); } else list.push(row);
     P.boards[board] = list.sort((a, b) => b.score - a.score).slice(0, 50); A.profile.save();
-    let global = null;
-    if (await R.check()) { try { const r = await fetch("/api/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ board, ...row }) }); const j = await r.json(); if (j.ok) global = j; } catch (e) { /* solo local */ } }
+    const global = (await R.check()) ? await post({ board, ...row }) : null;
     return { record: rec, global };
+  };
+  /* v0.37: cambias de nombre -> se cambia en tus filas locales y se reenvia a las tablas que se ven (Aventura, hoy y ayer). El servidor se queda con
+     la mejor puntuacion (ZADD GT) y con los intentos ya guardados (HSETNX): del reenvio solo cambia el nombre. */
+  R.rename = async () => {
+    const P = A.profile.get(), name = R.name();
+    for (const b in P.boards) (P.boards[b] || []).forEach(r => { if (r.id === P.id) r.name = name; });
+    A.profile.save();
+    if (!(await R.check())) return;
+    const adv = (P.boards["adv-all"] || []).find(r => r.id === P.id), jobs = [];
+    if (adv) jobs.push(post({ board: "adv-all", id: P.id, name, score: adv.score }));
+    for (const b of [R.daily.board(), R.daily.yesterday()]) { const st = R.daily.get(b); if (st.done) jobs.push(post({ board: b, id: P.id, name, tries: st.tries.filter(t => !t.live).map(t => t.s || 0) })); }
+    await Promise.all(jobs);
   };
   R.myRank = board => { const P = A.profile.get(), rows = R.localTop(board, 50), i = rows.findIndex(r => r.id === P.id); return i < 0 ? null : i + 1; };
 
@@ -100,11 +118,10 @@ window.AIQ = window.AIQ || {};
     /* la puntuacion global (suma de los intentos cerrados) va a la tabla local y, si hay servidor, a la global */
     async submit(board) {
       const P = A.profile.get(), st = DY.get(board), tries = st.tries.filter(t => !t.live).map(t => t.s || 0);
-      const row = { id: P.id, name: P.name || A.T("Anónimo", "Anonymous"), score: st.total, tries, ts: Date.now() };
+      const row = { id: P.id, name: R.name(), score: st.total, tries, ts: Date.now() };
       P.boards[board] = (P.boards[board] || []).filter(r => r.id !== P.id).concat(row).sort((a, b) => b.score - a.score).slice(0, 50);
       A.profile.record(board, st.total); A.profile.save();
-      let global = null;
-      if (await R.check()) { try { const r = await fetch("/api/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ board, id: row.id, name: row.name, tries }) }); const j = await r.json(); if (j.ok) global = j; } catch (e) { /* solo local */ } }
+      const global = (await R.check()) ? await post({ board, id: row.id, name: row.name, tries }) : null;
       return { total: st.total, global };
     },
   };

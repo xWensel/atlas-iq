@@ -177,13 +177,15 @@ window.AIQ = window.AIQ || {};
         <div class="dr-tabs">${tabs.map(([id, l]) => `<button type="button" class="sq-fit${id === board ? " on" : ""}" data-b="${id}">${l}</button>`).join("")}</div>
         <div class="lb" id="lb"><p class="lb-load">…</p></div>
         <div class="dr-stats"><span><b class="sq-fit">${A.fmt(hist.days)}</b><i>${P6("Días jugados|Days played|Jours joués|Dias jogados|Gespielte Tage|Giorni giocati||已玩天数|플레이한 날|プレイ日数|Дней сыграно|Dni gry")}</i></span><span><b class="sq-fit">${A.fmt(hist.streak)}</b><i>${P6("Días seguidos|Days in a row|Jours d'affilée|Dias seguidos|Tage in Folge|Giorni di fila||连续天数|연속 일수|連続日数|Дней подряд|Dni z rzędu")}</i></span><span><b class="sq-fit">${A.fmt(hist.best)}</b><i>${P6("Mejor día|Best day|Meilleur jour|Melhor dia|Bester Tag|Giorno migliore||最佳一天|최고의 날|ベストの日|Лучший день|Najlepszy dzień")}</i></span></div>
-        <label class="nick"><span>${T("Tu nombre en la clasificación", "Your leaderboard name")}</span><input id="nickIn" maxlength="16" value="${esc(P.name)}" placeholder="${T("Aventurero", "Adventurer")}"></label>
+        <label class="nick"><span>${T("Tu nombre en la clasificación", "Your leaderboard name")}</span><input id="nickIn" maxlength="${A.profile.NAME_MAX}" value="${esc(P.name)}" placeholder="${T("Aventurero", "Adventurer")}" spellcheck="false" autocomplete="off"></label>
       </aside></div>`, "s-daily"), "tablewrap");
     wireTools(); $("hubBack").onclick = () => { clearInterval(tickT); screen("home"); };
-    /* el nombre se puede cambiar despues de jugar: se reenvia la puntuacion (el servidor no deja cambiar los intentos ya guardados) */
-    $("nickIn").onchange = e => { A.profile.setName(e.target.value); if (st.done) DY.submit(day).then(() => loadBoard()); };
+    /* el nombre se puede cambiar despues de jugar: A.nombre.set lo reenvia a las tablas (el servidor no deja cambiar los intentos ya guardados) */
+    const nick = $("nickIn");
+    nick.oninput = e => { if (e.isComposing) return; const v = A.profile.clean(nick.value); if (v !== nick.value) nick.value = v; };
+    nick.onchange = () => { A.nombre.set(nick.value).then(() => loadBoard()); nick.value = P.name; };
     document.querySelectorAll(".dr-tabs button").forEach(b => (b.onclick = () => { board = b.dataset.b; document.querySelectorAll(".dr-tabs button").forEach(x => x.classList.toggle("on", x === b)); A.sfx.ui(); loadBoard(); }));
-    if ($("dailyGo")) $("dailyGo").onclick = () => { A.profile.setName($("nickIn").value); A.sfx.depart(); clearInterval(tickT); enterRun(() => (sv ? A.adv.resume(true) : A.adv.beginDaily(day))); };
+    if ($("dailyGo")) $("dailyGo").onclick = () => { A.nombre.set(nick.value); A.sfx.depart(); clearInterval(tickT); enterRun(() => (sv ? A.adv.resume(true) : A.adv.beginDaily(day))); };
     /* cuenta atras hasta tu medianoche; al cambiar de dia, la pantalla se reparte sola */
     tickT = setInterval(() => {
       const el = $("drClock"); if (!el) return clearInterval(tickT);
@@ -200,7 +202,7 @@ window.AIQ = window.AIQ || {};
     const rows = res.rows || [], inTop = rows.some(r => r.id === my);
     const dots = r => (isDay ? `<span class="lb-tries">${[0, 1, 2].map(i => `<i class="${r.tries && i < r.tries.length ? "on" : ""}"></i>`).join("")}</span>` : "");
     const li = (r, n) => `<li class="${r.id === my ? "me" : ""}"><span class="lb-n">${n <= 3 ? A.icon("medal_" + ["gold", "silver", "bronze"][n - 1], "sm") : A.fmt(n)}</span><span class="lb-name">${esc(r.name || "—")}</span>${dots(r)}<b>${A.fmt(r.score)}</b></li>`;
-    const mine = res.global && res.me && !inTop ? `<li class="lb-gap" aria-hidden="true">···</li>` + li({ id: my, name: P.name || A.T("Anónimo", "Anonymous"), score: res.me.score, tries: isDay ? DY.get(b).tries.filter(t => !t.live) : null }, res.me.rank) : "";
+    const mine = res.global && res.me && !inTop ? `<li class="lb-gap" aria-hidden="true">···</li>` + li({ id: my, name: A.rank.name(), score: res.me.score, tries: isDay ? DY.get(b).tries.filter(t => !t.live) : null }, res.me.rank) : "";
     const src = res.global ? `${A.icon("globe", "sm")}<span>${P6("Mundial|Worldwide|Mondial|Mundial|Weltweit|Mondiale||全球|전 세계|世界|Мировая|Światowy")}</span><em>${P6("Jugadores: {n}|Players: {n}|Joueurs : {n}|Jogadores: {n}|Spieler: {n}|Giocatori: {n}||玩家：{n}|플레이어: {n}|プレイヤー：{n}|Игроков: {n}|Graczy: {n}").replace("{n}", A.fmt(res.count))}</em>`
       : `<span>${P6("Solo este equipo|This device only|Cet appareil uniquement|Só este aparelho|Nur dieses Gerät|Solo questo dispositivo||仅限本设备|이 기기만|この端末のみ|Только это устройство|Tylko to urządzenie")}</span>`;
     el.innerHTML = `<p class="lb-src">${src}</p>` + (rows.length ? `<ol class="${isDay ? "dy" : ""}">${rows.map((r, i) => li(r, i + 1)).join("")}${mine}</ol>` : `<p class="lb-empty">${T("Aún no hay puntuaciones. ¡Sé el primero!", "No scores yet. Be the first!")}</p>`);

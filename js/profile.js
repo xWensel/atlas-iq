@@ -9,7 +9,7 @@ window.AIQ = window.AIQ || {};
   const defaults = () => ({
     v: 1, id: Math.random().toString(36).slice(2, 10) + Date.now().toString(36), name: "", created: Date.now(),
     stats: { plays: 0, questions: 0, km: 0, hits: 0, bulls: 0, bestStreak: 0, perfectRounds: 0, timeouts: 0, seconds: 0, inside: 0 },
-    records: {}, ach: {}, boards: {}, daily: {},
+    records: {}, ach: {}, boards: {}, daily: {}, nameLog: [], nameAsk: 0,
     adv: { runs: 0, wins: 0, bestScore: 0, bestRound: 0, coins: 0, asc: 0, boss: 0, decks: { explorer: 1 }, deckWins: {}, seen: {} },
     medals: {},
   });
@@ -17,9 +17,18 @@ window.AIQ = window.AIQ || {};
   try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d && d.v === 1) { P = Object.assign(defaults(), d); P.stats = Object.assign(defaults().stats, d.stats); P.adv = Object.assign(defaults().adv, d.adv); } } catch (e) { /* perfil nuevo */ }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) { /* sin almacenamiento */ } };
 
+  /* nombre con el que rankeas (v0.37): letras de cualquier alfabeto, cifras, espacio y _ . - ' (lo mismo que acepta api/submit.js), hasta 20 */
+  const NAME_MAX = 20;
+  const clean = n => [...String(n || "").normalize("NFC").replace(/[^\p{L}\p{N} _.'\-]/gu, "").replace(/\s+/g, " ").trimStart()].slice(0, NAME_MAX).join("");
   A.profile = {
-    get: () => P, save,
-    setName(n) { P.name = String(n || "").replace(/[^\p{L}\p{N} _.\-]/gu, "").trim().slice(0, 16); save(); return P.name; },
+    get: () => P, save, NAME_MAX, clean,
+    /* guarda el nombre y lo apunta en P.nameLog (los que ya has usado: el crupier "ya te conoce" si vuelves a uno) */
+    setName(n) {
+      P.name = clean(n).trim();
+      if (P.name) { const low = P.name.toLowerCase(); P.nameLog = [P.name, ...(P.nameLog || []).filter(x => x.toLowerCase() !== low)].slice(0, 8); P.nameAsk = 0; }
+      save(); return P.name;
+    },
+    knownName: n => { const low = clean(n).trim().toLowerCase(); return !!low && (P.nameLog || []).some(x => x.toLowerCase() === low); },
     /* records[board] = mejor puntuacion; devuelve true si es nuevo record */
     record(board, score) { const old = P.records[board] || 0; if (score > old) { P.records[board] = score; save(); return true; } return false; },
     medal(id, m) { const rank = { bronze: 1, silver: 2, gold: 3 }; if ((rank[m] || 0) > (rank[P.medals[id]] || 0)) { P.medals[id] = m; save(); } },

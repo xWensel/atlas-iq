@@ -197,6 +197,7 @@
     if ($("resetAllNote")) $("resetAllNote").textContent = A.T("Borra partida guardada, perfil, logros, barajas y ascensiones desbloqueadas, récords, Enciclopedia, tutorial y ajustes. Solo para desarrollo.", "Deletes the saved run, profile, achievements, unlocked decks and ascensions, records, Encyclopedia, tutorial and settings. Dev only.");
     const rc = $("resetCodex"); if (rc && !rc.classList.contains("armed")) rc.textContent = A.T("Restablecer Enciclopedia", "Reset Encyclopedia");
     $("resetCodexNote").textContent = A.T("Borra todas las tarjetas desbloqueadas. Tu perfil, logros y récords no cambian.", "Deletes every unlocked card. Your profile, achievements and records stay.");
+    if (A.nombre) A.nombre.sync();                                          // v0.37: "Tu nombre" (js/nombre.js)
   }
   /* restablecer la Enciclopedia: hay que pulsar dos veces (la primera arma el boton) */
   { const rc = $("resetCodex"); let tm = 0;
@@ -664,6 +665,7 @@ ${A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km s
       stats: win ? [[A.t("v.total"), shown]] : [[A.t("v.points"), S.levelScore], [A.t("v.goal"), L.advance]],
       stamp: win ? A.t("stamp.win") : A.t("stamp.no"), stampSub: win ? A.icon("u_star", "st") : pad2(S.level + 1), iq, tier, tierName, buttons: btns,
     });
+    if (A.nombre) A.nombre.maybeAsk({ won: win });                          // v0.37: fin de tu primera partida sin nombre: el crupier te lo pregunta
   }
 
   /* ------------------------------------------------------------ pausa y reloj */
