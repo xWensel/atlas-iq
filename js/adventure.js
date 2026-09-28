@@ -316,7 +316,7 @@ window.AIQ = window.AIQ || {};
   /* el crupier habla en la intro: lo que toca segun el momento de la expedicion (primera, revancha, reanudada, reintento, nuevo acto, jefe...)
      + una frase por reto (y protesta si ya llevas el perk que lo anula). El guion vive en js/dealer.js (D.introSeq). */
   let resumedIntro = false;                                           // la proxima intro es la primera tras reanudar una partida guardada
-  A.adv.introReady = Lv => {
+  A.adv.introReady = (Lv, talked) => {                                // talked: avisa cuando el crupier ha acabado de hablar (con su segundo de mas)
     const host = $("introDealer"); if (!host || !run) return 0; const D = A.dealer, list = run.chal || [];
     D.enable(true); D.dock(host);
     const counters = list.some(c => (A.CHAL[c.id].counters || []).some(id => owned(id)));
@@ -325,7 +325,7 @@ window.AIQ = window.AIQ || {};
       act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), counters,
     });
     resumedIntro = false;
-    D.sequence(seq); return seq.reduce((n, it) => n + A.tx(it.line).length * 40 + 900, 0);
+    D.sequence(seq, talked); return seq.reduce((n, it) => n + A.tx(it.line).length * 40 + 900 + D.LINGER, 0);   // cada frase, con su segundo de mas
   };
   A.adv.introEnd = () => { A.dealer.dock(null); A.dealer.hide(); };
 

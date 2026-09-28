@@ -537,6 +537,7 @@ window.AIQ = window.AIQ || {};
     bs.marginBottom = Math.min(want, maxM) + "px";                                    // si no cabe del todo, antes pisa las herramientas que la placa
   }
   addEventListener("resize", () => { if (D.busy) fitCorner(curText); });
+  const LINGER = 1000;                                                // SIEMPRE un segundo mas: al acabar cada frase se queda antes de irse o de pasar a la siguiente (intro incluida)
   /* dice una frase con voz arcade y maquina de escribir */
   D.say = (line, o = {}) => {
     if (!D.on && !D.onHome) return; ensure(); clear();
@@ -547,7 +548,7 @@ window.AIQ = window.AIQ || {};
     if (mood === "laugh") A.sfx.laugh && A.sfx.laugh();
     let i = 0; const chars = [...text], step = mood === "laugh" ? 44 : 34;
     const tick = () => {
-      if (i >= chars.length) { el.classList.add("done"); if (o.hold !== 0) later(() => D.hide(), o.hold || 1800 + text.length * 22); if (o.done) o.done(); return; }
+      if (i >= chars.length) { el.classList.add("done"); if (o.hold !== 0) later(() => D.hide(), (o.hold || 1800 + text.length * 22) + LINGER); if (o.done) later(o.done, LINGER); return; }
       txt.textContent += chars[i]; if (/\S/.test(chars[i]) && i % 2 === 0 && mood !== "laugh") A.sfx.voice && A.sfx.voice(mood, i); i++; later(tick, step + (/[.,!?…]/.test(chars[i - 1]) ? 140 : 0));
     };
     tick(); D.busy = true;
@@ -566,7 +567,7 @@ window.AIQ = window.AIQ || {};
   /* secuencia de frases: [{line, mood}] */
   D.sequence = (items, done) => { let k = 0; const next = () => { if (k >= items.length) return done && done(); const it = items[k++]; D.say(it.line, { mood: it.mood, hold: 0, done: () => later(next, it.gap || 700) }); }; next(); };
   D.line = (key, i) => { const a = LINES[key]; return a ? (i == null ? rand(a) : a[i % a.length]) : null; };
-  D.lines = LINES;
+  D.lines = LINES; D.LINGER = LINGER;
   D._pick = key => pickLine(key);   // solo para pruebas de desarrollo (dev/*.js): saca una frase de la bolsa sin repetir
 
   /* ---------------------------------------------------------------- memoria persistente: visitas, tiempo jugado, como acabo la ultima expedicion

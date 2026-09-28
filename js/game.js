@@ -421,10 +421,12 @@
       <span class="tag">${L.bonus ? A.t("intro.bonus") : A.t("kind." + L.kind)}</span><h2>${A.tx(L.name)}</h2>
       <p>${A.t("intro.q", { n: S.qs.length })} · ${A.t("intro.t", { s: L.seconds })}${L.advance > 1 ? " · " + A.t("intro.goal", { a: A.fmt(L.advance) }) : ""}</p></div></div>`;
     A.sfx.intro(); map.animateTo(map.home(), 1100);
-    let done = false, ms = S.run ? (L.boss ? 4200 : 3300) : 2600;
-    if (S.run && A.adv.introReady) ms = Math.min(11000, Math.max(ms, 1200 + (A.adv.introReady(L) || 0)));
+    let done = false, ms = S.run ? (L.boss ? 4200 : 3300) : 2600, talking = false, timeUp = false;
+    /* la intro no se cierra sola mientras el crupier habla: espera a su ultima frase y a su segundo de mas, aunque vaya con retraso
+       (antes un tope de 11 s le cortaba a media frase). Un clic o una tecla la saltan igual. */
+    if (S.run && A.adv.introReady) { const need = A.adv.introReady(L, () => { talking = false; if (timeUp) end(); }) || 0; talking = need > 0; ms = Math.max(ms, 1200 + need); }
     const end = () => { if (done) return; done = true; el.onclick = null; if (S.run && A.adv.introEnd) A.adv.introEnd(); el.classList.add("out"); setTimeout(() => { el.classList.add("hidden"); cb(); }, 430); };
-    S.skipIntro = end; el.onclick = end; setTimeout(end, ms);
+    S.skipIntro = end; el.onclick = end; setTimeout(() => { timeUp = true; if (!talking) end(); }, ms); setTimeout(end, ms + 15000);   // red de seguridad: nunca se queda colgada
   }
   function nextQuestion() {
     S.phase = "asking"; S.paused = false; S.tense = false; S.limit = lv().seconds; S.t0 = performance.now(); S.pausedAcc = 0; S.lastTick = -1; S.lastTimeStr = "";
