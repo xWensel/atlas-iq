@@ -211,8 +211,14 @@ const XL = ["en", "es", "fr", "pt", "de", "it", "zh", "ko", "ja", "ru", "pl"];  
  * desbloqueadas (codex.v1 guarda por clave), salvo que choque con un lugar ("victoria" = Victoria de Seychelles) */
 const CODEX_EN = fs.existsSync(path.join(ROOT, "data", "wiki", "en.json")) ? JSON.parse(read("data/wiki/en.json")) : {};
 const PLACE_IDS = new Set(PLACES.filter(p => p[1] !== "history").map(p => p[0]));   // los "history" del banco son los mismos sucesos: su tarjeta vale
+/* y si ya hay una tarjeta del mismo articulo (curada o suceso del banco: "galileo", "siege-of-vienna"), se usa esa:
+ * dos tarjetas con el mismo texto serian un duplicado en la Enciclopedia */
+const SAME_ART = {};
+for (const id of [...(ctx.window.AIQ.CODEX_CURATED || []).map(c => c[0]), ...PLACES.filter(p => p[1] === "history").map(p => p[0])])
+  if (CODEX_EN[id] && !SAME_ART[CODEX_EN[id][0]]) SAME_ART[CODEX_EN[id][0]] = id;
 function codexKey(wiki, label) {
-  const k = ckey(wiki || label), old = ckey(label);
+  const k = ckey(wiki || label), old = ckey(label), art = CODEX_EN[k] && CODEX_EN[k][0];
+  if (art && SAME_ART[art]) return SAME_ART[art];
   return CODEX_EN[k] || !CODEX_EN[old] || PLACE_IDS.has(old) ? k : old;
 }
 const BC = { en: "{y} BC", es: "{y} a. C.", fr: "{y} av. J.-C.", pt: "{y} a.C.", de: "{y} v. Chr.", it: "{y} a.C.", zh: "公元前{y}年", ko: "기원전 {y}년", ja: "紀元前{y}年", ru: "{y} до н. э.", pl: "{y} p.n.e." };
