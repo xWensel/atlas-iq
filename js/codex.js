@@ -155,7 +155,7 @@ window.AIQ = window.AIQ || {};
         if (pid !== id) add({ id: pid, type: /ocean|sea$/i.test(a[2]) ? "water" : "place", name: { en: a[2].split(",")[0], es: a[3].split(",")[0] }, wiki: wikiFor(pid, a[2]), lat: a[4], lon: a[5], country: countryFrom(a[2], ""), fact: { en: "", es: "" }, rarity: r, src: "atlas" });
       }
     }));
-    // 3) modo Clasico: 536 destinos de las 6 partidas originales
+    // 3) modo Clasico: los destinos de sus 11 campanas
     (A.CLASSIC || []).forEach(g => g.levels.forEach((L, li) => {
       const r = rarityFor(li, g.levels.length);
       L.dests.forEach(d => {

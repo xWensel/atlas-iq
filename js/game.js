@@ -554,7 +554,7 @@
     } else {
       sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
       S.streak = guess && sc.dist / sc.distMax >= 0.6 ? S.streak + 1 : 0;
-      /* el Clasico mantiene la puntuacion exacta del original */
+      /* el Clasico tiene su propia puntuacion (data/campaigns.js) */
       chips = sc.dist + sc.time;
       mult = 1;
       total = Math.round(chips * mult);

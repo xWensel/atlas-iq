@@ -95,7 +95,7 @@ window.AIQ = window.AIQ || {};
   const row6 = row => { const o = {}; L6.forEach((l, i) => { o[l] = row[i] || (l === "es-419" ? row[1] : row[0]); }); return o; };
 
 
-  /* textos del juego original (solo ingles) -> {en, es, fr, pt, de, it}: data/classic-tr.js, luego la base de lugares y, si no, igual en todos */
+  /* textos de los niveles (ingles) -> {en, es, fr, pt, de, it...}: data/classic-tr.js, luego la base de lugares y, si no, igual en todos */
   const L6 = ["en", "es", "fr", "pt", "de", "it", "es-419", "zh", "ko", "ja", "ru", "pl"], nk = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
   let PBY = null;
   const placeBy = en => {
@@ -130,6 +130,14 @@ window.AIQ = window.AIQ || {};
     return o;
   }
 
+  /* cada partida de un nivel son 10 preguntas: los niveles con mas lugares sortean 10 (en orden de dificultad) y cada intento trae otros */
+  const PLAY_Q = 10;
+  const pick10 = list => {
+    if (list.length <= PLAY_Q) return list;
+    const idx = list.map((_, i) => i); for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+    return idx.slice(0, PLAY_Q).sort((a, b) => a - b).map(i => list[i]);
+  };
+
   const classic = (window.AIQ.CLASSIC || []).map(g => {
     const meta = CLASSIC_META[g.id];
     return {
@@ -146,7 +154,7 @@ window.AIQ = window.AIQ || {};
             const full = !clue && (A.CLASSIC_TR || {})[d.n] ? tr6(d.n) : null;                 // traduccion del nombre completo (p. ej. "Olympia, Washington"): se parte en cada idioma
             const part = k => { const o = {}; L6.forEach(l => { const v = full[l], i = v.lastIndexOf(", "); o[l] = i > 0 ? (k ? v.slice(i + 2) : v.slice(0, i)) : (k ? "" : v); }); return o; };
             return {
-              t: "p", lat: d.lat, lon: d.lon, cid: [d.ck || A.ckey(clue ? d.f : d.n)],
+              t: "p", lat: d.lat, lon: d.lon, cid: [d.ck || A.ckey(clue ? d.f : d.n)], kf: d.kf || 1,
               name: full ? part(0) : clue && d.c6 ? { en: d.n, ...d.c6 } : tr6(sp.name), sub: full ? part(1) : tr6(sp.sub),
               clue: !!clue, answer: clue ? tr6(d.f) : null,
               fact: clue ? same("") : d.f6 ? { en: d.f, ...d.f6 } : tr6(d.f, d.f.length > 40),
@@ -156,14 +164,14 @@ window.AIQ = window.AIQ || {};
           tier: L.bonus ? 2 : Math.min(2, Math.floor((li / g.levels.length) * 3)), all: () => L.dests.map(mk),
           name: levelName(L), kind, region: L.region || "world", bonus: L.bonus, plainName: true,
           seconds: L.tpq, advance: L.advance, maxPerQ: L.kmBase + L.speed,
-          /* Puntuacion identica al original:
-             distancia = floor(KMBase - km * KMDist), velocidad = floor((1 - tiempo/(TPQ - corte)) * SpeedBonus) */
+          /* Puntuacion de Geolite: distancia = floor(kmBase - km * kmDist / kf), velocidad = floor((1 - tiempo/(tpq - corte)) * speed).
+             kf = 1,5 en naturaleza, 1,6 en mares y 1,4 en estrechos (zonas enormes: el mismo error cuenta menos) */
           score(q, km, timeLeft) {
-            const dist = Math.max(0, Math.floor(L.kmBase - km * L.kmDist));
+            const dist = Math.max(0, Math.floor(L.kmBase - (km * L.kmDist) / (q.kf || 1)));
             const time = Math.max(0, Math.floor((1 - (L.tpq - timeLeft) / (L.tpq - L.cutoff)) * L.speed));
             return { dist, time, distMax: L.kmBase, timeMax: L.speed };
           },
-          questions: () => L.dests.map(mk),
+          questions: () => pick10(L.dests).map(mk),
         };
       }),
     };

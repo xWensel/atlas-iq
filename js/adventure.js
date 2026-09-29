@@ -167,7 +167,8 @@ window.AIQ = window.AIQ || {};
   const has = flag => perkList().some(p => p[flag]);
   const sumFlag = flag => perkList().reduce((n, p) => n + (p[flag] || 0), 0);
   const owned = id => run.perks.includes(id);
-  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = 7000 * Math.min(0.95, 0.3 + 0.05 * r) * (isBoss() ? 1.08 : 1) * ascFx(run.asc).target; return Math.round((base * t.target) / 50) * 50; };
+  /* objetivo: escalera lineal, +350 por ronda de 2.000 (ronda 1) a 5.500 (ronda 11); el jefe final (ronda 12) es 5.777 exactos. Redondeado a 50 (salvo ese 5.777 sin ascension ni perks de ronda) */
+  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = r >= 11 ? 5777 : 2000 + 350 * r, m = ascFx(run.asc).target * t.target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };
   const shopCtx = () => { const x = { price: 0, freeReroll: 0, slots: 3 }; perkList().forEach(p => p.shop && p.shop(x, run)); return x; };
   const inflation = () => 1 + 0.25 * run.act;                            // todo cuesta mas en cada acto: el dinero pesa mas segun avanzas
   const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price * inflation()) + shopCtx().price);

@@ -13,7 +13,7 @@ piden antes del 28 de septiembre.
       con `node tools/build-classic.mjs` desde `data/places.js` + `data/wiki`
       y `tools/extra-data.json` (`node tools/build-extra.mjs`, Wikidata, solo
       si cambian las listas de Eventos/Personajes). Cero lugares, facts o
-      umbrales copiados del Traveler IQ Challenge original. Sin solapes: cada
+      umbrales de otros juegos: todo es propio de Geolite. Sin solapes: cada
       lugar sale en una sola campana; capitales solo en Capitales del mundo,
       paises solo en Banderas, batallas y sucesos solo en Eventos. Los nombres
       de nivel se traducen en `data/campaigns.js` (`LEVEL_LABEL`).

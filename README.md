@@ -4,6 +4,9 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.11.1** - Aventura: objetivos de ronda en escalera lineal, +350 por ronda, de 2.000 (ronda 1) a 5.500 (ronda 11), y el jefe final (ronda 12) en 5.777; antes subían a saltos irregulares hasta 6.450 y los jefes llevaban recargo. Los objetivos son 2.000, 2.350, 2.700, 3.050, 3.400, 3.750, 4.100, 4.450, 4.800, 5.150, 5.500 y 5.777. Con ascensión o perks de ronda se redondean a 50.
+  Clásico: todos los niveles se juegan con 10 preguntas (los que tienen más lugares sortean 10 en cada intento y cada intento trae otros); Asia pasa de 8-10 a 12 lugares por nivel al reservarle sus lugares (Mundo y Pistas ya no se llevan los asiáticos); naturaleza y mares puntúan con más tolerancia (kf 1,5 / 1,6 en mares / 1,4 en estrechos, incluso en Pistas); el tiempo por pregunta sube a 15 s (18 s en Pistas, Eventos y Personajes) para jugar sin prisa. Fuera cualquier referencia a otro juego en el código y los textos: la puntuación y el contenido son de Geolite.
+
 **v0.10.1** - Menú principal con sonido al pasar el ratón: los 6 botones (Clásico, Aventura, Reto diario, Enciclopedia, Perfil y Ajustes) suenan como rozar una ficha de casino, muy flojito y corto (clac de ficha, nota de kalimba, brillo de campana y una pizca de 8 bits). Cada botón tiene su nota (barrer las cartas suena a arpegio) y cada vez varían la nota, el timbre y el volumen, así que nunca suena igual. Solo con ratón: en móvil el toque ya suena al pulsar.
 
 **v0.9.1** - Clásico: al elegir campaña o nivel ya no se rehace la pantalla (adiós a las tarjetas que desaparecían y al redimensionado).
@@ -214,7 +217,7 @@
 **v0.12.1** - Correccion urgente. (1) **Parpadeo:** el vigilante de rendimiento comparaba cada fotograma con el mas rapido visto y, con la variacion normal de un navegador cualquiera, creia ir lento: bajaba la resolucion una y otra vez (cada cambio vacia el lienzo = parpadeo) y frenaba el redibujado en reposo (tirones). Ahora mide la mediana de 3 s, baja como mucho hasta 0,7 y nunca por picos sueltos; ademas se quito el centelleo del filtro CRT. (2) **Pais que faltaba:** la v0.12.0 borro por error la tabla de paises de los lugares (`A.PCOUNTRY`), asi que la placa de la pregunta y el codex no decian el pais. Restaurada, y `dev/smoke.js` ahora falla si vuelve a faltar.
 
 **v0.12** - Revision completa: fallos, traducciones, maquetacion y limpieza.
-- **Traducciones:** el modo Clasico (536 preguntas, 53 niveles, 122 datos curiosos) estaba solo en ingles incluso en espanol: ahora esta en los 6 idiomas (`data/classic-tr.js`), con las erratas del original corregidas ("Colisseum", "New Dehli", "Kinshasha"...) y datos anticuados actualizados. El modo Extendido y 23 textos de interfaz ya tienen frances, portugues, aleman e italiano (`js/i18n5.js`). Nombres corregidos en la base de lugares (Tokio en aleman, Piramides de Guiza...).
+- **Traducciones:** el modo Clasico (536 preguntas, 53 niveles, 122 datos curiosos) estaba solo en ingles incluso en espanol: ahora esta en los 6 idiomas (`data/classic-tr.js`), con las erratas corregidas ("Colisseum", "New Dehli", "Kinshasha"...) y datos anticuados actualizados. El modo Extendido y 23 textos de interfaz ya tienen frances, portugues, aleman e italiano (`js/i18n5.js`). Nombres corregidos en la base de lugares (Tokio en aleman, Piramides de Guiza...).
 - **Fallos corregidos:** el bloque "Puntos x Racha" del ticket salia sin estilo ("Fichas819 × Mult · Racha 21.2"); con `?skipboot` la pantalla de carga no se quitaba; las frases del crupier al ganar/perder ronda nunca se decian; el crupier tapaba el boton del veredicto; el aviso de tarjeta nueva tapaba el texto; la sacudida de racha no tenia estilo.
 - **Maquetacion:** comprobada en 390x844, 1024x768, 1280x720, 1366x768 y 1920x1080: el veredicto y la portada caben sin desplazarse, el ticket ya no tapa el marcador, las cartas de herramienta quedan siempre sobre el pie, el Campamento se adapta a pantallas medianas y moviles, y las notas de campo se limitan a 3 lineas.
 - **Notas de campo limpias:** fuera transliteraciones, pronunciaciones y parentesis en otros alfabetos de los extractos de Wikipedia, y nunca acaban a media frase.
@@ -319,7 +322,7 @@ Herramienta de desarrollo: `dev/bot.js` (jugador automático para equilibrar la 
 
 **v0.4** – 4 skins que cambian TODO (mapa por shader, paleta, formas, tipografia y sonido):
 - **Expedicion** (papel y tinta) · **Casino** (mesa de cartas, remolino animado, monitor CRT, tipografia pixel, estilo "Balatro") · **Plano** (cianotipo con letra de delineante) · **Riso** (poster serigrafiado con desregistro de tinta y bordes recortados a mano).
-- Modo Extendido con **FICHAS x MULT**: las rachas multiplican la puntuacion, con animacion y sacudida de pantalla. El modo Clasico conserva la puntuacion exacta del original.
+- Modo Extendido con **FICHAS x MULT**: las rachas multiplican la puntuacion, con animacion y sacudida de pantalla. El modo Clasico tiene su propia puntuacion.
 - Cada skin tiene su propia banda (tempo, swing, transposicion y timbre del piano).
 
 **v0.3** – mapa en la GPU, entrada de estudio y mas idiomas:
@@ -338,14 +341,14 @@ Juego de geografía: haz clic lo más cerca posible del lugar que te piden, cuan
 Sin build ni dependencias para jugar: abre `index.html` (o `JUGAR.bat`); en la web lo sirve Vercel y en escritorio Electron (`main.js`). 12 idiomas: es, en, fr, pt (Brasil), de, it, es-419, zh, ko, ja, ru y pl.
 
 ## Modos
-- **Clásico** – 11 campañas (Mundo, Capitales del mundo, EE. UU., Europa, Asia, Latinoamérica, Oceanía, Banderas, Pistas, Eventos históricos y Personajes históricos), 10 niveles cada una, con la puntuación del juego original. Datos en `data/classic.js` (uso interno).
+- **Clásico** – 11 campañas (Mundo, Capitales del mundo, EE. UU., Europa, Asia, Latinoamérica, Oceanía, Banderas, Pistas, Eventos históricos y Personajes históricos), 10 niveles cada una, con su propia puntuación. Datos en `data/classic.js` (uso interno).
 - **Aventura** – el modo principal: roguelike de 12 rondas en 3 actos con jefe, trucos del crupier, reliquias, herramientas y Campamento con doblones; ascensiones 0-5 y modo infinito al ganar.
 - **Reto diario** – una mano al azar por día (misma semilla para todos), 3 intentos y puntuación global = suma; clasificación Hoy / Ayer / Aventura.
 - **Enciclopedia** – 4.966 tarjetas que se desbloquean acertando cerca (300 / 150 / 75 km), con textos, fotos y banderas empaquetados (nunca Wikipedia en vivo).
 
 ## Puntuación
 - Solo precisión y rapidez: las reliquias no multiplican los puntos.
-- Clásico (idéntica al original): `distancia = floor(KMBase − km·KMDist)` · `velocidad = floor((1 − t/(TPQ − corte)) · SpeedBonus)`.
+- Clásico: `distancia = floor(kmBase − km·kmDist / kf)` · `velocidad = floor((1 − t/(tpq − corte)) · speed)`. `kf` = 1,5 en naturaleza, 1,6 en mares y 1,4 en estrechos (zonas enormes: el mismo error cuenta menos). Cada partida de un nivel son 10 preguntas.
 - En las preguntas de país, estar dentro del país es 0 km; si no, cuenta la distancia real sobre la esfera hasta su frontera más cercana.
 
 ## Estructura
@@ -359,4 +362,4 @@ Sin build ni dependencias para jugar: abre `index.html` (o `JUGAR.bat`); en la w
 
 ## Créditos de datos
 Fronteras: Natural Earth (dominio público) vía `world-atlas` (ISC). `topojson-client` (ISC).
-Modo Clásico: contenido del juego original, solo para uso interno.
+Modo Clásico: contenido propio de Geolite (lugares, datos y puntuación).
