@@ -39,6 +39,9 @@ module.exports = async (req, res) => {
       await kv.pipeline([["ZADD", lb, "GT", score, id], ["HSET", names, id, name], ["EXPIRE", lb, TTL], ["EXPIRE", names, TTL]]);
     } else {                                                           // la Aventura es "de siempre": no caduca (con EXPIRE se borraba entera si nadie jugaba en 40 dias)
       await kv.pipeline([["ZADD", lb, "GT", score, id], ["HSET", names, id, name], ["PERSIST", lb], ["PERSIST", names]]);
+      /* y cuenta para "Hoy" (fecha de Espana): asi entran tambien las partidas de versiones del juego anteriores a las tablas del dia, que solo envian aqui */
+      const day = "day-" + new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()).replace(/-/g, "");
+      await kv.pipeline([["ZADD", "lb:" + day, "GT", score, id], ["HSET", "names:" + day, id, name], ["EXPIRE", "lb:" + day, TTL], ["EXPIRE", "names:" + day, TTL]]);
     }
     const [rank, count] = await kv.pipeline([["ZREVRANK", lb, id], ["ZCARD", lb]]);
     res.status(200).json({ ok: true, rank: rank == null ? null : rank + 1, total: count, ...(mine ? { score: total, tries: mine } : {}) });

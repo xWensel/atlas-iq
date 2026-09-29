@@ -4,6 +4,8 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.18.1** - Clasificación Hoy/Ayer: toda puntuación de la Aventura que llega al servidor cuenta también para el día en curso (fecha de España), la envíe la versión que sea del juego. Antes solo entraban las partidas de jugadores con la v0.15.1 o posterior, y quien jugaba con una versión anterior (caché, Steam) no aparecía en Hoy. Cada día tiene su tabla: la de hoy pasa sola a Ayer a medianoche.
+
 **v0.17.1** - Fluidez: el juego ya no da tirones al cambiar de pantalla y el mapa de fondo sigue moviéndose suave en todo momento. Medido fotograma a fotograma en todas las pantallas, con la CPU normal y frenada ×4 (como un portátil modesto): abrir el **Perfil** pasaba de ~100 fotogramas perdidos (el mapa se quedaba a tirones más de un segundo) a 0; la primera Aventura se congelaba ~0,3 s (1 s en un equipo lento) y ya no; una expedición entera perdía 95 fotogramas y ahora 1-5. Qué se ha arreglado:
 - El ajuste de textos sin huérfanos (`A.squeeze`) mide todo de una vez y prueba cada paso en todos los textos a la vez (antes, cientos de recálculos de la página: uno por texto y por intento). Mismo resultado, comprobado en 3 idiomas y 3 resoluciones.
 - El ajuste de pantalla (`A.fitK`) se hace en el mismo fotograma en que la pantalla aparece (sin salto), no se repite si nada ha cambiado (antes, una vez por cada imagen que cargaba: 200 en el Perfil) y recuerda la escala de cada pantalla para no buscarla otra vez (el Clásico daba 2-4 vueltas en cada apertura).
