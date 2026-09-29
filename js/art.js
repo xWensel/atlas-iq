@@ -11,6 +11,16 @@ window.AIQ = window.AIQ || {};
    * queda decodificada (complete=true, opacity:1 por CSS) pero invisible
    * hasta el siguiente repintado "de verdad". Forzar un reflow y esperar a
    * decode() + dos rAF antes de tocar el DOM evita que quede huerfana. */
+  /* Por tandas: las imagenes que terminan de cargar antes del mismo fotograma
+   * comparten los reflows (antes, dos reflows de la pagina entera POR imagen:
+   * la Enciclopedia y los menus con muchas ilustraciones iban a tirones). */
+  let revQ = null;
+  const revFlush = () => {
+    const q = revQ; revQ = null;
+    void document.body.offsetHeight;
+    q.forEach(([im]) => (im.style.transform = "")); void document.body.offsetHeight;
+    requestAnimationFrame(() => q.forEach(([, cb]) => cb()));
+  };
   A.revealImg = (im, cb) => {
     let done = false;
     const run = () => {
@@ -19,8 +29,8 @@ window.AIQ = window.AIQ || {};
        * en algunos equipos; forzar una promocion/despromocion de capa via
        * transform suele destrabar el pintado "fantasma" que se queda atras. */
       im.style.transform = "translateZ(0)";
-      void document.body.offsetHeight;
-      requestAnimationFrame(() => { im.style.transform = ""; void im.offsetHeight; requestAnimationFrame(cb); });
+      if (!revQ) { revQ = []; requestAnimationFrame(revFlush); }
+      revQ.push([im, cb]);
     };
     (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(run);
     im.onload = run;

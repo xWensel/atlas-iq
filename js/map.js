@@ -720,8 +720,11 @@ void main(){
       else return;
       this.resize(true);
     }
+    /* tapado del todo por una pantalla opaca (Ajustes, Enciclopedia): no se dibuja lo que no se ve. Al destaparse, se redibuja en ese mismo fotograma */
+    setHold(on) { this.hold = !!on; this._holdN = 0; if (!on) this.dirty = this.fxDirty = true; }
     _frame(now) {
       if (this.lost) return;
+      if (this.hold) { this.lastT = this._rawT = now; if (!(this.holdCheck && ++this._holdN % 15 === 0 && !this.holdCheck())) return; }
       const dt = this.lastT ? Math.min(0.05, (now - this.lastT) / 1000) : 0.016; this.lastT = now;
       this._adapt(now); this._stepDistort(now); this._stepMotion(now, dt);
       if (this.anim) {
@@ -909,7 +912,7 @@ void main(){
     /* ---------- capa 2D: retícula (etiquetas), chinchetas, linea, etiquetas y cursor ---------- */
     _drawGridLabels(c) {
       const { W, H } = this, gp = this._gridParams();
-      c.font = `400 10px ${this._fm()}`; c.textBaseline = "top";
+      this._setFont(c, `400 10px ${this._fm()}`); c.textBaseline = "top";
       const [wx0, wyTop] = this._toWorld(0, 0), [wx1, wyBot] = this._toWorld(W, H);
       const latTop = unproject(0, wyTop)[1], latBot = unproject(0, wyBot)[1];
       const draw = (step, alpha) => {
@@ -947,7 +950,7 @@ void main(){
         if (G && m.pop && age > 700) {
           const t = Math.min(1, (age - 700) / 1700), y = G[1] - 52 - easeIO(t) * 46;
           c.save(); c.globalAlpha = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
-          c.font = `900 34px ${this._fd()}`; c.textAlign = "center"; c.lineJoin = "round";
+          this._setFont(c, `900 34px ${this._fd()}`); c.textAlign = "center"; c.lineJoin = "round";
           c.lineWidth = 7; c.strokeStyle = sk.ink; c.strokeText(m.pop, G[0], y); c.fillStyle = sk.paper; c.fillText(m.pop, G[0], y); c.restore();
         }
       }
@@ -987,8 +990,17 @@ void main(){
       }
       if (now < this._probeAnim || this.probes.some(p => p.km || p.bearing != null)) this.fxDirty = true;   // el borde discontinuo se anima
     }
-    _fd() { return getComputedStyle(document.documentElement).getPropertyValue("--serif") || "Jersey 15, sans-serif"; }
-    _fm() { return getComputedStyle(document.documentElement).getPropertyValue("--mono") || "'DM Mono', monospace"; }
+    /* familias de letra del tema: solo cambian con el idioma o el tema, asi que se leen del CSS una vez (leerlas en cada fotograma forzaba
+       un recalculo de estilos de la pagina entera en mitad del dibujo del mapa, justo cuando una pantalla nueva estaba entrando) */
+    _font(v, def) { const h = document.documentElement, key = h.lang + "|" + h.dataset.skin; if (this._fk !== key) { this._fk = key; this._fc = {}; } return this._fc[v] || (this._fc[v] = getComputedStyle(h).getPropertyValue(v) || def); }
+    _fd() { return this._font("--serif", "Jersey 15, sans-serif"); }
+    /* poner la letra del lienzo obliga al navegador a recalcular los estilos de la pagina (aunque sea la misma): solo si cambia de verdad.
+       Se compara con como la guarda el lienzo (su forma normalizada); si llega una fuente nueva, se vuelve a poner */
+    _setFont(c, f) {
+      if (!this._fser) { this._fser = new Map(); if (document.fonts) document.fonts.addEventListener("loadingdone", () => this._fser.clear()); }
+      const s = this._fser.get(f); if (s !== undefined && c.font === s) return; c.font = f; this._fser.set(f, c.font);
+    }
+    _fm() { return this._font("--mono", "'DM Mono', monospace"); }
     _rgba(h, a) { const [r, g, b] = hex(h); return `rgba(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)},${a})`; }
     _line(c, m, G, Aa, age) {
       const k = clamp((age - 300) / 500, 0, 1), e = easeIO(k); if (k <= 0) return;
@@ -1008,7 +1020,7 @@ void main(){
       this._chip(c, m.dist, x, y, { font: `500 12px ${this._fm()}`, center: true, alpha: Math.min(1, (age - 800) / 250) });
     }
     _chip(c, text, x, y, o = {}) {
-      c.save(); c.globalAlpha = o.alpha == null ? 1 : o.alpha; c.font = o.font || "600 14px sans-serif";
+      c.save(); c.globalAlpha = o.alpha == null ? 1 : o.alpha; this._setFont(c, o.font || "600 14px sans-serif");
       const w = c.measureText(text).width + 22, h = 28, cut = 6, sk = this.sk;
       let rx = o.center ? x - w / 2 : x, ry = y - h / 2; rx = clamp(rx, 8, this.W - w - 8); ry = clamp(ry, 8, this.H - h - 8);
       const path = () => { c.beginPath(); c.moveTo(rx + cut, ry); c.lineTo(rx + w - cut, ry); c.lineTo(rx + w, ry + cut); c.lineTo(rx + w, ry + h - cut); c.lineTo(rx + w - cut, ry + h); c.lineTo(rx + cut, ry + h); c.lineTo(rx, ry + h - cut); c.lineTo(rx, ry + cut); c.closePath(); };
@@ -1037,7 +1049,7 @@ void main(){
       const [wx, wy] = this._toWorld(x, y), [lon, lat] = unproject(wx, wy);
       if (Math.abs(lon) <= 180 && Math.abs(lat) <= 90) {
         const txt = fmtCoord(lat, "N", "S") + "  " + fmtCoord(lon, "E", "W");
-        c.font = `500 11px ${this._fm()}`; const w = c.measureText(txt).width + 14;
+        this._setFont(c, `500 11px ${this._fm()}`); const w = c.measureText(txt).width + 14;
         let bx = x + 20, by = y + 18; if (bx + w > this.W - 6) bx = x - 20 - w; if (by + 22 > this.H - 6) by = y - 40;
         c.fillStyle = this._rgba(sk.ink, 0.9); c.fillRect(bx, by, w, 22); c.fillStyle = sk.paper; c.textBaseline = "middle"; c.fillText(txt, bx + 7, by + 12);
       }
@@ -1052,7 +1064,9 @@ void main(){
       const g = c.createLinearGradient(0, 0, 0, cv.height); g.addColorStop(0, st.oceanTop); g.addColorStop(1, st.oceanBot); c.fillStyle = g; c.fillRect(0, 0, cv.width, cv.height);
       const [x, y] = project(spec.lon, spec.lat), z = Math.max(1, spec.zoom * 0.85), uw = (BX1 - BX0) / z, k = cv.width / uw;
       c.setTransform(k, 0, 0, -k, cv.width / 2 - x * k, cv.height / 2 + y * k);
-      for (const f of this.world.features) { c.fillStyle = st.land[f.ci] || st.land[0]; c.fill(f.path); }
+      /* solo los paises que caen en la miniatura (antes se rellenaba el mundo entero en cada una: las 11 del Clasico costaban un fotograma) */
+      const m = 2 / k, xl = x - uw / 2 - m, xr = x + uw / 2 + m, hh = cv.height / k / 2 + m, yb = y - hh, yt = y + hh;
+      for (const f of this.world.features) { if (!f.wrap && (f.px1 < xl || f.px0 > xr || f.py1 < yb || f.py0 > yt)) continue; c.fillStyle = st.land[f.ci] || st.land[0]; c.fill(f.path); }
       c.setTransform(1, 0, 0, 1, 0, 0);
       const px = cv.width / 2, py = cv.height / 2;
       if (spec.mark !== false) { c.strokeStyle = st.red; c.lineWidth = 2 * dpr; c.beginPath(); c.arc(px, py, 6 * dpr, 0, Math.PI * 2); c.stroke(); c.fillStyle = st.red; c.beginPath(); c.arc(px, py, 2 * dpr, 0, Math.PI * 2); c.fill(); }   // mark:false = miniatura de region (campanas), sin punto

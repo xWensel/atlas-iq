@@ -461,4 +461,8 @@ window.AIQ = window.AIQ || {};
       noise(t + 0.4, 0.7, { hp: 5000, vol: 0.025, sweepTo: 12000, type: "highpass" }); A.music.duck(0.4, 2000);
     }),
   };
+  /* el motor de sonido (abrir el dispositivo de audio y preparar la reverb: ~50 ms de golpe) se monta ya, detras de la pantalla de carga.
+     Antes se montaba con el primer sonido (la intro del estudio o el primer clic) y ese fotograma se quedaba parado. Sin gesto del jugador
+     el navegador lo deja en pausa: init() lo reanuda con el primer clic, como siempre */
+  init();
 })(window.AIQ);

@@ -22,7 +22,7 @@ window.AIQ = window.AIQ || {};
   const L6 = s => (A.L6 ? A.L6(s) : { es: s.split("|")[0] });
   const tx = o => (A.tx ? A.tx(o) : o.es);
 
-  let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false;
+  let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [];
   const U = {}, t0 = performance.now(), timers = [];
   const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, e: 0, b: 0, bt: 0 }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [] };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
@@ -103,15 +103,27 @@ void main(){
       glCv = document.createElement("canvas"); glCv.className = "chx-gl";
       gl = glCv.getContext("webgl2", { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, powerPreference: "high-performance" });
       if (!gl) return null;
-      const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+      /* se compila sin esperar al resultado: con KHR_parallel_shader_compile el driver lo hace en segundo plano y ready() solo pregunta si ya esta.
+         Antes se esperaba aqui mismo: ~300 ms con la pantalla congelada al empezar la primera Aventura */
+      psc = gl.getExtension("KHR_parallel_shader_compile");
+      const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); shs.push(s); return s; };
       prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
-      for (const n of ["uR", "uP", "uK", "uT", "uFlash", "uDark", "uSpot", "uSmoke", "uCut"]) U[n] = gl.getUniformLocation(prog, n);
       gl.bindVertexArray(gl.createVertexArray());
       glCv.addEventListener("webglcontextlost", e => { e.preventDefault(); gl = null; });
     } catch (e) { console.warn("chfx: sin WebGL2", e); gl = null; }
     return gl;
   }
+  /* programa listo para dibujar? Sin bloquear mientras se compila; si fallara, sin WebGL (js/challenges.js vuelve a sus capas CSS) */
+  function ready() {
+    if (linked) return true; if (!gl || !prog) return false;
+    if (psc && !gl.getProgramParameter(prog, psc.COMPLETION_STATUS_KHR)) return false;
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn("chfx: sin WebGL2", gl.getProgramInfoLog(prog), ...shs.map(s => gl.getShaderInfoLog(s))); gl = null; return false; }
+    for (const n of ["uR", "uP", "uK", "uT", "uFlash", "uDark", "uSpot", "uSmoke", "uCut"]) U[n] = gl.getUniformLocation(prog, n);
+    return (linked = true);
+  }
+  /* se deja compilando en un rato libre nada mas arrancar: cuando llegue el primer reto ya esta listo */
+  { const idle = (fn, ms) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: ms }) : setTimeout(fn, ms));
+    addEventListener("load", () => idle(() => { initGL(); idle(ready, 6000); }, 5000), { once: true }); }
 
   /* ------------------------------------------------------------------ lienzos y capas */
   const part = cls => { let el = ov.querySelector("." + cls); if (!el) { el = document.createElement("div"); el.className = cls; ov.appendChild(el); } return el; };
@@ -122,13 +134,17 @@ void main(){
     for (const cls of ["chx-wet", "chx-drops", "chx-shards", "chx-prints"]) part(cls);
     if (glCv) ov.appendChild(glCv);
     ov.appendChild(cv); part("chx-wins"); ov.appendChild(ov.querySelector(".chx-wins"));
+    /* el tamano de la capa se apunta cuando cambia (ResizeObserver): leer clientWidth en cada fotograma obligaba a maquetar la pagina a mitad del dibujo */
+    if (window.ResizeObserver) { if (!ro) ro = new ResizeObserver(() => { ovW = ov.clientWidth; ovH = ov.clientHeight; }); ro.disconnect(); ro.observe(ov); }
+    ovW = ov.clientWidth; ovH = ov.clientHeight;
     W = 0; size();
   };
+  let ro = null, ovW = 0, ovH = 0;
   X.ok = () => !!(gl && ov);
   X._tick = (n = 1, ms = 16) => { for (let i = 0; i < n; i++) { last -= ms; tick(performance.now()); } return !!raf; };   // depuracion: avanza fotogramas sin requestAnimationFrame (pestana oculta)
   function size() {
     if (!ov) return false;
-    const w = ov.clientWidth || innerWidth, h = ov.clientHeight || innerHeight, dpr = Math.min(2, devicePixelRatio || 1);
+    const w = (ro ? ovW : ov.clientWidth) || innerWidth, h = (ro ? ovH : ov.clientHeight) || innerHeight, dpr = Math.min(2, devicePixelRatio || 1);
     const k = Math.max(0.5, dpr * ({ low: 0.45, high: 0.85 }[game().quality] || 0.65));
     if (w === W && h === H && k === K && dpr === D2) return false;
     W = w; H = h; K = k; D2 = dpr;
@@ -169,7 +185,7 @@ void main(){
   }
 
   function drawGL(now) {
-    if (!gl) return;
+    if (!gl || !ready()) { if (glCv) glCv.classList.remove("on"); return; }
     const need = !!(E.dark || E.spot || E.smoke || E.cut.v > 0.001 || E.flash > 0.001);
     glCv.classList.toggle("on", need); if (!need) return;
     gl.viewport(0, 0, glCv.width, glCv.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -304,7 +320,7 @@ void main(){
   function land(h) {
     if (!E.crack || !E.crack.on) return; renderHit(h); h.at = performance.now(); kick();
     say("glass"); const app = document.getElementById("app");
-    if (app && !reduce()) { app.classList.remove("chx-punch"); void app.offsetWidth; app.classList.add("chx-punch"); later(() => app.classList.remove("chx-punch"), 260); }
+    if (app && !reduce()) { app.classList.remove("chx-punch"); A.restyle(app); app.classList.add("chx-punch"); later(() => app.classList.remove("chx-punch"), 260); }
     const sh = document.createElement("i"), r = h.Rpx * 0.34, rr = seeded(h.seed + ":s"), poly = [];
     for (let i = 0; i < 16; i++) { const a = (i / 16) * TAU, q = 0.62 + rr() * 0.38; poly.push(`${(50 + Math.cos(a) * 50 * q).toFixed(1)}% ${(50 + Math.sin(a) * 50 * q).toFixed(1)}%`); }
     sh.className = "chx-shard"; Object.assign(sh.style, { left: (h.fx * W - r) + "px", top: (h.fy * H - r) + "px", width: 2 * r + "px", height: 2 * r + "px", clipPath: `polygon(${poly.join(",")})` });

@@ -210,7 +210,7 @@ window.AIQ = window.AIQ || {};
     const a = queue.shift(); let el = document.getElementById("achToast");
     if (!el) { el = document.createElement("div"); el.id = "achToast"; el.className = "ach-toast hidden"; (document.getElementById("leftCol") || document.getElementById("app")).appendChild(el); }
     el.innerHTML = `<span class="ach-ico">${A.badge(a.id)}</span><span class="ach-t"><em>${A.T("Logro desbloqueado", "Achievement unlocked")}</em><b>${A.tx(a.name)}</b><i>${A.tx(a.desc)}</i></span>`;
-    el.classList.remove("hidden", "in"); void el.offsetWidth; el.classList.add("in"); A.sfx.ach();
+    el.classList.remove("hidden", "in"); A.restyle(el); el.classList.add("in"); A.sfx.ach();
     setTimeout(() => { el.classList.add("hidden"); showing = false; setTimeout(toast, 250); }, 4600);
   }
   A.ach = {

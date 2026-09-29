@@ -141,6 +141,10 @@
     setInterval(() => { if (cur && !cur.isConnected) { hide(); cur = null; } }, 400);
   }
 
+  /* reinicia una animacion o transicion CSS (quitar la clase, A.restyle, volver a ponerla): basta con recalcular el estilo. El clasico
+     `void el.offsetWidth` maquetaba ademas la pagina entera cada vez (en cada respuesta, racha, aviso de logro...) */
+  A.restyle = el => { if (el) void getComputedStyle(el).opacity; };
+
   /* ------------------------------------------------------------------ textos sin "huerfanos"
      Si un texto necesita una linea mas solo por unas pocas letras (la ultima linea es muy corta), se aprieta un poco
      (primero el interletrado, luego como mucho un 8 % de tamano) para que quepa en una linea menos. Si ni asi cabe, se deja
@@ -153,37 +157,54 @@
     for (const r of rs) { const l = lines[lines.length - 1]; if (l && r.top < l.bottom - Math.min(r.height, l.bottom - l.top) * 0.5) { l.left = Math.min(l.left, r.left); l.right = Math.max(l.right, r.right); l.bottom = Math.max(l.bottom, r.bottom); } else lines.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom }); }
     return lines;
   }
-  function squeezeOne(el) {
-    const cs = getComputedStyle(el); if (cs.display === "inline" || cs.display === "none" || /nowrap|pre/.test(cs.whiteSpace)) return;
-    const lines = lineBoxes(el); if (lines.length < 2 || lines.length > 6) return;
+  /* primero se LEE todo y luego se prueba cada paso en todos los textos a la vez: un solo recalculo de la pagina por paso. Antes cada texto
+     escribia y medía por su cuenta (cientos de recalculos: el Perfil, con sus 100 logros, congelaba el mapa de fondo mas de un segundo) */
+  function squeezePlan(el) {
+    const cs = getComputedStyle(el); if (cs.display === "inline" || cs.display === "none" || /nowrap|pre/.test(cs.whiteSpace)) return null;
+    const lines = lineBoxes(el); if (lines.length < 2 || lines.length > 6) return null;
     const box = el.getBoundingClientRect(), sc = el.offsetWidth ? box.width / el.offsetWidth : 1;
     const w = box.width - (parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) * sc, last = lines[lines.length - 1];
-    if (!(w > 0) || last.right - last.left > w * 0.25) return;                  // la ultima linea ya es "de verdad": no se toca
+    if (!(w > 0) || last.right - last.left > w * 0.25) return null;                  // la ultima linea ya es "de verdad": no se toca
     const fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0, keep = { ls: el.style.letterSpacing, fs: el.style.fontSize };
     const tries = []; if (ls > 0.4) tries.push([ls * 0.5, 1], [0, 1]); [0.96, 0.92].forEach(k => tries.push([ls > 0.4 ? 0 : ls, k]));
-    for (const [l, k] of tries) {
-      el.style.letterSpacing = l + "px"; el.style.fontSize = (fs * k).toFixed(2) + "px";
-      if (lineBoxes(el).length < lines.length) { el.dataset.sq = JSON.stringify(keep); return; }
-    }
-    el.style.letterSpacing = keep.ls; el.style.fontSize = keep.fs;
+    return { el, n: lines.length, fs, keep, tries };
   }
-  A.squeeze = root => {
-    if (!root || !root.isConnected) return;
-    root.querySelectorAll("[data-sq]").forEach(el => { try { const k = JSON.parse(el.dataset.sq); el.style.letterSpacing = k.ls; el.style.fontSize = k.fs; } catch (e) { /* nada */ } delete el.dataset.sq; });
-    root.classList.add("sq-measure");                                            // se mide con el reparto normal de lineas (sin `pretty`)
-    const els = [root, ...root.querySelectorAll("*")].filter(el => !el.closest(SQ_SKIP) && [...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim().length > 1) && el.getClientRects().length);
-    els.forEach(squeezeOne);
-    root.classList.remove("sq-measure");
-    /* etiquetas de una sola linea (.sq-fit): si no caben, primero se quita el prefijo prescindible (.sq-pre, si lo hay) y luego se aprietan como arriba */
-    root.querySelectorAll(".sq-fit").forEach(el => {
-      el.classList.remove("sq-short", "sq-wrap"); el.style.letterSpacing = el.style.fontSize = "";
-      const over = () => el.scrollWidth > el.clientWidth + 1; if (!over()) return;
-      el.classList.add("sq-short"); if (!over()) return;
-      const cs = getComputedStyle(el), fs = parseFloat(cs.fontSize);
-      for (const k of [1, 0.95, 0.9, 0.86]) { el.style.letterSpacing = "0px"; el.style.fontSize = (fs * k).toFixed(2) + "px"; if (!over()) return; }
-      el.classList.add("sq-wrap");                                               // ultimo recurso: dos lineas (y un poco mas pequena si una palabra sola no cabe), nunca cortado
-      for (const k of [1, 0.9, 0.8]) { el.style.fontSize = (fs * k).toFixed(2) + "px"; if (!over()) return; }
-    });
+  /* textos con algo de texto propio (no solo hijos), fuera de SQ_SKIP y visibles: se recorren los nodos de texto (antes, todos los elementos con closest) */
+  function sqTargets(root) {
+    const out = new Set(), tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n; (n = tw.nextNode());) { const p = n.parentElement; if (p && !out.has(p) && n.nodeValue.trim().length > 1) out.add(p); }
+    return [...out].filter(el => !el.closest(SQ_SKIP) && el.getClientRects().length);
+  }
+  A.squeeze = root => {                                                          // un elemento o una lista (p. ej. las cartas recien anadidas a una rejilla)
+    const roots = (Array.isArray(root) ? root : [root]).filter(r => r && r.isConnected); if (!roots.length) return;
+    roots.forEach(r => r.querySelectorAll("[data-sq]").forEach(el => { try { const k = JSON.parse(el.dataset.sq); el.style.letterSpacing = k.ls; el.style.fontSize = k.fs; } catch (e) { /* nada */ } delete el.dataset.sq; }));
+    roots.forEach(r => r.classList.add("sq-measure"));                           // se mide con el reparto normal de lineas (sin `pretty`)
+    let todo = roots.flatMap(sqTargets).map(squeezePlan).filter(Boolean);
+    for (let i = 0; todo.length; i++) {
+      const next = [];
+      todo.forEach(p => { const t = p.tries[i]; if (t) { p.el.style.letterSpacing = t[0] + "px"; p.el.style.fontSize = (p.fs * t[1]).toFixed(2) + "px"; } });   // escribe
+      todo.forEach(p => {                                                        // y lee
+        if (!p.tries[i]) { p.el.style.letterSpacing = p.keep.ls; p.el.style.fontSize = p.keep.fs; return; }    // ni asi cabe: como estaba
+        if (lineBoxes(p.el).length < p.n) p.el.dataset.sq = JSON.stringify(p.keep); else next.push(p);
+      });
+      todo = next;
+    }
+    roots.forEach(r => r.classList.remove("sq-measure"));
+    /* etiquetas de una sola linea (.sq-fit): si no caben, primero se quita el prefijo prescindible (.sq-pre, si lo hay) y luego se aprietan como arriba;
+       ultimo recurso: dos lineas (y un poco mas pequena si una palabra sola no cabe), nunca cortado. Tambien por pasos, todas a la vez */
+    const over = el => el.scrollWidth > el.clientWidth + 1;
+    const FIT = [
+      el => { el.classList.remove("sq-short", "sq-wrap"); el.style.letterSpacing = el.style.fontSize = ""; },
+      el => el.classList.add("sq-short"),
+      ...[1, 0.95, 0.9, 0.86].map(k => (el, fs) => { el.style.letterSpacing = "0px"; el.style.fontSize = (fs * k).toFixed(2) + "px"; }),
+      ...[1, 0.9, 0.8].map((k, i) => (el, fs) => { if (!i) el.classList.add("sq-wrap"); el.style.fontSize = (fs * k).toFixed(2) + "px"; }),
+    ];
+    let fit = roots.flatMap(r => [...r.querySelectorAll(".sq-fit")]).map(el => ({ el, fs: 0 }));
+    for (let i = 0; i < FIT.length && fit.length; i++) {
+      fit.forEach(f => FIT[i](f.el, f.fs));
+      fit = fit.filter(f => over(f.el));
+      if (i === 1) fit.forEach(f => (f.fs = parseFloat(getComputedStyle(f.el).fontSize)));   // su tamano, ya sin el prefijo
+    }
   };
 
   /* etiquetas accesibles en el idioma del juego (index.html solo trae las de espanol): los botones con data-tip usan su texto, los interruptores

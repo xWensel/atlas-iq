@@ -29,7 +29,7 @@
   }
   function show() {
     if (!musicOn() || S().songToast === false || S().settingsOpen || A.music.index() < 0) return;
-    if (!el) build(); fill(el); el.classList.remove("show"); void el.offsetWidth; el.classList.add("show"); arm(4600);
+    if (!el) build(); fill(el); el.classList.remove("show"); A.restyle(el); el.classList.add("show"); arm(4600);
   }
   /* control equivalente dentro de Ajustes */
   function sync() {

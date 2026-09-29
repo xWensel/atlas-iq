@@ -84,12 +84,12 @@ window.AIQ = window.AIQ || {};
     const n = len(composing ? v : inp.value), grew = n > st.len;               // mientras se compone no se toca la casilla (romperia el teclado): solo se cuenta
     if (n !== st.len) {
       A.sfx.key(grew ? n : -1);
-      const f = $("nmField"); f.classList.remove("bump"); void f.offsetWidth; f.classList.add("bump");
-      if (grew) { const d = $("nmDots").children[n - 1]; if (d) { d.classList.remove("pop"); void d.offsetWidth; d.classList.add("pop"); } }
+      const f = $("nmField"); f.classList.remove("bump"); A.restyle(f); f.classList.add("bump");
+      if (grew) { const d = $("nmDots").children[n - 1]; if (d) { d.classList.remove("pop"); A.restyle(d); d.classList.add("pop"); } }
     } else if (v !== raw && !composing) nope();                                            // un caracter que no vale (emoji, simbolo): no entra
     st.len = n; meter(n);
   }
-  function nope() { const d = $("nmDots"); d.classList.remove("nope"); void d.offsetWidth; d.classList.add("nope"); A.sfx.key(-1); }
+  function nope() { const d = $("nmDots"); d.classList.remove("nope"); A.restyle(d); d.classList.add("nope"); A.sfx.key(-1); }
 
   function open(ctx) {
     build(); clearAll(); asked = true;
@@ -97,7 +97,7 @@ window.AIQ = window.AIQ || {};
     $("nmQ").textContent = t6(TX.q); $("nmTitle").textContent = t6(TX.card); $("nmNo").textContent = memberNo();
     $("nmHint").textContent = t6(TX.hint); $("nmOkT").textContent = t6(TX.ok); $("nmSkip").textContent = t6(TX.skip); $("nmStamp").textContent = t6(TX.stamp); $("nmNextT").textContent = t6(TX.next);
     const inp = $("nmIn"); inp.value = ""; inp.readOnly = false; inp.placeholder = t6(TX.ph); meter(0);
-    root.className = "nm"; void root.offsetWidth; root.classList.add("on");  // la sala se apaga
+    root.className = "nm"; A.restyle(root); root.classList.add("on");  // la sala se apaga
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   // que un Espacio no pulse el boton del veredicto que queda detras
     A.dealer.hold(true); if (A.tt && A.tt.hide) A.tt.hide();
     A.music.muffle(true); A.sfx.spot();
@@ -111,7 +111,7 @@ window.AIQ = window.AIQ || {};
   function confirm() {
     if (!st || st.phase !== "ask") return;
     const inp = $("nmIn"), v = clean(inp.value).trim();
-    if (!v) { const f = $("nmField"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); A.sfx.deny(); focusIn(); return; }
+    if (!v) { const f = $("nmField"); f.classList.remove("shake"); A.restyle(f); f.classList.add("shake"); A.sfx.deny(); focusIn(); return; }
     st.phase = "done"; st.doneAt = Date.now();
     const known = A.profile.knownName(v);                                     // antes de guardarlo: ¿ya se lo habias dicho alguna vez?
     inp.value = v; inp.readOnly = true; inp.blur(); meter(len(v));

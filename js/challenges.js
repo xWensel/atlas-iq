@@ -338,13 +338,18 @@ window.AIQ = window.AIQ || {};
   function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.style.fontSize = ""; if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
+  /* la colocacion de continentes (19-76 ms de calculo) sale igual en todas las preguntas de la ronda (misma semilla, mismo reto): se calcula una vez
+     y se reutiliza. Antes se repetia al empezar cada pregunta, justo cuando los continentes echan a andar */
+  const LAYM = new Map();
+  const layoutMemo = (map, key, fn) => { let L = LAYM.get(key); if (!L) { L = fn(); LAYM.set(key, L); if (LAYM.size > 8) LAYM.delete(LAYM.keys().next().value); } return { ...L, shift: L.shift.map(p => p.slice()), scale: L.scale.slice() }; };
   function mapSpec(map, o) {
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}`);
     const lay = ["pangea", "shuffle", "spread"].map(id => get(id)).find(Boolean);
     const tl = get("tilt"); if (tl) { const k = par(tl).k; for (let c = 0; c < 6; c++) spec.rot[c] = (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * k; any = true; }
     if (lay || tl) {                                                                                // motor de encaje con mascaras reales: los continentes nunca se pisan, tambien en Pangea
-      const L = map.layout(lay ? lay.id : "hold", lay ? par(lay).k : 1, rr, spec.rot); spec.shift = L.shift; spec.scale = L.scale; any = true;
+      const kind = lay ? lay.id : "hold", k = lay ? par(lay).k : 1;
+      const L = layoutMemo(map, [S.seed, S.round, kind, k, spec.rot.join()].join("|"), () => map.layout(kind, k, rr, spec.rot)); spec.shift = L.shift; spec.scale = L.scale; any = true;
       if (lay && lay.id === "pangea") { spec.smooth = true; spec.ms = 2600; }
     }
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
@@ -432,6 +437,11 @@ window.AIQ = window.AIQ || {};
     begin(list, fx, ctx = {}) {
       this.end(); S.list = list.slice(); S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0;
       S.map = A.core && A.core.map; if (S.map) ensureOverlay(S.map);
+      /* retos que mueven continentes: su colocacion se deja calculada mientras se presenta la ronda (con el mapa ya quieto), no al empezar la pregunta */
+      if (S.map && S.map.layout && S.list.some(c => ["pangea", "shuffle", "spread", "tilt"].includes(c.id))) {
+        const idle = fn => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 0));
+        later(() => idle(() => { if (S.on && S.map) try { mapSpec(S.map, null); } catch (e) { /* ya se calculara en la pregunta */ } }), 1300);
+      }
     },
     active: () => S.list.slice(),
     has,
@@ -441,7 +451,7 @@ window.AIQ = window.AIQ || {};
       decorate(o);
       const spec = map.setDistort ? mapSpec(map, o) : null, app = $("app");
       if (spec) { map.setDistort(spec, spec.ms || 900); say("chal"); } else if (map.clearDistort) map.clearDistort(300);
-      if (S.list.some(c => D[c.id].kind === "map")) { app.classList.remove("ch-glitch"); void app.offsetWidth; app.classList.add("ch-glitch"); later(() => app.classList.remove("ch-glitch"), 600); }
+      if (S.list.some(c => D[c.id].kind === "map")) { app.classList.remove("ch-glitch"); A.restyle(app); app.classList.add("ch-glitch"); later(() => app.classList.remove("ch-glitch"), 600); }
       app.classList.toggle("ch-negative", has("negative") && !S.fx.noNegative);
       ensureOverlay(map).classList.add("on");
       const bl = get("blur"), dk = get("dark"), cl = get("clouds"), rn = get("rain"), my = get("myopia"), bs = get("blindspot"), dc = get("decoys");

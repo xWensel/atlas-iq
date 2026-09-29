@@ -1134,8 +1134,8 @@ window.AIQ = window.AIQ || {};
   let bo;
   const ensureBO = () => { if (!bo || !bo.isConnected) { bo = document.createElement("div"); bo.id = "dlBlackout"; document.body.appendChild(bo); } return bo; };
   D.fx = kind => {
-    if (kind === "shake") { const root = document.documentElement; root.classList.remove("dl-tantrum"); void root.offsetWidth; root.classList.add("dl-tantrum"); setTimeout(() => root.classList.remove("dl-tantrum"), 700); }
-    else if (kind === "blackout") { const el = ensureBO(); el.classList.remove("go"); void el.offsetWidth; el.classList.add("go"); setTimeout(() => el.classList.remove("go"), 1300); }
+    if (kind === "shake") { const root = document.documentElement; root.classList.remove("dl-tantrum"); A.restyle(root); root.classList.add("dl-tantrum"); setTimeout(() => root.classList.remove("dl-tantrum"), 700); }
+    else if (kind === "blackout") { const el = ensureBO(); el.classList.remove("go"); A.restyle(el); el.classList.add("go"); setTimeout(() => el.classList.remove("go"), 1300); }
   };
   D.react = (kind, o = {}) => {
     if (!D.on || D.host) return; const ph = phase(); if (ph === "shop" || ph === "title" || ph === "intro") return;

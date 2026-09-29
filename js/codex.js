@@ -460,12 +460,13 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------- abrir / cerrar / aviso de tarjeta nueva ---------------- */
   function open(id) {
-    buildUI(); const root = $("codex"); root.classList.remove("hidden"); document.body.classList.add("cx-on"); labels(); ui.cur = null;
+    buildUI(); const root = $("codex"); root.classList.remove("hidden"); document.body.classList.add("cx-on"); labels(); ui.cur = null; if (A.coverMap) A.coverMap("codex", true, isOpen);
     $("cxDetail").classList.add("hidden"); $("cxGrid").classList.remove("hidden"); $("cxFilters").classList.remove("hidden"); document.querySelector("#codex .cx-tools").classList.remove("hidden");
-    renderGrid(true); root.tabIndex = -1; root.focus({ preventScroll: true });
+    renderGrid(true); root.tabIndex = -1;
+    requestAnimationFrame(() => setTimeout(() => { if (isOpen()) root.focus({ preventScroll: true }); }, 0));   // el foco, ya pintada: dado al instante obligaba a maquetar la Enciclopedia entera a medio abrir
     if (id && E[id]) openDetail(id); else A.sfx.card();                 // openDetail ya suena: no montar dos sonidos
   }
-  function close() { const r = $("codex"); if (r) r.classList.add("hidden"); document.body.classList.remove("cx-on"); ui.cur = null; A.sfx.ui(); if (A.codexOnClose) A.codexOnClose(); }
+  function close() { const r = $("codex"); if (r) r.classList.add("hidden"); document.body.classList.remove("cx-on"); if (A.coverMap) A.coverMap("codex", false); ui.cur = null; A.sfx.ui(); if (A.codexOnClose) A.codexOnClose(); }
   const isOpen = () => !!$("codex") && !$("codex").classList.contains("hidden");
 
   /* aviso de tarjeta nueva: un carrete con todo lo conseguido, tarjeta a tarjeta, como el rodillo de una tragaperras.
@@ -508,7 +509,7 @@ window.AIQ = window.AIQ || {};
     el.onpointerenter = () => clearTimeout(reelT);
     el.onpointerleave = () => { clearTimeout(reelT); reelT = setTimeout(next, 700); };
     el.onclick = () => { clearTimeout(reelT); if (A.core && A.core.S && A.core.S.phase === "asking") { leave(); return; } el.classList.add("hidden"); open(ids[i]); };   // con el reloj corriendo solo se aparta
-    el.classList.remove("hidden", "in", "out"); void el.offsetWidth; el.classList.add("in");
+    el.classList.remove("hidden", "in", "out"); A.restyle(el); el.classList.add("in");
     show(0); reelT = setTimeout(next, hold(0));
   }
   listeners.push(added => { setTimeout(() => toast(added), 1700); });   // sin sonido propio: lo celebran los jackpots del ticket (A.sfx.jackpot)

@@ -45,6 +45,12 @@
   const world = A.geo.buildWorld();
   { const col = $("leftCol"), pl = document.querySelector(".plate-sh"); if (col && pl) col.appendChild(pl); }        // columna izquierda: placa, marcador de partida y logros (el mapa queda libre)
   const map = A.createMap($("map"), world, onPick);
+  /* pantallas opacas a pantalla completa (Ajustes, Enciclopedia): cuando terminan de entrar y tapan el mapa del todo, el mapa deja de dibujarse
+     (no se ve: se ahorra la GPU y el hilo principal, que en equipos modestos se nota). Al cerrarse se destapa al instante */
+  { const covers = new Map(), coverT = {}, sync = () => map.setHold && map.setHold(covers.size > 0);
+    A.coverMap = (key, on, still) => { clearTimeout(coverT[key]); if (on) coverT[key] = setTimeout(() => { if (still && !still()) return; covers.set(key, still || (() => true)); sync(); }, 520); else { covers.delete(key); sync(); } };
+    map.holdCheck = () => { for (const [k, f] of covers) if (!f()) covers.delete(k); if (!covers.size) sync(); return covers.size > 0; };   // red de seguridad: si la pantalla se fue por otro camino, el mapa vuelve solo
+  }
   A.codex.init(world, map); A.pointer.init(map);
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
@@ -72,7 +78,8 @@
     if (el._shape !== shape) {
       const prev = el._cols ? el._cols.map(c => +c.style.getPropertyValue("--d") || 0) : null;
       const aligned = prev ? Array(Math.max(0, digits.length - prev.length)).fill(0).concat(prev).slice(-digits.length) : null;
-      el.style.setProperty("--t", "0s"); odoBuild(el, shape, aligned); void el.offsetWidth;
+      /* las cifras nuevas parten de las de antes: basta con calcular su estilo (antes se maquetaba la pagina entera en cada contador que cambiaba de cifras) */
+      el.style.setProperty("--t", "0s"); odoBuild(el, shape, aligned); el._cols.forEach(c => getComputedStyle(c).getPropertyValue("--t"));
     }
     el.style.setProperty("--t", instant ? "0s" : ms + "ms"); el.style.setProperty("--dl", instant ? "0ms" : delay + "ms");
     el._cols.forEach((c, i) => c.style.setProperty("--d", digits[i]));
@@ -168,7 +175,7 @@
   }
   function setStreak() {
     const c = $("streakChip");
-    if (S.streak >= 2) { c.textContent = A.t("streak", { n: S.streak }); c.classList.remove("hidden", "pop"); void c.offsetWidth; c.classList.add("pop"); }
+    if (S.streak >= 2) { c.textContent = A.t("streak", { n: S.streak }); c.classList.remove("hidden", "pop"); A.restyle(c); c.classList.add("pop"); }
     else c.classList.add("hidden");
   }
 
@@ -241,8 +248,10 @@
       else if (was && S._dealerWasHome) A.dealer.homeTease(true);            // solo al cerrar Ajustes de verdad (prepareRun y showTitle lo llaman cerrado: no reactiva al crupier del inicio al empezar partida)
     }
     if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; fitSetSoon(); }
+    if (on !== was) A.coverMap("settings", on, () => S.settingsOpen);
     /* foco (teclado y lectores de pantalla): al abrir va al panel y al cerrar vuelve a donde estaba (boton de ajustes, "Continuar" de la pausa...) */
-    if (on && !was) { setFocusBack = document.activeElement; const p = $("settings"); if (p) { p.tabIndex = -1; p.focus({ preventScroll: true }); } }
+    /* el foco del panel, justo despues de pintarlo: dado en el mismo instante obligaba a recalcular la pagina entera a medio abrir (tiron al abrir Ajustes) */
+    if (on && !was) { setFocusBack = document.activeElement; const p = $("settings"); if (p) { p.tabIndex = -1; requestAnimationFrame(() => setTimeout(() => { if (S.settingsOpen) p.focus({ preventScroll: true }); }, 0)); } }
     else if (!on && was) { const b = setFocusBack; setFocusBack = null; if (b && b !== document.body && b.isConnected && b.focus) b.focus({ preventScroll: true }); }
   }
   let blipT = 0;
@@ -406,8 +415,23 @@
   const setK = () => { const w = innerWidth, h = innerHeight, k = (w < 900 || h < 520) ? 1 : Math.max(1, Math.min(1.85, Math.min(w / 1280, h / 720))); document.documentElement.style.setProperty("--k", k.toFixed(3)); };
   /* ajuste fino: si una pantalla escalada (inicio, campamento, veredicto...) no cabe en la ventana, se baja SU k hasta que quepa entera (nunca hay que desplazarse: esto es un juego de escritorio) */
   const FIT = ".hh, .scr, .table, .vd";
+  /* huella de lo que decide el ajuste (pantalla, ventana, escala, fuentes y medidas): si no ha cambiado desde el ultimo, el resultado seria el mismo
+     y se ahorra repetirlo (los repasos de seguridad, las imagenes que terminan de cargar sin mover nada y los contadores o frases que cambian
+     dentro de la pantalla ya no la recalculan entera) */
+  let dlgNew = 0, fitNew = -1, fitLast = "";
+  const fitSig = (d, el) => {
+    const b = el && el.querySelector(".scr-body"), box = el || d;
+    return [innerWidth, innerHeight, document.documentElement.style.getPropertyValue("--k"), document.fonts ? document.fonts.status : "", d.clientWidth, d.clientHeight,
+      box.scrollWidth, box.scrollHeight, box.getBoundingClientRect().height.toFixed(1), b ? b.scrollHeight + "/" + b.clientHeight : "",
+      ...[...box.children].map(c => c.offsetTop + ":" + c.offsetHeight), ...[...box.querySelectorAll(".offer.pc")].map(c => c.scrollHeight)].join();
+  };
   const fitK = () => {
-    const d = $("dlg"), el = d && d.querySelector(":scope > " + FIT.split(", ").join(", :scope > ")); if (!el) { if (d && A.squeeze) A.squeeze(d); return; }
+    const d = $("dlg"), el = d && d.querySelector(":scope > " + FIT.split(", ").join(", :scope > ")); if (!d || !d.isConnected || !d.getClientRects().length) return;   // oculto (ya se cerro): nada que ajustar
+    if (fitNew === dlgNew && fitSig(d, el) === fitLast) return;                 // pantalla nueva: ni se mide, se ajusta directamente (medir la huella costaba otro recalculo entero)
+    fitRun(d, el); fitNew = dlgNew; fitLast = fitSig(d, el);
+  };
+  const fitRun = (d, el) => {
+    if (!el) { if (A.squeeze) A.squeeze(d); return; }
     const base = uiK(); el.style.removeProperty("--k");
     if (el.classList.contains("scrolls")) { if (A.squeeze) A.squeeze(el); return; }                    // pantalla con desplazamiento (solo el Perfil): a tamano completo
     const over = () => {
@@ -424,16 +448,28 @@
       return r;
     };
     let k = base;
+    /* la misma pantalla (mismos textos, ventana, escala e idioma) ya se ajusto antes: se empieza en la k a la que llego. El resultado es el mismo,
+       pero en una sola vuelta en vez de 2-4 (cada una recalcula la pantalla entera: el Clasico daba un tiron cada vez que se abria) */
+    let h = 0; const tx = el.textContent; for (let i = 0; i < tx.length; i++) h = (h * 31 + tx.charCodeAt(i)) | 0;
+    const ims = el.getElementsByTagName("img"); let ok = 0; for (const im of ims) if (im.complete) ok++;          // las imagenes que ya han llegado tambien cuentan
+    const ck = [el.className, innerWidth, innerHeight, base, A.lang, document.fonts ? document.fonts.status : "", ims.length, ok, tx.length, h].join("|"), hint = kMemo.get(ck);
+    if (hint && hint < base) { k = hint; el.style.setProperty("--k", k.toFixed(3)); }
     /* primero se quitan las lineas "de 3 letras" (A.squeeze), luego se mide */
     for (let i = 0; i < 8; i++) { if (A.squeeze) A.squeeze(el); const r = over(); if (r >= 1) break; k = Math.max(0.55, k * r * 0.985); el.style.setProperty("--k", k.toFixed(3)); if (k <= 0.55) break; }
+    kMemo.delete(ck); kMemo.set(ck, k); if (kMemo.size > 60) kMemo.delete(kMemo.keys().next().value);
   };
+  const kMemo = new Map();                                                     // solo en esta sesion: con otro CSS saldria otra k
   let fitT = 0; const fitSoon = () => { clearTimeout(fitT); fitT = setTimeout(() => { requestAnimationFrame(fitK); }, 60); };
+  /* una pantalla que se completa poco a poco y ajusta ella misma lo que anade (el Perfil): lo que hay ahora cuenta como ya ajustado */
+  A.fitMark = () => queueMicrotask(() => { const d = $("dlg"); if (!d || !d.isConnected) return; fitNew = dlgNew; fitLast = fitSig(d, d.querySelector(":scope > " + FIT.split(", ").join(", :scope > "))); });
   setK(); A.uiK = uiK; A.fitK = fitK;
   addEventListener("resize", () => { setK(); fitSoon(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSoon);
-  if (window.MutationObserver && $("dlg")) { new MutationObserver(m => { if (m.some(x => x.addedNodes.length)) { fitSoon(); setTimeout(fitK, 260); setTimeout(fitK, 700); } }).observe($("dlg"), { childList: true }); }
-  /* las cartas (retratos, iconos) pueden tardar en cargar en la primera visita: si llegan tarde, el ajuste ya hecho se queda corto y el panel desborda */
-  if ($("dlg")) $("dlg").addEventListener("load", e => { if (e.target.tagName === "IMG") { fitSoon(); setTimeout(fitK, 300); } }, true);
+  /* pantalla nueva: se ajusta en el mismo fotograma en que se pinta por primera vez (sale ya ajustada, sin salto) y luego dos repasos por si algo llega tarde */
+  if (window.MutationObserver && $("dlg")) { const d = $("dlg"); new MutationObserver(m => { if (m.some(x => x.addedNodes.length)) { dlgNew++; clearTimeout(fitT); requestAnimationFrame(fitK); setTimeout(fitK, 260); setTimeout(fitK, 700); } }).observe(d, { childList: true }); }
+  /* las cartas (retratos, iconos) pueden tardar en cargar en la primera visita: si llegan tarde, el ajuste ya hecho se queda corto y el panel desborda.
+     Un solo reajuste cuando termina la tanda (antes, uno por imagen: el Perfil trae 200 y el mapa de fondo iba a tirones) */
+  let imgT = 0; if ($("dlg")) $("dlg").addEventListener("load", e => { if (e.target.tagName === "IMG") { clearTimeout(imgT); imgT = setTimeout(fitSoon, 240); } }, true);
   { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
     if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
 
@@ -585,7 +621,7 @@
       for (let k = 1; k <= cxr.level; k++) setTimeout(() => jpShake(k), (k - 1) * JP_MS);
     }, JP_AT);
     if (adv && adv.coins) coinFx(adv.coins);
-    if (S.streak >= 2) setTimeout(() => { if (!still()) { if (S.phase === "asking") setStreak(); return; } A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce && S.shake) { const ap = $("app"); ap.classList.remove("shake"); void ap.offsetWidth; ap.classList.add("shake"); } }, 1500); else setStreak();
+    if (S.streak >= 2) setTimeout(() => { if (!still()) { if (S.phase === "asking") setStreak(); return; } A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce && S.shake) { const ap = $("app"); ap.classList.remove("shake"); A.restyle(ap); ap.classList.add("shake"); } }, 1500); else setStreak();
 
     const last = S.qi === S.qs.length - 1 || (S.run && A.adv.infDone && A.adv.infDone());
     const place = o.answer ? A.tx(o.answer) : A.tx(o.name) + (A.tx(o.sub) ? ", " + A.tx(o.sub) : "");
@@ -831,6 +867,11 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
   applyLang(); syncSettings();
   const start = () => {
     { const sp = $("splash"); if (sp) { sp.classList.add("out"); setTimeout(() => sp.remove(), 500); } }   // pantalla de carga fuera en cualquier caso
+    /* las fuentes pequenas que aun no se han usado (variantes latinas, cirilico, nombres de los idiomas) se cargan ya, durante el arranque: la primera vez
+       que salian (Ajustes, Perfil...) se cargaban y se buscaban letras de repuesto en ese mismo fotograma (tiron). Las CJK grandes (~600 KB), solo si hacen falta */
+    try { document.fonts.forEach(f => { if (f.status === "unloaded" && !/Fusion Pixel/i.test(f.family)) f.load().catch(() => {}); }); } catch (e) { /* sin FontFaceSet */ }
+    /* y Ajustes (los 12 idiomas, cada uno con sus letras) se maqueta una vez, oculto, aun tapado por la carga: la primera apertura ya no da tiron */
+    { const sh = $("setSh"); if (sh && !S.settingsOpen) { sh.style.visibility = "hidden"; sh.classList.remove("hidden"); void sh.offsetHeight; sh.classList.add("hidden"); sh.style.visibility = ""; } }
     if (/[?&]skipboot/.test(location.search)) { S.booting = false; showTitle(); } else runBoot();
   };
   if (document.fonts && document.fonts.load) Promise.race([Promise.all([document.fonts.load("400 20px 'Jersey 15'"), document.fonts.load("400 12px Silkscreen"), document.fonts.load("700 12px Silkscreen")]), new Promise(r => setTimeout(r, 1200))]).then(start, start);

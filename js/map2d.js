@@ -35,8 +35,14 @@ window.AIQ = window.AIQ || {};
   };
   const fmtCoord = (v, pos, neg) => Math.abs(v).toFixed(2) + "°" + (v >= 0 ? pos : neg);
   /* las fuentes pixel del juego (como map.js): Fraunces y DM Mono ya no vienen en fonts/ y caian a Georgia, sin pixel */
-  const FD = () => getComputedStyle(document.documentElement).getPropertyValue("--serif") || "'Jersey 15', sans-serif";
-  const FM = () => getComputedStyle(document.documentElement).getPropertyValue("--mono") || "Silkscreen, monospace";
+  /* se leen del CSS solo cuando cambia el idioma o el tema (en cada fotograma forzaban un recalculo de estilos) */
+  let fk = "", fc = {};
+  const font = (v, def) => { const h = document.documentElement, key = h.lang + "|" + h.dataset.skin; if (fk !== key) { fk = key; fc = {}; } return fc[v] || (fc[v] = getComputedStyle(h).getPropertyValue(v) || def); };
+  const FD = () => font("--serif", "'Jersey 15', sans-serif");
+  const FM = () => font("--mono", "Silkscreen, monospace");
+  /* poner la letra del lienzo recalcula los estilos de la pagina (aunque sea la misma): solo si cambia (como en map.js) */
+  const fser = new Map(); if (document.fonts) document.fonts.addEventListener("loadingdone", () => fser.clear());
+  const setFont = (c, f) => { const s = fser.get(f); if (s !== undefined && c.font === s) return; c.font = f; fser.set(f, c.font); };
 
   class MapView2D {
     constructor(canvas, world, onPick) {
@@ -238,7 +244,9 @@ window.AIQ = window.AIQ || {};
 
     /* ---------- bucle ---------- */
     _needSharp() { return this.view.s * this.dpr > this.texSc * 0.85; }
+    setHold(on) { this.hold = !!on; this._holdN = 0; if (!on) this.dirty = this.fxDirty = this.hlDirty = true; }
     _frame(now) {
+      if (this.hold) { this.lastT = now; if (!(this.holdCheck && ++this._holdN % 15 === 0 && !this.holdCheck())) return; }
       this._adapt(now);
       if (this.anim) {
         const a = this.anim, k = Math.min(1, (now - a.t0) / a.ms), e = easeIO(k);
@@ -384,7 +392,7 @@ window.AIQ = window.AIQ || {};
         if (G && m.pop && age > 700) {
           const t = Math.min(1, (age - 700) / 1700), y = G[1] - 52 - easeIO(t) * 46;
           c.save(); c.globalAlpha = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
-          c.font = `900 34px ${FD()}`; c.textAlign = "center"; c.lineJoin = "round";
+          setFont(c, `900 34px ${FD()}`); c.textAlign = "center"; c.lineJoin = "round";
           c.lineWidth = 7; c.strokeStyle = INK; c.strokeText(m.pop, G[0], y); c.fillStyle = PAPER; c.fillText(m.pop, G[0], y); c.restore();
         }
       }
@@ -413,7 +421,7 @@ window.AIQ = window.AIQ || {};
 
     /* etiqueta de papel con esquinas cortadas */
     _chip(c, text, x, y, o = {}) {
-      c.save(); c.globalAlpha = o.alpha == null ? 1 : o.alpha; c.font = o.font || "600 14px sans-serif";
+      c.save(); c.globalAlpha = o.alpha == null ? 1 : o.alpha; setFont(c, o.font || "600 14px sans-serif");
       const w = c.measureText(text).width + 22, h = 28, cut = 6;
       let rx = o.center ? x - w / 2 : x, ry = y - h / 2;
       rx = clamp(rx, 8, this.W - w - 8); ry = clamp(ry, 8, this.H - h - 8);
@@ -446,7 +454,7 @@ window.AIQ = window.AIQ || {};
       const [wx, wy] = this._toWorld(x, y), [lon, lat] = unproject(wx, wy);
       if (Math.abs(lon) <= 180 && Math.abs(lat) <= 90) {
         const txt = fmtCoord(lat, "N", "S") + "  " + fmtCoord(lon, "E", "W");
-        c.font = `500 11px ${FM()}`; const w = c.measureText(txt).width + 14;
+        setFont(c, `500 11px ${FM()}`); const w = c.measureText(txt).width + 14;
         let bx = x + 20, by = y + 18; if (bx + w > this.W - 6) bx = x - 20 - w; if (by + 22 > this.H - 6) by = y - 40;
         c.fillStyle = "rgba(20,35,43,.9)"; c.fillRect(bx, by, w, 22);
         c.fillStyle = PAPER; c.textBaseline = "middle"; c.fillText(txt, bx + 7, by + 12);

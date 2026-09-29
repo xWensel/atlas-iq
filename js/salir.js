@@ -171,7 +171,7 @@ window.AIQ = window.AIQ || {};
     $("qxQ").textContent = t6(TX.q); $("qxSub").textContent = subLine();
     $("qxStayT").textContent = t6(TX.stay); $("qxGoT").textContent = t6(TX.go); $("qxStamp").textContent = t6(TX.stamp);
     $("qxActs").classList.remove("swap");
-    root.className = "qx"; void root.offsetWidth; root.classList.add("on");   // la sala se apaga
+    root.className = "qx"; A.restyle(root); root.classList.add("on");   // la sala se apaga
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     if (A.tt && A.tt.hide) A.tt.hide();
     if (st.home) D().homeTease(false);
@@ -184,7 +184,7 @@ window.AIQ = window.AIQ || {};
   /* bloqueo mientras dura la trastada: Salir no responde (un "no" seco), Me quedo si */
   const lock = () => { st.lock = true; root.classList.add("busy"); $("qxGo").setAttribute("aria-disabled", "true"); };
   const unlock = () => { if (!st || st.phase !== "ask") return; st.lock = false; root.classList.remove("busy"); $("qxGo").removeAttribute("aria-disabled"); };
-  const nope = () => { const g = $("qxGo"); g.classList.remove("nope"); void g.offsetWidth; g.classList.add("nope"); A.sfx.deny(); };
+  const nope = () => { const g = $("qxGo"); g.classList.remove("nope"); A.restyle(g); g.classList.add("nope"); A.sfx.deny(); };
 
   function go() {
     if (!st || st.phase !== "ask") return;
@@ -285,7 +285,7 @@ window.AIQ = window.AIQ || {};
     if (reduced()) return;
     const box = $("qxRain");
     box.innerHTML = Array.from({ length: 30 }, () => `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--w:${(Math.random() * 900).toFixed(0)}ms;--t:${(1300 + Math.random() * 900).toFixed(0)}ms;--r:${Math.round(Math.random() * 720 - 360)}deg;--s:${(30 + Math.random() * 26).toFixed(0)}px">${A.icon(rand(CHIPS))}</i>`).join("");
-    root.classList.remove("rain"); void root.offsetWidth; root.classList.add("rain");
+    root.classList.remove("rain"); A.restyle(root); root.classList.add("rain");
     later(() => { root.classList.remove("rain"); box.innerHTML = ""; }, 3400);
   }
 
@@ -365,7 +365,7 @@ window.AIQ = window.AIQ || {};
     const c = document.createElement("div"); c.id = "qxc"; c.className = "qxc"; c.setAttribute("role", "dialog"); c.setAttribute("aria-modal", "true");
     c.innerHTML = `<div class="qxc-in"><div class="qxc-sign"><b class="qxc-neon">${esc(t6(TX.closed))}</b></div><div class="qxc-stage" id="qxcStage"></div>
       <p class="qxc-hint">${esc(t6(TX.tab))}</p><button type="button" class="btn-ink qxc-back" id="qxcBack">${esc(t6(TX.back))}</button></div>`;
-    document.body.appendChild(c); void c.offsetWidth; c.classList.add("on");
+    document.body.appendChild(c); A.restyle(c); c.classList.add("on");
     st.phase = "closed"; st.talking = false; st.pend = null;
     later(() => { A.sfx.buzz(0); c.classList.add("lit"); }, 500); later(() => A.sfx.buzz(1), 640); later(() => A.sfx.buzz(3), 900);   // el neon arranca a trompicones
     later(() => { if (!st || st.phase !== "closed") return; D().dock($("qxcStage")); talk(pick("quitWeb"), "sly", () => { c.classList.add("ready"); const b = $("qxcBack"); try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }); }, 1300);

@@ -108,7 +108,9 @@ window.AIQ = window.AIQ || {};
       $("campFoot").innerHTML = foot(); wireFoot();
     }));
     wireFoot();
-    requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => c.map.drawThumb(b.querySelector("canvas"), campThumb(camps[i]))));
+    /* las miniaturas, un fotograma despues de ajustar la pantalla (A.fitK): no se suman a su primer fotograma y salen ya a su tamano final (antes se
+       pintaban al tamano de antes del ajuste y el navegador las estiraba) */
+    requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => { const cv = b.querySelector("canvas"); if (cv && camps[i]) c.map.drawThumb(cv, campThumb(camps[i])); })));
   }
 
   /* ------------------------------------------------------------------ Aventura */
@@ -267,14 +269,28 @@ window.AIQ = window.AIQ || {};
     const tiers = A.ACH_TIERS.map((t, i) => { const list = A.ACH.filter(a => a.tier === i); return { t, i, list, n: list.filter(got).length }; }).filter(x => x.list.length);
     const total = A.ach.total(), done = A.ach.count();
     const jump = tiers.map(x => `<button class="ac-jump-b${x.n === x.list.length ? " full" : ""}" data-t="${x.i}" type="button"><span class="ac-rn">${ROMAN[x.i]}</span><span class="ac-jn"><b>${A.tx(x.t.n)}</b><em>${x.n}/${x.list.length}</em></span></button>`).join("");
-    const secs = tiers.map(x => `<section class="ac-sec" id="acSec${x.i}"><header class="ac-th"><span class="ac-rn">${ROMAN[x.i]}</span><span class="ac-tn"><b>${A.tx(x.t.n)}</b><i>${A.tx(x.t.t)}</i></span><span class="ac-tc"><b>${x.n}<i>/${x.list.length}</i></b><u><s style="width:${pct(x.n, x.list.length)}%"></s></u></span></header>
-      <div class="ac-grid">${x.list.map(card).join("")}</div></section>`).join("");
+    const sec = (x, cards) => `<section class="ac-sec" id="acSec${x.i}"><header class="ac-th"><span class="ac-rn">${ROMAN[x.i]}</span><span class="ac-tn"><b>${A.tx(x.t.n)}</b><i>${A.tx(x.t.t)}</i></span><span class="ac-tc"><b>${x.n}<i>/${x.list.length}</i></b><u><s style="width:${pct(x.n, x.list.length)}%"></s></u></span></header>
+      <div class="ac-grid">${cards.join("")}</div></section>`;
+    /* se pinta primero lo de arriba (estadisticas, resumen y el primer tramo; la pantalla aun esta entrando en fundido) y el resto llega por tandas de 12 logros, una por fotograma y ya
+       ajustadas, por debajo de la vista: maquetar los 100 logros de golpe paraba el mapa de fondo unos fotogramas al abrir el Perfil */
+    const FIRST = 1, CHUNK = 12, steps = [];
+    tiers.slice(FIRST).forEach(x => { const cs = x.list.map(card); for (let j = 0; j < cs.length; j += CHUNK) steps.push({ x, cards: cs.slice(j, j + CHUNK), first: !j }); });
     c.dialog(scr(T("Perfil", "Profile"), `
       <div class="pf-grid">${cell(T("Preguntas", "Questions"), A.fmt(s.questions), "a_pin")}${cell(T("Dianas", "Bullseyes"), A.fmt(s.bulls), "a_target")}${cell(T("Error medio", "Avg. error"), A.fmtDist(avg), "a_lens")}${cell(T("Mejor racha", "Best streak"), s.bestStreak, "a_flame")}${cell(T("Enciclopedia", "Encyclopedia"), st.u + "/" + st.t, "m_codex")}${cell(T("Récord aventura", "Adventure best"), A.fmt(P.adv.bestScore), "crown")}</div>
       <section class="ac-sum"><span class="ac-sum-l"><span class="ac-k">${T("Logros", "Achievements")}</span><b>${done}<i>/${total}</i></b></span><span class="ac-bar"><s style="width:${pct(done, total)}%"></s></span><em class="ac-pct">${pct(done, total)}%</em><nav class="ac-jump">${jump}</nav></section>
-      ${secs}`, "s-prof scrolls"), "tablewrap");
+      ${tiers.slice(0, FIRST).map(x => sec(x, x.list.map(card))).join("")}`, "s-prof scrolls"), "tablewrap");
     wireTools(); $("hubBack").onclick = () => screen("home");
     document.querySelectorAll(".ac-jump-b").forEach(b => (b.onclick = () => { const el = $("acSec" + b.dataset.t); if (el) { A.sfx.card(); el.scrollIntoView({ behavior: "smooth", block: "start" }); } }));
+    const body = document.querySelector("#dlg .s-prof .scr-body"); let k = 0;
+    const more = () => {
+      if (!body || !body.isConnected || k >= steps.length) return;
+      const st = steps[k++];
+      if (st.first) { body.insertAdjacentHTML("beforeend", sec(st.x, st.cards)); if (A.squeeze) A.squeeze(body.lastElementChild); }
+      else { const g = $("acSec" + st.x.i).querySelector(".ac-grid"), n = g.children.length; g.insertAdjacentHTML("beforeend", st.cards.join("")); if (A.squeeze) A.squeeze([...g.children].slice(n)); }
+      if (A.fitMark) A.fitMark();                                                     // lo anadido ya va ajustado: los repasos de A.fitK no rehacen el Perfil entero
+      if (k < steps.length) requestAnimationFrame(more);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(more));
   }
 
   function screen(id) {

@@ -32,7 +32,7 @@ window.AIQ = window.AIQ || {};
     sh.style.width = ""; sh.classList.toggle("mc-open", open);
     const to = sh.getBoundingClientRect().width;
     if (still() || Math.abs(to - from) < 1) return;
-    sh.style.transition = "none"; sh.style.width = from + "px"; void sh.offsetWidth; sh.style.transition = "";
+    sh.style.transition = "none"; sh.style.width = from + "px"; A.restyle(sh); sh.style.transition = "";
     sh.style.width = to + "px";
     widthT = setTimeout(() => { sh.style.width = ""; }, 460);
   }
@@ -44,8 +44,8 @@ window.AIQ = window.AIQ || {};
     p.innerHTML = html; p.style.removeProperty("--mc-z");
     isOpen = true; document.body.classList.add("tk-on", "mc-on");
     if (!was) {
-      sh.classList.remove("mc-live"); void sh.offsetWidth;
-      sh.classList.add("mc-live"); void sh.offsetWidth;          // hueco montado a alto 0: la transicion arranca desde ahi
+      sh.classList.remove("mc-live"); A.restyle(sh);
+      sh.classList.add("mc-live"); A.restyle(sh);          // hueco montado a alto 0: la transicion arranca desde ahi
       widthTo(true);
       if (!still() && A.sfx.feed) setTimeout(A.sfx.feed, 70);
     }
