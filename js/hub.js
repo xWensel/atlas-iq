@@ -66,16 +66,28 @@ window.AIQ = window.AIQ || {};
         <span class="camp-body"><span class="camp-t">${A.tx(x.title)}${md ? ` ${A.icon("medal_" + md, "sm")}` : ""}</span><span class="camp-d">${A.tx(x.blurb)}</span>
         <span class="camp-m"><span class="camp-p">${ticks}</span><span>${p.best ? A.t("camp.best", { s: A.fmt(p.best) }) : A.t("camp.new")}</span></span></span></button>`;
     }).join("");
-    let picker = "";
-    if (pr.unlocked > 1) { for (let i = 0; i < cur.levels.length; i++) picker += `<button class="lv${i === S.startLevel ? " sel" : ""}" data-lv="${i}" ${i >= pr.unlocked ? "disabled" : ""}>${i + 1}</button>`; picker = `<div class="picker"><span>${A.t("title.from")}</span><div class="lrail">${picker}</div></div>`; }
+    /* el pie (niveles + boton) se repinta solo: al elegir campana o nivel NO se rehace la pantalla (las tarjetas reaparecian y las miniaturas parpadeaban) */
+    const foot = () => {
+      const cu = camps.find(x => x.id === S.campId), pu = c.prog(cu.id); let picker = "";
+      if (pu.unlocked > 1) { for (let i = 0; i < cu.levels.length; i++) picker += `<button class="lv${i === S.startLevel ? " sel" : ""}" data-lv="${i}" ${i >= pu.unlocked ? "disabled" : ""}>${i + 1}</button>`; picker = `<div class="picker"><span>${A.t("title.from")}</span><div class="lrail">${picker}</div></div>`; }
+      return picker + startBtn("goBtn", A.t("go.label"), A.t("go.sub", { n: S.startLevel + 1, name: A.tx(cu.title) }), true);
+    };
+    const wireFoot = () => {
+      document.querySelectorAll(".lv").forEach(b => (b.onclick = () => { S.startLevel = +b.dataset.lv; document.querySelectorAll(".lv").forEach(x => x.classList.toggle("sel", x === b)); const sub = $("goBtn").querySelector("i"); if (sub) sub.innerHTML = A.t("go.sub", { n: S.startLevel + 1, name: A.tx(camps.find(x => x.id === S.campId).title) }); }));
+      $("goBtn").onclick = () => { A.sfx.depart(); S.ranked = null; c.newRun(); };
+    };
     c.dialog(scr(T("Clásico", "Classic"), `
       <p class="mode-d">${A.t("mode." + mode + ".d")}</p>
       <div class="camps">${list}</div>
-      <div class="camp-foot">${picker}${startBtn("goBtn", A.t("go.label"), A.t("go.sub", { n: S.startLevel + 1, name: A.tx(cur.title) }), true)}</div>`, "s-camps"), "tablewrap");
+      <div class="camp-foot" id="campFoot">${foot()}</div>`, "s-camps"), "tablewrap");
     wireTools(); $("hubBack").onclick = () => screen("home");
-    document.querySelectorAll(".camp").forEach(b => (b.onclick = () => { S.campId = b.dataset.id; S.startLevel = 0; c.save(); campaigns(mode); }));
-    document.querySelectorAll(".lv").forEach(b => (b.onclick = () => { S.startLevel = +b.dataset.lv; campaigns(mode); }));
-    $("goBtn").onclick = () => { A.sfx.depart(); S.ranked = null; c.newRun(); };
+    document.querySelectorAll(".camp").forEach(b => (b.onclick = () => {
+      if (b.dataset.id === S.campId) return;
+      S.campId = b.dataset.id; S.startLevel = 0; c.save();
+      document.querySelectorAll(".camp").forEach(x => { x.classList.toggle("sel", x === b); x.style.animation = "none"; });
+      $("campFoot").innerHTML = foot(); wireFoot();
+    }));
+    wireFoot();
     requestAnimationFrame(() => document.querySelectorAll(".camp").forEach((b, i) => c.map.drawThumb(b.querySelector("canvas"), campThumb(camps[i]))));
   }
 

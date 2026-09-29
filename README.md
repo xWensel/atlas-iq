@@ -4,6 +4,8 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.9.1** - Clásico: al elegir campaña o nivel ya no se rehace la pantalla (adiós a las tarjetas que desaparecían y al redimensionado).
+
 **v0.8.1** - Las recomendaciones de la revisión: partidas más justas, datos al día y textos coherentes.
 - **Clásico:** reintentar un nivel fallido ya no baja tu IQ ni tu medalla: cuentan los puntos de la pasada buena. La casilla Enciclopedia del ticket usa los umbrales reales de cada lugar (el doble en mares, naturaleza y estrechos) y, como la pista de cada tarjeta, respeta el ajuste de millas.
 - **Aventura:** el jefe del acto II ya no es siempre de banderas: la semilla elige entre los cuatro de banderas y tres del acto, entre ellos "Rompe la cuarta pared", que antes nunca salía fuera del Reto diario. Una expedición guardada antes de ese jefe puede encontrarse otro. `docs/rondas-aventura.md` refleja las rondas actuales.
