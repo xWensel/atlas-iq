@@ -1,4 +1,5 @@
 /* POST /api/submit  { board, id, name, score }  ->  guarda la MEJOR puntuacion de cada jugador en la tabla.
+   Puntuaciones del dia: { board:"day-AAAAMMDD", id, name, score }  ->  la MEJOR partida del jugador ese dia, sea de la Aventura o de un intento del Reto diario.
    Reto diario: { board:"daily-AAAAMMDD", id, name, tries:[s1, s2, s3] }  ->  cada intento se guarda una sola vez (el primero que llega manda)
    y la tabla ordena por la PUNTUACION GLOBAL del dia (suma de los intentos). Devuelve { ok, rank, total, score, tries }.
    OJO: por ahora la puntuacion es de confianza (limites de plausibilidad + limite de frecuencia). Para clasificar en serio hay que reproducir la partida
@@ -11,15 +12,17 @@ module.exports = async (req, res) => {
   if (!kv.configured) return res.status(503).json({ ok: false, reason: "no-backend" });
   let b; try { b = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {}; } catch (e) { return res.status(400).json({ ok: false, reason: "json" }); }
   if (!b || typeof b !== "object") b = {};                             // "null", un numero...: se rechaza abajo como invalido (antes b.board reventaba)
-  const board = String(b.board || ""), id = String(b.id || "").replace(/[^a-z0-9]/gi, "").slice(0, 24), daily = /^daily-/.test(board);
+  const board = String(b.board || ""), id = String(b.id || "").replace(/[^a-z0-9]/gi, "").slice(0, 24), daily = /^daily-/.test(board), dayB = /^day-/.test(board);
   const name = [...String(b.name || "").normalize("NFC").replace(/[^\p{L}\p{N} _.'\-]/gu, "").replace(/\s+/g, " ").trim()].slice(0, 20).join("").trim() || "Anonymous";   // el mismo filtro que A.profile.clean (hasta 20)
   const tries = daily ? (Array.isArray(b.tries) ? b.tries : [b.score]).slice(0, 3).map(v => Math.floor(+v)) : [];
   const score = daily ? 0 : Math.floor(+b.score);
   if (!kv.BOARD.test(board) || !id) return res.status(400).json({ ok: false, reason: "invalid" });
   if (daily ? !tries.length || tries.some(v => !Number.isFinite(v) || v < 0 || v > 2e6) : !Number.isFinite(score) || score < 0 || score > 5e6) return res.status(400).json({ ok: false, reason: "invalid" });
-  if (daily) {                                                         // el reto diario va por fecha local: se acepta el dia de hoy (UTC) +-1
-    const d = new Date(), ymd = x => x.getUTCFullYear() * 10000 + (x.getUTCMonth() + 1) * 100 + x.getUTCDate(), v = +board.slice(6);
-    if (![ymd(d), ymd(new Date(d - 864e5)), ymd(new Date(+d + 864e5))].includes(v)) return res.status(400).json({ ok: false, reason: "day" });
+  if (daily || dayB) {                                                 // Reto diario y "Hoy/Ayer" van por fecha local: se acepta el dia de hoy (UTC) +-1
+    const d = new Date(), ymd = x => x.getUTCFullYear() * 10000 + (x.getUTCMonth() + 1) * 100 + x.getUTCDate(), v = +board.slice(daily ? 6 : 4);
+    const ok = [ymd(d), ymd(new Date(d - 864e5)), ymd(new Date(+d + 864e5))];
+    if (dayB) ok.push(ymd(new Date(d - 2 * 864e5)));                   // "Ayer" en America a ultima hora ya son dos dias atras en UTC
+    if (!ok.includes(v)) return res.status(400).json({ ok: false, reason: "day" });
   }
   const ip = String((req.headers["x-forwarded-for"] || "").split(",")[0] || "x").slice(0, 45), rl = "rl:" + ip + ":" + Math.floor(Date.now() / 60000);
   try {
@@ -32,6 +35,8 @@ module.exports = async (req, res) => {
       const got = await kv.pipeline([...tries.map((v, i) => ["HSETNX", tk, String(i + 1), v]), ["EXPIRE", tk, TTL], ["HMGET", tk, "1", "2", "3"]]);
       mine = got[got.length - 1].filter(v => v != null).map(Number); total = mine.reduce((a, v) => a + v, 0);
       await kv.pipeline([["ZADD", lb, total, id], ["HSET", names, id, name], ["HSET", "tries:" + board, id, mine.join(",")], ["EXPIRE", lb, TTL], ["EXPIRE", names, TTL], ["EXPIRE", "tries:" + board, TTL]]);
+    } else if (dayB) {                                                 // mejor partida del dia (Aventura o intento del Reto diario), caduca como el Reto diario
+      await kv.pipeline([["ZADD", lb, "GT", score, id], ["HSET", names, id, name], ["EXPIRE", lb, TTL], ["EXPIRE", names, TTL]]);
     } else {                                                           // la Aventura es "de siempre": no caduca (con EXPIRE se borraba entera si nadie jugaba en 40 dias)
       await kv.pipeline([["ZADD", lb, "GT", score, id], ["HSET", names, id, name], ["PERSIST", lb], ["PERSIST", names]]);
     }

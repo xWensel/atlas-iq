@@ -1,6 +1,6 @@
 /*
  * Geolite - Clasificacion en la portada (v0.14.1). Un boton del menu principal (al lado de la Enciclopedia) despliega un PODIO: se abre
- * siempre en la tabla de la Aventura, la principal, y en pestanas estan las del Reto diario de hoy y de ayer (las tres unicas del juego, js/rank.js).
+ * siempre en la tabla de la Aventura, la principal, y en pestanas las mejores puntuaciones de hoy y de ayer (de la Aventura o del Reto diario, js/rank.js).
  * Los 3 primeros suben al podio (oro, plata y bronce, con la corona del primero), del 4.o al 8.o van en lista y, si no estas entre ellos, tu puesto
  * al final. Sonidos del resto del menu (roce de ficha al pasar, carta al abrir, clic al cambiar de pestana) y una ficha por escalon al subir el podio,
  * de mas grave (bronce) a mas aguda (oro); la tuya suena a moneda y se enciende con luces de marquesina.
@@ -11,7 +11,7 @@ window.AIQ = window.AIQ || {};
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const TITLE = () => P6("Clasificación|Leaderboard|Classement|Placar|Rangliste|Classifica|Ranking|排行榜|리더보드|ランキング|Рейтинг|Ranking");   // corto: cabe en la fila de la portada
   const TABS = () => [["adv", A.T("Aventura", "Adventure")], ["today", P6("Hoy|Today|Aujourd'hui|Hoje|Heute|Oggi||今天|오늘|今日|Сегодня|Dziś")], ["yday", P6("Ayer|Yesterday|Hier|Ontem|Gestern|Ieri||昨天|어제|昨日|Вчера|Wczoraj")]];
-  const boardOf = t => (t === "today" ? A.rank.daily.board() : t === "yday" ? A.rank.daily.yesterday() : "adv-all");
+  const boardOf = t => (t === "today" ? A.rank.day.board() : t === "yday" ? A.rank.day.yesterday() : "adv-all");   // Hoy y Ayer: la mejor partida de cada uno, de la Aventura o del Reto diario
   const ROWS = 8;                                                     // 3 en el podio + 5 en la lista: la misma peticion que la tabla del Reto diario
   let tab = "adv", seq = 0, sfxT = [], back = null, dealerWas = false;
   const isOpen = () => !!$("podio");
@@ -23,12 +23,14 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ boton de la portada: la placa dorada del centro (bajo la carta de la Aventura).
      La cinta de neon es tu puesto MUNDIAL en la Aventura (sin servidor no se ensena: seria "#1 de 1"); no mueve nada al aparecer */
   const button = () => A.hub.plaque("plq-rank", "rankBtn", "m_rank", TITLE(), A.T("Aventura", "Adventure"), null,
-    `aria-haspopup="dialog" aria-expanded="false" ${A.ttAttr(TITLE(), A.tip6("El podio de la Aventura y el del Reto diario de hoy y de ayer.|The Adventure podium, plus today's and yesterday's Daily challenge.|Le podium de l'Aventure et celui du Défi quotidien d'aujourd'hui et d'hier.|O pódio da Aventura e o do Desafio diário de hoje e de ontem.|Das Podest des Abenteuers und das der Tagesherausforderung von heute und gestern.|Il podio dell'Avventura e quello della Sfida giornaliera di oggi e di ieri.||冒险模式的领奖台，以及今天和昨天的每日挑战排行。|모험 시상대와 오늘·어제의 일일 도전 순위.|アドベンチャーの表彰台と、今日と昨日のデイリーチャレンジ。|Пьедестал Приключения, а также Испытания дня за сегодня и вчера.|Podium Przygody oraz Wyzwania dnia z dziś i wczoraj."))}`,
+    `aria-haspopup="dialog" aria-expanded="false" ${A.ttAttr(TITLE(), A.tip6("El podio de la Aventura y las mejores puntuaciones de hoy y de ayer.|The Adventure podium, plus the best scores of today and yesterday.|Le podium de l'Aventure et les meilleurs scores d'aujourd'hui et d'hier.|O pódio da Aventura e as melhores pontuações de hoje e de ontem.|Das Podest des Abenteuers und die besten Punktzahlen von heute und gestern.|Il podio dell'Avventura e i migliori punteggi di oggi e di ieri.||冒险模式的领奖台，以及今天和昨天的最高分。|모험 시상대와 오늘·어제의 최고 점수.|アドベンチャーの表彰台と、今日と昨日のベストスコア。|Пьедестал Приключения и лучшие результаты за сегодня и вчера.|Podium Przygody oraz najlepsze wyniki z dziś i wczoraj."))}`,
     `<em class="plq-rib" id="rkMine"></em>`);
   /* cambio de pantalla (o la portada se vuelve a pintar): fuera el podio al instante, sin sonido y sin tocar al crupier (lo gobierna la pantalla nueva) */
   const reset = () => { seq++; sfxT.forEach(clearTimeout); sfxT = []; dealerWas = false; back = null; document.querySelectorAll(".pd-wrap").forEach(w => w.remove()); };
+  let filled = false;
   const wire = () => {
     reset();
+    if (!filled) { filled = true; A.rank.day.fill(); }               // Hoy / Ayer: tambien las partidas de esos dias jugadas antes de existir sus tablas
     const b = $("rankBtn"); if (!b) return;
     b.onclick = () => (isOpen() ? close() : open());
     const P = A.profile.get(); if (!(P.boards["adv-all"] || []).some(r => r.id === P.id)) return;   // sin puntuacion de Aventura no hay puesto que ensenar: ni se pregunta
@@ -89,7 +91,7 @@ window.AIQ = window.AIQ || {};
   /* contenido: origen, podio (2.o, 1.o, 3.o), lista del 4.o al 8.o y el pie (tu puesto, lo que te falta para el podio o como entrar).
      rows = null: esperando al servidor (mismas medidas, sin nadie: al llegar, los escalones suben desde el suelo) */
   function body(res) {
-    const rows = (res && res.rows) || [], day = tab !== "adv", my = A.profile.get().id, meI = rows.findIndex(r => r.id === my);
+    const rows = (res && res.rows) || [], day = false, my = A.profile.get().id, meI = rows.findIndex(r => r.id === my);
     const dots = r => (day ? `<span class="lb-tries">${[0, 1, 2].map(i => `<i class="${r.tries && i < r.tries.length ? "on" : ""}"></i>`).join("")}</span>` : "");
     const col = n => {
       const r = rows[n - 1], me = !!r && r.id === my;
@@ -119,7 +121,7 @@ window.AIQ = window.AIQ || {};
     const res = await A.rank.topC(boardOf(t), ROWS);
     if (n !== seq || t !== tab || !$("pdBody")) return;
     el.innerHTML = body(res); el.classList.remove("wait");
-    const play = $("pdPlay"); if (play) play.onclick = () => A.hub.screen(tab === "today" ? "daily" : "adventure");   // hub.screen quita el podio (reset)
+    const play = $("pdPlay"); if (play) play.onclick = () => A.hub.screen("adventure");   // hub.screen quita el podio (reset)
     /* los escalones aterrizan de bronce a oro: una ficha cada uno, cada vez mas aguda (el tuyo, moneda) */
     const rows = res.rows || [], my = A.profile.get().id;
     [[3, 430], [2, 530], [1, 630]].forEach(([p, ms], k) => { const r = rows[p - 1]; if (r) sfxT.push(setTimeout(() => { if (n === seq) (r.id === my ? A.sfx.coin(k) : A.sfx.chip(k)); }, ms)); });

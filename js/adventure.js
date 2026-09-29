@@ -849,6 +849,7 @@ window.AIQ = window.AIQ || {};
     A.profile.save();
     const hadBest = (P.records["adv-all"] || 0) > 0, rec = !daily && A.profile.record("adv-all", final);   // la primera expedicion siempre es "record": el crupier solo lo celebra si habia uno que batir
     if (!daily) A.rank.submit("adv-all", { score: final, extra: { deck: run.deck, asc: run.asc, r: run.cleared } });
+    A.rank.day.submit(final);                                                                  // "Hoy" y "Ayer" del podio: la mejor partida del dia, sea de la Aventura o del Reto diario
     A.ach.emit("adv", { kind: "end", score: final, won: !!run.won });
     /* Reto diario: el intento se cierra y suma a la puntuacion global del dia (las partidas del formato antiguo, sin numero de intento, cuentan como el primero) */
     let day = null, sent = null;

@@ -15,7 +15,7 @@ window.AIQ = window.AIQ || {};
   const R = A.rank = {
     hash, ymd, week,
     dailySeed: () => R.daily.board(),
-    boards: { daily: () => R.daily.board(), adv: "adv-all" },   // solo hay tres tablas: el reto de hoy y el de ayer (fecha LOCAL, ver R.daily) y la Aventura de siempre
+    boards: { today: () => R.day.board(), yday: () => R.day.yesterday(), adv: "adv-all" },   // las tres del podio: mejores partidas de hoy y de ayer (cualquier modo, fecha LOCAL, ver R.day) y la Aventura de siempre; el Reto diario (R.daily) tiene las suyas
     remote: null,                                                   // null = sin comprobar, true/false = servidor disponible
   };
 
@@ -47,6 +47,8 @@ window.AIQ = window.AIQ || {};
       /* tus intentos del dia no llegaron (jugaste sin red, servidor dormido, limite de envios): se reenvian una vez y se vuelve a pedir la tabla */
       const st = !again && /^daily-\d{8}$/.test(board) && R.daily.get(board);
       if (st && st.done && (!j.me || j.me.score < st.total)) { await R.daily.submit(board); return R.top(board, n, true); }
+      const mine = !again && /^day-\d{8}$/.test(board) && (A.profile.get().boards[board] || []).find(r => r.id === A.profile.get().id);
+      if (mine && (!j.me || j.me.score < mine.score)) { await post({ board, id: mine.id, name: R.name(), score: mine.score }); return R.top(board, n, true); }
       return { global: true, rows: j.rows, me: j.me || null, count: j.count || j.rows.length };
     } } catch (e) { /* cae a local */ } }
     return { global: false, rows: R.localTop(board, n) };
@@ -80,8 +82,48 @@ window.AIQ = window.AIQ || {};
     if (!(await R.check())) return;
     const adv = (P.boards["adv-all"] || []).find(r => r.id === P.id), jobs = [];
     if (adv) jobs.push(post({ board: "adv-all", id: P.id, name, score: adv.score }));
+    for (const b of [R.day.board(), R.day.yesterday()]) { const m = (P.boards[b] || []).find(r => r.id === P.id); if (m) jobs.push(post({ board: b, id: P.id, name, score: m.score })); }
     for (const b of [R.daily.board(), R.daily.yesterday()]) { const st = R.daily.get(b); if (st.done) jobs.push(post({ board: b, id: P.id, name, tries: st.tries.filter(t => !t.live).map(t => t.s || 0) })); }
     await Promise.all(jobs); R.ver++;
+  };
+  /* v0.15.1: "Hoy" y "Ayer" del podio son PUNTUACIONES: la mejor partida de cada jugador ese dia, sea de la Aventura o de un intento del Reto diario
+     (el Reto diario ademas tiene sus propias tablas por dia, con la suma de sus 3 intentos). Fecha LOCAL, como el Reto diario. */
+  const dayKey = (d = new Date()) => "day-" + (d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate());
+  R.day = {
+    board: dayKey,
+    yesterday: () => { const d = new Date(); d.setDate(d.getDate() - 1); return dayKey(d); },
+    /* cada partida acabada (Aventura o intento del Reto diario) pasa por aqui con su puntuacion final; el servidor y el perfil se quedan con la mejor del dia */
+    async submit(score) {
+      score = Math.max(0, Math.round(score || 0)); const board = dayKey(), P = A.profile.get();
+      const list = (P.boards[board] = P.boards[board] || []), mine = list.find(r => r.id === P.id);
+      if (mine) { if (score > mine.score) Object.assign(mine, { score, name: R.name(), ts: Date.now() }); } else list.push({ id: P.id, name: R.name(), score, ts: Date.now() });
+      const keep = [board, R.day.yesterday()]; Object.keys(P.boards).forEach(k => { if (/^day-\d{8}$/.test(k) && !keep.includes(k)) delete P.boards[k]; });   // solo hoy y ayer
+      A.profile.save(); R.ver++;
+      const global = (await R.check()) ? await post({ board, id: P.id, name: R.name(), score }) : null; R.ver++;
+      return { global };
+    },
+    /* las partidas de hoy y de ayer jugadas ANTES de existir estas tablas tambien cuentan: tu mejor Aventura (su fila de "adv-all" lleva la fecha
+       en que la hiciste) y los intentos cerrados del Reto diario de esos dias (P.daily). Entran como las demas (la mejor de cada dia) y suben al
+       servidor una sola vez por puntuacion (P.dayFill). Lo llama la portada una vez por sesion (js/podio.js) */
+    async fill() {
+      const P = A.profile.get(), days = [dayKey(), R.day.yesterday()], best = {};
+      const add = (ts, s) => { const b = ts ? dayKey(new Date(ts)) : ""; if (days.includes(b) && s > (best[b] || 0)) best[b] = Math.round(s); };
+      const adv = (P.boards["adv-all"] || []).find(r => r.id === P.id); if (adv) add(adv.ts, adv.score || 0);
+      for (const k in P.daily) if (/^daily-\d{8}$/.test(k)) ((P.daily[k] || {}).tries || []).forEach(t => { if (t && !t.live) add(t.ts, t.s || 0); });
+      const sent = (P.dayFill = P.dayFill && typeof P.dayFill === "object" ? P.dayFill : {}), jobs = [];
+      Object.keys(sent).forEach(k => { if (!days.includes(k)) delete sent[k]; });
+      for (const b of days) {
+        const s = best[b]; if (!s) continue;
+        const list = (P.boards[b] = P.boards[b] || []), mine = list.find(r => r.id === P.id);
+        if (mine && mine.score >= s) continue;                                                      // ya la apunto una partida nueva (y la subio R.day.submit)
+        if (mine) Object.assign(mine, { score: s, name: R.name() }); else list.push({ id: P.id, name: R.name(), score: s, ts: Date.now() });
+        if ((sent[b] || 0) < s) jobs.push(b);
+      }
+      A.profile.save(); if (!jobs.length) return; R.ver++;
+      if (!(await R.check())) return;
+      for (const b of jobs) { const s = P.boards[b].find(r => r.id === P.id).score; if (await post({ board: b, id: P.id, name: R.name(), score: s })) sent[b] = s; }
+      A.profile.save(); R.ver++;
+    },
   };
   R.myRank = board => { const P = A.profile.get(), rows = R.localTop(board, 50), i = rows.findIndex(r => r.id === P.id); return i < 0 ? null : i + 1; };
 
