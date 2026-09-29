@@ -238,6 +238,10 @@ window.AIQ = window.AIQ || {};
     const t0 = performance.now(), wait = () => { if (ctx.state === "running") fn(ctx.currentTime + 0.005, ...a); else if (performance.now() - t0 < 300) setTimeout(wait, 30); };
     wait();
   };
+  /* grado pentatonico de cada boton del menu principal: clasico, aventura, diario (las cartas suben de izquierda a derecha),
+     Enciclopedia y Perfil (abajo, mas graves) y Ajustes (arriba, el mas agudo). Todo entre do5 y re6 */
+  const HOV_DEG = [7, 8, 9, 6, 7, 10];
+  let hovT = -1, hovLast = 0;
   const JP_GAP = 0.46;                    // segundos entre jackpots de la Enciclopedia: el ticket enciende sus casillas y el movil vibra a este mismo ritmo
   A.audio.jpGap = JP_GAP;
   /* vibracion del movil (Android; en iPhone y en escritorio no existe y no hace nada). Va aparte del sonido: tambien vibra con los efectos
@@ -253,6 +257,21 @@ window.AIQ = window.AIQ || {};
   A.sfx = {
     ui: go(t => pluck(84, t, { vol: 0.05, dur: 0.12, bright: 3, rev: 0.1 })),
     hover: go(t => noise(t, 0.02, { hp: 5000, vol: 0.02 })),
+    /* menu principal (3 modos, Enciclopedia, Perfil, Ajustes): rozar una ficha de casino. Clac minimo de ficha, nota de marimba o kalimba,
+       brillo de campana y una pizca de 8 bits, todo flojito. Cada boton tiene su registro (barrer las cartas suena a arpegio) y cada vez
+       se sortea la nota vecina (nunca la misma que la anterior), el timbre, el brillo, la sala y el volumen: no suena dos veces igual */
+    menuHover: go((t, k = 0) => {
+      if (t - hovT < 0.05) return; hovT = t;                                          // barrido muy rapido por encima: no se amontonan
+      const r = Math.random, deg = HOV_DEG[k] != null ? HOV_DEG[k] : 7;
+      let m = hovLast; for (let i = 0; i < 6 && m === hovLast; i++) m = scaleNote(deg + Math.floor(r() * 3) - 1, 60);
+      hovLast = m; m += (r() - 0.5) * 0.1;                                             // +-5 cents: suena vivo, no de fabrica
+      const v = 0.01 * (0.8 + 0.4 * r());                                              // flojito: muy por debajo del clic que viene despues
+      noise(t, 0.006 + 0.004 * r(), { type: "bandpass", lp: 3200 + 2400 * r(), q: 1.4, vol: 0.0045 * (0.7 + 0.6 * r()) });
+      if (r() < 0.5) noise(t + 0.01 + 0.008 * r(), 0.005, { type: "bandpass", lp: 4200 + 2000 * r(), q: 1.4, vol: 0.0022 });   // a veces, la ficha de debajo
+      pluck(m, t + 0.004, { vol: v, dur: 0.08 + 0.06 * r(), bright: 2.5 + 1.5 * r(), rev: 0.1 + 0.08 * r(), wave: r() < 0.7 ? "sine" : "triangle" });
+      bell(m + (r() < 0.6 ? 12 : 19), t + 0.008 + 0.012 * r(), { vol: v * (0.22 + 0.12 * r()), dur: 0.12 + 0.1 * r(), rev: 0.3 });
+      if (r() < 0.6) chirp(m + 12, t + 0.006, v * 0.12, 0.02);
+    }),
     /* clic en el fieltro: pulsar donde sea en el menu, sin que haya nada que pulsar, y aun asi se siente bien */
     felt: go(t => { thump(t, { vol: 0.13, f0: 150, f1: 58, dur: 0.08 }); noise(t, 0.04, { lp: 1700, vol: 0.035 }); pluck(64, t + 0.012, { vol: 0.03, dur: 0.14, bright: 2, rev: 0.15 }); }),
     start: go(t => { MOTIF.forEach((m, i) => pluck(m, t + i * 0.13, { vol: 0.16, dur: 0.9, rev: 0.6 })); bell(79, t + 0.42, { vol: 0.07 }); }),

@@ -4,6 +4,8 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.10.1** - Menú principal con sonido al pasar el ratón: los 6 botones (Clásico, Aventura, Reto diario, Enciclopedia, Perfil y Ajustes) suenan como rozar una ficha de casino, muy flojito y corto (clac de ficha, nota de kalimba, brillo de campana y una pizca de 8 bits). Cada botón tiene su nota (barrer las cartas suena a arpegio) y cada vez varían la nota, el timbre y el volumen, así que nunca suena igual. Solo con ratón: en móvil el toque ya suena al pulsar.
+
 **v0.9.1** - Clásico: al elegir campaña o nivel ya no se rehace la pantalla (adiós a las tarjetas que desaparecían y al redimensionado).
 
 **v0.8.1** - Las recomendaciones de la revisión: partidas más justas, datos al día y textos coherentes.

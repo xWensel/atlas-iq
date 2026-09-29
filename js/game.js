@@ -368,11 +368,16 @@
   document.addEventListener("pointerdown", e => { if (S.settingsOpen && !e.target.closest("#setSh, #setBtn, .menu-gear, #langPop")) openSettings(false); }, true);
 
   /* los tooltips (data-tt / data-tip / title) los pinta js/uikit.js */
-  /* sonido suave al pasar por controles */
-  let lastHover = null;
+  /* sonido suave al pasar por controles. Los 6 botones del menu principal (3 modos, Enciclopedia, Perfil, Ajustes) tienen el suyo, solo
+     con raton: en movil el toque ya suena al pulsar y no se montan dos sonidos */
+  const MENU6 = ".hh .mcard, .hh .codex-shelf, .hh #profBtn, .hh .menu-gear";
+  const menuK = el => (el.classList.contains("mcard") ? ["classic", "adventure", "daily"].indexOf(el.dataset.mode) : el.classList.contains("codex-shelf") ? 3 : el.id === "profBtn" ? 4 : 5);
+  let lastHover = null, ptr = "mouse";
+  document.addEventListener("pointerover", e => (ptr = e.pointerType), true);
   document.addEventListener("mouseover", e => {
-    const el = e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear, .cx-strip, .mode-card, .deck:not(:disabled), .asc:not(:disabled), .tool, .buy:not(:disabled), .hub-back, .inv-perk");
-    if (el && el !== lastHover) A.sfx.hover(); lastHover = el;
+    const el = e.target.closest && e.target.closest(MENU6 + ", .go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear, .cx-strip, .mode-card, .deck:not(:disabled), .asc:not(:disabled), .tool, .buy:not(:disabled), .hub-back, .inv-perk");
+    if (el && el !== lastHover) { if (!el.matches(MENU6)) A.sfx.hover(); else if (ptr === "mouse") A.sfx.menuHover(menuK(el)); }
+    lastHover = el;
   });
 
   /* ------------------------------------------------------------ movimiento de camara -> sonido */
