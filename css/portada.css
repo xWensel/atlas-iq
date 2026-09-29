@@ -80,7 +80,8 @@ html body #dlg > .hh-ver { font-size: 12px; }
 @media (max-width: 700px) and (orientation: portrait) {
   .hh .hh-cards { flex-wrap: nowrap; gap: 8px; }
   .hh .hh-cards > .mcard { width: calc((100 * var(--vw) - 48px) * .32); padding: 8px; gap: 6px; border-radius: 14px; }
-  .hh .hh-cards > .mcard.hero { width: calc((100 * var(--vw) - 48px) * .36); }
+  .hh .hh-cards > .mcard.hero { width: calc((100 * var(--vw) - 48px) * .36); --mqi: 8.5px; --mqb: 4px; padding: 13px; }   /* bombillas mas pequenas y la mitad de juntas */
+  .hh .mqb rect { stroke-dasharray: 0 4; } .hh .mqb .mqb-a, .hh .mqb .mqb-b { stroke-dasharray: 0 8; } .hh .mqb .mqb-b { stroke-dashoffset: 4; }
   .hh .mc-name { font-size: clamp(13px, calc(4.1 * var(--vw)), 17px); }   /* "Приключение" cabe entera en un movil de 375 px */ .hh .mc-stat { font-size: 11px; letter-spacing: .02em; padding: 4px 6px 3px; } .hh .mc-ribbon { font-size: 11px; padding: 4px 8px 3px; }
   .hh-deck { gap: 8px; }
   .hh-resume { gap: 10px 8px; padding: 10px 12px; } .hh-resume .hr-ic { display: none; }   /* sin la ficha sola en su fila: texto arriba y los dos botones a partes iguales */
@@ -97,7 +98,7 @@ html body #dlg > .hh-ver { font-size: 12px; }
   .hh-deck { width: min(100%, 700px); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   .plq { min-height: 0; gap: 8px; padding: 7px 10px 10px; } .plq::before { inset: 5px 5px 8px; }
   .plq-ic .ic { width: 30px; height: 30px; } .plq-t { gap: 4px; } .plq-t > b { font-size: 19px; }
-  .hh .mcard.hero { padding-top: 24px; } .hh .mcard.hero .mc-ribbon { font-size: 11px; padding: 3px 8px 2px; top: -8px; }   /* la cinta "Modo principal" no tapa el nombre de la carta */
+  .hh .mcard.hero { padding: 24px 13px 13px; --mqi: 7.5px; --mqb: 4px; } .hh .mcard.hero .mc-ribbon { font-size: 11px; padding: 3px 8px 2px; top: -8px; }   /* la cinta "Modo principal" no tapa el nombre de la carta */
   .plq-rib { font-size: 12px; top: -17px; padding: 4px 8px 3px; }
   .hh-bottom .hh-resume { min-width: 0; }
   html body .plq-tag > span { font-size: 11px; } .plq-tag { padding: 3px 6px 5px; }

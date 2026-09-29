@@ -37,8 +37,11 @@ window.AIQ = window.AIQ || {};
       : dst.done ? `${A.fmt(dst.total)} · ${dst.done}/3`
       : A.pick6("Nuevo reto|New today|Nouveau défi|Novo desafio|Neue Runde|Nuova sfida||新挑战|새 도전|新しい挑戦|Новый день|Nowe dziś");
     /* cada modo es una carta (sin indices de baraja: el marco y la ilustracion bastan); la descripcion solo sale al pasar el raton (ficha data-tt) */
+    /* bombillas de marquesina de la Aventura: puntos redondos a lo largo de un rectangulo redondeado (pathLength fijo: siempre enteras y repartidas por igual,
+       tambien en las esquinas). Capas: casquillo de tinta, cristal apagado y dos tandas encendidas que se turnan */
+    const BULBS = `<svg class="mqb" aria-hidden="true">${["mqb-sk", "mqb-off", "mqb-a", "mqb-a mqb-c", "mqb-b", "mqb-b mqb-c"].map(k => `<rect class="${k}" pathLength="144"/>`).join("")}</svg>`;
     const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}" ${A.ttAttr(title, desc)} aria-description="${esc(desc)}">
-      ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-stat sq-fit">${meta}</span></button>`;
+      ${id === "adventure" ? BULBS : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-stat sq-fit">${meta}</span></button>`;
     c.dialog(`<div class="hh">
       <div class="hh-top">${A.salir ? A.salir.button() : ""}<img class="hh-logo" src="assets/logo.png" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
       <p class="hh-tag">${A.t("title.tag")}</p>

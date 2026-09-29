@@ -39,7 +39,16 @@ img.ic { display: block; object-fit: contain; image-rendering: auto; filter: dro
   0%, 3%, 6%, 100% { box-shadow: 0 4px 0 rgba(0, 0, 0, .45), 0 0 0 2px #16241c, 0 0 16px 2px var(--red); }
   4%, 5% { box-shadow: 0 4px 0 rgba(0, 0, 0, .45), 0 0 0 2px #16241c, 0 0 3px 0 var(--red); }
 }
-.mcard.hero .marq { border-radius: 18px; }
+/* marquesina de la carta de la Aventura: bombillas enteras en el margen crema, entre el marco y la ilustracion (el relleno se abre para que ninguna quede tapada) */
+.mcard.hero { --mqi: 13.5px; --mqb: 7px; padding: 20px 20px 18px; }
+.mqb { position: absolute; z-index: 1; left: var(--mqi); top: var(--mqi); width: calc(100% - 2 * var(--mqi)); height: calc(100% - 2 * var(--mqi)); overflow: visible; pointer-events: none; }
+.mqb rect { x: 0; y: 0; width: 100%; height: 100%; rx: calc(18px - var(--mqi)); fill: none; stroke-linecap: round; stroke-dasharray: 0 2; stroke-width: var(--mqb); }
+.mqb .mqb-sk { stroke: #16241c; stroke-width: calc(var(--mqb) + 3px); }                 /* casquillo: cada bombilla con su contorno de tinta, bien definida */
+.mqb .mqb-off { stroke: #b57a30; }                                                      /* cristal apagado: se ve la bombilla aunque no luzca */
+.mqb .mqb-a, .mqb .mqb-b { stroke: #ffc24d; stroke-dasharray: 0 4; filter: drop-shadow(0 0 3px rgba(255, 214, 110, 1)) drop-shadow(0 0 9px rgba(255, 168, 40, .8)); animation: mqb-a 1.1s steps(1) infinite; }
+.mqb .mqb-b { stroke-dashoffset: 2; animation-name: mqb-b; }
+.mqb .mqb-c { stroke: #fff6cf; stroke-width: calc(var(--mqb) * .45); filter: none; }    /* filamento blanco en el centro */
+@keyframes mqb-a { 50% { opacity: 0; } } @keyframes mqb-b { 0% { opacity: 0; } 50% { opacity: 1; } }
 .hh-bottom { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; }
 .hh-ver { font-family: var(--mono); font-size: 14px; letter-spacing: .05em; color: rgba(242, 233, 214, .45); }
 .chipbtn { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: #ffe08a; background: #16241c; padding: 10px 18px 9px; border-radius: 999px; cursor: pointer;
