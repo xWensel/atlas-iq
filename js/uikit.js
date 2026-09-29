@@ -146,7 +146,7 @@
      (primero el interletrado, luego como mucho un 8 % de tamano) para que quepa en una linea menos. Si ni asi cabe, se deja
      como estaba y `text-wrap: pretty` (CSS) reparte las lineas para que no quede una palabra sola. Lo llama A.fitK (menus,
      Campamento, veredicto) y la presentacion de ronda. La placa de la pregunta no se toca nunca. */
-  const SQ_SKIP = "#plate, [data-nosq], .ch-marq, .tt, svg, input, textarea";
+  const SQ_SKIP = "#plate, [data-nosq], .ch-marq, .tt, .dealer, svg, input, textarea";   // el crupier no: lo encogia a medio escribir (y su globo ya reparte las lineas con text-wrap: pretty)
   function lineBoxes(el) {
     const rg = document.createRange(); rg.selectNodeContents(el);
     const rs = [...rg.getClientRects()].filter(r => r.width > 0.5 && r.height > 0.5).sort((a, b) => a.top - b.top), lines = [];

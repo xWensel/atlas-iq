@@ -756,7 +756,7 @@ window.AIQ = window.AIQ || {};
   for (const k in LINES) LINES[k] = LINES[k].map(L6);
 
   const D = A.dealer = { on: false, onHome: false, host: null, timers: [], busy: false };
-  let el, face, bubble, txt, typing = false, doneAt = 0, pend = null;   // typing: esta escribiendo una frase; doneAt: cuando acabo la ultima; pend: la que espera su turno
+  let el, face, bubble, txt, sofar, rest, typing = false, doneAt = 0, pend = null;   // typing: esta escribiendo una frase; doneAt: cuando acabo la ultima; pend: la que espera su turno
   const rand = a => a[Math.floor(Math.random() * a.length)];
 
   function ensure() {
@@ -772,30 +772,32 @@ window.AIQ = window.AIQ || {};
   /* en partida el retrato va abajo a la izquierda, pero NUNCA encima de la placa del nombre, la barra del acto, las cartas de herramientas,
      la nota ni el dock: mide el hueco real, encoge el retrato hasta que quepa y sube o estrecha el bocadillo (ventanas bajas, portatiles
      pequenos, movil en horizontal). Antes el retrato de 250 px tapaba la placa en pantallas de poca altura. */
-  let curText = "";
-  function fitCorner(text) {
+  function fitCorner() {
     if (!el) return;
     const bs = bubble.style, fs = face.style;
     const reset = () => { el.style.bottom = ""; fs.width = fs.height = fs.display = ""; bs.marginBottom = bs.maxWidth = ""; };
-    if (D.host || !D.on || el.classList.contains("inline") || el.classList.contains("home") || el.classList.contains("big")) return reset();
+    if (el.classList.contains("home") && !D.host) {                                 // en el inicio: el hueco libre a su lado de la portada (homeRoom)
+      reset(); const room = homeRoom(homeCorner); el.style.setProperty("--hf", Math.min(256, room) + "px"); el.style.setProperty("--hb", Math.min(380, room) + "px"); return;
+    }
+    if (D.host || !D.on || el.classList.contains("inline") || el.classList.contains("big")) return reset();
     const app = $("app"); if (!app) return reset();
     const R = app.getBoundingClientRect(), box = id => { const e = $(id); if (!e || e.classList.contains("hidden")) return null; const r = e.getBoundingClientRect(); return r.width > 1 && r.height > 1 ? r : null; };
     const hits = (r, x0, x1) => r && r.left < x1 && r.right > x0;
-    const mob = innerWidth <= 720, maxS = mob ? 170 : 250, L = R.left + 16;
+    const mob = innerWidth <= 720, maxS = mob ? 170 : 320, L = R.left + 16;
     const top = [box("plate"), box("advBar")].filter(r => hits(r, L, L + maxS + 360)).reduce((m, r) => Math.max(m, r.bottom), R.top) + 10;
     const lows = [box("dock"), box("note"), box("toolBar")];
     let floor = R.bottom - 8; for (const r of lows) if (hits(r, L, L + maxS)) floor = Math.min(floor, r.top - 8);
     let sz = Math.round(Math.min(maxS, floor - top)); const noFace = sz < 84;
     if (noFace) { sz = 0; fs.display = "none"; } else { fs.display = ""; fs.width = fs.height = sz + "px"; }
     el.style.bottom = Math.max(0, R.bottom - floor) + "px";
-    const x0 = L + (noFace ? 0 : sz + 4), room = Math.max(150, Math.min(mob ? innerWidth * 0.6 : 340, R.right - 12 - x0));
+    const x0 = L + (noFace ? 0 : sz + 4), room = Math.max(150, Math.min(mob ? innerWidth * 0.62 : 440, R.right - 12 - x0));
     bs.maxWidth = room + "px";
-    const keep = txt.textContent; txt.textContent = text || curText; const bh = bubble.offsetHeight || 90; txt.textContent = keep;   // alto real con la frase entera
+    const bh = bubble.offsetHeight || 90;                                          // alto real: el globo ya lleva la frase entera (lo que falta, invisible)
     let bFloor = floor; for (const r of lows) if (hits(r, x0, x0 + room)) bFloor = Math.min(bFloor, r.top - 8);
-    const minM = noFace ? 0 : mob ? 20 : 58, want = Math.max(minM, floor - bFloor), maxM = Math.max(0, floor - top - bh);
+    const minM = noFace ? 0 : mob ? 20 : 74, want = Math.max(minM, floor - bFloor), maxM = Math.max(0, floor - top - bh);
     bs.marginBottom = Math.min(want, maxM) + "px";                                    // si no cabe del todo, antes pisa las herramientas que la placa
   }
-  addEventListener("resize", () => { if (D.busy) fitCorner(curText); });
+  addEventListener("resize", () => { if (D.busy) fitCorner(); });
   const LINGER = 1000;                                                // SIEMPRE un segundo mas: al acabar cada frase se queda antes de irse o de pasar a la siguiente (intro incluida)
   let held = false;                                                   // v0.37: mientras te pregunta el nombre (js/nombre.js) solo habla esa escena (o.force)
   const flush = () => { const p = pend; pend = null; if (p) D.say(p[0], p[1]); if (!typing) D.hide(); };   // si la que esperaba ya no toca, la anterior se va igual
@@ -809,14 +811,17 @@ window.AIQ = window.AIQ || {};
     ensure(); clear(); if (o.fx) D.fx(o.fx);
     const mood = o.mood || "sly", text = o.force ? (typeof line === "string" ? line : A.tx(line)) : personal(typeof line === "string" ? line : A.tx(line)), src = FACE[mood] || "dealer_neutral";
     const inline = !!el.closest("#vdDealer"), home = D.onHome && !D.host && !inline && homeCorner ? " home " + homeCorner : "";
-    face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (inline ? " inline" : "") + home; txt.textContent = ""; bubble.classList.add("on");
-    curText = text; fitCorner(text);
+    face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (inline ? " inline" : "") + home; bubble.classList.add("on");
+    /* la frase entera ya maquetada desde el principio, con lo que falta por escribir invisible: el globo nace con su tamano final y ninguna palabra
+       salta de linea a media escritura (y `text-wrap: pretty` reparte las lineas sin dejar una palabra sola) */
+    sofar = document.createTextNode(""); rest = document.createElement("span"); rest.className = "dl-rest"; rest.textContent = text; txt.replaceChildren(sofar, rest);
+    fitCorner();
     if (mood === "laugh") A.sfx.laugh && A.sfx.laugh();
-    let i = 0; const chars = [...text], step = mood === "laugh" ? 44 : 34;
+    let i = 0, at = 0; const chars = [...text], step = mood === "laugh" ? 44 : 34;
     const tick = () => {
       if (!el.isConnected) { clear(); D.busy = false; return; }                // otra pantalla sustituyo la suya: se calla (sin voz de fondo ni frases que asomen luego)
       if (i >= chars.length) { typing = false; doneAt = Date.now(); el.classList.add("done"); if (pend) { later(flush, LINGER); return; } if (o.hold !== 0) later(() => D.hide(), (o.hold || 1800 + text.length * 22) + LINGER); if (o.done) later(o.done, LINGER); return; }
-      txt.textContent += chars[i]; if (/\S/.test(chars[i]) && i % 2 === 0 && mood !== "laugh") A.sfx.voice && A.sfx.voice(mood, i); i++; later(tick, step + (/[.,!?…。，！？、]/.test(chars[i - 1]) ? 140 : 0));
+      sofar.data += chars[i]; at += chars[i].length; rest.textContent = text.slice(at); if (/\S/.test(chars[i]) && i % 2 === 0 && mood !== "laugh") A.sfx.voice && A.sfx.voice(mood, i); i++; later(tick, step + (/[.,!?…。，！？、]/.test(chars[i - 1]) ? 140 : 0));
     };
     typing = true; tick(); D.busy = true;
   };
@@ -957,6 +962,19 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------------------------------------------------------- pantalla principal */
   const HOME_CORNERS = ["home-tl", "home-tr"];
+  /* asoma en la franja libre a un lado de la portada, con el globo encima: mide donde acaba lo que hay (logo, lema, cartas, botones) a la altura
+     en que aparece, porque la portada crece con la ventana (--k). Si por ningun lado cabe (ventana estrecha), ese rato no asoma */
+  const HOME_TOP = 92, HOME_H = 480, HOME_MIN = 230;
+  function homeRoom(corner) {
+    const hh = document.querySelector(".hh"); if (!hh) return 0;
+    const tl = corner === "home-tl", y1 = HOME_TOP + HOME_H; let edge = tl ? innerWidth : 0;
+    const add = r => { if (r.width > 2 && r.height > 2 && r.width < innerWidth * 0.6 && r.top < y1 && r.bottom > HOME_TOP) edge = tl ? Math.min(edge, r.left) : Math.max(edge, r.right); };
+    hh.querySelectorAll("img, svg, canvas, button, [class*=card]").forEach(e => add(e.getBoundingClientRect()));
+    const rg = document.createRange(), tw = document.createTreeWalker(hh, NodeFilter.SHOW_TEXT);
+    for (let n; (n = tw.nextNode());) if (n.nodeValue.trim()) { rg.selectNodeContents(n); add(rg.getBoundingClientRect()); }   // la tinta del texto, no su caja (el lema ocupa todo el ancho)
+    return Math.floor((tl ? edge : innerWidth - edge) - 22 - 20);                    // margen a la ventana y a la portada
+  }
+  const pickCorner = () => { const ok = HOME_CORNERS.filter(c => homeRoom(c) >= HOME_MIN); return ok.length ? rand(ok) : ""; };
   let homeT = 0, homeCorner = "", lastCat = "", homeN = 0, guideI = 0, greeted = false;
   /* por que llega el jugador al menu: "open" (arranca el juego), "afterRun" (acaba de terminar una expedicion), "left" (guardo y salio a medias) */
   let entry = "open", entryAt = Date.now(), entrySince = 0, entryFlags = {}, lastEnd = null;
@@ -1000,8 +1018,9 @@ window.AIQ = window.AIQ || {};
     if (!D.onHome) return;
     const S = A.core && A.core.S;
     if (!document.querySelector(".hh") || phase() !== "title" || (S && (S.booting || S.settingsOpen)) || D.busy || tourOn()) { homeT = setTimeout(homeTick, 2500); return; }   // solo en el inicio, sin pisar a nadie
+    const corner = pickCorner(); if (!corner) { homeT = setTimeout(homeTick, 2500); return; }   // la portada no le deja hueco: lo que tocaba decir espera
     const b = homeBeat(); homeN++;
-    ensure(); homeCorner = rand(HOME_CORNERS);
+    ensure(); homeCorner = corner;
     if (b.chain) chain(b.chain); else if (b.t) D.say(b.t, { mood: b.mood || "sly", hold: holdFor(b.t) });
     homeT = setTimeout(homeTick, (b.wait || 0) + 14000 + Math.random() * 13000);
   }
@@ -1044,7 +1063,7 @@ window.AIQ = window.AIQ || {};
       setTimeout(() => { if (!D.on || D.host) return; const t = say1("tabBackRun"); D.say(t, { mood: "sly", hold: holdFor(t) }); }, 450);
     } else if (D.onHome && hidPhase === "title" && away >= 45000) {
       backAt = now;
-      setTimeout(() => { if (!D.onHome || D.busy || !document.querySelector(".hh") || S.settingsOpen) return; homeCorner = homeCorner || rand(HOME_CORNERS); const t = say1("tabBackHome"); D.say(t, { mood: "laugh", hold: holdFor(t) }); }, 700);
+      setTimeout(() => { if (!D.onHome || D.busy || !document.querySelector(".hh") || S.settingsOpen || !(homeCorner = pickCorner())) return; const t = say1("tabBackHome"); D.say(t, { mood: "laugh", hold: holdFor(t) }); }, 700);
     }
   }
   let rzT = 0, rzW = innerWidth, fsAt = 0;
@@ -1055,7 +1074,8 @@ window.AIQ = window.AIQ || {};
     if (!S || S.booting || once.resize || dw < 120 || Date.now() - fsAt < 3000 || activeMs() < 20000 || D.busy) return;   // pantalla completa y arranque no cuentan
     const home = D.onHome && phase() === "title" && document.querySelector(".hh") && !S.settingsOpen, run = D.on && S.phase === "asking" && !D.host;
     if (!home && !run) return;
-    once.resize = 1; if (home) homeCorner = homeCorner || rand(HOME_CORNERS);
+    if (home && !(homeCorner = pickCorner())) return;                                 // con la ventana nueva, el lado que tenga sitio
+    once.resize = 1;
     const t = say1("resize"); D.say(t, { mood: "laugh", hold: holdFor(t) });
   }
 
