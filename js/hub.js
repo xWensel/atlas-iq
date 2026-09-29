@@ -16,8 +16,21 @@ window.AIQ = window.AIQ || {};
   const where = sv => (sv.inf ? T("Modo infinito", "Infinite mode") : sv.act > 3 ? T("Tres actos completados", "Three acts completed") : `${T("Acto", "Act")} ${sv.act} · ${T("Ronda", "Round")} ${sv.round}`);
 
   /* ------------------------------------------------------------------ pantalla principal */
+  /* placa de casino del pie de la portada (Enciclopedia, Clasificacion, Perfil): icono, nombre y una etiqueta como la de las cartas;
+     pct (0-100) pinta la barra de progreso de la etiqueta. js/podio.js la usa para la Clasificacion */
+  const plaque = (cls, id, ico, title, tag, pct, attrs = "", extra = "") => `<button class="plq ${cls}" id="${id}" type="button" ${attrs}>${extra}<span class="plq-ic">${A.icon(ico)}</span>
+    <span class="plq-t"><b class="sq-fit">${title}</b><i class="plq-tag${pct == null ? "" : " bar"}"${pct == null ? "" : ` style="--p:${Math.min(100, pct).toFixed(1)}%"`}><span class="sq-fit">${tag}</span></i></span></button>`;
+  /* nombres de las cartas: como mucho dos lineas. Una palabra muy larga en una carta estrecha (el aleman "Tagesherausforderung") llegaba a tres;
+     se reduce la letra poco a poco (hasta un 25 %) hasta que quepa en dos. Se mide en px propios de la carta: ni el zoom ni el giro cambian la cuenta */
+  const lineCount = el => { const cs = getComputedStyle(el), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize); return Math.round(el.offsetHeight / lh); };   // alto sin transformaciones (las cartas entran girando)
+  const fitNames = () => document.querySelectorAll(".hh .mc-name").forEach(el => {
+    el.style.fontSize = ""; if (lineCount(el) <= 2) return;
+    const fs = parseFloat(getComputedStyle(el).fontSize);
+    for (let k = 0.94; k >= 0.74 && lineCount(el) > 2; k -= 0.04) el.style.fontSize = (fs * k).toFixed(1) + "px";
+  });
+  addEventListener("resize", () => { if (document.querySelector(".hh")) fitNames(); });
   function home() {
-    const c = C(), P = A.profile.get(), adv = P.adv, saved = A.adv.hasSave(), sm = saved && A.adv.summary();
+    const c = C(), P = A.profile.get(), adv = P.adv, saved = A.adv.hasSave(), sm = saved && A.adv.summary(), cx = A.codexStats();
     /* carta del Reto diario: intento a medias, puntuacion global de hoy o los 3 intentos por estrenar */
     const today = A.rank.daily.board(), dst = A.rank.daily.get(today), dsv = A.adv.summary(true), dLive = dsv && dsv.board === today;
     const dMeta = dLive ? A.pick6("Intento {k}/3|Attempt {k}/3|Essai {k}/3|Tentativa {k}/3|Versuch {k}/3|Tentativo {k}/3||尝试 {k}/3|도전 {k}/3|挑戦 {k}/3|Попытка {k}/3|Podejście {k}/3").replace("{k}", dsv.dailyTry || 1)
@@ -25,26 +38,29 @@ window.AIQ = window.AIQ || {};
       : A.pick6("Nuevo reto|New today|Nouveau défi|Novo desafio|Neue Runde|Nuova sfida||新挑战|새 도전|新しい挑戦|Новый день|Nowe dziś");
     /* cada modo es una carta (sin indices de baraja: el marco y la ilustracion bastan); la descripcion solo sale al pasar el raton (ficha data-tt) */
     const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}" ${A.ttAttr(title, desc)} aria-description="${esc(desc)}">
-      ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-stat">${meta}</span></button>`;
+      ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-stat sq-fit">${meta}</span></button>`;
     c.dialog(`<div class="hh">
       <div class="hh-top">${A.salir ? A.salir.button() : ""}<img class="hh-logo" src="assets/logo.png" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
       <p class="hh-tag">${A.t("title.tag")}</p>
       <div class="hh-cards">
         ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Regiones del mundo, banderas, pistas, sucesos y personajes, contra el reloj.", "Regions of the world, flags, clues, events and famous people, against the clock."), T("Directo al grano", "No frills"))}
-        ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: el crupier cambia las reglas. Mapa a oscuras, del revés, letras que tiemblan… y reliquias para vencerlo.", "Roguelike: the dealer changes the rules. Dark maps, upside-down worlds, shaky letters… and relics to beat him."), saved ? T("▶ Partida guardada", "▶ Saved run") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
+        ${mc("adventure", "A", "s_peak", "card_adv", T("Aventura", "Adventure"), T("Roguelike: el crupier cambia las reglas. Mapa a oscuras, del revés, letras que tiemblan… y reliquias para vencerlo.", "Roguelike: the dealer changes the rules. Dark maps, upside-down worlds, shaky letters… and relics to beat him."), saved ? T("▶ Guardada", "▶ Saved") : adv.bestScore ? T("Récord ", "Best ") + A.fmt(adv.bestScore) : T("Nueva", "New"), T("Modo principal", "Main mode"))}
         ${mc("daily", "Q", "s_compass", "card_compete", T("Reto diario", "Daily challenge"), A.pick6("Una expedición al azar, la misma para todos. 3 intentos que suman.|A random expedition, the same for all. 3 attempts that add up.|Une expédition au hasard, la même pour tous. 3 essais cumulés.|Expedição aleatória, igual para todos. 3 tentativas que somam.|Zufällige Expedition, für alle gleich. 3 Versuche, eine Summe.|Spedizione a caso, uguale per tutti. 3 tentativi che si sommano.||随机远征，人人相同。3 次尝试，分数累加。|모두에게 똑같은 무작위 탐험. 도전 3번의 점수를 합산.|全員共通のランダム遠征。3回の挑戦を合計。|Случайная экспедиция, одна на всех. 3 попытки в сумме.|Losowa wyprawa, ta sama dla wszystkich. 3 podejścia w sumie."), dMeta)}
       </div>
       <div class="hh-bottom">
-      ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${where(sm)} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
-        <button class="codex-shelf" id="codexBtn" type="button" ${A.ttAttr(A.t("codex.title"), A.tip6("Fichas de lugares, historia y datos clave: se descubren acertando cerca.|Cards for places, history and key facts: found by pinning close.|Fiches de lieux, d'histoire et de faits clés : on les découvre en visant juste.|Fichas de lugares, história e dados-chave: descobertas ao acertar perto.|Karten zu Orten, Geschichte und Kernfakten: entdeckt durch genaue Treffer.|Schede di luoghi, storia e dati chiave: si scoprono colpendo vicino.||地点、历史与关键信息的卡片：准确标出即可发现。|장소, 역사, 핵심 정보 카드: 가깝게 맞히면 발견됩니다.|場所・歴史・重要な事実のカード：近くに当てると見つかる。|Карточки мест, истории и ключевых фактов: открываются точными попаданиями.|Karty miejsc, historii i kluczowych faktów: odkrywasz je celnymi trafieniami."))}>
-          <span class="cs-ic">${A.icon("m_codex")}</span>
-          <span class="cs-t"><b>${A.t("codex.title")}</b><i>${A.fmt(A.codexStats().u)} / ${A.fmt(A.codexStats().t)}</i><u><s style="width:${(100 * A.codexStats().u / Math.max(1, A.codexStats().t)).toFixed(1)}%"></s></u></span>
-          <span class="cs-ar">${A.icon("u_next", "sm")}</span></button>
-        <button class="chipbtn big" id="profBtn" type="button">${A.icon("m_prof", "sm")}<span>${T("Perfil", "Profile")}</span><em>${A.ach.count()}/${A.ach.total()}</em></button>
-        <span class="hh-ver">Geolite · v${A.VERSION}</span>
-      </div></div>`, "home");
-    wireTools(); if (A.salir) A.salir.wire();                       // salir del juego: js/salir.js
-    $("codexBtn").onclick = () => A.codex.open(); $("profBtn").onclick = () => screen("profile");
+        ${saved && sm ? `<div class="hh-resume"><span class="hr-ic">${A.icon("chip_r")}</span><span class="hr-t"><b>${T("Tienes una expedición guardada", "You have a saved expedition")}</b><i>${where(sm)} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}</i></span><button class="btn-ink" id="homeCont" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line" id="homeNew">${T("Nueva partida", "New run")}</button></div>` : ""}
+        <div class="hh-deck">
+          ${plaque("plq-codex", "codexBtn", "m_codex", A.t("codex.title"), `${A.fmt(cx.u)} / ${A.fmt(cx.t)}`, (100 * cx.u) / Math.max(1, cx.t), A.ttAttr(A.t("codex.title"), A.tip6("Fichas de lugares, historia y datos clave: se descubren acertando cerca.|Cards for places, history and key facts: found by pinning close.|Fiches de lieux, d'histoire et de faits clés : on les découvre en visant juste.|Fichas de lugares, história e dados-chave: descobertas ao acertar perto.|Karten zu Orten, Geschichte und Kernfakten: entdeckt durch genaue Treffer.|Schede di luoghi, storia e dati chiave: si scoprono colpendo vicino.||地点、历史与关键信息的卡片：准确标出即可发现。|장소, 역사, 핵심 정보 카드: 가깝게 맞히면 발견됩니다.|場所・歴史・重要な事実のカード：近くに当てると見つかる。|Карточки мест, истории и ключевых фактов: открываются точными попаданиями.|Karty miejsc, historii i kluczowych faktów: odkrywasz je celnymi trafieniami.")))}
+          ${A.podio.button()}
+          ${plaque("plq-prof", "profBtn", "m_prof", T("Perfil", "Profile"), `${A.icon("u_star")}${A.fmt(A.ach.count())} / ${A.fmt(A.ach.total())}`, (100 * A.ach.count()) / Math.max(1, A.ach.total()), A.ttAttr(T("Perfil", "Profile"), A.tip6("Tus estadísticas y tus logros.|Your stats and achievements.|Tes statistiques et tes succès.|Suas estatísticas e conquistas.|Deine Statistiken und Erfolge.|Le tue statistiche e i tuoi obiettivi.||你的统计数据和成就。|내 통계와 업적.|あなたの記録と実績。|Твоя статистика и достижения.|Twoje statystyki i osiągnięcia.")))}
+        </div>
+      </div></div>
+      <span class="hh-ver">Geolite · v${A.VERSION}</span>`, "home");               // fuera de .hh: no cuenta para la composicion ni para A.fitK
+    wireTools(); A.podio.wire();                                      // Clasificacion: js/podio.js
+    fitNames(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNames);
+    if (A.salir) A.salir.wire();                                      // salir del juego: js/salir.js
+    $("codexBtn").onclick = () => A.codex.open();                     // la Enciclopedia ya suena al abrirse
+    $("profBtn").onclick = () => { A.sfx.card(); screen("profile"); };
     document.querySelectorAll(".mcard").forEach(b => (b.onclick = () => { A.sfx.card(); screen(b.dataset.mode); }));
     if ($("homeCont")) { $("homeCont").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume(), true); }; $("homeNew").onclick = () => { A.sfx.card(); screen("adventure"); }; }
   }
@@ -212,14 +228,12 @@ window.AIQ = window.AIQ || {};
     const el = $("lb"); if (!el) return; const DY = A.rank.daily, P = A.profile.get(), my = P.id, tab = board;
     const b = tab === "yday" ? DY.yesterday() : tab === "adv" ? "adv-all" : DY.board(), isDay = b !== "adv-all";
     el.innerHTML = `<p class="lb-load">…</p>`;
-    const res = await A.rank.top(b, 8); if (tab !== board || !$("lb")) return;                     // 8 + tu puesto: cabe entero sin encoger la pantalla
+    const res = await A.rank.topC(b, 8); if (tab !== board || !$("lb")) return;                    // 8 + tu puesto: cabe entero sin encoger la pantalla (la misma peticion que el podio de la portada)
     const rows = res.rows || [], inTop = rows.some(r => r.id === my);
     const dots = r => (isDay ? `<span class="lb-tries">${[0, 1, 2].map(i => `<i class="${r.tries && i < r.tries.length ? "on" : ""}"></i>`).join("")}</span>` : "");
     const li = (r, n) => `<li class="${r.id === my ? "me" : ""}"><span class="lb-n">${n <= 3 ? A.icon("medal_" + ["gold", "silver", "bronze"][n - 1], "sm") : A.fmt(n)}</span><span class="lb-name">${esc(r.name || "—")}</span>${dots(r)}<b>${A.fmt(r.score)}</b></li>`;
     const mine = res.global && res.me && !inTop ? `<li class="lb-gap" aria-hidden="true">···</li>` + li({ id: my, name: A.rank.name(), score: res.me.score, tries: isDay ? DY.get(b).tries.filter(t => !t.live) : null }, res.me.rank) : "";
-    const src = res.global ? `${A.icon("globe", "sm")}<span>${P6("Mundial|Worldwide|Mondial|Mundial|Weltweit|Mondiale||全球|전 세계|世界|Мировая|Światowy")}</span><em>${P6("Jugadores: {n}|Players: {n}|Joueurs : {n}|Jogadores: {n}|Spieler: {n}|Giocatori: {n}||玩家：{n}|플레이어: {n}|プレイヤー：{n}|Игроков: {n}|Graczy: {n}").replace("{n}", A.fmt(res.count))}</em>`
-      : `<span>${P6("Solo este equipo|This device only|Cet appareil uniquement|Só este aparelho|Nur dieses Gerät|Solo questo dispositivo||仅限本设备|이 기기만|この端末のみ|Только это устройство|Tylko to urządzenie")}</span>`;
-    el.innerHTML = `<p class="lb-src">${src}</p>` + (rows.length ? `<ol class="${isDay ? "dy" : ""}">${rows.map((r, i) => li(r, i + 1)).join("")}${mine}</ol>` : `<p class="lb-empty">${T("Aún no hay puntuaciones. ¡Sé el primero!", "No scores yet. Be the first!")}</p>`);
+    el.innerHTML = `<p class="lb-src">${A.podio.src(res)}</p>` + (rows.length ? `<ol class="${isDay ? "dy" : ""}">${rows.map((r, i) => li(r, i + 1)).join("")}${mine}</ol>` : `<p class="lb-empty">${T("Aún no hay puntuaciones. ¡Sé el primero!", "No scores yet. Be the first!")}</p>`);
   }
 
   /* ------------------------------------------------------------------ Perfil y logros */
@@ -261,9 +275,10 @@ window.AIQ = window.AIQ || {};
   }
 
   function screen(id) {
+    A.podio.reset();                                                  // el podio de la portada no se queda encima de otra pantalla
     C().S.hub = id;
     ({ home, classic: () => campaigns("classic"), adventure, daily, profile }[id] || home)();
     C().refreshSkinBits && C().refreshSkinBits();
   }
-  A.hub = { render: id => screen(id || "home"), screen };
+  A.hub = { render: id => screen(id || "home"), screen, plaque };
 })(window.AIQ);

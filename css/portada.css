@@ -1,0 +1,105 @@
+/* ==== v0.14.1: PORTADA simetrica. Todo gira sobre el eje central: logo, lema, abanico de cartas en espejo (-4 / 0 / +4 grados) y, debajo,
+   tres placas de casino alineadas con las cartas: Enciclopedia (turquesa, bajo el Clasico), Clasificacion (oro, bajo la Aventura) y Perfil
+   (violeta, bajo el Reto diario): los mismos colores que el marco de la carta de encima. Placas "Balatro": color plano con luz arriba,
+   sombra abajo, contorno de tinta y labio grueso; al pasar se levantan hacia fuera (espejo) y al pulsar se hunden. La version va aparte,
+   pequena, en la esquina inferior derecha: no forma parte de la composicion. ==== */
+
+/* medidas de las cartas (las mismas formulas que premium.css / uikit.css): las placas usan las mismas columnas */
+.hh {
+  --cw: min(calc(20.5 * var(--vw)), calc(28 * var(--vh)) * .7 * 1.36, 310px);
+  --hw: min(calc(24 * var(--vw)), calc(33 * var(--vh)) * .7 * 1.36, 360px);
+  --cg: clamp(10px, calc(1.8 * var(--vw)), 30px); }
+.hh:has(.hh-resume) { --cw: min(calc(20.5 * var(--vw)), calc(26 * var(--vh)) * .7 * 1.36, 300px); --hw: min(calc(24 * var(--vw)), calc(30 * var(--vh)) * .7 * 1.36, 340px); }
+
+/* ---------- abanico en espejo: la Aventura recta en el centro, las otras dos abiertas y un poco mas bajas ---------- */
+.hh-cards .mcard:nth-child(1) { --rot: -4deg; } .hh-cards .mcard.hero { --rot: 0deg; } .hh-cards .mcard:nth-child(3) { --rot: 4deg; }
+.hh-cards .mcard:not(.hero) { transform: translateY(10px) rotate(var(--rot)); }
+.hh-cards .mcard:not(.hero):hover { transform: rotate(0deg) translateY(-24px) scale(1.07); }
+/* sin indices de carta ya no hace falta reservar la esquina: el nombre usa todo el ancho y no se parte en trozos */
+.mcard .mc-name { padding: 0 2px; hyphens: manual; -webkit-hyphens: manual; overflow-wrap: normal; }
+.mcard .mc-stat.sq-fit { white-space: nowrap; overflow: hidden; } .mcard .mc-stat.sq-wrap { white-space: normal; text-wrap: balance; line-height: 1.1; }   /* A.squeeze la aprieta antes de partirla */
+
+/* ---------- pie: banner de partida guardada y placas, del mismo ancho que el abanico ---------- */
+/* el bloque mide lo que su contenido mas ancho (banner o placas) y los dos se estiran a ese ancho: bordes alineados.
+   Columnas de las placas: como minimo las de las cartas; las dos laterales siempre iguales (1fr) aunque un nombre sea mas largo (ru, ja) */
+.hh-bottom { justify-self: center; width: max-content; max-width: 100%; display: grid; justify-items: stretch; gap: clamp(10px, calc(1.8 * var(--vh)), 18px); }
+.hh-deck { display: grid; grid-template-columns: minmax(var(--cw), 1fr) minmax(var(--hw), max-content) minmax(var(--cw), 1fr); gap: var(--cg); align-items: stretch; }
+.hh-bottom .hh-resume { flex: none; box-sizing: border-box; width: auto; max-width: none; margin: 0; }   /* en una sola fila, del ancho de las placas */
+.hh-bottom:has(.hh-resume .btn-ink):has(.plq-rib.on) { row-gap: clamp(24px, calc(3.2 * var(--vh)), 32px); }   /* la cinta de tu puesto no toca el banner */
+
+.plq { --c1: #4ee3c1; --c2: #1fb3a3; --c3: #16787f; --c4: #164a5c; --glow: rgba(78, 227, 193, .5); --tilt: 0deg; --d: .3s;
+  position: relative; display: flex; align-items: center; justify-content: center; gap: 11px; min-width: 0; min-height: 66px; box-sizing: border-box; padding: 8px 14px 11px;
+  border: 0; border-radius: 14px; cursor: pointer; text-align: left; color: #fff; background: var(--c2);
+  box-shadow: 0 0 0 3px #16241c, inset 0 4px 0 var(--c1), inset 0 -6px 0 var(--c3), 0 8px 0 3px #16241c, 0 16px 26px rgba(0, 0, 0, .45);
+  transition: transform .3s var(--spring), box-shadow .25s; animation: plq-in .62s var(--spring) var(--d) backwards, plq-bob 5s ease-in-out calc(var(--d) + .8s) infinite; }
+/* costura de ficha de casino: una linea discontinua por dentro del borde */
+.plq::before { content: ""; position: absolute; inset: 7px 7px 10px; border-radius: 8px; border: 2px dashed rgba(255, 255, 255, .32); pointer-events: none; }
+.plq-codex { --tilt: -2deg; --d: .38s; }
+.plq-rank { --c1: #ffd95a; --c2: #f5a623; --c3: #c46a1b; --c4: #7f3a1a; --glow: rgba(255, 208, 107, .6); --d: .3s; }
+.plq-prof { --c1: #b36cff; --c2: #8440e0; --c3: #5a2ab0; --c4: #351a70; --glow: rgba(199, 139, 240, .55); --tilt: 2deg; --d: .38s; }
+.plq:hover { transform: translateY(-7px) rotate(var(--tilt)) scale(1.05); z-index: 2; box-shadow: 0 0 0 3px #16241c, inset 0 4px 0 var(--c1), inset 0 -6px 0 var(--c3), 0 13px 0 3px #16241c, 0 0 40px 4px var(--glow); }
+.plq:active { transform: translateY(5px) scale(.98); box-shadow: 0 0 0 3px #16241c, inset 0 4px 0 var(--c1), inset 0 -4px 0 var(--c3), 0 3px 0 3px #16241c, 0 6px 12px rgba(0, 0, 0, .4); transition-duration: .08s; }
+.plq:focus-visible { outline: 3px solid #fff; outline-offset: 5px; }
+@keyframes plq-in { from { opacity: 0; transform: translateY(70px) scale(.8); } }
+@keyframes plq-bob { 50% { translate: 0 -3px; } }                                    /* respiracion muy suave (translate: no pisa el transform del raton) */
+.plq-rank { animation-name: plq-in, plq-bob-c; } @keyframes plq-bob-c { 0%, 100% { translate: 0 -3px; } 50% { translate: 0 0; } }   /* el centro respira al reves: espejo */
+
+.plq-ic { position: relative; z-index: 1; flex: none; display: grid; place-items: center; }
+.plq-ic .ic { width: 42px; height: 42px; filter: drop-shadow(0 3px 0 rgba(22, 36, 28, .6)); transition: transform .3s var(--spring); }
+.plq:hover .plq-ic .ic { transform: rotate(calc(var(--tilt) * -3)) scale(1.12); }
+.plq-t { position: relative; z-index: 1; display: grid; justify-items: start; gap: 5px; min-width: 0; }
+.plq-t > b { max-width: 100%; font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: 26px; line-height: .9; color: #fff; text-shadow: 0 3px 0 var(--c4), 0 0 1px var(--c4); white-space: nowrap; overflow: hidden; }
+.plq-t > b.sq-wrap { white-space: normal; text-wrap: balance; }
+.plq-tag { position: relative; max-width: 100%; box-sizing: border-box; display: flex; overflow: hidden; font-style: normal; background: #16241c; padding: 3px 8px 6px; }
+.plq-tag > span { display: flex; align-items: center; gap: 5px; min-width: 0; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; line-height: 1; text-transform: uppercase; color: #f6efdc; white-space: nowrap; overflow: hidden; }
+.plq-tag > span.sq-wrap { white-space: normal; }
+.plq-tag .ic { flex: none; width: 15px; height: 15px; margin: 0; filter: none; }
+.plq-tag.bar::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: max(3px, var(--p)); background: var(--c1); }   /* progreso, del color de la placa */
+html body .plq-tag > span { font-size: 14px; }
+
+/* tu puesto mundial: cinta de neon centrada arriba, como "Modo principal" en la carta de la Aventura */
+.plq-rib { position: absolute; z-index: 3; top: -23px; left: 50%; display: none; align-items: center; gap: 5px; font-family: var(--mono); font-style: normal; font-size: 14px; letter-spacing: .05em; line-height: 1; color: #fff; background: var(--red);
+  padding: 5px 10px 4px; box-shadow: 0 4px 0 rgba(0, 0, 0, .45), 0 0 0 2px #16241c; white-space: nowrap; text-shadow: 0 0 6px #fff, 0 0 14px var(--red), 0 0 26px var(--red); transform: translateX(-50%) rotate(-2deg); pointer-events: none;
+  animation: rib-in .5s var(--spring) both, neon-flicker 3.2s linear .5s infinite; }
+.plq-rib.on { display: inline-flex; } .plq-rib .ic { width: 16px; height: 16px; margin: 0; filter: none; }
+@keyframes rib-in { from { opacity: 0; transform: translateX(-50%) rotate(-2deg) scale(.3); } }
+
+/* ---------- version: aparte, pequena, abajo a la derecha (hermana de .hh dentro del dialogo: no se escala ni cuenta para el ajuste) ---------- */
+#dlg > .hh-ver { position: absolute; right: 14px; bottom: 7px; margin: 0; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; line-height: 1; color: rgba(242, 233, 214, .36); pointer-events: none; white-space: nowrap; }
+html body #dlg > .hh-ver { font-size: 12px; }
+
+/* ---------- pantallas estrechas (tableta, ventana pequena): tres placas a partes iguales ---------- */
+@media (max-width: 899px) {
+  .hh-top { flex-direction: row; } .hh-top .menu-tools { position: absolute; right: 0; top: 0; margin: 0; }   /* el engranaje arriba a la derecha tambien aqui: espejo del boton de salir */
+  .hh-bottom { width: 100%; justify-items: center; }
+  .hh-deck { width: min(100%, 760px); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .hh-bottom .hh-resume { width: min(100%, 760px); min-width: 0; }
+  .hh { padding-bottom: 26px; }                                                        /* hueco para la version */
+}
+/* movil vertical: cartas en abanico a lo ancho y placas en columna (icono, nombre y etiqueta centrados) */
+@media (max-width: 700px) and (orientation: portrait) {
+  .hh .hh-cards { flex-wrap: nowrap; gap: 8px; }
+  .hh .hh-cards > .mcard { width: calc((100 * var(--vw) - 48px) * .32); padding: 8px; gap: 6px; border-radius: 14px; }
+  .hh .hh-cards > .mcard.hero { width: calc((100 * var(--vw) - 48px) * .36); }
+  .hh .mc-name { font-size: clamp(13px, calc(4.1 * var(--vw)), 17px); }   /* "Приключение" cabe entera en un movil de 375 px */ .hh .mc-stat { font-size: 11px; letter-spacing: .02em; padding: 4px 6px 3px; } .hh .mc-ribbon { font-size: 11px; padding: 4px 8px 3px; }
+  .hh-deck { gap: 8px; }
+  .hh-resume { gap: 10px 8px; padding: 10px 12px; } .hh-resume .hr-ic { display: none; }   /* sin la ficha sola en su fila: texto arriba y los dos botones a partes iguales */
+  .hh-resume .btn-ink, .hh-resume .btn-line { flex: 1 1 0; min-width: 0; padding: 9px 8px; font-size: 14px; letter-spacing: .03em; } .hh-resume .btn-ink .ar { display: none; }
+  .plq { flex-direction: column; gap: 6px; min-height: 0; padding: 10px 6px 14px; text-align: center; }
+  .plq::before { inset: 5px 5px 8px; }
+  .plq-ic .ic { width: 36px; height: 36px; }
+  .plq-t { justify-items: center; gap: 5px; width: 100%; } .plq-t > b { font-size: clamp(13px, calc(3.9 * var(--vw)), 18px); }
+  html body .plq-tag > span { font-size: 11px; letter-spacing: .02em; } .plq-tag { padding: 3px 6px 5px; } .plq-tag .ic { width: 12px; height: 12px; }
+  .plq-rib { font-size: 12px; top: -17px; padding: 4px 8px 3px; } .plq-rib .ic { width: 13px; height: 13px; }
+}
+/* movil horizontal: placas bajas en una fila */
+@media (max-height: 520px) and (orientation: landscape) {
+  .hh-deck { width: min(100%, 700px); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .plq { min-height: 0; gap: 8px; padding: 7px 10px 10px; } .plq::before { inset: 5px 5px 8px; }
+  .plq-ic .ic { width: 30px; height: 30px; } .plq-t { gap: 4px; } .plq-t > b { font-size: 19px; }
+  .hh .mcard.hero { padding-top: 24px; } .hh .mcard.hero .mc-ribbon { font-size: 11px; padding: 3px 8px 2px; top: -8px; }   /* la cinta "Modo principal" no tapa el nombre de la carta */
+  .plq-rib { font-size: 12px; top: -17px; padding: 4px 8px 3px; }
+  .hh-bottom .hh-resume { min-width: 0; }
+  html body .plq-tag > span { font-size: 11px; } .plq-tag { padding: 3px 6px 5px; }
+  .hh { padding-bottom: 22px; }
+}

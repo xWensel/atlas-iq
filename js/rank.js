@@ -51,14 +51,24 @@ window.AIQ = window.AIQ || {};
     } } catch (e) { /* cae a local */ } }
     return { global: false, rows: R.localTop(board, n) };
   };
+  /* v0.14.1: la misma tabla la piden la portada (podio, js/podio.js) y el Reto diario: se guarda 30 s (age; la etiqueta de la portada acepta 5 min:
+     cada peticion son 5 comandos de Redis). Enviar una puntuacion o cambiar de nombre sube R.ver y la invalida (antes de enviar y al llegar la respuesta) */
+  const TC = {};
+  R.ver = 0;
+  R.topC = (board, n = 8, age = 30000) => {
+    const key = board + ":" + n, c = TC[key];
+    if (c && c.v === R.ver && Date.now() - c.t < age) return c.p;
+    const p = R.top(board, n); TC[key] = { p, t: Date.now(), v: R.ver };
+    return p;
+  };
   /* entrada: {score, extra:{...}}. Devuelve {rank?, record}. */
   R.submit = async (board, entry) => {
     const P = A.profile.get(), rec = A.profile.record(board, entry.score);
     const row = { id: P.id, name: R.name(), score: entry.score, ts: Date.now(), extra: entry.extra || {} };
     const list = (P.boards[board] = P.boards[board] || []);
     const mine = list.find(r => r.id === P.id); if (mine) { if (row.score > mine.score) Object.assign(mine, row); } else list.push(row);
-    P.boards[board] = list.sort((a, b) => b.score - a.score).slice(0, 50); A.profile.save();
-    const global = (await R.check()) ? await post({ board, ...row }) : null;
+    P.boards[board] = list.sort((a, b) => b.score - a.score).slice(0, 50); A.profile.save(); R.ver++;
+    const global = (await R.check()) ? await post({ board, ...row }) : null; R.ver++;
     return { record: rec, global };
   };
   /* v0.37: cambias de nombre -> se cambia en tus filas locales y se reenvia a las tablas que se ven (Aventura, hoy y ayer). El servidor se queda con
@@ -66,12 +76,12 @@ window.AIQ = window.AIQ || {};
   R.rename = async () => {
     const P = A.profile.get(), name = R.name();
     for (const b in P.boards) (P.boards[b] || []).forEach(r => { if (r.id === P.id) r.name = name; });
-    A.profile.save();
+    A.profile.save(); R.ver++;
     if (!(await R.check())) return;
     const adv = (P.boards["adv-all"] || []).find(r => r.id === P.id), jobs = [];
     if (adv) jobs.push(post({ board: "adv-all", id: P.id, name, score: adv.score }));
     for (const b of [R.daily.board(), R.daily.yesterday()]) { const st = R.daily.get(b); if (st.done) jobs.push(post({ board: b, id: P.id, name, tries: st.tries.filter(t => !t.live).map(t => t.s || 0) })); }
-    await Promise.all(jobs);
+    await Promise.all(jobs); R.ver++;
   };
   R.myRank = board => { const P = A.profile.get(), rows = R.localTop(board, 50), i = rows.findIndex(r => r.id === P.id); return i < 0 ? null : i + 1; };
 
@@ -150,8 +160,8 @@ window.AIQ = window.AIQ || {};
       const P = A.profile.get(), st = DY.get(board), tries = st.tries.filter(t => !t.live).map(t => t.s || 0);
       const row = { id: P.id, name: R.name(), score: st.total, tries, ts: Date.now() };
       P.boards[board] = (P.boards[board] || []).filter(r => r.id !== P.id).concat(row).sort((a, b) => b.score - a.score).slice(0, 50);
-      A.profile.record(board, st.total); A.profile.save();
-      const global = (await R.check()) ? await post({ board, id: row.id, name: row.name, tries }) : null;
+      A.profile.record(board, st.total); A.profile.save(); R.ver++;
+      const global = (await R.check()) ? await post({ board, id: row.id, name: row.name, tries }) : null; R.ver++;
       return { total: st.total, global };
     },
   };

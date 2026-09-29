@@ -115,7 +115,7 @@ window.AIQ = window.AIQ || {};
     "Main mode": ["Mode principal", "Modo principal", "Hauptmodus", "Modalità principale", "Modo principal", "主模式", "메인 모드", "メインモード", "Основной режим", "Tryb główny"],
     "Classic": ["Classique", "Clássico", "Klassik", "Classico", "Clásico", "经典", "클래식", "クラシック", "Классика", "Klasyczny"],
     "Regions of the world, flags, clues, events and famous people, against the clock.": ["Régions du monde, drapeaux, indices, événements et personnages, contre la montre.", "Regiões do mundo, bandeiras, pistas, eventos e personagens, contra o relógio.", "Weltregionen, Flaggen, Hinweise, Ereignisse und Persönlichkeiten, gegen die Uhr.", "Regioni del mondo, bandiere, indizi, eventi e personaggi, contro il tempo.", "Regiones del mundo, banderas, pistas, sucesos y personajes, contra el reloj.", "世界各地区、国旗、线索、历史事件与人物，与时间赛跑。", "세계의 지역, 국기, 단서, 사건, 인물을 시간과 겨루며.", "世界の地域・国旗・ヒント・出来事・人物を、時間と競いながら。", "Регионы мира, флаги, подсказки, события и личности — на время.", "Regiony świata, flagi, wskazówki, wydarzenia i sławne postacie – na czas."],
-    "No frills": ["Sans chichis", "Sem frescuras", "Ohne Schnick­schnack", "Senza fronzoli", "Sin adornos", "简约无华", "군더더기 없음", "シンプル", "Без изысков", "Bez fajerwerków"],
+    "No frills": ["Sans chichis", "Sem frescuras", "Kurz und knapp", "Senza fronzoli", "Sin adornos", "简约无华", "군더더기 없음", "シンプル", "Без изысков", "Bez fajerwerków"],
     "Profile": ["Profil", "Perfil", "Profil", "Profilo", "Perfil", "个人资料", "프로필", "プロフィール", "Профиль", "Profil"],
     "Act": ["Acte", "Ato", "Akt", "Atto", "Acto", "幕", "막", "幕", "Акт", "Akt"],
     "pts": ["pts", "pts", "Pkt.", "pt", "pts", "分", "점", "pt", "очк.", "pkt"],

@@ -239,8 +239,9 @@ window.AIQ = window.AIQ || {};
     wait();
   };
   /* grado pentatonico de cada boton del menu principal: clasico, aventura, diario (las cartas suben de izquierda a derecha),
-     Enciclopedia y Perfil (abajo, mas graves) y Ajustes (arriba, el mas agudo). Todo entre do5 y re6 */
-  const HOV_DEG = [7, 8, 9, 6, 7, 10];
+     Enciclopedia, Perfil y Clasificacion (abajo, mas graves y tambien subiendo: Enciclopedia, Clasificacion, Perfil) y Ajustes (arriba, el mas agudo).
+     Todo entre do5 y re6 */
+  const HOV_DEG = [7, 8, 9, 6, 8, 10, 7];
   let hovT = -1, hovLast = 0;
   const JP_GAP = 0.46;                    // segundos entre jackpots de la Enciclopedia: el ticket enciende sus casillas y el movil vibra a este mismo ritmo
   A.audio.jpGap = JP_GAP;
@@ -257,7 +258,7 @@ window.AIQ = window.AIQ || {};
   A.sfx = {
     ui: go(t => pluck(84, t, { vol: 0.05, dur: 0.12, bright: 3, rev: 0.1 })),
     hover: go(t => noise(t, 0.02, { hp: 5000, vol: 0.02 })),
-    /* menu principal (3 modos, Enciclopedia, Perfil, Ajustes): rozar una ficha de casino. Clac minimo de ficha, nota de marimba o kalimba,
+    /* menu principal (3 modos, Enciclopedia, Clasificacion, Perfil, Ajustes): rozar una ficha de casino. Clac minimo de ficha, nota de marimba o kalimba,
        brillo de campana y una pizca de 8 bits, todo flojito. Cada boton tiene su registro (barrer las cartas suena a arpegio) y cada vez
        se sortea la nota vecina (nunca la misma que la anterior), el timbre, el brillo, la sala y el volumen: no suena dos veces igual */
     menuHover: go((t, k = 0) => {

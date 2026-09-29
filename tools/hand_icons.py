@@ -649,6 +649,22 @@ def medal(id):
     rp_ = MEDAL[id]; I.add(sphere(circle(32, 42, 19), 31, 41, 19, R[rp_]))
     I.add(faceted_star(32, 43, 11, 4.5, rp_)); return I
 
+@icon("m_rank")
+def m_rank(id):   # clasificacion de la portada: podio de oro, plata y bronce con la estrella del primero encima
+    I = Icon()
+    I.add(bevel(rect(2, 36, 21, 25), R["grey"]))
+    I.add(bevel(rect(41, 43, 21, 18), R["brown"]))
+    I.add(bevel(rect(20, 26, 24, 35), R["gold"]))
+    DIG = {1: (".#.", "##.", ".#.", ".#.", "###"), 2: ("##.", "..#", ".#.", "#..", "###"), 3: ("##.", "..#", ".#.", "..#", "##.")}   # cifras de 3x5 a x2
+    for n, x, y, w, rp_ in ((2, 2, 36, 21, "grey"), (3, 41, 43, 21, "brown"), (1, 20, 26, 24, "gold")):
+        I.put(rect(x + 1, y + 1, w - 2, 3), R[rp_][1]); I.put(rect(x + 1, y + 4, w - 2, 1), R[rp_][3])   # tapa de cada escalon
+        dx, dy = x + w // 2 - 3, y + 7 + (4 if n == 1 else 0)
+        for r_, row in enumerate(DIG[n]):
+            for c_, ch in enumerate(row):
+                if ch == "#": I.put(rect(dx + 2 * c_, dy + 2 * r_, 2, 2), R[rp_][4])
+    I.add(faceted_star(32, 13, 12, 5, "gold"))
+    return I
+
 def cursor(x, y, s=1.0):
     pts = [(0, 0), (0, 36), (9, 28), (15, 41), (22, 38), (16, 25), (27, 25)]
     return poly([(x + px * s, y + py * s) for px, py in pts])
