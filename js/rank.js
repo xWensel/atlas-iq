@@ -82,6 +82,20 @@ window.AIQ = window.AIQ || {};
      de los tres. En el perfil: P.daily[tablero] = { v:2, tries:[{ s, r, won, ts, live? }] } (una entrada por dia: los logros cuentan dias). */
   const TRIES = 3, DECK_IDS = ["explorer", "historian", "navigator", "blind"], ASC_BAG = [0, 0, 1, 1, 1, 2, 2, 3];
   const dayNum = (d = new Date()) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  /* ¿sirve el regalo desde la primera ronda? Lo mismo que mira la tienda de la Aventura al empezar (useful en js/adventure.js): las piezas de una
+     herramienta solo si la baraja la trae, y una contra pura solo si alguno de sus retos sale en CADA intento del dia, con y sin runas
+     (en chino, japones y coreano no salen, y el regalo es el mismo para todo el mundo). Lo demas sirve siempre al empezar. */
+  const HANDS = {};
+  const giftOk = (id, board, deck, asc, route) => {
+    const p = (A.RELICS || {})[id], D = A.ADV && A.ADV.DECKS[deck]; if (!p || !D) return true;
+    if ((p.sonarErr && !D.tools.includes("sonar")) || (p.compass16 && !D.tools.includes("compass")) || (p.toolBonus && !D.tools.length)) return false;
+    if (!A.chal || !A.CHAL || !A.ADV.ROUNDS) return true;
+    const cs = Object.keys(A.CHAL).filter(c => (A.CHAL[c].counters || []).includes(id));
+    if (!cs.length || p.open || p.round || p.clear || p.post || p.shop || p.buy || p.actStart) return true;          // no es una contra pura
+    const pl = D.perks.map(x => A.RELICS[x]).filter(Boolean), skip = pl.reduce((n, x) => n + (x.skipFirst || 0), 0);   // como chalFor, con las reliquias de la baraja
+    const hits = (k, cjk) => route.some((ri, r) => A.chal.plan(DY.trySeed(board, k), r, asc, A.ADV.ROUNDS[ri].topic, cjk).list.slice(skip).some(c => cs.includes(c.id) && !pl.some(x => (x.immune || []).includes(c.id))));
+    return [1, 2, 3].every(k => hits(k, false) && hits(k, true));
+  };
   const DY = R.daily = {
     TRIES,
     board: (d = new Date()) => "daily-" + dayNum(d),
@@ -92,11 +106,16 @@ window.AIQ = window.AIQ || {};
     trySeed: (board, k) => board + "#" + k,
     msToNext: () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1) - n; },
     hand(board) {
+      if (HANDS[board]) return HANDS[board];
       const rr = A.rng(board + ":hand"), REL = A.RELICS || {}, deck = rr.pick(DECK_IDS), asc = rr.pick(ASC_BAG);
       const own = ((A.ADV && A.ADV.DECKS[deck]) || { perks: [] }).perks;
-      const gifts = Object.keys(REL).filter(id => REL[id].r <= 1 && !own.includes(id)).sort(), gift = gifts.length ? rr.pick(gifts) : null;
+      const gifts = Object.keys(REL).filter(id => REL[id].r <= 1 && !own.includes(id)).sort(); let gift = gifts.length ? rr.pick(gifts) : null;
       const route = []; [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10]].forEach(act => route.push(...rr.shuffle(act))); route.push(11);   // el Jackpot sigue cerrando la expedicion
-      return { deck, asc, gift, route };
+      /* el regalo nunca es papel mojado: si el de la semilla no sirve con la baraja del dia (o su reto no sale en los 3 intentos), se elige otro
+         con una semilla aparte. Los dias en que si sirve no cambian (ni el regalo ni la ruta) */
+      if (gift && !giftOk(gift, board, deck, asc, route)) { const ok = gifts.filter(id => giftOk(id, board, deck, asc, route)); gift = ok.length ? A.rng(board + ":gift").pick(ok) : null; }
+      const h = { deck, asc, gift, route }; if (A.chal && A.ADV) HANDS[board] = h;
+      return h;
     },
     /* estado del dia en el perfil (sin crear la entrada: solo los dias jugados cuentan para los logros) */
     get(board) {

@@ -75,7 +75,7 @@ window.AIQ = window.AIQ || {};
     /* ---- II. primera sesion (menos de 1 h) ---- */
     ...tier(1, [
       AD("codex_50", "📚", "Rata de biblioteca", "Bookworm", "50 tarjetas.", "50 cards.", "codex", c => c.u >= 50),
-      AD("adv_bribe", "💸", "Bajo la mesa", "Under the table", "Soborna al crupier para quitar un truco.", "Bribe the dealer to remove a trick.", "adv", c => c.kind === "bribe"),
+      AD("adv_bribe", "💸", "Bajo la mesa", "Under the table", "Soborna al crupier para quitar un reto.", "Bribe the dealer to remove a challenge.", "adv", c => c.kind === "bribe"),
       AD("perfect", "💯", "Ronda perfecta", "Perfect round", "Acierta bien todas las preguntas de un nivel del Clásico.", "Nail every question in a Classic level.", "level", c => c.perfect),
       AD("q_100", "🧭", "Aprendiz", "Apprentice", "100 preguntas respondidas.", "100 questions answered.", "q", () => S().questions >= 100),
       AD("km_equator", "📏", "Despiste ecuatorial", "Equatorial blunder", "Acumula 40.075 km de error: una vuelta entera al mundo.", "Rack up 40,075 km of total error: one full lap of the Earth.", "q", () => S().km >= 40075),

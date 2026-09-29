@@ -399,9 +399,6 @@
   "pl": "Katastrofa Titanica",
   "de": "Untergang der Titanic"
  },
- "torres-del-paine": {
-  "ja": "パイネ山群"
- },
  "troms": {
   "pl": "Tromsø"
  },
@@ -421,5 +418,18 @@
  },
  "c:Tonga": {
   "zh": "汤加"
+ },
+ "zanzibar-city": {
+  "es": "Ciudad de Zanzíbar",
+  "fr": "Ville de Zanzibar",
+  "pt": "Cidade de Zanzibar",
+  "de": "Sansibar-Stadt",
+  "it": "Città di Zanzibar",
+  "pl": "Miasto Zanzibar"
+ },
+ "saint-john-s": {
+  "en": "Saint John's",
+  "es": "Saint John's",
+  "pt": "Saint John's"
  }
 }

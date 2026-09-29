@@ -4,6 +4,16 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.8.1** - Las recomendaciones de la revisión: partidas más justas, datos al día y textos coherentes.
+- **Clásico:** reintentar un nivel fallido ya no baja tu IQ ni tu medalla: cuentan los puntos de la pasada buena. La casilla Enciclopedia del ticket usa los umbrales reales de cada lugar (el doble en mares, naturaleza y estrechos) y, como la pista de cada tarjeta, respeta el ajuste de millas.
+- **Aventura:** el jefe del acto II ya no es siempre de banderas: la semilla elige entre los cuatro de banderas y tres del acto, entre ellos "Rompe la cuarta pared", que antes nunca salía fuera del Reto diario. Una expedición guardada antes de ese jefe puede encontrarse otro. `docs/rondas-aventura.md` refleja las rondas actuales.
+- **Reto diario:** el regalo ya nunca es papel mojado: si la reliquia no sirve con la baraja del día (Sonar trucado sin Sonar, Ruleta de 16 rumbos sin Brújula) o frena un reto que no sale en alguno de los 3 intentos, el crupier regala otra. Los días en que ya servía no cambian.
+- **Enciclopedia:** las fotos reales (tarjetas, ficha, visor HD, aviso de tarjeta nueva) y los retratos de Personajes se reducen suavizadas, sin dientes de sierra; las ilustraciones, los iconos y las banderas siguen en pixel nítido.
+- **Capitales al día:** Gitega (Burundi), Ciudad de la Paz (Guinea Ecuatorial) y Saint John's (Antigua y Barbuda) entran con ficha, textos en 12 idiomas y foto; Bujumbura y Malabo pasan a ser ciudades. La Enciclopedia vuelve a 4.966 tarjetas.
+- **Clásico regenerado** con las herramientas corregidas: Banderas llega a los 196 países, Capitales del mundo incluye todas las capitales (ninguna depende ya del modo infinito), 150 pistas en japonés y chino que salían en inglés, el Sepik pasa a Oceanía y el estrecho de Bering a EE. UU. Mark Twain nació en Florida (Misuri), Covadonga fue en 722, el monte Fitz Roy en Argentina, Zanzíbar ciudad distinta de la isla y fuera el duplicado de Torres del Paine.
+- **Textos:** la interfaz habla siempre de "retos" (el "truco" queda para las frases del crupier) y de "sucesos" en español; fuera unas 170 traducciones viejas sin uso, entre ellas todas las que decían qué reliquia frena qué reto o hablaban de multiplicadores.
+- Créditos y licencias y exportación de logros de Steam regenerados.
+
 **v0.7.1** - Preparación para Steam: empaquetado de escritorio (demo y juego completo), auditoría de licencias de las fotos (créditos y licencias en Ajustes → Datos), foto de Lexington sustituida por una de dominio público y créditos completados en 6 fotos y la bandera de Georgia.
 
 **v0.6.1** - Revisión completa del juego: bugs, incoherencias y erratas fuera, en los 12 idiomas.
@@ -327,7 +337,7 @@ Sin build ni dependencias para jugar: abre `index.html` (o `JUGAR.bat`); en la w
 - **Clásico** – 11 campañas (Mundo, Capitales del mundo, EE. UU., Europa, Asia, Latinoamérica, Oceanía, Banderas, Pistas, Eventos históricos y Personajes históricos), 10 niveles cada una, con la puntuación del juego original. Datos en `data/classic.js` (uso interno).
 - **Aventura** – el modo principal: roguelike de 12 rondas en 3 actos con jefe, trucos del crupier, reliquias, herramientas y Campamento con doblones; ascensiones 0-5 y modo infinito al ganar.
 - **Reto diario** – una mano al azar por día (misma semilla para todos), 3 intentos y puntuación global = suma; clasificación Hoy / Ayer / Aventura.
-- **Enciclopedia** – 4.960 tarjetas que se desbloquean acertando cerca (300 / 150 / 75 km), con textos, fotos y banderas empaquetados (nunca Wikipedia en vivo).
+- **Enciclopedia** – 4.966 tarjetas que se desbloquean acertando cerca (300 / 150 / 75 km), con textos, fotos y banderas empaquetados (nunca Wikipedia en vivo).
 
 ## Puntuación
 - Solo precisión y rapidez: las reliquias no multiplican los puntos.

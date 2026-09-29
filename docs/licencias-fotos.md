@@ -1,23 +1,23 @@
 # Licencias de fotos y banderas (Geolite)
 
-Generado por `node tools/audit-licenses.mjs`. 2702 imagenes (2506 fotos, 196 banderas).
+Generado por `node tools/audit-licenses.mjs`. 2705 imagenes (2509 fotos, 196 banderas).
 
 | Clase | Que exige | Imagenes |
 |---|---|---|
-| libre | nada (dominio publico, CC0, FAL...) | 1211 |
+| libre | nada (dominio publico, CC0, FAL...) | 1212 |
 | atribucion | citar autor, licencia y enlace (CC BY, OGL, KOGL) | 363 |
-| compartir | lo anterior + la foto modificada se comparte con la misma licencia (CC BY-SA, GFDL) | 1128 |
+| compartir | lo anterior + la foto modificada se comparte con la misma licencia (CC BY-SA, GFDL) | 1130 |
 | **revisar** | sin licencia, NC/ND o desconocida: sustituir o comprobar a mano | **0** |
 
 ## Licencias encontradas
 
 - Public domain: 1119
-- CC BY-SA 4.0: 566
-- CC BY-SA 3.0: 362
+- CC BY-SA 4.0: 567
+- CC BY-SA 3.0: 363
 - CC BY 2.0: 175
 - CC BY-SA 2.0: 139
 - CC BY 4.0: 85
-- CC0: 76
+- CC0: 77
 - CC BY 3.0: 54
 - CC BY-SA 3.0 de: 19
 - CC BY 2.5: 19

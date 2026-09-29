@@ -76,7 +76,7 @@ kbd { font-family: var(--mono); font-size: .85em; }
 #askName.ask-flag-wrap { margin-top: 8px; display: flex; justify-content: center; }
 .ask-flag { max-width: min(220px, 60vw); max-height: 140px; width: auto; height: auto; border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); background: #fff; object-fit: contain; transition: filter .3s; }
 #askName.ask-person-wrap { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
-.ask-portrait { flex: none; width: 76px; height: 96px; object-fit: cover; object-position: 50% 20%; border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); background: var(--paper, #f3ead3); }
+.ask-portrait { flex: none; width: 76px; height: 96px; object-fit: cover; object-position: 50% 20%; border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); background: var(--paper, #f3ead3); image-rendering: auto; }   /* foto real: se reduce suavizada */
 .clock { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
 .ruler { flex: 1; height: 12px; position: relative; border-bottom: 2px solid var(--ink);
   background: repeating-linear-gradient(90deg, rgba(20,35,43,.55) 0 1px, transparent 1px 10%), repeating-linear-gradient(90deg, rgba(20,35,43,.3) 0 1px, transparent 1px 2%) bottom / 100% 5px no-repeat; }

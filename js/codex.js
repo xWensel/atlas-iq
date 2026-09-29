@@ -260,6 +260,7 @@ window.AIQ = window.AIQ || {};
   const ui = { built: false, filter: "all", sort: "recent", only: false, q: "", shown: 0, list: [], cur: null, tilt: null };
   const nameOf = (e, rec) => e.parent ? nameOf(E[e.parent], rec) + " · " + A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : e.name[A.lang] || e.name[A.wlang()] || (rec && rec.title && rec.lang === A.wlang() ? rec.title : "") || e.name.en || e.name.es;
   const esc = s => A.esc(s);                                           // textos de Wikipedia/Commons dentro de innerHTML
+  const photo = u => (/\.svg$/i.test(u) ? "" : "cx-photo");           // fotos de Wikipedia/Commons: se reducen suavizadas (css/codex.css); el arte pixel y las banderas SVG siguen nitidos
   const fold = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();   // busqueda sin tildes ni mayusculas
   const rarDots = r => A.icon("g_" + r, "gem").repeat(r + 1);
   const contOf = e => A.t(CONT[continent(e.lat, e.lon)]);
@@ -359,7 +360,7 @@ window.AIQ = window.AIQ || {};
     try {
       const rec = await loadContent(E[id], A.wlang()); if (rec.none) return;
       b.querySelector(".cx-nm").textContent = nameOf(E[id], rec);
-      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const art = b.querySelector(".cx-art"); art.classList.toggle("flag", !!rec.img.flag); art.prepend(im); b.classList.add("has-img"); }); }
+      if (rec.img && !b.querySelector(".cx-art img:not(.cx-ph):not(.cx-ic)")) { const im = new Image(); im.decoding = "async"; im.alt = ""; im.className = photo(rec.img.thumb); im.src = rec.img.thumb; A.revealImg(im, () => { const art = b.querySelector(".cx-art"); art.classList.toggle("flag", !!rec.img.flag); art.prepend(im); b.classList.add("has-img"); }); }
     } catch (x) { /* sin conexion: se queda el icono */ }
   }
   function tiltMove(el, ev, deg) {
@@ -395,7 +396,7 @@ window.AIQ = window.AIQ || {};
     d.innerHTML = `
       <div class="cx-d-wrap">
         <div class="cx-d-card"><div class="cx-bigcard r${e.rarity} ${un ? "open" : "locked"}" id="cxBig">
-          <div class="cx-art${rec && rec.img && rec.img.flag ? " flag" : ""}">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" alt="" src="${esc(rec.img.card)}" decoding="async">` : ""}</div>
+          <div class="cx-art${rec && rec.img && rec.img.flag ? " flag" : ""}">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">` : `${A.icon("lock", "q")}`}${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" class="${photo(rec.img.card)}" alt="" src="${esc(rec.img.card)}" decoding="async">` : ""}</div>
           ${ixs(e)}<div class="cx-cap"><span class="cx-nm">${un ? esc(nameOf(e, rec)) : A.t("codex.locked")}</span><span class="cx-mt"><em>${typeLabel(e.type)}</em><i>${rarDots(e.rarity)}</i></span></div><span class="cx-no">${fmtNo(e.no)}</span><span class="cx-foil"></span>
         </div>
         ${rec && rec.img && rec.credit ? `<p class="cx-credit">${A.t("codex.photo")}: ${rec.credit.artist ? esc(rec.credit.artist) + " · " : ""}<a href="${esc(rec.credit.page)}" target="_blank" rel="noopener">${esc(rec.credit.license || "Wikimedia Commons")}</a></p>` : ""}
@@ -404,7 +405,7 @@ window.AIQ = window.AIQ || {};
           <div class="cx-d-tags"><span class="tag">${typeLabel(e.type)}</span><span class="tag r">${A.t("rar." + RARITY[e.rarity])} ${rarDots(e.rarity)}</span>${e.lat != null ? `<span class="tag c">${A.icon("k_" + continent(e.lat, e.lon), "sm")}${contOf(e)}</span>` : ""}</div>
           <h2>${un ? esc(nameOf(e, rec)) : "???"}</h2>
           ${un && rec && rec.desc ? `<p class="cx-desc">${esc(rec.desc)}</p>` : ""}
-          ${un ? "" : `<p class="cx-hint">${e.parent ? A.t("codex.hint.tier", { km: A.codexLimits(e)[e.tier - 1] }) : e.src === "curated" ? A.t("codex.hint.chain") : A.t("codex.hint.place")}</p>`}
+          ${un ? "" : `<p class="cx-hint">${e.parent ? (A.core && A.core.S.units === "mi" ? A.t("codex.hint.tier").replace(/\{km\}\s*(?:km|公里|км)/, A.fmtDist(A.codexLimits(e)[e.tier - 1])) : A.t("codex.hint.tier", { km: A.codexLimits(e)[e.tier - 1] })) : e.src === "curated" ? A.t("codex.hint.chain") : A.t("codex.hint.place")}</p>`}
           ${un && factLine ? `<blockquote class="cx-fact">${esc(factLine)}</blockquote>` : ""}
           ${un ? `<div class="cx-sec" id="cxText"><p class="cx-load">${A.T("Cargando…", "Loading…")}</p></div>` : ""}
           ${rel ? `<div class="cx-sec"><h3>${A.t("codex.related")}</h3><div class="cx-rels">${rel}</div></div>` : ""}
@@ -452,7 +453,7 @@ window.AIQ = window.AIQ || {};
   }
   function lightbox(id) {
     const rec = memOf(id), L = $("cxLight"); if (!rec || !rec.img) return;
-    L.innerHTML = `<img alt="" src="${esc(rec.img.hd)}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">${A.icon("u_close")}</button><p>${rec.credit ? esc((rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "")) : ""}</p>`;
+    L.innerHTML = `<img class="${photo(rec.img.hd)}" alt="" src="${esc(rec.img.hd)}"><button type="button" class="cx-lx" aria-label="${A.t("codex.close")}">${A.icon("u_close")}</button><p>${rec.credit ? esc((rec.credit.artist ? rec.credit.artist + " · " : "") + (rec.credit.license || "")) : ""}</p>`;
     const im = L.querySelector("img"); im.onerror = () => { im.onerror = null; im.src = rec.img.card; };   // build de Steam "ligero"/demo sin fotos HD: se ve la tarjeta
     L.classList.remove("hidden"); L.onclick = () => L.classList.add("hidden"); A.sfx.card();
   }
@@ -477,7 +478,7 @@ window.AIQ = window.AIQ || {};
     loadContent(e, A.wlang()).then(rec => {
       if (rec.none) return;
       it.querySelector("b").textContent = nameOf(e, rec);
-      if (rec.img) { const im = new Image(); im.alt = ""; im.src = rec.img.thumb; A.revealImg(im, () => { const art = it.querySelector(".cx-art"); art.classList.toggle("flag", !!rec.img.flag); art.prepend(im); }); }
+      if (rec.img) { const im = new Image(); im.alt = ""; im.className = photo(rec.img.thumb); im.src = rec.img.thumb; A.revealImg(im, () => { const art = it.querySelector(".cx-art"); art.classList.toggle("flag", !!rec.img.flag); art.prepend(im); }); }
     }).catch(() => {});
     return it;
   }

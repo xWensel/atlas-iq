@@ -69,7 +69,17 @@
  },
  "Q7245": {
   "place": {
-   "ko": "플로리다"
+   "ko": "플로리다 (미주리주)",
+   "en": "Florida, Missouri",
+   "es": "Florida (Misuri)",
+   "fr": "Florida (Missouri)",
+   "pt": "Florida (Missouri)",
+   "de": "Florida (Missouri)",
+   "it": "Florida (Missouri)",
+   "zh": "佛罗里达（密苏里州）",
+   "ja": "フロリダ (ミズーリ州)",
+   "ru": "Флорида (Миссури)",
+   "pl": "Florida (Missouri)"
   }
  },
  "Q36014": {
@@ -737,7 +747,8 @@
  "Q957186": {
   "place": {
    "ko": "코바동가"
-  }
+  },
+  "year": 722
  },
  "Q219697": {
   "place": {
@@ -982,6 +993,9 @@
  "Q3044": {
   "place": {
    "en": "Francia"
+  },
+  "desc": {
+   "en": "king of the Franks, regarded as the first Holy Roman Emperor (748–814)"
   }
  },
  "Q8429": {

@@ -313,7 +313,7 @@ claim(countries);
 
 /* 2. Capitales del mundo: todas las capitales (unico sitio donde salen) */
 const capitals = PLACES.filter(p => p[1] === "capital" && free(p)).sort((a, b) => diffOf(a) - diffOf(b));
-const capRes = tenLevels(capitals, { kind: "capital", region: "world", mk: mkDest, tpq: 10, label: "World Capital Cities", cap: 20 });
+const capRes = tenLevels(capitals, { kind: "capital", region: "world", mk: mkDest, tpq: 10, label: "World Capital Cities", cap: 20, all: true });   // todas: con el tope de 20 por floor() se quedaban fuera las 12 menos conocidas (y con ellas el logro Embajador dependia del modo infinito)
 claim(capRes.used); claim(capitals);                                      // las que no caben tampoco van a otras campanas
 
 /* 3. Mundo: lo mas conocido de cada tipo */

@@ -345,18 +345,18 @@
    "polish": "Pod stołem"
   },
   "desc": {
-   "english": "Bribe the dealer to remove a trick.",
-   "spanish": "Soborna al crupier para quitar un truco.",
-   "french": "Soudoie le croupier pour retirer un tour.",
-   "brazilian": "Suborne o crupiê para tirar um truque.",
-   "german": "Besteche den Croupier, damit er einen Trick streicht.",
-   "italian": "Corrompi il croupier per togliere un trucco.",
-   "latam": "Soborna al crupier para quitar un truco.",
-   "schinese": "贿赂荷官，撤掉一个花招。",
-   "koreana": "딜러를 매수해 속임수 하나를 없애세요.",
-   "japanese": "ディーラーを買収してトリックを1つ消そう。",
-   "russian": "Подкупи крупье, чтобы убрать трюк.",
-   "polish": "Przekup krupiera, żeby usunąć sztuczkę."
+   "english": "Bribe the dealer to remove a challenge.",
+   "spanish": "Soborna al crupier para quitar un reto.",
+   "french": "Soudoie le croupier pour retirer un défi.",
+   "brazilian": "Suborne o crupiê para tirar um desafio.",
+   "german": "Besteche den Croupier, damit er eine Herausforderung streicht.",
+   "italian": "Corrompi il croupier per togliere una sfida.",
+   "latam": "Soborna al crupier para quitar un reto.",
+   "schinese": "贿赂荷官，撤掉一个挑战。",
+   "koreana": "딜러를 매수해 도전 하나를 없애세요.",
+   "japanese": "ディーラーを買収してチャレンジを1つ消そう。",
+   "russian": "Подкупи крупье, чтобы убрать испытание.",
+   "polish": "Przekup krupiera, żeby usunąć wyzwanie."
   }
  },
  {
@@ -924,7 +924,7 @@
    "english": "20 battles and events.",
    "spanish": "20 batallas y sucesos.",
    "french": "20 batailles et événements.",
-   "brazilian": "20 batalhas e acontecimentos.",
+   "brazilian": "20 batalhas e eventos.",
    "german": "20 Schlachten und Ereignisse.",
    "italian": "20 battaglie ed eventi.",
    "latam": "20 batallas y sucesos.",

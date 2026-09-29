@@ -114,9 +114,15 @@ window.AIQ = window.AIQ || {};
       let list = [], combo = null;
       /* trucos que en esta ronda no harian nada (texto en la de banderas, Sin pais o Adivinanza sin pais ni nota debajo, runas y sin vocales en zh/ja/ko):
          si el sorteo cae en uno, se sortea otro. Lo que ya salia bien no cambia (partidas guardadas y sobornos intactos) */
-      const noop = id => (flagRound && D[id].kind === "text") || (cjk && (id === "runes" || id === "novowels")) || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
+      const useless = id => (flagRound && D[id].kind === "text") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
+      const noop = id => useless(id) || (cjk && (id === "runes" || id === "novowels"));
       if (boss) {
-        combo = A.rng(`${seed}:boss:${act}`).pick(flagRound ? FLAG_BOSS : BOSS[a]);
+        /* v0.7.1: el jefe de una ronda de banderas (la 8 de la Aventura) ya no es siempre de banderas: la semilla sortea entre los de banderas y los
+           del acto que sirven en esa ronda (sin trucos de texto: la bandera manda), cada combinacion con la misma probabilidad. Los jefes que no
+           cambian de ronda salen igual que antes (misma semilla y misma lista), y si sale uno de banderas es el mismo de siempre */
+        const normal = BOSS[a].filter(c => !c.ids.some(useless)), rb = A.rng(`${seed}:boss:${act}`);
+        if (flagRound) combo = normal.length && A.rng(`${seed}:bossmix:${act}`)() < normal.length / (FLAG_BOSS.length + normal.length) ? rb.pick(normal) : rb.pick(FLAG_BOSS);
+        else combo = rb.pick(normal.length ? normal : BOSS[a]);
         list = combo.ids.map((id, i) => ({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) }));
         if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPW, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
         if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia
