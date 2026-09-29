@@ -16,4 +16,6 @@ contextBridge.exposeInMainWorld("geoliteHost", {
   windowMode: () => ipcRenderer.sendSync("win:getMode"),
   setWindowMode: (mode) => ipcRenderer.send("win:setMode", mode),
   onWindowModeChange: (cb) => ipcRenderer.on("win:mode-changed", (e, mode) => cb(mode)),
+  /* boton de encendido de la portada (js/salir.js): cierra el juego */
+  quit: () => ipcRenderer.send("app:quit"),
 });

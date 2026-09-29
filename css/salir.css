@@ -1,0 +1,191 @@
+/* Geolite - salir del juego (js/salir.js): el boton de encendido de la portada y la escena del crupier. El mismo arte que "tu nombre" (nombre.css):
+   la sala se apaga, un foco, el crupier asomando y su tarjeta de fieltro con marco dorado y bombillas; encima, sus trastadas y el apagado de tele */
+
+/* ------------------------------------------------ el boton: arriba a la izquierda, espejo exacto del engranaje (mismo tamano, borde y distancia) */
+.hh-top .menu-quit { position: absolute; left: 0; top: 0; z-index: 2; }
+.menu-gear.menu-quit:hover, .menu-gear.menu-quit:focus-visible { transform: none; border-color: var(--red); color: var(--red); box-shadow: 0 0 14px rgba(254, 95, 85, .45); }
+.menu-gear.menu-quit:hover .ic { animation: qx-led .36s steps(2) 2; }                        /* el piloto parpadea, como una tele que se va a apagar */
+.menu-gear.menu-quit:active { transform: translateY(2px); }
+@keyframes qx-led { 50% { filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .5)) brightness(1.6) sepia(1) hue-rotate(-50deg) saturate(4); } }
+
+/* ------------------------------------------------ la escena */
+.qx { position: absolute; inset: 0; z-index: 100030; display: grid; place-items: center; overflow: hidden; color: var(--paper); }
+.qx.hidden { display: none; }
+.qx-dim { position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse 58% 66% at 50% 42%, rgba(14, 26, 19, .8), rgba(3, 7, 5, .95) 72%, rgba(1, 3, 2, .98));
+  -webkit-backdrop-filter: blur(3px) saturate(.45); backdrop-filter: blur(3px) saturate(.45); transition: background .25s; }
+.qx.on .qx-dim { animation: qx-lights .8s ease-out forwards; }
+.qx.out .qx-dim { animation: qx-lights-up .5s ease forwards; }
+@keyframes qx-lights { 0% { opacity: 0; } 10% { opacity: .72; } 16% { opacity: .22; } 28% { opacity: .86; } 36% { opacity: .55; } 100% { opacity: 1; } }
+@keyframes qx-lights-up { from { opacity: 1; } to { opacity: 0; } }
+
+.qx-in { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; width: min(720px, calc(100 * var(--vw) - 32px)); padding-top: 64px;
+  zoom: var(--k); --vh: calc(1vh / var(--k)); --vw: calc(1vw / var(--k)); --face: clamp(160px, calc(30 * var(--vh)), 256px); }
+.qx.out .qx-in { animation: qx-fade .45s ease forwards; } @keyframes qx-fade { to { opacity: 0; transform: translateY(14px) scale(.98); } }
+.qx-stage { position: relative; z-index: 1; width: var(--face); height: var(--face); margin-bottom: -34px; }
+
+/* el foco, su charco en el suelo y el polvo en el haz */
+.qx-beam { position: absolute; left: 50%; bottom: -26px; width: calc(var(--face) * 2.3); height: calc(160 * var(--vh)); transform: translateX(-50%); pointer-events: none; opacity: 0;
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); mix-blend-mode: screen; transition: filter .6s;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 84%, transparent 100%); mask-image: linear-gradient(180deg, #000 0, #000 84%, transparent 100%);
+  background: linear-gradient(180deg, rgba(255, 238, 196, 0) 0%, rgba(255, 232, 172, .07) 55%, rgba(255, 224, 150, .2) 88%, rgba(255, 218, 140, .28) 100%); }
+.qx-beam u { position: absolute; left: var(--x); top: var(--y); width: 3px; height: 3px; border-radius: 1px; background: #fff3cf; opacity: 0; animation: qx-mote var(--d) linear var(--w) infinite; }
+@keyframes qx-mote { 0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: .75; } 80% { opacity: .5; } 100% { opacity: 0; transform: translate(14px, -150px); } }
+.qx-pool { position: absolute; left: 50%; bottom: -44px; width: calc(var(--face) * 2.5); height: 70px; transform: translateX(-50%); pointer-events: none; opacity: 0; transition: filter .6s;
+  background: radial-gradient(ellipse at center, rgba(255, 222, 150, .34), rgba(255, 210, 120, .1) 45%, transparent 70%); }
+.qx.spot .qx-beam { animation: qx-ignite .7s linear forwards, qx-breathe 4.2s ease-in-out .7s infinite; }
+.qx.spot .qx-pool { animation: qx-ignite .7s linear forwards; }
+@keyframes qx-ignite { 0% { opacity: 0; } 18% { opacity: .95; } 26% { opacity: .15; } 40% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes qx-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .82; } }
+
+/* el crupier asoma de un salto con el globo a su derecha */
+.qx-stage .dealer.big { position: relative; left: 0; bottom: 0; z-index: 1; display: block; width: var(--face); height: var(--face); transform: none; opacity: 1; }
+.qx.spot .qx-stage .dealer { animation: qx-pop .6s cubic-bezier(.3, 1.6, .4, 1) both; }
+@keyframes qx-pop { from { opacity: 0; transform: translateY(46px) scale(.7); } }
+.qx-stage .dealer.big .dl-face { width: var(--face); height: var(--face); transition: filter .25s, transform .2s; filter: drop-shadow(0 8px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 22px rgba(255, 214, 140, .25)); }
+.qx-stage .dealer.big .dl-bubble, .qxc-stage .dealer.big .dl-bubble { position: absolute; left: calc(100% - 8px); bottom: 56%; width: max-content; max-width: min(420px, calc(50 * var(--vw) - var(--face) / 2 - 12px)); margin: 0;
+  padding: 11px 18px 13px 16px; font-family: var(--sans); font-weight: 400; font-size: calc(27px * var(--dll, 1)); line-height: 1.12; transform-origin: 0 100%; clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% + 12px)); }
+
+/* textos de la tarjeta en Jersey a 54 / 27 px: la rejilla de la fuente es de 27 px (como el globo del crupier), asi cada pixel cae en su sitio y se ve nitida */
+/* la tarjeta: fieltro, marco dorado y bombillas de marquesina que corren */
+.qx-card { position: relative; z-index: 2; width: 100%; box-sizing: border-box; padding: 22px 28px 24px; border-radius: 18px; opacity: 0; transform: translateY(46px) scale(.94);
+  background: radial-gradient(130% 100% at 50% 0%, #245a41 0%, #173d2c 52%, #0e271c 100%); transition: background .25s, filter .5s;
+  box-shadow: 0 0 0 3px #0a140f, inset 0 0 0 3px #f8b449, inset 0 0 0 5px #7a4e17, inset 0 0 0 7px #0a140f, 0 12px 0 rgba(0, 0, 0, .5), 0 34px 70px rgba(0, 0, 0, .65), 0 0 70px rgba(255, 200, 110, .12); }
+.qx.card-in .qx-card { animation: qx-card-in .6s cubic-bezier(.25, 1.45, .45, 1) forwards; }
+@keyframes qx-card-in { to { opacity: 1; transform: none; } }
+.qx-bulbs { position: absolute; inset: 10px; border-radius: 11px; pointer-events: none; filter: drop-shadow(0 0 2px rgba(255, 200, 90, .75)); transition: opacity .2s;
+  --bulb: radial-gradient(circle, #fff7dc 0 1.5px, #ffcf66 2px 2.6px, rgba(255, 190, 80, .3) 3.2px, transparent 4px);
+  background: var(--bulb) 0 0 / 18px 8px repeat-x, var(--bulb) 0 100% / 18px 8px repeat-x, var(--bulb) 0 0 / 8px 18px repeat-y, var(--bulb) 100% 0 / 8px 18px repeat-y; }
+.qx-bulbs.b { background-position: 9px 0, 9px 100%, 0 9px, 100% 9px; }
+.qx.card-in .qx-bulbs { animation: qx-chase .9s steps(1) infinite; } .qx.card-in .qx-bulbs.b { animation-delay: -.45s; }
+@keyframes qx-chase { 0% { opacity: 1; } 50% { opacity: .16; } }
+
+.qx-top { display: flex; align-items: center; gap: 10px; margin: 2px 2px 0; font-family: var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.qx-ic .ic { display: block; width: 28px; height: 28px; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .5)); }
+.qx-top b { font-weight: 700; font-size: 15px; color: var(--brass-lt); text-shadow: 0 2px 0 rgba(0, 0, 0, .5); white-space: nowrap; }
+.qx-top em { margin-left: auto; font-style: normal; font-size: 13px; color: rgba(255, 217, 138, .62); white-space: nowrap; }
+.qx-q { margin: 16px 2px 8px; font-family: var(--serif); font-weight: 400; font-size: calc(54px * var(--dll, 1)); line-height: 1; letter-spacing: .01em; color: #fff6dc; text-shadow: 0 4px 0 rgba(0, 0, 0, .45); text-wrap: balance; }
+.qx-sub { margin: 0 2px 20px; font-size: calc(27px * var(--dll, 1)); line-height: 1.12; color: rgba(242, 233, 214, .66); text-wrap: pretty; }
+.qx-acts { display: flex; align-items: stretch; gap: 14px; }
+.qx-acts .qx-stay { order: 1; flex: 1 0 auto; width: auto; padding: 15px 20px; font-size: 19px; white-space: nowrap; }   /* "Me quedo" nunca se parte: si falta sitio, se estrecha Salir */
+.qx-acts .qx-go { order: 2; flex: 0 1 auto; min-width: min(150px, 40%); padding: 12px 22px; border: 0; border-radius: 10px; cursor: pointer; background: rgba(0, 0, 0, .22); color: rgba(242, 233, 214, .78);
+  font-family: var(--mono); font-size: 15px; letter-spacing: .07em; text-transform: uppercase; box-shadow: inset 0 0 0 2px rgba(242, 233, 214, .32); transition: color .15s, box-shadow .15s, background .15s, opacity .2s; }
+.qx-acts .qx-go:hover, .qx-acts .qx-go:focus-visible { color: #ffc3ba; background: rgba(254, 95, 85, .14); box-shadow: inset 0 0 0 2px rgba(254, 95, 85, .8); outline: none; }
+.qx-acts.swap .qx-stay { order: 2; } .qx-acts.swap .qx-go { order: 1; }
+.qx.busy .qx-go { opacity: .42; cursor: not-allowed; }
+.qx-go.nope { animation: qx-nope .32s ease; } @keyframes qx-nope { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.qx.shuffling .qx-acts button { pointer-events: none; }
+.qx.shuffling .qx-acts button { z-index: 1; position: relative; }
+
+/* ya contestado: la tarjeta cae (te vas) o sale volando hacia arriba (te quedas) y la sala vuelve a encenderse */
+.qx.leaving .qx-card { animation: qx-card-drop .5s ease-in forwards; }
+@keyframes qx-card-drop { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(80px) rotate(4deg); } }
+/* te quedas: "Salir" se apaga, "Me quedo" se enciende en oro y la marquesina corre de celebracion mientras el crupier presume */
+.qx.stayed .qx-go { display: none; }                                               /* "Me quedo" ocupa toda la fila (con su salto de alegria) */
+.qx.stayed .qx-stay { pointer-events: none; background: var(--brass); color: #16241c; box-shadow: 0 5px 0 #b3741c, 0 0 0 3px #fff3c8, 0 0 34px 8px rgba(248, 180, 73, .6); animation: qx-yes .5s cubic-bezier(.3, 1.6, .4, 1); }
+@keyframes qx-yes { 0% { transform: scale(.94); } 60% { transform: scale(1.04); } 100% { transform: none; } }
+.qx.stayed .qx-bulbs { animation-duration: .22s !important; } .qx.stayed .qx-bulbs.b { animation-delay: -.11s !important; }
+
+/* ------------------------------------------------ trastadas */
+/* apagon: negro total; el crupier es una silueta que habla, y solo brilla "Me quedo" */
+.qx.dark .qx-dim { opacity: 1; animation: none; background: #000; }
+.qx.dark .qx-beam, .qx.dark .qx-pool { animation: none; opacity: 0; }
+.qx.dark .qx-stage .dealer.big .dl-face { filter: brightness(.07) drop-shadow(0 0 1px rgba(255, 255, 255, .2)); }
+.qx.dark .qx-card { background: #030605; box-shadow: 0 0 0 3px #000, 0 12px 0 rgba(0, 0, 0, .5); }
+.qx.dark .qx-top, .qx.dark .qx-q, .qx.dark .qx-sub { opacity: .04; }
+.qx.dark .qx-bulbs { animation: none !important; opacity: 0; }                   /* sin luz, tampoco la marquesina */
+.qx.dark .qx-go { opacity: .05; pointer-events: none; }
+.qx.dark .qx-stay { box-shadow: 0 5px 0 var(--red-deep), 0 0 0 3px #ffd0c9, 0 0 26px 6px rgba(254, 95, 85, .75), 0 0 80px 20px rgba(254, 95, 85, .35); animation: qx-glow 1s ease-in-out infinite; }
+@keyframes qx-glow { 50% { box-shadow: 0 5px 0 var(--red-deep), 0 0 0 3px #ffd0c9, 0 0 36px 10px rgba(254, 95, 85, .9), 0 0 110px 30px rgba(254, 95, 85, .45); } }
+.qx.flick .qx-card, .qx.flick .qx-dim { animation: qx-flick .45s steps(1) forwards; }
+@keyframes qx-flick { 0% { filter: brightness(3); } 20% { filter: brightness(.2); } 45% { filter: brightness(2.2); } 60% { filter: brightness(.4); } 100% { filter: none; } }
+
+/* rabieta: marquesina roja a toda velocidad, la tarjeta arde por dentro, el foco se tine de rojo y el globo GRITA */
+.qx.rage .qx-bulbs { --bulb: radial-gradient(circle, #ffe6df 0 1.5px, #ff5a55 2px 2.6px, rgba(255, 60, 60, .35) 3.2px, transparent 4px); filter: drop-shadow(0 0 3px rgba(255, 60, 60, .9)); animation-duration: .16s !important; }
+.qx.rage .qx-bulbs.b { animation-delay: -.08s !important; }
+.qx.rage .qx-card { box-shadow: 0 0 0 3px #0a140f, inset 0 0 0 3px #fe5f55, inset 0 0 0 5px #7a1f17, inset 0 0 0 7px #0a140f, inset 0 0 70px rgba(254, 70, 60, .35), 0 12px 0 rgba(0, 0, 0, .5), 0 0 90px rgba(254, 60, 50, .35); }
+.qx.rage .qx-beam, .qx.rage .qx-pool { filter: hue-rotate(-38deg) saturate(3.2) brightness(1.15); }
+.qx.rage .qx-dim { background: radial-gradient(ellipse 58% 66% at 50% 42%, rgba(60, 10, 10, .82), rgba(12, 2, 2, .95) 72%, rgba(3, 0, 0, .98)); }
+.qx.rage .qx-stage .dealer.big .dl-face { transform: scale(1.06); }
+.qx.shout .dealer .dl-bubble { background: #fff1ee; color: #b3122a; box-shadow: inset 0 0 0 3px #b3122a, 0 6px 0 rgba(0, 0, 0, .4), 0 0 30px rgba(254, 60, 50, .5); font-size: calc(30px * var(--dll, 1)); animation: qx-yell .1s steps(2) infinite; }
+@keyframes qx-yell { 0% { translate: -1px 1px; } 50% { translate: 2px -1px; } }
+
+/* sello: DENEGADO cae de golpe en el centro de la tarjeta */
+.qx-stamp { --st: translate(-50%, -50%) rotate(-11deg); position: absolute; z-index: 4; left: 50%; top: 42%; padding: 8px 20px 4px; border: 5px solid #e2483d; border-radius: 12px; pointer-events: none; opacity: 0;
+  transform: var(--st) scale(2.6); background: rgba(246, 239, 220, .9); color: #e2483d; font-family: var(--serif); font-weight: 400; font-size: calc(54px * var(--dll, 1)); line-height: 1; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, .35), inset 0 0 0 2px rgba(226, 72, 61, .35); }
+.qx.stamped .qx-stamp { animation: qx-stamp .3s cubic-bezier(.3, 1.5, .5, 1) forwards; }
+.qx.unstamp .qx-stamp { animation: qx-unstamp .35s ease forwards; }
+@keyframes qx-stamp { to { opacity: 1; transform: var(--st) scale(1); } }
+@keyframes qx-unstamp { from { opacity: 1; transform: var(--st) scale(1); } to { opacity: 0; transform: var(--st) scale(.9) translateY(10px); } }
+
+/* suplica: el foco se vuelve azul y frio, la marquesina casi se apaga y el fieltro pierde el color: solo "Me quedo" lo conserva */
+.qx.sad .qx-beam { filter: none; background: linear-gradient(180deg, rgba(150, 190, 255, 0) 0%, rgba(140, 180, 255, .07) 55%, rgba(130, 170, 255, .2) 88%, rgba(130, 170, 255, .3) 100%); }
+.qx.sad .qx-pool { filter: none; background: radial-gradient(ellipse at center, rgba(140, 180, 255, .3), rgba(120, 160, 255, .08) 45%, transparent 70%); }
+.qx.sad .qx-beam u { animation-duration: 14s; background: #d8e6ff; }
+.qx.sad .qx-dim { background: radial-gradient(ellipse 58% 66% at 50% 42%, rgba(12, 18, 30, .84), rgba(3, 5, 10, .96) 72%, rgba(1, 2, 4, .98)); }
+.qx.sad .qx-bulbs { opacity: .1; animation: none !important; }
+.qx.sad .qx-card { background: radial-gradient(130% 100% at 50% 0%, #3a4541 0%, #2a322e 52%, #1b211e 100%);
+  box-shadow: 0 0 0 3px #0a140f, inset 0 0 0 3px #a99c80, inset 0 0 0 5px #4f4636, inset 0 0 0 7px #0a140f, 0 12px 0 rgba(0, 0, 0, .5), 0 34px 70px rgba(0, 0, 0, .65); }
+.qx.sad .qx-top, .qx.sad .qx-q, .qx.sad .qx-sub, .qx.sad .qx-go { filter: saturate(.25); opacity: .82; }
+.qx.sad .qx-stage .dealer.big .dl-face { filter: saturate(.6) drop-shadow(0 8px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 22px rgba(140, 180, 255, .3)); }
+
+/* soborno: fichas que caen por toda la sala */
+.qx-rain { position: absolute; inset: 0; z-index: 5; overflow: hidden; pointer-events: none; }
+.qx-rain i { position: absolute; left: var(--x); top: -70px; width: var(--s); height: var(--s); opacity: 0; }
+.qx-rain .ic { display: block; width: 100%; height: 100%; image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .5)); }
+.qx.rain .qx-rain i { animation: qx-fall var(--t) cubic-bezier(.4, 0, .85, .55) var(--w) both; }
+@keyframes qx-fall { 0% { opacity: 1; transform: translateY(0) rotate(0); } 92% { opacity: 1; } 100% { opacity: 0; transform: translateY(calc(100vh + 140px)) rotate(var(--r)); } }
+
+/* ------------------------------------------------ apagado de tele: fondo negro detras de la imagen que se aplasta y el punto que queda brillando */
+html.qx-crt, html.qx-crt body { background: #000 !important; }
+#qxDot { position: fixed; left: 50%; top: 50%; z-index: 100050; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; opacity: 0; transform: translate(-50%, -50%);
+  background: #fff; box-shadow: 0 0 10px 3px rgba(210, 235, 255, .95), 0 0 36px 10px rgba(150, 200, 255, .55); }
+
+/* ------------------------------------------------ navegador: el casino queda CERRADO (la pestana no la puede cerrar el juego) */
+.qxc { position: fixed; inset: 0; z-index: 100040; display: grid; place-items: center; overflow: hidden; color: var(--paper); opacity: 0; transition: opacity .6s;
+  background: radial-gradient(ellipse 70% 60% at 50% 38%, #120a10 0%, #050305 60%, #000 100%); }
+.qxc.on { opacity: 1; } .qxc.out { opacity: 0; transition-duration: .4s; }
+.qxc-in { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 24px; zoom: var(--k); --vh: calc(1vh / var(--k)); --vw: calc(1vw / var(--k)); --face: clamp(140px, calc(24 * var(--vh)), 200px); }
+.qxc-sign { position: relative; padding: 16px 34px 10px; border-radius: 18px; box-shadow: inset 0 0 0 4px #3a1822, 0 0 0 3px #0c0508; }
+.qxc-neon { display: block; font-family: var(--serif); font-weight: 400; font-size: clamp(64px, calc(13 * var(--vh)), 120px); line-height: 1; letter-spacing: .06em; text-transform: uppercase; color: #3a1822; }
+.qxc.lit .qxc-sign { animation: qxc-tube 4.8s linear .6s infinite; box-shadow: inset 0 0 0 4px #ff6b8a, 0 0 0 3px #0c0508, 0 0 22px rgba(255, 90, 130, .7), inset 0 0 22px rgba(255, 90, 130, .45); }
+.qxc.lit .qxc-neon { color: #ffd6e0; text-shadow: 0 0 4px #fff, 0 0 12px #ff5f8a, 0 0 30px #ff2d6a, 0 0 60px #ff2d6a; animation: qxc-on .5s steps(1) both, qxc-tube 4.8s linear .6s infinite; }
+@keyframes qxc-on { 0% { opacity: .15; } 20% { opacity: 1; } 32% { opacity: .2; } 48% { opacity: 1; } 56% { opacity: .35; } 70%, 100% { opacity: 1; } }
+@keyframes qxc-tube { 0%, 61%, 63%, 88%, 100% { opacity: 1; } 62% { opacity: .45; } 89% { opacity: .7; } }
+.qxc-stage { position: relative; width: var(--face); height: var(--face); margin-right: 260px; }
+.qxc-stage .dealer.big { position: relative; left: 0; bottom: 0; display: block; width: var(--face); height: var(--face); transform: none; opacity: 1; animation: qx-pop .6s cubic-bezier(.3, 1.6, .4, 1) both; }
+.qxc-stage .dealer.big .dl-face { width: var(--face); height: var(--face); filter: brightness(.55) drop-shadow(0 0 18px rgba(255, 60, 110, .35)); }
+.qxc-hint { margin: 0; font-family: var(--mono); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: rgba(242, 233, 214, .55); opacity: 0; transition: opacity .5s; }
+.qxc-back { width: auto; padding: 13px 26px; opacity: 0; pointer-events: none; transition: opacity .5s .15s; }
+.qxc.ready .qxc-hint, .qxc.ready .qxc-back { opacity: 1; pointer-events: auto; }
+
+/* ------------------------------------------------ movil en vertical: el globo arriba a lo ancho y el crupier asomando a la izquierda */
+@media (max-width: 720px) {
+  .qx { place-items: start center; }
+  .qx-in { width: calc(100 * var(--vw) - 24px); padding-top: 14px; --face: 104px; --bub: 150px; }
+  .qx-stage { align-self: stretch; width: auto; height: calc(var(--bub) + var(--face)); margin-bottom: -20px; }
+  .qx-beam, .qx-pool { left: calc(var(--face) / 2 + 4px); }
+  .qx-stage .dealer.big { position: absolute; left: 0; right: 0; bottom: 0; width: auto; height: var(--face); }
+  .qx-stage .dealer.big .dl-face { margin-left: 4px; }
+  .qx-stage .dealer.big .dl-bubble { left: 0; right: 0; bottom: calc(100% + 4px); width: auto; max-width: none; font-size: calc(22px * var(--dll, 1)); padding: 9px 14px 23px 12px; transform-origin: 20% 100%;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), 76px calc(100% - 12px), 56px 100%, 38px calc(100% - 12px), 0 calc(100% - 12px)); }
+  .qx.shout .dealer .dl-bubble { font-size: calc(24px * var(--dll, 1)); }
+  .qx-card { padding: 18px 16px 18px; }
+  .qx-top b { font-size: 13px; } .qx-top em { font-size: 12px; } .qx-ic .ic { width: 24px; height: 24px; }
+  .qx-q { font-size: calc(36px * var(--dll, 1)); margin-top: 12px; } .qx-sub { font-size: calc(20px * var(--dll, 1)); margin-bottom: 16px; }
+  .qx-acts { gap: 10px; } .qx-acts .qx-stay { padding: 12px 14px; font-size: 17px; } .qx-acts .qx-go { min-width: 0; padding: 10px 14px; font-size: 13px; }
+  .qx-stamp { font-size: 44px; }
+  .qxc-stage { margin-right: 0; }
+  .qxc-stage .dealer.big .dl-bubble { left: 50%; bottom: calc(100% + 8px); transform-origin: 50% 100%; translate: -50% 0; width: calc(100 * var(--vw) - 40px); max-width: none; font-size: calc(22px * var(--dll, 1)); text-align: center;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(50% + 10px) calc(100% - 12px), 50% 100%, calc(50% - 10px) calc(100% - 12px), 0 calc(100% - 12px)); padding-bottom: 22px; }
+  .qxc-in { gap: 16px; } .qxc-stage { margin-top: 110px; }
+}
+/* pantallas bajas (movil en horizontal, portatiles pequenos): todo mas compacto */
+@media (max-height: 560px) and (min-width: 721px) {
+  .qx-in { padding-top: 36px; --face: 118px; } .qx-stage { margin-bottom: -22px; }
+  .qx-card { padding: 14px 22px 16px; } .qx-q { font-size: calc(40px * var(--dll, 1)); margin-top: 10px; } .qx-sub { font-size: calc(20px * var(--dll, 1)); margin-bottom: 12px; }
+  .qx-acts .qx-stay { padding: 10px 16px; font-size: 16px; } .qx-acts .qx-go { padding: 8px 16px; }
+  .qx-stage .dealer.big .dl-bubble { font-size: calc(22px * var(--dll, 1)); }
+}
+html.reduce-motion .qx-beam u, html.reduce-motion .qx-rain { display: none; }
+html.reduce-motion .qx.shout .dealer .dl-bubble { animation: none; }

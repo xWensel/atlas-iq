@@ -27,7 +27,7 @@ window.AIQ = window.AIQ || {};
     const mc = (id, rank, suit, art, title, desc, meta, badge) => `<button class="mcard${id === "adventure" ? " hero" : ""}" data-mode="${id}" data-suit="${suit === "s_pin" || suit === "s_compass" ? "red" : "blk"}" ${A.ttAttr(title, desc)} aria-description="${esc(desc)}">
       ${id === "adventure" ? '<i class="marq"></i>' : ""}${badge ? `<span class="mc-ribbon">${badge}</span>` : ""}<span class="mc-win">${A.pic(art)}</span><b class="mc-name">${title}</b><span class="mc-stat">${meta}</span></button>`;
     c.dialog(`<div class="hh">
-      <div class="hh-top"><img class="hh-logo" src="assets/logo.png" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
+      <div class="hh-top">${A.salir ? A.salir.button() : ""}<img class="hh-logo" src="assets/logo.png" alt="Geolite" onerror="this.outerHTML='<h1>Geo<em>lite</em></h1>'">${tools()}</div>
       <p class="hh-tag">${A.t("title.tag")}</p>
       <div class="hh-cards">
         ${mc("classic", "K", "s_palm", "card_classic", T("Clásico", "Classic"), T("Regiones del mundo, banderas, pistas, sucesos y personajes, contra el reloj.", "Regions of the world, flags, clues, events and famous people, against the clock."), T("Directo al grano", "No frills"))}
@@ -43,7 +43,8 @@ window.AIQ = window.AIQ || {};
         <button class="chipbtn big" id="profBtn" type="button">${A.icon("m_prof", "sm")}<span>${T("Perfil", "Profile")}</span><em>${A.ach.count()}/${A.ach.total()}</em></button>
         <span class="hh-ver">Geolite · v${A.VERSION}</span>
       </div></div>`, "home");
-    wireTools(); $("codexBtn").onclick = () => A.codex.open(); $("profBtn").onclick = () => screen("profile");
+    wireTools(); if (A.salir) A.salir.wire();                       // salir del juego: js/salir.js
+    $("codexBtn").onclick = () => A.codex.open(); $("profBtn").onclick = () => screen("profile");
     document.querySelectorAll(".mcard").forEach(b => (b.onclick = () => { A.sfx.card(); screen(b.dataset.mode); }));
     if ($("homeCont")) { $("homeCont").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume(), true); }; $("homeNew").onclick = () => { A.sfx.card(); screen("adventure"); }; }
   }

@@ -511,6 +511,13 @@ def u_set(id):
     m = (teeth | circle(32, 32, 22)) & ~circle(32, 32, 8.5)
     I = Icon(); I.add(bevel(m, R["grey"])); I.put(ring(32, 32, 12, 14.5), R["grey"][3]); return I
 
+@icon("u_quit")
+def u_quit(id):   # salir del juego (arriba a la izquierda de la portada, espejo del engranaje): boton de encendido, mismo gris
+    y, x = np.mgrid[0:N, 0:N]
+    a = np.arctan2(x + .5 - 32, -(y + .5 - 35))                 # angulo desde arriba: el aro se abre por donde entra la barra
+    arc = opening(ring(32, 35, 16, 25.5) & (np.abs(a) > math.radians(38)), 1)
+    I = Icon(); I.add(bevel(arc, R["grey"])); I.add(bevel(rrect(27, 3, 11, 32, 3), R["grey"])); return I
+
 @icon("u_star")
 def u_star(id):
     I = Icon(); I.add(faceted_star(32, 34, 30, 13, "gold")); return I

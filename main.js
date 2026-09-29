@@ -101,6 +101,8 @@ function setWindowMode(mode) {
   old.close();
 }
 ipcMain.on("win:getMode", (e) => { e.returnValue = currentMode; });
+/* boton de encendido de la portada (js/salir.js): cierra el juego entero; solo lo acepta de la ventana del juego */
+ipcMain.on("app:quit", (e) => { if (win && e.sender === win.webContents) app.quit(); });
 ipcMain.on("win:setMode", (e, mode) => setWindowMode(mode));
 
 /* Las imagenes generadas (WebP) no pintan aunque devtools confirme que estan
