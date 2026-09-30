@@ -39,6 +39,7 @@ def run(ids=None):
         for f in sorted(folder.glob("*.webp")):
             id = f.stem
             if ids and id not in ids: continue
+            if id.startswith("dealer_"): continue                 # v0.32: el crupier sale de tools/crupier/build.py (pulido a mano); nunca de su jpg
             raw = RAW / f"{id}.jpg"
             if not raw.exists(): print("sin raw", id); continue
             nat, col, k = spec(id, kind)

@@ -127,7 +127,7 @@ def fix(*ids):
 
 def run(ids, apply=False):
     gen = sorted(p.stem for p in (ROOT / "assets" / "gen").glob("*.webp"))
-    dealers = ["dealer_neutral", "dealer_laugh", "dealer_angry", "dealer_shock"]
+    dealers = []                                                  # v0.32: el crupier sale de tools/crupier/build.py; este retoque ya no le toca
     todo = [(i, f"assets/gen/{i}.webp", False) for i in gen] + [(i, f"assets/icons/{i}.webp", True) for i in dealers]
     if ids: todo = [t for t in todo if t[0] in ids]
     STAGE.mkdir(parents=True, exist_ok=True); done = []

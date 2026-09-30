@@ -10,7 +10,7 @@ window.AIQ = window.AIQ || {};
 (function (A) {
   const $ = id => document.getElementById(id);
   const L6 = A.L6;
-  const FACE = { sly: "dealer_neutral", boss: "dealer_neutral", laugh: "dealer_laugh", angry: "dealer_angry", shock: "dealer_shock" };
+  const FACE = { boss: "dare" };                                     // v0.32: el retrato es el sprite animado (js/crupier.js); los moods de siempre son caras suyas
 
   /* frases: es | en | fr | pt | de | it */
   const LINES = {
@@ -1358,17 +1358,171 @@ window.AIQ = window.AIQ || {};
   };
   for (const k in MORE) LINES[k].push(...MORE[k]);
   for (const k in LINES) LINES[k] = LINES[k].map(L6);
+  /* v0.32: cada frase sabe quien es (clave e indice) para que el crupier ponga su cara y su gesto (XMAP, mas abajo) */
+  const LINE_ID = new Map(); for (const k in LINES) LINES[k].forEach((ln, i) => LINE_ID.set(ln, [k, i]));
+  const lineOf = new Map();                                           // texto ya traducido y con sus datos -> [clave, indice]
+  const mark = (t, id) => { if (t && id) { lineOf.set(t, id); if (lineOf.size > 300) lineOf.delete(lineOf.keys().next().value); } return t; };
 
+  /* v0.32: CARA Y GESTO POR FRASE (clave o "clave#indice" -> [cara, gesto]). Sale de revisar las 537 frases y escenas (catalogo de 18 caras y
+     48 gestos de js/crupier.js). Caras: sly smug wink suspicious laugh sad shock bored nervous bow innocent angry dark dark_vexed furious dare puzzled sleep */
+  const XMAP = {
+    hello: ["sly", "hat_tip"], calm: ["sly"], newHand: ["sly", "deal_card"], boss: ["dare", "fan_open"], good: ["suspicious", "nod"],
+    "good#1": ["sly", "nod"], "good#2": ["suspicious"], "good#4": ["bored"], "good#5": ["nervous"], "good#7": ["suspicious", "finger_wag"],
+    bull: ["shock", "hat_pop"], "bull#1": ["shock", "hand_heart"], "bull#4": ["suspicious"], "bull#5": ["suspicious"], "bull#6": ["suspicious"],
+    "bull#7": ["nervous"], "bull#9": ["suspicious", "jot"], miss: ["laugh"], "miss#4": ["smug"], "miss#5": ["smug"], "miss#6": ["smug"],
+    "miss#7": ["smug"], "miss#8": ["smug", "jot"], timeout: ["smug", "pocket_watch"], "timeout#2": ["laugh"], "timeout#4": ["smug", "slow_clap"],
+    "timeout#5": ["smug", "finger_wag"], "timeout#6": ["bored"], "timeout#7": ["bored", "yawn"], streak: ["nervous", "fan_self"],
+    "streak#0": ["sly", "finger_wag"], "streak#2": ["suspicious", "jot"], "streak#4": ["suspicious"], counter: ["angry", "crumple"],
+    "counter#0": ["angry", "turn_away"], "counter#1": ["angry", "finger_wag"], roundWin: ["angry", "crumple"], "roundWin#1": ["angry", "jot"],
+    "roundWin#3": ["sly"], "roundWin#4": ["wink", "shh"], "roundWin#5": ["suspicious", "jot"], "roundWin#6": ["angry", "turn_away"],
+    "roundWin#7": ["suspicious", "jot"], roundFail: ["smug", "fan_self"], "roundFail#3": ["laugh"], "roundFail#4": ["smug", "hat_tip"],
+    "roundFail#6": ["smug", "hand_heart"], runWin: ["shock", "hat_pop"], "runWin#1": ["angry"], "runWin#2": ["sly", "jot"],
+    runLose: ["smug", "hat_tip"], "runLose#0": ["laugh", "hat_tip"], "runLose#1": ["smug", "pocket_coin"], shaky: ["laugh"], missing: ["innocent"],
+    swap: ["sly", "shuffle"], mirror: ["laugh", "head_tilt"], nocountry: ["innocent", "shrug"], memory: ["sly", "magic_pass"], blur: ["sly", "blow"],
+    dark: ["innocent"], flicker: ["innocent"], wrongborders: ["wink"], noborders: ["sly", "snap"], pangea: ["sly", "hat_tip"],
+    flip: ["laugh", "head_tilt"], clouds: ["sly", "blow"], upside: ["laugh", "head_tilt"], runes: ["sly"], scroll: ["sly", "snap"],
+    novowels: ["innocent", "shrug"], anagram: ["laugh", "shuffle"], dance: ["laugh", "sway"], riddle: ["sly", "magic_pass"], babel: ["sly"],
+    deal: ["sly", "shuffle"], spread: ["laugh", "fan_open"], tilt: ["sly", "head_tilt"], spin: ["laugh", "sway"], mirrorx: ["sly", "head_tilt"],
+    myopia: ["innocent"], blindspot: ["wink"], mosaic: ["sly", "shrug"], negative: ["sly", "snap"], quake: ["innocent", "shrug"],
+    drift: ["sly", "sway"], decoys: ["wink"], lightning: ["sly", "snap"], rain: ["innocent"], tremble: ["sly"], blink: ["sly", "magic_pass"],
+    ghost: ["laugh", "magic_pass"], cblur: ["sly", "magic_pass"], lag: ["innocent", "shrug"], cmirror: ["laugh", "head_tilt"],
+    dizzy: ["laugh", "sway"], bribe: ["wink", "pocket_coin"], reroll: ["sly", "shuffle"], wind: ["laugh", "blow"], storm: ["sly", "pocket_watch"],
+    silence: ["sly", "shh"], crack: ["innocent", "glass_knock"], smudge: ["wink", "glass_knock"], hang: ["wink", "freeze"],
+    battery: ["sly", "pocket_watch"], flaginvert: ["sly", "card_reveal"], flaghue: ["innocent"], flagblur: ["sly", "card_reveal"],
+    flagdark: ["sly", "snap"], flaggray: ["sly", "hat_tip"], homeTaunt: ["sly"], "homeTaunt#0": ["sly", "point"], "homeTaunt#1": ["sly", "point"],
+    "homeTaunt#2": ["sly", "beckon"], "homeTaunt#3": ["laugh"], "homeTaunt#5": ["sly", "coin_toss"], "homeTaunt#6": ["sly", "beckon"],
+    "homeTaunt#9": ["wink"], "homeTaunt#11": ["sly", "fan_self"], "homeTaunt#12": ["laugh"], "homeTaunt#13": ["sly", "slow_clap"],
+    "homeTaunt#14": ["suspicious", "lean_in"], "homeTaunt#15": ["suspicious"], "homeTaunt#17": ["bored", "cards_tap"], "homeTaunt#18": ["sly"],
+    homeTempt: ["sly"], "homeTempt#0": ["wink", "shh"], "homeTempt#1": ["sly", "coin_toss"], "homeTempt#2": ["sly", "beckon"],
+    "homeTempt#3": ["sly", "deal_card"], "homeTempt#8": ["sly", "point"], "homeTempt#9": ["sly", "beckon"], "homeTempt#10": ["sly", "fan_open"],
+    "homeTempt#11": ["sly", "point"], "homeTempt#12": ["sly", "shrug"], "homeTempt#13": ["sly", "finger_up"], "homeTempt#14": ["suspicious", "point"],
+    "homeTempt#16": ["sly", "beckon"], "homeTempt#17": ["sly", "pocket_watch"], homeTrivia: ["sly", "finger_up"], homeReturn: ["sly", "hat_tip"],
+    "homeReturn#0": ["smug", "hat_tip"], "homeReturn#2": ["sly", "hand_heart"], "homeReturn#4": ["sly", "shrug"],
+    "homeReturn#5": ["sly", "slow_clap"], "homeReturn#6": ["bored"], "homeReturn#8": ["sly"], homeTimeMorning: ["sly"],
+    "homeTimeMorning#0": ["sly", "yawn"], "homeTimeMorning#1": ["sly", "finger_up"], "homeTimeMorning#2": ["sly", "slow_clap"],
+    "homeTimeMorning#5": ["sly", "hat_tip"], homeTimeAfternoon: ["sly", "hat_tip"], "homeTimeAfternoon#1": ["wink", "shh"],
+    "homeTimeAfternoon#2": ["sly"], "homeTimeAfternoon#3": ["sly"], "homeTimeAfternoon#5": ["sly", "shrug"], homeTimeEvening: ["sly", "hat_tip"],
+    "homeTimeEvening#1": ["sly"], "homeTimeEvening#2": ["sly"], "homeTimeEvening#3": ["sly", "snap"], "homeTimeEvening#4": ["sly"],
+    homeTimeNight: ["sly", "yawn"], "homeTimeNight#3": ["sly", "head_tilt"], "homeTimeNight#4": ["sly", "pocket_watch"],
+    "homeTimeNight#6": ["bored", "yawn"], "homeTimeNight#7": ["smug"], homeTimeWeekend: ["sly"], "homeTimeWeekend#0": ["sly", "fan_self"],
+    "homeTimeWeekend#3": ["sly", "shrug"], homeMeta: ["sly"], "homeMeta#0": ["sly", "glass_knock"], "homeMeta#1": ["wink"],
+    "homeMeta#2": ["sly", "lean_in"], "homeMeta#3": ["puzzled", "scratch_head"], "homeMeta#4": ["puzzled"], "homeMeta#5": ["suspicious", "lean_in"],
+    "homeMeta#6": ["sly", "shuffle"], "homeMeta#11": ["sly", "lean_in"], runIdle: ["sly"], "runIdle#1": ["sly", "coin_toss"],
+    "runIdle#2": ["sly", "pocket_watch"], "runIdle#3": ["suspicious"], "runIdle#6": ["suspicious"], "runIdle#9": ["suspicious"],
+    "runIdle#13": ["sly", "shrug"], tantrumShake: ["furious", "tantrum"], "tantrumShake#5": ["furious", "tremble_body"], tantrumBlackout: ["dark"],
+    "tantrumBlackout#2": ["dark_vexed"], "tantrumBlackout#3": ["dark_vexed"], "tantrumBlackout#5": ["dark_vexed"], firstMeet: ["sly", "point"],
+    "firstMeet#1": ["bow", "hat_off_bow"], "firstMeet#2": ["wink", "deal_card"], firstGuide: ["sly", "point"], "firstGuide#1": ["sly", "fan_open"],
+    openResume: ["innocent", "cards_hide"], "openResume#1": ["sly", "point"], "openResume#2": ["sly"], openLastLose: ["smug"],
+    "openLastLose#2": ["sly", "pinch"], openLastWin: ["suspicious", "cards_hide"], "openLastWin#1": ["dare", "hat_low"],
+    openLongAway: ["sad", "turn_away"], "openLongAway#1": ["wink"], "openLongAway#2": ["angry", "turn_away"], homeAfterLose: ["sly", "shuffle"],
+    "homeAfterLose#0": ["sly", "beckon"], "homeAfterLose#1": ["sly", "point"], homeAfterWin: ["dare", "hat_tip"],
+    "homeAfterWin#1": ["nervous", "tremble"], homeLeft: ["sly", "hat_tip"], "homeLeft#0": ["sly", "hand_heart"], homeIdle: ["bored", "shuffle"],
+    "homeIdle#1": ["bored", "cards_tap"], afk: ["suspicious", "glass_knock"], "afk#2": ["sly"], tabBackHome: ["sly"],
+    "tabBackHome#1": ["sad", "hand_heart"], "tabBackHome#2": ["bored", "shuffle"], resize: ["sly", "preen"], clock: ["sly", "pocket_watch"],
+    "clock#0": ["wink", "shh"], "clock#1": ["sly"], visitsMeta: ["sly"], "visitsMeta#0": ["sly", "jot"], totalMeta: ["sly", "jot"],
+    "totalMeta#0": ["sly"], pt10: ["sly", "pocket_watch"], pt20: ["suspicious", "pocket_watch"], pt30: ["sly", "finger_up"], pt45: ["sly", "preen"],
+    pt60: ["bored", "slow_clap"], pt90: ["sly", "yawn"], pt120: ["wink", "shh"], pt180: ["sly", "slow_blink"], runFirst: ["sly", "deal_card"],
+    "runFirst#1": ["laugh"], runStart: ["sly", "shuffle"], "runStart#3": ["sly", "hat_tip"], runAfterLose: ["smug"],
+    "runAfterLose#0": ["sly", "coin_toss"], "runAfterLose#2": ["sly"], runAfterWin: ["sly", "shuffle"], "runAfterWin#0": ["dare", "hat_low"],
+    runDaily: ["sly", "fan_open"], "runDaily#1": ["sly"], "runDaily#2": ["suspicious", "jot"], runDaily2: ["sly", "shuffle"],
+    "runDaily2#0": ["sly", "fan_self"], runDailyLast: ["sly", "lean_in"], "runDailyLast#1": ["sly"], runResume: ["innocent", "cards_hide"],
+    "runResume#1": ["sly", "hand_heart"], "runResume#2": ["sly"], act2: ["sly", "fan_open"], "act2#1": ["sly", "lean_in"], act3: ["dare", "hat_low"],
+    finalBoss: ["dare", "fan_open"], infinite: ["sly", "pocket_watch"], "infinite#0": ["laugh"], retry: ["sly", "shuffle"],
+    "retry#0": ["sly", "finger_wag"], "retry#2": ["sly", "pinch"], runDanger: ["smug", "lean_in"], "runDanger#0": ["smug", "finger_up"],
+    "runDanger#3": ["smug", "fan_self"], roundFailLast: ["smug", "fan_self"], roundWinBig: ["angry", "coin_toss"],
+    "roundWinBig#2": ["nervous", "coin_toss"], "roundWinBig#3": ["suspicious", "lean_in"], roundFailConso: ["sly", "coin_toss"],
+    "roundFailConso#0": ["wink", "coin_toss"], runEarly: ["sly"], "runEarly#1": ["sly", "finger_up"], "runEarly#3": ["wink", "cards_hide"],
+    "runEarly#4": ["sly", "finger_up"], runMid: ["sly"], "runMid#2": ["wink", "shuffle"], runLate: ["sly", "lean_in"],
+    "runLate#1": ["suspicious", "lean_in"], "runLate#2": ["sly"], "runLate#4": ["dare", "hat_low"], runInf: ["sly"], "runInf#0": ["sly", "fan_self"],
+    "runInf#2": ["sly", "jot"], runHot: ["suspicious", "lean_in"], "runHot#0": ["nervous"], "runHot#3": ["angry", "crumple"], "runHot#4": ["nervous"],
+    runMeta: ["sly"], "runMeta#0": ["sly", "preen"], "runMeta#1": ["sly", "point"], "runMeta#2": ["sly", "jot"],
+    "runMeta#4": ["suspicious", "lean_in"], "runMeta#5": ["sad", "glass_knock"], tabBackRun: ["wink", "shh"], "tabBackRun#1": ["suspicious"],
+    runAgainLose: ["sly", "deal_card"], "runAgainLose#0": ["sly", "point"], "runAgainLose#3": ["sly", "hand_heart"],
+    runAgainRecord: ["sly", "hat_tip"], runAgainWin: ["sly", "deal_card"], "runAgainWin#1": ["smug", "hat_tip"], hoverQuit: ["sad"],
+    "hoverQuit#1": ["sly", "point"], "hoverQuit#2": ["sad", "hand_heart"], hoverAbandon: ["suspicious", "finger_wag"],
+    "hoverAbandon#0": ["sly", "finger_wag"], nameAsk: ["sly", "lean_in"], nameWelcome: ["sly"], "nameWelcome#0": ["bow", "hat_off_bow"],
+    "nameWelcome#1": ["smug"], "nameWelcome#2": ["sly", "stamp"], "nameWelcome#3": ["smug"], "nameWelcome#4": ["bow", "hat_off_bow"],
+    "nameWelcome#5": ["sly", "jot"], nameRecall: ["suspicious", "nod"], "nameRecall#2": ["puzzled", "nod"], nameSkip: ["sly"],
+    "nameSkip#0": ["sly", "shrug"], "nameSkip#2": ["suspicious"], nameChanged: ["suspicious"], "nameChanged#2": ["suspicious", "jot"],
+    openName: ["sly", "hat_tip"], "openName#0": ["sly", "deal_card"], "openName#2": ["smug", "hat_tip"], "openName#3": ["sly", "slow_blink"],
+    nameHome: ["sly"], "nameHome#0": ["sly", "beckon"], "nameHome#1": ["sly", "point"], "nameHome#3": ["sly", "glass_knock"],
+    "nameHome#4": ["wink", "jot"], nameRun: ["suspicious"], "nameRun#1": ["wink"], "nameRun#2": ["sly"], "nameRun#4": ["sly", "finger_up"],
+    "nameRun#5": ["wink", "shh"], "nameRun#6": ["sly", "jot"], nameAgain: ["sly", "deal_card"], "nameAgain#2": ["wink", "deal_card"],
+    quitHover: ["sly", "finger_wag"], "quitHover#1": ["nervous", "fan_self"], "quitHover#3": ["sly"], "quitHover#4": ["nervous"], quitAsk: ["shock"],
+    "quitAsk#3": ["sly", "shuffle"], "quitAsk#4": ["sad", "shuffle"], "quitAsk#5": ["sly", "finger_up"], "quitAsk#6": ["suspicious"],
+    "quitAsk#7": ["dare", "hat_low"], quitAskSave: ["sly"], "quitAskSave#1": ["nervous"], "quitAskSave#2": ["wink", "cards_hide"],
+    quitAskLate: ["sly", "pocket_watch"], quitAskQuick: ["shock"], "quitAskQuick#0": ["shock", "shuffle"], "quitAskQuick#1": ["sly", "hat_tip"],
+    "quitAskQuick#2": ["bored", "slow_clap"], quitAskLong: ["sad", "droop"], "quitAskLong#2": ["angry", "turn_away"],
+    quitAskAgain: ["smug", "finger_wag"], "quitAskAgain#0": ["angry", "finger_wag"], "quitAskAgain#1": ["sly", "lean_in"],
+    "quitAskAgain#3": ["bored"], quitAskName: ["sad", "droop"], "quitAskName#1": ["sad", "hand_heart"], "quitAskName#2": ["sly", "deal_card"],
+    quitDark: ["dark"], quitShout: ["furious", "tantrum"], quitShell: ["sly", "shuffle"], "quitShell#2": ["innocent", "shuffle"],
+    "quitShell#3": ["smug"], quitDenied: ["bored", "stamp"], "quitDenied#3": ["sly", "stamp"], quitPlead: ["sad", "hat_chest"],
+    "quitPlead#0": ["sad", "shuffle"], quitBribe: ["nervous", "coin_toss"], "quitBribe#2": ["nervous"], "quitBribe#3": ["sly"],
+    quitFake: ["laugh", "hat_pop"], "quitFake#2": ["wink"], "quitFake#3": ["smug"], quitStay: ["sly", "deal_card"],
+    "quitStay#0": ["smug", "deal_card"], "quitStay#1": ["sly", "hat_tip"], "quitStay#3": ["sly"], quitStayTroll: ["smug", "fan_self"],
+    "quitStayTroll#1": ["innocent"], "quitStayTroll#2": ["smug"], "quitStayTroll#3": ["smug", "deal_card"], quitBye: ["sly", "hat_tip"],
+    "quitBye#0": ["smug", "hat_tip"], "quitBye#1": ["wink"], "quitBye#3": ["wink"], "quitBye#4": ["sad"], "quitBye#5": ["sly", "hat_tip"],
+    "quitBye#6": ["dare", "hat_low"], quitByeName: ["sly", "hat_tip"], "quitByeName#0": ["sly", "jot"], "quitByeName#1": ["sly", "shuffle"],
+    quitWeb: ["dark"], quitBack: ["laugh", "hat_pop"], "quitBack#0": ["smug"], "quitBack#2": ["sly", "hat_tip"], quitReturn: ["sly", "hat_tip"],
+    "quitReturn#0": ["smug", "hat_tip"], "quitReturn#1": ["sly", "point"], "quitReturn#3": ["sly", "deal_card"], quitRetDark: ["sly", "hat_tip"],
+    quitRetShout: ["sly", "preen"], quitRetShell: ["wink", "shuffle"], quitRetDenied: ["sly", "shrug"], quitRetPlead: ["sad"],
+    quitRetBribe: ["suspicious", "finger_wag"], quitRetFake: ["sly", "hat_tip"], quitRetSeason: ["sly", "twirl_moustache"],
+    quitRetMany: ["sly", "hand_heart"], quitRetX: ["suspicious", "jot"], "quitRetX#1": ["sly", "fan_open"], quitRetCrash: ["nervous", "cards_hide"],
+    quitRetCrashSave: ["sly"], quitSeason: ["sad", "shrug"], "quitSeason#1": ["bow", "hat_off_bow"], quitSeasonExpress: ["sly", "hat_tip"],
+    quitAskCount: ["bored"], quitAskStays: ["sly", "preen"], poke: ["shock", "hat_pop"], "poke#0": ["puzzled"], "poke#1": ["laugh"],
+    "poke#2": ["angry", "finger_wag"], "poke#3": ["angry", "turn_away"], pokeMemory: ["sad"], sulk: ["angry", "snap"], sulkBack: ["sly", "snap"],
+    babelOld: ["puzzled", "scratch_head"], babelNew: ["sly", "preen"], "babelNew#1": ["wink", "preen"], babelMany: ["sly", "fan_self"],
+    newVersion: ["sly", "preen"], "newVersion#1": ["wink", "shh"], fakeAch: ["laugh"], "fakeAch#0": ["smug", "slow_clap"], fakeAchIdle: ["sly"],
+    fakeAchDoor: ["smug"], trickDebut: ["sly", "fan_open"], trickHouse: ["smug", "twirl_moustache"], "trickHouse#1": ["smug", "hand_heart"],
+    trickYou: ["sly", "shuffle"], "trickYou#1": ["sly", "card_reveal"], trickVet: ["angry", "turn_away"], bossNamed: ["dare", "hat_low"],
+    ghostFall: ["smug"], virgin: ["nervous", "shuffle"], ghostBeat: ["shock", "hat_pop"], handPtr: ["smug", "fan_self"],
+    "handPtr#0": ["smug", "preen"], handWind: ["smug", "blow"], handMap: ["smug", "shuffle"], handPangea: ["smug"], handFlip: ["smug", "head_tilt"],
+    handBlind: ["shock", "hat_pop"], nemesis: ["smug"], nemesisBeat: ["sad", "droop"], pfDiffGood: ["suspicious", "finger_wag"],
+    pfDiffBad: ["smug", "jot"], pfBookClock: ["wink", "card_reveal"], pfBookDoor: ["sad", "jot"], pfBookCoins: ["smug", "pocket_coin"],
+    pfBookKm: ["laugh", "card_reveal"], anniv: ["sly", "hat_tip"], "anniv#1": ["smug", "hat_tip"], annivYear: ["bow", "hat_off_bow"],
+    streakDays: ["sly", "hat_tip"], lateLeft: ["suspicious", "yawn"], copyName: ["suspicious", "finger_wag"], rightClick: ["sly", "fan_open"],
+    batteryReal: ["shock", "point"], napWake: ["bored", "yawn"], "napWake#1": ["bored", "shuffle"], trickAgain: ["sly", "card_reveal"],
+    "trickAgain#0": ["smug", "card_reveal"], "trickAgain#5": ["sly", "card_reveal"], campArrive: ["sly", "fan_open"],
+    campArrive1: ["sly", "card_reveal"], campClean: ["suspicious"], campBoss: ["dare", "hat_low"], campRetry: ["suspicious", "shuffle"],
+    campBroke: ["smug", "cards_hide"], campAct: ["sly", "coin_toss"], campDoubt: ["bored", "cards_tap"], campNoFunds: ["bored", "stamp"],
+    "campNoFunds#1": ["sly", "stamp"], campShell: ["wink", "shuffle"], chestStuck: ["wink", "tremble_body"], campHabit: ["smug", "nod"],
+    campSkip: ["smug"], "campSkip#1": ["sly", "pocket_coin"], secondWin: ["shock", "hat_pop"], "secondWin#1": ["sly"], cxFirst: ["sly", "fan_open"],
+    cxPace: ["puzzled"], cxPaceSlow: ["laugh"], cxNothing: ["bored"], lockMine: ["suspicious", "finger_wag"], cxTease: ["sly", "cards_hide"],
+    fileFirst: ["wink", "shh"], forgetBye: ["sad", "hand_heart"], dejavu: ["puzzled", "lean_in"], pauseWait: ["sly", "shuffle"],
+    "pauseWait#0": ["sly", "pocket_watch"], pauseBack: ["laugh", "shuffle"], wake: ["nervous", "hat_pop"], "wake#2": ["bored", "hat_pop"],
+    tagFix: ["smug", "point"], tierUp: ["sly", "stamp"], "tierUp#1": ["sly", "stamp"], "tierUp#2": ["bow", "hat_off_bow"],
+    tierHome1: ["sly", "hat_tip"], "tierHome1#2": ["sly", "cards_tap"], tierHome2: ["sly"], "tierHome2#0": ["wink", "lean_in"],
+    "tierHome2#1": ["bored"], "tierHome2#2": ["sly", "shuffle"], tierHome3: ["wink", "shh"], "tierHome3#1": ["sly", "beckon"],
+    "tierHome3#2": ["wink", "lean_in"], tierRun1: ["sly"], "tierRun1#0": ["wink"], tierRun2: ["sly"], "tierRun2#1": ["nervous"],
+    tierRun3: ["nervous"], "tierRun3#1": ["sad", "hand_heart"], h2hYou: ["sad", "jot"], h2hHouse: ["smug", "fan_self"], h2hLead: ["shock", "hat_pop"],
+    "h2hLead#1": ["nervous", "fan_self"], h2hBack: ["smug", "preen"], betMake: ["sly", "card_reveal"], betDouble: ["suspicious", "card_reveal"],
+    betWon: ["smug", "jot"], "betWon#1": ["smug", "finger_up"], betLost: ["sad", "hat_tip"], "betLost#1": ["sad", "hand_heart"],
+    betLostWin: ["bow", "hat_off_bow"], betDebt: ["wink", "jot"], betGiveUp: ["sad", "cards_hide"], betBrag: ["smug", "fan_open"], retire: ["sad"],
+    "retire#1": ["bow", "hat_off_bow"], retireBack: ["sly", "shuffle"], retireAgain: ["sad", "hat_tip"], nickFirst: ["sly", "card_reveal"],
+    nickNew: ["sly", "slow_clap"], nickBye: ["sad", "hat_tip"], nameSkipLast: ["sly", "jot"], calNewYear: ["sly", "hat_tip"],
+    calHalloween: ["laugh", "tremble_body"], calXmas: ["wink", "cards_hide"], calInoc: ["wink"], calApril: ["wink"],
+    midnight: ["sly", "pocket_watch"], photo: ["sly", "preen"], "photo#0": ["sly", "head_tilt"], winSmall: ["bored"], winFull: ["sly", "preen"],
+    winBorder: ["sly", "fan_open"], tourSkip: ["angry", "turn_away"], hoverOver: ["sad", "facepalm"], hoverOver2: ["shock", "facepalm"],
+    wrongCountry: ["smug", "pinch"], "wrongCountry#1": ["smug"], decoyHit: ["laugh"], "decoyHit#1": ["wink"], goalMid: ["bored"],
+    "goalMid#1": ["bored", "jot"], streakEnd: ["smug", "hat_chest"], closeCall: ["suspicious", "pinch"], funeral: ["sad", "hat_chest"],
+    gateWait: ["sly", "pocket_watch"], cardAdv: ["sly", "finger_wag"], cardAdvNone: ["sly"], cardDaily0: ["sly"], cardDaily: ["sly", "shrug"],
+    cardDaily3: ["sly", "shrug"], achSecret: ["suspicious", "shh"], "achSecret#0": ["suspicious", "lean_in"], achGen: ["bored", "slow_clap"],
+    "achGen#0": ["bored", "jot"], "achGen#1": ["bored"], achAll: ["shock", "hat_pop"], "achAll#1": ["bow", "hat_off_bow"],
+    podOne: ["bored", "slow_clap"], podGold: ["suspicious", "shuffle"], podPodium: ["sly", "finger_wag"], podRank: ["laugh"],
+    podNone: ["sly", "deal_card"], osLang: ["sly", "hat_tip"], gearHover: ["suspicious", "finger_wag"], "gearHover#1": ["dare"], classicBack: ["sly"],
+    monitor: ["puzzled", "preen"],
+  };
   const D = A.dealer = { on: false, onHome: false, host: null, timers: [], busy: false };
-  let el, face, bubble, txt, sofar, rest, typing = false, doneAt = 0, pend = null, dozing = false;   // typing: esta escribiendo una frase; doneAt: cuando acabo la ultima; pend: la que espera su turno
+  let el, face, spr, bubble, txt, sofar, rest, typing = false, doneAt = 0, pend = null, dozing = false;   // typing: esta escribiendo una frase; doneAt: cuando acabo la ultima; pend: la que espera su turno
   const rand = a => a[Math.floor(Math.random() * a.length)];
 
   function ensure() {
     if (el && el.isConnected) return;
     if (el) { rehome(); return; }                                    // su pantalla se fue con el dentro: vuelve a #app con lo que estuviera diciendo (nunca se le corta)
     el = document.createElement("div"); el.id = "dealer"; el.className = "dealer";
-    el.innerHTML = `<div class="dl-bubble"><p></p></div><img class="dl-face" alt="" src="assets/icons/dealer_neutral.webp">`;
+    el.innerHTML = `<div class="dl-bubble"><p></p></div><div class="dl-face"></div>`;
     $("app").appendChild(el); face = el.querySelector(".dl-face"); bubble = el.querySelector(".dl-bubble"); txt = bubble.querySelector("p");
+    spr = A.crupier.mount(face);                                      // v0.32: el crupier animado (caras, boca al hablar, gestos), siempre a escala entera de pixel
     face.addEventListener("pointerdown", e => onPoke(e));
     clear(); D.busy = false;                                          // el retrato anterior se fue con la pantalla que lo contenia: el nuevo empieza callado
   }
@@ -1386,17 +1540,18 @@ window.AIQ = window.AIQ || {};
     const bs = bubble.style, fs = face.style;
     const reset = () => { el.style.bottom = el.style.top = ""; fs.width = fs.height = fs.display = ""; bs.marginBottom = bs.maxWidth = ""; };
     if (el.classList.contains("home") && !D.host) {                                 // en el inicio: el hueco libre a su lado de la portada (homeRoom)
-      reset(); const room = homeRoom(homeCorner), top = homeTop(); if (top > HOME_TOP) el.style.top = top + "px"; el.style.setProperty("--hf", Math.min(256, room) + "px"); el.style.setProperty("--hb", Math.min(380, room) + "px"); return;
+      reset(); const room = homeRoom(homeCorner), top = homeTop(); if (top > HOME_TOP) el.style.top = top + "px"; el.style.setProperty("--hf", Math.max(A.crupier.snap(Math.min(256, room)).css, 112) + "px"); el.style.setProperty("--hb", Math.min(380, room) + "px"); return;
     }
     if (D.host || !D.on || el.classList.contains("inline") || el.classList.contains("big")) return reset();
     const app = $("app"); if (!app) return reset();
     const R = app.getBoundingClientRect(), box = id => { const e = $(id); if (!e || e.classList.contains("hidden")) return null; const r = e.getBoundingClientRect(); return r.width > 1 && r.height > 1 ? r : null; };
     const hits = (r, x0, x1) => r && r.left < x1 && r.right > x0;
-    const mob = innerWidth <= 720, maxS = mob ? 170 : 320, L = R.left + 16;
-    const top = [box("plate"), box("advBar")].filter(r => hits(r, L, L + maxS + 360)).reduce((m, r) => Math.max(m, r.bottom), R.top) + 10;
+    const mob = innerWidth <= 720, maxS = mob ? 170 : 384, L = R.left + 16;
+    const top = [box("plate"), box("advBar"), box("cxToast")].filter(r => hits(r, L, L + maxS + 360)).reduce((m, r) => Math.max(m, r.bottom), R.top) + 10;   // v0.32: tampoco pisa el aviso de tarjeta nueva
     const lows = [box("dock"), box("note"), box("toolBar")];
     let floor = R.bottom - 8; for (const r of lows) if (hits(r, L, L + maxS)) floor = Math.min(floor, r.top - 8);
-    let sz = Math.round(Math.min(maxS, floor - top)); const noFace = sz < 84;
+    const sn = A.crupier.snap(Math.min(maxS, floor - top), mob ? 0 : Math.floor(3 * (devicePixelRatio || 1) + 0.25));   // v0.32: x3 si cabe, si no x2 o x1 (pixel entero)
+    let sz = sn.css; const noFace = sz < 84;
     if (noFace) { sz = 0; fs.display = "none"; } else { fs.display = ""; fs.width = fs.height = sz + "px"; }
     el.style.bottom = Math.max(0, R.bottom - floor) + "px";
     const x0 = L + (noFace ? 0 : sz + 4), room = Math.max(150, Math.min(mob ? innerWidth * 0.62 : 440, R.right - 12 - x0));
@@ -1407,6 +1562,17 @@ window.AIQ = window.AIQ || {};
     bs.marginBottom = Math.min(want, maxM) + "px";                                    // si no cabe del todo, antes pisa las herramientas que la placa
   }
   addEventListener("resize", () => { if (D.busy) fitCorner(); });
+  /* v0.32: la cara y el gesto de cada frase. Manda la escena si lo pide (o.face / o.gesture); si no, la tabla XMAP por clave (y por indice,
+     "clave#i"), revisada frase a frase; si la frase no esta en la tabla, el mood de siempre. Un gesto no se repite dos veces seguidas en 20 s */
+  let lastGest = "", lastGestAt = 0;
+  function faceFor(line, o) {
+    const id = lineOf.get(line) || LINE_ID.get(line);
+    const m = id && (XMAP[id[0] + "#" + id[1]] || XMAP[id[0]]);
+    let e = o.face || (m && m[0]) || FACE[o.mood] || o.mood || "sly", g = o.gesture !== undefined ? o.gesture : m ? m[1] : null;
+    if (g && g === lastGest && Date.now() - lastGestAt < 20000 && o.gesture === undefined) g = null;
+    if (g) { lastGest = g; lastGestAt = Date.now(); }
+    return { e: A.crupier.expr(e), g: g || null };
+  }
   const LINGER = 1000;                                                // SIEMPRE un segundo mas: al acabar cada frase se queda antes de irse o de pasar a la siguiente (intro incluida)
   let held = false;                                                   // v0.37: mientras te pregunta el nombre (js/nombre.js) solo habla esa escena (o.force)
   const flush = () => { const p = pend; pend = null; if (p) D.say(p[0], p[1]); if (!typing) D.hide(); };   // si la que esperaba ya no toca, la anterior se va igual
@@ -1421,33 +1587,33 @@ window.AIQ = window.AIQ || {};
     if (left > 0) { if (!pend && left !== Infinity) later(flush, left); pend = [line, o]; return; }
     ensure(); clear(); leaving = false; clearTimeout(leaveT); const me = ++lineN; if (o.fx) D.fx(o.fx);
     if (!o.force && !D.host) noteSaid();
-    const mood = o.mood || "sly", text = o.force ? (typeof line === "string" ? line : A.tx(line)) : personal(typeof line === "string" ? line : A.tx(line)), src = FACE[mood] || "dealer_neutral";
+    const X = faceFor(line, o), mood = o.mood || "sly", text = o.force ? (typeof line === "string" ? line : A.tx(line)) : personal(typeof line === "string" ? line : A.tx(line));
     const inline = !!el.closest("#vdDealer"), home = D.onHome && !D.host && !inline && homeCorner ? " home " + homeCorner : "";
-    face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (inline ? " inline" : "") + (o.camp && !D.host && !inline ? " camp" : o.screen && !D.host && !inline ? " screen" + (o.screen === "pod" ? " pod" : "") : home); bubble.classList.add("on");
+    spr.release(); spr.set(X.e, { quiet: !!X.g }); if (X.g) spr.play(X.g); el.className = "dealer in " + mood + (D.host ? " big" : "") + (inline ? " inline" : "") + (o.camp && !D.host && !inline ? " camp" : o.screen && !D.host && !inline ? " screen" + (o.screen === "pod" ? " pod" : "") : home); bubble.classList.add("on");
     if (o.camp && campBox) { const st = el.style; st.bottom = st.top = ""; face.style.width = face.style.height = face.style.display = ""; bubble.style.marginBottom = bubble.style.maxWidth = "";
       st.setProperty("--cl", campBox.l + "px"); st.setProperty("--cb", campBox.b + "px"); st.setProperty("--hf", campBox.hf + "px"); st.setProperty("--hb", campBox.hb + "px"); }
     if (o.lang) { bubble.lang = o.lang; bubble.style.setProperty("--dll", /^(zh|ja|ko|ru)/.test(o.lang) ? ".889" : "1"); } else if (bubble.lang) { bubble.removeAttribute("lang"); bubble.style.removeProperty("--dll"); }
     /* la frase entera ya maquetada desde el principio, con lo que falta por escribir invisible: el globo nace con su tamano final y ninguna palabra
        salta de linea a media escritura (y `text-wrap: pretty` reparte las lineas sin dejar una palabra sola) */
     sofar = document.createTextNode(""); rest = document.createElement("span"); rest.className = "dl-rest"; rest.textContent = text; txt.replaceChildren(sofar, rest);
-    fitCorner();
+    fitCorner(); spr.fit(); spr.shown(true); spr.talk(true);
     if (mood === "laugh") A.sfx.laugh && A.sfx.laugh();
     let i = 0, at = 0; const chars = [...text], step = mood === "laugh" ? 44 : 34;
     const tick = () => {
       if (!el.isConnected) { rehome(); fitCorner(); }                        // otra pantalla sustituyo la suya: termina la frase en la esquina (antes se callaba a media frase)
       if (i >= chars.length) {
-        typing = false; doneAt = Date.now(); el.classList.add("done");
+        typing = false; doneAt = Date.now(); el.classList.add("done"); spr.talk(false); later(() => spr.release(), LINGER);   // un gesto sostenido dura su frase y su segundo de mas
         if (pend) { later(flush, LINGER); return; }
         if (leaving) { later(finishLeave, LINGER); return; }                  // se iba: acaba, su segundo de mas, y se va (sin encadenar nada detras)
         if (o.hold !== 0) later(() => D.hide(), (o.hold || 1800 + text.length * 22) + LINGER);
         if (o.done && released !== me) later(o.done, LINGER); return;
       }
-      sofar.data += chars[i]; at += chars[i].length; rest.textContent = text.slice(at); if (/\S/.test(chars[i]) && i % 2 === 0 && mood !== "laugh") A.sfx.voice && A.sfx.voice(mood, i); i++; later(tick, step + (/[.,!?…。，！？、]/.test(chars[i - 1]) ? 140 : 0));
+      sofar.data += chars[i]; at += chars[i].length; rest.textContent = text.slice(at); if (/\S/.test(chars[i])) { spr.syl(); if (i % 2 === 0 && mood !== "laugh") A.sfx.voice && A.sfx.voice(mood, i); } i++; later(tick, step + (/[.,!?…。，！？、]/.test(chars[i - 1]) ? 140 : 0));
     };
     typing = true; tick(); D.busy = true;
   };
   /* se va: lo que estuviera diciendo o fuera a decir se corta con el (antes seguia escribiendo oculto, con su voz, y el resto de la intro asomaba luego en la esquina) */
-  D.hide = () => { if (!el) return; clear(); el.classList.remove("in", "done", "laugh", "angry", "shock", "sly", "boss", "doze"); bubble.classList.remove("on"); D.busy = false; dozing = false; const z = el.querySelector(".dl-zz"); if (z) z.remove(); };
+  D.hide = () => { if (!el) return; clear(); el.classList.remove("in", "done", "laugh", "angry", "shock", "sly", "boss", "doze"); bubble.classList.remove("on"); D.busy = false; dozing = false; spr.talk(false); spr.release(); spr.shown(false); };
   D.enable = on => {
     D.on = !!on; clearTimeout(runT);
     if (on && D.onHome) D.homeTease(false);                           // entrar en partida (p. ej. Continuar desde el inicio) apaga las apariciones del menu
@@ -1478,6 +1644,8 @@ window.AIQ = window.AIQ || {};
     if (!typing) { D.timers.forEach(clearTimeout); D.timers = []; leaveT = setTimeout(finishLeave, Math.max(0, doneAt + LINGER - Date.now())); }
   };
   /* lo coloca dentro de un hueco de la pantalla (veredicto) sin bloquear sus reacciones */
+  /* v0.32: cambia la cara (y un gesto) sin decir nada: la luz que vuelve en la trastada del apagon, una escena que lo pide */
+  D.face = (e, g) => { if (!spr) return; spr.set(e, { quiet: !!g }); if (g) spr.play(g); };
   D.anchor = host => { if (!host) return; ensure(); host.appendChild(el); el.classList.add("inline"); };
   /* secuencia de frases: [{line, mood}] */
   D.sequence = (items, done) => { let k = 0; const next = () => { if (k >= items.length) return done && done(); const it = items[k++]; D.say(it.line, { mood: it.mood, lang: it.lang, hold: 0, done: () => later(next, it.gap || 700) }); }; next(); };
@@ -1554,8 +1722,8 @@ window.AIQ = window.AIQ || {};
        CIERRE     al acabar la expedicion te tienta a otra; al volver al menu, tambien; y si vas a salir, ve tu cursor
      Y rompe la cuarta pared una y otra vez con datos reales: la hora de tu reloj, tus visitas, las horas que llevais, el cursor quieto,
      la ventana que cambias de tamaño o que abandonas en plena pregunta. */
-  const fill = (s, d) => (d ? s.replace(/\{(\w+)\}/g, (m, k) => (d[k] != null ? d[k] : m)) : s);
-  const tx6 = ln => (ln == null ? "" : typeof ln === "string" ? ln : A.tx(ln));
+  const fill = (s, d) => (d ? mark(s.replace(/\{(\w+)\}/g, (m, k) => (d[k] != null ? d[k] : m)), lineOf.get(s)) : s);
+  const tx6 = ln => (ln == null ? "" : mark(typeof ln === "string" ? ln : A.tx(ln), LINE_ID.get(ln)));
   const who = () => { const P = A.profile && A.profile.get(); return (P && P.name) || nickName(); };     // tu nombre (v0.37) o, si le dijiste 3 veces "Ahora no", tu mote (v0.20); "" si nada
   const say1 = (key, d) => { const ln = pickLine(key); return ln ? fill(tx6(ln), Object.assign({ name: who() }, d)) : null; };   // una de la bolsa, con los datos puestos
   const nth = (key, i, d) => { const a = LINES[key]; return a && a[i] ? fill(tx6(a[i]), d) : null; };     // una concreta (las que van en orden)
@@ -1787,16 +1955,17 @@ window.AIQ = window.AIQ || {};
   function onPoke(e) {
     if (!el || !el.classList.contains("home") || !el.classList.contains("in") || D.host || held || pokeN >= 5) return;
     e.preventDefault(); e.stopPropagation();
+    if (dozing) return;                                                                  // dormido: le despierta wakeUp (con su respingo y su frase), sin frase de toque a medias
     pokeN++; DS.pokes = pokeN; saveStore();
-    const was = face.src; face.src = "assets/icons/dealer_shock.webp"; setTimeout(() => { if (face.src.endsWith("dealer_shock.webp")) face.src = was; }, 650);
-    face.classList.remove("poked"); A.restyle(face); face.classList.add("poked"); setTimeout(() => face.classList.remove("poked"), 360);
+    const was = spr.expr, n = lineN, jolt = !document.documentElement.classList.contains("no-shake");   // respingo: la chistera salta (con Vibracion = No, solo la cara)
+    spr.set("shock", { quiet: true }); if (jolt) spr.play("hat_pop"); setTimeout(() => { if (spr.expr === "shock" && lineN === n) spr.set(was, { quiet: true }); }, 650);
     if (A.sfx.chip) A.sfx.chip(Math.min(4, pokeN - 1));
     const idx = { 1: 0, 2: 1, 3: 2, 5: 3 }[pokeN]; if (idx == null || Date.now() - pokeSaid < 3000) return;
     pokeSaid = Date.now();
     const S = A.core && A.core.S, reduced = (S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
     const fx = pokeN === 5 && !reduced ? (S && S.shake === false ? "blackout" : "shake") : null;
     D.say(nth("poke", idx), {                                                          // el respingo es inmediato; la frase, a su turno (nunca se le corta)
-      mood: ["shock", "laugh", "angry", "angry"][idx], hold: holdFor(nth("poke", idx)), fx });
+      mood: ["shock", "laugh", "angry", "angry"][idx], hold: holdFor(nth("poke", idx)), fx, gesture: jolt && !typing ? "hat_pop" : undefined });   // si dice ya su frase, el bote va con ella
     if (pokeN === 5) { clearTimeout(homeT); homeT = setTimeout(() => { if (D.onHome) homeTick(); }, 60000 + holdFor("x") + 4000); }
   }
 
@@ -1840,7 +2009,7 @@ window.AIQ = window.AIQ || {};
     if (b.many) return { t: say1("babelMany"), mood: "laugh" };
     const i = Math.floor(Math.random() * LINES.babelOld.length), o = LINES.babelOld[i], L = b.old;
     const oldTxt = o[L] || (L === "es-419" && o.es) || o.en; if (!oldTxt) return null;
-    return { chain: [{ t: oldTxt, mood: "shock", lang: L, gap: 700 }, { t: tx6(LINES.babelNew[i % LINES.babelNew.length]), mood: "sly" }] };
+    return { chain: [{ t: mark(oldTxt, LINE_ID.get(o)), mood: "shock", lang: L, gap: 700 }, { t: tx6(LINES.babelNew[i % LINES.babelNew.length]), mood: "sly" }] };
   }
 
   /* EL LOGRO FALSO: un "Logro desbloqueado" identico a los de verdad, inventado pero con un dato real, al que le cae un sello "De broma" (js/profile.js).
@@ -2035,8 +2204,8 @@ window.AIQ = window.AIQ || {};
   function campRoom() {
     const of = document.querySelector("#dlg .offers"), first = of && of.querySelector(".offer"), app = $("app"); if (!of || !first || !app) return null;
     const R = of.getBoundingClientRect(), f = first.getBoundingClientRect(), A0 = app.getBoundingClientRect();
-    const room = Math.floor(f.left - R.left - 24), hf = Math.min(200, Math.round(room * 0.6), Math.round(R.height - 110));
-    if (room < 200 || hf < 110) return null;
+    const room = Math.floor(f.left - R.left - 24), sn = A.crupier.snap(Math.min(224, Math.round(room * 0.6), Math.round(R.height - 110))), hf = sn.css;   // v0.32: el busto a pixel entero (x2 o x1)
+    if (room < 200 || !sn.k) return null;
     return { l: Math.round(R.left - A0.left + 6), b: Math.round(A0.bottom - R.bottom + 4), hf, hb: Math.min(380, room) };
   }
   function campSay(t, mood) {
@@ -2078,8 +2247,7 @@ window.AIQ = window.AIQ || {};
      entonces se despierta de golpe con una excusa (o, a veces, con el logro falso de mirar el techo) */
   function startDoze() {
     if (!el || !D.onHome || !afkAt || lastInput > afkAt) return;
-    dozing = true; bubble.classList.remove("on"); el.classList.add("doze"); face.src = "assets/icons/dealer_neutral.webp";
-    if (!el.querySelector(".dl-zz")) { const z = document.createElement("span"); z.className = "dl-zz"; z.setAttribute("aria-hidden", "true"); z.innerHTML = "<i>Z</i><i>Z</i><i>z</i>"; el.appendChild(z); }
+    dozing = true; bubble.classList.remove("on"); el.classList.add("doze"); spr.play("yawn", () => { if (dozing) spr.set("sleep"); });   // bosteza y se queda traspuesto (zetas y cabeceo en el sprite)
     clearTimeout(homeT); homeT = setTimeout(homeTick, 1000);                         // mientras duerme, mira cada segundo si has vuelto
   }
   function wakeUp() {
@@ -2142,7 +2310,8 @@ window.AIQ = window.AIQ || {};
     const rows = [["visits", A.fmt(DS.visits || 1)], ["hours", A.fmt(Math.floor((DS.playMs || 0) / 3600000)) + " h"], ["since", since], ["streak", A.fmt(DS.streak || 1)],
       ["door", A.fmt(q.quits || 0)], ["stays", A.fmt(q.stays || 0)], ["tricks", A.fmt(q.trolls || 0)], ["nemesis", nem ? nem.p : "—"], ["hour", hi >= 0 && H[hi] > 1 ? String(hi).padStart(2, "0") + ":00" : "—"]];
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-    host.innerHTML = `<h3 class="dlf-h">${A.icon("dealer_neutral", "sm")}<span>${esc(A.pick6(FILE.title))}</span></h3><div class="dlf">${rows.map(([k, v]) => `<div class="dlf-r"><span>${esc(A.pick6(FILE[k]))}</span><b>${esc(v)}</b></div>`).join("")}</div>`;
+    host.innerHTML = `<h3 class="dlf-h">${A.icon("dealer_mini", "sm")}<span>${esc(A.pick6(FILE.title))}</span></h3><div class="dlf">${rows.map(([k, v]) => `<div class="dlf-r"><span>${esc(A.pick6(FILE[k]))}</span><b>${esc(v)}</b></div>`).join("")}</div>`;
+    { const ic = host.querySelector(".dlf-h .ic"), dpr = devicePixelRatio || 1; if (ic && dpr % 1) { const s = 36 * Math.max(1, Math.round(dpr)) / dpr; ic.style.width = ic.style.height = s + "px"; } }   // v0.32: su cabeza a pixel entero tambien con el escalado de Windows
     if (!DS.fileSeen) { DS.fileSeen = 1; saveStore(); setTimeout(() => screenSay(say1("fileFirst"), "sly"), 500); }
   };
   /* TE OLVIDA DE VERDAD: "Borrar todos mis datos". Se despide (sin que se le corte: el borrado espera a su frase) y deja de guardar nada; al volver,
@@ -2313,7 +2482,7 @@ window.AIQ = window.AIQ || {};
   function babelTrick() {
     const o = LINES.babel && LINES.babel[0]; if (!o) return null; const base = (A.lang || "es").replace("-419", "");
     const ls = ["es", "en", "fr", "pt", "de", "it", "zh", "ko", "ja", "ru", "pl"].filter(l => l !== base && o[l]); if (!ls.length) return null;
-    const L = rand(ls); return { t: o[L], lang: L };
+    const L = rand(ls); return { t: mark(o[L], LINE_ID.get(o)), lang: L };
   }
   /* LOGROS CON COMENTARIO: los secretos siempre; alguno suelto (1 por sesion, al 15 %); y con el ultimo de los 100, escena bajo el foco */
   D.noteAch = a => {
@@ -2460,7 +2629,8 @@ window.AIQ = window.AIQ || {};
   const ensureBO = () => { if (!bo || !bo.isConnected) { bo = document.createElement("div"); bo.id = "dlBlackout"; document.body.appendChild(bo); } return bo; };
   D.fx = kind => {
     if (kind === "shake") { const root = document.documentElement; root.classList.remove("dl-tantrum"); A.restyle(root); root.classList.add("dl-tantrum"); setTimeout(() => root.classList.remove("dl-tantrum"), 700); }
-    else if (kind === "blackout") { const el = ensureBO(); el.classList.remove("go"); A.restyle(el); el.classList.add("go"); setTimeout(() => el.classList.remove("go"), 1300); }
+    else if (kind === "blackout") { const el = ensureBO(); el.classList.remove("go"); A.restyle(el); el.classList.add("go"); setTimeout(() => el.classList.remove("go"), 1300);
+      setTimeout(() => { if (spr && /^dark/.test(spr.expr)) spr.set(spr.expr === "dark" ? "innocent" : "angry", { quiet: true }); }, 1100); }   // v0.32: vuelve la luz: se le ve la cara
   };
   D.react = (kind, o = {}) => {
     if (!D.on || D.host) return; const ph = phase(); if (ph === "shop" || ph === "title" || ph === "intro") return;
@@ -2496,7 +2666,7 @@ window.AIQ = window.AIQ || {};
       : kind === "roundWin" && o.big ? say1("roundWinBig", { c: o.c, p: o.p })                     // v0.35: aplastas la meta (+50 % o mas) y el botin se nota
       : pickLine(kind);                                                                             // de la bolsa: sin repetir la misma dos veces seguidas
     if (!line) return;
-    let t = tx6(line); if (nameOk(0.06)) { nameUse(); t = voc(t); }                              // v0.37: muy de vez en cuando, "Nombre… ¡ja, ja!"
+    let t = tx6(line); if (nameOk(0.06)) { nameUse(); t = mark(voc(t), lineOf.get(t)); }                              // v0.37: muy de vez en cuando, "Nombre… ¡ja, ja!"
     D.say(t, { mood, valid: o.valid });                                     // o.valid: si espera turno y ya estas en otra pregunta, no se dice
   };
   /* v0.37: tras preguntarte el nombre en el veredicto, solo la invitacion a jugar otra (la reaccion ya la ha tapado la pregunta) */

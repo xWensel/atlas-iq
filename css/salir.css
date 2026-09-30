@@ -40,8 +40,8 @@
 /* el crupier asoma de un salto con el globo a su derecha */
 .qx-stage .dealer.big { position: relative; left: 0; bottom: 0; z-index: 1; display: block; width: var(--face); height: var(--face); transform: none; opacity: 1; }
 .qx.spot .qx-stage .dealer { animation: qx-pop .6s cubic-bezier(.3, 1.6, .4, 1) both; }
-@keyframes qx-pop { from { opacity: 0; transform: translateY(46px) scale(.7); } }
-.qx-stage .dealer.big .dl-face { width: var(--face); height: var(--face); transition: filter .25s, transform .2s; filter: drop-shadow(0 8px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 22px rgba(255, 214, 140, .25)); }
+@keyframes qx-pop { from { opacity: 0; transform: translateY(46px); } }   /* v0.32: sin escalar (el sprite hace su propio bote) */
+.qx-stage .dealer.big .dl-face { width: var(--face); height: var(--face); transition: filter .25s; filter: drop-shadow(0 8px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 22px rgba(255, 214, 140, .25)); }
 .qx-stage .dealer.big .dl-bubble, .qxc-stage .dealer.big .dl-bubble { position: absolute; left: calc(100% - 8px); bottom: 56%; width: max-content; max-width: min(420px, calc(50 * var(--vw) - var(--face) / 2 - 12px)); margin: 0;
   padding: 11px 18px 13px 16px; font-family: var(--sans); font-weight: 400; font-size: calc(27px * var(--dll, 1)); line-height: 1.12; transform-origin: 0 100%; clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% + 12px)); }
 
@@ -89,7 +89,7 @@
 /* apagon: negro total; el crupier es una silueta que habla, y solo brilla "Me quedo" */
 .qx.dark .qx-dim { opacity: 1; animation: none; background: #000; }
 .qx.dark .qx-beam, .qx.dark .qx-pool { animation: none; opacity: 0; }
-.qx.dark .qx-stage .dealer.big .dl-face { filter: brightness(.07) drop-shadow(0 0 1px rgba(255, 255, 255, .2)); }
+.qx.dark .qx-stage .dealer.big .dl-face { filter: none; }      /* v0.32: a oscuras lo pinta el sprite: silueta con los ojos encendidos */
 .qx.dark .qx-card { background: #030605; box-shadow: 0 0 0 3px #000, 0 12px 0 rgba(0, 0, 0, .5); }
 .qx.dark .qx-top, .qx.dark .qx-q, .qx.dark .qx-sub { opacity: .04; }
 .qx.dark .qx-bulbs { animation: none !important; opacity: 0; }                   /* sin luz, tampoco la marquesina */
@@ -105,7 +105,7 @@
 .qx.rage .qx-card { box-shadow: 0 0 0 3px #0a140f, inset 0 0 0 3px #fe5f55, inset 0 0 0 5px #7a1f17, inset 0 0 0 7px #0a140f, inset 0 0 70px rgba(254, 70, 60, .35), 0 12px 0 rgba(0, 0, 0, .5), 0 0 90px rgba(254, 60, 50, .35); }
 .qx.rage .qx-beam, .qx.rage .qx-pool { filter: hue-rotate(-38deg) saturate(3.2) brightness(1.15); }
 .qx.rage .qx-dim { background: radial-gradient(ellipse 58% 66% at 50% 42%, rgba(60, 10, 10, .82), rgba(12, 2, 2, .95) 72%, rgba(3, 0, 0, .98)); }
-.qx.rage .qx-stage .dealer.big .dl-face { transform: scale(1.06); }
+/* v0.32: la rabieta la hace el sprite (cara a gritos, botes y chistera), sin escalarlo */
 .qx.shout .dealer .dl-bubble { background: #fff1ee; color: #b3122a; box-shadow: inset 0 0 0 3px #b3122a, 0 6px 0 rgba(0, 0, 0, .4), 0 0 30px rgba(254, 60, 50, .5); font-size: calc(30px * var(--dll, 1)); animation: qx-yell .1s steps(2) infinite; }
 @keyframes qx-yell { 0% { translate: -1px 1px; } 50% { translate: 2px -1px; } }
 
@@ -127,7 +127,7 @@
 .qx.sad .qx-card { background: radial-gradient(130% 100% at 50% 0%, #3a4541 0%, #2a322e 52%, #1b211e 100%);
   box-shadow: 0 0 0 3px #0a140f, inset 0 0 0 3px #a99c80, inset 0 0 0 5px #4f4636, inset 0 0 0 7px #0a140f, 0 12px 0 rgba(0, 0, 0, .5), 0 34px 70px rgba(0, 0, 0, .65); }
 .qx.sad .qx-top, .qx.sad .qx-q, .qx.sad .qx-sub, .qx.sad .qx-go { filter: saturate(.25); opacity: .82; }
-.qx.sad .qx-stage .dealer.big .dl-face { filter: saturate(.6) drop-shadow(0 8px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 22px rgba(140, 180, 255, .3)); }
+.qx.sad .qx-stage .dealer.big .dl-face { filter: drop-shadow(0 8px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 22px rgba(140, 180, 255, .3)); }
 
 /* soborno: fichas que caen por toda la sala */
 .qx-rain { position: absolute; inset: 0; z-index: 5; overflow: hidden; pointer-events: none; }
@@ -154,7 +154,7 @@ html.qx-crt, html.qx-crt body { background: #000 !important; }
 @keyframes qxc-tube { 0%, 61%, 63%, 88%, 100% { opacity: 1; } 62% { opacity: .45; } 89% { opacity: .7; } }
 .qxc-stage { position: relative; width: var(--face); height: var(--face); margin-right: 260px; }
 .qxc-stage .dealer.big { position: relative; left: 0; bottom: 0; display: block; width: var(--face); height: var(--face); transform: none; opacity: 1; animation: qx-pop .6s cubic-bezier(.3, 1.6, .4, 1) both; }
-.qxc-stage .dealer.big .dl-face { width: var(--face); height: var(--face); filter: brightness(.55) drop-shadow(0 0 18px rgba(255, 60, 110, .35)); }
+.qxc-stage .dealer.big .dl-face { width: var(--face); height: var(--face); filter: drop-shadow(0 0 18px rgba(255, 60, 110, .35)); }
 .qxc-hint { margin: 0; font-family: var(--mono); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: rgba(242, 233, 214, .55); opacity: 0; transition: opacity .5s; }
 .qxc-back { width: auto; padding: 13px 26px; opacity: 0; pointer-events: none; transition: opacity .5s .15s; }
 .qxc.ready .qxc-hint, .qxc.ready .qxc-back { opacity: 1; pointer-events: auto; }

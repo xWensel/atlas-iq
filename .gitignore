@@ -9,6 +9,8 @@ tools/cache-langs/
 tools/*.log
 assets_stage/
 tools/__pycache__/
+tools/crupier/__pycache__/
+tools/crupier/out/
 tools/cache-codex/
 tools/cache-r2.json
 assets/wiki/

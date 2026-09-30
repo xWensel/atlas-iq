@@ -304,7 +304,8 @@ button:focus-visible, .camp:focus-visible { outline: 3px solid var(--brass); out
 /* el crupier ocupa el hueco bajo la ficha: es el protagonista de la mesa, asi que sale grande. cara abajo, globo de texto arriba con la punta hacia el */
 .v-side .v-dealer { min-height: 0; width: 100%; display: grid; justify-items: center; margin-top: 6px; }
 .v-side .dealer.inline { flex-direction: column; align-items: center; gap: 10px; transform: none; }
-.v-side .dealer.inline .dl-face { width: clamp(144px, calc(21 * var(--vh)), 240px); height: clamp(144px, calc(21 * var(--vh)), 240px); order: 2; }
+.v-side .dealer.inline .dl-face { width: clamp(144px, calc(27 * var(--vh)), 240px); height: clamp(144px, calc(27 * var(--vh)), 240px); order: 2; }   /* v0.32: x2 exacto desde 768 px de alto */
+.v-side .dealer.inline .dl-face > .cr-cv:not(.mini) { top: 0; transform: translate(-50%, -6.25%); }   /* el sombrero pegado al globo: lo que sobre del hueco queda debajo */
 .v-side .dealer.inline .dl-bubble { margin: 0; max-width: min(96%, 400px); font-size: calc(24px * var(--dll, 1)); text-align: center; order: 1; transform-origin: 50% 100%; padding-bottom: 20px;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(50% + 10px) calc(100% - 12px), 50% 100%, calc(50% - 10px) calc(100% - 12px), 0 calc(100% - 12px)); }
 @keyframes medal-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }

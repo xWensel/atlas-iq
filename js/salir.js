@@ -205,12 +205,12 @@ window.AIQ = window.AIQ || {};
   const TROLL = {
     /* apagon: se va la luz de golpe y solo brilla "Me quedo"; vuelve a parpadeos */
     dark(line) {
-      const ok = both(2); A.sfx.powerdown(); root.classList.add("dark"); A.haptic([40]);
-      st.undo = () => root.classList.remove("dark", "flick");
+      const ok = both(2); A.sfx.powerdown(); root.classList.add("dark"); A.haptic([40]); if (D().face) D().face("dark");   // se va la luz: solo sus ojos (v0.32)
+      st.undo = () => { root.classList.remove("dark", "flick"); if (D().face) D().face("laugh"); };
       talk(line, "laugh", ok, { start: () => {
         later(() => { A.sfx.buzz(0); root.classList.add("flick"); }, 2300);
         later(() => A.sfx.buzz(2), 2480);
-        later(() => { root.classList.remove("dark", "flick"); A.sfx.restore(); ok(); }, 2760);
+        later(() => { root.classList.remove("dark", "flick"); A.sfx.restore(); if (D().face) D().face("laugh"); ok(); }, 2760);   // vuelve la luz: se le ve la cara (v0.32)
       } });
     },
     /* rabieta: grita en mayusculas, retumba la sala, tiembla la pantalla (flojo, fuerte, mas fuerte) y la marquesina se pone roja */

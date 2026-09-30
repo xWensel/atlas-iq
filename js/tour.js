@@ -40,9 +40,14 @@ window.AIQ = window.AIQ || {};
   function ensure() {
     let el = $("tour"); if (el) return el;
     el = document.createElement("div"); el.id = "tour"; el.className = "tour hidden";
-    el.innerHTML = `<i class="tour-hole"></i><div class="tour-card"><img class="tour-face" alt="" src="assets/icons/dealer_neutral.webp"><div class="tour-body"><p class="tour-txt"></p><div class="tour-nav"><button type="button" class="tour-skip"></button><span class="tour-dots"></span><button type="button" class="tour-next btn-ink"></button></div></div></div>`;
-    $("app").appendChild(el); return el;
+    el.innerHTML = `<i class="tour-hole"></i><div class="tour-card"><div class="tour-face"></div><div class="tour-body"><p class="tour-txt"></p><div class="tour-nav"><button type="button" class="tour-skip"></button><span class="tour-dots"></span><button type="button" class="tour-next btn-ink"></button></div></div></div>`;
+    $("app").appendChild(el);
+    if (A.crupier) face = A.crupier.mount(el.querySelector(".tour-face"), { mini: true, fidget: false });   // v0.32: el crupier de sus frases, la cabeza a escala entera
+    return el;
   }
+  let face = null, faceT = 0;
+  /* mientras aparece cada explicacion mueve la boca un momento (el texto sale de golpe: se le ve hablar, sin maquina de escribir) */
+  const mouth = n => { if (!face) return; clearInterval(faceT); face.talk(true); let k = 0; faceT = setInterval(() => { face.syl(); if (++k > n) { clearInterval(faceT); face.talk(false); } }, 70); };
 
   function place(step) {
     const el = $("tour"), hole = el.querySelector(".tour-hole"), card = el.querySelector(".tour-card");
@@ -74,6 +79,7 @@ window.AIQ = window.AIQ || {};
     nx.innerHTML = `<span>${last ? t6("¡Entendido!|Got it!|Compris !|Entendi!|Verstanden!|Capito!||明白了！|알겠어요!|わかった！|Понятно!|Jasne!") : t6("Siguiente|Next|Suivant|Próximo|Weiter|Avanti||下一步|다음|次へ|Далее|Dalej")}</span>`;
     el.querySelector(".tour-dots").innerHTML = tour.steps.map((_, k) => `<i class="${k === tour.i ? "on" : ""}"></i>`).join("");
     place(step); if (!quiet && A.sfx.card) A.sfx.card();
+    if (!quiet) mouth(Math.min(28, Math.round(t6(step.txt).length / 3)));
     nx.onclick = () => { tour.i++; show(); }; el.querySelector(".tour-skip").onclick = () => finish(false, true);
   }
   function finish(done, skipAll) {

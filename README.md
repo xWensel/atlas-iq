@@ -4,6 +4,14 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.32.1** - Don Crupier, pulido y animado.
+- El crupier de siempre, pulido píxel a píxel: chistera lisa (fuera los restos del broche), máscara sin manchas, cartas sin índices, guante con volumen y brillo en los ojos. Todas sus caras y gestos salen de ese único retrato partido en capas, así que la chistera, la máscara, la pajarita y las cartas son los mismos píxeles siempre.
+- 18 caras (pícaro, presumido, guiño, sospecha, carcajada, pena, sorpresa, aburrido, nervioso, reverencia, yo no he sido, enfado, rabieta, desafiante, desconcertado, dormido y dos a oscuras) y 48 gestos (reverencia quitándose la chistera, bote de chistera, barajar, repartir, abanicarse, chitón, dedo que dice no, reloj de bolsillo, sellazo, doblón, pase de mago…). Respira, parpadea, mueve la boca al ritmo de las letras y, en reposo, hace algún gesto suelto.
+- Cada una de las 764 frases tiene su cara y, cuando pega, su gesto (revisadas una a una). En los apagones solo se le ven los ojos; en la rabieta grita; en la súplica se lleva la chistera al pecho.
+- Siempre nítido: se pinta a un múltiplo exacto de los píxeles reales de la pantalla (también con el escalado de Windows al 125 % o 150 %). En partida sale a x3 si cabe (si no, x2); nada de giros ni escalados que emborronen el píxel.
+- En todas partes: partida, portada, intro de ronda, veredicto, Campamento, salir, tu nombre, escenas bajo el foco, tutorial (su cabeza animada), el logro de broma y el expediente de Ajustes. La tarjeta de Aventura lleva el retrato nuevo.
+- Motor en js/crupier.js (datos en js/crupier-data.js, generados con tools/crupier/build.py). Sin fotogramas perdidos, igual que antes (medido x1 y con la CPU x4).
+
 **v0.31.1** - Continentes barajados: mezclar continentes, ahora bien hecho.
 - Nuevo reto del mapa «Continentes barajados», en el hueco del antiguo «Continentes cambiados» (retirado en la v0.23.1 porque jugaba como Pangea, pero peor, y se rompía): el crupier baraja los continentes y los reparte como cartas. Cada uno se encoge en su sitio y aparece en la silla de otro, sin cruzarse por el mapa. Nivel 1: una pareja cambia de sitio; nivel 2: cuatro continentes; nivel 3: los seis sobre la mesa, en dos filas de tres.
 - Sin solapes: cada continente se mide con su tierra real (máscaras, con el mundo dando la vuelta), nada queda debajo del HUD (tampoco con el mapa del revés o en espejo) y todas las preguntas de la ronda quedan a la vista. Los clics leen el continente que ves: ida y vuelta 0 px en todas las pruebas.
