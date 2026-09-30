@@ -44,23 +44,26 @@ window.AIQ = window.AIQ || {};
     box.className = className + " cs-anim"; box.setAttribute("role", "img"); box.setAttribute("aria-label", "Cousins Studio");
     box.style.aspectRatio = VB[2] + " / " + VB[3];
     const yr = cls => { let a = 1e9, b = -1e9; A.CS_LETTERS.forEach(([c, , , y, , h]) => { if (c === cls) { a = Math.min(a, y); b = Math.max(b, y + h); } }); return [a, b]; };
-    /* metal fresado con una sola luz cenital: cara perla con horizonte lila, filo de luz en los bordes que miran arriba y filo en sombra en los
-       que miran abajo (cada palabra con sus degradados, en un svg invisible del tamano del logo) */
+    /* metal fresado con una sola luz cenital: "Cousins" en oro champan (horizonte ambar) y "studio" en perla neutra; filo de luz en
+       los bordes que miran arriba y filo en sombra en los que miran abajo (cada palabra con sus degradados, en un svg invisible del tamano del logo) */
     const defsSvg = el("svg", { viewBox: vb, class: "cs-defs", "aria-hidden": "true" }), defs = el("defs");
     const grad = (id, [y1, y2], stops, h) => {
       const g = el("linearGradient", h ? { id, x1: h > 0 ? "0" : "1", y1: "0", x2: h > 0 ? "1" : "0", y2: "0" } : { id, gradientUnits: "userSpaceOnUse", x1: "0", y1, x2: "0", y2 });
       stops.forEach(([o, c, a = 1]) => g.appendChild(el("stop", { offset: o, "stop-color": c, "stop-opacity": a }))); defs.appendChild(g);
     };
-    const FACE = [["0", "#ece1fb"], [".35", "#f7f1fe"], [".52", "#efe4fc"], [".56", "#cbb0ee"], [".6", "#b999e5"], [".72", "#c4a9ec"], [".9", "#bb9eea"], ["1", "#a888e0"]];
-    const HI = [["0", "#ffffff"], [".6", "#fbf6ff"], ["1", "#efe4ff"]];
-    const LO = [["0", "#9a79d8"], [".6", "#7c59c4"], ["1", "#6341ad"]];
-    const RULE = [["0", "#d9c4f1", 0], [".62", "#d8c3f0"], ["1", "#e8dbf8"]];
+    const PEARL = [["0", "#f4f2ee"], [".35", "#fdfcfa"], [".52", "#f5f3ef"], [".56", "#dcd8d1"], [".6", "#cbc6be"], [".72", "#d6d2cb"], [".9", "#cdc9c1"], ["1", "#bdb8b0"]];
+    const PEARL_HI = [["0", "#ffffff"], [".6", "#fdfcfa"], ["1", "#f3f1ec"]];
+    const PEARL_LO = [["0", "#9a958e"], [".6", "#7d7872"], ["1", "#64605b"]];
+    const GOLD = [["0", "#fff3d2"], [".3", "#f3dcab"], [".5", "#ddb776"], [".66", "#b3843f"], [".76", "#976525"], [".88", "#c39650"], ["1", "#e2bf7f"]];
+    const GOLD_HI = [["0", "#fffaf0"], [".6", "#fff1d6"], ["1", "#f7e3b8"]];
+    const GOLD_LO = [["0", "#8d5b1d"], [".6", "#6e4312"], ["1", "#54320b"]];
+    const RULE = [["0", "#e2ded7", 0], [".62", "#e0dcd5"], ["1", "#f1eee9"]];
     const bigY = yr("big"), smallY = yr("small");
-    grad("csFaceB", bigY, FACE); grad("csHiB", bigY, HI); grad("csLoB", bigY, LO);
-    grad("csFaceS", smallY, FACE); grad("csHiS", smallY, HI); grad("csLoS", smallY, LO);
+    grad("csFaceB", bigY, GOLD); grad("csHiB", bigY, GOLD_HI); grad("csLoB", bigY, GOLD_LO);
+    grad("csFaceS", smallY, PEARL); grad("csHiS", smallY, PEARL_HI); grad("csLoS", smallY, PEARL_LO);
     grad("csRuleL", [], RULE, 1); grad("csRuleR", [], RULE, -1);
     defsSvg.appendChild(defs); box.appendChild(defsSvg);
-    /* halos: las letras de cada palabra en violeta y desenfocadas, pintadas UNA vez en un lienzo pequeno (1/6) que se amplia con css.
+    /* halos: las letras de cada palabra en su color (ambar el oro, gris calido la perla) y desenfocadas, pintadas UNA vez en un lienzo pequeno (1/6) que se amplia con css.
        Con un desenfoque SVG grande el primer fotograma costaba ~300 ms (se recalculaba por tesela); asi es una imagen fija y solo cambia su opacidad.
        willReadFrequently deja el lienzo en la CPU: el desenfoque de ~310x160 px es ~1 ms ahi, y acelerado (GL por software) costaba ~50 ms.
        Margen E holgado: el desenfoque (ancho) no llega a cortarse en el borde del lienzo */
@@ -70,7 +73,7 @@ window.AIQ = window.AIQ || {};
       cv.width = Math.round(gw * SC); cv.height = Math.round(gh * SC); cv.className = "cs-glow cs-g" + cls[0]; cv.setAttribute("aria-hidden", "true");
       cv.style.cssText = `left:${-E / VB[2] * 100}%;top:${-E / VB[3] * 100}%;width:${gw / VB[2] * 100}%;height:${gh / VB[3] * 100}%`;
       if (ctx) {
-        ctx.filter = `blur(${64 * SC}px)`; ctx.globalAlpha = .5; ctx.fillStyle = "#7b3fe0"; ctx.setTransform(SC, 0, 0, SC, (E - VB[0]) * SC, (E - VB[1]) * SC);
+        ctx.filter = `blur(${64 * SC}px)`; ctx.globalAlpha = .5; ctx.fillStyle = cls === "big" ? "#c7872c" : "#8f8a82"; ctx.setTransform(SC, 0, 0, SC, (E - VB[0]) * SC, (E - VB[1]) * SC);
         ctx.fill(new Path2D(A.CS_LETTERS.filter(([c]) => c === cls).map(([, d]) => d).join(" ")), "evenodd");
       }
       return cv;

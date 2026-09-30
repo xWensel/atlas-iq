@@ -21,13 +21,13 @@
 @keyframes breathe { 50% { opacity: .35; } }
 @keyframes st-fade { from { opacity: 0; } to { opacity: 1; } }
 
-/* ---- secuencia del estudio (~3,5 s, fondo negro). Las letras de "Cousins" salen de la oscuridad en metal violeta apagado y se encienden
-   con el primer golpe grave (0,62 s); "studio" igual con el segundo (1,26 s) mientras sus filetes se abren hacia fuera; una luz calida
+/* ---- secuencia del estudio (~3,5 s, fondo negro). Las letras de "Cousins" (oro) salen de la oscuridad en penumbra ambar y se encienden
+   con el primer golpe grave (0,62 s); "studio" (perla) igual con el segundo (1,26 s) mientras sus filetes se abren hacia fuera; una luz calida
    cruza el metal (1,85 s) y la camara avanza despacio todo el rato. Cada letra es una capa propia (js/logo.js) y solo se animan
    transform/opacity de esas capas y un filtro de color por palabra (dos capas): la tarjeta grafica lo mueve todo, sin repintar ---- */
 .studio { position: absolute; inset: 0; overflow: hidden; background: #000; }
 .st-bg { position: absolute; inset: 0; opacity: 0; animation: st-bg 3.5s linear both;
-  background: radial-gradient(ellipse 46% 34% at 50% 50%, rgba(84, 38, 150, .04), rgba(84, 38, 150, .028) 30%, rgba(84, 38, 150, .012) 58%, rgba(84, 38, 150, .004) 82%, rgba(84, 38, 150, 0)); }
+  background: radial-gradient(ellipse 46% 34% at 50% 50%, rgba(150, 104, 44, .04), rgba(150, 104, 44, .028) 30%, rgba(150, 104, 44, .012) 58%, rgba(150, 104, 44, .004) 82%, rgba(150, 104, 44, 0)); }
 @keyframes st-bg { 0%, 16% { opacity: 0; } 19% { opacity: 1; } 34% { opacity: .75; } 37% { opacity: 1; } 100% { opacity: .85; } }
 
 .st-logo { position: absolute; left: 50%; top: 50%; width: min(calc(52 * var(--vw)), calc(120 * var(--vh)), 960px); transform: translate(-50%, -50%); animation: st-push 3.6s linear both; }
@@ -39,7 +39,7 @@
 .cs-anim { position: relative; width: 100%; }
 .cs-defs, .cs-glow, .cs-w, .cs-shine { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cs-defs { visibility: hidden; pointer-events: none; }
-/* halo violeta con forma de letra, uno por palabra (lienzo fijo, js/logo.js): estalla con su golpe y se queda en un rastro que no tine las contraformas */
+/* halo con forma de letra (ambar el oro, gris calido la perla), uno por palabra (lienzo fijo, js/logo.js): estalla con su golpe y se queda en un rastro que no tine las contraformas */
 .cs-glow { display: block; opacity: 0; }
 .cs-gb { animation: cs-glow-b 3.5s linear both; }
 .cs-gs { animation: cs-glow-s 3.5s linear both; }
@@ -53,15 +53,15 @@
 .cs-ws .cs-rule { animation: cs-draw 1.3s cubic-bezier(.16, 1, .3, 1) 1.26s both; }
 .cs-rl { transform-origin: 100% 50%; } .cs-rr { transform-origin: 0 50%; }
 @keyframes cs-draw { 0% { opacity: 0; transform: scaleX(0); } 20% { opacity: 1; } 100% { opacity: 1; transform: none; } }
-/* el encendido (un filtro de color por palabra): la palabra llega en penumbra violeta (primero se oscurece y luego se tine: asi el perla
-   tambien coge color) y en el golpe salta de una vez casi al blanco (steps: sin pasar por otros tonos) y se enfria hasta quedar sin filtro */
+/* el encendido (un filtro de color por palabra): la palabra llega en penumbra (el oro, oscurecido y
+   calentado hacia el ambar; la perla, gris neutro) y en el golpe salta de una vez casi al blanco (steps: sin pasar por otros tonos) y se enfria hasta quedar sin filtro */
 .cs-wb { animation: cs-lit-b 2.4s linear backwards; }   /* sin "forwards": al acabar la palabra se queda sin filtro (none), no con uno neutro que seguiria costando una capa */
 .cs-ws { animation: cs-lit-s 3s linear backwards; }
-@keyframes cs-lit-b { 0% { filter: brightness(.14) sepia(1) hue-rotate(226deg) saturate(2.7); }
-  25.8% { filter: brightness(.27) sepia(1) hue-rotate(226deg) saturate(2.7); animation-timing-function: steps(1, end); }
+@keyframes cs-lit-b { 0% { filter: brightness(.14) sepia(.7) hue-rotate(-8deg) saturate(1.6); }
+  25.8% { filter: brightness(.27) sepia(.7) hue-rotate(-8deg) saturate(1.6); animation-timing-function: steps(1, end); }
   25.9% { filter: brightness(1.55) sepia(0) hue-rotate(0deg) saturate(1); animation-timing-function: cubic-bezier(.2, .6, .3, 1); } 100% { filter: none; } }
-@keyframes cs-lit-s { 0% { filter: brightness(.14) sepia(1) hue-rotate(226deg) saturate(2.7); }
-  41.9% { filter: brightness(.27) sepia(1) hue-rotate(226deg) saturate(2.7); animation-timing-function: steps(1, end); }
+@keyframes cs-lit-s { 0% { filter: brightness(.14) sepia(0) hue-rotate(0deg) saturate(.5); }
+  41.9% { filter: brightness(.27) sepia(0) hue-rotate(0deg) saturate(.5); animation-timing-function: steps(1, end); }
   42% { filter: brightness(1.55) sepia(0) hue-rotate(0deg) saturate(1); animation-timing-function: cubic-bezier(.2, .6, .3, 1); } 100% { filter: none; } }
 /* la luz: una franja calida que cruza una vez, recortada con la silueta del logo (mascara fija; solo se desplaza la franja) */
 .cs-shine { pointer-events: none; overflow: hidden; -webkit-mask: var(--cs-mask) 0 0 / 100% 100% no-repeat; mask: var(--cs-mask) 0 0 / 100% 100% no-repeat;

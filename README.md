@@ -4,6 +4,11 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.25.1** - Cousins Studio en oro y perla.
+- «Cousins» pasa a oro champán (horizonte ámbar, filo de luz cálido, sombra ámbar oscura); sale de la oscuridad en penumbra ámbar y se funde casi a blanco en el primer golpe antes de asentarse en oro.
+- «studio» y sus filetes, en perla neutra: sin rastro de lavanda (tampoco en su halo ni en su fase apagada). El resplandor de fondo pasa a ámbar; el fondo sigue siendo negro puro.
+- Misma fluidez: 0 fotogramas perdidos a CPU x1 y x4.
+
 **v0.24.1** - Intro del estudio nueva: Cousins Studio sobre negro.
 - Fondo negro puro en la intro (y en la transición hacia la pantalla de entrada).
 - Logo nuevo «Cousins Studio», dibujado a mano como trazos (sin fuentes), de la familia del de Vault Raiders: «Cousins» grande y «studio» debajo, letras gruesas y redondeadas con la t y la d de corte inclinado, en metal perla lavanda con filo de luz arriba y sombra violeta abajo.
