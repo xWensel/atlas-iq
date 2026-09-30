@@ -324,9 +324,12 @@ window.AIQ = window.AIQ || {};
     /* v0.23: retos que ya no existen ("Continentes cambiados"): fuera de la partida guardada, y el soborno que se pago por quitarlo se devuelve
        (en esa ronda sale otro reto en su lugar) */
     if (r.chal) r.chal = r.chal.filter(c => A.CHAL[c.id]);
+    /* v0.29: y los sobornos de un reto que ya no sale en esa ronda (entre la v0.23 y la v0.28 alli se sorteaba otro; ahora salen Continentes barajados) */
+    const now = r.act * 4 + r.round;
     for (const k in r.bribed || {}) {
-      const gone = r.bribed[k].filter(id => !A.CHAL[id]); if (!gone.length) continue;
-      r.bribed[k] = r.bribed[k].filter(id => A.CHAL[id]); r.bribeN = Math.max(0, (r.bribeN || 0) - gone.length);
+      let inPlan = null; if (!r.inf && !A.adv._force && r === run && +k >= now) try { inPlan = chalFor(+k).paid; } catch (e) { inPlan = null; }
+      const gone = r.bribed[k].filter(id => !A.CHAL[id] || (inPlan && !inPlan.includes(id))); if (!gone.length) continue;
+      r.bribed[k] = r.bribed[k].filter(id => !gone.includes(id)); r.bribeN = Math.max(0, (r.bribeN || 0) - gone.length);
       r.coins += gone.length * Math.max(2, Math.round(10 * (+k % 4 === 3 ? 2 : 1) * (1 + 0.5 * r.bribeN) * ascFx(r.asc).price * (1 + 0.25 * Math.floor(+k / 4))));   // lo mas que podia costar sobornarlo en esa ronda (truco de mapa de nivel 3): nunca se devuelve de menos
     }
   }

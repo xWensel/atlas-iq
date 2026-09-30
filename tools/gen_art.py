@@ -131,7 +131,7 @@ icons({
  "ch_memory": "a fading ghostly thought bubble with a question mark", "ch_blur": "a blurry out of focus eye surrounded by foggy circles",
  "ch_dark": "a dark night cloud with a crescent moon and one small candle", "ch_flicker": "a broken flickering casino light bulb with sparks",
  "ch_wrongborders": "a folded map with a crooked red wavy border line and a warning triangle", "ch_noborders": "a globe with erased dotted border lines and an eraser",
- "ch_pangea": "one giant supercontinent glued together from puzzle pieces",
+ "ch_pangea": "one giant supercontinent glued together from puzzle pieces", "ch_deal": "continent puzzle pieces swapping places with circular arrows",
  "ch_flip": "an upside down globe with a curved turning arrow", "ch_clouds": "puffy grey smoke clouds covering a small map",
  # OJO: dealer_neutral tambien va dentro de la tarjeta de Aventura: si cambia, regenerar con tools/card_adv.py (ver CLAUDE.md)
  "dealer_neutral": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves fanning playing cards, sly confident smile, facing front",

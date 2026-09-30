@@ -15,7 +15,7 @@ window.layoutTest = function (seeds = ["a", "b", "c", "d", "e", "f", "g", "h"]) 
   };
   const pairs = spec => { const L = layers(spec), res = []; for (let i = 0; i < 6; i++) for (let j = i + 1; j < 7; j++) { let n = 0; for (let q = 3; q < L[i].length; q += 4) if (L[i][q] > 200 && L[j][q] > 200) n++; if (n > 3) res.push(i + "-" + j + ":" + n); } return res; };
   const rows = []; let worst = 0, maxMs = 0, minScale = 1;
-  for (const kind of ["pangea", "spread", "hold"]) for (const seed of seeds) {
+  for (const kind of ["pangea", "spread", "hold", "mix"]) for (const seed of seeds) {
     const rot = kind === "hold" ? [0.5, -0.5, 0.6, -0.4, 0.5, -0.6, 0].map(v => v * (seed.charCodeAt(0) % 2 ? 1 : -1)) : [0, 0, 0, 0, 0, 0, 0];
     const t0 = performance.now(), L = m.layout(kind, kind === "pangea" ? 0.8 : 1, window.AIQ.rng(seed), rot), ms = Math.round(performance.now() - t0);
     const pr = pairs({ shift: L.shift, rot, scale: L.scale }), px = pr.reduce((a, s) => a + +s.split(":")[1], 0);

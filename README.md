@@ -4,6 +4,14 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.31.1** - Continentes barajados: mezclar continentes, ahora bien hecho.
+- Nuevo reto del mapa «Continentes barajados», en el hueco del antiguo «Continentes cambiados» (retirado en la v0.23.1 porque jugaba como Pangea, pero peor, y se rompía): el crupier baraja los continentes y los reparte como cartas. Cada uno se encoge en su sitio y aparece en la silla de otro, sin cruzarse por el mapa. Nivel 1: una pareja cambia de sitio; nivel 2: cuatro continentes; nivel 3: los seis sobre la mesa, en dos filas de tres.
+- Sin solapes: cada continente se mide con su tierra real (máscaras, con el mundo dando la vuelta), nada queda debajo del HUD (tampoco con el mapa del revés o en espejo) y todas las preguntas de la ronda quedan a la vista. Los clics leen el continente que ves: ida y vuelta 0 px en todas las pruebas.
+- Mientras se reparten las cartas (1,8 s) el mapa no lee clics y ese tiempo se devuelve al reloj.
+- Sale en las mismas rondas que sacaba el antiguo (misma semilla: partidas, Reto diario y Campamento no cambian en nada más) y en el jefe «Baraja revuelta». Frase nueva del crupier, icono propio y los 12 idiomas.
+- Chincheta y Sonar junto al borde izquierdo o derecho: la curva de la pantalla CRT enseña allí un poco más de mundo (las dos copias a la vez) y, con los continentes movidos, la chincheta podía salir en el borde contrario. Ahora sale justo donde tocas. Un toque en mar abierto ya no se lee pasado el polo.
+- Partidas guardadas: los sobornos pagados (entre la v0.23 y la v0.30) a un reto que ya no sale en esa ronda se devuelven en doblones.
+
 **v0.30.1** - Aventura: tarjeta nueva, cara a cara con el crupier.
 - Nueva ilustración del modo Aventura en la portada: el crupier de sus frases preside la mesa del mapamundi y, subido al tapete y de espaldas, el explorador le planta cara con su brújula entre las fichas en juego.
 - Todo sobre la misma retícula de píxel que el crupier (mismo tamaño de píxel y contorno de 1 px): tapete repintado con el mapamundi real, filete dorado y el foco sobre el explorador; fichas dibujadas píxel a píxel; telón en penumbra.

@@ -14,6 +14,9 @@ window.AIQ = window.AIQ || {};
 (function (A) {
   const { project, unproject, D2R } = A.geo;
   const BX0 = -Math.PI, BX1 = Math.PI, BY0 = -1.5, BY1 = 2.1;
+  /* marco de un punto en el mapa deformado: el continente (0-5; 6 = el resto) y, si viene de un clic, la vuelta al mundo de la copia tocada,
+     con la misma cuenta que los vertices de la GPU: ct + 8 * (vuelta + 2). Sin vuelta (t null), el punto se envuelve al lado visible del mundo */
+  const frameOf = ct => (ct == null ? [null, null] : ct < 8 ? [ct, null] : [ct % 8, Math.floor(ct / 8) - 2]);
   const TWO_PI = Math.PI * 2;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const easeIO = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -332,6 +335,254 @@ void main(){
     return anim;
   };
 
+  /* ================================================================== Continentes barajados (reto "deal", tipo "mix")
+     El crupier reparte los continentes como cartas. Con k < 0.7 una pareja cambia de sitio (nivel 1; con el Nivel de crupier, siempre); con k < 0.95,
+     cuatro continentes (dos parejas o un ciclo de 4); con k >= 0.95 los seis se reparten en una MESA de 3 + 3 cartas dentro de la parte libre de la vista
+     de inicio (sin el HUD), cada uno escalado para caber en su carta (entre 0,55 y 1), ninguno en su plaza de siempre y todos lejos de casa.
+     Juego limpio: la tierra habitada, el punto de cada pais y los objetivos de la ronda (Z.pts) que se ven en casa se siguen viendo. Sin solapes: la
+     misma prueba de mascaras que la colocacion de siempre. Determinista: el presupuesto de busqueda se cuenta en barridos, no en ms (Reto diario).
+     mixLayout(map, k, rr, Z) -> { shift, scale, rot, ok, deal }. Z: A.chal.hudZones (+ pts: [[lon, lat, ct]...]) */
+  function mixPrep(map) {
+    if (map._mixP) return map._mixP;
+    const K = map.masks, CS = K.CS, NX = K.NX, X0 = K.X0, TAU = TWO_PI;
+    const YPOP = 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * 72 * Math.PI / 180));   // tierra habitada: hasta 72 grados (Tromso, Murmansk, Barrow); mas al norte casi no vive nadie
+    const P = [];
+    for (let c = 0; c < 6; c++) {
+      const L = K.cells[c], n = L.length / 2, gi = new Int32Array(n), at = new Map();
+      for (let q = 0; q < n; q++) { gi[q] = Math.floor((L[2 * q + 1] - BY0) / CS) * NX + Math.floor((L[2 * q] - X0) / CS); at.set(gi[q], q); }
+      /* cuerpo principal (lo que mide la carta): el trozo de tierra mas grande (celdas a menos de 2 de distancia) y los trozos a menos de 0,45 de el
+         (Madagascar, Japon, Islandia, Nueva Zelanda, Galapagos). Las islas lejanas (la Polinesia que viaja con Sudamerica, Hawai con Norteamerica,
+         Fiyi o Samoa con Oceania) no agrandan la carta, pero cuentan para los solapes y para el juego limpio */
+      const lab = new Int32Array(n).fill(-1), comps = [];
+      for (let q = 0; q < n; q++) {
+        if (lab[q] >= 0) continue;
+        const id = comps.length, mem = [q], st = [q]; lab[q] = id;
+        while (st.length) {
+          const u = st.pop(), i = gi[u] % NX, j = (gi[u] - i) / NX;
+          for (let dj = -2; dj <= 2; dj++) for (let di = -2; di <= 2; di++) { const v = at.get((j + dj) * NX + i + di); if (v !== undefined && lab[v] < 0) { lab[v] = id; st.push(v); mem.push(v); } }
+        }
+        comps.push(mem);
+      }
+      comps.sort((a, b) => b.length - a.length);
+      const main = comps[0].slice(), near = (m, D) => m.some(q => main.some(u => Math.hypot(L[2 * q] - L[2 * u], L[2 * q + 1] - L[2 * u + 1]) <= D));
+      for (let grow = true; grow;) { grow = false; for (let i = 1; i < comps.length; i++) if (comps[i] && near(comps[i], 0.45)) { main.push(...comps[i]); comps[i] = null; grow = true; } }
+      const xs = main.map(q => L[2 * q]).sort((a, b) => a - b), ys = main.map(q => L[2 * q + 1]).sort((a, b) => a - b);
+      const pc = (a, f) => a[Math.min(a.length - 1, Math.max(0, Math.round((a.length - 1) * f)))];
+      const box = [pc(xs, 0.01) - CS / 2, pc(ys, 0.01) - CS / 2, pc(xs, 0.99) + CS / 2, pc(ys, 0.99) + CS / 2];
+      /* ancho de la carta: tambien las islas lejanas que pesan (trozos con un 4 % de la tierra o mas: Samoa, Tonga y la Polinesia al oeste de
+         Sudamerica). Asi la mesa les deja sitio a la vista y lejos de los demas */
+      const wide = [].concat(...comps.filter(m => m && m.length >= 0.04 * n)).concat(main), wx = wide.map(q => L[2 * q]).sort((a, b) => a - b);
+      const wbox = [Math.min(box[0], pc(wx, 0.01) - CS / 2), box[1], Math.max(box[2], pc(wx, 0.99) + CS / 2), box[3]];
+      /* copia a una vuelta al mundo que tambien se dibuja (como en _initGL): la de su sitio de siempre si la propia cae fuera del mundo, y la de las
+         islas pequenas cerca del borde (Samoa, Tonga o la Polinesia, que viajan con Sudamerica; Fiyi con Oceania). w: +1 / -1 / 0 */
+      const inMain = new Uint8Array(n); for (const q of main) inMain[q] = 1;
+      const wrapOf = (x, small) => (x < -Math.PI ? 1 : x > Math.PI ? -1 : small && x < -2.34 ? 1 : small && x > 2.34 ? -1 : 0);
+      const pop = [], popS = [];
+      for (let q = 0; q < n; q++) {
+        const x = L[2 * q], y = L[2 * q + 1]; if (Math.abs(y) >= YPOP) continue;
+        const w = wrapOf(x, !inMain[q]); pop.push(x, y, w); const i = gi[q] % NX, j = (gi[q] - i) / NX; if (!(i & 1) && !(j & 1)) popS.push(x, y, w);
+      }
+      const pts = [];                                                  // un punto por pais (o trozo de pais que viaja con este continente)
+      for (const f of map.contFeat[c]) {
+        const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a));
+        let [x, y] = project((big.bbox[0] + big.bbox[2]) / 2, Math.max(-85, Math.min(85, (big.bbox[1] + big.bbox[3]) / 2)));
+        x += TAU * Math.round((map.contCen[c][0] - x) / TAU);           // del lado del mundo de su continente (como su copia propia en la GPU)
+        pts.push(x, y, wrapOf(x, big.bbox[2] - big.bbox[0] < 14 && big.bbox[3] - big.bbox[1] < 14));
+      }
+      P.push({ box, bw: box[2] - box[0], bh: box[3] - box[1], bc: [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2], ww: wbox[2] - wbox[0], wc: (wbox[0] + wbox[2]) / 2, pop: Float32Array.from(pop), popS: Float32Array.from(popS), pts: Float32Array.from(pts), n });
+    }
+    let top = -9; const A6 = K.cells[6]; for (let q = 1; q < A6.length; q += 2) top = Math.max(top, A6[q]);
+    P.antTop = top + CS / 2;
+    /* desarreglos de las 6 plazas de la mesa (0-2 fila de arriba, 3-5 fila de abajo); plaza de casa: NA 0, Eu 1, As 2, SA 3, Af 4, Oc 5 */
+    P.HOME = [4, 0, 3, 2, 1, 5];
+    const der = [], perm = (a, i) => { if (i === 6) { der.push(a.slice()); return; } for (let s = 0; s < 6; s++) if (!a.includes(s) && s !== P.HOME[i]) { a[i] = s; perm(a, i + 1); } a[i] = -1; };
+    perm([-1, -1, -1, -1, -1, -1], 0); P.DER = der;                   // 265
+    const off = [], st = 0.05, R = 0.8, m = Math.round(R / st);
+    for (let a = -m; a <= m; a++) for (let b = -m; b <= m; b++) { const d = Math.hypot(a, b) * st; if (d <= R) off.push([a * st, b * st, d]); }
+    P.OFF = off.sort((p, q) => p[2] - q[2]);
+    P.occ = new Uint8Array(K.NX * K.NY);
+    return (map._mixP = P);
+  }
+
+  function mixLayout(map, k, rr, Z) {
+    const P = mixPrep(map), K = map.masks, CC = map.contCen, N6 = [0, 1, 2, 3, 4, 5], SMIN = 0.55, DMIN = 0.9, FR = 0.02, GAP = 0.1, TAU = TWO_PI;
+    const V = Z.view, R = Z.rects, eps = 1e-6;
+    const nDeal = k >= 0.95 ? 6 : k >= 0.7 ? 4 : 2;
+    const ST = map._mixStats = { place: 0, scan: 0, cand: 0, fails: [], tried: 0 };
+    /* presupuesto de busqueda en barridos (no en ms): el resultado depende solo de la semilla, igual en cualquier equipo (Reto diario) */
+    const BUDGET = 160, SOFT = 100, TBUDGET = 90;                     // por fase: reparto parcial (tope, y tope si ya hay uno bueno) y mesa
+    /* lo que se ve: rejilla fina (media celda) con la vista de inicio y el HUD; se guarda por zonas (cambia con la ventana) */
+    const NX = K.NX, NY = K.NY, CS = K.CS, X0 = K.X0, HS = CS / 2, HX = NX * 2, HY = NY * 2, zkey = V.concat(...R).map(v => v.toFixed(3)).join();
+    if (P.hidKey !== zkey) {
+      const g = P.hidG = P.hidG || new Uint8Array(HX * HY);
+      for (let j = 0; j < HY; j++) { const y = BY0 + (j + 0.5) * HS; for (let i = 0; i < HX; i++) { const x = X0 + (i + 0.5) * HS; let h = x < V[0] || x > V[2] || y < V[1] || y > V[3]; if (!h) for (const r of R) if (x >= r[0] && x <= r[2] && y >= r[1] && y <= r[3]) { h = true; break; } g[j * HX + i] = h ? 1 : 0; } }
+      P.hidKey = zkey; P.home = null;
+    }
+    const HG = P.hidG, hid = (x, y) => { const i = Math.floor((x - X0) / HS), j = Math.floor((y - BY0) / HS); return i < 0 || j < 0 || i >= HX || j >= HY || HG[j * HX + i] === 1; };
+    const gone = (x, y, w) => hid(x, y) && !(w && !hid(x + w * TAU, y));   // tapado en todas sus copias
+    const flags = a => { const o = new Uint8Array(a.length / 3); for (let i = 0; i < o.length; i++) o[i] = gone(a[3 * i], a[3 * i + 1], a[3 * i + 2]) ? 1 : 0; return o; };
+    const home = P.home = P.home || N6.map(c => ({ pop: flags(P[c].pop), popS: flags(P[c].popS), pts: flags(P[c].pts) }));
+    /* objetivos de la ronda (opcional: Z.pts = [[lon, lat, ct]...], ct el marco con el que se mueve cada uno, map._ctOf): los de un continente que se
+       mueve acaban siempre a la vista, esten como esten en casa (Z es mas holgado que el HUD real: lo que Z tapa en casa suele verse de verdad).
+       Como en lonLatToScreen, lo que sale por un lado del mundo entra por el otro */
+    const wrapX = x => (x > Math.PI || x < -Math.PI ? x - TAU * Math.round(x / TAU) : x), TP = N6.map(() => []), MG = 0.03;   // MG: margen (~8 px) del borde de la vista y del HUD
+    const hidT = (x, y) => { if (x < V[0] + MG || x > V[2] - MG || y < V[1] + MG || y > V[3] - MG) return true; for (const r of R) if (x >= r[0] - MG && x <= r[2] + MG && y >= r[1] - MG && y <= r[3] + MG) return true; return false; };
+    if (Z.pts) for (const [lo, la, ct] of Z.pts) if (ct >= 0 && ct < 6) { let [x, y] = project(lo, Math.max(-89, Math.min(89, la))); x += TAU * Math.round((CC[ct][0] - x) / TAU); TP[ct].push(x, y); }
+    /* juego limpio: lo que se ve en casa se sigue viendo (tierra habitada: como mucho un 2 % nueva tapada; paises y objetivos de la ronda: ninguno) */
+    const fair = (c, t, full) => {
+      const p = P[c], cc = CC[c], a = full ? p.pop : p.popS, h = full ? home[c].pop : home[c].popS, lim = FR * a.length / 3; let n = 0;
+      for (let i = 0, u = 0; i < a.length; i += 3, u++) if (!h[u] && gone(cc[0] + t.s * (a[i] - cc[0]) + t.x, cc[1] + t.s * (a[i + 1] - cc[1]) + t.y, a[i + 2]) && ++n > lim) return false;
+      const q = p.pts, hq = home[c].pts;
+      for (let i = 0, u = 0; i < q.length; i += 3, u++) if (!hq[u] && gone(cc[0] + t.s * (q[i] - cc[0]) + t.x, cc[1] + t.s * (q[i + 1] - cc[1]) + t.y, q[i + 2])) return false;
+      const g = TP[c];
+      for (let i = 0; i < g.length; i += 2) if (hidT(wrapX(cc[0] + t.s * (g[i] - cc[0]) + t.x), cc[1] + t.s * (g[i + 1] - cc[1]) + t.y)) return false;
+      return true;
+    };
+    /* rejilla de ocupacion de los ya colocados (engordados una celda, con sus copias a una vuelta al mundo): busqueda rapida de solapes */
+    const occ = P.occ;
+    let dil = 2;                                                       // mesa: dos celdas de hueco (se ve: ~1 celda, 12-19 px); repartos parciales: una (como la colocacion de siempre)
+    const mark = (x, y) => { const i = Math.floor((x - X0) / CS), j = Math.floor((y - BY0) / CS), r2 = dil === 2 ? 5 : 2; for (let dj = -dil; dj <= dil; dj++) { const jj = j + dj; if (jj < 0 || jj >= NY) continue; for (let di = -dil; di <= dil; di++) { const ii = i + di; if (ii >= 0 && ii < NX && di * di + dj * dj <= r2) occ[jj * NX + ii] = 1; } } };
+    const fill = (placed, T) => {
+      occ.fill(0);
+      for (const j of placed) { const L = K.cells[j], cc = CC[j], t = T[j]; for (let q = 0; q < L.length; q += 2) { const x = cc[0] + t.s * (L[q] - cc[0]) + t.x, y = cc[1] + t.s * (L[q + 1] - cc[1]) + t.y; mark(x, y); if (x > Math.PI - 0.7) mark(x - TAU, y); if (x < -Math.PI + 0.7) mark(x + TAU, y); } }
+    };
+    const hitOcc = (c, t, coarse) => {
+      const L = coarse ? K.cellsS[c] : K.cells[c], cc = CC[c];
+      for (let q = 0; q < L.length; q += 2) {
+        const x = cc[0] + t.s * (L[q] - cc[0]) + t.x, y = cc[1] + t.s * (L[q + 1] - cc[1]) + t.y, j = Math.floor((y - BY0) / CS);
+        if (j < 0 || j >= NY) continue;
+        for (let w = -1; w <= 1; w++) { const i = Math.floor((x + w * TAU - X0) / CS); if (i >= 0 && i < NX && occ[j * NX + i]) return true; }
+      }
+      return false;
+    };
+    const fresh = () => [0, 1, 2, 3, 4, 5, 6].map(() => ({ x: 0, y: 0, s: 1, c: 1, n: 0 }));
+    /* hueco libre mas cercano a (X,Y) (centro del cuerpo principal) con c a escala s: dentro de la vista, sin tapar nada ni pisar a nadie */
+    const scan = (c, s, X, Y, maxR, T, placed) => {
+      const p = P[c], cc = CC[c], t = T[c]; ST.scan++; t.s = s;
+      const hw = s * p.bw / 2, hh = s * p.bh / 2, bx = X - cc[0] - s * (p.bc[0] - cc[0]), by = Y - cc[1] - s * (p.bc[1] - cc[1]);
+      for (const [ox, oy, d] of P.OFF) {
+        if (d > maxR) break;
+        const cx = X + ox, cy = Y + oy;
+        if (cx - hw < V[0] + 0.02 || cx + hw > V[2] - 0.02 || cy + hh > V[3] + 0.1 || cy - hh < P.antTop) continue;   // sin partirse por el antimeridiano y encima de la Antartida
+        t.x = bx + ox; t.y = by + oy; ST.cand++;
+        if (hitOcc(c, t, true) || !fair(c, t, false) || hitOcc(c, t, false) || !fair(c, t, true)) continue;
+        if (map._clash(c, placed, T, 1, false)) continue;               // confirmacion exacta (la de la colocacion de siempre)
+        return [t.x, t.y];
+      }
+      return null;
+    };
+    /* la mayor escala (entre sMin y s0, busqueda binaria) a la que cabe cerca de su destino */
+    const place = (c, X, Y, s0, maxR, T, placed, sMin = SMIN) => {
+      const t = T[c]; ST.place++; fill(placed, T);
+      const top = Math.max(sMin, Math.min(1, s0)); let got = scan(c, top, X, Y, maxR, T, placed), gs = top;
+      if (!got) {
+        if (top <= sMin || !(got = scan(c, sMin, X, Y, maxR, T, placed))) { t.x = t.y = 0; t.s = 1; ST.fails.push(c); return false; }
+        gs = sMin; let lo = sMin, hi = top;
+        while (hi - lo > 0.035) { const m = (lo + hi) / 2, g = scan(c, m, X, Y, maxR, T, placed); if (g) { lo = m; got = g; gs = m; } else hi = m; }
+      }
+      t.s = gs; t.x = got[0]; t.y = got[1]; return true;
+    };
+    const massAt = (c, t) => { const cc = CC[c], m = K.mass[c]; return [cc[0] + t.s * (m[0] - cc[0]) + t.x, cc[1] + t.s * (m[1] - cc[1]) + t.y]; };
+    const moved = (c, t) => { const m = massAt(c, t), h = K.mass[c]; return Math.hypot(m[0] - h[0], m[1] - h[1]); };
+    const done = (T, deal) => ({ shift: T.map(t => [t.x, t.y]), scale: T.map(t => t.s), rot: [0, 0, 0, 0, 0, 0, 0], ok: true, deal });
+    const fail = () => ({ shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), scale: [1, 1, 1, 1, 1, 1, 1], rot: [0, 0, 0, 0, 0, 0, 0], ok: false });
+
+    /* parte de su tierra que cae sobre su propia huella de casa: se ha ido de verdad si es poca (Asia, enorme, puede moverse 1 unidad y seguir encima) */
+    const selfOv = (c, t) => { const L = K.cellsS[c], cc = CC[c], M = K.m0[c]; let on = 0; for (let q = 0; q < L.length; q += 2) { const i = Math.floor((cc[0] + t.s * (L[q] - cc[0]) + t.x - X0) / CS), j = Math.floor((cc[1] + t.s * (L[q + 1] - cc[1]) + t.y - BY0) / CS); if (i >= 0 && i < NX && j >= 0 && j < NY && M[j * NX + i]) on++; } return on / (L.length / 2 || 1); };
+    const away = (c, t, d) => moved(c, t) >= d && selfOv(c, t) <= 0.3;
+
+    /* ---- reparto parcial: 2 (una pareja) o 4 continentes (dos parejas o un ciclo de 4) cambian de plaza; los demas, en casa ----
+       Cada uno va al hueco del que ocupaba su nueva plaza (centro de su cuerpo principal). Estimacion barata del hueco: la caja del de antes menos lo
+       que pisan las cajas de los que se quedan y el HUD. Se prueban en el orden de la semilla (con 4, primero los que caben holgados) */
+    const hole = (b, stay) => {
+      let [x0, y0, x1, y1] = P[b].box;
+      for (const q of stay.map(o => P[o].box).concat(R)) {
+        if (q[0] >= x1 || q[2] <= x0 || q[1] >= y1 || q[3] <= y0) continue;
+        let bst = null, ba = -1;
+        for (const r of [[x0, y0, Math.min(x1, q[0]), y1], [Math.max(x0, q[2]), y0, x1, y1], [x0, y0, x1, Math.min(y1, q[1])], [x0, Math.max(y0, q[3]), x1, y1]]) { const ar = Math.max(0, r[2] - r[0]) * Math.max(0, r[3] - r[1]); if (ar > ba) { ba = ar; bst = r; } }
+        [x0, y0, x1, y1] = bst;
+      }
+      return [x0, y0, x1, y1];
+    };
+    const est = (a, h) => Math.min(1, 1.1 * Math.min((h[2] - h[0]) / P[a].bw, (h[3] - h[1]) / P[a].bh));
+    const partial = n => {
+      dil = 1; const ACC = n > 2 ? 0.58 : 0.6;                          // escala minima con la que se da por buena (con 4 hay menos sitio)
+      const subs = []; (function pick(i, cur) { if (cur.length === n) { subs.push(cur.slice()); return; } for (let c = i; c < 6; c++) { cur.push(c); pick(c + 1, cur); cur.pop(); } })(0, []);
+      const cands = [];
+      for (const sub of subs) {
+        const stay = N6.filter(c => !sub.includes(c)), H = {}; sub.forEach(b => { H[b] = hole(b, stay); });
+        const ders = []; (function perm(i, cur) { if (i === sub.length) { ders.push(cur.slice()); return; } for (const b of sub) if (b !== sub[i] && !cur.includes(b)) { cur.push(b); perm(i + 1, cur); cur.pop(); } })(0, []);
+        for (const dst of ders) {
+          let e = 1, far = true; sub.forEach((a, i) => { const b = dst[i]; e = Math.min(e, est(a, H[b])); if (Math.hypot(P[a].bc[0] - P[b].bc[0], P[a].bc[1] - P[b].bc[1]) < DMIN) far = false; });
+          if (far && e >= SMIN * 0.85) cands.push({ go: sub.map((a, i) => [a, dst[i]]), e, stay, H, key: rr() });
+        }
+      }
+      const near = cd => cd.go.reduce((s, [a, b]) => s + Math.hypot(P[a].bc[0] - P[b].bc[0], P[a].bc[1] - P[b].bc[1]), 0);
+      cands.sort(k < 0.5 ? (u, v) => near(u) - near(v) || u.key - v.key : (u, v) => u.key - v.key);   // en el orden de la semilla (mas variedad); con el Nivel de crupier (k < 0,5), la pareja mas cercana: menos desplazamiento
+      let best = null, tried = 0; const s0 = ST.scan;
+      for (const cd of cands) {
+        if (tried >= 14 || ST.scan - s0 > BUDGET || (best && ST.scan - s0 > SOFT)) break;
+        tried++; ST.tried++;
+        const T = fresh(), placed = [6].concat(cd.stay), go = cd.go.slice().sort((u, v) => P[v[0]].bw * P[v[0]].bh - P[u[0]].bw * P[u[0]].bh);   // primero el mas grande
+        let ok = true, mn = 1;
+        for (const [a, b] of go) {
+          if (!place(a, P[b].bc[0], P[b].bc[1], Math.min(1, est(a, cd.H[b]) * 1.15), 0.6, T, placed, best ? Math.min(ACC, best.mn + 0.02) : SMIN) || !away(a, T[a], DMIN * 0.8)) { ok = false; break; }
+          placed.push(a); mn = Math.min(mn, T[a].s);
+        }
+        if (ok && (!best || mn > best.mn)) best = { T, deal: cd.go, mn };
+        if (best && best.mn >= ACC) break;                              // basta con que se reconozcan bien; si no, la mejor de las probadas
+      }
+      return best;
+    };
+    if (nDeal < 6) { const b = partial(nDeal) || (nDeal > 2 ? partial(2) : null); return b ? done(b.T, b.deal) : fail(); }   // si no caben dos parejas, una
+
+    /* ---- la mesa: 3 + 3 cartas ---- */
+    let yb = P.antTop + 0.05; for (const r of R) if (r[1] <= V[1] + eps && r[0] < 0 && r[2] > 0) yb = Math.max(yb, r[3]);   // encima de la placa de abajo y de la Antartida
+    const TL = R.filter(r => r[0] <= V[0] + eps && r[3] >= V[3] - eps);                       // bloque de arriba a la izquierda (marcador y barra)
+    const xaTop = Math.max(V[0], ...TL.map(r => r[2]));
+    const low = TL.reduce((a, r) => (!a || r[1] < a[1] ? r : a), null), boxBot = low ? low[1] : V[3], boxRight = low ? low[2] : V[0];
+    const rail = R.find(r => r[2] >= V[2] - eps && r[1] > V[1] + eps && r[3] < V[3] - eps), xb = rail ? rail[0] : V[2];
+    const splits = [-0.3, -0.15, 0, 0.15, 0.3].map(d => boxBot + d).filter(y => y > yb + 1.0 && y < V[3] - 1.0);
+    if (!splits.length) splits.push((yb + V[3]) / 2);
+    /* una fila: continentes seguidos, mismo hueco entre ellos y en los extremos; misma reduccion para todos (hasta caber de ancho), tope 1 y alto de la fila */
+    const row = (list, xa, xb2, ya, yb2) => {
+      const H = yb2 - ya - 0.08, Wd = xb2 - xa - GAP * (list.length + 1), smax = list.map(c => Math.min(1, H / P[c].bh));
+      const need = f => list.reduce((a, c, i) => a + Math.min(smax[i], f) * P[c].ww, 0);
+      let lo = 0.2, hi = 1; if (need(1) <= Wd) lo = 1; else for (let it = 0; it < 18; it++) { const m = (lo + hi) / 2; if (need(m) <= Wd) lo = m; else hi = m; }
+      const s = list.map((c, i) => Math.min(smax[i], lo)), used = list.reduce((a, c, i) => a + s[i] * P[c].ww, 0), sp = (xb2 - xa - used) / (list.length + 1);
+      let x = xa + sp; const X = [], Y = (ya + yb2) / 2;
+      list.forEach((c, i) => { X.push(x + s[i] * (P[c].ww / 2 + P[c].bc[0] - P[c].wc)); x += s[i] * P[c].ww + sp; });   // X: centro del cuerpo principal
+      return { s, X, Y };
+    };
+    const cands = [];
+    for (const ys of splits) {
+      const xaB = ys <= boxBot + 0.2 ? V[0] : boxRight;
+      for (const d of P.DER) {
+        const top = [], bot = []; for (let s = 0; s < 6; s++) { const c = d.indexOf(s); (s < 3 ? top : bot).push(c); }
+        const A1 = row(top, xaTop, xb, ys, V[3]), B1 = row(bot, xaB, xb, yb, ys);
+        const tg = [], sc = []; top.forEach((c, i) => { tg[c] = [A1.X[i], A1.Y]; sc[c] = A1.s[i]; }); bot.forEach((c, i) => { tg[c] = [B1.X[i], B1.Y]; sc[c] = B1.s[i]; });
+        const mn = Math.min(...sc); if (mn < SMIN) continue;
+        let far = true; for (const c of N6) { const p = P[c], m = K.mass[c], mx = tg[c][0] + sc[c] * (m[0] - p.bc[0]), my = tg[c][1] + sc[c] * (m[1] - p.bc[1]); if (Math.hypot(mx - m[0], my - m[1]) < DMIN) { far = false; break; } }
+        if (!far) continue;
+        const mean = sc.reduce((a, b) => a + b, 0) / 6;
+        cands.push({ d, tg, sc, score: mn + 0.5 * mean, key: rr() });
+      }
+    }
+    const best = Math.max(...cands.map(c => c.score));
+    const pool = cands.filter(c => c.score >= best - 0.12).sort((u, v) => u.key - v.key);   // entre las buenas, la que diga la semilla
+    for (const cd of pool.slice(0, 10)) {
+      if (ST.scan > TBUDGET) break;
+      const T = fresh(), placed = [6], order = N6.slice().sort((a, b) => cd.sc[b] * cd.sc[b] * P[b].bw * P[b].bh - cd.sc[a] * cd.sc[a] * P[a].bw * P[a].bh);
+      let ok = true;
+      for (const c of order) {
+        if (!place(c, cd.tg[c][0], cd.tg[c][1], cd.sc[c], 0.45, T, placed) || !away(c, T[c], DMIN * 0.85)) { ok = false; break; }
+        placed.push(c);
+      }
+      if (ok) return done(T, cd.d);
+    }
+    const b = partial(4) || partial(2); return b ? done(b.T, b.deal) : fail();   // la mesa no cabe (ventana rarisima): se reparte menos
+  }
+
   /* ================================================================== MapViewGL */
   class MapViewGL {
     static supported() {
@@ -457,7 +708,10 @@ void main(){
     /* sondas de la Aventura: [{lon,lat,km?,bearing?,label}] -> anillo de distancia y flecha de rumbo, siempre nitidos (vector 2D) */
     setProbes(list) { this.probes = keepT0(this.probes, list); this.fxDirty = this.dirty = true; }
     /* punto real -> coordenadas del mapa tal como se ve (deformado, sin la camara): la Brujula mide ahi el rumbo hacia el objetivo */
-    sceneOf(lon, lat, ct) { const [x, y] = project(lon, lat); if (!this.dist.spec) return [x, y]; const p = this._dispFwd(x, y, ct == null ? this._ctOf(lon, lat) : ct); if (p[0] > BX1 || p[0] < BX0) p[0] -= TWO_PI * Math.round(p[0] / TWO_PI); return p; }
+    sceneOf(lon, lat, ct) {
+      const [x, y] = project(lon, lat); if (!this.dist.spec) return [x, y]; const [c, t] = frameOf(ct), p = this._dispFwd(x, y, c == null ? this._ctOf(lon, lat) : c);
+      if (t != null) p[0] += t * TWO_PI; else if (p[0] > BX1 || p[0] < BX0) p[0] -= TWO_PI * Math.round(p[0] / TWO_PI); return p;
+    }
     setPick(on) { this.pickEnabled = on; this.fxDirty = true; for (const c of [this.cv, this.fx]) c.classList.toggle("aiming", on); }
     setQuality(q) { this.quality = q; this.rs = 1; this._capInit = false; this.idleMs = 40; this.slow = 0; this.resize(true); }
 
@@ -540,8 +794,9 @@ void main(){
     lonLatToScreen(lon, lat, ct) {
       if (!this.dist.spec || !this._moved()) { const [x, y] = project(lon, lat); return this.toScreen(x, y); }
       const lo = ((lon + 180) % 360 + 360) % 360 - 180, turn = Math.round((lon - lo) / 360) * TWO_PI;   // redondeada: una longitud ya normalizada dejaba un resto de 1e-15 y el punto no daba la vuelta
-      let [x, y] = this._dispFwd(...project(lo, lat), ct == null ? this._ctOf(lo, lat) : ct);
-      if (x > BX1 || x < BX0) x -= TWO_PI * Math.round(x / TWO_PI);   // lo que sale por un lado del mundo entra por el otro
+      const [c, t] = frameOf(ct); let [x, y] = this._dispFwd(...project(lo, lat), c == null ? this._ctOf(lo, lat) : c);
+      if (t != null) x += t * TWO_PI;                                   // marco de un clic: la copia del mundo que tocaste (junto al borde se ven las dos)
+      else if (x > BX1 || x < BX0) x -= TWO_PI * Math.round(x / TWO_PI);   // lo que sale por un lado del mundo entra por el otro
       return this.toScreen(x + turn, y);
     }
 
@@ -586,6 +841,11 @@ void main(){
       const d = this.dist, sp = d.spec, e = d.eff = d.eff || { sh: new Float32Array(16), rot: new Float32Array(8), sc: new Float32Array(8).fill(1), cen: new Float32Array(16), wob: 0, lineA: 1, oa: 0, mx: 0, on: false };
       const k = sp ? (d.kk || 0) : 0;
       for (let c = 0; c < 8; c++) { e.sh[c * 2] = sp && sp.shift[c] ? sp.shift[c][0] * k : 0; e.sh[c * 2 + 1] = sp && sp.shift[c] ? sp.shift[c][1] * k : 0; e.rot[c] = sp && sp.rot ? (sp.rot[c] || 0) * k : 0; e.sc[c] = sp && sp.scale && sp.scale[c] != null ? 1 + (sp.scale[c] - 1) * k : 1; const cc = this.contCen[c] || [0, 0]; e.cen[c * 2] = cc[0]; e.cen[c * 2 + 1] = cc[1]; }
+      if (sp && sp.deal) for (let c = 0; c < 6; c++) {                  // Continentes barajados: como cartas, cada uno se encoge en su sitio y aparece en el nuevo (asi no cruzan el mapa por encima de los demas)
+        const t = sp.shift[c], s1 = sp.scale[c]; if (!t || (!t[0] && !t[1] && s1 === 1)) continue;
+        const on = k >= 0.5, f = on ? 2 * k - 1 : 1 - 2 * k;
+        e.sh[c * 2] = on ? t[0] : 0; e.sh[c * 2 + 1] = on ? t[1] : 0; e.sc[c] = Math.max(0.001, (on ? s1 : 1) * f);
+      }
       e.wob = sp ? (sp.wob || 0) * k : 0; e.lineA = sp && sp.lineA != null ? 1 + (sp.lineA - 1) * d.kl : 1;
       const ko = sp ? (d.ko || 0) : 0; e.oa = sp && sp.orient ? sp.orient.rot * ko : 0; e.mx = sp && sp.orient ? (sp.orient.mx || 0) * ko : 0;
       if (sp && sp.spin) e.oa += sp.spin.amp * Math.sin(performance.now() / 1000 * sp.spin.speed) * k;
@@ -639,7 +899,7 @@ void main(){
       const own = (c, p) => Math.abs(p[0] - this.contCen[c][0]) <= Math.PI;   // solo esa copia puede caer en su tierra dibujada (con un continente muy encogido, las otras quedan lejos)
       const q = d.ct != null && d.ct < 6 ? d.ct : null, order = [q, 0, 1, 2, 3, 4, 5].filter((c, i, a) => c != null && a.indexOf(c) === i);
       for (const c of order) { const p = cand(c); if (!own(c, p)) continue; const [lo, la] = unproject(p[0], p[1]); if (this._inCont(c, lo, la)) { this.lastCt = c; return p; } }
-      if (q != null) { const p = cand(q); if (own(q, p)) { const [lo, la] = unproject(p[0], p[1]); if (this._nearCont(q, lo, la, 260)) { this.lastCt = q; return p; } } }
+      if (q != null) { const p = cand(q); if (own(q, p)) { const [lo, la] = unproject(p[0], p[1]); if (Math.abs(la) <= 89 && this._nearCont(q, lo, la, 260)) { this.lastCt = q; return p; } } }   // pasado el polo, la cuenta de distancias da la vuelta y "encontraba" costa
       /* mar abierto: el continente mas cercano en el mapa que ves; el de la pregunta cuenta como si estuviera algo mas cerca (un mar lejos de la costa se
          lee con el marco en el que se dibuja) y nunca un marco que lleve el toque mas alla del polo (la chincheta saldria lejos del dedo) */
       let bc = q != null ? q : 0, bd = 1e18;
@@ -696,7 +956,9 @@ void main(){
        Se van colocando de uno en uno; cada continente va lo mas cerca posible de su destino y, si ahi hay otro (comprobado con las mascaras de tierra reales), se busca el hueco libre mas cercano.
        En Pangea se encogen un poco para encajar. Si algo no cabe, todo se encoge hasta que quepa. k: fuerza 0..1; rot: giro final de cada continente (tilt).
        Devuelve { shift: [[dx,dy] x7], scale: [x7], ok } en unidades del mapa. */
+    warmMix() { mixPrep(this); }                                       // la preparacion de Continentes barajados, en un hueco libre aparte (una vez)
     layout(kind, k, rr, rot, zones) {
+      if (kind === "mix") return mixLayout(this, k, rr, zones || { view: [BX0, BY0, BX1, BY1], rects: [] });   // Continentes barajados
       const base = { pangea: 1 - 0.26 * k, spread: 1 - 0.16 * k, hold: 0.9 }[kind] || 1;   // los continentes no caben a tamano real sin pisarse: se encogen segun el reto
       return this._layout(kind, k, rot, base, zones);
     }
@@ -864,11 +1126,13 @@ void main(){
     _pinchState() { const [a, b] = [...this.pointers.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; }
     _tap(px, py) {
       if (!this.pickEnabled) return;
+      if (this.dist.spec && this.dist.spec.deal && this.dist.k < 0.999) return;   // Continentes barajados: mientras se reparten, el mapa esta casi vacio (el reloj devuelve ese tiempo)
       const rx = px, ry = py;
       const ef = A.pointer && A.pointer.effective && A.pointer.effective(); if (ef) { px = ef[0]; py = ef[1]; }     // el puntero puede tener retos (temblor, retraso, invertido...)
       let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); const [lon, lat] = this._real(x, y);
       if (lon < -180 || lon > 180 || lat > 90 || lat < -90) return;
       this.pickCt = this.lastCt;                                         // marco del clic: la chincheta y el anillo del Sonar se dibujan justo donde has tocado
+      if (this.lastCt != null) { const w = this._toWorld(px, py)[0], f = this._dispFwd(x, y, this.lastCt)[0]; this.pickCt = this.lastCt + 8 * (Math.round((w - f) / TWO_PI) + 2); }   // y en la copia del mundo que tocaste: junto al borde (la curva CRT ensena algo mas del mundo) se ven las dos y la chincheta salia en la otra
       /* para el crupier (js/dealer.js): donde estaba tu raton de verdad y donde habrias clicado en el mapa sin girar ni mover continentes */
       try { const v = this.viewJ || this.view; this.lastTap = { raw: ef ? this.screenToLonLat(rx, ry) : [lon, lat], plain: unproject(v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s), at: performance.now() }; } catch (e) { this.lastTap = null; }
       this.onPick(lon, lat);

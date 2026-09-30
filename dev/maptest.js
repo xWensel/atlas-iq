@@ -1,4 +1,4 @@
-/* Solo para desarrollo: comprueba los retos que mueven continentes (Pangea, Big bang y Continentes torcidos) en sus tres niveles. Uso (consola, con el
+/* Solo para desarrollo: comprueba los retos que mueven continentes (Pangea, Big bang, Continentes torcidos y Continentes barajados) en sus tres niveles. Uso (consola, con el
  * mapa cargado): mapTest() -> { worstPx, rejected, tripPx, hiddenExtra, ringJumpPx, maxMs, rows }
  *  - worstPx: pixeles donde se pisan dos continentes, dibujando TODAS sus copias como la GPU (la propia y las de +-2pi, que la siguen a una vuelta)
  *  - rejected: clics de una rejilla que caen fuera del mundo (antes el juego los tiraba); tripPx: ida y vuelta pantalla -> lon/lat -> pantalla con el
@@ -33,9 +33,9 @@ window.mapTest = function (seeds = ["a", "b", "c", "d", "e", "f"]) {
   const save = { spec: m.dist.spec, k: m.dist.k, kk: m.dist.kk, kl: m.dist.kl, ko: m.dist.ko, ct: m.dist.ct };
   const rest = [0, 1, 2, 3, 4, 5].map(c => m._hidden(c, { x: 0, y: 0, s: 1, c: 1, n: 0 }, Z));   // celdas tapadas en su sitio
   const rows = []; let worst = 0, rej = 0, trip = 0, hidEx = 0, jump = 0, maxMs = 0;
-  const KS = { pangea: [0.9, 0.95, 1], spread: [0.5, 0.8, 1], hold: [1, 1, 1] }, TILT = [0.4, 0.65, 0.9];
+  const KS = { pangea: [0.9, 0.95, 1], spread: [0.5, 0.8, 1], hold: [1, 1, 1], mix: [0.6, 0.85, 1] }, TILT = [0.4, 0.65, 0.9];
   try {
-    for (const kind of ["pangea", "spread", "hold"]) for (let lv = 0; lv < 3; lv++) for (const seed of kind === "hold" ? seeds : seeds.slice(0, 1)) {
+    for (const kind of ["pangea", "spread", "hold", "mix"]) for (let lv = 0; lv < 3; lv++) for (const seed of kind === "hold" || kind === "mix" ? seeds : seeds.slice(0, 1)) {
       const rr = A.rng(seed + ":m:" + lv), rot = kind === "hold" ? [0, 1, 2, 3, 4, 5].map(() => (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * TILT[lv]).concat([0]) : [0, 0, 0, 0, 0, 0, 0];
       const t0 = performance.now(), L = m.layout(kind, KS[kind][lv], rr, rot, Z), ms = Math.round(performance.now() - t0), spec = { shift: L.shift, scale: L.scale, rot };
       const px = overlap(spec); worst = Math.max(worst, px); maxMs = Math.max(maxMs, ms);
