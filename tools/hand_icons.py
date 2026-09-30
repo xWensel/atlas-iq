@@ -356,16 +356,24 @@ def allin_icon(id):
 
 @icon("coin")
 def coin_icon(id):
-    I = Icon(); cx, cy, r = 32, 30, 28
-    I.add(flat(circle(cx, cy + 3, r), R["gold"][4]))
+    """doblon: canto acordonado debajo, borde levantado, campo hundido y estrella acunada (nada de lineas que la partan)"""
+    I = Icon(); cx, cy, r, th = 32, 29, 27, 5
+    y, x = np.mgrid[0:N, 0:N]
+    side = (circle(cx, cy + th, r) | (rect(cx - r, cy, 2 * r, th) & (np.abs(x + .5 - cx) <= r))) & ~circle(cx, cy, r)
+    e = np.zeros((N, N, 4), np.uint8); e[side | circle(cx, cy, r)] = R["gold"][3]
+    e[side & (x % 3 == 0)] = R["gold"][4]; e[side & (x + .5 < cx - r * .45) & (x % 3 != 0)] = R["gold"][2]
+    I.add(e)
     face = circle(cx, cy, r); t = bevel(face, R["gold"])
-    t[ring(cx, cy, r - 5, r - 3.4)] = R["gold"][3]; t[ring(cx, cy, r - 5.8, r - 5)] = R["gold"][1]
-    y, x = np.mgrid[0:N, 0:N]; ins = circle(cx, cy, r - 6)
-    for k in (-.55, 0, .55):                          # meridianos y paralelos grabados: el doblon del explorador
-        t[ins & (np.abs((x + .5 - cx) - k * np.sqrt(np.clip((r - 6) ** 2 - (y + .5 - cy) ** 2, 0, None))) < .7)] = R["gold"][3]
-        t[ins & (np.abs(y + .5 - cy - k * (r - 10)) < .6)] = R["gold"][3]
-    t[ins & (np.abs(x + .5 - cx - 1) < .6) & (y > cy)] = R["gold"][1]
-    I.add(t); return I
+    field = circle(cx, cy, r - 4.5); t[face & ~field & erode(face, 2)] = R["gold"][1]; t[field] = R["gold"][2]
+    t[field & (edge(field, 0, -1) | edge(field, -1, 0))] = R["gold"][4]      # el hueco: sombra arriba-izquierda, luz abajo-derecha
+    t[field & (edge(field, 0, 1) | edge(field, 1, 0))] = R["gold"][0]
+    t[field & edge(field, 0, -1) & edge(field, 1, 0)] = R["gold"][2]; t[field & edge(field, -1, 0) & edge(field, 0, 1)] = R["gold"][2]
+    I.add(t)
+    m = star(cx, cy + 1.5, 15, 6.3)
+    s = np.zeros((N, N, 4), np.uint8); s[(shift(m, 1, 1) | shift(m, 2, 2)) & ~m & field] = R["gold"][3]
+    I.add(s, outline=False)
+    b = bevel(m, R["gold"]); b[erode(m, 2)] = R["gold"][1]
+    I.add(b, outline=False); return I
 
 # ---- palos
 def pip(kind, cx, cy, s):
