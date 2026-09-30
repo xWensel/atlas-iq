@@ -296,7 +296,7 @@ window.AIQ = window.AIQ || {};
     try { localStorage.removeItem(key); } catch (e) { /* sin almacenamiento */ }
   };
   A.adv.save = () => persist();
-  A.adv.leave = () => { if (run) { persist(); A.dealer.noteLeave(); } clearTimers(); A.chal.end(); A.dealer.enable(false); run = null; A.adv.hideBars(); };
+  A.adv.leave = () => { if (run) { snapSpent(); persist(); A.dealer.noteLeave(); } clearTimers(); A.chal.end(); A.dealer.enable(false); run = null; A.adv.hideBars(); };
   A.adv.summary = (daily = false) => { const r = (run && !!run.board === daily && run) || loadSlot(daily); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives, board: r.board || null, dailyTry: r.dailyTry || 0, inf: !!r.inf } : null; };
   A.adv.active = () => !!run;
   A.adv.isDaily = () => !!(run && run.board);
@@ -392,12 +392,15 @@ window.AIQ = window.AIQ || {};
         <div class="intro-art">${A.pic("topic_mixed")}<div class="intro-dealer" id="introDealer"></div></div></div>`;
     }
     const info = actInfo(run.act), def = rdef(), list = run.chal || [];
+    /* territorio nuevo: una ronda mas alla de tu mejor ronda de siempre (desde la 2.a expedicion, una vez por expedicion): sello "Nuevo" y el crupier lo dice */
+    const Pv = A.profile.get(); run._virgin = !run.attempt && (Pv.adv.runs || 0) >= 2 && roundNo() + 1 > (Pv.adv.bestRound || 0) && !run.virginShown; if (run._virgin) run.virginShown = true;
+    const NEW = A.pick6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||新领域|새 영역|未踏|Впервые|Nowe");
     const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</em>` : ""}</div></div>`; }).join("");
     const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? "skull" : run.round === 0 ? "s_pin" : "s_compass";
     return `<div class="intro-in adv${Lv.boss ? " is-boss" : ""}"><div class="intro-left"><div class="intro-num blind">${A.blind(kind, inner)}</div><div class="intro-body">
       <span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${A.tx(Lv.topicName)}</h2>
       ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
-      <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}</p>
+      <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}${run._virgin ? ` <b class="intro-new">${NEW}</b>` : ""}</p>
       <p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
       ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
       <div class="intro-art">${A.pic("topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
@@ -413,11 +416,12 @@ window.AIQ = window.AIQ || {};
       boss: !!Lv.boss, last: roundNo() === 11, inf: !!run.inf, fresh: run.act === 0 && run.round === 0 && !run.qTotal && !run.attempt, resumed: resumedIntro, ranked: !!run.ranked,
       dailyTry: run.dailyTry || 0, dailyTotal: run.board && run.dailyTry ? A.rank.daily.get(run.board).total : 0,
       act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), counters,
+      rn: roundNo() + 1, bossName: Lv.boss && run.chalName ? A.tx(run.chalName) : "", virgin: !!run._virgin,
     });
     resumedIntro = false;
     D.sequence(seq, talked); return seq.reduce((n, it) => n + A.tx(it.line).length * 40 + 900 + D.LINGER, 0);   // cada frase, con su segundo de mas
   };
-  A.adv.introEnd = () => { A.dealer.dock(null); A.dealer.hide(); };
+  A.adv.introEnd = () => { A.dealer.dock(null); A.dealer.release(); };   // si saltas la intro a media frase, la termina en la esquina y se va (sin decir el resto)
 
   /* ---------------- puntuacion de una pregunta ---------------- */
   A.adv.score = function (o, km, left, noSide) {
@@ -462,7 +466,12 @@ window.AIQ = window.AIQ || {};
     }
     persist(); A.ach.emit("adv", { kind: "hold", coins: run.coins, perks: run.perks.length, inf: run.inf ? run.qi : 0 });   // inf: preguntas aguantadas en el modo infinito
     const kind = res.km == null ? "timeout" : res.dist >= 960 ? "bull" : res.dist < 400 ? "miss" : res.streak >= 3 ? "streak" : res.dist >= 750 ? "good" : null;
-    clearTimeout(reactT); if (kind) reactT = setTimeout(() => A.dealer.react(kind), 1300);
+    const qAt = C().S.qi, still = () => { const S2 = C().S; return !!run && S2.qi === qAt && S2.phase === "reveal"; };   // pasaste a la siguiente: ya no la comenta
+    /* lo que el crupier sabe de esta respuesta: el lugar, tu mano de verdad y si es "ese sitio otra vez" (js/dealer.js) */
+    const oq = C().S.qs[qAt], info = { valid: still, km: res.km, dist: res.dist, hand: res.hand || null, chal: (run.chal || []).map(c => c.id), rk: run.act + ":" + run.round + ":" + (run.attempt || 0),
+      place: oq ? A.tx(oq.clue ? oq.answer : oq.name) : "", key: oq ? (oq.cid ? oq.cid[0] : oq.key || (oq.name && (oq.name.en || oq.name.es))) : "" };
+    if (A.dealer.noteAnswer) A.dealer.noteAnswer(info);
+    clearTimeout(reactT); reactT = setTimeout(() => { if (still()) A.dealer.react(kind || "quiet", info); }, 1300);
   };
 
   /* ---------------- pistas gratis de reliquias ---------------- */
@@ -482,7 +491,17 @@ window.AIQ = window.AIQ || {};
   }
   const hints = [];
   const noteH = (txt, icon) => { hints.push(txt); const el = $("factText"); el.textContent = hints.join("  ·  "); if (icon) el.insertAdjacentHTML("afterbegin", A.icon(icon, "sm")); };
+  /* el reloj de la pregunta no vuelve a empezar si recargas o sales a mitad: al reanudar sigue con lo que ya habias gastado
+     (antes recargar la pagina daba el tiempo entero otra vez, tambien en el Reto diario) */
+  const qKey = () => run && `${run.act}:${run.round}:${run.attempt || 0}:${run.qi}:${run.inf ? 1 : 0}`;
+  function snapSpent() {
+    const S = C() && C().S; if (!run || !S || S.run !== run || S.phase !== "asking") return;
+    run.qSpent = { k: qKey(), ms: Math.max(0, (S.paused ? S.pauseAt : performance.now()) - S.t0 - S.pausedAcc) }; persist();
+  }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) snapSpent(); });
+  addEventListener("pagehide", snapSpent);
   A.adv.onQuestion = function () {
+    if (run && run.qSpent) { if (run.qSpent.k === qKey()) C().S.t0 -= run.qSpent.ms; run.qSpent = null; }
     clearTimers(); hints.length = 0; run.qTools = 0; run.probes = []; run.tool = null; run.windOff = false; const S = C().S; S.tool = null; renderBars();
     const o = S.qs[S.qi]; if (!o) return;
     const fx = A.chal.fx(perkList()); A.chal.question(o, run.qi);
@@ -611,6 +630,7 @@ window.AIQ = window.AIQ || {};
   A.adv.roundEnd = function () {
     if (run.inf) { run.score += C().S.levelScore; run.sup = {}; persist(); A.adv.hideBars(); return endRun(true); }   // modo infinito: sin provisiones, se cobra directamente
     const S = C().S, Lv = S.camp.levels[0], pass = S.levelScore >= Lv.advance, boss = isBoss();
+    if (A.dealer.noteTricks) A.dealer.noteTricks((run.chal || []).map(c => c.id), pass);   // el historial de cada truco (lo cuenta el crupier en la intro)
     S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); clearTimeout(reactT); A.chal.end(); C().map.setStyle(mapStyleFor());
     if (pass) {
       run.score += S.levelScore; run.cleared++; S.runTotal = run.score;
@@ -632,9 +652,9 @@ window.AIQ = window.AIQ || {};
         text: `${A.fmt(S.levelScore)} / ${A.fmt(Lv.advance)}`, lines,
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Total de la expedición", "Expedition total"), run.score], [A.T("Doblones", "Doubloons"), run.coins]],
         stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : "win",
-        buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => afterVerdict(boss) }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
+        buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => { if (boss && run.act < 2 && !run.chestStuckDone && Math.random() < 0.6) { run.chestStuckDone = true; persist(); return stuckChest(); } afterVerdict(boss); } }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
       });
-      const wb = { big: lt.margin >= 3, c: got, p: pctOf(S.levelScore - Lv.advance, Lv.advance) };   // aplastar la meta (+50 %) tiene sus propias frases
+      const wb = { big: lt.margin >= 3, c: got, p: pctOf(S.levelScore - Lv.advance, Lv.advance), rn: roundNo() + 1 };   // aplastar la meta (+50 %) tiene sus propias frases
       setTimeout(() => A.dealer.react("roundWin", wb), 700);                // el crupier protesta (antes estas frases nunca se decian)
     } else {
       const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
@@ -659,6 +679,13 @@ window.AIQ = window.AIQ || {};
     if (run.sup && run.sup.seguro) run.segN = (run.segN || 0) + 1;         // Seguro gastado: el siguiente cuesta 2 mas
     run.sup = {}; persist();                                                // los suministros solo valen para una ronda
   };
+  /* el primer clic en "Abrir el cofre" no lo abre: el cofre (la medalla) tiembla y el crupier confiesa que lo esta sujetando; el segundo ya lo abre */
+  function stuckChest() {
+    const m = document.querySelector(".v-medal"), b = $("nlBtn"), S = C().S, reduced = (S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    A.sfx.deny();
+    if (!reduced) [m, b].forEach(e => e && e.animate([{ transform: "none" }, { transform: "translateX(-6px) rotate(-4deg)" }, { transform: "translateX(5px) rotate(3deg)" }, { transform: "translateX(-3px) rotate(-2deg)" }, { transform: "none" }], { duration: 420, easing: "ease-out" }));
+    if (A.dealer.chestStuck) A.dealer.chestStuck();
+  }
   function afterVerdict(boss) { if (boss && run.act + 1 === 3 && !run.won) return winScreen(); nextStep(boss); }
   function nextStep(boss) {
     if (boss) { run.act++; run.round = 0; run.attempt = 0; perkList().forEach(p => p.actStart && p.actStart(run)); openShop(true); }
@@ -707,10 +734,16 @@ window.AIQ = window.AIQ || {};
     return out;
   }
   function openShop(chest) {
-    const S = C().S; S.phase = "shop"; A.adv.hideBars(); clearTimers(); A.chal.end(); A.dealer.hide(); run.phase = chest ? "chest" : "shop";
-    const key = `${roundNo()}:${run.attempt || 0}:${run.shopN}:${chest}`, visit = `${roundNo()}:${run.attempt || 0}:${chest}`;
+    const S = C().S; S.phase = "shop"; A.adv.hideBars(); clearTimers(); A.chal.end(); A.dealer.release(); run.phase = chest ? "chest" : "shop";
+    const key = `${roundNo()}:${run.attempt || 0}:${run.shopN}:${chest}`, visit = `${roundNo()}:${run.attempt || 0}:${chest}`, newVisit = run.shopKey !== visit;
+    if (newVisit) run.visitBuys = 0;
     if (!run.stock || run.stockKey !== key) { run.stock = offers(chest); run.stockKey = key; run.bought = []; if (run.shopKey !== visit) { run.shopKey = visit; run.rerolls = 0; run.freeUsed = 0; } }
     persist(); renderShop(chest);
+    if (newVisit && A.dealer.campArrive) {                                            // el crupier se sienta a la mesa (js/dealer.js)
+      const cf = chalFor(roundNo()), costs = (run.stock || []).map(s => (s.k === "life" ? lifePrice() : cardCost(s)));
+      A.dealer.campArrive({ chest, coins: run.coins, n: cf.list.length, r: roundNo() + 1, boss: !!cf.boss && !chest, bossName: cf.combo ? A.tx(cf.combo.n) : "", retry: run.attempt > 0,
+        newAct: run.round === 0 && run.act > 0 && !run.attempt, cheapest: costs.length ? Math.min(...costs) : 0 });
+    }
   }
   /* "proxima ronda" del Campamento: una tarjeta por ronda con cada truco explicado (que hace y cuanto pesa).
      El jefe del acto es una tarjeta grande con su nombre y numero de poderes; con el Ojo en el cielo tambien se ve la ronda siguiente.
@@ -769,7 +802,9 @@ window.AIQ = window.AIQ || {};
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     /* la mochila no avisa de que una reliquia ya no sirve: saber cuando venderla tambien es cosa del jugador */
     const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b>${chest ? "" : `<em>${A.T("vender", "sell")} ${sellValue(id)}</em>`}</button>` : `<span class="inv-empty"></span>`; }).join("");
-    const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));   // revancha: queda la carta a mitad de precio que frena los trucos de la ronda que repites
+    const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));
+    /* antes del jefe, el crupier te reescribe el boton (funciona igual) */
+    const doom = !chest && !!chalFor(roundNo()).boss, DOOM = A.pick6("Ir al matadero|To the slaughter|À l'abattoir|Pro matadouro|Zur Schlachtbank|Al macello||去送死|도살장으로|処刑台へ|На убой|Na rzeź");   // revancha: queda la carta a mitad de precio que frena los trucos de la ronda que repites
     C().dialog(`<div class="table${chest ? " chest" : ""}">
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
         <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
@@ -781,15 +816,20 @@ window.AIQ = window.AIQ || {};
       <footer class="tb-tray"><div class="tray-col"><h4>${A.T("Reliquias", "Relics")} ${run.perks.length}/${slots}</h4><div class="tray-row">${relicSlots}</div></div>
         <div class="tray-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" ${A.kitTip("tool", id)}>${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
         <div class="tray-col"><h4>${A.T("Provisiones", "Provisions")}</h4><div class="tray-row hearts">${hearts()}</div></div>
-        <button class="btn-ink go-next" id="goRound" data-primary><span>${chest ? A.T("Continuar sin elegir", "Continue without picking") : A.T("Siguiente ronda", "Next round")}</span>${chest ? `<em class="gn-coins">${CN()}+${gain(chestSkip())}</em>` : ""}<span class="ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
-    document.querySelectorAll(".offer").forEach(el => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); });
+        <button class="btn-ink go-next${doom ? " doom" : ""}" id="goRound" data-primary><span>${chest ? A.T("Continuar sin elegir", "Continue without picking") : doom ? DOOM : A.T("Siguiente ronda", "Next round")}</span>${chest ? `<em class="gn-coins">${CN()}+${gain(chestSkip())}</em>` : ""}<span class="ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
+    document.querySelectorAll(".offer").forEach((el, i) => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); if (!chest) el.addEventListener("pointerenter", e => { if (e.pointerType === "mouse" && A.dealer.campHover) A.dealer.campHover(i); }); });
     document.querySelectorAll(".inv-perk").forEach(b => (b.onclick = () => { if (chest) return; sell(b.dataset.sell); }));
-    if ($("rerollBtn")) $("rerollBtn").onclick = () => { const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll(); openShop(false); };
+    if ($("rerollBtn")) $("rerollBtn").onclick = () => {
+      const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll();
+      if (c > 0 && !run.shellDone && (run.paidRerolls = (run.paidRerolls || 0) + 1) >= 2) { run.shellDone = true; persist(); if (A.dealer.campShell) A.dealer.campShell(); return shellCards(() => openShop(false)); }   // el trile: una vez por expedicion
+      openShop(false);
+    };
     $("shopMenu").onclick = () => C().runMenu();
     document.querySelectorAll(".ch-buy").forEach(b => (b.onclick = () => bribe(b.dataset.id)));
     if ($("chalReroll")) $("chalReroll").onclick = rerollChal;
     if (!chest) wireSup();
     $("goRound").onclick = () => {
+      if (!chest && !run.visitBuys && !run.skipSaid && run.coins >= 8 && Math.random() < 0.5 && A.dealer.campSkip) { run.skipSaid = true; A.dealer.campSkip(run.coins); }   // te vas sin comprar nada (una vez por expedicion)
       run.stock = null;
       if (chest) { const k = gain(chestSkip()); run.coins += k; run.stats.coinsEarned += k; A.sfx.sell(); }   // dejar el cofre sin abrir tambien se cobra (con la mochila llena, el cofre no es papel mojado)
       persist(); chest ? openShop(false) : startRound();
@@ -812,27 +852,56 @@ window.AIQ = window.AIQ || {};
     document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {
       const s = SUPS.find(x => x.id === b.dataset.sup), c = supCost(s); run.sup = run.sup || {};
       if (run.sup[s.id]) { run.coins += typeof run.sup[s.id] === "number" ? run.sup[s.id] : c; run.sup[s.id] = false; A.sfx.sell(); }   // devuelve lo que pagaste (vender el Vale entre medias ya no regala 1)
-      else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = c; A.sfx.buy(); if (SUPS.every(x => run.sup[x.id])) A.ach.emit("adv", { kind: "supplies" }); }
+      else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = c; run.visitBuys = (run.visitBuys || 0) + 1; A.sfx.buy(); if (SUPS.every(x => run.sup[x.id])) A.ach.emit("adv", { kind: "supplies" }); }
       persist(); renderShop(false);
     }));
   }
-  const shake = el => { el.classList.remove("no"); void el.offsetWidth; el.classList.add("no"); };
+  const shake = el => { el.classList.remove("no"); A.restyle(el); el.classList.add("no"); };   // A.restyle: sin forzar la maquetacion (offsetWidth daba tirones)
+  /* sin fondos: le cae un sello a la carta (como el DENEGADO de la salida) y el crupier lo comenta una vez por visita */
+  const NOFUNDS = "Sin fondos|No funds|Sans le sou|Sem fundos|Keine Deckung|Senza fondi||余额不足|잔고 부족|残高不足|Нет средств|Brak środków";
+  function noFunds(el) {
+    A.sfx.stamp(); if (A.haptic) A.haptic([20, 30, 40]);
+    let st = el.querySelector(".of-stamp"); if (!st) { st = document.createElement("b"); st.className = "of-stamp"; st.textContent = A.pick6(NOFUNDS); el.appendChild(st); }
+    st.classList.remove("on"); A.restyle(st); st.classList.add("on");
+    if (A.dealer.campNoFunds) A.dealer.campNoFunds(run.coins);
+  }
+  /* el trile: las cartas se dan la vuelta y se barajan como cubiletes antes de las nuevas (solo animacion: las cartas y precios son los que tocan) */
+  function shellCards(done) {
+    const tb = document.querySelector("#dlg .table"), cards = [...document.querySelectorAll("#dlg .offers .offer")], S = C().S;
+    const reduced = (S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fin = () => { if (tb) tb.classList.remove("shelling"); if (C().S.phase === "shop" && run && run.phase === "shop") done(); };
+    if (!tb || cards.length < 2 || reduced) return fin();
+    tb.classList.add("shelling");
+    const xs = cards.map(c => c.getBoundingClientRect().left);
+    cards.forEach(c => c.animate([{ transform: "rotateY(0)" }, { transform: "rotateY(90deg)" }], { duration: 170, easing: "ease-in" }).onfinish = () => { c.classList.add("faced"); c.animate([{ transform: "rotateY(-90deg)" }, { transform: "rotateY(0)" }], { duration: 170, easing: "ease-out" }); });
+    let pass = 0;
+    const one = () => {
+      if (!tb.isConnected) return fin();
+      const a = pass % cards.length, b = (a + 1) % cards.length, dx = xs[b] - xs[a], up = pass % 2 ? 1 : -1;
+      cards[a].animate([{ transform: "none" }, { transform: `translate(${dx / 2}px, ${-28 * up}px) scale(1.04)` }, { transform: `translate(${dx}px, 0)` }, { transform: "none" }], { duration: 420, easing: "ease-in-out" });
+      cards[b].animate([{ transform: "none" }, { transform: `translate(${-dx / 2}px, ${28 * up}px)` }, { transform: `translate(${-dx}px, 0)` }, { transform: "none" }], { duration: 420, easing: "ease-in-out" });
+      A.sfx.card(); if (pass % 2) A.sfx.chip(pass);
+      if (++pass < 3) setTimeout(one, 440); else setTimeout(fin, 460);
+    };
+    setTimeout(one, 380);
+  }
   function buy(el, chest) {
     const i = +el.dataset.i, s = run.stock[i]; if (!s || run.bought.includes(i)) return;
-    if (s.k === "life") { const c = lifePrice(); if (run.coins < c || run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
+    if (s.k === "life") { const c = lifePrice(); if (run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } if (run.coins < c) return noFunds(el); run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
       if (run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
-      if (run.coins < c) { A.sfx.deny(); shake(el); return; }
+      if (run.coins < c) return noFunds(el);
+      if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);
       run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run); if (p.r === 3) A.ach.emit("adv", { kind: "legend" });
     } else {
       const c = cardCost(s);
       if (!run.tools[s.id] && Object.keys(run.tools).length >= 4) { A.sfx.deny(); shake(el); flash(A.T("Solo 4 herramientas distintas.", "Only 4 different tools.")); return; }
-      if (run.coins < c) { A.sfx.deny(); shake(el); return; }
+      if (run.coins < c) return noFunds(el);
       run.coins -= c; addTool(s.id);
     }
     if (s.fix) run.fixUsed = `${roundNo()}:${run.attempt}`;              // ya cobraste la rebaja de esta revancha
-    run.bought.push(i); A.sfx.buy(); persist();
+    run.bought.push(i); run.visitBuys = (run.visitBuys || 0) + 1; A.sfx.buy(); persist();
     if (chest) { run.stock = null; run.bought = []; persist(); return openShop(false); }
     renderShop(chest);
   }

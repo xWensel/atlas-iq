@@ -752,32 +752,408 @@ window.AIQ = window.AIQ || {};
       "Te fuiste apagando las luces y ahora vuelves como si nada. Me gusta.|You left turning off the lights and now you're back like nothing happened. I like it.|Tu es parti en éteignant les lumières et tu reviens comme si de rien n'était. J'aime ça.|Você saiu apagando as luzes e agora volta como se nada fosse. Gostei.|Du bist gegangen und hast das Licht ausgemacht, und jetzt kommst du zurück, als wäre nichts gewesen. Gefällt mir.|Te ne sei andato spegnendo le luci e ora torni come se niente fosse. Mi piace.||你走的时候关了灯，现在又若无其事地回来了。我喜欢。|불까지 끄고 나가더니 아무 일 없었다는 듯 돌아왔네. 마음에 들어.|明かりを消して出ていったくせに、何事もなかったように戻ってきたな。気に入った。|Ушёл, выключив свет, а теперь возвращаешься как ни в чём не бывало. Мне нравится.|Wyszedłeś, gasząc światło, a teraz wracasz, jak gdyby nigdy nic. Podoba mi się.",
       "¿Qué, echabas de menos la mesa? Normal. Siéntate.|What, missed the table? Of course you did. Sit down.|Alors, la table te manquait ? Normal. Assieds-toi.|E aí, sentiu falta da mesa? Claro. Senta aí.|Na, hast du den Tisch vermisst? Klar. Setz dich.|Allora, ti mancava il tavolo? Normale. Siediti.|¿Qué, extrañabas la mesa? Normal. Siéntate.|怎么，想念这张牌桌了？正常。坐吧。|뭐야, 테이블이 그리웠어? 당연하지. 앉아.|どうした、テーブルが恋しかったか？当然だな。座りな。|Что, соскучился по столу? Ещё бы. Садись.|Co, stęskniłeś się za stołem? No jasne. Siadaj.",
     ],
+    /* ---- vuelves tras salir por su boton: se acuerda de la trastada concreta que te hizo (una clave por trastada) */
+    quitRetDark: [
+      "La última vez te apagué las luces y aun así encontraste la salida. A tientas. Respeto.|Last time I cut the lights and you still found the exit. In the dark. Respect.|La dernière fois, j'ai coupé la lumière et tu as quand même trouvé la sortie. À tâtons. Respect.|Da última vez eu apaguei as luzes e mesmo assim você achou a saída. No escuro. Respeito.|Letztes Mal hab ich das Licht ausgemacht, und du hast den Ausgang trotzdem gefunden. Im Dunkeln. Respekt.|L'ultima volta ti ho spento le luci e hai trovato l'uscita lo stesso. A tentoni. Rispetto.||上次我把灯关了，你还是摸黑找到了出口。佩服。|지난번엔 불까지 껐는데도 넌 출구를 찾아냈지. 더듬더듬. 인정한다.|前回は明かりを消したのに、君は手探りで出口を見つけた。敬意を表するよ。|В прошлый раз я выключил свет, а ты всё равно нашёл выход. Наощупь. Уважаю.|Ostatnio zgasiłem ci światło, a i tak znalazłeś wyjście. Po omacku. Szacunek."
+    ],
+    quitRetShout: [
+      "La última vez te grité y te fuiste igual. Hoy vengo con la voz descansada.|Last time I yelled at you and you left anyway. Today my voice is well rested.|La dernière fois, je t'ai hurlé dessus et tu es parti quand même. Aujourd'hui, j'ai la voix reposée.|Da última vez eu gritei com você e você foi embora mesmo assim. Hoje estou com a voz descansada.|Letztes Mal hab ich dich angeschrien, und du bist trotzdem gegangen. Heute ist meine Stimme ausgeruht.|L'ultima volta ti ho urlato contro e te ne sei andato lo stesso. Oggi ho la voce riposata.||上次我冲你大吼，你还是走了。今天我的嗓子养好了。|지난번엔 소리까지 질렀는데 그래도 가더라. 오늘은 목 좀 쉬고 왔어.|前回は怒鳴ったのに、君は結局出ていった。今日は喉を休めてきたぞ。|В прошлый раз я на тебя накричал, а ты всё равно ушёл. Сегодня мой голос отдохнул.|Ostatnio na ciebie nakrzyczałem, a i tak wyszedłeś. Dziś mam wypoczęty głos."
+    ],
+    quitRetShell: [
+      "Te barajé los botones y encontraste la salida igual. Hoy los he pegado con cola.|I shuffled the buttons and you found the exit anyway. Today I've glued them down.|J'ai mélangé les boutons et tu as trouvé la sortie quand même. Aujourd'hui, je les ai collés.|Eu embaralhei os botões e você achou a saída mesmo assim. Hoje eu colei os dois.|Ich hab die Knöpfe gemischt, und du hast den Ausgang trotzdem gefunden. Heute hab ich sie festgeklebt.|Ti ho mescolato i pulsanti e hai trovato l'uscita lo stesso. Oggi li ho incollati.|Te barajé los botones y encontraste la salida igual. Hoy los pegué con pegamento.|我把按钮洗了一遍，你还是找到了出口。今天我把它们粘死了。|버튼을 섞어놨는데도 출구를 찾아냈지. 오늘은 풀로 붙여놨어.|ボタンをシャッフルしたのに、君は出口を見つけた。今日は接着剤で固めておいた。|Я перетасовал кнопки, а ты всё равно нашёл выход. Сегодня я их приклеил.|Potasowałem przyciski, a i tak znalazłeś wyjście. Dziś je przykleiłem."
+    ],
+    quitRetDenied: [
+      "Te estampé un DENEGADO y te fuiste igual. Ese sello ya no me funciona contigo.|I stamped DENIED on you and you left anyway. That stamp doesn't work on you anymore.|Je t'ai collé un REFUSÉ et tu es parti quand même. Ce tampon ne marche plus avec toi.|Eu te carimbei um NEGADO e você foi embora mesmo assim. Esse carimbo não funciona mais com você.|Ich hab dir ein ABGELEHNT verpasst, und du bist trotzdem gegangen. Der Stempel wirkt bei dir nicht mehr.|Ti ho stampato un RESPINTO e te ne sei andato lo stesso. Quel timbro con te non funziona più.||我给你盖了个“驳回”，你还是走了。这个章对你已经不管用了。|'거부' 도장까지 찍었는데 그래도 가더라. 그 도장은 이제 너한테 안 먹혀.|「却下」の判を押したのに、君は出ていった。あの判子はもう君には効かないな。|Я поставил тебе печать «ОТКАЗАНО», а ты всё равно ушёл. Эта печать на тебя больше не действует.|Wbiłem ci pieczątkę ODRZUCONO, a i tak wyszedłeś. Ta pieczątka już na ciebie nie działa."
+    ],
+    quitRetPlead: [
+      "Te fuiste y me dejaste solo. Con la luz triste y todo. Ya se me ha pasado. Casi.|You left me all alone. Sad lighting and everything. I'm over it now. Almost.|Tu es parti et tu m'as laissé seul. Avec la lumière triste et tout. C'est passé. Presque.|Você foi embora e me deixou sozinho. Com luz triste e tudo. Já passou. Quase.|Du bist gegangen und hast mich allein gelassen. Mit trauriger Beleuchtung und allem. Ich bin drüber weg. Fast.|Te ne sei andato e mi hai lasciato solo. Con la luce triste e tutto. Mi è passata. Quasi.|Te fuiste y me dejaste solo. Con la luz triste y todo. Ya se me pasó. Casi.|你走了，把我一个人丢在这儿。连灯光都那么悲伤。我已经缓过来了。差不多吧。|넌 떠났고 난 혼자 남았지. 슬픈 조명까지 켜놓고. 이제 괜찮아. 거의.|君は私を独り残して出ていった。悲しい照明までつけたのに。もう立ち直ったよ。ほぼね。|Ты ушёл и оставил меня одного. С грустным светом и всем прочим. Я уже отошёл. Почти.|Wyszedłeś i zostawiłeś mnie samego. Ze smutnym światłem i w ogóle. Już mi przeszło. Prawie."
+    ],
+    quitRetBribe: [
+      "La última vez te llovieron fichas y aun así te fuiste. Hoy no hay soborno.|Last time it rained chips on you and you still left. No bribe today.|La dernière fois, il t'a plu des jetons et tu es parti quand même. Pas de pot-de-vin aujourd'hui.|Da última vez choveram fichas em você e mesmo assim você foi embora. Hoje não tem suborno.|Letztes Mal hat es Chips auf dich geregnet, und du bist trotzdem gegangen. Heute gibt's keine Bestechung.|L'ultima volta ti sono piovute addosso fiches e te ne sei andato lo stesso. Oggi niente mazzette.||上次筹码像雨一样砸向你，你还是走了。今天没有贿赂了。|지난번엔 칩이 비처럼 쏟아졌는데도 가더라. 오늘은 뇌물 없어.|前回はチップの雨を降らせたのに、君は出ていった。今日は賄賂なしだ。|В прошлый раз на тебя сыпались фишки, а ты всё равно ушёл. Сегодня никаких взяток.|Ostatnio sypały się na ciebie żetony, a i tak wyszedłeś. Dziś bez łapówek."
+    ],
+    quitRetFake: [
+      "La última vez te apagué la pantalla de broma y luego te fuiste de verdad. Touché.|Last time I switched your screen off as a joke, and then you left for real. Touché.|La dernière fois, j'ai éteint ton écran pour rire, et ensuite tu es parti pour de vrai. Touché.|Da última vez eu desliguei sua tela de brincadeira, e depois você saiu de verdade. Touché.|Letztes Mal hab ich deinen Bildschirm zum Spaß ausgeschaltet, und dann bist du wirklich gegangen. Touché.|L'ultima volta ti ho spento lo schermo per scherzo, e poi te ne sei andato davvero. Touché.||上次我开玩笑关了你的屏幕，结果你真的走了。算你狠。|지난번엔 장난으로 화면을 껐는데, 그다음엔 네가 진짜로 나가버렸지. 한 방 먹었네.|前回は冗談で画面を消したら、そのあと君は本当に出ていった。一本取られたよ。|В прошлый раз я в шутку выключил тебе экран, а потом ты ушёл по-настоящему. Туше.|Ostatnio zgasiłem ci ekran dla żartu, a potem wyszedłeś naprawdę. Touché."
+    ],
+    quitRetSeason: [
+      "He estado ensayando. Temporada dos de mis trastadas. Estás avisado.|I've been rehearsing. Season two of my pranks. Consider yourself warned.|J'ai répété. Saison deux de mes coups tordus. Te voilà prévenu.|Andei ensaiando. Segunda temporada das minhas travessuras. Está avisado.|Ich hab geprobt. Staffel zwei meiner Streiche. Du bist gewarnt.|Mi sono esercitato. Seconda stagione dei miei scherzi. Sei avvisato.|Estuve ensayando. Temporada dos de mis travesuras. Estás avisado.|我一直在排练。恶作剧第二季来了。别说我没提醒你。|연습 좀 했지. 내 장난 시즌 2야. 미리 경고했다.|稽古してきたぞ。いたずらシーズン2の開幕だ。警告はしたからな。|Я репетировал. Второй сезон моих проделок. Ты предупреждён.|Ćwiczyłem. Drugi sezon moich psikusów. Zostałeś ostrzeżony."
+    ],
+    quitRetMany: [
+      "{n} despedidas. Ninguna definitiva. Lo nuestro va en serio.|{n} goodbyes. None of them final. This thing of ours is serious.|{n} adieux. Aucun définitif. Entre nous, c'est sérieux.|{n} despedidas. Nenhuma definitiva. O nosso lance é sério.|{n} Abschiede. Keiner endgültig. Das mit uns ist was Ernstes.|{n} addii. Nessuno definitivo. Tra noi è una cosa seria.||告别了{n}次，没有一次是真的。我们这是认真的。|작별만 {n}번. 진짜 작별은 한 번도 없었지. 우리 사이, 진지하다.|さよならは{n}回。どれも本当のさよならじゃない。私たちの仲は本物だな。|Прощаний: {n}. Ни одного окончательного. У нас с тобой всё серьёзно.|Pożegnań: {n}. Żadne ostateczne. Między nami to coś poważnego."
+    ],
+    /* ---- vuelves y la ultima vez cerraste con la X de la ventana (o Alt+F4): sin interceptar nada, solo lo recuerda */
+    quitRetX: [
+      "La última vez te fuiste sin pasar por mi botón. Ni un adiós. Lo tengo apuntado.|Last time you left without using my button. Not even a goodbye. I've written that down.|La dernière fois, tu es parti sans passer par mon bouton. Pas même un au revoir. C'est noté.|Da última vez você saiu sem passar pelo meu botão. Nem um tchau. Anotei.|Letztes Mal bist du gegangen, ohne meinen Knopf zu benutzen. Nicht mal ein Tschüss. Hab ich mir notiert.|L'ultima volta te ne sei andato senza passare dal mio pulsante. Neanche un ciao. L'ho segnato.|La última vez te fuiste sin pasar por mi botón. Ni un adiós. Lo tengo anotado.|上次你没走我的按钮就溜了。连声再见都没有。我记下了。|지난번엔 내 버튼도 안 누르고 가버렸지. 인사 한마디 없이. 적어 뒀다.|前回は私のボタンを通らずに帰ったな。さよならも言わずに。メモしてあるぞ。|В прошлый раз ты ушёл, не нажав мою кнопку. Даже не попрощался. Я записал.|Ostatnio wyszedłeś bez mojego przycisku. Nawet bez do widzenia. Zanotowałem.",
+      "Para la próxima: mi botón de salir tiene luces, drama y despedida. La X no tiene nada.|Next time: my quit button has lights, drama and a proper goodbye. The X has nothing.|La prochaine fois : mon bouton pour partir a des lumières, du drame et des adieux. La croix, rien du tout.|Da próxima vez: meu botão de sair tem luzes, drama e despedida. O X não tem nada.|Nächstes Mal: Mein Beenden-Knopf hat Licht, Drama und einen Abschied. Das X hat gar nichts.|La prossima volta: il mio pulsante per uscire ha luci, dramma e un addio. La X non ha niente.||下次记住：我的退出按钮有灯光、有戏、有告别。那个X什么都没有。|다음엔 기억해. 내 종료 버튼엔 조명도, 드라마도, 작별도 있어. X엔 아무것도 없고.|次からはこっちにしな。私の終了ボタンには照明もドラマも別れもある。×には何もない。|На будущее: у моей кнопки выхода есть свет, драма и прощание. У крестика — ничего.|Na przyszłość: mój przycisk wyjścia ma światła, dramat i pożegnanie. Iks nie ma nic."
+    ],
+    /* ---- vuelves y la ultima sesion murio de golpe (cuelgue, corte de luz, proceso cerrado): con o sin expedicion guardada */
+    quitRetCrash: [
+      "La última vez la mesa se apagó de golpe, sin despedida ni nada. Esta vez no he sido yo. Creo.|Last time the table went dark all of a sudden, no goodbye, nothing. That one wasn't me. I think.|La dernière fois, la table s'est éteinte d'un coup, sans adieux ni rien. Cette fois, ce n'était pas moi. Je crois.|Da última vez a mesa apagou de repente, sem despedida nem nada. Dessa vez não fui eu. Acho.|Letztes Mal ging der Tisch plötzlich aus, ohne Abschied, ohne alles. Das war nicht ich. Glaube ich.|L'ultima volta il tavolo si è spento di colpo, senza un addio né niente. Stavolta non sono stato io. Credo.|La última vez la mesa se apagó de golpe, sin despedida ni nada. Esta vez no fui yo. Creo.|上次牌桌突然就黑了，连告别都没有。这次不是我干的。应该吧。|지난번엔 테이블이 갑자기 꺼졌지. 작별 인사도 없이. 이번엔 내가 한 거 아니야. 아마도.|前回はテーブルが突然真っ暗になった。別れの挨拶もなしに。今回は私じゃない。たぶん。|В прошлый раз стол вдруг погас — ни прощания, ничего. Это был не я. Кажется.|Ostatnio stół nagle zgasł, bez pożegnania, bez niczego. Tym razem to nie ja. Chyba."
+    ],
+    quitRetCrashSave: [
+      "Se fue la luz, ¿eh? Tu expedición sigue ahí: acto {act}, ronda {round}. La he vigilado.|Power cut, huh? Your expedition is still there: act {act}, round {round}. I kept an eye on it.|Coupure de courant, hein ? Ton expédition est toujours là : acte {act}, manche {round}. Je l'ai surveillée.|Acabou a luz, né? Sua expedição continua lá: ato {act}, rodada {round}. Fiquei de olho nela.|Stromausfall, was? Deine Expedition ist noch da: Akt {act}, Runde {round}. Ich hab auf sie aufgepasst.|Salta la luce, eh? La tua spedizione è ancora lì: atto {act}, round {round}. L'ho tenuta d'occhio.|Se cortó la luz, ¿eh? Tu expedición sigue ahí: acto {act}, ronda {round}. La estuve vigilando.|停电了，是吧？你的远征还在：第{act}幕，第{round}回合。我一直替你看着呢。|정전이었나 보지? 네 원정은 그대로야. {act}막 {round}라운드. 내가 지켜봤지.|停電か？君の遠征はそのままだ。第{act}幕、ラウンド{round}。見張っておいたよ。|Свет вырубило, да? Твоя экспедиция на месте: акт {act}, раунд {round}. Я за ней приглядывал.|Prąd wysiadł, co? Twoja wyprawa nadal czeka: akt {act}, runda {round}. Pilnowałem jej."
+    ],
+    /* ---- TEMPORADA DOS: ya te ha hecho las 7 trastadas; el boton dice "Salir (sin trucos)" y te deja ir a la primera (en orden: A y luego B) */
+    quitSeason: [
+      "Siete trastadas. Te las he hecho todas. No me queda ni un truco.|Seven pranks. I've pulled every one on you. I haven't got a single trick left.|Sept coups tordus. Je te les ai tous faits. Il ne me reste plus un seul tour.|Sete travessuras. Já fiz todas com você. Não me sobrou nenhum truque.|Sieben Streiche. Alle schon an dir ausprobiert. Mir bleibt kein einziger Trick.|Sette scherzi. Te li ho fatti tutti. Non mi resta neanche un trucco.|Siete travesuras. Ya te las hice todas. No me queda ni un truco.|七个恶作剧，我全在你身上用过了。一个花招都不剩了。|장난 일곱 개. 너한테 다 써먹었어. 이제 남은 속임수가 하나도 없네.|いたずらは七つ。全部君に仕掛けた。もう一つも手が残ってない。|Семь проделок. Все уже на тебе опробовал. Не осталось ни одного трюка.|Siedem psikusów. Wszystkie już na tobie wypróbowałem. Nie został mi ani jeden trik.",
+      "Anda, vete. Esta vez te abro yo la puerta.|Go on, off you go. This time I'll get the door for you.|Allez, file. Cette fois, c'est moi qui t'ouvre la porte.|Vai, pode ir. Dessa vez eu mesmo abro a porta pra você.|Na los, geh schon. Diesmal halte ich dir die Tür auf.|Dai, vai. Stavolta la porta te la apro io.|Anda, vete. Esta vez yo te abro la puerta.|走吧走吧。这次我亲自给你开门。|그래, 가. 이번엔 내가 문 열어줄게.|ほら、行きな。今回は私がドアを開けてやる。|Ладно, иди. На этот раз я сам открою тебе дверь.|No idź już. Tym razem sam otworzę ci drzwi."
+    ],
+    quitSeasonExpress: [
+      "Tú ya te sabes el camino. Salida exprés, cortesía de la casa.|You know the way by now. Express exit, courtesy of the house.|Tu connais le chemin maintenant. Sortie express, offerte par la maison.|Você já conhece o caminho. Saída expressa, cortesia da casa.|Du kennst den Weg ja inzwischen. Express-Ausgang, aufs Haus.|Ormai conosci la strada. Uscita express, offre la casa.||这条路你已经熟了。快速离场，本店请客。|이제 길은 알잖아. 익스프레스 출구, 가게에서 쏜다.|もう道は分かってるだろう。特急出口、店のおごりだ。|Дорогу ты уже знаешь. Экспресс-выход, за счёт заведения.|Znasz już drogę. Wyjście ekspresowe, na koszt firmy."
+    ],
+    /* ---- la saga de la puerta: la pregunta de salir sabe cuantas veces te has ido ({n}) y cuantas te has quedado ({s}) */
+    quitAskCount: [
+      "Salida número {n}. Ya tienes tarjeta de cliente de la puerta.|Exit number {n}. You've got a loyalty card for the door by now.|Sortie numéro {n}. Tu as déjà ta carte de fidélité de la porte.|Saída número {n}. Você já tem cartão fidelidade da porta.|Ausgang Nummer {n}. Du hast inzwischen eine Kundenkarte für die Tür.|Uscita numero {n}. Ormai hai la tessera fedeltà della porta.||第{n}次离场。你都可以办这扇门的会员卡了。|{n}번째 출구행. 이제 문 단골 카드라도 만들어야겠어.|{n}回目の退場だ。もうドアのポイントカードが作れるな。|Выход номер {n}. У тебя уже карта постоянного клиента этой двери.|Wyjście numer {n}. Masz już kartę stałego klienta tych drzwi.",
+      "¿Otra vez aquí? Es tu salida número {n}. La puerta ya te saluda por tu nombre.|Here again? That's exit number {n}. The door greets you by name now.|Encore ici ? C'est ta sortie numéro {n}. La porte te salue par ton prénom, maintenant.|De novo aqui? É sua saída número {n}. A porta já te cumprimenta pelo nome.|Schon wieder hier? Das ist Ausgang Nummer {n}. Die Tür grüßt dich schon mit Namen.|Di nuovo qui? È la tua uscita numero {n}. La porta ormai ti saluta per nome.||又来了？这是你第{n}次离场了。那扇门都能叫出你的名字了。|또 왔어? {n}번째 출구행이야. 이제 문이 네 이름 부르며 인사하더라.|またここか？{n}回目の退場だ。ドアのほうが君の名前を覚えたぞ。|Опять здесь? Это твой выход номер {n}. Дверь уже здоровается с тобой по имени.|Znowu tutaj? To twoje wyjście numer {n}. Drzwi już witają cię po imieniu."
+    ],
+    quitAskStays: [
+      "Te has quedado {s} de {n} veces. Empiezo a pensar que te gusto.|You've stayed {s} times out of {n}. I'm starting to think you like me.|Tu es resté {s} fois sur {n}. Je commence à croire que je te plais.|Você ficou {s} de {n} vezes. Tô começando a achar que você gosta de mim.|Du bist {s} von {n} Malen geblieben. Langsam glaube ich, du magst mich.|Sei rimasto {s} volte su {n}. Comincio a pensare che ti piaccio.|Te quedaste {s} de {n} veces. Empiezo a pensar que te gusto.|{n}次里你留下了{s}次。我开始觉得你喜欢我了。|{n}번 중에 {s}번은 남았지. 슬슬 네가 날 좋아하는 것 같아.|{n}回中{s}回は残ったな。さては私のことが好きなんだろう。|Из {n} раз ты остался {s}. Начинаю думать, что я тебе нравлюсь.|Zostałeś {s} razy na {n}. Zaczynam myśleć, że mnie lubisz."
+    ],
+    /* ---- le tocas la cara en la portada (en orden: 1.er, 2.o, 3.er y 5.o toque) y, la sesion siguiente, se acuerda ({n} toques) */
+    poke: [
+      "¿Qué? ¿Tengo algo en la cara?|What? Have I got something on my face?|Quoi ? J'ai quelque chose sur la figure ?|Que foi? Tem alguma coisa na minha cara?|Was? Hab ich was im Gesicht?|Che c'è? Ho qualcosa in faccia?||干嘛？我脸上有东西吗？|뭐야? 내 얼굴에 뭐 묻었어?|なんだ？顔に何かついてるか？|Что? У меня что-то на лице?|Co? Mam coś na twarzy?",
+      "Eso hace cosquillas. Los píxeles también sienten.|That tickles. Pixels have feelings too.|Ça chatouille. Les pixels aussi, ça ressent.|Isso faz cócegas. Pixel também sente.|Das kitzelt. Pixel haben auch Gefühle.|Fa il solletico. Anche i pixel sentono.||好痒。像素也是有感觉的。|간지러워. 픽셀도 느낄 줄 안다고.|くすぐったい。ピクセルにも感覚はあるんだ。|Щекотно. Пиксели тоже всё чувствуют.|To łaskocze. Piksele też czują.",
+      "Sin tocar al personal. Norma número uno del casino.|No touching the staff. House rule number one.|On ne touche pas au personnel. Règle numéro un du casino.|Não toque nos funcionários. Regra número um do cassino.|Personal nicht anfassen. Hausregel Nummer eins.|Non si tocca il personale. Regola numero uno del casinò.|No se toca al personal. Regla número uno del casino.|禁止触摸员工。本赌场第一条规矩。|직원 만지지 마. 카지노 규칙 제1조야.|従業員にはお触り禁止。カジノの鉄則その一だ。|Персонал руками не трогать. Правило номер один в казино.|Personelu nie dotykamy. Zasada numer jeden kasyna.",
+      "Se acabó. Me voy a barajar a otra parte.|That's it. I'm going to go shuffle somewhere else.|Ça suffit. Je vais battre les cartes ailleurs.|Chega. Vou embaralhar em outro lugar.|Schluss jetzt. Ich mische woanders weiter.|Basta. Vado a mescolare da un'altra parte.|Se acabó. Me voy a barajar a otro lado.|够了。我去别处洗牌了。|그만. 딴 데 가서 카드나 섞을래.|もう終わりだ。よそでシャッフルしてくる。|Всё. Пойду тасовать карты в другом месте.|Dość. Idę tasować gdzie indziej."
+    ],
+    pokeMemory: [
+      "La última vez me diste {n} toques en la cara. Aún me duele un píxel.|Last time you poked me in the face {n} times. One pixel still hurts.|La dernière fois, tu m'as touché la figure {n} fois. J'ai encore mal à un pixel.|Da última vez você cutucou minha cara {n} vezes. Ainda dói um pixel.|Letztes Mal hast du mir {n}-mal ins Gesicht gestupst. Ein Pixel tut immer noch weh.|L'ultima volta mi hai toccato la faccia {n} volte. Mi fa ancora male un pixel.||上次你戳了我的脸{n}下。现在还有一个像素在疼。|지난번에 내 얼굴을 {n}번이나 찔렀지. 아직 픽셀 하나가 아파.|前回は顔を{n}回もつついたな。まだピクセルが一つ痛む。|В прошлый раз ты тыкал меня в лицо. Тычков: {n}. Один пиксель до сих пор болит.|Ostatnio szturchałeś mnie w twarz. Razy: {n}. Jeden piksel wciąż boli."
+    ],
+    /* ---- te quedas mirando la carta del Clasico: apaga las luces de la suya (sulk) y, si vuelves a la Aventura, las enciende (sulkBack) */
+    sulk: [
+      "¿El Clásico? Vale. Apago las luces de mi carta. Ya está. ¿Contento?|The Classic? Fine. I'm switching off my card's lights. There. Happy?|Le Classique ? D'accord. J'éteins les lumières de ma carte. Voilà. Content ?|O Clássico? Tá bom. Vou apagar as luzes da minha carta. Pronto. Satisfeito?|Der Klassiker? Schön. Ich schalte die Lichter meiner Karte aus. So. Zufrieden?|Il Classico? Va bene. Spengo le luci della mia carta. Ecco. Contento?|¿El Clásico? Bueno. Apago las luces de mi carta. Listo. ¿Contento?|经典模式？行。我把我那张牌的灯关了。好了。满意了吧？|클래식? 좋아. 내 카드 불 꺼버린다. 됐지? 만족해?|クラシック？いいだろう。私のカードの明かりを消した。ほら。満足か？|Классика? Ладно. Выключаю огни на моей карте. Вот. Доволен?|Klasyczny? Dobra. Gaszę światła na mojej karcie. Proszę. Zadowolony?",
+      "El Clásico no tiene crupier. Ni luces. Ni gracia. Tú mismo.|The Classic has no dealer. No lights. No fun. Your call.|Le Classique n'a pas de croupier. Ni lumières. Ni charme. À toi de voir.|O Clássico não tem crupiê. Nem luzes. Nem graça. Você que sabe.|Der Klassiker hat keinen Croupier. Keine Lichter. Keinen Spaß. Deine Entscheidung.|Il Classico non ha croupier. Né luci. Né gusto. Fai tu.|El Clásico no tiene crupier. Ni luces. Ni gracia. Tú sabrás.|经典模式没有荷官。没有灯光。也没意思。你自己看着办。|클래식엔 딜러가 없어. 조명도 없고. 재미도 없지. 알아서 해.|クラシックにはディーラーがいない。明かりもない。面白みもない。好きにしな。|В Классике нет крупье. Ни огней. Ни веселья. Тебе решать.|W Klasycznym nie ma krupiera. Ani świateł. Ani frajdy. Twój wybór."
+    ],
+    sulkBack: [
+      "Eso es. Luces encendidas. Casi me enfado de verdad.|That's more like it. Lights on. I almost got angry for real.|Voilà qui est mieux. Lumières allumées. J'ai failli me fâcher pour de vrai.|Assim que eu gosto. Luzes acesas. Quase fiquei bravo de verdade.|Na also. Lichter an. Fast wäre ich wirklich sauer geworden.|Così mi piace. Luci accese. Stavo per arrabbiarmi sul serio.|Eso es. Luces encendidas. Casi me enojo de verdad.|这就对了。灯亮了。我差点就真生气了。|그렇지. 불 켰다. 진짜 화낼 뻔했잖아.|それでいい。明かりをつけた。本気で怒るところだったぞ。|Вот так-то лучше. Огни горят. Я чуть не обиделся по-настоящему.|No i proszę. Światła włączone. Prawie się naprawdę obraziłem."
+    ],
+    /* ---- BABEL EN DIRECTO: cambias de idioma. babelOld sale en el idioma que acabas de dejar; babelNew (la misma posicion) ya en el nuevo */
+    babelOld: [
+      "Espera, espera… ¿en qué idioma hablamos ahora?|Wait, wait… what language are we speaking now?|Attends, attends… on parle quelle langue, maintenant ?|Espera, espera… em que língua a gente fala agora?|Moment, Moment… welche Sprache sprechen wir jetzt?|Aspetta, aspetta… che lingua parliamo adesso?||等等，等等……我们现在说哪种语言？|잠깐, 잠깐… 이제 무슨 말로 하는 거야?|待て待て……今度は何語で話すんだ？|Стой, стой… на каком языке мы теперь говорим?|Czekaj, czekaj… w jakim języku teraz rozmawiamy?",
+      "¿Eh? ¿Qué le ha pasado a mi…?|Huh? What happened to my…?|Hein ? Qu'est-ce qui est arrivé à mon… ?|Hã? O que aconteceu com o meu…?|Hä? Was ist mit meinem…?|Eh? Cos'è successo al mio…?|¿Eh? ¿Qué le pasó a mi…?|嗯？我的……怎么了？|어? 내… 내 말이 왜 이래?|え？私の……どうなった？|А? Что случилось с моим…?|Hę? Co się stało z moim…?"
+    ],
+    babelNew: [
+      "Ah, vale. Ya está. Mi acento es terrible, pero te sigo a donde vayas.|Ah, right. Got it. My accent is terrible, but I'll follow you wherever you go.|Ah, d'accord. C'est bon. Mon accent est affreux, mais je te suis partout.|Ah, tá. Pronto. Meu sotaque é horrível, mas eu te sigo aonde for.|Ah, verstehe. Passt. Mein Akzent ist furchtbar, aber ich folge dir überallhin.|Ah, ok. Fatto. Ho un accento terribile, ma ti seguo ovunque.|Ah, bueno. Listo. Mi acento es terrible, pero te sigo a donde vayas.|啊，好吧。搞定。我的口音很糟，但你去哪儿我都跟着。|아, 알았어. 됐다. 발음은 엉망이지만 네가 어디로 가든 따라간다.|ああ、なるほど。よし。訛りはひどいが、どこへでもついていくぞ。|А, понял. Готово. Акцент у меня ужасный, но я за тобой куда угодно.|Aha, dobra. Już. Mam okropny akcent, ale pójdę za tobą wszędzie.",
+      "¡Ja! Idioma nuevo, mismas trampas.|Ha! New language, same old tricks.|Ha ! Nouvelle langue, mêmes coups tordus.|Ha! Língua nova, as mesmas trapaças.|Ha! Neue Sprache, dieselben Tricks.|Ah! Lingua nuova, stessi trucchi.||哈！换了语言，还是老一套花招。|하! 말은 바뀌어도 속임수는 그대로지.|ハッ！言葉は変わっても、手口は同じだ。|Ха! Язык новый, фокусы старые.|Ha! Nowy język, te same sztuczki."
+    ],
+    babelMany: [
+      "¿Buscas un idioma en el que yo sea simpático? No existe.|Looking for a language where I'm nice? There isn't one.|Tu cherches une langue où je suis sympa ? Elle n'existe pas.|Procurando uma língua em que eu seja simpático? Não existe.|Suchst du eine Sprache, in der ich nett bin? Gibt es nicht.|Cerchi una lingua in cui io sia simpatico? Non esiste.||在找一种我会变得和善的语言？不存在的。|내가 친절해지는 언어를 찾는 거야? 그런 건 없어.|私が優しくなる言語を探してるのか？そんなものはない。|Ищешь язык, на котором я буду милым? Такого нет.|Szukasz języka, w którym będę miły? Nie ma takiego."
+    ],
+    /* ---- me han actualizado: la primera vez tras una version nueva ({v}) */
+    newVersion: [
+      "Versión {v}. Me han actualizado mientras no mirabas. Frases nuevas; tu puntería, la de siempre.|Version {v}. They updated me while you weren't looking. New lines; your aim, same as ever.|Version {v}. On m'a mis à jour pendant que tu ne regardais pas. Nouvelles répliques ; ta visée, toujours la même.|Versão {v}. Me atualizaram enquanto você não olhava. Falas novas; sua mira, a de sempre.|Version {v}. Man hat mich aktualisiert, während du nicht hingeschaut hast. Neue Sprüche; deine Treffsicherheit, wie immer.|Versione {v}. Mi hanno aggiornato mentre non guardavi. Battute nuove; la tua mira, quella di sempre.|Versión {v}. Me actualizaron mientras no mirabas. Frases nuevas; tu puntería, la de siempre.|{v}版本。趁你不注意，我被更新了。台词是新的，你的准头还是老样子。|{v} 버전. 네가 안 보는 사이에 업데이트됐어. 대사는 새것, 네 조준 실력은 그대로.|バージョン{v}。君が見ていない間にアップデートされた。台詞は新しく、君の腕前はいつも通り。|Версия {v}. Меня обновили, пока ты не смотрел. Фразы новые, а меткость у тебя прежняя.|Wersja {v}. Zaktualizowali mnie, kiedy nie patrzyłeś. Nowe teksty; twoja celność bez zmian.",
+      "Versión nueva. El autor me ha enseñado trucos. No pienso decirte cuáles.|New version. The author taught me some tricks. I'm not telling you which.|Nouvelle version. L'auteur m'a appris des tours. Je ne te dirai pas lesquels.|Versão nova. O autor me ensinou uns truques. Não vou te contar quais.|Neue Version. Der Autor hat mir Tricks beigebracht. Welche, verrate ich nicht.|Versione nuova. L'autore mi ha insegnato dei trucchi. Non ti dirò quali.|Versión nueva. El autor me enseñó trucos. No pienso decirte cuáles.|新版本。作者教了我几招新花样。我可不告诉你是哪几招。|새 버전이야. 만든 사람이 속임수 좀 가르쳐줬지. 뭔지는 안 알려줘.|新バージョンだ。作者に新しい手を仕込まれた。どれかは教えないぞ。|Новая версия. Автор научил меня паре трюков. Каких — не скажу.|Nowa wersja. Autor nauczył mnie kilku sztuczek. Nie powiem jakich."
+    ],
+    /* ---- EL LOGRO FALSO: tras el sello "De broma" (fakeAch cualquiera; fakeAchIdle con {s} segundos quieto; fakeAchDoor con {q} salidas) */
+    fakeAch: [
+      "¿Te lo habías creído? Mírate la cara. Eso sí que es un logro.|Did you believe it? Look at your face. Now that's an achievement.|Tu y as cru ? Regarde ta tête. Ça, c'est un vrai exploit.|Você acreditou? Olha a sua cara. Isso sim é uma conquista.|Hast du's geglaubt? Schau dir dein Gesicht an. DAS ist eine Errungenschaft.|Ci avevi creduto? Guarda che faccia. Questo sì che è un traguardo.|¿Te lo creíste? Mírate la cara. Eso sí que es un logro.|你信了？看看你的表情。这才叫成就。|믿었어? 네 표정 좀 봐. 그게 진짜 업적이지.|信じたか？その顔を見てみな。それこそが実績だ。|Поверил? Посмотри на своё лицо. Вот это достижение.|Uwierzyłeś? Spójrz na swoją minę. To dopiero osiągnięcie.",
+      "Ja. No cuenta. Los logros de verdad los da el juego; yo solo los imito.|Ha. It doesn't count. The game hands out the real ones; I just do impressions.|Ha. Ça ne compte pas. Les vrais succès, c'est le jeu qui les donne ; moi, je les imite.|Ha. Não vale. As conquistas de verdade quem dá é o jogo; eu só imito.|Ha. Zählt nicht. Die echten Erfolge vergibt das Spiel; ich mache sie nur nach.|Ah. Non vale. Gli obiettivi veri li dà il gioco; io li imito e basta.||哈。不算数。真成就是游戏给的，我只是模仿一下。|하. 무효야. 진짜 업적은 게임이 주고, 난 흉내만 낼 뿐이지.|ハッ。無効だ。本物の実績はゲームがくれる。私は真似してるだけさ。|Ха. Не считается. Настоящие достижения даёт игра, а я их только изображаю.|Ha. Nie liczy się. Prawdziwe osiągnięcia daje gra; ja je tylko podrabiam."
+    ],
+    fakeAchIdle: [
+      "Me lo he inventado. Pero los {s} segundos mirando el techo son de verdad.|I made it up. But the {s} seconds staring at the ceiling were real.|Je l'ai inventé. Mais les {s} secondes à fixer le plafond, elles, sont bien réelles.|Eu inventei. Mas os {s} segundos olhando pro teto foram de verdade.|Hab ich mir ausgedacht. Aber die {s} Sekunden an die Decke starren waren echt.|Me lo sono inventato. Ma i {s} secondi a fissare il soffitto sono veri.|Me lo inventé. Pero los {s} segundos mirando el techo son de verdad.|我编的。不过你盯着天花板的那{s}秒是真的。|내가 지어낸 거야. 근데 천장 보던 {s}초는 진짜였지.|でっちあげだ。だが天井を見つめていた{s}秒は本物だぞ。|Я это выдумал. Но твои {s} с разглядывания потолка были настоящими.|Wymyśliłem to. Ale te {s} s gapienia się w sufit były prawdziwe."
+    ],
+    fakeAchDoor: [
+      "Inventado. Pero lo de volver después de irte, eso lo haces de verdad. {q} veces.|Made up. But coming back after leaving, that you really do. {q} times.|Inventé. Mais revenir après être parti, ça, tu le fais pour de vrai. {q} fois.|Inventado. Mas voltar depois de ir embora, isso você faz de verdade. {q} vezes.|Erfunden. Aber zurückkommen, nachdem du gegangen bist, das machst du wirklich. {q}-mal.|Inventato. Ma tornare dopo essertene andato, quello lo fai davvero. {q} volte.||编的。不过走了又回来，这事你是真干了。{q}次。|지어낸 거야. 근데 나갔다가 돌아오는 건 진짜 네 얘기지. {q}번이나.|でっちあげだ。だが出ていっては戻ってくるのは本当だ。{q}回もな。|Выдумка. Но возвращаться после ухода — это ты правда делаешь. Раз: {q}.|Zmyślone. Ale wracanie po wyjściu to u ciebie prawda. Razy: {q}."
+    ],
+    /* ---- EL HISTORIAL DE CADA TRUCO: {t} = nombre del truco; {h} = rondas que te ha ganado; {y} = rondas que le has ganado tu; {n} = veces que ha salido */
+    trickDebut: [
+      "Estreno mundial: «{t}». Lo he guardado para ti.|World premiere: “{t}”. I saved it just for you.|Première mondiale : « {t} ». Je te l'avais gardé.|Estreia mundial: “{t}”. Guardei só pra você.|Weltpremiere: „{t}“. Hab ich extra für dich aufgehoben.|Prima mondiale: «{t}». L'ho tenuto da parte per te.||全球首演：“{t}”。专门给你留的。|월드 프리미어: '{t}'. 너를 위해 아껴뒀지.|世界初公開：「{t}」。君のために取っておいた。|Мировая премьера: «{t}». Берёг специально для тебя.|Światowa premiera: „{t}”. Chowałem to dla ciebie.",
+      "«{t}». Nunca te lo había hecho. Hoy es un día especial para los dos.|“{t}”. I've never pulled this one on you. A special day for both of us.|« {t} ». Je ne te l'avais jamais fait. Un grand jour pour nous deux.|“{t}”. Nunca tinha feito essa com você. Dia especial pra nós dois.|„{t}“. Den hab ich dir noch nie gezeigt. Ein besonderer Tag für uns beide.|«{t}». Non te l'avevo mai fatto. Oggi è un giorno speciale per tutti e due.|«{t}». Nunca te lo había hecho. Hoy es un día especial para los dos.|“{t}”。我从没对你用过这招。今天对我们俩都是特别的日子。|'{t}'. 너한텐 처음 써보는 거야. 우리 둘에게 특별한 날이지.|「{t}」。君に仕掛けるのは初めてだ。二人にとって特別な日だな。|«{t}». Этого я тебе ещё не показывал. Особенный день для нас обоих.|„{t}”. Jeszcze ci tego nie robiłem. Wyjątkowy dzień dla nas obu."
+    ],
+    trickHouse: [
+      "¿«{t}» otra vez? Vamos {h} a {y}… para mí.|“{t}” again? It's {h} to {y}… for me.|« {t} », encore ? On en est à {h} à {y}… pour moi.|“{t}” de novo? Tá {h} a {y}… pra mim.|„{t}“ schon wieder? Es steht {h} zu {y}… für mich.|«{t}» di nuovo? Siamo {h} a {y}… per me.|¿«{t}» otra vez? Vamos {h} a {y}… a mi favor.|又是“{t}”？比分{h}比{y}……我领先。|'{t}' 또? {h} 대 {y}… 내가 앞서고 있지.|また「{t}」か？{h}対{y}……私のリードだ。|Опять «{t}»? Счёт {h}:{y}… в мою пользу.|Znowu „{t}”? Jest {h} do {y}… dla mnie.",
+      "«{t}» y tú: {h} a {y}. Le tengo mucho cariño a este truco.|“{t}” versus you: {h} to {y}. I'm very fond of this trick.|« {t} » contre toi : {h} à {y}. J'ai beaucoup d'affection pour ce tour.|“{t}” contra você: {h} a {y}. Tenho muito carinho por esse truque.|„{t}“ gegen dich: {h} zu {y}. Ich hänge sehr an diesem Trick.|«{t}» contro di te: {h} a {y}. Sono molto affezionato a questo trucco.||“{t}”对你：{h}比{y}。我可太喜欢这招了。|'{t}' 대 너: {h} 대 {y}. 난 이 속임수가 정말 좋아.|「{t}」対君：{h}対{y}。この手には愛着があってね。|«{t}» против тебя: {h}:{y}. Я очень люблю этот трюк.|„{t}” kontra ty: {h} do {y}. Bardzo lubię tę sztuczkę."
+    ],
+    trickYou: [
+      "Con «{t}» me ganas {y} a {h}. Hoy lo he afilado.|With “{t}” you're beating me {y} to {h}. I've sharpened it today.|Avec « {t} », tu me bats {y} à {h}. Aujourd'hui, je l'ai aiguisé.|Com “{t}” você me ganha de {y} a {h}. Hoje eu afiei.|Bei „{t}“ führst du {y} zu {h}. Heute hab ich ihn geschärft.|Con «{t}» mi batti {y} a {h}. Oggi l'ho affilato.|Con «{t}» me ganas {y} a {h}. Hoy lo afilé.|“{t}”这招你赢我{y}比{h}。今天我把它磨快了。|'{t}'에선 네가 {y} 대 {h}로 이기고 있지. 오늘은 날 좀 세워왔어.|「{t}」では君が{y}対{h}で勝ってる。今日は研いできたぞ。|С «{t}» ты ведёшь {y}:{h}. Сегодня я его наточил.|Przy „{t}” wygrywasz {y} do {h}. Dziś go naostrzyłem.",
+      "«{t}» otra vez. Sí, ya sé que vas {y} a {h}. Por eso lo saco.|“{t}” again. Yes, I know you're up {y} to {h}. That's why I brought it out.|« {t} », encore. Oui, je sais que tu mènes {y} à {h}. C'est pour ça que je le sors.|“{t}” de novo. Sim, eu sei que você tá {y} a {h}. Por isso mesmo.|„{t}“ schon wieder. Ja, ich weiß, du führst {y} zu {h}. Genau deshalb.|«{t}» di nuovo. Sì, lo so che sei avanti {y} a {h}. Proprio per questo.||又是“{t}”。是啊，我知道你{y}比{h}领先。所以才又拿出来。|또 '{t}'야. 그래, 네가 {y} 대 {h}로 앞선 거 알아. 그래서 꺼낸 거야.|また「{t}」だ。ああ、君が{y}対{h}でリードしてるのは知ってる。だからこそだ。|Опять «{t}». Да, знаю, ты ведёшь {y}:{h}. Потому и достал.|Znowu „{t}”. Tak, wiem, że prowadzisz {y} do {h}. Właśnie dlatego."
+    ],
+    trickVet: [
+      "«{t}», vez número {n}. Ya lo lees mejor que yo. No se lo digas a nadie.|“{t}”, time number {n}. You read it better than I do by now. Don't tell anyone.|« {t} », pour la {n}e fois. Tu le lis mieux que moi, maintenant. Ne le dis à personne.|“{t}”, vez número {n}. Você já lê melhor que eu. Não conta pra ninguém.|„{t}“, Nummer {n}. Du durchschaust ihn inzwischen besser als ich. Nicht weitersagen.|«{t}», volta numero {n}. Ormai lo leggi meglio di me. Non dirlo a nessuno.||“{t}”，第{n}次了。你现在看得比我还透。别告诉别人。|'{t}', {n}번째야. 이제 나보다 네가 더 잘 읽네. 아무한테도 말하지 마.|「{t}」、これで{n}回目。もう私より見抜いてるな。誰にも言うなよ。|«{t}», раз номер {n}. Ты уже читаешь его лучше меня. Никому не говори.|„{t}”, raz numer {n}. Czytasz go już lepiej niż ja. Nikomu nie mów."
+    ],
+    /* ---- el jefe se presenta por su nombre ({j}) */
+    bossNamed: [
+      "Te presento a «{j}». Bueno, soy yo con otro sombrero.|Allow me to introduce “{j}”. Well, it's me in a different hat.|Je te présente « {j} ». Bon, c'est moi avec un autre chapeau.|Apresento “{j}”. Bom, sou eu com outro chapéu.|Darf ich vorstellen: „{j}“. Na ja, das bin ich mit anderem Hut.|Ti presento «{j}». Be', sono io con un altro cappello.||介绍一下，“{j}”。好吧，其实是我换了顶帽子。|'{j}'를 소개하지. 뭐, 모자만 바꾼 나야.|紹介しよう、「{j}」だ。まあ、帽子を替えた私なんだが。|Позволь представить: «{j}». Ну, это я в другой шляпе.|Przedstawiam „{j}”. No dobra, to ja w innym kapeluszu.",
+      "«{j}». El nombre se lo puse yo. Los trucos, también.|“{j}”. I came up with the name. And the tricks.|« {j} ». Le nom, c'est moi qui l'ai choisi. Les tours aussi.|“{j}”. O nome fui eu que dei. Os truques também.|„{j}“. Den Namen hab ich mir ausgedacht. Die Tricks auch.|«{j}». Il nome gliel'ho dato io. Anche i trucchi.||“{j}”。名字是我起的。花招也是。|'{j}'. 이름은 내가 지었어. 속임수도.|「{j}」。名前をつけたのは私だ。トリックもな。|«{j}». Имя придумал я. И трюки тоже.|„{j}”. Nazwę wymyśliłem ja. Sztuczki też.",
+      "Aquí llega «{j}». Ponte cómodo. O no.|Here comes “{j}”. Make yourself comfortable. Or don't.|Voici « {j} ». Mets-toi à l'aise. Ou pas.|Lá vem “{j}”. Fique à vontade. Ou não.|Hier kommt „{j}“. Mach's dir bequem. Oder lieber nicht.|Ecco «{j}». Mettiti comodo. O forse no.||“{j}”来了。放轻松。或者别放松。|'{j}' 등장. 편하게 있어. 아니면 말고.|「{j}」のお出ましだ。楽にしてくれ。いや、しなくていい。|А вот и «{j}». Устраивайся поудобнее. Или нет.|Oto nadchodzi „{j}”. Rozgość się. Albo nie."
+    ],
+    /* ---- EL FANTASMA DE TU ULTIMA CAIDA: la ronda donde caiste la ultima vez ({r}), territorio nuevo, y cuando la superas */
+    ghostFall: [
+      "Ronda {r}. Aquí caíste la última vez. ¿Te suena el paisaje?|Round {r}. This is where you fell last time. Look familiar?|Manche {r}. C'est ici que tu es tombé la dernière fois. Ça te dit quelque chose ?|Rodada {r}. Foi aqui que você caiu da última vez. Reconhece a paisagem?|Runde {r}. Hier bist du letztes Mal gefallen. Kommt dir die Gegend bekannt vor?|Round {r}. Qui sei caduto l'ultima volta. Ti ricorda qualcosa?||第{r}回合。上次你就倒在这里。风景眼熟吗？|{r}라운드. 지난번에 네가 쓰러진 곳이지. 풍경 기억나?|ラウンド{r}。前回君が倒れた場所だ。見覚えがあるだろう？|Раунд {r}. Здесь ты пал в прошлый раз. Пейзаж знакомый?|Runda {r}. Tu ostatnio poległeś. Znajomy krajobraz?",
+      "Ronda {r}. La última vez te despedí aquí mismo. Hoy traigo pañuelo, por si acaso.|Round {r}. Last time I waved you goodbye right here. I've brought a hanky, just in case.|Manche {r}. La dernière fois, je t'ai dit adieu pile ici. J'ai pris un mouchoir, au cas où.|Rodada {r}. Da última vez eu me despedi de você bem aqui. Trouxe um lenço, por via das dúvidas.|Runde {r}. Letztes Mal hab ich dich genau hier verabschiedet. Ich hab ein Taschentuch dabei, nur für alle Fälle.|Round {r}. L'ultima volta ti ho salutato proprio qui. Ho portato un fazzoletto, non si sa mai.|Ronda {r}. La última vez te despedí aquí mismo. Hoy traje pañuelo, por si acaso.|第{r}回合。上次我就是在这儿送走你的。今天我带了手帕，以防万一。|{r}라운드. 지난번에 바로 여기서 널 배웅했지. 오늘은 혹시 몰라 손수건 챙겨왔어.|ラウンド{r}。前回ちょうどここで君を見送った。念のためハンカチを持ってきたぞ。|Раунд {r}. В прошлый раз я проводил тебя прямо здесь. На всякий случай взял платочек.|Runda {r}. Ostatnio pożegnałem cię dokładnie tutaj. Na wszelki wypadek wziąłem chusteczkę."
+    ],
+    virgin: [
+      "Ronda {r}. Aquí no habías llegado nunca. Ni yo te tenía la silla preparada.|Round {r}. You've never made it this far. I didn't even have a chair ready for you.|Manche {r}. Tu n'étais jamais arrivé jusqu'ici. Je ne t'avais même pas préparé de chaise.|Rodada {r}. Você nunca tinha chegado aqui. Nem cadeira eu tinha pra você.|Runde {r}. So weit bist du noch nie gekommen. Ich hatte nicht mal einen Stuhl für dich bereit.|Round {r}. Non eri mai arrivato fin qui. Non ti avevo nemmeno preparato la sedia.|Ronda {r}. Nunca habías llegado aquí. Ni silla te tenía preparada.|第{r}回合。你从没走到过这里。我连椅子都没给你准备。|{r}라운드. 여기까진 처음이네. 네 의자도 준비 안 해뒀는데.|ラウンド{r}。ここまで来たのは初めてだな。君の椅子すら用意してなかった。|Раунд {r}. Так далеко ты ещё не забирался. Я даже стул тебе не приготовил.|Runda {r}. Tak daleko jeszcze nie doszedłeś. Nawet krzesła ci nie przygotowałem.",
+      "Territorio nuevo: ronda {r}. Nunca te había visto tan lejos. Me pone nervioso.|New territory: round {r}. I've never seen you this far in. It makes me nervous.|Territoire inconnu : manche {r}. Je ne t'avais jamais vu aussi loin. Ça me rend nerveux.|Território novo: rodada {r}. Nunca te vi tão longe. Isso me deixa nervoso.|Neuland: Runde {r}. So weit hab ich dich noch nie gesehen. Das macht mich nervös.|Territorio nuovo: round {r}. Non ti avevo mai visto così avanti. Mi rende nervoso.||新领域：第{r}回合。从没见你走这么远。我有点紧张了。|새 영역: {r}라운드. 이렇게 멀리 온 건 처음 보네. 긴장되는데.|未踏の地：ラウンド{r}。君がここまで来るのは初めてだ。落ち着かないな。|Новая территория: раунд {r}. Никогда не видел тебя так далеко. Нервничаю.|Nowe terytorium: runda {r}. Nigdy nie widziałem cię tak daleko. Denerwuje mnie to."
+    ],
+    ghostBeat: [
+      "Has superado la ronda {r}, la que te ganó la última vez. Territorio nuevo. Para los dos.|You've cleared round {r}, the one that beat you last time. New territory. For both of us.|Tu as passé la manche {r}, celle qui t'avait battu la dernière fois. Territoire inconnu. Pour nous deux.|Você passou da rodada {r}, a que te derrotou da última vez. Território novo. Pra nós dois.|Du hast Runde {r} geschafft, die dich letztes Mal besiegt hat. Neuland. Für uns beide.|Hai superato il round {r}, quello che ti aveva battuto l'ultima volta. Territorio nuovo. Per tutti e due.|Superaste la ronda {r}, la que te ganó la última vez. Territorio nuevo. Para los dos.|你过了第{r}回合，就是上次打败你的那一关。新领域，对我们俩都是。|지난번에 널 이긴 {r}라운드를 넘었네. 새 영역이야. 우리 둘 다에게.|前回君を負かしたラウンド{r}を突破したな。未踏の地だ。二人にとってな。|Ты прошёл раунд {r}, который в прошлый раз тебя победил. Новая территория. Для нас обоих.|Przeszedłeś rundę {r}, która ostatnio cię pokonała. Nowe terytorium. Dla nas obu."
+    ],
+    /* ---- «SIN MI TRUCO LA CLAVABAS»: en el ticket, tu mano de verdad frente a donde cayo el pin ({p} lugar, {raw} tu raton, {km} tu pin) */
+    handPtr: [
+      "Tu ratón estaba a {raw} de {p}. Tu pin, a {km}. La diferencia se llama crupier.|Your mouse was {raw} from {p}. Your pin, {km}. The difference is called the dealer.|Ta souris était à {raw} de {p}. Ton épingle, à {km}. La différence s'appelle le croupier.|Seu mouse estava a {raw} de {p}. Seu pino, a {km}. A diferença se chama crupiê.|Deine Maus war {raw} von {p} entfernt. Dein Pin {km}. Der Unterschied heißt Croupier.|Il tuo mouse era a {raw} da {p}. Il tuo pin, a {km}. La differenza si chiama croupier.||你的鼠标离{p}只有{raw}，你的图钉却差了{km}。差距就叫荷官。|네 마우스는 {p}에서 {raw}, 네 핀은 {km}. 그 차이를 딜러라고 부르지.|君のマウスは{p}から{raw}、ピンは{km}。その差をディーラーと呼ぶ。|Твоя мышь была в {raw} от «{p}». Твой пин — в {km}. Разница называется крупье.|Twoja mysz była {raw} od {p}. Twoja pinezka — {km}. Ta różnica nazywa się krupier.",
+      "Tu mano sabía dónde estaba {p}. Mi truco también. Ganó el truco.|Your hand knew where {p} was. So did my trick. The trick won.|Ta main savait où était {p}. Mon tour aussi. Le tour a gagné.|Sua mão sabia onde ficava {p}. Meu truque também. O truque venceu.|Deine Hand wusste, wo {p} liegt. Mein Trick auch. Der Trick hat gewonnen.|La tua mano sapeva dov'era {p}. Anche il mio trucco. Ha vinto il trucco.||你的手知道{p}在哪。我的花招也知道。花招赢了。|네 손은 {p}가 어딘지 알았지. 내 속임수도 알았고. 속임수가 이겼어.|君の手は{p}の場所を知っていた。私のトリックもな。勝ったのはトリックだ。|Твоя рука знала, где «{p}». Мой трюк тоже. Победил трюк.|Twoja ręka wiedziała, gdzie jest {p}. Moja sztuczka też. Wygrała sztuczka."
+    ],
+    handWind: [
+      "Apuntaste bien a {p}. Mi vendaval, mejor. El viento también es de la casa.|You aimed well at {p}. My gale aimed better. The wind works for the house too.|Tu avais bien visé {p}. Ma bourrasque, mieux. Le vent aussi travaille pour la maison.|Você mirou bem em {p}. Minha ventania, melhor. O vento também é da casa.|Du hast gut auf {p} gezielt. Mein Sturm besser. Auch der Wind arbeitet fürs Haus.|Hai mirato bene a {p}. La mia bufera, meglio. Anche il vento lavora per la casa.||你瞄{p}瞄得不错。我的狂风更准。风也是庄家的。|{p}를 잘 겨눴어. 내 질풍이 더 잘 겨눴지. 바람도 하우스 편이거든.|{p}をうまく狙ったな。私の疾風のほうが上手だった。風も胴元の味方さ。|Ты хорошо целился в «{p}». Мой шквал — лучше. Ветер тоже работает на заведение.|Dobrze celowałeś w {p}. Moja wichura lepiej. Wiatr też gra dla kasyna."
+    ],
+    handMap: [
+      "Has clicado justo donde estaría {p}… si yo no hubiera movido los continentes. Memoria: diez. Adaptación: cero.|You clicked right where {p} would be… if I hadn't moved the continents. Memory: ten. Adapting: zero.|Tu as cliqué pile où serait {p}… si je n'avais pas bougé les continents. Mémoire : dix. Adaptation : zéro.|Você clicou bem onde {p} estaria… se eu não tivesse mexido nos continentes. Memória: dez. Adaptação: zero.|Du hast genau da geklickt, wo {p} wäre… hätte ich die Kontinente nicht verschoben. Gedächtnis: eins. Anpassung: sechs.|Hai cliccato proprio dove sarebbe {p}… se non avessi spostato i continenti. Memoria: dieci. Adattamento: zero.|Clicaste justo donde estaría {p}… si yo no hubiera movido los continentes. Memoria: diez. Adaptación: cero.|你点的正是{p}本来的位置……要是我没挪动大洲的话。记性：满分。应变：零分。|내가 대륙을 안 옮겼다면 {p}가 있을 바로 그 자리를 찍었네. 기억력: 10점. 적응력: 0점.|大陸を動かしていなければ{p}があった場所をぴったりクリックしたな。記憶力は満点、適応力はゼロ。|Ты кликнул ровно туда, где был бы «{p}»… если бы я не двигал континенты. Память — десять. Сообразительность — ноль.|Kliknąłeś dokładnie tam, gdzie byłoby {p}… gdybym nie przestawił kontynentów. Pamięć: szóstka. Adaptacja: pała."
+    ],
+    handPangea: [
+      "Ahí estaba {p} antes de que juntara los continentes. Llegas unos 200 millones de años tarde.|That's where {p} was before I squeezed the continents together. You're about 200 million years late.|C'est là qu'était {p} avant que je rassemble les continents. Tu as environ 200 millions d'années de retard.|Era aí que ficava {p} antes de eu juntar os continentes. Você chegou uns 200 milhões de anos atrasado.|Da lag {p}, bevor ich die Kontinente zusammengeschoben habe. Du bist etwa 200 Millionen Jahre zu spät.|Lì c'era {p} prima che unissi i continenti. Arrivi con circa 200 milioni di anni di ritardo.||我把大洲拼起来之前，{p}就在那儿。你来晚了大约两亿年。|내가 대륙을 합치기 전엔 {p}가 거기 있었지. 한 2억 년쯤 늦었어.|私が大陸をくっつける前、{p}はそこにあった。二億年ほど遅刻だな。|Там был «{p}», пока я не собрал континенты вместе. Ты опоздал миллионов на двести лет.|Tam było {p}, zanim złączyłem kontynenty. Spóźniłeś się jakieś 200 milionów lat."
+    ],
+    handFlip: [
+      "Clavado… con el norte arriba. Hoy el norte está abajo, explorador.|Spot on… with north at the top. Today north is at the bottom, explorer.|En plein dans le mille… avec le nord en haut. Aujourd'hui, le nord est en bas, explorateur.|Na mosca… com o norte em cima. Hoje o norte está embaixo, explorador.|Volltreffer… mit Norden oben. Heute ist Norden unten, Entdecker.|Centrato… con il nord in alto. Oggi il nord sta in basso, esploratore.||正中……如果北在上面的话。今天北在下面，探险家。|정확해… 북쪽이 위라면 말이지. 오늘은 북쪽이 아래야, 탐험가.|ど真ん中……北が上ならな。今日は北が下だぞ、探検家。|В точку… если бы север был сверху. Сегодня север внизу, исследователь.|W sam środek… gdyby północ była na górze. Dziś północ jest na dole, odkrywco."
+    ],
+    handBlind: [
+      "Has disparado con el puntero invisible. Y has acertado. Esto no estaba en el guion.|You fired with an invisible pointer. And you hit it. That wasn't in the script.|Tu as tiré avec un pointeur invisible. Et tu as touché. Ce n'était pas dans le scénario.|Você atirou com o ponteiro invisível. E acertou. Isso não estava no roteiro.|Du hast mit unsichtbarem Zeiger geschossen. Und getroffen. Das stand nicht im Drehbuch.|Hai sparato col puntatore invisibile. E hai fatto centro. Non era nel copione.|Disparaste con el puntero invisible. Y acertaste. Esto no estaba en el guion.|你用看不见的指针开了一枪，还打中了。剧本里可没这段。|보이지도 않는 포인터로 쐈는데 맞혔네. 대본에 없던 건데.|見えないポインターで撃って、当てたな。台本になかったぞ。|Ты стрелял невидимым курсором. И попал. Такого не было в сценарии.|Strzeliłeś niewidzialnym kursorem. I trafiłeś. Tego nie było w scenariuszu."
+    ],
+    /* ---- ESE SITIO OTRA VEZ: un lugar que fallas en sesiones distintas ({p}, {n} veces) y cuando por fin lo aciertas */
+    nemesis: [
+      "¿{p} otra vez? Ya van {n}. Le voy a poner tu nombre a una calle.|{p} again? That's {n} now. I'm naming a street after you there.|{p}, encore ? Ça fait {n}. Je vais donner ton nom à une rue là-bas.|{p} de novo? Já são {n}. Vou dar seu nome a uma rua de lá.|Schon wieder {p}? Das ist Nummer {n}. Ich benenne dort eine Straße nach dir.|{p} di nuovo? Siamo a {n}. Ti intitolo una via, lì.||又是{p}？这已经第{n}次了。我要在那儿用你的名字命名一条街。|또 {p}? 벌써 {n}번째야. 거기 길 하나에 네 이름 붙여야겠어.|また{p}か？これで{n}回目だ。あそこの通りに君の名前をつけてやろう。|Опять «{p}»? Уже раз {n}-й. Назову там улицу в твою честь.|Znowu {p}? To już {n}. raz. Nazwę tam ulicę twoim imieniem.",
+      "{p}. Vuestra relación es complicada, lo sé. {n} desencuentros.|{p}. It's complicated between you two, I know. {n} misses.|{p}. Entre vous, c'est compliqué, je sais. {n} rendez-vous manqués.|{p}. A relação de vocês é complicada, eu sei. {n} desencontros.|{p}. Zwischen euch ist es kompliziert, ich weiß. {n} Fehlversuche.|{p}. Tra voi è complicato, lo so. {n} appuntamenti mancati.|{p}. Su relación es complicada, lo sé. {n} desencuentros.|{p}。你们俩的关系很复杂，我懂。已经错过{n}次了。|{p}. 너희 사이 복잡한 거 알아. {n}번이나 엇갈렸지.|{p}。君たちの関係は複雑だよな。すれ違いは{n}回目だ。|«{p}». У вас сложные отношения, я знаю. Промахов: {n}.|{p}. Wasza relacja jest skomplikowana, wiem. Pudeł: {n}.",
+      "{p} te vuelve a dar esquinazo. Empiezo a pensar que es algo personal.|{p} gives you the slip again. I'm starting to think it's personal.|{p} te file encore entre les doigts. Je commence à croire que c'est personnel.|{p} te escapou de novo. Tô começando a achar que é pessoal.|{p} entwischt dir schon wieder. Langsam glaube ich, das ist persönlich.|{p} ti sfugge di nuovo. Comincio a pensare che sia una cosa personale.||{p}又从你手里溜走了。我开始觉得这是私人恩怨了。|{p}가 또 널 피해 갔네. 이쯤 되면 개인적인 감정 같은데.|{p}にまた逃げられたな。個人的な恨みがあるんじゃないか。|«{p}» опять от тебя ускользнул. Начинаю думать, что это личное.|{p} znowu ci się wymyka. Zaczynam myśleć, że to coś osobistego."
+    ],
+    nemesisBeat: [
+      "Por fin, {p}. Se acabó mi chiste favorito. Me has dejado sin material.|Finally, {p}. There goes my favourite joke. You've left me with no material.|Enfin, {p}. Adieu ma blague préférée. Tu m'as laissé sans matière.|Finalmente, {p}. Lá se vai minha piada favorita. Você me deixou sem material.|Endlich, {p}. Weg ist mein Lieblingswitz. Du lässt mich ohne Material.|Finalmente, {p}. Addio alla mia battuta preferita. Mi hai lasciato senza materiale.|Por fin, {p}. Se acabó mi chiste favorito. Me dejaste sin material.|终于拿下{p}了。我最爱的笑话没了。你让我没素材了。|드디어 {p}. 내 최애 농담이 끝났네. 이제 소재가 없잖아.|ついに{p}か。私のお気に入りのネタが終わった。ネタ切れだよ。|Наконец-то, «{p}». Прощай, моя любимая шутка. Ты оставил меня без материала.|Nareszcie, {p}. Koniec mojego ulubionego żartu. Zostawiłeś mnie bez materiału.",
+      "¡{p}, al fin! Lo celebraría, pero me quitas un chiste.|{p}, at last! I'd celebrate, but you've just killed one of my jokes.|{p}, enfin ! Je fêterais ça, mais tu viens de tuer une de mes blagues.|{p}, até que enfim! Eu comemoraria, mas você acabou de matar uma piada minha.|{p}, endlich! Ich würde feiern, aber du hast mir gerade einen Witz geklaut.|{p}, finalmente! Festeggerei, ma mi hai appena rubato una battuta.||{p}，终于！本想庆祝，可你刚毁了我一个笑话。|{p}, 드디어! 축하하고 싶은데, 방금 내 농담 하나를 없앴잖아.|{p}、ついにか！祝いたいところだが、ネタを一つ潰されたな。|«{p}», наконец! Я бы отпраздновал, но ты только что убил мою шутку.|{p}, wreszcie! Świętowałbym, ale właśnie zabiłeś mój żart."
+    ],
+    /* ---- SU LIBRETA EN EL PERFIL: lo que ha cambiado desde tu ultima visita ({q} preguntas, {b} dianas, {k} distancia) y la casilla que se da la vuelta */
+    pfDiffGood: [
+      "Desde la última vez que miraste esto: {q} preguntas más, {b} dianas más y tu error medio ha bajado {k}. No te acostumbres.|Since you last looked at this: {q} more questions, {b} more bullseyes, and your average error is down {k}. Don't get used to it.|Depuis ta dernière visite ici : {q} questions de plus, {b} en plein dans le mille, et ton erreur moyenne a baissé de {k}. N'y prends pas goût.|Desde a última vez que você olhou isto: {q} perguntas a mais, {b} na mosca, e seu erro médio caiu {k}. Não se acostuma.|Seit du das zuletzt angeschaut hast: {q} Fragen mehr, {b} Volltreffer mehr, und dein Durchschnittsfehler ist um {k} gesunken. Gewöhn dich nicht dran.|Dall'ultima volta che hai guardato qui: {q} domande in più, {b} centri in più e il tuo errore medio è sceso di {k}. Non ci fare l'abitudine.|Desde la última vez que miraste esto: {q} preguntas más, {b} dianas más y tu error medio bajó {k}. No te acostumbres.|自你上次看这里以来：多答了{q}题，多了{b}次正中，平均误差减少了{k}。别习惯了。|지난번에 본 뒤로: 문제 {q}개 더, 명중 {b}번 더, 평균 오차는 {k} 줄었어. 익숙해지진 마.|前回ここを見てから、問題は{q}問増え、命中は{b}回増え、平均誤差は{k}減った。慣れるなよ。|С прошлого раза: ещё вопросов — {q}, попаданий — {b}, средняя ошибка меньше на {k}. Не привыкай.|Od ostatniego razu: pytań więcej o {q}, trafień w dziesiątkę o {b}, a średni błąd spadł o {k}. Nie przyzwyczajaj się."
+    ],
+    pfDiffBad: [
+      "{q} preguntas desde tu última visita y tu error medio ha subido {k}. Lo he apuntado en rojo.|{q} questions since your last visit, and your average error is up {k}. I've written that in red.|{q} questions depuis ta dernière visite, et ton erreur moyenne a grimpé de {k}. Je l'ai noté en rouge.|{q} perguntas desde sua última visita, e seu erro médio subiu {k}. Anotei em vermelho.|{q} Fragen seit deinem letzten Besuch, und dein Durchschnittsfehler ist um {k} gestiegen. Hab ich rot notiert.|{q} domande dalla tua ultima visita e il tuo errore medio è salito di {k}. L'ho segnato in rosso.|{q} preguntas desde tu última visita y tu error medio subió {k}. Lo anoté en rojo.|自你上次来又答了{q}题，平均误差却增加了{k}。我用红笔记下了。|지난 방문 후로 {q}문제, 평균 오차는 {k} 늘었어. 빨간 펜으로 적어 뒀다.|前回から{q}問、平均誤差は{k}増えた。赤で書いておいたぞ。|С прошлого визита вопросов: {q}, а средняя ошибка выросла на {k}. Записал красным.|Od ostatniej wizyty pytań: {q}, a średni błąd wzrósł o {k}. Zapisałem na czerwono."
+    ],
+    pfBookClock: [
+      "Esa te la enseño yo. La de verdad: se te ha acabado el reloj {n} veces.|I'll show you this one myself. The real stat: you've run out of time {n} times.|Celle-là, c'est moi qui te la montre. La vraie : le temps t'a filé entre les doigts {n} fois.|Essa quem mostra sou eu. A de verdade: seu tempo acabou {n} vezes.|Die zeig ich dir selbst. Die echte: Dir ist {n}-mal die Zeit ausgegangen.|Questa te la mostro io. Quella vera: ti è scaduto il tempo {n} volte.|Esa te la muestro yo. La de verdad: se te acabó el reloj {n} veces.|这个由我来给你看。真实数据：你超时了{n}次。|이건 내가 보여주지. 진짜 기록: 시간 초과 {n}번.|これは私が見せてやる。本当の数字だ。時間切れ{n}回。|Эту покажу я. Настоящая статистика: время у тебя кончалось раз {n}.|Tę pokażę ci ja. Prawdziwa: skończył ci się czas tyle razy: {n}."
+    ],
+    pfBookDoor: [
+      "Veces que me has dejado por el botón de salir: {n}. Esa la llevo yo, a mano.|Times you've left me through the quit button: {n}. I keep that one by hand.|Nombre de fois où tu m'as quitté par le bouton de sortie : {n}. Celle-là, je la tiens à la main.|Vezes que você me deixou pelo botão de sair: {n}. Essa eu anoto à mão.|So oft hast du mich über den Beenden-Knopf verlassen: {n}. Die führe ich von Hand.|Volte che mi hai lasciato col pulsante per uscire: {n}. Questa la tengo io, a mano.||你用退出按钮丢下我的次数：{n}。这个我亲手记着。|종료 버튼으로 날 떠난 횟수: {n}. 그건 내가 손으로 적고 있지.|終了ボタンで私を置いていった回数：{n}。これは手書きでつけてる。|Сколько раз ты бросал меня через кнопку выхода: {n}. Это я веду от руки.|Ile razy zostawiłeś mnie przyciskiem wyjścia: {n}. To liczę ręcznie."
+    ],
+    pfBookCoins: [
+      "Has ganado {n} doblones en tu vida. ¿Dónde están? Exacto: en mi caja.|You've won {n} doubloons in your life. Where are they? Exactly: in my till.|Tu as gagné {n} doublons dans ta vie. Où sont-ils ? Exactement : dans ma caisse.|Você ganhou {n} dobrões na vida. Onde estão? Exato: no meu caixa.|Du hast in deinem Leben {n} Dublonen gewonnen. Wo sind sie? Genau: in meiner Kasse.|Hai vinto {n} dobloni in vita tua. Dove sono? Esatto: nella mia cassa.|Ganaste {n} doblones en tu vida. ¿Dónde están? Exacto: en mi caja.|你这辈子赢了{n}枚金币。它们在哪？没错：在我的钱箱里。|넌 평생 도블론 {n}개를 땄지. 어디 있냐고? 맞아, 내 금고 안에.|君は生涯で{n}ダブロン稼いだ。どこにあるかって？そう、私の金庫の中だ。|За всю жизнь ты выиграл дублонов: {n}. Где они? Именно: в моей кассе.|Wygrałeś w życiu dublonów: {n}. Gdzie są? No właśnie: w mojej kasie."
+    ],
+    pfBookKm: [
+      "Kilómetros fallados en total: {n}. Te daría para dar la vuelta al mundo. Varias.|Total distance missed: {n}. Enough to go round the world. Several times.|Distance ratée au total : {n}. De quoi faire le tour du monde. Plusieurs fois.|Distância errada no total: {n}. Dava pra dar a volta ao mundo. Várias.|Insgesamt danebengelegen: {n}. Reicht für eine Weltumrundung. Mehrere.|Distanza sbagliata in totale: {n}. Basterebbe per fare il giro del mondo. Più volte.||偏差总距离：{n}。够你环游世界了。好几圈。|총 빗나간 거리: {n}. 세계 일주도 하겠어. 여러 바퀴.|外した距離の合計：{n}。世界一周できるな。何周もな。|Всего промахов на: {n}. Хватит на кругосветку. Даже на несколько.|Łącznie chybione o: {n}. Starczy na podróż dookoła świata. Kilka."
+    ],
+    /* ---- NOS CONOCEMOS DESDE…: dias desde tu primera partida ({d}), el primer ano y la racha de dias seguidos ({n}) */
+    anniv: [
+      "Hoy hace {d} días que te sentaste por primera vez en mi mesa. No te he regalado nada. Es mi estilo.|{d} days ago today you first sat down at my table. I haven't got you anything. It's my style.|Il y a {d} jours aujourd'hui, tu t'asseyais pour la première fois à ma table. Je ne t'ai rien offert. C'est mon style.|Hoje faz {d} dias que você sentou pela primeira vez na minha mesa. Não te dei nada. É meu estilo.|Heute vor {d} Tagen hast du dich zum ersten Mal an meinen Tisch gesetzt. Ich hab dir nichts geschenkt. Mein Stil.|Oggi sono {d} giorni che ti sei seduto per la prima volta al mio tavolo. Non ti ho regalato niente. È il mio stile.|Hoy se cumplen {d} días desde que te sentaste por primera vez en mi mesa. No te regalé nada. Es mi estilo.|今天是你第一次坐上我牌桌的第{d}天。我什么礼物都没准备。这是我的风格。|오늘로 네가 내 테이블에 처음 앉은 지 {d}일째야. 선물은 없어. 그게 내 스타일이지.|君が初めて私のテーブルに座ってから、今日で{d}日だ。プレゼントはない。それが私の流儀さ。|Сегодня ровно {d} дн. с тех пор, как ты впервые сел за мой стол. Подарка нет. Такой уж я.|Dziś mija {d} dni, odkąd pierwszy raz usiadłeś przy moim stole. Nic ci nie kupiłem. Taki mój styl.",
+      "{d} días desde nuestra primera mano. El tiempo vuela cuando pierdes.|{d} days since our first hand. Time flies when you're losing.|{d} jours depuis notre première donne. Le temps file quand on perd.|{d} dias desde a nossa primeira mão. O tempo voa quando você perde.|{d} Tage seit unserer ersten Hand. Die Zeit vergeht wie im Flug, wenn man verliert.|{d} giorni dalla nostra prima mano. Il tempo vola quando perdi.||从我们第一手牌到现在已经{d}天了。输的时候时间过得真快。|우리 첫 판 이후 {d}일. 질 때는 시간이 빨리 가지.|最初の一手から{d}日。負けていると時間は早いな。|С нашей первой раздачи прошло дней: {d}. Когда проигрываешь, время летит.|{d} dni od naszego pierwszego rozdania. Czas leci, kiedy przegrywasz."
+    ],
+    annivYear: [
+      "Un año exacto desde tu primera mano en mi mesa. Ni la baraja aguanta tanto conmigo.|Exactly one year since your first hand at my table. Not even the deck lasts that long with me.|Un an pile depuis ta première donne à ma table. Même le jeu de cartes ne tient pas aussi longtemps avec moi.|Um ano exato desde a sua primeira mão na minha mesa. Nem o baralho aguenta tanto tempo comigo.|Genau ein Jahr seit deiner ersten Hand an meinem Tisch. Nicht mal das Kartenspiel hält es so lange mit mir aus.|Un anno esatto dalla tua prima mano al mio tavolo. Nemmeno il mazzo resiste così tanto con me.||从你在我桌上打第一手牌算起，整整一年了。连这副牌都没跟我撑这么久。|내 테이블에서 첫 판을 한 지 딱 1년. 카드 한 벌도 나랑 이렇게 오래 못 버텨.|私のテーブルでの最初の一手から、ちょうど一年。トランプだって私とこんなに長くはもたない。|Ровно год с твоей первой раздачи за моим столом. Даже колода столько со мной не выдерживает.|Dokładnie rok od twojego pierwszego rozdania przy moim stole. Nawet talia tyle ze mną nie wytrzymuje."
+    ],
+    streakDays: [
+      "{n} días seguidos viniendo. Esto ya es costumbre.|{n} days in a row. This is a habit now.|{n} jours d'affilée. Ça devient une habitude.|{n} dias seguidos vindo aqui. Já virou costume.|{n} Tage am Stück. Das ist jetzt eine Gewohnheit.|{n} giorni di fila. Ormai è un'abitudine.||连续来了{n}天。这已经成习惯了。|{n}일 연속 방문. 이제 습관이네.|{n}日連続だ。もう習慣だな。|Дней подряд: {n}. Это уже привычка.|Dni z rzędu: {n}. To już nawyk.",
+      "Día {n} seguido. Ya me sé tu cara mejor que la mía.|Day {n} in a row. I know your face better than my own by now.|{n}e jour d'affilée. Je connais ta tête mieux que la mienne.|Dia {n} seguido. Já conheço sua cara melhor que a minha.|Tag {n} in Folge. Dein Gesicht kenne ich inzwischen besser als meins.|Giorno {n} di fila. Ormai conosco la tua faccia meglio della mia.||连续第{n}天。我对你的脸比对我自己的还熟。|연속 {n}일째. 이젠 네 얼굴을 내 얼굴보다 잘 알겠어.|連続{n}日目。もう自分の顔より君の顔のほうがよく知ってる。|День {n} подряд. Твоё лицо я знаю лучше своего.|Dzień {n} z rzędu. Znam już twoją twarz lepiej niż swoją."
+    ],
+    lateLeft: [
+      "Anoche te fuiste a las {time}. Yo no dormí. Tú tampoco, por lo que veo.|Last night you left at {time}. I didn't sleep. Neither did you, by the look of it.|Hier soir, tu es parti à {time}. Je n'ai pas dormi. Toi non plus, apparemment.|Ontem à noite você saiu às {time}. Eu não dormi. Você também não, pelo visto.|Letzte Nacht bist du um {time} gegangen. Ich hab nicht geschlafen. Du offenbar auch nicht.|Ieri notte te ne sei andato alle {time}. Io non ho dormito. E a quanto vedo nemmeno tu.|Anoche te fuiste a las {time}. Yo no dormí. Tú tampoco, por lo que veo.|昨晚你{time}才走。我没睡。看样子你也没睡。|어젯밤 {time}에 나갔지. 난 못 잤어. 보아하니 너도 못 잤고.|昨夜は{time}に帰ったな。私は眠れなかった。君もそうらしいな。|Вчера ты ушёл в {time}. Я не спал. Ты, похоже, тоже.|Wczoraj wyszedłeś o {time}. Nie spałem. Ty chyba też nie."
+    ],
+    /* ---- EN PLENA PREGUNTA: copias el nombre del lugar (Ctrl+C) o haces clic derecho */
+    copyName: [
+      "¿Copiando el nombre? El buscador no juega en esta mesa.|Copying the name? Search engines don't play at this table.|Tu copies le nom ? Les moteurs de recherche ne jouent pas à cette table.|Copiando o nome? Buscador não joga nesta mesa.|Den Namen kopieren? Suchmaschinen spielen an diesem Tisch nicht mit.|Copi il nome? I motori di ricerca non giocano a questo tavolo.||在复制地名？搜索引擎可不能上这张桌。|이름 복사 중? 검색 엔진은 이 테이블에서 못 놀아.|名前をコピー？検索エンジンはこのテーブルでは遊べないぞ。|Копируешь название? Поисковики за этим столом не играют.|Kopiujesz nazwę? Wyszukiwarki nie grają przy tym stole.",
+      "Ctrl+C… Te he visto. Aquí se juega de memoria.|Ctrl+C… I saw that. At this table we play from memory.|Ctrl+C… Je t'ai vu. Ici, on joue de mémoire.|Ctrl+C… Eu vi. Aqui se joga de memória.|Strg+C… Hab ich gesehen. Hier wird aus dem Gedächtnis gespielt.|Ctrl+C… Ti ho visto. Qui si gioca a memoria.|Ctrl+C… Te vi. Aquí se juega de memoria.|Ctrl+C……我看见了。这里靠记性玩。|Ctrl+C… 다 봤어. 여긴 기억력으로 하는 곳이야.|Ctrl+C……見てたぞ。ここは記憶で勝負する場所だ。|Ctrl+C… Я всё видел. Здесь играют по памяти.|Ctrl+C… Widziałem. Tu gra się z pamięci."
+    ],
+    rightClick: [
+      "Aquí no hay menú secreto. Solo yo.|There's no secret menu here. Just me.|Il n'y a pas de menu secret ici. Juste moi.|Aqui não tem menu secreto. Só eu.|Hier gibt's kein geheimes Menü. Nur mich.|Qui non c'è nessun menu segreto. Solo io.||这里没有隐藏菜单。只有我。|여긴 비밀 메뉴 없어. 나만 있지.|ここに隠しメニューはない。私がいるだけだ。|Здесь нет секретного меню. Только я.|Tu nie ma tajnego menu. Tylko ja."
+    ],
+    /* ---- TU MUNDO DE VERDAD: la bateria del portatil ({p} %) y la siesta del ordenador ({t} = cuanto ha dormido) */
+    batteryReal: [
+      "Esta vez no es un truco mío: te queda un {p} % de batería. Enchúfate o despídete.|This time it's not one of my tricks: you've got {p}% battery left. Plug in or say goodbye.|Cette fois, ce n'est pas un de mes tours : il te reste {p} % de batterie. Branche-toi ou dis au revoir.|Dessa vez não é truque meu: você tem {p}% de bateria. Liga na tomada ou se despede.|Diesmal ist es kein Trick von mir: Du hast noch {p} % Akku. Einstecken oder verabschieden.|Stavolta non è un mio trucco: ti resta il {p}% di batteria. Attacca la spina o saluta.||这次不是我的花招：你只剩{p}%的电量了。去充电，或者说再见。|이번엔 내 속임수가 아니야. 배터리가 {p}% 남았어. 충전하든지 작별하든지.|今回は私のトリックじゃない。バッテリー残り{p}%だ。充電するか、別れを告げるか。|На этот раз это не мой трюк: у тебя {p} % заряда. Подключайся или прощайся.|Tym razem to nie moja sztuczka: zostało ci {p}% baterii. Podłącz się albo się pożegnaj.",
+      "Aviso de verdad, no de la casa: {p} % de batería. Yo no me apago; tu portátil sí.|A real warning, not a house trick: {p}% battery. I don't switch off; your laptop does.|Un vrai avertissement, pas un coup de la maison : {p} % de batterie. Moi, je ne m'éteins pas ; ton portable, si.|Aviso de verdade, não da casa: {p}% de bateria. Eu não desligo; seu notebook sim.|Eine echte Warnung, kein Trick des Hauses: {p} % Akku. Ich gehe nicht aus, dein Laptop schon.|Avviso vero, non della casa: {p}% di batteria. Io non mi spengo; il tuo portatile sì.|Aviso de verdad, no de la casa: {p} % de batería. Yo no me apago; tu laptop sí.|这是真警告，不是庄家的把戏：电量{p}%。我不会关机，你的笔记本会。|하우스 장난 아니고 진짜 경고야. 배터리 {p}%. 난 안 꺼져도 네 노트북은 꺼져.|店の仕掛けじゃない、本物の警告だ。バッテリー{p}%。私は消えないが、君のノートは消える。|Настоящее предупреждение, не от заведения: {p} % заряда. Я не выключаюсь, а твой ноутбук — да.|Prawdziwe ostrzeżenie, nie od kasyna: {p}% baterii. Ja się nie wyłączę, twój laptop tak."
+    ],
+    napWake: [
+      "Cerraste la tapa y me quedé a oscuras {t}. Yo no he pegado ojo.|You shut the lid and left me in the dark for {t}. I didn't sleep a wink.|Tu as fermé le capot et je suis resté dans le noir pendant {t}. Je n'ai pas fermé l'œil.|Você fechou a tampa e eu fiquei no escuro por {t}. Não preguei o olho.|Du hast den Deckel zugeklappt, und ich saß {t} im Dunkeln. Ich hab kein Auge zugetan.|Hai chiuso il coperchio e sono rimasto al buio per {t}. Non ho chiuso occhio.|Cerraste la tapa y me quedé a oscuras {t}. No pegué ojo.|你合上盖子，我在黑暗里待了{t}。我一眼都没合。|네가 뚜껑을 닫는 바람에 {t} 동안 깜깜했어. 한숨도 못 잤다고.|君が蓋を閉じたせいで、{t}も真っ暗だった。一睡もしてないぞ。|Ты закрыл крышку, и я просидел в темноте {t}. Глаз не сомкнул.|Zamknąłeś klapę i siedziałem po ciemku {t}. Oka nie zmrużyłem.",
+      "Tu ordenador se ha echado una siesta de {t}. Yo he seguido aquí, barajando.|Your computer took a {t} nap. I stayed right here, shuffling.|Ton ordinateur a fait une sieste de {t}. Moi, je suis resté là, à battre les cartes.|Seu computador tirou uma soneca de {t}. Eu fiquei aqui, embaralhando.|Dein Computer hat {t} Nickerchen gemacht. Ich bin hiergeblieben und hab gemischt.|Il tuo computer si è fatto un pisolino di {t}. Io sono rimasto qui a mescolare.|Tu computadora se echó una siesta de {t}. Yo seguí aquí, barajando.|你的电脑睡了{t}的午觉。我一直在这儿洗牌。|네 컴퓨터가 {t} 동안 낮잠을 잤어. 난 여기서 계속 카드 섞고 있었고.|君のパソコンは{t}の昼寝をした。私はずっとここでシャッフルしてたぞ。|Твой компьютер вздремнул на {t}. А я сидел тут и тасовал колоду.|Twój komputer uciął sobie drzemkę na {t}. Ja siedziałem tu i tasowałem."
+    ],
+    /* ---- un truco que ya dijo su frase en esta sesion: la siguiente vez, una de estas con su nombre ({t}), en vez de repetirla */
+    trickAgain: [
+      "Otra vez «{t}». Me gusta repetir lo que funciona.|“{t}” again. I like repeating what works.|« {t} », encore. J'aime répéter ce qui marche.|“{t}” de novo. Gosto de repetir o que funciona.|Wieder „{t}“. Ich wiederhole gern, was funktioniert.|Di nuovo «{t}». Mi piace ripetere ciò che funziona.||又是“{t}”。我喜欢重复有效的东西。|또 '{t}'. 먹히는 건 반복하는 게 좋지.|また「{t}」だ。効くものは繰り返す主義でね。|Снова «{t}». Люблю повторять то, что работает.|Znowu „{t}”. Lubię powtarzać to, co działa.",
+      "«{t}», de nuevo. Ya sabes cómo va.|“{t}”, once more. You know how it goes.|« {t} », de nouveau. Tu connais la chanson.|“{t}”, mais uma vez. Você já sabe como é.|„{t}“, noch einmal. Du weißt ja, wie's läuft.|«{t}», un'altra volta. Sai già come funziona.||“{t}”，再来一次。你知道规矩。|'{t}' 한 번 더. 어떻게 돌아가는지 알지?|「{t}」、もう一度。やり方は分かってるだろう。|«{t}», ещё раз. Ты знаешь, как это бывает.|„{t}”, jeszcze raz. Wiesz, jak to idzie.",
+      "Vuelve «{t}». Tú y él tenéis cuentas pendientes.|“{t}” is back. You two have unfinished business.|« {t} » est de retour. Vous avez des comptes à régler, tous les deux.|“{t}” voltou. Vocês dois têm contas a acertar.|„{t}“ ist zurück. Ihr zwei habt noch eine Rechnung offen.|Torna «{t}». Voi due avete un conto in sospeso.|Vuelve «{t}». Ustedes dos tienen cuentas pendientes.|“{t}”回来了。你俩还有账没算清。|'{t}' 복귀. 둘 사이에 풀 게 남았잖아.|「{t}」が戻ってきた。君たちには貸し借りがあるからな。|«{t}» вернулся. У вас двоих незаконченное дело.|„{t}” wraca. Macie ze sobą niezałatwione sprawy.",
+      "Hoy repite «{t}». No es manía, es método.|“{t}” repeats today. It's not an obsession, it's a method.|« {t} » rempile aujourd'hui. Ce n'est pas une manie, c'est une méthode.|Hoje repete “{t}”. Não é mania, é método.|Heute nochmal „{t}“. Das ist keine Macke, das ist Methode.|Oggi si replica «{t}». Non è una fissa, è metodo.||今天再来“{t}”。不是怪癖，是方法。|오늘도 '{t}'. 집착이 아니라 전략이야.|今日も「{t}」だ。こだわりじゃない、戦略だ。|Сегодня снова «{t}». Это не причуда, это метод.|Dziś powtórka: „{t}”. To nie mania, to metoda.",
+      "«{t}» otra vez en la mesa. Que no se diga que no soy constante.|“{t}” on the table again. No one can say I'm not consistent.|« {t} » encore sur la table. Qu'on ne dise pas que je ne suis pas constant.|“{t}” na mesa de novo. Ninguém pode dizer que não sou constante.|„{t}“ wieder auf dem Tisch. Keiner soll sagen, ich sei nicht beständig.|«{t}» di nuovo sul tavolo. Che non si dica che non sono costante.||“{t}”又上桌了。谁也不能说我不专一。|'{t}'가 또 테이블에. 내가 꾸준하지 않다곤 못 하겠지.|「{t}」がまたテーブルに。一貫性がないとは言わせない。|«{t}» снова на столе. Никто не скажет, что я непостоянен.|„{t}” znowu na stole. Niech nikt nie mówi, że nie jestem konsekwentny.",
+      "Te suena «{t}», ¿verdad? A mí también.|“{t}” rings a bell, doesn't it? For me too.|« {t} », ça te dit quelque chose, non ? À moi aussi.|“{t}” te lembra alguma coisa, né? A mim também.|„{t}“ kommt dir bekannt vor, oder? Mir auch.|«{t}» ti dice qualcosa, vero? Anche a me.||“{t}”，耳熟吧？我也是。|'{t}', 익숙하지? 나도 그래.|「{t}」、聞き覚えがあるだろう？私もだ。|«{t}» тебе знаком, правда? Мне тоже.|„{t}” brzmi znajomo, prawda? Mnie też."
+    ],
+    /* ---- EL CAMPAMENTO (v0.19): se sienta al otro lado de la mesa. Llegada: {c} doblones, {n} trucos de la ronda {r}; ronda limpia; antes del jefe ({j});
+       revancha; sin dinero; acto nuevo */
+    campArrive: [
+      "Campamento. Traes {c} doblones. Yo traigo {n} trucos para la ronda {r}. Tú primero.|Camp. You bring {c} doubloons. I bring {n} tricks for round {r}. After you.|Campement. Tu apportes {c} doublons. Moi, {n} tours pour la manche {r}. Après toi.|Acampamento. Você traz {c} dobrões. Eu trago {n} truques pra rodada {r}. Você primeiro.|Lager. Du bringst {c} Dublonen mit. Ich {n} Tricks für Runde {r}. Nach dir.|Accampamento. Tu porti {c} dobloni. Io porto {n} trucchi per il round {r}. Prima tu.||营地。你带了{c}枚金币。我为第{r}回合带了{n}个花招。你先请。|캠프. 넌 도블론 {c}개, 난 {r}라운드용 속임수 {n}개. 먼저 해.|キャンプだ。君はダブロン{c}枚、私はラウンド{r}用のトリックを{n}つ。お先にどうぞ。|Лагерь. У тебя дублонов: {c}. У меня трюков на раунд {r}: {n}. Ты первый.|Obóz. Masz dublonów: {c}. Ja mam sztuczek na rundę {r}: {n}. Ty pierwszy.",
+      "Siéntate. Tú pones {c} doblones sobre la mesa; yo, {n} trucos para la ronda {r}. Empate técnico.|Sit down. You put {c} doubloons on the table; I put {n} tricks for round {r}. A technical draw.|Assieds-toi. Tu poses {c} doublons sur la table ; moi, {n} tours pour la manche {r}. Match nul technique.|Senta aí. Você põe {c} dobrões na mesa; eu, {n} truques pra rodada {r}. Empate técnico.|Setz dich. Du legst {c} Dublonen auf den Tisch, ich {n} Tricks für Runde {r}. Technisches Unentschieden.|Siediti. Tu metti {c} dobloni sul tavolo; io, {n} trucchi per il round {r}. Pareggio tecnico.|Siéntate. Tú pones {c} doblones sobre la mesa; yo, {n} trucos para la ronda {r}. Empate técnico.|坐吧。你往桌上放{c}枚金币，我放第{r}回合的{n}个花招。技术性平局。|앉아. 넌 테이블에 도블론 {c}개, 난 {r}라운드 속임수 {n}개. 기술적 무승부지.|座りな。君はダブロン{c}枚、私はラウンド{r}のトリック{n}つをテーブルに。引き分けだな。|Садись. Ты кладёшь на стол дублонов: {c}; я — трюков на раунд {r}: {n}. Техническая ничья.|Siadaj. Ty kładziesz na stół dublonów: {c}; ja sztuczek na rundę {r}: {n}. Remis techniczny."
+    ],
+    campArrive1: [
+      "Campamento. Traes {c} doblones. Yo, un solo truco para la ronda {r}. Pero es de los buenos.|Camp. You bring {c} doubloons. I bring just one trick for round {r}. But it's a good one.|Campement. Tu apportes {c} doublons. Moi, un seul tour pour la manche {r}. Mais un bon.|Acampamento. Você traz {c} dobrões. Eu, um truque só pra rodada {r}. Mas dos bons.|Lager. Du bringst {c} Dublonen mit. Ich nur einen Trick für Runde {r}. Aber einen guten.|Accampamento. Tu porti {c} dobloni. Io un solo trucco per il round {r}. Ma di quelli buoni.||营地。你带了{c}枚金币。我为第{r}回合只带了一个花招。不过是好货。|캠프. 넌 도블론 {c}개. 난 {r}라운드용 속임수 딱 하나. 근데 제대로 된 거야.|キャンプだ。君はダブロン{c}枚。私はラウンド{r}用のトリックを一つだけ。だが上物だ。|Лагерь. У тебя дублонов: {c}. У меня всего один трюк на раунд {r}. Зато хороший.|Obóz. Masz dublonów: {c}. Ja tylko jedną sztuczkę na rundę {r}. Ale porządną."
+    ],
+    campClean: [
+      "Ronda {r} limpia. Ni un truco. ¿No te parece sospechoso? A mí sí.|Round {r} is clean. Not one trick. Doesn't that seem suspicious? It does to me.|Manche {r} propre. Pas un seul tour. Ça ne te paraît pas suspect ? Moi, si.|Rodada {r} limpa. Nenhum truque. Não te parece suspeito? Pra mim, sim.|Runde {r} ist sauber. Kein einziger Trick. Kommt dir das nicht verdächtig vor? Mir schon.|Round {r} pulito. Neanche un trucco. Non ti sembra sospetto? A me sì.||第{r}回合很干净，一个花招都没有。你不觉得可疑吗？我觉得。|{r}라운드는 깨끗해. 속임수 하나 없어. 수상하지 않아? 난 수상한데.|ラウンド{r}はきれいなもんだ。トリックなし。怪しいと思わないか？私は思う。|Раунд {r} чистый. Ни одного трюка. Тебе не кажется это подозрительным? Мне — да.|Runda {r} czysta. Ani jednej sztuczki. Nie wydaje ci się to podejrzane? Mnie tak."
+    ],
+    campBoss: [
+      "La próxima es «{j}». Te he cambiado el botón: ahora dice la verdad.|Next up is “{j}”. I've changed your button: now it tells the truth.|La prochaine, c'est « {j} ». J'ai changé ton bouton : maintenant, il dit la vérité.|A próxima é “{j}”. Mudei seu botão: agora ele diz a verdade.|Als Nächstes kommt „{j}“. Ich hab deinen Knopf geändert: Jetzt sagt er die Wahrheit.|Il prossimo è «{j}». Ti ho cambiato il pulsante: ora dice la verità.|La próxima es «{j}». Te cambié el botón: ahora dice la verdad.|下一个是“{j}”。我改了你的按钮：现在它说实话了。|다음은 '{j}'야. 네 버튼 바꿔놨어. 이제 진실을 말하지.|次は「{j}」だ。ボタンを書き換えておいた。これで正直になった。|Дальше — «{j}». Я поменял тебе кнопку: теперь она говорит правду.|Następny jest „{j}”. Zmieniłem ci przycisk: teraz mówi prawdę."
+    ],
+    campRetry: [
+      "Revancha en la ronda {r}. Lugares nuevos, los mismos trucos. Yo no olvido.|Rematch in round {r}. New places, same tricks. I don't forget.|Revanche à la manche {r}. Nouveaux lieux, mêmes tours. Moi, je n'oublie pas.|Revanche na rodada {r}. Lugares novos, os mesmos truques. Eu não esqueço.|Revanche in Runde {r}. Neue Orte, dieselben Tricks. Ich vergesse nicht.|Rivincita nel round {r}. Luoghi nuovi, stessi trucchi. Io non dimentico.||第{r}回合复仇战。新地点，老花招。我可不会忘。|{r}라운드 복수전. 장소는 새로, 속임수는 그대로. 난 안 잊어.|ラウンド{r}のリベンジだ。場所は新しく、トリックは同じ。私は忘れないぞ。|Реванш в раунде {r}. Места новые, трюки те же. Я не забываю.|Rewanż w rundzie {r}. Nowe miejsca, te same sztuczki. Ja nie zapominam."
+    ],
+    campBroke: [
+      "Traes {c} doblones. Aquí eso no compra ni mi silencio.|You've got {c} doubloons. Here that doesn't even buy my silence.|Tu as {c} doublons. Ici, ça n'achète même pas mon silence.|Você tem {c} dobrões. Aqui isso não compra nem o meu silêncio.|Du hast {c} Dublonen. Dafür kriegst du hier nicht mal mein Schweigen.|Hai {c} dobloni. Qui non comprano nemmeno il mio silenzio.||你只有{c}枚金币。在这儿连我的沉默都买不到。|도블론 {c}개라. 여기선 내 침묵도 못 사.|ダブロン{c}枚か。ここじゃ私の沈黙すら買えないな。|Дублонов у тебя: {c}. Здесь на это не купишь даже моё молчание.|Dublonów masz: {c}. Tu nie kupisz za to nawet mojego milczenia."
+    ],
+    campAct: [
+      "Acto nuevo, precios nuevos. La inflación también la controlo yo.|New act, new prices. I control inflation too.|Nouvel acte, nouveaux prix. L'inflation aussi, c'est moi qui la contrôle.|Ato novo, preços novos. A inflação também quem controla sou eu.|Neuer Akt, neue Preise. Die Inflation steuere auch ich.|Atto nuovo, prezzi nuovi. Anche l'inflazione la controllo io.||新的一幕，新的价格。通货膨胀也归我管。|새 막, 새 가격. 물가도 내가 쥐고 있지.|新しい幕、新しい値段。インフレも私が操っている。|Новый акт — новые цены. Инфляцией тоже управляю я.|Nowy akt, nowe ceny. Inflację też kontroluję ja."
+    ],
+    /* ---- el Campamento: dudas entre cartas, sin fondos (sello), el trile al cambiar cartas, tu reliquia de siempre ({p}) y te vas sin comprar ({c}) */
+    campDoubt: [
+      "¿Esta o esa? Te lo digo yo: la que no puedes pagar.|This one or that one? I'll tell you: the one you can't afford.|Celle-ci ou celle-là ? Je te le dis : celle que tu ne peux pas payer.|Essa ou aquela? Eu te digo: a que você não pode pagar.|Die oder die? Ich sag's dir: die, die du dir nicht leisten kannst.|Questa o quella? Te lo dico io: quella che non puoi permetterti.||这张还是那张？我告诉你：你买不起的那张。|이거야 저거야? 내가 알려주지. 네가 못 사는 거.|これか、あれか？教えてやろう。君が払えないほうだ。|Эту или ту? Скажу тебе: ту, на которую не хватает.|Ta czy tamta? Powiem ci: ta, na którą cię nie stać.",
+      "Tanto mirarlas, las vas a desgastar. Son cartas, no cuadros.|Keep staring and you'll wear them out. They're cards, not paintings.|À force de les regarder, tu vas les user. Ce sont des cartes, pas des tableaux.|De tanto olhar, você vai gastar as cartas. São cartas, não quadros.|Wenn du sie so anstarrst, nutzt du sie ab. Das sind Karten, keine Gemälde.|A forza di guardarle le consumi. Sono carte, non quadri.|De tanto mirarlas, las vas a gastar. Son cartas, no cuadros.|你再盯下去，牌都要被看坏了。这是牌，不是画。|그렇게 쳐다보다간 닳겠다. 카드지 그림이 아니라고.|そんなに見つめたらすり減るぞ。カードだ、絵じゃない。|Будешь так смотреть — протрёшь до дыр. Это карты, а не картины.|Tak się gapisz, że je zetrzesz. To karty, nie obrazy."
+    ],
+    campNoFunds: [
+      "Sin fondos. La casa no fía.|Insufficient funds. The house doesn't do credit.|Fonds insuffisants. La maison ne fait pas crédit.|Sem fundos. A casa não vende fiado.|Keine Deckung. Das Haus gibt keinen Kredit.|Fondi insufficienti. La casa non fa credito.||余额不足。本店概不赊账。|잔고 부족. 외상은 안 돼.|残高不足だ。ツケはきかない。|Недостаточно средств. Заведение в долг не даёт.|Brak środków. Kasyno nie daje na kreskę.",
+      "Con {c} doblones, eso no. Pero mirar es gratis.|With {c} doubloons, not that one. But looking is free.|Avec {c} doublons, pas celle-là. Mais regarder, c'est gratuit.|Com {c} dobrões, essa não. Mas olhar é de graça.|Mit {c} Dublonen nicht die. Aber Gucken ist gratis.|Con {c} dobloni, quella no. Ma guardare è gratis.||就{c}枚金币，买不了这个。不过看看不要钱。|도블론 {c}개로는 그건 안 돼. 구경은 공짜지만.|ダブロン{c}枚じゃ、それは無理だ。見るのはタダだがな。|С такими деньгами (дублонов: {c}) — не эту. Но смотреть бесплатно.|Za tyle (dublonów: {c}) — nie tę. Ale patrzeć można za darmo."
+    ],
+    campShell: [
+      "Barajo yo, que tú ya has visto demasiado.|I'll shuffle. You've seen too much already.|Je bats les cartes. Tu en as déjà trop vu.|Eu embaralho. Você já viu demais.|Ich mische. Du hast schon zu viel gesehen.|Mescolo io, tu hai già visto troppo.||我来洗牌。你已经看得太多了。|섞는 건 내가 해. 넌 이미 너무 많이 봤어.|シャッフルは私がやる。君はもう見すぎだ。|Тасую я. Ты уже слишком много видел.|Ja tasuję. Ty już za dużo widziałeś."
+    ],
+    chestStuck: [
+      "Está atascado. Bueno, lo estoy sujetando yo.|It's stuck. Well, I'm the one holding it shut.|Il est coincé. Bon, c'est moi qui le retiens.|Está emperrado. Tá, sou eu que estou segurando.|Klemmt. Na ja, ich halte ihn zu.|È bloccato. Be', lo sto tenendo chiuso io.|Está trabado. Bueno, lo estoy sujetando yo.|卡住了。好吧，是我在按着它。|안 열리네. 사실 내가 잡고 있는 거야.|開かないな。まあ、私が押さえてるんだが。|Заело. Ну ладно, это я его держу.|Zacięła się. No dobra, to ja ją trzymam."
+    ],
+    campHabit: [
+      "¿Otra vez {p}? Eres una criatura de costumbres.|{p} again? You're a creature of habit.|{p}, encore ? Tu es un animal d'habitudes.|{p} de novo? Você é uma criatura de hábitos.|Schon wieder {p}? Du bist ein Gewohnheitstier.|Di nuovo {p}? Sei una creatura abitudinaria.||又是{p}？你真是个习惯动物。|또 {p}? 넌 습관의 동물이구나.|また{p}か？君は習慣の生き物だな。|Опять «{p}»? Ты раб привычки.|Znowu {p}? Jesteś stworzeniem przyzwyczajeń.",
+      "{p}, como siempre. Si fuera tú, variaría. Por suerte, no lo soy.|{p}, as always. If I were you, I'd mix it up. Luckily, I'm not.|{p}, comme toujours. À ta place, je varierais. Heureusement, je ne suis pas toi.|{p}, como sempre. Se eu fosse você, variaria. Ainda bem que não sou.|{p}, wie immer. An deiner Stelle würde ich mal was anderes nehmen. Zum Glück bin ich's nicht.|{p}, come sempre. Se fossi in te, cambierei. Per fortuna non lo sono.||{p}，老样子。换我就换换口味。还好我不是你。|{p}, 늘 그렇듯. 나라면 바꿔보겠어. 다행히 난 네가 아니지만.|{p}、いつも通りだな。私なら変えるね。幸い、君じゃないが。|«{p}», как всегда. На твоём месте я бы разнообразил. К счастью, я не ты.|{p}, jak zawsze. Na twoim miejscu bym to zmienił. Na szczęście nie jestem tobą."
+    ],
+    campSkip: [
+      "¿Ni una carta? Ahorrar también es una forma de perder.|Not a single card? Saving is just another way of losing.|Pas une seule carte ? Économiser, c'est aussi une façon de perdre.|Nem uma carta? Economizar também é um jeito de perder.|Nicht eine Karte? Sparen ist auch eine Art zu verlieren.|Neanche una carta? Risparmiare è un altro modo di perdere.||一张牌都不买？省钱也是一种输法。|카드 한 장도 안 사? 아끼는 것도 지는 방법이야.|カード一枚も買わないのか？節約も負け方の一つだ。|Ни одной карты? Экономия — тоже способ проиграть.|Ani jednej karty? Oszczędzanie to też sposób na przegraną.",
+      "Te vas con {c} doblones en el bolsillo. Me los guardo para la próxima.|You're leaving with {c} doubloons in your pocket. I'll save them for next time.|Tu repars avec {c} doublons en poche. Je te les garde pour la prochaine fois.|Você vai embora com {c} dobrões no bolso. Guardo pra próxima.|Du gehst mit {c} Dublonen in der Tasche. Die heb ich dir fürs nächste Mal auf.|Te ne vai con {c} dobloni in tasca. Te li tengo per la prossima.|Te vas con {c} doblones en el bolsillo. Te los guardo para la próxima.|你兜里揣着{c}枚金币就走了。我替你留到下次。|도블론 {c}개를 주머니에 넣고 가네. 다음을 위해 맡아둘게.|ダブロン{c}枚をポケットに入れたまま行くのか。次まで預かっておこう。|Уходишь с дублонами в кармане ({c}). Приберегу их до следующего раза.|Wychodzisz z dublonami w kieszeni ({c}). Zachowam je na następny raz."
+    ],
+    /* ---- solo hay un crupier: abres el juego otra vez con el primero abierto (Electron lo trae al frente) */
+    secondWin: [
+      "¿Otra ventana? Solo hay un crupier, y está aquí.|Another window? There's only one dealer, and he's right here.|Une autre fenêtre ? Il n'y a qu'un croupier, et il est ici.|Outra janela? Só existe um crupiê, e ele está aqui.|Noch ein Fenster? Es gibt nur einen Croupier, und der ist hier.|Un'altra finestra? C'è un solo croupier, ed è qui.||又开一个窗口？荷官只有一个，就在这儿。|창 하나 더? 딜러는 하나뿐이고, 여기 있어.|別のウィンドウ？ディーラーは一人だけ、ここにいる。|Ещё одно окно? Крупье только один, и он здесь.|Kolejne okno? Jest tylko jeden krupier i siedzi tutaj.",
+      "Ya estaba abierto, explorador. Yo nunca cierro.|It was already open, explorer. I never close.|C'était déjà ouvert, explorateur. Moi, je ne ferme jamais.|Já estava aberto, explorador. Eu nunca fecho.|War schon offen, Entdecker. Ich schließe nie.|Era già aperto, esploratore. Io non chiudo mai.||早就开着呢，探险家。我从不打烊。|이미 열려 있었어, 탐험가. 난 문 안 닫아.|もう開いてるぞ、探検家。私は店を閉めない。|Уже открыто, исследователь. Я никогда не закрываюсь.|Już było otwarte, odkrywco. Ja nigdy nie zamykam."
+    ],
+    /* ---- TANDA 4 (v0.19). La Enciclopedia: tu ritmo ({n} nuevas desde tu ultima visita; {y} ano en que la acabarias), la primera vez ({u} de {t}),
+       nada nuevo, la cerradura que es suya y la tarjeta que te ensena y te quita */
+    cxFirst: [
+      "Tu Enciclopedia: {u} de {t}. Las demás las tengo yo, en la mesa.|Your Encyclopedia: {u} of {t}. I've got the rest, on the table.|Ton Encyclopédie : {u} sur {t}. Les autres, c'est moi qui les ai, sur la table.|Sua Enciclopédia: {u} de {t}. As outras estão comigo, na mesa.|Deine Enzyklopädie: {u} von {t}. Den Rest hab ich, auf dem Tisch.|La tua Enciclopedia: {u} su {t}. Le altre ce le ho io, sul tavolo.||你的百科：{t}张里有{u}张。其余的在我这儿，在牌桌上。|네 백과사전: {t}장 중 {u}장. 나머진 내가 갖고 있지, 테이블 위에.|君の百科事典：{t}枚中{u}枚。残りは私がテーブルに持ってる。|Твоя энциклопедия: {u} из {t}. Остальные у меня, на столе.|Twoja encyklopedia: {u} z {t}. Resztę mam ja, na stole."
+    ],
+    cxPace: [
+      "{n} tarjetas nuevas desde la última vez. A este ritmo, la acabas en {y}.|{n} new cards since last time. At this rate, you'll finish it in {y}.|{n} nouvelles cartes depuis la dernière fois. À ce rythme, tu la finiras en {y}.|{n} cartas novas desde a última vez. Nesse ritmo, você termina em {y}.|{n} neue Karten seit dem letzten Mal. In diesem Tempo bist du {y} fertig.|{n} carte nuove dall'ultima volta. Di questo passo la finisci nel {y}.||自上次以来新增{n}张。照这个速度，你{y}年就能集齐。|지난번 이후 새 카드 {n}장. 이 속도면 {y}년에 다 모으겠네.|前回から新しいカードが{n}枚。このペースなら{y}年に完成だ。|С прошлого раза новых карточек: {n}. В таком темпе закончишь в {y} году.|Nowych kart od ostatniego razu: {n}. W tym tempie skończysz w {y} roku."
+    ],
+    cxPaceSlow: [
+      "{n} tarjetas nuevas desde la última vez. A este ritmo, la acabarán tus nietos.|{n} new cards since last time. At this rate, your grandchildren will finish it.|{n} nouvelles cartes depuis la dernière fois. À ce rythme, ce sont tes petits-enfants qui la finiront.|{n} cartas novas desde a última vez. Nesse ritmo, quem termina são seus netos.|{n} neue Karten seit dem letzten Mal. In diesem Tempo machen deine Enkel sie fertig.|{n} carte nuove dall'ultima volta. Di questo passo la finiranno i tuoi nipoti.||自上次以来新增{n}张。照这个速度，得你孙子来集齐了。|지난번 이후 새 카드 {n}장. 이 속도면 네 손주들이 다 모으겠다.|前回から新しいカードが{n}枚。このペースだと完成させるのは君の孫だな。|С прошлого раза новых карточек: {n}. В таком темпе её закончат твои внуки.|Nowych kart od ostatniego razu: {n}. W tym tempie skończą ją twoje wnuki."
+    ],
+    cxNothing: [
+      "Ninguna tarjeta nueva desde la última vez. Las cartas no se ganan mirando.|No new cards since last time. You don't win cards by looking at them.|Aucune nouvelle carte depuis la dernière fois. Les cartes ne se gagnent pas en les regardant.|Nenhuma carta nova desde a última vez. Carta não se ganha olhando.|Keine neue Karte seit dem letzten Mal. Karten gewinnt man nicht durchs Anschauen.|Nessuna carta nuova dall'ultima volta. Le carte non si vincono guardandole.||上次以来一张新卡都没有。卡片可不是看着就能赢来的。|지난번 이후 새 카드 없음. 카드는 쳐다본다고 생기지 않아.|前回から新しいカードはなし。眺めていてもカードは増えないぞ。|С прошлого раза ни одной новой карточки. Карты глазами не выигрывают.|Od ostatniego razu żadnej nowej karty. Kart nie wygrywa się patrzeniem."
+    ],
+    lockMine: [
+      "Esa cerradura es mía. Y no se abre a golpes.|That lock is mine. And it doesn't open by banging on it.|Cette serrure est à moi. Et elle ne s'ouvre pas à coups de poing.|Essa fechadura é minha. E não abre na pancada.|Das Schloss gehört mir. Und es geht nicht mit Gewalt auf.|Quella serratura è mia. E non si apre a pugni.||那把锁是我的。敲是敲不开的。|그 자물쇠는 내 거야. 두드린다고 안 열려.|その錠は私のものだ。叩いても開かないぞ。|Этот замок мой. И кулаками его не открыть.|Ta kłódka jest moja. I nie otwiera się na siłę."
+    ],
+    cxTease: [
+      "Mira, pero no toques. Esta te la ganas en la mesa.|Look, but don't touch. You earn this one at the table.|Regarde, mais ne touche pas. Celle-là, tu la gagnes à la table.|Olha, mas não toca. Essa você ganha na mesa.|Schauen, nicht anfassen. Die verdienst du dir am Tisch.|Guarda, ma non toccare. Questa te la guadagni al tavolo.||只许看，不许碰。这张得在牌桌上赢。|보기만 해, 만지지 말고. 이건 테이블에서 따야 해.|見るだけだ、触るなよ。これはテーブルで勝ち取るものだ。|Смотри, но не трогай. Эту ты выиграешь за столом.|Patrz, ale nie dotykaj. Tę zdobędziesz przy stole."
+    ],
+    /* ---- su expediente (Ajustes > Datos), la primera vez que lo abres; y te olvida de verdad si borras todos tus datos (forgetBye), con un deja vu al volver */
+    fileFirst: [
+      "Mi expediente sobre ti. Todo lo que sé, a la vista. Bueno, casi todo.|My file on you. Everything I know, out in the open. Well, almost everything.|Mon dossier sur toi. Tout ce que je sais, à découvert. Enfin, presque tout.|Minha ficha sobre você. Tudo o que eu sei, à vista. Bom, quase tudo.|Meine Akte über dich. Alles, was ich weiß, offen einsehbar. Na ja, fast alles.|Il mio fascicolo su di te. Tutto quello che so, alla luce del sole. Be', quasi tutto.||我关于你的档案。我知道的一切，全摆在这儿。嗯，差不多一切。|너에 대한 내 파일이야. 내가 아는 전부, 공개. 뭐, 거의 전부.|君についての私の調書だ。知っていることは全部見せる。まあ、ほぼ全部な。|Моё досье на тебя. Всё, что я знаю, на виду. Ну, почти всё.|Moje akta na twój temat. Wszystko, co wiem, na widoku. No, prawie wszystko."
+    ],
+    forgetBye: [
+      "¿Borrarlo todo? Vale. Pero que conste que yo me acordaba de todo.|Delete everything? Fine. But for the record, I remembered it all.|Tout effacer ? D'accord. Mais sache que moi, je me souvenais de tout.|Apagar tudo? Tá bom. Mas fica registrado que eu lembrava de tudo.|Alles löschen? Na gut. Aber fürs Protokoll: Ich hab mich an alles erinnert.|Cancellare tutto? Va bene. Ma che resti agli atti: io mi ricordavo tutto.|¿Borrarlo todo? Bueno. Pero que conste que yo me acordaba de todo.|全部删掉？行。不过我要声明，我可什么都记得。|전부 지운다고? 그래. 근데 난 다 기억하고 있었다는 거, 알아둬.|全部消すのか？いいだろう。だが私は全部覚えていたんだからな。|Стереть всё? Ладно. Но для протокола: я всё помнил.|Wszystko skasować? Dobra. Ale dla porządku: ja wszystko pamiętałem."
+    ],
+    dejavu: [
+      "Vaya… una cara nueva. Qué raro, tengo un déjà vu rarísimo. ¿Nos conocíamos?|Well, well… a new face. Strange, I've got the weirdest déjà vu. Have we met?|Tiens, tiens… un nouveau visage. Bizarre, j'ai une impression de déjà-vu. On se connaît ?|Ora, ora… um rosto novo. Estranho, tô com um déjà-vu esquisito. A gente se conhece?|Sieh an… ein neues Gesicht. Seltsam, ich hab ein komisches Déjà-vu. Kennen wir uns?|Guarda un po'… una faccia nuova. Strano, ho un déjà-vu stranissimo. Ci conosciamo?|Vaya… una cara nueva. Qué raro, tengo un déjà vu rarísimo. ¿Nos conocíamos?|哟……一张新面孔。奇怪，我有种很强的似曾相识感。我们见过吗？|오호… 새 얼굴이네. 이상하다, 엄청난 데자뷔가 느껴져. 우리 만난 적 있나?|おや……新しい顔だ。妙だな、ひどいデジャヴがする。どこかで会ったか？|Так-так… новое лицо. Странно, у меня жуткое дежавю. Мы знакомы?|No proszę… nowa twarz. Dziwne, mam okropne déjà vu. Znamy się?"
+    ],
+    /* ---- la pausa: te espera en el velo (pauseWait) y, si tardas mas de 2 min, lo comenta al volver ({t} = cuanto) */
+    pauseWait: [
+      "Te espero. El reloj también. Por una vez.|I'll wait. So will the clock. For once.|Je t'attends. L'horloge aussi. Pour une fois.|Eu espero. O relógio também. Pra variar.|Ich warte. Die Uhr auch. Ausnahmsweise.|Ti aspetto. Anche l'orologio. Per una volta.||我等你。时钟也等。难得一次。|기다릴게. 시계도 기다려. 이번만.|待ってるぞ。時計もな。今回だけは。|Я подожду. Часы тоже. В кои-то веки.|Poczekam. Zegar też. Wyjątkowo.",
+      "Pausa. Aprovecho para barajar. Tú aprovecha para pensar.|Pause. I'll use it to shuffle. You use it to think.|Pause. J'en profite pour battre les cartes. Toi, profite-en pour réfléchir.|Pausa. Vou aproveitar pra embaralhar. Aproveita pra pensar.|Pause. Ich nutze sie zum Mischen. Du zum Nachdenken.|Pausa. Io ne approfitto per mescolare. Tu approfittane per pensare.||暂停。我趁机洗牌。你趁机想想。|일시정지. 난 카드 좀 섞을게. 넌 생각 좀 해.|一時停止だ。私はシャッフルする。君は考えな。|Пауза. Я пока потасую. А ты подумай.|Pauza. Ja potasuję. Ty pomyśl."
+    ],
+    pauseBack: [
+      "{t} de pausa. Yo he contado cartas. Tú, ¿ovejas?|{t} of pause. I counted cards. You counted sheep?|{t} de pause. Moi, j'ai compté les cartes. Toi, les moutons ?|{t} de pausa. Eu contei cartas. E você, carneirinhos?|{t} Pause. Ich hab Karten gezählt. Du Schäfchen?|{t} di pausa. Io ho contato le carte. Tu le pecore?||暂停了{t}。我在数牌。你在数羊？|{t} 동안 일시정지. 난 카드를 셌어. 넌 양을 셌어?|{t}の休憩。私はカードを数えていた。君は羊か？|Пауза длиной {t}. Я считал карты. А ты — овец?|{t} przerwy. Ja liczyłem karty. A ty owce?"
+    ],
+    /* ---- se queda traspuesto en la portada tras el "¿sigues ahi?" y se despierta de golpe cuando vuelves */
+    wake: [
+      "¡Estaba despierto! Solo descansaba los ojos.|I was awake! Just resting my eyes.|J'étais réveillé ! Je reposais juste mes yeux.|Eu tava acordado! Só descansando os olhos.|Ich war wach! Hab nur die Augen ausgeruht.|Ero sveglio! Riposavo solo gli occhi.||我醒着呢！只是闭目养神。|깨어 있었어! 눈만 잠깐 쉬고 있었지.|起きてたぞ！目を休めていただけだ。|Я не спал! Просто глаза отдыхали.|Nie spałem! Tylko dawałem odpocząć oczom.",
+      "¿Eh? ¿Qué? Sí, sí, te estaba vigilando. Todo el rato.|Huh? What? Yes, yes, I was watching you. The whole time.|Hein ? Quoi ? Oui, oui, je te surveillais. Tout le temps.|Hã? O quê? Sim, sim, eu tava de olho em você. O tempo todo.|Hä? Was? Ja, ja, ich hab dich beobachtet. Die ganze Zeit.|Eh? Cosa? Sì, sì, ti stavo tenendo d'occhio. Tutto il tempo.||嗯？什么？对对，我一直盯着你呢。一直。|어? 뭐? 응, 응, 계속 지켜보고 있었어. 쭉.|え？なんだ？ああ、ずっと見張ってたさ。ずっとな。|А? Что? Да-да, я за тобой следил. Всё время.|Hę? Co? Tak, tak, pilnowałem cię. Cały czas.",
+      "Me he quedado traspuesto. Tu culpa: con tanto silencio, cualquiera.|I dozed off. Your fault: with all that silence, who wouldn't.|Je me suis assoupi. Ta faute : avec tout ce silence, forcément.|Cochilei. Culpa sua: com esse silêncio todo, qualquer um.|Ich bin eingenickt. Deine Schuld: Bei so viel Stille kein Wunder.|Mi sono appisolato. Colpa tua: con tutto questo silenzio, chiunque.|Me quedé dormido. Tu culpa: con tanto silencio, cualquiera.|我打了个盹。怪你：这么安静，谁都会睡着。|깜빡 졸았네. 네 탓이야. 이렇게 조용하면 누구라도 존다고.|うとうとしてしまった。君のせいだ、こんなに静かじゃ誰だって眠る。|Я задремал. Сам виноват: в такой тишине любой уснёт.|Przysnąłem. Twoja wina: w takiej ciszy każdy by zasnął."
+    ],
+    /* ---- corrige el lema de la portada: lo tacha y escribe "Yo si." */
+    tagFix: [
+      "¿Que si sé dónde queda? Lo he corregido yo mismo.|Do I know where it is? I've corrected it myself.|Si je sais où c'est ? Je l'ai corrigé moi-même.|Se eu sei onde fica? Corrigi eu mesmo.|Ob ich weiß, wo es ist? Hab ich selbst korrigiert.|Se so dov'è? L'ho corretto io stesso.|¿Que si sé dónde queda? Lo corregí yo mismo.|问我知不知道在哪儿？我亲手改好了。|어딘지 아냐고? 내가 직접 고쳐놨지.|どこにあるか知ってるか、だと？自分で直しておいた。|Знаю ли я, где это? Я сам всё исправил.|Czy wiem, gdzie to jest? Sam to poprawiłem."
+    ],
   };
+  /* v0.19: mas variedad en las reacciones de la mesa (medido: con 4 frases, en 8 minutos con 5 dianas ya repetia literalmente) */
+  const MORE = {
+    bull: [
+      "¿Diana? Voy a pedir que revisen la mesa.|Bullseye? I'm having the table inspected.|En plein dans le mille ? Je fais inspecter la table.|Na mosca? Vou mandar revisar a mesa.|Volltreffer? Ich lasse den Tisch überprüfen.|Centro? Faccio controllare il tavolo.||正中？我要让人检查一下这张桌子。|명중? 테이블 점검 좀 받아야겠어.|ど真ん中？テーブルを点検させるぞ。|Яблочко? Велю проверить стол.|W dziesiątkę? Każę sprawdzić stół.",
+      "Clavado. Sospechosamente clavado.|Nailed it. Suspiciously nailed it.|Pile dessus. Étrangement pile dessus.|Cravado. Suspeitamente cravado.|Getroffen. Verdächtig genau getroffen.|Centrato. Sospettosamente centrato.||正中。可疑地正中。|정확해. 수상할 정도로 정확해.|ぴったり。怪しいほどぴったりだ。|В точку. Подозрительно в точку.|Trafione. Podejrzanie trafione.",
+      "Eso ha sido suerte. Dímelo tú, que yo no me lo creo.|That was luck. Tell me it was, because I don't believe it.|C'était de la chance. Dis-le-moi, parce que moi, je n'y crois pas.|Isso foi sorte. Me diz que foi, porque eu não acredito.|Das war Glück. Sag's mir, ich glaub's nämlich nicht.|È stata fortuna. Dimmelo tu, perché io non ci credo.|Eso fue suerte. Dímelo tú, que yo no me lo creo.|那是运气。你说是，因为我不信。|그건 운이야. 네가 그렇다고 해줘. 난 못 믿겠으니까.|今のは運だ。そう言ってくれ、私には信じられない。|Это была удача. Скажи, что удача, я не верю.|To było szczęście. Powiedz, że tak, bo ja nie wierzę.",
+      "Ni un píxel de error. Me vas a dejar sin trabajo.|Not a pixel off. You're going to put me out of a job.|Pas un pixel d'écart. Tu vas me mettre au chômage.|Nem um pixel de erro. Você vai me deixar sem emprego.|Kein Pixel daneben. Du machst mich noch arbeitslos.|Neanche un pixel di errore. Mi lascerai senza lavoro.||一个像素都没偏。你要让我失业了。|픽셀 하나 안 틀렸네. 나 일자리 잃겠어.|誤差ゼロピクセル。私を失業させる気か。|Ни пикселя мимо. Ты оставишь меня без работы.|Ani piksela błędu. Zostawisz mnie bez pracy.",
+      "¡En todo el centro! Hasta el mapa ha aplaudido. Yo no.|Dead centre! Even the map applauded. I didn't.|En plein centre ! Même la carte a applaudi. Pas moi.|Bem no centro! Até o mapa aplaudiu. Eu não.|Genau in die Mitte! Sogar die Karte hat geklatscht. Ich nicht.|In pieno centro! Perfino la mappa ha applaudito. Io no.|¡En todo el centro! Hasta el mapa aplaudió. Yo no.|正中央！连地图都鼓掌了。我没有。|한가운데! 지도도 박수쳤어. 난 안 쳤지만.|ど真ん中！地図まで拍手したぞ。私はしないがな。|В самый центр! Даже карта аплодировала. Я — нет.|W sam środek! Nawet mapa klaskała. Ja nie.",
+      "Diana. Te pongo en mi lista de sospechosos.|Bullseye. You're going on my list of suspects.|Dans le mille. Je te mets sur ma liste de suspects.|Na mosca. Vou te pôr na minha lista de suspeitos.|Volltreffer. Du kommst auf meine Liste der Verdächtigen.|Centro. Ti metto nella mia lista di sospettati.||正中。我把你列入嫌疑人名单了。|명중. 넌 내 용의자 명단에 올랐어.|命中。容疑者リストに載せておく。|Яблочко. Вношу тебя в список подозреваемых.|Dziesiątka. Wpisuję cię na listę podejrzanych."
+    ],
+    miss: [
+      "¿Seguro que era ahí? El mapa dice que no. Y yo también.|Sure it was there? The map says no. So do I.|Sûr que c'était là ? La carte dit que non. Moi aussi.|Tem certeza de que era aí? O mapa diz que não. Eu também.|Sicher, dass es da war? Die Karte sagt nein. Ich auch.|Sicuro che fosse lì? La mappa dice di no. Anch'io.||确定是那儿？地图说不是。我也说不是。|거기 확실해? 지도는 아니래. 나도.|本当にそこか？地図は違うと言ってる。私もだ。|Точно там? Карта говорит «нет». И я тоже.|Na pewno tam? Mapa mówi, że nie. Ja też.",
+      "Te has ido tan lejos que casi sales de la pantalla.|You went so far you nearly left the screen.|Tu es allé si loin que tu as failli sortir de l'écran.|Você foi tão longe que quase saiu da tela.|Du bist so weit daneben, dass du fast aus dem Bildschirm gefallen wärst.|Sei andato così lontano che per poco non uscivi dallo schermo.|Te fuiste tan lejos que casi te sales de la pantalla.|你偏得太远，差点跑出屏幕了。|너무 멀리 가서 화면 밖으로 나갈 뻔했어.|遠すぎて画面から出るところだったぞ。|Ты так промахнулся, что чуть не вылетел за экран.|Poleciałeś tak daleko, że prawie wyszedłeś za ekran.",
+      "Ni cerca. Pero con mucha seguridad, eso sí.|Not even close. But very confident, I'll give you that.|Même pas proche. Mais avec beaucoup d'assurance, ça oui.|Nem perto. Mas com muita confiança, isso sim.|Nicht mal nah dran. Aber sehr selbstbewusst, das schon.|Neanche vicino. Ma con molta sicurezza, questo sì.||差得远。不过倒是挺自信的。|근처도 아니야. 자신감은 넘쳤지만.|かすりもしない。自信だけはたっぷりだったがな。|Даже не близко. Зато очень уверенно.|Nawet nie blisko. Ale za to bardzo pewnie.",
+      "Eso no es un fallo. Es una expedición a otro sitio.|That's not a miss. That's an expedition somewhere else.|Ce n'est pas une erreur. C'est une expédition ailleurs.|Isso não é um erro. É uma expedição pra outro lugar.|Das ist kein Fehler. Das ist eine Expedition woandershin.|Questo non è un errore. È una spedizione da un'altra parte.||这不是失误，这是去了别处探险。|이건 실수가 아니야. 다른 데로 원정 간 거지.|これは外れじゃない。別の場所への遠征だ。|Это не промах. Это экспедиция в другое место.|To nie pudło. To wyprawa w inne miejsce.",
+      "Apunto la distancia. En la libreta de los récords… malos.|I'm noting the distance. In the book of records… bad ones.|Je note la distance. Dans le carnet des records… mauvais.|Vou anotar a distância. No caderno dos recordes… ruins.|Ich notiere die Entfernung. Im Buch der Rekorde… der schlechten.|Annoto la distanza. Nel quaderno dei record… negativi.||我把距离记下了。记在纪录本里……糟糕的那种。|거리 적어둘게. 기록 노트에… 나쁜 기록으로.|距離を記録しておく。記録帳に……ワースト記録としてな。|Записываю расстояние. В книгу рекордов… худших.|Zapisuję odległość. W zeszycie rekordów… złych."
+    ],
+    good: [
+      "Bien. No muy bien. Bien.|Good. Not great. Good.|Bien. Pas très bien. Bien.|Bom. Não muito bom. Bom.|Gut. Nicht sehr gut. Gut.|Bene. Non benissimo. Bene.||不错。不算很好。不错。|좋아. 아주 좋진 않고. 좋아.|いいね。すごくはないが。いいね。|Хорошо. Не отлично. Хорошо.|Dobrze. Nie bardzo dobrze. Dobrze.",
+      "Casi. Lo suficiente para que me preocupe.|Almost. Enough to worry me.|Presque. Assez pour m'inquiéter.|Quase. O suficiente pra me preocupar.|Fast. Genug, um mir Sorgen zu machen.|Quasi. Abbastanza da preoccuparmi.||差一点。足够让我担心了。|거의. 날 걱정시키기엔 충분하지.|惜しい。私が心配になるくらいにはな。|Почти. Достаточно, чтобы я забеспокоился.|Prawie. Wystarczająco, żebym się zaniepokoił.",
+      "Buena mano. No te lo digo más.|Good hand. I won't say it again.|Belle main. Je ne le dirai pas deux fois.|Boa mão. Não vou repetir.|Gute Hand. Ich sag's nicht nochmal.|Bella mano. Non lo ripeterò.||好手气。我不会再说第二遍。|좋은 손이야. 두 번은 말 안 해.|いい手だ。二度は言わないぞ。|Хорошая рука. Больше не повторю.|Dobra ręka. Nie powtórzę.",
+      "Rozando. La próxima no te la dejo pasar.|Grazing it. Next time I won't let it slide.|Tu frôles. La prochaine, je ne la laisse pas passer.|Raspando. Na próxima eu não deixo passar.|Knapp dran. Nächstes Mal lass ich das nicht durchgehen.|Sfiorato. La prossima non te la faccio passare.||擦边而过。下次我可不放过你。|아슬아슬. 다음엔 안 봐준다.|かすめたな。次は見逃さないぞ。|Впритирку. В следующий раз не спущу.|Otarłeś się. Następnym razem nie odpuszczę."
+    ],
+    timeout: [
+      "Tic, tac… y adiós. El reloj es de la casa.|Tick, tock… and goodbye. The clock works for the house.|Tic, tac… et au revoir. L'horloge travaille pour la maison.|Tic, tac… e tchau. O relógio é da casa.|Tick, tack… und tschüss. Die Uhr arbeitet fürs Haus.|Tic, tac… e ciao. L'orologio lavora per la casa.||嘀嗒……再见。时钟是庄家的。|째깍째깍… 안녕. 시계는 하우스 편이야.|チクタク……さようなら。時計は胴元の味方だ。|Тик-так… и до свидания. Часы работают на заведение.|Tik, tak… i do widzenia. Zegar gra dla kasyna.",
+      "Ni un clic. El silencio también cuenta… como cero.|Not a single click. Silence counts too… as zero.|Pas un clic. Le silence compte aussi… pour zéro.|Nem um clique. O silêncio também conta… como zero.|Kein einziger Klick. Stille zählt auch… als null.|Neanche un clic. Anche il silenzio conta… come zero.||一次都没点。沉默也算分……算零分。|클릭 한 번 없네. 침묵도 점수야… 0점짜리.|一度もクリックなし。沈黙も点になる……ゼロ点だがな。|Ни одного клика. Молчание тоже считается… как ноль.|Ani jednego kliknięcia. Cisza też się liczy… jako zero.",
+      "Se acabó el tiempo. Yo ya me estaba aburriendo.|Time's up. I was starting to get bored.|Temps écoulé. Je commençais à m'ennuyer.|Acabou o tempo. Eu já estava ficando entediado.|Die Zeit ist um. Mir wurde schon langweilig.|Tempo scaduto. Cominciavo ad annoiarmi.|Se acabó el tiempo. Ya me estaba aburriendo.|时间到。我都开始无聊了。|시간 끝. 나 슬슬 지루해지던 참이었어.|時間切れだ。退屈し始めていたところだ。|Время вышло. Мне уже становилось скучно.|Czas minął. Zaczynałem się nudzić."
+    ],
+    streak: [
+      "Otra más. Empiezo a sudar debajo del sombrero.|Another one. I'm starting to sweat under my hat.|Encore une. Je commence à transpirer sous mon chapeau.|Mais uma. Tô começando a suar debaixo do chapéu.|Noch einer. Ich fange an, unter dem Hut zu schwitzen.|Un'altra. Comincio a sudare sotto il cappello.||又一个。我帽子底下开始冒汗了。|또 맞혔어. 모자 밑으로 땀이 나기 시작하네.|また当たりか。帽子の下で汗が出てきた。|Ещё одно. Я начинаю потеть под шляпой.|Kolejne. Zaczynam się pocić pod kapeluszem.",
+      "Llevas una racha que no me gusta nada.|You're on a streak I don't like one bit.|Tu es sur une série qui ne me plaît pas du tout.|Você está numa sequência que eu não gosto nada.|Du hast eine Serie, die mir gar nicht gefällt.|Sei su una serie che non mi piace per niente.||你这连击我一点都不喜欢。|네 연속 기록, 하나도 마음에 안 들어.|その連続記録、まったく気に入らない。|У тебя серия, которая мне совсем не нравится.|Masz serię, która wcale mi się nie podoba.",
+      "Así no se puede trabajar. Para ya.|I can't work like this. Stop it.|On ne peut pas travailler comme ça. Arrête.|Assim não dá pra trabalhar. Para com isso.|So kann man nicht arbeiten. Hör auf damit.|Così non si può lavorare. Smettila.||这样我没法干活了。快停下。|이래서야 일을 못 하지. 그만해.|これじゃ仕事にならない。もうやめろ。|Так невозможно работать. Прекрати.|Tak się nie da pracować. Przestań."
+    ],
+    roundWin: [
+      "Ronda tuya. La apunto con la letra más pequeña que tengo.|Round's yours. I'm writing it down in my smallest handwriting.|Manche pour toi. Je la note avec ma plus petite écriture.|Rodada sua. Vou anotar com a menor letra que eu tenho.|Die Runde geht an dich. Ich notiere sie in meiner kleinsten Schrift.|Round tuo. Lo annoto con la calligrafia più piccola che ho.||这回合归你。我用最小的字记下来。|이번 라운드는 네 거. 제일 작은 글씨로 적어둘게.|このラウンドは君のものだ。一番小さな字で記録しておく。|Раунд твой. Запишу самым мелким почерком.|Runda twoja. Zapiszę ją najmniejszym pismem, jakie mam.",
+      "Pasas. Que no se repita. Bueno, sí, que se repita, que así me divierto.|You pass. Don't let it happen again. Well, do, it keeps me entertained.|Tu passes. Que ça ne se reproduise pas. Enfin si, ça m'amuse.|Passou. Que não se repita. Tá, que se repita, que assim eu me divirto.|Du kommst weiter. Das darf nicht wieder passieren. Na gut, doch, das unterhält mich.|Passi. Che non si ripeta. Anzi sì, che si ripeta, così mi diverto.||你过了。别再有下次。算了，还是有下次吧，这样我才好玩。|통과. 다시는 이러지 마. 아니, 또 그래. 그래야 재밌지.|通過だ。二度とするな。いや、またやってくれ、そのほうが楽しい。|Проходишь. Чтобы больше не повторялось. Хотя нет, повторяй, мне так веселее.|Przechodzisz. Żeby mi to się nie powtórzyło. Albo nie, niech się powtarza, tak się bawię.",
+      "Te la llevas. Esta mesa tiene memoria, que lo sepas.|You take it. This table has a memory, just so you know.|Tu l'emportes. Cette table a de la mémoire, sache-le.|Você leva essa. Esta mesa tem memória, fique sabendo.|Die gehört dir. Dieser Tisch hat ein Gedächtnis, nur damit du's weißt.|Te lo porti a casa. Questo tavolo ha memoria, sappilo.||这局你拿走。这张桌子是有记性的，你要知道。|이번 건 가져가. 이 테이블은 기억력이 좋다는 거 알아둬.|持っていけ。このテーブルは覚えてるからな。|Забирай. Имей в виду, у этого стола хорошая память.|Bierzesz ją. Ten stół ma pamięć, żebyś wiedział."
+    ],
+    roundFail: [
+      "Ronda para mí. Te guardo el sitio para la revancha.|Round goes to me. I'll save your seat for the rematch.|Manche pour moi. Je te garde ta place pour la revanche.|Rodada pra mim. Guardo seu lugar pra revanche.|Die Runde geht an mich. Ich halte dir den Platz für die Revanche frei.|Round per me. Ti tengo il posto per la rivincita.||这回合归我。给你留着位子等你复仇。|이번 라운드는 내 거. 복수전 자리는 맡아둘게.|このラウンドは私のものだ。リベンジの席は取っておく。|Раунд мой. Придержу тебе место для реванша.|Runda dla mnie. Zatrzymam ci miejsce na rewanż.",
+      "No llegaste. Pero qué bonito ha sido verte intentarlo.|You didn't make it. But it was lovely watching you try.|Tu n'y es pas arrivé. Mais c'était beau de te voir essayer.|Não chegou lá. Mas foi lindo te ver tentar.|Nicht geschafft. Aber es war schön, dir beim Versuchen zuzusehen.|Non ce l'hai fatta. Ma che bello vederti provare.|No llegaste. Pero qué lindo fue verte intentarlo.|你没过。不过看你努力的样子真不错。|못 해냈네. 그래도 애쓰는 거 보는 건 즐거웠어.|届かなかったな。だが挑む姿は美しかったよ。|Не дотянул. Но как же приятно было смотреть на твои попытки.|Nie dałeś rady. Ale jak miło było patrzeć, jak próbujesz.",
+      "La meta se ha quedado esperándote. Yo no.|The target was left waiting for you. I wasn't.|L'objectif est resté à t'attendre. Moi, non.|A meta ficou te esperando. Eu não.|Das Ziel hat auf dich gewartet. Ich nicht.|L'obiettivo è rimasto ad aspettarti. Io no.|La meta se quedó esperándote. Yo no.|目标一直在等你。我可没等。|목표는 널 기다렸어. 난 아니고.|目標は君を待っていた。私は待たないがな。|Цель тебя ждала. А я — нет.|Cel na ciebie czekał. Ja nie."
+    ],
+  };
+  for (const k in MORE) LINES[k].push(...MORE[k]);
   for (const k in LINES) LINES[k] = LINES[k].map(L6);
 
   const D = A.dealer = { on: false, onHome: false, host: null, timers: [], busy: false };
-  let el, face, bubble, txt, sofar, rest, typing = false, doneAt = 0, pend = null;   // typing: esta escribiendo una frase; doneAt: cuando acabo la ultima; pend: la que espera su turno
+  let el, face, bubble, txt, sofar, rest, typing = false, doneAt = 0, pend = null, dozing = false;   // typing: esta escribiendo una frase; doneAt: cuando acabo la ultima; pend: la que espera su turno
   const rand = a => a[Math.floor(Math.random() * a.length)];
 
   function ensure() {
     if (el && el.isConnected) return;
+    if (el) { rehome(); return; }                                    // su pantalla se fue con el dentro: vuelve a #app con lo que estuviera diciendo (nunca se le corta)
     el = document.createElement("div"); el.id = "dealer"; el.className = "dealer";
     el.innerHTML = `<div class="dl-bubble"><p></p></div><img class="dl-face" alt="" src="assets/icons/dealer_neutral.webp">`;
     $("app").appendChild(el); face = el.querySelector(".dl-face"); bubble = el.querySelector(".dl-bubble"); txt = bubble.querySelector("p");
+    face.addEventListener("pointerdown", e => onPoke(e));
     clear(); D.busy = false;                                          // el retrato anterior se fue con la pantalla que lo contenia: el nuevo empieza callado
   }
   const clear = () => { D.timers.forEach(clearTimeout); D.timers = []; typing = false; pend = null; };
+  const rehome = () => { D.host = null; $("app").appendChild(el); el.classList.remove("big", "inline"); };
+  /* ¿esta a media frase? (escribiendo, o dentro de su segundo de mas) */
+  const speaking = () => !!el && D.busy && (typing || Date.now() < doneAt + LINGER);
   const later = (fn, ms) => { const t = setTimeout(fn, ms); D.timers.push(t); return t; };
 
   /* en partida el retrato va abajo a la izquierda, pero NUNCA encima de la placa del nombre, la barra del acto, las cartas de herramientas,
      la nota ni el dock: mide el hueco real, encoge el retrato hasta que quepa y sube o estrecha el bocadillo (ventanas bajas, portatiles
      pequenos, movil en horizontal). Antes el retrato de 250 px tapaba la placa en pantallas de poca altura. */
   function fitCorner() {
-    if (!el) return;
+    if (!el || el.classList.contains("camp")) return;                                // en el Campamento su sitio lo mide campRoom
     const bs = bubble.style, fs = face.style;
-    const reset = () => { el.style.bottom = ""; fs.width = fs.height = fs.display = ""; bs.marginBottom = bs.maxWidth = ""; };
+    const reset = () => { el.style.bottom = el.style.top = ""; fs.width = fs.height = fs.display = ""; bs.marginBottom = bs.maxWidth = ""; };
     if (el.classList.contains("home") && !D.host) {                                 // en el inicio: el hueco libre a su lado de la portada (homeRoom)
-      reset(); const room = homeRoom(homeCorner); el.style.setProperty("--hf", Math.min(256, room) + "px"); el.style.setProperty("--hb", Math.min(380, room) + "px"); return;
+      reset(); const room = homeRoom(homeCorner), top = homeTop(); if (top > HOME_TOP) el.style.top = top + "px"; el.style.setProperty("--hf", Math.min(256, room) + "px"); el.style.setProperty("--hb", Math.min(380, room) + "px"); return;
     }
     if (D.host || !D.on || el.classList.contains("inline") || el.classList.contains("big")) return reset();
     const app = $("app"); if (!app) return reset();
@@ -806,12 +1182,18 @@ window.AIQ = window.AIQ || {};
      o.fx: efecto de pantalla (rabieta) que sale justo cuando empieza la frase */
   D.say = (line, o = {}) => {
     if (!o.force && (held || (!D.on && !D.onHome))) return;
-    const left = !o.force && D.busy && el && el.isConnected ? (typing ? Infinity : doneAt + LINGER - Date.now()) : 0;
+    if (o.valid && !o.valid()) return;                                // la frase ya no toca (p. ej. la reaccion a una pregunta que ya paso)
+    if (el) ensure();
+    const left = D.busy && el ? (typing ? Infinity : doneAt + LINGER - Date.now()) : 0;   // tambien las escenas (force) esperan a que acabe la frase en curso
     if (left > 0) { if (!pend && left !== Infinity) later(flush, left); pend = [line, o]; return; }
-    ensure(); clear(); if (o.fx) D.fx(o.fx);
+    ensure(); clear(); leaving = false; clearTimeout(leaveT); const me = ++lineN; if (o.fx) D.fx(o.fx);
+    if (!o.force && !D.host) noteSaid();
     const mood = o.mood || "sly", text = o.force ? (typeof line === "string" ? line : A.tx(line)) : personal(typeof line === "string" ? line : A.tx(line)), src = FACE[mood] || "dealer_neutral";
     const inline = !!el.closest("#vdDealer"), home = D.onHome && !D.host && !inline && homeCorner ? " home " + homeCorner : "";
-    face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (inline ? " inline" : "") + home; bubble.classList.add("on");
+    face.src = `assets/icons/${src}.webp`; el.className = "dealer in " + mood + (D.host ? " big" : "") + (inline ? " inline" : "") + (o.camp && !D.host && !inline ? " camp" : o.screen && !D.host && !inline ? " screen" : home); bubble.classList.add("on");
+    if (o.camp && campBox) { const st = el.style; st.bottom = st.top = ""; face.style.width = face.style.height = face.style.display = ""; bubble.style.marginBottom = bubble.style.maxWidth = "";
+      st.setProperty("--cl", campBox.l + "px"); st.setProperty("--cb", campBox.b + "px"); st.setProperty("--hf", campBox.hf + "px"); st.setProperty("--hb", campBox.hb + "px"); }
+    if (o.lang) { bubble.lang = o.lang; bubble.style.setProperty("--dll", /^(zh|ja|ko|ru)/.test(o.lang) ? ".889" : "1"); } else if (bubble.lang) { bubble.removeAttribute("lang"); bubble.style.removeProperty("--dll"); }
     /* la frase entera ya maquetada desde el principio, con lo que falta por escribir invisible: el globo nace con su tamano final y ninguna palabra
        salta de linea a media escritura (y `text-wrap: pretty` reparte las lineas sin dejar una palabra sola) */
     sofar = document.createTextNode(""); rest = document.createElement("span"); rest.className = "dl-rest"; rest.textContent = text; txt.replaceChildren(sofar, rest);
@@ -819,22 +1201,49 @@ window.AIQ = window.AIQ || {};
     if (mood === "laugh") A.sfx.laugh && A.sfx.laugh();
     let i = 0, at = 0; const chars = [...text], step = mood === "laugh" ? 44 : 34;
     const tick = () => {
-      if (!el.isConnected) { clear(); D.busy = false; return; }                // otra pantalla sustituyo la suya: se calla (sin voz de fondo ni frases que asomen luego)
-      if (i >= chars.length) { typing = false; doneAt = Date.now(); el.classList.add("done"); if (pend) { later(flush, LINGER); return; } if (o.hold !== 0) later(() => D.hide(), (o.hold || 1800 + text.length * 22) + LINGER); if (o.done) later(o.done, LINGER); return; }
+      if (!el.isConnected) { rehome(); fitCorner(); }                        // otra pantalla sustituyo la suya: termina la frase en la esquina (antes se callaba a media frase)
+      if (i >= chars.length) {
+        typing = false; doneAt = Date.now(); el.classList.add("done");
+        if (pend) { later(flush, LINGER); return; }
+        if (leaving) { later(finishLeave, LINGER); return; }                  // se iba: acaba, su segundo de mas, y se va (sin encadenar nada detras)
+        if (o.hold !== 0) later(() => D.hide(), (o.hold || 1800 + text.length * 22) + LINGER);
+        if (o.done && released !== me) later(o.done, LINGER); return;
+      }
       sofar.data += chars[i]; at += chars[i].length; rest.textContent = text.slice(at); if (/\S/.test(chars[i]) && i % 2 === 0 && mood !== "laugh") A.sfx.voice && A.sfx.voice(mood, i); i++; later(tick, step + (/[.,!?…。，！？、]/.test(chars[i - 1]) ? 140 : 0));
     };
     typing = true; tick(); D.busy = true;
   };
   /* se va: lo que estuviera diciendo o fuera a decir se corta con el (antes seguia escribiendo oculto, con su voz, y el resto de la intro asomaba luego en la esquina) */
-  D.hide = () => { if (!el) return; clear(); el.classList.remove("in", "done", "laugh", "angry", "shock", "sly", "boss"); bubble.classList.remove("on"); D.busy = false; };
+  D.hide = () => { if (!el) return; clear(); el.classList.remove("in", "done", "laugh", "angry", "shock", "sly", "boss", "doze"); bubble.classList.remove("on"); D.busy = false; dozing = false; const z = el.querySelector(".dl-zz"); if (z) z.remove(); };
   D.enable = on => {
     D.on = !!on; clearTimeout(runT);
     if (on && D.onHome) D.homeTease(false);                           // entrar en partida (p. ej. Continuar desde el inicio) apaga las apariciones del menu
-    if (!on) { clear(); D.dock(null); if (el) el.classList.add("hidden"); }
+    if (!on) { if (speaking()) D.release(); else { clear(); D.dock(null); if (el) el.classList.add("hidden"); } }   // a media frase: la acaba y se va
     else { ensure(); el.classList.remove("hidden"); runT = setTimeout(runTick, 18000 + Math.random() * 14000); }
   };
   /* pasa el retrato a un contenedor grande (pantalla de intro) o lo devuelve a la esquina */
-  D.dock = host => { ensure(); clear(); D.busy = false; D.host = host || null; if (host) host.appendChild(el); else $("app").appendChild(el); el.classList.toggle("big", !!host); };   // escena nueva: lo de la pantalla anterior no le sigue
+  /* escena nueva: lo que iba a decir en la pantalla anterior ya no le sigue, pero si esta a media frase se la lleva consigo y la termina alli
+     (la escena habla despues, cuando le toque). Antes se le cortaba en seco al pasar a la intro, a la salida o a la pregunta del nombre */
+  D.dock = host => {
+    ensure();
+    if (speaking()) { pend = null; leaving = false; clearTimeout(leaveT); } else { clear(); D.busy = false; }
+    D.host = host || null; if (host) host.appendChild(el); else $("app").appendChild(el);
+    el.classList.toggle("big", !!host); el.classList.remove("camp", "screen"); if (host) el.classList.remove("inline", "home", ...HOME_CORNERS);   // lo del Campamento o del Perfil no le sigue
+  };
+  /* se retira SIN cortarle: si esta a media frase la acaba donde este (con su segundo de mas) y luego se va; nada de lo que esperaba turno le sigue */
+  let leaving = false, leaveT = 0, lineN = 0, released = 0;
+  function finishLeave() {
+    clearTimeout(leaveT); leaving = false; if (pend) return;             // entretanto le dieron algo nuevo que decir: eso manda
+    clear(); D.hide();
+    if (!D.onHome && el) { el.classList.remove("home", ...HOME_CORNERS); homeCorner = ""; }
+    if (!D.on && !D.onHome && el) el.classList.add("hidden");
+  }
+  D.release = () => {
+    pend = null; clearTimeout(leaveT);
+    if (!speaking()) return finishLeave();
+    leaving = true; released = lineN;
+    if (!typing) { D.timers.forEach(clearTimeout); D.timers = []; leaveT = setTimeout(finishLeave, Math.max(0, doneAt + LINGER - Date.now())); }
+  };
   /* lo coloca dentro de un hueco de la pantalla (veredicto) sin bloquear sus reacciones */
   D.anchor = host => { if (!host) return; ensure(); host.appendChild(el); el.classList.add("inline"); };
   /* secuencia de frases: [{line, mood}] */
@@ -842,6 +1251,7 @@ window.AIQ = window.AIQ || {};
   D.line = (key, i) => { const a = LINES[key]; return a ? (i == null ? rand(a) : a[i % a.length]) : null; };
   D.lines = LINES; D.LINGER = LINGER;
   D._pick = key => pickLine(key);   // solo para pruebas de desarrollo (dev/*.js): saca una frase de la bolsa sin repetir
+  D._fake = (kind, n) => fakeAch(kind || "idle", n || 75);   // solo para pruebas: fuerza el logro falso
 
   /* ---------------------------------------------------------------- memoria persistente: visitas, tiempo jugado, como acabo la ultima expedicion
      y "bolsas" para no repetir frase hasta agotar la categoria (ni entre sesiones) */
@@ -852,7 +1262,9 @@ window.AIQ = window.AIQ || {};
   /* tiempo de juego real: solo cuenta con la ventana a la vista (el de esta sesion marca los hitos; el acumulado, las horas "juntos") */
   const T0 = Date.now(); let hidAcc = 0, hidAt = document.hidden ? T0 : 0, flushed = 0;
   const activeMs = () => Date.now() - T0 - hidAcc - (hidAt ? Date.now() - hidAt : 0);
+  let forgotten = false;                                                             // D.forget: borraste todos tus datos; ni el pagehide vuelve a escribir su memoria
   const saveStore = () => {
+    if (forgotten) return;
     const ms = activeMs(); DS.playMs = (DS.playMs || 0) + Math.max(0, ms - flushed); flushed = ms; DS.lastSeen = Date.now();
     try { localStorage.setItem(SKEY, JSON.stringify(DS)); } catch (e) { /* sin almacenamiento */ }
   };
@@ -877,6 +1289,25 @@ window.AIQ = window.AIQ || {};
   const isReturning = !firstVisit && Date.now() - prevSeen > 20 * 60 * 1000;
   const daysAway = !firstVisit && prevSeen ? Math.floor((Date.now() - prevSeen) / 86400000) : 0;
   DS.visits++; saveStore();
+  /* COMO TE FUISTE LA ULTIMA VEZ (v0.19): por su boton (quitAt, js/salir.js), con la X de la ventana o Alt+F4 (pagehide sin quitAt) o de golpe (la sesion
+     seguia "viva": cuelgue, corte de luz, proceso cerrado). Una recarga de desarrollo no cuenta. Y si el juego se ha actualizado desde tu ultima visita */
+  const navReload = (() => { try { const n = performance.getEntriesByType("navigation")[0]; return !!n && n.type === "reload"; } catch (e) { return false; } })();
+  const prevEnd = firstVisit || navReload ? "" : DS.quitAt ? "btn" : DS.live ? "crash" : DS.end || "";
+  const prevLen = DS.lastLen || 0, prevPokes = DS.pokes || 0;
+  let verNote = !firstVisit && !navReload && !!DS.ver && !!A.VERSION && DS.ver !== A.VERSION;
+  DS.live = 1; DS.end = ""; DS.ver = A.VERSION || DS.ver; DS.pokes = 0;
+  /* nuestra historia: desde cuando nos conocemos, cuantos dias seguidos vienes y si anoche te fuiste de madrugada (1:00-4:59, hace menos de 20 h) */
+  const dayKey = d => d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  if (!DS.first) DS.first = Date.now();
+  { const H = Array.isArray(DS.hours) && DS.hours.length === 24 ? DS.hours : (DS.hours = Array(24).fill(0)); H[new Date().getHours()]++; }   // tu hora habitual (su expediente)
+  let dejavu = false; try { dejavu = !!localStorage.getItem("atlasiq-dejavu"); } catch (e) { /* sin almacenamiento */ }   // borraste tus datos: queda un deja vu (fuera de atlasiq.*)
+  { const today = dayKey(new Date()), yest = dayKey(new Date(Date.now() - 86400000)); if (DS.day !== today) { DS.streak = DS.day === yest ? (DS.streak || 1) + 1 : 1; DS.day = today; } }
+  const lateEnd = (() => {
+    if (firstVisit || navReload || !prevSeen || Date.now() - prevSeen > 20 * 3600000 || prevEnd === "crash") return "";
+    const d = new Date(prevSeen), h = d.getHours(); if (h < 1 || h >= 5) return "";
+    try { const L = (A.LANGS || []).find(l => l.code === A.lang); return d.toLocaleTimeString(L ? L.loc : undefined, { hour: "2-digit", minute: "2-digit" }); } catch (e) { return h + ":" + String(d.getMinutes()).padStart(2, "0"); }
+  })();
+  saveStore();
   const timeBucket = () => { const h = new Date().getHours(); return h < 5 ? "homeTimeNight" : h < 12 ? "homeTimeMorning" : h < 19 ? "homeTimeAfternoon" : h < 23 ? "homeTimeEvening" : "homeTimeNight"; };
   const isWeekend = () => { const d = new Date().getDay(); return d === 0 || d === 6; };
   const lateHour = () => { const h = new Date().getHours(); return h >= 23 || h < 5; };
@@ -911,12 +1342,21 @@ window.AIQ = window.AIQ || {};
   const PT = [10, 20, 30, 45, 60, 90, 120, 180]; let ptI = 0;                        // hitos de minutos jugados en esta sesion
   const milestone = () => { const m = activeMs() / 60000; let k = null; while (ptI < PT.length && m >= PT[ptI]) k = PT[ptI++]; return k ? "pt" + k : null; };
   let lastInput = Date.now(), quietUntil = 0;
+  /* EL PRESUPUESTO: menos charla y mas calma. El crupier no esta para comentarlo todo, sino para aparecer cuando cuenta (y romper la cuarta pared).
+     Medido con un jugador simulado (38 min): hablaba cada 20 s de media, el silencio mas largo era de 46 s y comentaba una de cada 2 respuestas.
+     Ahora: tras 3 frases en un minuto se toma 40 s de calma (salvo lo grande: rondas, fin de expedicion, escenas); las reacciones pequenas
+     dejan 12 s desde la ultima frase (comenta ~1 de cada 4 respuestas); en plena pregunta, como mucho un comentario por ronda; en el inicio, uno cada 35-60 s. */
+  const BUDGET = { burstN: 3, burstWin: 60000, calm: 40000, smallGap: 12000 };
+  const said = [];                                                                  // cuando empezo cada frase suelta (las de escena -intro, salir, nombre- no cuentan)
+  const noteSaid = () => { const t = Date.now(); said.push(t); while (said.length > 8) said.shift(); };
+  const sinceSaid = () => (said.length ? Date.now() - said[said.length - 1] : Infinity);
+  const calmNow = () => { const n = said.length; return n >= BUDGET.burstN && said[n - 1] - said[n - BUDGET.burstN] <= BUDGET.burstWin && Date.now() - said[n - 1] < BUDGET.calm; };
   ["pointermove", "pointerdown", "keydown", "wheel"].forEach(ev => addEventListener(ev, () => { lastInput = Date.now(); }, { passive: true, capture: true }));
   /* varias frases seguidas en el mismo bocadillo; la ultima se queda un rato y se va */
   function chain(items, lastHold) {
     items = items.filter(it => it && it.t); if (!items.length) return;
     let k = 0;
-    const next = () => { const it = items[k++], last = k >= items.length; D.say(it.t, { mood: it.mood || "sly", hold: last ? (lastHold || holdFor(it.t)) : 0, done: last ? null : () => later(next, it.gap || 1000) }); };
+    const next = () => { const it = items[k++], last = k >= items.length; D.say(it.t, { mood: it.mood || "sly", lang: it.lang, hold: last ? (lastHold || holdFor(it.t)) : 0, done: last ? null : () => later(next, it.gap || 1000) }); };
     next();
   }
   /* cuarta pared con datos reales: cada una sale como mucho una vez por sesion (p rebaja la probabilidad dentro de la partida) */
@@ -958,33 +1398,59 @@ window.AIQ = window.AIQ || {};
   };
   D.pick = (key, d) => say1(key, d);                                    // js/nombre.js: una frase de la bolsa (sin repetir), con tu nombre puesto
   /* js/nombre.js: mientras te pregunta el nombre, calla todo lo demas (lo que estaba diciendo y lo que iba a decir) */
-  D.hold = on => { held = !!on; if (held) { clear(); D.hide(); } };
+  D.hold = on => { held = !!on; if (held) { pend = null; if (!speaking()) { clear(); D.hide(); } } };   // si esta a media frase la acaba: la escena le recoge (D.dock) y habla despues
 
   /* ---------------------------------------------------------------- pantalla principal */
   const HOME_CORNERS = ["home-tl", "home-tr"];
   /* asoma en la franja libre a un lado de la portada, con el globo encima: mide donde acaba lo que hay (logo, lema, cartas, botones) a la altura
      en que aparece, porque la portada crece con la ventana (--k). Si por ningun lado cabe (ventana estrecha), ese rato no asoma */
   const HOME_TOP = 92, HOME_H = 480, HOME_MIN = 230;
+  const HOME_MQ = matchMedia("(max-width: 900px), (max-height: 560px)");   // igual que uikit.css (.dealer.home se oculta): alli no asoma (antes hablaba invisible y gastaba la apertura)
+  /* asoma justo debajo de los botones de salir y del engranaje: en pantallas grandes (2560 px) la portada los agranda (--k) y bajaban hasta su franja,
+     asi que homeRoom los contaba como obstaculo y el crupier no asomaba nunca (ni la frase de rondar la salida) */
+  const homeTop = () => { const g = document.querySelector(".hh .menu-gear"); return Math.max(HOME_TOP, g ? Math.ceil(g.getBoundingClientRect().bottom) + 14 : 0); };
   function homeRoom(corner) {
-    const hh = document.querySelector(".hh"); if (!hh) return 0;
-    const tl = corner === "home-tl", y1 = HOME_TOP + HOME_H; let edge = tl ? innerWidth : 0;
-    const add = r => { if (r.width > 2 && r.height > 2 && r.width < innerWidth * 0.6 && r.top < y1 && r.bottom > HOME_TOP) edge = tl ? Math.min(edge, r.left) : Math.max(edge, r.right); };
-    hh.querySelectorAll("img, svg, canvas, button, [class*=card]").forEach(e => add(e.getBoundingClientRect()));
+    const hh = document.querySelector(".hh"); if (!hh || HOME_MQ.matches) return 0;
+    const top = homeTop(), tl = corner === "home-tl", y1 = top + HOME_H; let edge = tl ? innerWidth : 0;
+    const add = r => { if (r.width > 2 && r.height > 2 && r.width < innerWidth * 0.6 && r.top < y1 && r.bottom > top) edge = tl ? Math.min(edge, r.left) : Math.max(edge, r.right); };
+    hh.querySelectorAll("img, svg, canvas, button, [class*=card]").forEach(e => { if (!e.closest(".menu-gear")) add(e.getBoundingClientRect()); });
     const rg = document.createRange(), tw = document.createTreeWalker(hh, NodeFilter.SHOW_TEXT);
     for (let n; (n = tw.nextNode());) if (n.nodeValue.trim()) { rg.selectNodeContents(n); add(rg.getBoundingClientRect()); }   // la tinta del texto, no su caja (el lema ocupa todo el ancho)
     return Math.floor((tl ? edge : innerWidth - edge) - 22 - 20);                    // margen a la ventana y a la portada
   }
   const pickCorner = () => { const ok = HOME_CORNERS.filter(c => homeRoom(c) >= HOME_MIN); return ok.length ? rand(ok) : ""; };
-  let homeT = 0, homeCorner = "", lastCat = "", homeN = 0, guideI = 0, greeted = false;
+  let afkAt = 0, afkFrom = 0, fakeDoor = false, babelPend = null, homeT = 0, homeCorner = "", lastCat = "", homeN = 0, guideI = 0, greeted = false;
   /* por que llega el jugador al menu: "open" (arranca el juego), "afterRun" (acaba de terminar una expedicion), "left" (guardo y salio a medias) */
   let entry = "open", entryAt = Date.now(), entrySince = 0, entryFlags = {}, lastEnd = null;
+  /* vuelves tras salir por su boton: se acuerda de la trastada que te hizo (o de la temporada dos), de cuantas veces te has ido, o solo te recibe;
+     y a veces, mas tarde, el logro falso de la puerta */
+  const RET = { dark: "quitRetDark", shout: "quitRetShout", shell: "quitRetShell", denied: "quitRetDenied", plead: "quitRetPlead", bribe: "quitRetBribe", fake: "quitRetFake" };
+  function quitRet() {
+    const q = (A.salir && A.salir.stats && A.salir.stats()) || {};
+    fakeDoor = true;
+    if (q.last === "season") return { t: say1("quitRetSeason"), mood: "laugh" };
+    if (q.quits >= 3 && Math.random() < 0.3) return { t: say1("quitRetMany", { n: q.quits }), mood: "laugh" };
+    if (RET[q.last] && Math.random() < 0.6) return { t: say1(RET[q.last]), mood: q.last === "plead" ? "sly" : "laugh" };
+    return { t: say1("quitReturn"), mood: "laugh" };
+  }
   function opener(kind) {
     if (kind === "afterRun" && lastEnd) return { t: say1(lastEnd.won ? "homeAfterWin" : "homeAfterLose", { r: lastEnd.r }), mood: lastEnd.won ? "angry" : "sly" };
     if (kind === "left") return hasSave() ? { t: say1("homeLeft") } : null;
     if (kind === "renamed") { const k = renamed; renamed = ""; return k && who() ? { t: noteLine(k), mood: k === "recall" ? "shock" : "laugh" } : null; }
     if (kind !== "open") return null;
-    if (firstVisit && newbie()) return { chain: [0, 1, 2].map(i => ({ t: nth("firstMeet", i), mood: i === 2 ? "laugh" : "sly" })), wait: 16000 };
-    if (DS.quitAt) { DS.quitAt = 0; saveStore(); return { t: say1("quitReturn"), mood: "laugh" }; }   // la ultima vez saliste por el boton de encendido (js/salir.js)
+    if (firstVisit && newbie()) {
+      const ch = [0, 1, 2].map(i => ({ t: nth("firstMeet", i), mood: i === 2 ? "laugh" : "sly" }));
+      if (dejavu) { ch[0] = { t: say1("dejavu"), mood: "shock" }; dejavu = false; try { localStorage.removeItem("atlasiq-dejavu"); } catch (e) { /* sin almacenamiento */ } }
+      return { chain: ch, wait: 16000 };
+    }
+    if (DS.quitAt) { DS.quitAt = 0; saveStore(); return quitRet(); }                // la ultima vez saliste por el boton de encendido (js/salir.js)
+    if (prevEnd === "crash") { const sm = hasSave() && A.adv.summary && A.adv.summary(); return { t: sm ? say1("quitRetCrashSave", { act: sm.act, round: sm.round }) : say1("quitRetCrash"), mood: "shock" }; }
+    if (prevEnd === "x" && prevLen > 180000 && DS.visits > 4 && DS.xSaid !== DS.visits - 1 && Math.random() < 0.35) { DS.xSaid = DS.visits; saveStore(); return { t: say1("quitRetX"), mood: "angry" }; }
+    if (verNote) { verNote = false; return { t: say1("newVersion", { v: A.VERSION }), mood: "laugh" }; }
+    { const days = Math.floor((Date.now() - (DS.first || Date.now())) / 86400000), m = [30, 100, 200, 365, 500, 730, 1000].filter(x => days >= x && days <= x + 6).pop();
+      if (m && DS.anniv !== m) { DS.anniv = m; saveStore(); return { t: m === 365 ? say1("annivYear") : say1("anniv", { d: days }), mood: "sly" }; } }
+    if ([3, 7, 14, 30, 60, 100, 365].includes(DS.streak) && DS.streakSaid !== DS.streak) { DS.streakSaid = DS.streak; saveStore(); return { t: say1("streakDays", { n: DS.streak }), mood: "laugh" }; }
+    if (lateEnd) return { t: say1("lateLeft", { time: lateEnd }), mood: "sly" };
     const sm = hasSave() && A.adv.summary && A.adv.summary();
     if (sm) return { t: say1("openResume", { act: sm.act, round: sm.round }) };
     if (who() && (isReturning || daysAway >= 1) && Math.random() < 0.5) { nameAt = activeMs(); return { t: say1("openName") }; }   // "ah, {name}, ya te conozco"
@@ -996,46 +1462,60 @@ window.AIQ = window.AIQ || {};
     greeted = true; return { t: say1(isWeekend() && Math.random() < 0.4 ? "homeTimeWeekend" : timeBucket()) };
   }
   function homeBeat() {
+    if (babelPend) { const b = babelPend; babelPend = null; if (Date.now() - b.at < 600000) { const o = babelBeat(b); if (o) return o; } }   // cambiaste de idioma: eso va primero
     if (entry) { const k = entry, stale = k !== "open" && Date.now() - entryAt > 10 * 60 * 1000; entry = ""; const o = !stale && opener(k); if (o && (o.t || o.chain)) return o; }
+    if (verNote && homeN >= 1) { verNote = false; return { t: say1("newVersion", { v: A.VERSION }), mood: "laugh" }; }
+    if (prevPokes >= 3 && !once.pokeMem && homeN >= 1) { once.pokeMem = 1; return { t: say1("pokeMemory", { n: prevPokes }), mood: "sly" }; }
+    if (fakeDoor && homeN >= 1 && fakeOk()) { fakeDoor = false; const n = ((A.salir && A.salir.stats && A.salir.stats()) || {}).quits || 1; return { fake: "door", n }; }
     if (!advRuns() && guideI < LINES.firstGuide.length && homeN >= 1) return { t: nth("firstGuide", guideI++) };   // aun no ha jugado ninguna expedicion: por donde empezar
     const ms = milestone(); if (ms) return { t: say1(ms), mood: "laugh" };
     if (!greeted) { greeted = true; if (homeN <= 2) return { t: say1(isWeekend() && Math.random() < 0.4 ? "homeTimeWeekend" : timeBucket()) }; }
     if (homeN < 2) return { t: say1("homeTempt") };                                   // lo segundo que dice: una invitacion, nunca un dato suelto
     if (nameOk(0.14)) { nameUse(); return { t: say1("nameHome"), mood: rand(["sly", "laugh"]) }; }   // muy de vez en cuando, por tu nombre
     const now = Date.now();
-    if (!entryFlags.afk && now - lastInput > 40000) { entryFlags.afk = 1; return { t: say1("afk"), mood: "shock" }; }
+    if (!entryFlags.afk && now - lastInput > 40000) { entryFlags.afk = 1; afkAt = now; afkFrom = lastInput; return { t: say1("afk"), mood: "shock", afk: true }; }   // y luego se queda traspuesto   // y luego calla hasta que vuelvas
     if (!entryFlags.idle && now - entrySince > 100000) { entryFlags.idle = 1; return { t: say1("homeIdle") }; }
+    if (!once.tag && !newbie() && homeN >= 3 && now - entrySince > 60000 && Math.random() < 0.3) { once.tag = 1; return { t: say1("tagFix"), mood: "laugh", tag: true }; }   // corrige el lema (1 por sesion)
     const meta = metaBeat(); if (meta) return meta;
     const runs = advRuns(), pool = []; const push = (k, n) => { for (let i = 0; i < n; i++) pool.push(k); };
-    if (hasSave()) { push("homeTempt", 5); push("homeTaunt", 3); push("homeTrivia", 3); }                  // partida a medias: mas tentacion para que la retome
-    else if (!runs) { push("homeTaunt", 5); push("homeTrivia", 3); push("homeTempt", 3); }                 // aun no ha jugado la Aventura: burla y ganas de que empiece
-    else { push("homeTaunt", 4); push("homeTrivia", 4); push("homeTempt", 3); }
-    push("homeMeta", 2); push(timeBucket(), 1); if (isWeekend()) push("homeTimeWeekend", 1);
+    if (hasSave()) { push("homeTempt", 4); push("homeTaunt", 2); push("homeTrivia", 1); }                  // partida a medias: mas tentacion para que la retome
+    else if (!runs) { push("homeTaunt", 3); push("homeTempt", 3); push("homeTrivia", 1); }                 // aun no ha jugado la Aventura: burla y ganas de que empiece
+    else { push("homeTaunt", 3); push("homeTempt", 2); push("homeTrivia", 1); }
+    push("homeMeta", 4); push(timeBucket(), 1); if (isWeekend()) push("homeTimeWeekend", 1);             // lo que mas pesa: la cuarta pared, no el dato suelto
     let cat = rand(pool); if (cat === lastCat && pool.some(p => p !== cat)) cat = rand(pool.filter(p => p !== cat)); lastCat = cat;
     return { t: say1(cat), mood: rand(["sly", "laugh"]) };
   }
   function homeTick() {
     if (!D.onHome) return;
+    if (dozing) { if (lastInput > afkAt) wakeUp(); homeT = setTimeout(homeTick, dozing ? 1000 : 16000 + Math.random() * 10000); return; }   // traspuesto: al volver se despierta de golpe
     const S = A.core && A.core.S;
     if (!document.querySelector(".hh") || phase() !== "title" || (S && (S.booting || S.settingsOpen)) || D.busy || tourOn()) { homeT = setTimeout(homeTick, 2500); return; }   // solo en el inicio, sin pisar a nadie
+    if (afkAt && lastInput > afkAt) {                                                  // vuelves tras el "¿sigues ahi?": a veces, el logro falso de mirar el techo
+      const idle = Math.round((lastInput - afkFrom) / 1000); afkAt = 0;
+      if (idle >= 60 && fakeOk()) { fakeAch("idle", idle); homeT = setTimeout(homeTick, 30000 + Math.random() * 20000); return; }
+    }
+    if (!babelPend && ((afkAt && lastInput <= afkAt) || calmNow())) { homeT = setTimeout(homeTick, 2500); return; }   // te fuiste (ya te lo dijo) o acaba de hablar mucho: calma
     const corner = pickCorner(); if (!corner) { homeT = setTimeout(homeTick, 2500); return; }   // la portada no le deja hueco: lo que tocaba decir espera
     const b = homeBeat(); homeN++;
+    if (b.fake) { fakeAch(b.fake, b.n); homeT = setTimeout(homeTick, 30000 + Math.random() * 20000); return; }
     ensure(); homeCorner = corner;
-    if (b.chain) chain(b.chain); else if (b.t) D.say(b.t, { mood: b.mood || "sly", hold: holdFor(b.t) });
-    homeT = setTimeout(homeTick, (b.wait || 0) + 14000 + Math.random() * 13000);
+    if (b.tag && !tagFix()) { homeT = setTimeout(homeTick, 5000); return; }
+    if (b.afk) D.say(b.t, { mood: b.mood, hold: 0, done: startDoze });
+    else if (b.chain) chain(b.chain); else if (b.t) D.say(b.t, { mood: b.mood || "sly", hold: holdFor(b.t) });
+    homeT = setTimeout(homeTick, (b.wait || 0) + (homeN <= 2 ? 14000 + Math.random() * 10000 : 35000 + Math.random() * 25000));   // al llegar, seguido; luego, espaciado
   }
   /* activa/desactiva las apariciones de inicio (independiente de D.on, que es solo para dentro de una partida) */
   D.homeTease = on => {
     const S = A.core && A.core.S;
     if (D.on && phase() === "title" && S && !S.run) D.enable(false);  // ya en el menu sin expedicion (del veredicto final al inicio): el de la partida se retira, sin seguir hablando por los menus ni ocupar el hueco del veredicto del Clasico
     const was = D.onHome; D.onHome = !!on; clearTimeout(homeT);
-    if (!on) { if (was) { clear(); homeCorner = ""; if (el) el.classList.remove(...HOME_CORNERS, "home"); D.hide(); } return; }   // solo se calla si estaba en el inicio (no pisa al crupier de la partida)
+    if (!on) { if (was) { if (speaking()) D.release(); else { clear(); homeCorner = ""; if (el) el.classList.remove(...HOME_CORNERS, "home"); D.hide(); } } return; }   // a media frase: la acaba y se va   // solo se calla si estaba en el inicio (no pisa al crupier de la partida)
     ensure(); el.classList.remove("hidden");
     if (!was) { entrySince = Date.now(); entryFlags = {}; }
     homeT = setTimeout(homeTick, entry || !homeN ? 2600 + Math.random() * 1200 : 7000 + Math.random() * 6000);   // si trae algo que decirte al llegar, lo dice enseguida
   };
   /* la Aventura avisa de como acaba cada expedicion (se recuerda entre sesiones) y de si sales a medias: marca la proxima llegada al menu */
-  D.noteRun = o => { DS.lastRun = { r: o.r, won: !!o.won, ts: Date.now() }; lastEnd = { r: o.r, won: !!o.won }; entry = "afterRun"; entryAt = Date.now(); if ("daily" in o) curDaily = !!o.daily; saveStore(); };   // o.daily: si la Aventura lo dice (si no, lo sabe por la intro)
+  D.noteRun = o => { DS.lastRun = { r: o.r, won: !!o.won, ts: Date.now(), daily: !!o.daily }; lastEnd = { r: o.r, won: !!o.won }; entry = "afterRun"; entryAt = Date.now(); if ("daily" in o) curDaily = !!o.daily; saveStore(); };   // o.daily: si la Aventura lo dice (si no, lo sabe por la intro)
   D.noteLeave = () => { entry = "left"; entryAt = Date.now(); };
   /* js/salir.js: sales del juego por el boton de encendido (on) o vuelves desde el casino CERRADO sin haber cerrado la pestana (off).
      La proxima vez que abras el juego te lo recuerda nada mas llegar (quitReturn) */
@@ -1049,13 +1529,367 @@ window.AIQ = window.AIQ || {};
     D.say(t, { mood: mood || "sly", hold: holdFor(t) }); return true;
   };
 
+  /* ---------------------------------------------------------------- TANDA 1 de la cuarta pared (v0.19)
+     LE TOCAS LA CARA: en el inicio su retrato se puede pulsar. Respingo, ficha cada vez mas aguda y una frase en el 1.o, 2.o, 3.er y 5.o toque (como mucho
+     una cada 3 s); al quinto se enfada (temblor corto, o apagon con Vibracion = no; nada con "reducir movimiento") y no asoma en un minuto.
+     La sesion siguiente, si fueron 3 o mas, se acuerda (pokeMemory). */
+  let pokeN = 0, pokeSaid = 0;
+  function onPoke(e) {
+    if (!el || !el.classList.contains("home") || !el.classList.contains("in") || D.host || held || pokeN >= 5) return;
+    e.preventDefault(); e.stopPropagation();
+    pokeN++; DS.pokes = pokeN; saveStore();
+    const was = face.src; face.src = "assets/icons/dealer_shock.webp"; setTimeout(() => { if (face.src.endsWith("dealer_shock.webp")) face.src = was; }, 650);
+    face.classList.remove("poked"); A.restyle(face); face.classList.add("poked"); setTimeout(() => face.classList.remove("poked"), 360);
+    if (A.sfx.chip) A.sfx.chip(Math.min(4, pokeN - 1));
+    const idx = { 1: 0, 2: 1, 3: 2, 5: 3 }[pokeN]; if (idx == null || Date.now() - pokeSaid < 3000) return;
+    pokeSaid = Date.now();
+    const S = A.core && A.core.S, reduced = (S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fx = pokeN === 5 && !reduced ? (S && S.shake === false ? "blackout" : "shake") : null;
+    D.say(nth("poke", idx), {                                                          // el respingo es inmediato; la frase, a su turno (nunca se le corta)
+      mood: ["shock", "laugh", "angry", "angry"][idx], hold: holdFor(nth("poke", idx)), fx });
+    if (pokeN === 5) { clearTimeout(homeT); homeT = setTimeout(() => { if (D.onHome) homeTick(); }, 60000 + holdFor("x") + 4000); }
+  }
+
+  /* LUCES DEL CLASICO: te quedas 2,5 s con el raton sobre la carta del Clasico y apaga las bombillas de la suya (la Aventura), en dos tandas con zumbido.
+     Si luego pasas por la Aventura, se encienden de golpe. Una vez por sesion, a la mitad de las sesiones, nunca a novatos ni con el tutorial */
+  const sulkRoll = Math.random() < 0.5;
+  D.watchCards = root => {
+    const cl = root && root.querySelector('.mcard[data-mode="classic"]'), hero = root && root.querySelector(".mcard.hero"); if (!cl || !hero) return;
+    let t = 0;
+    cl.addEventListener("pointerenter", e => {
+      if (e.pointerType !== "mouse" || once.sulk || !sulkRoll || newbie() || tourOn()) return;
+      clearTimeout(t); t = setTimeout(() => {
+        if (once.sulk || !cl.matches(":hover") || !D.onHome || D.busy || !(homeCorner = homeCorner || pickCorner())) return;
+        if (!D.homeSay(say1("sulk"), "angry")) return;
+        once.sulk = 1; hero.classList.add("sulk"); A.sfx.buzz && A.sfx.buzz(0);
+        setTimeout(() => { if (hero.isConnected && hero.classList.contains("sulk")) { hero.classList.add("sulk2"); A.sfx.buzz && A.sfx.buzz(2); } }, 260);
+      }, 2500);
+    });
+    cl.addEventListener("pointerleave", () => clearTimeout(t));
+    hero.addEventListener("pointerenter", () => {
+      if (!hero.classList.contains("sulk")) return;
+      hero.classList.remove("sulk", "sulk2");
+      const b = say1("sulkBack"); if (b) D.say(b, { mood: "laugh", hold: holdFor(b) });
+    });
+  };
+
+  /* BABEL EN DIRECTO: cambias de idioma (portada o Ajustes) y su primera frase sale todavia en el idioma que acabas de dejar; la segunda, ya en el nuevo.
+     Una vez por sesion; si pruebas 3 idiomas en 20 s, otra frase aparte. Entre es y es-419, nada. Si cambias en Ajustes, lo dice al volver al inicio */
+  let langN = 0, langT0 = 0;
+  D.noteLang = (old, cur) => {
+    if (!old || old === cur || (/^es/.test(old) && /^es/.test(cur))) return;
+    const t = Date.now(); if (t - langT0 > 20000) { langT0 = t; langN = 0; } langN++;
+    if (langN >= 3 && !once.babelMany) { once.babelMany = 1; babelPend = { many: true, at: t }; }
+    else if (!once.babel) { once.babel = 1; babelPend = { old, at: t }; }
+    else return;
+    if (D.onHome) { clearTimeout(homeT); homeT = setTimeout(homeTick, 900); }
+  };
+  function babelBeat(b) {
+    if (b.many) return { t: say1("babelMany"), mood: "laugh" };
+    const i = Math.floor(Math.random() * LINES.babelOld.length), o = LINES.babelOld[i], L = b.old;
+    const oldTxt = o[L] || (L === "es-419" && o.es) || o.en; if (!oldTxt) return null;
+    return { chain: [{ t: oldTxt, mood: "shock", lang: L, gap: 700 }, { t: tx6(LINES.babelNew[i % LINES.babelNew.length]), mood: "sly" }] };
+  }
+
+  /* EL LOGRO FALSO: un "Logro desbloqueado" identico a los de verdad, inventado pero con un dato real, al que le cae un sello "De broma" (js/profile.js).
+     Nunca toca los logros de verdad ni Steam. Como mucho uno por sesion y cada 3 sesiones o mas, a la mitad de ellas; nunca a novatos, con menos de
+     5 logros de verdad, con el tutorial o con un logro real en cola. Momentos: vuelves tras quedarte quieto 60 s o mas, o poco despues de volver tras
+     salir por su boton */
+  const fakeRoll = Math.random() < 0.5;
+  const fakeOk = () => fakeRoll && !once.fake && !newbie() && DS.visits - (DS.fakeVisit || -99) >= 3 && A.ach && A.ach.fake && A.ach.count() >= 5 && !A.ach.busy() && !tourOn() && D.onHome && !D.busy;
+  const FAKE = {
+    idle: ["Mirar el techo|Ceiling gazer|Contempler le plafond|Olhar pro teto|Deckenstarrer|Fissare il soffitto||凝视天花板|천장 바라보기|天井を見つめて|Созерцатель потолка|Gapienie w sufit",
+      "{s} s sin tocar el ratón|{s} s without touching the mouse|{s} s sans toucher la souris|{s} s sem tocar no mouse|{s} s ohne die Maus zu berühren|{s} s senza toccare il mouse||{s} 秒没碰鼠标|{s}초 동안 마우스 안 만지기|{s}秒マウスに触れず|{s} с без мыши|{s} s bez dotykania myszy"],
+    door: ["Hijo pródigo|Prodigal son|Le fils prodigue|Filho pródigo|Der verlorene Sohn|Il figliol prodigo||浪子回头|돌아온 탕아|放蕩息子の帰還|Блудный сын|Syn marnotrawny",
+      "Volver después de irte por la puerta ({q} veces)|Come back after leaving through the door ({q} times)|Revenir après être parti par la porte ({q} fois)|Voltar depois de sair pela porta ({q} vezes)|Zurückkommen, nachdem du durch die Tür gegangen bist ({q}-mal)|Tornare dopo essere uscito dalla porta ({q} volte)||从门口离开后又回来（{q}次）|문으로 나갔다가 돌아오기 ({q}번)|ドアから出ていって戻ってくる（{q}回）|Вернуться, уйдя через дверь (раз: {q})|Wrócić po wyjściu przez drzwi (razy: {q})"],
+  };
+  function fakeAch(kind, n) {
+    once.fake = 1; DS.fakeVisit = DS.visits; saveStore();
+    const f = FAKE[kind], d = { s: n, q: n };
+    A.ach.fake({ name: fill(A.pick6(f[0]), d), desc: fill(A.pick6(f[1]), d), then: () => {
+      if (!D.onHome || held || D.host || !(homeCorner = pickCorner())) return;
+      const t = Math.random() < 0.5 ? say1(kind === "idle" ? "fakeAchIdle" : "fakeAchDoor", d) : say1("fakeAch");
+      ensure(); if (t) D.say(t, { mood: "laugh", hold: holdFor(t) });
+    } });
+  }
+
+  /* ---------------------------------------------------------------- TANDA 2 de la cuarta pared (v0.19)
+     EL HISTORIAL DE CADA TRUCO: cada ronda terminada con un truco suma a su marcador (DS.tricks[id] = {s: rondas, w: las que ganaste tu}).
+     En la intro, la primera vez en tu vida que sale, "estreno"; despues, la mitad de las veces, el marcador; en las vueltas 11, 26 y 51, el veterano.
+     A quien ya jugaba antes de que existiera el marcador no se le anuncian estrenos (no sabemos cuales ha visto). Nunca dice que reliquia lo frena */
+  D.noteTricks = (ids, won) => {
+    if (!ids || !ids.length) return; const T = DS.tricks || (DS.tricks = {});
+    ids.forEach(id => { const h = T[id] || (T[id] = { s: 0, w: 0 }); h.s++; if (won) h.w++; }); saveStore();
+  };
+  function trickLine(id) {
+    const T = DS.tricks || (DS.tricks = {}); if (DS.trickVet == null) { DS.trickVet = advRuns() > 1; saveStore(); }
+    const h = T[id] || { s: 0, w: 0 }, c = A.CHAL && A.CHAL[id], name = c ? tx6(c.n) : "";
+    if (!name) return D.line(id);
+    if (!h.s && !DS.trickVet) { const dv = DS.debuted || (DS.debuted = {}); if (!dv[id]) { dv[id] = 1; saveStore(); return say1("trickDebut", { t: name }); } }
+    if ([10, 25, 50].includes(h.s)) return say1("trickVet", { t: name, n: h.s + 1 });
+    if (h.s >= 2 && Math.random() < 0.5) { const house = h.s - h.w; return say1(house >= h.w ? "trickHouse" : "trickYou", { t: name, h: house, y: h.w }); }
+    if (ownSaid[id]) return say1("trickAgain", { t: name });                     // ya dijo su frase hoy: no la repite literal
+    ownSaid[id] = 1; return D.line(id);
+  }
+  const ownSaid = {};
+  /* EL FANTASMA DE TU ULTIMA CAIDA: ghostR = la ronda donde caiste en tu ultima expedicion del mismo modo */
+  let ghostR = 0, ghostSaid = false, virginSaid = false;
+
+  /* TU DATO REAL EN EL TICKET. "Sin mi truco la clavabas": con un truco de puntero (o el vendaval) tu raton estaba cerca y el pin cayo lejos; con un truco
+     de mapa clicaste donde estaria el lugar sin el truco. Como mucho una por ronda y una por truco de mapa y sesion. Y "ese sitio otra vez": un lugar
+     que fallas en 3 sesiones distintas; cuando por fin lo aciertas, se le acaba el chiste. Siempre despues de responder: nunca es una pista */
+  const PTR_T = ["tremble", "lag", "cmirror", "dizzy", "ghost", "blink", "cblur"], MAP_T = ["pangea", "shuffle", "spread", "tilt", "flip", "mirrorx", "spin"];
+  let handRound = "";
+  function answerLine(kind, o) {
+    if (o.nem === "beat") return { t: say1("nemesisBeat", { p: o.place }), mood: "shock" };
+    if (o.nem === "again") return { t: say1("nemesis", { p: o.place, n: o.nemN }), mood: "laugh" };
+    const h = o.hand, ids = o.chal || []; if (!h || handRound === o.rk || o.km == null) return null;
+    const ptr = ids.find(i => PTR_T.includes(i)), wind = ids.includes("wind"), mp = ids.find(i => MAP_T.includes(i));
+    if (kind === "bull" && (ids.includes("ghost") || ids.includes("blink"))) {           // disparaste con el puntero invisible
+      const cv = document.querySelector(".ptr-cv"); if (cv && parseFloat(cv.style.opacity || "1") < 0.15) { handRound = o.rk; return { t: say1("handBlind"), mood: "shock" }; }
+    }
+    if ((ptr || wind) && h.raw <= 300 && o.km >= 150) { handRound = o.rk; return ptr ? { t: say1("handPtr", { p: o.place, raw: A.fmtDist(h.raw), km: A.fmtDist(o.km) }), mood: "laugh" } : { t: say1("handWind", { p: o.place }), mood: "laugh" }; }
+    if (mp && h.plain <= 250 && o.km >= 1500 && !once["map_" + mp]) {
+      handRound = o.rk; once["map_" + mp] = 1;
+      return { t: say1(mp === "pangea" ? "handPangea" : mp === "flip" || mp === "mirrorx" || mp === "spin" ? "handFlip" : "handMap", { p: o.place }), mood: "laugh" };
+    }
+    return null;
+  }
+  const nemSaid = {};
+  D.noteAnswer = o => {
+    if (!o || !o.key) return; const N = DS.nemesis || (DS.nemesis = {}), e = N[o.key];
+    const miss = o.km == null || o.dist < 400, hit = o.km != null && o.dist >= 750;
+    if (miss) {
+      const x = e || (N[o.key] = { n: 0, v: 0 }); x.t = Date.now(); if (o.place) x.p = o.place;
+      if (x.v !== DS.visits) { x.n++; x.v = DS.visits; }
+      if (x.n >= 3 && !nemSaid[o.key]) { nemSaid[o.key] = 1; o.nem = "again"; o.nemN = x.n; }
+    } else if (hit && e && e.n >= 3) { delete N[o.key]; o.nem = "beat"; }
+    const ks = Object.keys(N); if (ks.length > 80) ks.sort((a, b) => (N[a].t || 0) - (N[b].t || 0)).slice(0, ks.length - 80).forEach(k => delete N[k]);
+    saveStore();
+  };
+
+  /* SU LIBRETA EN EL PERFIL: al abrirlo (como mucho cada 2 min) te cuenta lo que ha cambiado desde tu ultima visita; si no hay nada que contar, una de cada
+     tres veces una casilla se da la vuelta como una carta y enseña SU estadistica (la que el Perfil no enseña) durante 5 s. Asoma abajo a la izquierda */
+  const BOOK = {
+    clock: ["Relojes perdidos|Timeouts|Chronos perdus|Relógios perdidos|Verpasste Uhren|Tempo scaduto||超时次数|시간 초과|時間切れ|Время вышло|Stracony czas", "a_flame", "pfBookClock"],
+    door: ["Te has ido|Times you left|Départs|Saídas|Abgänge|Uscite||离场次数|나간 횟수|退場回数|Уходы|Wyjścia", "a_target", "pfBookDoor"],
+    coins: ["Doblones ganados|Doubloons won|Doublons gagnés|Dobrões ganhos|Gewonnene Dublonen|Dobloni vinti||赢得的金币|획득한 도블론|獲得ダブロン|Выиграно дублонов|Wygrane dublony", "crown", "pfBookCoins"],
+    km: ["Km fallados|Km missed|Km ratés|Km errados|Verfehlte km|Km sbagliati||偏差总距离|빗나간 거리|外した距離|Мимо, км|Chybione km", "a_lens", "pfBookKm"],
+  };
+  let pfAt = -1e9;
+  D.profile = () => {
+    const now = Date.now(); if (now - pfAt < 120000 || HOME_MQ.matches) return; pfAt = now;
+    const P = A.profile.get(), s = P.stats, n = s.questions - s.timeouts, avg = n > 0 ? s.km / n : 0, snap = DS.pfSnap;
+    DS.pfSnap = { q: s.questions, b: s.bulls, a: avg }; saveStore();
+    let line = null, flip = null;
+    if (snap && s.questions - snap.q >= 15 && snap.a > 0) {
+      const dq = s.questions - snap.q, db = Math.max(0, s.bulls - snap.b), dk = avg - snap.a;
+      if (dk <= -1) line = { t: say1("pfDiffGood", { q: A.fmt(dq), b: A.fmt(db), k: A.fmtDist(-dk) }), mood: "shock" };
+      else if (dk >= 1) line = { t: say1("pfDiffBad", { q: A.fmt(dq), k: A.fmtDist(dk) }), mood: "laugh" };
+    }
+    if (!line && Math.random() < 0.34) {
+      const quits = ((A.salir && A.salir.stats && A.salir.stats()) || {}).quits || 0;
+      const vals = { clock: s.timeouts >= 3 && A.fmt(s.timeouts), door: quits >= 1 && A.fmt(quits), coins: (P.adv.coins || 0) >= 20 && A.fmt(P.adv.coins), km: s.km >= 5000 && A.fmtDist(s.km) };
+      const ks = Object.keys(vals).filter(k => vals[k]);
+      if (ks.length) { const k = rand(ks); flip = { k, v: vals[k] }; line = { t: say1(BOOK[k][2], { n: vals[k] }), mood: "sly" }; }
+    }
+    if (!line || !line.t) return;
+    setTimeout(() => { if (!document.querySelector("#dlg .s-prof")) return; if (flip) flipCell(flip); screenSay(line.t, line.mood); }, 700);
+  };
+  function flipCell(f) {
+    const b = BOOK[f.k], cell = document.querySelector(`#dlg .pf-grid .ic-${b[1]}`); const c = cell && cell.closest(".pf-cell"); if (!c) return;
+    const S = A.core && A.core.S, reduced = (S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lab = c.querySelector("span"), val = c.querySelector("b"), was = [lab.textContent, val.textContent];
+    const turn = (to, after) => {
+      if (reduced) { to(); after && after(); return; }
+      const a = c.animate([{ transform: "perspective(600px) rotateY(0)" }, { transform: "perspective(600px) rotateY(90deg)" }], { duration: 160, easing: "ease-in" });
+      a.onfinish = () => { to(); c.animate([{ transform: "perspective(600px) rotateY(-90deg)" }, { transform: "perspective(600px) rotateY(0)" }], { duration: 180, easing: "ease-out" }); after && after(); };
+    };
+    turn(() => { lab.textContent = A.pick6(b[0]); val.textContent = f.v; c.classList.add("book"); A.sfx.card(); });
+    setTimeout(() => { if (c.isConnected) turn(() => { lab.textContent = was[0]; val.textContent = was[1]; c.classList.remove("book"); }); }, 5600);
+  }
+  function screenSay(t, mood, done) {
+    if (!t || held || D.host || D.busy || tourOn()) return false;
+    ensure(); el.classList.remove("hidden"); D.say(t, { mood, hold: done ? 0 : holdFor(t), force: true, screen: true, done }); return true;
+  }
+
+  /* EN PLENA PREGUNTA: intentas copiar (Ctrl+C) o haces clic derecho. Una vez por sesion cada una; responde aunque estes pensando (lo has provocado tu) */
+  addEventListener("keydown", e => {
+    if (!(e.ctrlKey || e.metaKey) || String(e.key).toLowerCase() !== "c" || once.copy) return;
+    const S = A.core && A.core.S; if (!D.on || !S || S.phase !== "asking" || D.host) return;
+    if (e.repeat) return;                                                             // el juego no deja seleccionar texto: basta con que lo intentes
+    once.copy = 1; const t = say1("copyName"); if (t) D.say(t, { mood: "sly", hold: holdFor(t) });
+  }, true);
+  addEventListener("contextmenu", () => {
+    const S = A.core && A.core.S; if (once.rclick || !D.on || !S || S.phase !== "asking" || D.host) return;
+    once.rclick = 1; const t = say1("rightClick"); if (t) D.say(t, { mood: "laugh", hold: holdFor(t) });
+  });
+
+  /* TU MUNDO DE VERDAD: novedades que llegan cuando llegan (bateria, siesta). Esperan a un buen momento: en el inicio, o en la partida fuera de la
+     pregunta y de la intro; como mucho 10 min, despues se descartan */
+  function newsSay(t, mood) {
+    if (!t) return; const t0 = Date.now();
+    const tryNow = () => {
+      if (Date.now() - t0 > 600000) return;
+      const S = A.core && A.core.S, ph = phase();
+      if (!held && !D.busy && !D.host && !tourOn()) {
+        if (D.onHome && document.querySelector(".hh") && (homeCorner = pickCorner())) { ensure(); D.say(t, { mood, hold: holdFor(t) }); return; }
+        if (D.on && S && S.run && ph !== "asking" && ph !== "intro" && ph !== "shop") { D.say(t, { mood, hold: holdFor(t) }); return; }
+      }
+      setTimeout(tryNow, 3000);
+    };
+    tryNow();
+  }
+  try {                                                                               // la bateria del portatil: solo si baja del 10 % sin cargar (una vez por sesion)
+    if (navigator.getBattery) navigator.getBattery().then(b => {
+      const chk = () => { if (once.bat || b.charging || !(b.level <= 0.1)) return; once.bat = 1; newsSay(say1("batteryReal", { p: Math.round(b.level * 100) }), "shock"); };
+      b.addEventListener("levelchange", chk); b.addEventListener("chargingchange", chk); chk();
+    }).catch(() => {});
+  } catch (e) { /* sin API de bateria */ }
+  /* la siesta: si el latido se para mas de 5 min, el ordenador estuvo suspendido (tapa cerrada). Ese rato no cuenta como tiempo jugado */
+  const UNIT = { zh: ["小时", "分钟", "", ""], ja: ["時間", "分", "", ""], ko: ["시간", "분", "", " "], de: ["Std.", "Min.", " ", " "], ru: ["ч", "мин", " ", " "] };
+  const durTxt = ms => { const m = Math.max(1, Math.round(ms / 60000)), h = Math.floor(m / 60), r = m % 60, u = UNIT[A.lang] || ["h", "min", " ", " "], p = []; if (h) p.push(h + u[2] + u[0]); if (r || !h) p.push(r + u[2] + u[1]); return p.join(u[3]); };
+  let beatAt = Date.now();
+  setInterval(() => {
+    const now = Date.now(), gap = now - beatAt; beatAt = now;
+    if (gap < 300000) return;
+    if (!hidAt) hidAcc += gap;                                                       // dormido con la ventana "a la vista": no es tiempo de juego
+    if (!once.nap) { once.nap = 1; newsSay(say1("napWake", { t: durTxt(gap) }), "angry"); }
+  }, 5000);
+
+  /* ---------------------------------------------------------------- TANDA 3 (v0.19): EL CAMPAMENTO. Se sienta al otro lado de la mesa: asoma en el hueco
+     libre a la izquierda de las cartas (lo mide campRoom; si no cabe un retrato de 110 px y su globo, esa vez no habla) y solo mientras habla.
+     Al llegar: con tus datos (40 % de las visitas normales; siempre antes del jefe, en la revancha, sin dinero o en un acto nuevo). Y responde a lo que
+     haces: dudar entre cartas, intentar comprar sin fondos, barajar, tu reliquia de siempre, irte sin comprar. Nunca dice que carta sirve para que */
+  let campAt = 0, doubtN = 0, doubtLast = -1, doubtSaid = false, fundsSaid = false, campBox = null;
+  function campRoom() {
+    const of = document.querySelector("#dlg .offers"), first = of && of.querySelector(".offer"), app = $("app"); if (!of || !first || !app) return null;
+    const R = of.getBoundingClientRect(), f = first.getBoundingClientRect(), A0 = app.getBoundingClientRect();
+    const room = Math.floor(f.left - R.left - 24), hf = Math.min(200, Math.round(room * 0.6), Math.round(R.height - 110));
+    if (room < 200 || hf < 110) return null;
+    return { l: Math.round(R.left - A0.left + 6), b: Math.round(A0.bottom - R.bottom + 4), hf, hb: Math.min(380, room) };
+  }
+  function campSay(t, mood) {
+    if (!t || held || D.host || tourOn() || HOME_MQ.matches || phase() !== "shop") return false;
+    const box = campRoom(); if (!box) return false;
+    ensure(); campBox = box; el.classList.remove("hidden"); D.say(t, { mood: mood || "sly", hold: holdFor(t), force: true, camp: true }); return true;
+  }
+  D.campArrive = x => {
+    campAt = Date.now(); doubtN = 0; doubtLast = -1; doubtSaid = fundsSaid = false;
+    if (x.chest) return;
+    let t = null, mood = "sly";
+    if (x.boss && x.bossName) { t = say1("campBoss", { j: x.bossName }); mood = "boss"; }
+    else if (x.retry) t = say1("campRetry", { r: x.r });
+    else if (x.newAct) t = say1("campAct");
+    else if (x.coins < x.cheapest) { t = x.coins < 2 ? nth("campNoFunds", 0) : say1("campBroke", { c: x.coins }); mood = "laugh"; }
+    else if (!x.n) t = say1("campClean", { r: x.r });
+    else if (Math.random() < 0.4) t = x.n === 1 ? say1("campArrive1", { c: x.coins, r: x.r }) : say1("campArrive", { c: x.coins, n: x.n, r: x.r });
+    if (t) setTimeout(() => campSay(t, mood), 900);
+  };
+  D.campHover = i => {                                                                // pasas de una carta a otra sin decidirte
+    if (doubtSaid || i === doubtLast) return; doubtLast = i; doubtN++;
+    if (doubtN >= 5 && Date.now() - campAt > 8000 && !D.busy) { doubtSaid = true; campSay(say1("campDoubt"), "laugh"); }
+  };
+  D.campNoFunds = c => { if (fundsSaid) return; fundsSaid = true; campSay(c < 2 ? nth("campNoFunds", 0) : say1("campNoFunds", { c }), "laugh"); };   // con 1 doblon, la frase sin numero (nada de "1 doblones")
+  D.campShell = () => campSay(say1("campShell"), "laugh");
+  D.campSkip = c => campSay(say1("campSkip", { c }), "sly");                           // te vas sin comprar: la frase se va contigo a la intro (D.dock se la lleva)
+  D.campBought = (id, name, seed) => {                                                // tu reliquia de siempre: la misma en 3 (y 6) expediciones distintas
+    const R0 = DS.relics || (DS.relics = {}), e = R0[id] || (R0[id] = { n: 0, s: "" });
+    if (e.s !== seed) { e.n++; e.s = seed; saveStore(); if (e.n === 3 || e.n === 6) setTimeout(() => campSay(say1("campHabit", { p: name }), "laugh"), 400); }
+  };
+  D.chestStuck = () => { const t = say1("chestStuck"); if (t) D.say(t, { mood: "laugh", hold: holdFor(t) }); };
+  /* SOLO HAY UN CRUPIER: abres el juego otra vez con el primero abierto; Electron trae esta ventana al frente y avisa (preload: onAgain) */
+  let againAt = 0;
+  if (window.geoliteHost && window.geoliteHost.onAgain) window.geoliteHost.onAgain(() => { if (Date.now() - againAt < 600000) return; againAt = Date.now(); newsSay(say1("secondWin"), "shock"); });
+
+  /* ---------------------------------------------------------------- TANDA 4 (v0.19)
+     SE QUEDA TRASPUESTO: tras decirte "¿sigues ahi?" en la portada se duerme (sin globo, con unas Z que suben) hasta que vuelvas a tocar algo;
+     entonces se despierta de golpe con una excusa (o, a veces, con el logro falso de mirar el techo) */
+  function startDoze() {
+    if (!el || !D.onHome || !afkAt || lastInput > afkAt) return;
+    dozing = true; bubble.classList.remove("on"); el.classList.add("doze"); face.src = "assets/icons/dealer_neutral.webp";
+    if (!el.querySelector(".dl-zz")) { const z = document.createElement("span"); z.className = "dl-zz"; z.setAttribute("aria-hidden", "true"); z.innerHTML = "<i>Z</i><i>Z</i><i>z</i>"; el.appendChild(z); }
+    clearTimeout(homeT); homeT = setTimeout(homeTick, 1000);                         // mientras duerme, mira cada segundo si has vuelto
+  }
+  function wakeUp() {
+    const idle = Math.round((lastInput - afkFrom) / 1000); afkAt = 0; D.hide();
+    if (idle >= 60 && fakeOk()) { fakeAch("idle", idle); return; }
+    if (!(homeCorner = homeCorner || pickCorner())) return;
+    const t = say1("wake"); if (t) { ensure(); D.say(t, { mood: "shock", hold: holdFor(t) }); }
+  }
+  /* CORRIGE EL LEMA: tacha "¿Sabes donde queda?" con tinta roja y escribe al lado "Yo si." (se arregla solo al repintar la portada) */
+  function tagFix() {
+    const tag = document.querySelector(".hh .hh-tag"); if (!tag || tag.querySelector(".tag-fix")) return false;
+    tag.innerHTML = `<s class="tag-x">${tag.innerHTML}</s> <b class="tag-fix">${A.pick6("Yo sí.|I do.|Moi, oui.|Eu sei.|Ich schon.|Io sì.||我知道。|난 알지.|私は知ってる。|Я знаю.|Ja wiem.")}</b>`;
+    A.sfx.card(); return true;
+  }
+  /* LA PAUSA: te espera en el velo (una frase cada 10 min como mucho) y, si la pausa pasa de 2 min, lo comenta al volver (una vez por sesion).
+     La pausa automatica al cambiar de ventana no cuenta */
+  let pauseAt0 = 0, pauseSaidAt = -1e9;
+  D.notePause = p => {
+    if (!D.on || D.host || document.hidden) { pauseAt0 = 0; return; }
+    if (p) { pauseAt0 = Date.now(); if (Date.now() - pauseSaidAt > 600000 && !D.busy) { pauseSaidAt = Date.now(); const t = say1("pauseWait"); if (t) D.say(t, { mood: "sly", hold: holdFor(t) }); } return; }
+    const d = pauseAt0 ? Date.now() - pauseAt0 : 0; pauseAt0 = 0;
+    if (d > 120000 && !once.pauseBack) { once.pauseBack = 1; const t = say1("pauseBack", { t: durTxt(d) }); if (t) D.say(t, { mood: "laugh", hold: holdFor(t) }); }
+  };
+  /* LA ENCICLOPEDIA: al abrirla (como mucho cada 2 min) tu ritmo real; la primera vez, cuantas tienes; a veces, que no has traido ninguna.
+     Y de vez en cuando (desde la 3.a visita, cada 4 o mas, a la mitad) te ensena una bloqueada 3 s y te la quita. Si pulsas 3 bloqueadas, la cerradura es suya */
+  let cxAt = -1e9;
+  D.codexOpen = api => {
+    const now = Date.now(); if (now - cxAt < 120000 || HOME_MQ.matches) return; cxAt = now;
+    const st = api.stats(), snap = DS.cxSnap; DS.cxSnap = { u: st.u, t: now }; DS.cxN = (DS.cxN || 0) + 1; saveStore();
+    if (DS.cxN >= 3 && DS.cxN - (DS.cxTease || -9) >= 4 && Math.random() < 0.5 && api.tease()) { DS.cxTease = DS.cxN; saveStore(); screenSay(say1("cxTease"), "sly"); return; }
+    let t = null;
+    if (!snap) t = say1("cxFirst", { u: A.fmt(st.u), t: A.fmt(st.t) });
+    else {
+      const n = st.u - snap.u, days = Math.max(1, (now - snap.t) / 86400000);
+      if (n >= 5) { const y = new Date(now + ((st.t - st.u) / (n / days)) * 86400000).getFullYear(); t = y <= new Date().getFullYear() + 30 ? say1("cxPace", { n: A.fmt(n), y }) : say1("cxPaceSlow", { n: A.fmt(n) }); }
+      else if (n === 0 && Math.random() < 0.34) t = say1("cxNothing");
+    }
+    if (t) screenSay(t, "sly");
+  };
+  D.codexLock = n => { if (n >= 3 && !once.lock) { once.lock = 1; screenSay(say1("lockMine"), "angry"); } };
+  /* SU EXPEDIENTE (Ajustes > Datos): lo que ya guarda de ti, a la vista. La primera vez que lo abres, lo comenta */
+  const FILE = {
+    title: "Lo que el crupier sabe de ti|What the dealer knows about you|Ce que le croupier sait de toi|O que o crupiê sabe de você|Was der Croupier über dich weiß|Cosa sa di te il croupier||荷官对你的了解|딜러가 너에 대해 아는 것|ディーラーが知っている君のこと|Что крупье знает о тебе|Co krupier o tobie wie",
+    visits: "Visitas|Visits|Visites|Visitas|Besuche|Visite||来访次数|방문|来店回数|Визиты|Wizyty",
+    hours: "Horas juntos|Hours together|Heures ensemble|Horas juntos|Stunden zusammen|Ore insieme||共处时长|함께한 시간|一緒の時間|Часов вместе|Godziny razem",
+    since: "Nos conocemos desde|Known you since|On se connaît depuis|A gente se conhece desde|Wir kennen uns seit|Ci conosciamo dal||相识于|알고 지낸 날|出会った日|Знакомы с|Znamy się od",
+    streak: "Días seguidos|Days in a row|Jours d'affilée|Dias seguidos|Tage am Stück|Giorni di fila||连续天数|연속 일수|連続日数|Дней подряд|Dni z rzędu",
+    door: "Salidas por mi puerta|Exits through my door|Sorties par ma porte|Saídas pela minha porta|Abgänge durch meine Tür|Uscite dalla mia porta||从我的门离开|내 문으로 나간 횟수|私のドアから退場|Уходы через мою дверь|Wyjścia przez moje drzwi",
+    stays: "Veces que te quedaste|Times you stayed|Fois où tu es resté|Vezes que você ficou|Mal geblieben|Volte che sei rimasto||留下来的次数|남아준 횟수|残った回数|Сколько раз остался|Ile razy zostałeś",
+    tricks: "Trastadas que te he hecho|Pranks I've pulled on you|Coups tordus que je t'ai faits|Travessuras que fiz com você|Streiche, die ich dir gespielt habe|Scherzi che ti ho fatto||我对你搞的恶作剧|너한테 친 장난|君へのいたずら|Мои проделки над тобой|Psikusy, które ci zrobiłem",
+    nemesis: "Tu lugar némesis|Your nemesis place|Ton lieu ennemi juré|Seu lugar nêmesis|Dein Erzfeind-Ort|Il tuo luogo nemesi||你的宿敌地点|네 천적 장소|君の宿敵の場所|Твоё место-враг|Twoje miejsce-nemezis",
+    hour: "Tu hora habitual|Your usual time|Ton heure habituelle|Seu horário de sempre|Deine übliche Uhrzeit|Il tuo orario abituale||你常来的时间|네가 주로 오는 시간|いつもの時間|Твоё обычное время|Twoja zwykła pora",
+  };
+  D.renderFile = host => {
+    if (!host) return;
+    const q = (A.salir && A.salir.stats && A.salir.stats()) || {}, N = DS.nemesis || {}, H = DS.hours || [];
+    const nem = Object.values(N).filter(x => x.n >= 2 && x.p).sort((a, b) => b.n - a.n)[0], hi = H.length ? H.indexOf(Math.max(...H)) : -1;
+    const L = (A.LANGS || []).find(l => l.code === A.lang), loc = L ? L.loc : undefined;
+    let since = "—"; try { since = new Date(DS.first || Date.now()).toLocaleDateString(loc, { day: "numeric", month: "short", year: "numeric" }); } catch (e) { /* formato */ }
+    const rows = [["visits", A.fmt(DS.visits || 1)], ["hours", A.fmt(Math.floor((DS.playMs || 0) / 3600000)) + " h"], ["since", since], ["streak", A.fmt(DS.streak || 1)],
+      ["door", A.fmt(q.quits || 0)], ["stays", A.fmt(q.stays || 0)], ["tricks", A.fmt(q.trolls || 0)], ["nemesis", nem ? nem.p : "—"], ["hour", hi >= 0 && H[hi] > 1 ? String(hi).padStart(2, "0") + ":00" : "—"]];
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    host.innerHTML = `<h3 class="dlf-h">${A.icon("dealer_neutral", "sm")}<span>${esc(A.pick6(FILE.title))}</span></h3><div class="dlf">${rows.map(([k, v]) => `<div class="dlf-r"><span>${esc(A.pick6(FILE[k]))}</span><b>${esc(v)}</b></div>`).join("")}</div>`;
+    if (!DS.fileSeen) { DS.fileSeen = 1; saveStore(); setTimeout(() => screenSay(say1("fileFirst"), "sly"), 500); }
+  };
+  /* TE OLVIDA DE VERDAD: "Borrar todos mis datos". Se despide (sin que se le corte: el borrado espera a su frase) y deja de guardar nada; al volver,
+     la presentacion de primera vez empieza con un deja vu */
+  D.forget = cb => {
+    forgotten = true; let done = false; const go = () => { if (done) return; done = true; cb && cb(); };
+    try { localStorage.setItem("atlasiq-dejavu", "1"); } catch (e) { /* sin almacenamiento */ }
+    const t = say1("forgetBye"); if (!t || !screenSay(t, "sly", () => setTimeout(go, 300))) go();
+    setTimeout(go, 9000);                                                             // red de seguridad
+  };
+
   /* ---------------------------------------------------------------- la cuarta pared en vivo: vuelves de otra ventana, cambias el tamaño */
   let hidPhase = "", backAt = 0;
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) { hidAt = Date.now(); hidPhase = phase(); saveStore(); return; }
     if (!hidAt) return; const away = Date.now() - hidAt; hidAcc += away; hidAt = 0; onBack(away);
   });
-  addEventListener("pagehide", saveStore);
+  addEventListener("pagehide", () => { DS.live = 0; if (!DS.quitAt) DS.end = "x"; DS.lastLen = activeMs(); saveStore(); });   // cerrar la ventana (X, Alt+F4): la proxima vez lo sabe
   function onBack(away) {
     const S = A.core && A.core.S, now = Date.now(); if (!S || S.booting || now - backAt < 180000) return;
     if (D.on && S.run && hidPhase === "asking" && away >= 2500 && !D.host && !tourOn()) {            // te fuiste en plena pregunta: "yo no he visto nada"
@@ -1080,7 +1914,7 @@ window.AIQ = window.AIQ || {};
   }
 
   /* ---------------------------------------------------------------- dentro de la expedicion */
-  let runT = 0, lastRunCat = "", runN = 0, dangerKey = "";
+  let beatRound = "", runT = 0, lastRunCat = "", runN = 0, dangerKey = "";
   /* lo que dice al entrar en cada ronda: primero el contexto (primera expedicion, revancha, reto diario, reanudada, reintento, nuevo acto,
      jefe, jefe final, modo infinito), luego si te queda una sola provision, y despues sus trucos. La Aventura le pasa el estado. */
   D.introSeq = o => {
@@ -1088,7 +1922,14 @@ window.AIQ = window.AIQ || {};
     const lr = DS.lastRun, runs = advRuns();
     curDaily = !!o.ranked;
     if (o.fresh || o.resumed) { runN = 0; if (entry === "afterRun" || entry === "left") entry = ""; }   // ya juegas otra: lo de "vuelves al menu tras la anterior" caduca (si la abandonas no te la recuerda)
-    if (o.resumed) add(say1("runResume"));
+    if (o.fresh) { ghostR = lr && !lr.won && lr.r >= 2 && !!lr.daily === !!o.ranked ? lr.r : 0; ghostSaid = virginSaid = false; }   // donde caiste la ultima vez (mismo modo)
+    let special = null;                                                               // el fantasma de tu ultima caida o territorio nuevo: sustituye a la frase de contexto
+    if (!o.inf && !o.resumed && !o.fresh && !(o.attempt > 0)) {
+      if (ghostR && o.rn === ghostR && !ghostSaid) { ghostSaid = true; special = say1("ghostFall", { r: o.rn }); }
+      else if (o.virgin && !virginSaid) { virginSaid = true; special = say1("virgin", { r: o.rn }); }
+    }
+    if (special) add(special, "sly");
+    else if (o.resumed) add(say1("runResume"));
     else if (o.inf) add(say1("infinite"), "laugh");
     else if (o.fresh) {
       if (runs <= 1) { add(nth("runFirst", 0)); add(nth("runFirst", 1), "laugh"); }
@@ -1099,10 +1940,10 @@ window.AIQ = window.AIQ || {};
     else if (o.attempt > 0) add(say1("retry"), "laugh");
     else if (o.round === 0 && o.act === 1) add(say1("act2"));
     else if (o.round === 0 && o.act === 2) add(say1("act3"));
-    if (o.boss && !o.inf) add(o.last ? say1("finalBoss") : D.line("boss"), "boss");
-    if (!seq.length) add(D.line(o.chal.length ? "deal" : "calm"));
+    if (o.boss && !o.inf) add(o.last ? say1("finalBoss") : o.bossName && Math.random() < 0.7 ? say1("bossNamed", { j: o.bossName }) : D.line("boss"), "boss");
+    if (!seq.length) { const k = o.chal.length ? "deal" : "calm"; if (!once[k]) { once[k] = 1; add(D.line(k)); } }   // una vez por sesion: luego hablan los trucos
     if (o.lives === 1 && !o.inf) { dangerKey = o.act + ":" + o.round + ":" + o.attempt; add(say1("runDanger"), "laugh"); }
-    o.chal.slice(0, seq.length > 1 ? 1 : o.boss ? 3 : 2).forEach(id => add(D.line(id)));
+    o.chal.slice(0, seq.length > 1 ? 1 : o.boss ? 3 : 2).forEach(id => add(trickLine(id)));
     if (o.counters) add(pickLine("counter"), "angry");
     return seq;
   };
@@ -1116,7 +1957,7 @@ window.AIQ = window.AIQ || {};
     if (runN === 0) return { t: say1(stage) };                                      // la primera de cada expedicion habla de la expedicion
     if (nameOk(0.12)) { nameUse(); return { t: say1("nameRun"), mood: rand(["sly", "laugh"]) }; }   // muy de vez en cuando, por tu nombre
     const meta = runN >= 2 && metaBeat(0.5); if (meta) return meta;
-    const pool = [stage, stage, stage, "runIdle", "runIdle", "runMeta", "runMeta", "homeTrivia"]; if (lateHour()) pool.push("homeTimeNight");
+    const pool = [stage, stage, "runIdle", "runMeta", "runMeta", "runMeta"]; if (lateHour()) pool.push("homeTimeNight");   // mas cuarta pared, sin trivia mientras piensas
     let cat = rand(pool); if (cat === lastRunCat && pool.some(p => p !== cat)) cat = rand(pool.filter(p => p !== cat)); lastRunCat = cat;
     return { t: say1(cat) };
   }
@@ -1124,9 +1965,12 @@ window.AIQ = window.AIQ || {};
     if (!D.on) return;
     const S = A.core && A.core.S, r = S && S.run;
     if (!r || S.phase !== "asking" || S.paused || (S.qi || 0) < 1 || D.busy || D.host || tourOn()) { runT = setTimeout(runTick, 3000); return; }
+    const rk = r.act + ":" + r.round + ":" + (r.attempt || 0), left = S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000;
+    if (rk === beatRound || calmNow() || sinceSaid() < 20000 || left < S.limit * 0.5) { runT = setTimeout(runTick, 3000); return; }   // uno por ronda, con calma y con tiempo de sobra
+    beatRound = rk;
     const b = runBeat(r, S); runN++;
     if (b && b.t) D.say(b.t, { mood: b.mood || rand(["sly", "laugh"]), hold: 3800 + b.t.length * 22 });
-    runT = setTimeout(runTick, 26000 + Math.random() * 24000);
+    runT = setTimeout(runTick, 45000 + Math.random() * 30000);
   }
 
   /* reacciones a lo que pasa en la mesa */
@@ -1139,9 +1983,14 @@ window.AIQ = window.AIQ || {};
   };
   D.react = (kind, o = {}) => {
     if (!D.on || D.host) return; const ph = phase(); if (ph === "shop" || ph === "title" || ph === "intro") return;
+    const sp = o.place ? answerLine(kind, o) : null;                                  // tu dato real manda: sustituye a la reaccion normal (y no se tira a los dados)
+    if (sp) { if (typing || pend) return; if (sp.t) D.say(sp.t, { mood: sp.mood, valid: o.valid, hold: holdFor(sp.t) }); return; }
+    if (kind === "quiet") return;
+    if (kind === "roundWin" && ghostR && o.rn === ghostR) { ghostR = 0; const t = say1("ghostBeat", { r: o.rn }); if (t) { D.say(t, { mood: "shock" }); return; } }   // superas la ronda donde caiste
     const big = kind === "roundWin" || kind === "roundFail" || kind === "runWin" || kind === "runLose";
     if (!big && (Date.now() < quietUntil || typing || pend)) return;                    // acaba de decir algo que no conviene pisar, o aun lo esta diciendo (las pequenas no esperan: llegarian tarde)
-    const p = { bull: 0.9, miss: 0.85, timeout: 1, good: 0.35, streak: 0.5, counter: 1, roundWin: 1, roundFail: 1, runWin: 1, runLose: 1 }[kind];
+    if (!big && kind !== "counter" && (calmNow() || sinceSaid() < BUDGET.smallGap)) return;   // el presupuesto: las pequenas no se amontonan
+    const p = { bull: 0.8, miss: 0.55, timeout: 0.75, good: 0.2, streak: 0.4, counter: 1, roundWin: 1, roundFail: 1, runWin: 1, runLose: 1 }[kind];
     if (p == null || Math.random() > p) return;
     const reduced = (A.core && A.core.S && A.core.S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;   // como los jackpots: sin movimiento, sin rabieta (ni frase que prometa un efecto que no llega)
     if (kind === "roundWin" && !reduced && Math.random() < 0.22) {
@@ -1158,7 +2007,7 @@ window.AIQ = window.AIQ || {};
       : pickLine(kind);                                                                             // de la bolsa: sin repetir la misma dos veces seguidas
     if (!line) return;
     let t = tx6(line); if (nameOk(0.06)) { nameUse(); t = voc(t); }                              // v0.37: muy de vez en cuando, "Nombre… ¡ja, ja!"
-    D.say(t, { mood });
+    D.say(t, { mood, valid: o.valid });                                     // o.valid: si espera turno y ya estas en otra pregunta, no se dice
   };
   /* v0.37: tras preguntarte el nombre en el veredicto, solo la invitacion a jugar otra (la reaccion ya la ha tapado la pregunta) */
   D.tempt = o => { if (!D.on || D.host || held) return; o = o || {}; const t = say1(o.record ? "runAgainRecord" : o.won ? "runAgainWin" : "runAgainLose", { r: o.r }); if (t) D.say(t, { mood: "sly", hold: holdFor(t) }); };

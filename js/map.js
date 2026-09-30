@@ -698,9 +698,12 @@ void main(){
     _pinchState() { const [a, b] = [...this.pointers.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; }
     _tap(px, py) {
       if (!this.pickEnabled) return;
+      const rx = px, ry = py;
       const ef = A.pointer && A.pointer.effective && A.pointer.effective(); if (ef) { px = ef[0]; py = ef[1]; }     // el puntero puede tener retos (temblor, retraso, invertido...)
       let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); const [lon, lat] = unproject(x, y);
       if (lon < -180 || lon > 180 || lat > 90 || lat < -90) return;
+      /* para el crupier (js/dealer.js): donde estaba tu raton de verdad y donde habrias clicado en el mapa sin girar ni mover continentes */
+      try { const v = this.viewJ || this.view; this.lastTap = { raw: ef ? this.screenToLonLat(rx, ry) : [lon, lat], plain: unproject(v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s), at: performance.now() }; } catch (e) { this.lastTap = null; }
       this.onPick(lon, lat);
     }
 

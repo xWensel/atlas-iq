@@ -381,6 +381,12 @@ window.AIQ = window.AIQ || {};
     ids.delete(e.id); return [...ids].slice(0, 14);
   }
   function openDetail(id) {
+    if (E[id] && !isUnlocked(id)) {                                                  // pulsas tarjetas bloqueadas: a la 3.a, la cerradura es suya
+      ui.lockN = (ui.lockN || 0) + 1;
+      if (ui.lockN >= 3) setTimeout(() => { const k = document.querySelector("#cxBig .cx-art .ic"); const S = A.core && A.core.S;
+        if (k && !((S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches)) k.animate([{ transform: "none" }, { transform: "rotate(-12deg)" }, { transform: "rotate(10deg)" }, { transform: "rotate(-6deg)" }, { transform: "none" }], { duration: 420 });
+        if (A.dealer && A.dealer.codexLock) A.dealer.codexLock(ui.lockN); }, 150);
+    }
     ui.cur = id; const e = E[id]; store.seen[id] = 1; save(); A.sfx.card();
     $("cxDetail").classList.remove("hidden"); $("cxGrid").classList.add("hidden"); $("cxFilters").classList.add("hidden"); document.querySelector("#codex .cx-tools").classList.add("hidden");
     renderDetail(id); $("cxDetail").scrollTop = 0;
@@ -459,14 +465,35 @@ window.AIQ = window.AIQ || {};
   }
 
   /* ---------------- abrir / cerrar / aviso de tarjeta nueva ---------------- */
+  /* el crupier de la portada no habla encima de la Enciclopedia: se retira al abrirla y vuelve a asomar al cerrarla (como con el podio, js/podio.js) */
+  let dealerWas = false;
   function open(id) {
+    if (!isOpen() && A.dealer && A.dealer.homeTease) { dealerWas = !!A.dealer.onHome; if (dealerWas) A.dealer.homeTease(false); }
     buildUI(); const root = $("codex"); root.classList.remove("hidden"); document.body.classList.add("cx-on"); labels(); ui.cur = null; if (A.coverMap) A.coverMap("codex", true, isOpen);
     $("cxDetail").classList.add("hidden"); $("cxGrid").classList.remove("hidden"); $("cxFilters").classList.remove("hidden"); document.querySelector("#codex .cx-tools").classList.remove("hidden");
     renderGrid(true); root.tabIndex = -1;
     requestAnimationFrame(() => setTimeout(() => { if (isOpen()) root.focus({ preventScroll: true }); }, 0));   // el foco, ya pintada: dado al instante obligaba a maquetar la Enciclopedia entera a medio abrir
     if (id && E[id]) openDetail(id); else A.sfx.card();                 // openDetail ya suena: no montar dos sonidos
+    ui.lockN = 0;
+    if (!id && A.dealer && A.dealer.codexOpen) setTimeout(() => { if (isOpen() && !ui.cur) A.dealer.codexOpen({ stats, tease }); }, 900);   // el crupier: tu ritmo, o te ensena una bloqueada
   }
-  function close() { const r = $("codex"); if (r) r.classList.add("hidden"); document.body.classList.remove("cx-on"); if (A.coverMap) A.coverMap("codex", false); ui.cur = null; A.sfx.ui(); if (A.codexOnClose) A.codexOnClose(); }
+  /* el crupier te ensena una tarjeta bloqueada 3 s (su foto) y la vuelve a cerrar: no desbloquea nada */
+  function tease() {
+    const g = $("cxGrid"); if (!g) return false; const gr = g.getBoundingClientRect();
+    const b = [...g.querySelectorAll(".cx-card.locked")].find(c => { const r = c.getBoundingClientRect(); return r.top >= gr.top && r.bottom <= gr.bottom; });
+    const art = b && b.querySelector(".cx-art"); if (!art) return false;
+    const img = new Image(); img.className = "cx-tease"; img.alt = ""; img.onerror = () => img.remove(); img.src = A.media(`assets/wiki/card/${A.mediaKey(b.dataset.id)}.webp`);
+    const S = A.core && A.core.S, reduced = (S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const flip = then => { if (reduced) return then(); b.animate([{ transform: "rotateY(0)" }, { transform: "rotateY(90deg)" }], { duration: 160, easing: "ease-in" }).onfinish = () => { then(); b.animate([{ transform: "rotateY(-90deg)" }, { transform: "rotateY(0)" }], { duration: 180, easing: "ease-out" }); }; };
+    flip(() => { art.appendChild(img); b.classList.add("teased"); A.sfx.card(); });
+    setTimeout(() => { if (b.isConnected) flip(() => { img.remove(); b.classList.remove("teased"); }); }, 3400);
+    return true;
+  }
+  function close() { const r = $("codex"); if (r) r.classList.add("hidden"); document.body.classList.remove("cx-on"); if (A.coverMap) A.coverMap("codex", false); ui.cur = null; A.sfx.ui(); if (A.codexOnClose) A.codexOnClose();
+    const S = A.core && A.core.S;
+    if (dealerWas && A.dealer && A.dealer.homeTease && document.querySelector(".hh") && S && S.phase === "title" && !S.settingsOpen) A.dealer.homeTease(true);
+    dealerWas = false;
+  }
   const isOpen = () => !!$("codex") && !$("codex").classList.contains("hidden");
 
   /* aviso de tarjeta nueva: un carrete con todo lo conseguido, tarjeta a tarjeta, como el rodillo de una tragaperras.

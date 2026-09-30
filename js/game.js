@@ -220,12 +220,15 @@
   { const ra = $("resetAll"); let tm = 0;
     ra.onclick = () => {
       if (!ra.classList.contains("armed")) { ra.classList.add("armed"); ra.textContent = A.T("¿Seguro? Se borra TODO. Pulsa otra vez", "Sure? EVERYTHING is deleted. Press again"); A.sfx.deny(); clearTimeout(tm); tm = setTimeout(() => { ra.classList.remove("armed"); syncSettings(); }, 4500); return; }
-      clearTimeout(tm);
+      clearTimeout(tm); ra.disabled = true;
+      const wipe = () => {
       try { A.adv.abandon && A.adv.abandon(); } catch (e) { /* sin partida */ }
       try { Object.keys(localStorage).filter(k => /^atlasiq\./.test(k)).forEach(k => localStorage.removeItem(k)); sessionStorage.clear(); } catch (e) { /* sin almacenamiento */ }
       try { indexedDB.deleteDatabase("atlasiq-codex"); } catch (e) { /* sin IndexedDB */ }
       try { navigator.serviceWorker && navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())); caches && caches.keys().then(ks => ks.forEach(k => caches.delete(k))); } catch (e) { /* sin SW */ }
       ra.textContent = A.T("Reiniciado. Recargando…", "Reset. Reloading…"); setTimeout(() => location.reload(), 500);
+      };
+      if (A.dealer && A.dealer.forget) A.dealer.forget(wipe); else wipe();       // el crupier se despide antes (y te olvida de verdad)
     }; }
   /* Ajustes no se escala con --k: si en una ventana pequena (1024x768 en ruso o japones) su panel no cabe, se encoge con zoom hasta que quepa
      (en escritorio nunca hay que desplazarse); en movil se desplaza como siempre */
@@ -247,7 +250,7 @@
       if (on) { if (!was) S._dealerWasHome = A.dealer.onHome; A.dealer.homeTease(false); }
       else if (was && S._dealerWasHome) A.dealer.homeTease(true);            // solo al cerrar Ajustes de verdad (prepareRun y showTitle lo llaman cerrado: no reactiva al crupier del inicio al empezar partida)
     }
-    if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; fitSetSoon(); }
+    if (on) { if (A.jukebox) A.jukebox.hide(); syncSettings(); A.sfx.ui(); const v = $("setVer"); if (v) v.textContent = A.VERSION; if (S.setTab === "data" && A.dealer && A.dealer.renderFile) A.dealer.renderFile($("dlFile")); fitSetSoon(); }
     if (on !== was) A.coverMap("settings", on, () => S.settingsOpen);
     /* foco (teclado y lectores de pantalla): al abrir va al panel y al cerrar vuelve a donde estaba (boton de ajustes, "Continuar" de la pausa...) */
     /* el foco del panel, justo despues de pintarlo: dado en el mismo instante obligaba a recalcular la pagina entera a medio abrir (tiron al abrir Ajustes) */
@@ -291,11 +294,12 @@
   function refreshLangUIs() { for (const id of ["gateLangs", "langGrid", "langPopGrid"]) { const h = $(id); if (h) [...h.children].forEach(b => b.classList.toggle("on", b.dataset.l === A.lang)); } }
   function setLang(code) {
     if (code === A.lang || !A.STR[code]) return;
-    A.lang = code; save(); A.sfx.ui(); A.wiki.loadShort(A.wlang()); applyLang(); refreshLangUIs();
+    const old = A.lang; A.lang = code; save(); A.sfx.ui(); A.wiki.loadShort(A.wlang()); applyLang(); refreshLangUIs();
     if (S.phase === "title" && !S.booting) renderMenu();
     else if (S.phase === "reveal") { const o = q(); if (o) $("factText").textContent = factLine(o); }
     if (S.camp) updateHud();
     A.codex.refresh();
+    if (A.dealer && A.dealer.noteLang) A.dealer.noteLang(old, code);          // Babel en directo: su proxima frase sale todavia en el idioma que dejas
   }
   langChips($("langGrid"), setLang); langChips($("langPopGrid"), code => { setLang(code); $("langPop").classList.add("hidden"); });
   function openLangPop(anchor) {
@@ -329,6 +333,7 @@
   /* pestanas de Ajustes */
   function setTab(t, silent) {
     S.setTab = t; segSet(document.querySelector('[data-seg="settab"]'), t);
+    if (t === "data" && A.dealer && A.dealer.renderFile) A.dealer.renderFile($("dlFile"));   // su expediente
     document.querySelectorAll(".set-pane").forEach(p => p.classList.toggle("hidden", p.dataset.pane !== t));
     if (!silent) { save(); A.sfx.ui(); } fitSetSoon();
   }
@@ -586,6 +591,8 @@
     let sc, chips, mult, total, adv = null;
     if (S.run) {                                                   // Aventura: reliquias, jefes y fichas x mult
       adv = A.adv.score(o, guess ? km : null, left, false); sc = adv.sc; S.streak = adv.streak; chips = adv.chips; mult = adv.mult * adv.xmult; total = adv.total;
+      const lt = map.lastTap; map.lastTap = null;                                  // el crupier compara tu mano de verdad con el pin (solo lo comenta)
+      if (guess && lt && performance.now() - lt.at < 1500) { const d = ll => (isC ? A.geo.distToFeature(ll[0], ll[1], world.byName[o.key]) : A.geo.haversine(ll[1], ll[0], o.lat, o.lon)); try { adv.hand = { raw: d(lt.raw), plain: d(lt.plain) }; } catch (e) { adv.hand = null; } }
       A.adv.afterQuestion(adv);
     } else {
       sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
@@ -768,6 +775,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     S.paused = !S.paused; A.sfx.pause(); A.music.muffle(S.paused);
     if (S.paused) { S.pauseAt = performance.now(); map.setPick(false); veilMenu(togglePause); }
     else { S.pausedAcc += performance.now() - S.pauseAt; map.setPick(true); closeVeil(); }
+    if (S.run && A.dealer && A.dealer.notePause) A.dealer.notePause(S.paused);     // el crupier te espera en la pausa (js/dealer.js)
   }
   /* pestana oculta o ventana minimizada: la pregunta se pausa (antes el reloj seguia corriendo y al volver ya se habia agotado) */
   document.addEventListener("visibilitychange", () => { if (document.hidden && S.phase === "asking" && !S.paused) togglePause(); });
@@ -807,7 +815,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     A.audio.unlock(!S.booting);
     if (e.target.closest && e.target.closest(".go, .camp, .btn-ink, .btn-line, .lv, #dock button, #rail button, .seg button, .menu-gear, .hub-back, .asc, .tool")) A.sfx.ui();
     /* menu principal: pulsar el fondo (nada activable) tambien suena, para que cada toque se sienta reconocido */
-    else if (S.phase === "title" && !(e.target.closest && e.target.closest("button, a, input, select, textarea, label, [role=button]"))) A.sfx.felt();
+    else if (S.phase === "title" && !(e.target.closest && e.target.closest("button, a, input, select, textarea, label, [role=button], .dl-face"))) A.sfx.felt();   // su cara suena a ficha (js/dealer.js)
   }, true);
 
   addEventListener("keydown", e => {

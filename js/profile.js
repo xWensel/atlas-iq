@@ -207,13 +207,29 @@ window.AIQ = window.AIQ || {};
   const queue = []; let showing = false;
   function toast() {
     if (showing || !queue.length) return; showing = true;
-    const a = queue.shift(); let el = document.getElementById("achToast");
+    const a = queue.shift(); if (a.fake) return fakeToast(a);
+    let el = document.getElementById("achToast");
     if (!el) { el = document.createElement("div"); el.id = "achToast"; el.className = "ach-toast hidden"; (document.getElementById("leftCol") || document.getElementById("app")).appendChild(el); }
     el.innerHTML = `<span class="ach-ico">${A.badge(a.id)}</span><span class="ach-t"><em>${A.T("Logro desbloqueado", "Achievement unlocked")}</em><b>${A.tx(a.name)}</b><i>${A.tx(a.desc)}</i></span>`;
     el.classList.remove("hidden", "in"); A.restyle(el); el.classList.add("in"); A.sfx.ach();
     setTimeout(() => { el.classList.add("hidden"); showing = false; setTimeout(toast, 250); }, 4600);
   }
+  /* EL LOGRO FALSO del crupier (js/dealer.js): identico a un aviso de verdad (mismo sonido), con su cara en la ficha; al segundo le cae el sello
+     "De broma", el crupier se rie y el aviso se tuerce y se cae. No pasa por P.ach, ni por el contador ni por Steam. Va en #app (se ve tambien en el inicio) */
+  const STAMP = "De broma|Just kidding|Pour rire|De brincadeira|Nur Spaß|Per scherzo||开玩笑的|농담|冗談|Шутка|Żart";
+  function fakeToast(a) {
+    let el = document.getElementById("achFake");
+    if (!el) { el = document.createElement("div"); el.id = "achFake"; document.getElementById("app").appendChild(el); }
+    el.innerHTML = `<span class="ach-ico"><span class="ic badge">${A.icon("blank_boss", "bd-base")}${A.icon("dealer_laugh", "bd-in")}</span></span><span class="ach-t"><em>${A.T("Logro desbloqueado", "Achievement unlocked")}</em><b>${a.name}</b><i>${a.desc}</i></span><b class="ach-stamp">${A.pick6(STAMP)}</b>`;
+    el.className = "ach-toast ach-fake"; A.restyle(el); el.classList.add("in"); A.sfx.ach();
+    setTimeout(() => { el.classList.add("fooled"); A.sfx.stamp(); if (A.haptic) A.haptic([30, 40, 70]); }, 1300);
+    setTimeout(() => { if (a.then) a.then(); }, 2000);
+    setTimeout(() => el.classList.add("drop"), 4300);
+    setTimeout(() => { el.className = "ach-toast ach-fake hidden"; showing = false; setTimeout(toast, 250); }, 5200);
+  }
   A.ach = {
+    fake(o) { if (showing || queue.length) return false; queue.push(Object.assign({ fake: true }, o)); toast(); return true; },
+    busy: () => showing || queue.length > 0,
     emit(ev, ctx) {
       ctx = ctx || {}; let n = 0;
       for (const a of A.ACH) {

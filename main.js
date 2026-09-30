@@ -158,7 +158,7 @@ async function createWindow() {
 /* una sola instancia: una segunda abriria otro puerto (otro origen) y mostraria el juego sin partidas ni perfil; se trae al frente la primera */
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
-  app.on("second-instance", () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
+  app.on("second-instance", () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); win.webContents.send("host:again"); } });   // el crupier lo comenta: "solo hay un crupier"
   app.whenReady().then(() => {
     /* permisos: solo lo que el juego usa (pantalla completa, copiar el resultado al portapapeles, bloqueo del puntero); el resto se deniega */
     const OK = new Set(["fullscreen", "clipboard-sanitized-write", "pointerLock"]);

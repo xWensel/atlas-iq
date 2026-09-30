@@ -136,7 +136,7 @@ window.AIQ = window.AIQ || {};
     root.classList.add("out"); A.sfx.restore(); A.music.muffle(false);        // vuelve la luz
     setTimeout(() => {
       root.className = "nm hidden"; st = null;
-      A.dealer.dock(null); A.dealer.hide(); A.dealer.hold(false);
+      A.dealer.dock(null); A.dealer.release(); A.dealer.hold(false);
       const vd = $("vdDealer"); if (vd && A.dealer.on) A.dealer.anchor(vd);   // el crupier vuelve a su sitio en el veredicto
       if (ctx && ctx.after) setTimeout(ctx.after, 400);
     }, 520);

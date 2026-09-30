@@ -4,6 +4,15 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.19.1** - El crupier, en todas partes: rompe la cuarta pared en todo el juego, habla menos y cuando cuenta.
+- Nunca se le corta a media frase: si su pantalla cambia se lleva la frase o la termina en su esquina; calla en la Enciclopedia; no habla invisible en ventanas bajas; asoma también en pantallas de más de 2000 px.
+- Presupuesto de voz (medido con un jugador simulado): calma tras una racha de frases, ~1 de cada 4 respuestas comentadas, un comentario por ronda mientras piensas y la portada más espaciada. Más frases en las reacciones y los trucos no se repiten literal.
+- Recargar a mitad de pregunta ya no devuelve el reloj entero (también en el Reto diario).
+- La salida recordada (su trastada, la X o un cuelgue), temporada dos de trastadas y la saga de la puerta; le tocas la cara; apaga las luces de su carta si miras el Clásico; Babel en directo al cambiar de idioma; versión nueva; el logro falso con sello «De broma».
+- Historial de cada truco y el jefe por su nombre; el fantasma de tu última caída y el sello «Nuevo»; tu mano de verdad en el ticket; tu lugar némesis; su libreta en el Perfil; aniversarios, racha de días y «anoche te fuiste a las…»; Ctrl+C y clic derecho; batería baja y siesta del ordenador.
+- El Campamento con crupier: llegada con tus datos, dudas, sello «Sin fondos», el trile al cambiar cartas, el cofre atascado, «Ir al matadero», tu reliquia de siempre y te vas sin comprar. Segunda ventana en Electron.
+- Enciclopedia (tu ritmo, la cerradura, te enseña una bloqueada), su expediente en Ajustes > Datos, te olvida de verdad al borrar tus datos (con déjà vu), la pausa, se queda traspuesto y corrige el lema.
+
 **v0.18.1** - Clasificación Hoy/Ayer: toda puntuación de la Aventura que llega al servidor cuenta también para el día en curso (fecha de España), la envíe la versión que sea del juego. Antes solo entraban las partidas de jugadores con la v0.15.1 o posterior, y quien jugaba con una versión anterior (caché, Steam) no aparecía en Hoy. Cada día tiene su tabla: la de hoy pasa sola a Ayer a medianoche.
 
 **v0.17.1** - Fluidez: el juego ya no da tirones al cambiar de pantalla y el mapa de fondo sigue moviéndose suave en todo momento. Medido fotograma a fotograma en todas las pantallas, con la CPU normal y frenada ×4 (como un portátil modesto): abrir el **Perfil** pasaba de ~100 fotogramas perdidos (el mapa se quedaba a tirones más de un segundo) a 0; la primera Aventura se congelaba ~0,3 s (1 s en un equipo lento) y ya no; una expedición entera perdía 95 fotogramas y ahora 1-5. Qué se ha arreglado:

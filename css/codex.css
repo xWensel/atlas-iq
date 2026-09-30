@@ -110,3 +110,5 @@ html[data-skin="casino"] .cx-art { border-radius: 10px; } html[data-skin="casino
   .cx-toast { bottom: auto; top: 64px; right: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { #codex, .cx-d-wrap, .cx-card.fresh, .cx-card.open.r3, .cx-bigcard.open.r3 { animation: none !important; } .cx-card, .cx-bigcard { transition: none; } }
+/* v0.19: la tarjeta bloqueada que el crupier te ensena 3 s (js/codex.js, tease) */
+.cx-card .cx-tease { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }

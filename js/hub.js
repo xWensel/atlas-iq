@@ -63,6 +63,7 @@ window.AIQ = window.AIQ || {};
     fitNames(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNames);
     if (A.salir) A.salir.wire();                                      // salir del juego: js/salir.js
     $("codexBtn").onclick = () => A.codex.open();                     // la Enciclopedia ya suena al abrirse
+    if (A.dealer && A.dealer.watchCards) A.dealer.watchCards(document.querySelector(".hh"));   // si miras mucho el Clasico, apaga las luces de su carta
     $("profBtn").onclick = () => { A.sfx.card(); screen("profile"); };
     document.querySelectorAll(".mcard").forEach(b => (b.onclick = () => { A.sfx.card(); screen(b.dataset.mode); }));
     if ($("homeCont")) { $("homeCont").onclick = () => { A.sfx.depart(); enterRun(() => A.adv.resume(), true); }; $("homeNew").onclick = () => { A.sfx.card(); screen("adventure"); }; }
@@ -280,6 +281,7 @@ window.AIQ = window.AIQ || {};
       <section class="ac-sum"><span class="ac-sum-l"><span class="ac-k">${T("Logros", "Achievements")}</span><b>${done}<i>/${total}</i></b></span><span class="ac-bar"><s style="width:${pct(done, total)}%"></s></span><em class="ac-pct">${pct(done, total)}%</em><nav class="ac-jump">${jump}</nav></section>
       ${tiers.slice(0, FIRST).map(x => sec(x, x.list.map(card))).join("")}`, "s-prof scrolls"), "tablewrap");
     wireTools(); $("hubBack").onclick = () => screen("home");
+    if (A.dealer && A.dealer.profile) A.dealer.profile();              // su libreta: lo que ha cambiado desde tu ultima visita, o una casilla que se da la vuelta
     document.querySelectorAll(".ac-jump-b").forEach(b => (b.onclick = () => { const el = $("acSec" + b.dataset.t); if (el) { A.sfx.card(); el.scrollIntoView({ behavior: "smooth", block: "start" }); } }));
     const body = document.querySelector("#dlg .s-prof .scr-body"); let k = 0;
     const more = () => {

@@ -25,6 +25,7 @@ window.AIQ = window.AIQ || {};
     table: "{t} en la mesa|{t} at the table|{t} à table|{t} na mesa|{t} am Tisch|{t} al tavolo||在桌边 {t}|테이블에서 {t}|テーブルで{t}|{t} за столом|{t} przy stole",
     stay: "Me quedo|I'll stay|Je reste|Vou ficar|Ich bleibe|Resto||我留下|남을게|残る|Остаюсь|Zostaję",
     go: "Salir|Quit|Quitter|Sair|Beenden|Esci||退出|나가기|やめる|Выйти|Wyjdź",
+    goSeason: "Salir (sin trucos)|Quit (no tricks)|Quitter (sans tours)|Sair (sem truques)|Beenden (ohne Tricks)|Esci (senza trucchi)||退出（不捣乱）|나가기 (속임수 없음)|やめる（いたずらなし）|Выйти (без фокусов)|Wyjdź (bez sztuczek)",
     guilt: "Salir y dejarle solo|Quit and leave him alone|Partir et le laisser seul|Sair e deixá-lo sozinho|Gehen und ihn allein lassen|Uscire e lasciarlo solo|Salir y dejarlo solo|退出，丢下他一个人|나가고 혼자 두기|出ていって独りにする|Уйти и бросить его|Wyjść i zostawić go samego",
     stamp: "Denegado|Denied|Refusé|Negado|Abgelehnt|Respinto||驳回|거부|却下|Отказано|Odrzucono",
     closed: "Cerrado|Closed|Fermé|Fechado|Geschlossen|Chiuso||打烊|영업 종료|閉店|Закрыто|Zamknięte",
@@ -52,7 +53,7 @@ window.AIQ = window.AIQ || {};
   const TROLLS = ["dark", "shout", "shell", "denied", "plead", "bribe", "fake"];
   const SK = "atlasiq.quit.v1";
   let store = null; try { store = JSON.parse(localStorage.getItem(SK) || "null"); } catch (e) { /* sin almacenamiento */ }
-  store = Object.assign({ bag: [], pos: 0, quits: 0 }, store || {});
+  store = Object.assign({ bag: [], pos: 0, quits: 0, stays: 0, opens: 0, last: "" }, store || {});   // stays/opens: la saga de la puerta; last: la trastada con la que te fuiste
   const saveStore = () => { try { localStorage.setItem(SK, JSON.stringify(store)); } catch (e) { /* sin almacenamiento */ } };
   let forced = null;                                                    // solo para pruebas de desarrollo (A.salir._troll)
   function nextTroll() {
@@ -148,6 +149,8 @@ window.AIQ = window.AIQ || {};
      y si ya lo has intentado en esta sesion, "¿OTRA VEZ?" */
   function askLine() {
     if (opens > 1) return pick("quitAskAgain");
+    if (store.quits >= 3 && Math.random() < 0.35) return pick("quitAskCount", { n: store.quits + 1 });                   // la saga de la puerta
+    if (store.stays >= 3 && store.opens > 5 && Math.random() < 0.3) return pick("quitAskStays", { s: store.stays, n: store.opens - 1 });
     const sm = A.adv && A.adv.hasSave && A.adv.hasSave() && A.adv.summary && A.adv.summary(), h = new Date().getHours(), mins = played() / 60000, pool = [];
     if (sm && !sm.inf && sm.act <= 3) pool.push(["quitAskSave", { act: sm.act, round: sm.round }]);
     if (h >= 23 || h < 5) pool.push(["quitAskLate", { time: clock() }]);
@@ -165,11 +168,13 @@ window.AIQ = window.AIQ || {};
 
   function open() {
     if (st || !free() || !D()) return;
-    build(); clearAll(); opens++;
+    build(); clearAll(); opens++; store.opens = (store.opens || 0) + 1; saveStore();
     st = { phase: "in", talking: false, pend: null, trolled: null, lock: false, undo: null, home: !!D().onHome };
+    /* TEMPORADA DOS: ya te ha hecho las 7 trastadas; esta vez el boton lo dice y te deja ir a la primera */
+    st.season = !forced && Array.isArray(store.bag) && store.bag.length === TROLLS.length && store.pos >= store.bag.length;
     $("qxHead").textContent = t6(TX.head); $("qxTime").textContent = t6(TX.table).replace("{t}", dur(played()));
     $("qxQ").textContent = t6(TX.q); $("qxSub").textContent = subLine();
-    $("qxStayT").textContent = t6(TX.stay); $("qxGoT").textContent = t6(TX.go); $("qxStamp").textContent = t6(TX.stamp);
+    $("qxStayT").textContent = t6(TX.stay); $("qxGoT").textContent = t6(st.season ? TX.goSeason : TX.go); $("qxStamp").textContent = t6(TX.stamp);
     $("qxActs").classList.remove("swap");
     root.className = "qx"; A.restyle(root); root.classList.add("on");   // la sala se apaga
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
@@ -189,7 +194,8 @@ window.AIQ = window.AIQ || {};
   function go() {
     if (!st || st.phase !== "ask") return;
     if (st.lock) return nope();
-    if (!st.trolled) { const k = nextTroll(); st.trolled = k; lock(); TROLL[k](pick(KEY[k])); return; }   // la primera vez: trastada
+    if (!st.trolled && st.season) { st.trolled = "season"; return season(); }                              // temporada dos: sin trucos
+    if (!st.trolled) { const k = nextTroll(); st.trolled = k; store.trolls = (store.trolls || 0) + 1; saveStore(); lock(); TROLL[k](pick(KEY[k])); return; }   // la primera vez: trastada
     bye();                                                                                                   // la segunda: se despide
   }
 
@@ -328,11 +334,18 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ te quedas / te vas */
   function stay() {
     if (!st || (st.phase !== "ask" && st.phase !== "in") || root.classList.contains("shuffling")) return;
-    const trolled = !!st.trolled; st.phase = "stay"; clearAll();
+    const trolled = !!st.trolled; st.phase = "stay"; clearAll(); store.stays = (store.stays || 0) + 1; saveStore();
     if (st.undo) st.undo(); root.classList.remove("busy", "rain", "flick"); $("qxRain").innerHTML = "";
     root.classList.add("stayed"); A.sfx.goal(); A.haptic([24, 40, 36]);             // la firma sol-do-re: quedarse suena a premio
     talk(pick(trolled ? "quitStayTroll" : "quitStay"), trolled ? "laugh" : "sly", () => later(close, 250));
     later(close, 14000);                                                                   // red de seguridad
+  }
+  /* se le han acabado las trastadas: lo confiesa y te abre la puerta (a partir de 20 salidas, la salida expres) */
+  function season() {
+    st.phase = "bye"; lock(); root.classList.add("leaving"); A.sfx.card();
+    const out = () => { A.music.stop(); crtOff(quitNow); };
+    if ((store.quits || 0) >= 20) return talk(pick("quitSeasonExpress"), "sly", out);
+    talk(D().line("quitSeason", 0), "shock", () => talk(D().line("quitSeason", 1), "sly", out));
   }
   function bye() {
     st.phase = "bye"; lock(); root.classList.add("leaving"); A.sfx.card();
@@ -341,7 +354,9 @@ window.AIQ = window.AIQ || {};
   }
   function quitNow() {
     if (!st) return;
-    st.phase = "gone"; store.quits = (store.quits || 0) + 1; saveStore();
+    st.phase = "gone"; store.quits = (store.quits || 0) + 1; store.last = st.trolled || "";
+    if (st.trolled === "season") { store.bag = []; store.pos = 0; }                           // empieza otra temporada
+    saveStore();
     if (D().noteQuit) D().noteQuit(true);                                                  // la proxima vez que abras el juego, te lo recuerda
     const h = window.geoliteHost;
     if (h && h.quit) h.quit(); else try { window.close(); } catch (e) { /* no se deja */ }
@@ -354,7 +369,7 @@ window.AIQ = window.AIQ || {};
     root.classList.add("out"); A.music.muffle(false);
     setTimeout(() => {
       root.className = "qx hidden"; st = null;
-      const d = D(); d.dock(null); d.hide(); d.hold(false);
+      const d = D(); d.dock(null); d.release(); d.hold(false);
       if (home && free()) d.homeTease(true);                                               // vuelve a asomar por la portada como siempre
       const b = $("quitBtn"); if (b && document.activeElement === document.body) try { b.focus({ preventScroll: true }); } catch (e) { /* sin foco */ }
     }, 520);
@@ -377,7 +392,7 @@ window.AIQ = window.AIQ || {};
     const c = $("qxc"); c.classList.add("out"); setTimeout(() => c.remove(), 500);
     removeEventListener("keydown", onKey, true);
     const home = st.home; root.className = "qx hidden"; st = null;
-    const d = D(); d.dock(null); d.hide(); d.hold(false); A.music.muffle(false);
+    const d = D(); d.dock(null); d.release(); d.hold(false); A.music.muffle(false);
     later(() => crtOn(() => {
       A.music.start();
       if (home && free()) { d.homeTease(true); later(() => { const t = d.pick("quitBack"); if (t) d.homeSay(t, "laugh", "home-tl"); }, 450); }
@@ -401,5 +416,5 @@ window.AIQ = window.AIQ || {};
     else if (e.repeat && (e.key === "Enter" || e.key === " ")) e.preventDefault();                       // dejarlo pulsado no se salta la trastada
   }
 
-  A.salir = { button, wire, open, isOpen: () => !!st, _troll: k => { forced = TROLLS.includes(k) ? k : null; } };   // _troll: la proxima trastada (pruebas)
+  A.salir = { button, wire, open, isOpen: () => !!st, stats: () => ({ quits: store.quits || 0, stays: store.stays || 0, opens: store.opens || 0, trolls: store.trolls || 0, last: store.last || "" }), _troll: k => { forced = TROLLS.includes(k) ? k : null; } };   // _troll: la proxima trastada (pruebas)
 })(window.AIQ);

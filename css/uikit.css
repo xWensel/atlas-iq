@@ -469,3 +469,35 @@ html body .dr-board .lb-src { margin: 0 0 6px; display: flex; align-items: cente
   .dr .dr-road { flex-wrap: wrap; } .dr-go .startbtn, .dr-go .dr-done { flex-basis: 100%; } .dr-next { margin: 0 auto; }
   .dr-top .tag { white-space: normal; }
 }
+/* v0.19: en el inicio su cara se puede pulsar (js/dealer.js, onPoke): respingo corto; sin movimiento con "reducir movimiento" ni con Vibracion = no */
+.dealer.home.in .dl-face { pointer-events: auto; cursor: pointer; }
+.dealer.home.in .dl-face.poked { animation: dl-poke .32s steps(4) both; }
+@keyframes dl-poke { 25% { transform: translate(-5px, 3px) rotate(-3deg); } 50% { transform: translate(4px, -3px) rotate(2deg); } 75% { transform: translate(-2px, 1px); } }
+html.no-shake .dealer.home.in .dl-face.poked, html.reduce-motion .dealer.home.in .dl-face.poked { animation: none; }
+@media (prefers-reduced-motion: reduce) { .dealer.home.in .dl-face.poked { animation: none; } }
+/* v0.19: el crupier asoma abajo a la izquierda en subpantallas (Perfil) mientras habla (js/dealer.js, screenSay) */
+.dealer.screen { left: 20px; bottom: 14px; top: auto; z-index: 100010; pointer-events: none; }
+.dealer.screen .dl-face { width: 200px; height: 200px; }
+.dealer.screen .dl-bubble { max-width: 420px; margin-bottom: 60px; }
+/* su libreta: la casilla del Perfil que se da la vuelta enseña SU estadistica, en tinta roja */
+.pf-cell.book { box-shadow: inset 0 0 0 2px rgba(226, 72, 61, .7); } .pf-cell.book b { color: #ff6a5c; } .pf-cell.book span { color: #ffb3a8; }
+/* v0.19: el crupier en el Campamento, en el hueco libre a la izquierda de las cartas (js/dealer.js, campRoom mide --cl --cb --hf --hb) */
+.dealer.camp { left: var(--cl); bottom: var(--cb); top: auto; right: auto; z-index: 100010; pointer-events: none; flex-direction: column; align-items: flex-start; gap: 4px; }
+.dealer.camp .dl-face { width: var(--hf); height: var(--hf); }
+.dealer.camp .dl-bubble { max-width: var(--hb); min-width: min(var(--hf), var(--hb)); margin: 0; padding-bottom: 22px; font-size: calc(27px * var(--dll, 1)); transform-origin: calc(var(--hf) / 2) 100%;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(var(--hf) / 2 + 10px) calc(100% - 12px), calc(var(--hf) / 2) 100%, calc(var(--hf) / 2 - 10px) calc(100% - 12px), 0 calc(100% - 12px)); }
+/* v0.19: se queda traspuesto en la portada (js/dealer.js, startDoze): sin globo, con unas Z que suben; quieto con "reducir movimiento" */
+.dealer.doze .dl-face { filter: brightness(.82) drop-shadow(0 6px 0 rgba(0, 0, 0, .4)); }
+.dl-zz { position: absolute; left: calc(var(--hf, 200px) * .62); top: 8px; display: flex; gap: 2px; font-family: var(--sans); color: #f3e6c8; text-shadow: 0 3px 0 rgba(0, 0, 0, .45); pointer-events: none; }
+.dl-zz i { font-style: normal; font-size: 30px; animation: dl-zz 2.4s steps(6) infinite; opacity: 0; }
+.dl-zz i:nth-child(2) { font-size: 24px; animation-delay: .8s; } .dl-zz i:nth-child(3) { font-size: 20px; animation-delay: 1.6s; }
+@keyframes dl-zz { 0% { opacity: 0; transform: translate(0, 12px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(10px, -40px); } }
+html.reduce-motion .dl-zz i { animation: none; opacity: 1; } @media (prefers-reduced-motion: reduce) { .dl-zz i { animation: none; opacity: 1; } }
+/* corrige el lema de la portada: tachado en rojo y "Yo si." a mano */
+.hh-tag .tag-x { text-decoration: line-through; text-decoration-color: #e2483d; text-decoration-thickness: 3px; }
+.hh-tag .tag-fix { display: inline-block; margin-left: 6px; color: #ff6a5c; font-family: var(--sans); font-weight: 400; transform: rotate(-4deg); }
+/* su expediente en Ajustes > Datos */
+.dl-file .dlf-h { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; } .dl-file .dlf-h .ic { width: 28px; height: 28px; }
+.dlf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 14px; }
+.dlf-r { display: flex; flex-direction: column; gap: 1px; min-width: 0; } .dlf-r span { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
+.dlf-r b { font-family: var(--sans); font-weight: 400; font-size: 20px; line-height: 1.1; overflow-wrap: anywhere; }

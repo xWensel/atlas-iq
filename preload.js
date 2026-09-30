@@ -18,4 +18,6 @@ contextBridge.exposeInMainWorld("geoliteHost", {
   onWindowModeChange: (cb) => ipcRenderer.on("win:mode-changed", (e, mode) => cb(mode)),
   /* boton de encendido de la portada (js/salir.js): cierra el juego */
   quit: () => ipcRenderer.send("app:quit"),
+  /* abres el juego otra vez con este abierto: main trae esta ventana al frente y el crupier lo comenta (js/dealer.js) */
+  onAgain: (cb) => ipcRenderer.on("host:again", () => cb()),
 });
