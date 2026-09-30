@@ -28,6 +28,8 @@ window.AIQ = window.AIQ || {};
     clues: { t: { en: "Clues", es: "Pistas", fr: "Indices", pt: "Pistas", de: "Hinweise", it: "Indizi", zh: "线索", ko: "단서", ja: "ヒント", ru: "Подсказки", pl: "Wskazówki" }, d: { en: "Only a fact, no name: figure out the place before the clock runs out.", es: "Solo un dato, sin nombre: averigua el lugar antes de que se acabe el tiempo.", fr: "Seulement un indice, pas de nom : trouve le lieu avant la fin du temps.", pt: "Só um dado, sem nome: descubra o lugar antes que o tempo acabe.", de: "Nur ein Hinweis, kein Name: finde den Ort, bevor die Zeit abläuft.", it: "Solo un indizio, niente nome: scopri il luogo prima che scada il tempo.", zh: "只有一条信息，没有名字：在时间耗尽前找出这个地点。", ko: "이름 없이 단서 하나만: 시간이 다 되기 전에 장소를 알아내세요.", ja: "名前はなく、手がかりが一つだけ：時間切れになる前に場所を突き止めよう。", ru: "Только факт, без названия: найди место, пока не вышло время.", pl: "Tylko fakt, bez nazwy: odgadnij miejsce, zanim skończy się czas." } },
     events: { t: { en: "Historic Events", es: "Eventos históricos", fr: "Événements historiques", pt: "Eventos históricos", de: "Historische Ereignisse", it: "Eventi storici", zh: "历史事件", ko: "역사적 사건", ja: "歴史的な出来事", ru: "Исторические события", pl: "Wydarzenia historyczne" }, d: { en: "Battles, disasters, treaties and turning points: where did it happen?", es: "Batallas, catástrofes, tratados y momentos clave: ¿dónde ocurrió?", fr: "Batailles, catastrophes, traités et tournants : où cela s'est-il passé ?", pt: "Batalhas, catástrofes, tratados e momentos decisivos: onde aconteceu?", de: "Schlachten, Katastrophen, Verträge und Wendepunkte: Wo geschah es?", it: "Battaglie, catastrofi, trattati e svolte: dove è successo?", zh: "战役、灾难、条约与转折点：它发生在哪里？", ko: "전투, 재난, 조약, 전환점: 어디에서 일어났을까요?", ja: "戦い、災害、条約、転換点：どこで起きた？", ru: "Битвы, катастрофы, договоры и поворотные моменты: где это произошло?", pl: "Bitwy, katastrofy, traktaty i punkty zwrotne: gdzie to się wydarzyło?" } },
     people: { t: { en: "Historical Figures", es: "Personajes históricos", fr: "Personnages historiques", pt: "Personagens históricos", de: "Historische Persönlichkeiten", it: "Personaggi storici", zh: "历史人物", ko: "역사 인물", ja: "歴史上の人物", ru: "Исторические личности", pl: "Postacie historyczne" }, d: { en: "Scientists, artists, rulers and explorers: where were they born?", es: "Científicos, artistas, gobernantes y exploradores: ¿dónde nacieron?", fr: "Scientifiques, artistes, dirigeants et explorateurs : où sont-ils nés ?", pt: "Cientistas, artistas, governantes e exploradores: onde nasceram?", de: "Wissenschaftler, Künstler, Herrscher und Entdecker: Wo wurden sie geboren?", it: "Scienziati, artisti, sovrani ed esploratori: dove sono nati?", zh: "科学家、艺术家、统治者与探险家：他们出生在哪里？", ko: "과학자, 예술가, 통치자, 탐험가: 어디에서 태어났을까요?", ja: "科学者、芸術家、統治者、探検家：どこで生まれた？", ru: "Учёные, художники, правители и путешественники: где они родились?", pl: "Naukowcy, artyści, władcy i odkrywcy: gdzie się urodzili?" } },
+    /* la 12.a no viene de data/classic.js: se monta abajo con el mismo nivel de todas las demas */
+    mix: { t: { en: "Mixed Bag", es: "Mezcla", fr: "Mélange", pt: "Mistura", de: "Gemischt", it: "Miscuglio", zh: "大杂烩", ko: "믹스", ja: "ミックス", ru: "Всё вперемешку", pl: "Mieszanka" }, d: { en: "A bit of every campaign, level by level: places, flags, clues, events and people.", es: "Un poco de cada campaña, nivel a nivel: lugares, banderas, pistas, sucesos y personajes.", fr: "Un peu de chaque campagne, niveau par niveau : lieux, drapeaux, indices, événements et personnages.", pt: "Um pouco de cada campanha, nível a nível: lugares, bandeiras, pistas, eventos e personagens.", de: "Von jeder Kampagne etwas, Stufe für Stufe: Orte, Flaggen, Hinweise, Ereignisse und Personen.", it: "Un po' di ogni campagna, livello per livello: luoghi, bandiere, indizi, eventi e personaggi.", zh: "每个战役都来一点，逐级混合：地点、国旗、线索、事件与人物。", ko: "모든 캠페인에서 조금씩, 단계별로: 장소, 국기, 단서, 사건, 인물.", ja: "全キャンペーンから少しずつ、レベルごとに：場所・国旗・ヒント・出来事・人物。", ru: "Понемногу из каждой кампании, уровень за уровнем: места, флаги, подсказки, события и личности.", pl: "Po trochu z każdej kampanii, poziom po poziomie: miejsca, flagi, wskazówki, wydarzenia i postacie." } },
   };
 
   /* nombres de ronda: {region}+{kind} -> frase en 6 idiomas (evita concatenar "Region + Kind" a lo bruto,
@@ -90,6 +92,7 @@ window.AIQ = window.AIQ || {};
     flag: { world: ["Flags", "Banderas", "Drapeaux", "Bandeiras", "Flaggen", "Bandiere", null, "国旗", "국기", "国旗", "Флаги", "Flagi"] },
     clue: { world: ["Clues", "Pistas", "Indices", "Pistas", "Hinweise", "Indizi", null, "线索", "단서", "ヒント", "Подсказки", "Wskazówki"] },
     event: { world: ["Historic Events", "Eventos históricos", "Événements historiques", "Eventos históricos", "Historische Ereignisse", "Eventi storici", null, "历史事件", "역사적 사건", "歴史的な出来事", "Исторические события", "Wydarzenia historyczne"] },
+    mixed: { world: ["Mixed Bag", "Mezcla", "Mélange", "Mistura", "Gemischt", "Miscuglio", null, "大杂烩", "믹스", "ミックス", "Всё вперемешку", "Mieszanka"] },
     character: { world: ["Historical Figures", "Personajes históricos", "Personnages historiques", "Personagens históricos", "Historische Persönlichkeiten", "Personaggi storici", null, "历史人物", "역사 인물", "歴史上の人物", "Исторические личности", "Postacie historyczne"] },
   };
   const row6 = row => { const o = {}; L6.forEach((l, i) => { o[l] = row[i] || (l === "es-419" ? row[1] : row[0]); }); return o; };
@@ -172,10 +175,38 @@ window.AIQ = window.AIQ || {};
             return { dist, time, distMax: L.kmBase, timeMax: L.speed };
           },
           questions: () => pick10(L.dests).map(mk),
+          one: () => ({ ...mk(L.dests[Math.floor(Math.random() * L.dests.length)]), kind, tpq: L.tpq }),   // para la Mezcla: una pregunta suelta con su tipo y su reloj
         };
       }),
     };
   });
+
+  /* Mezcla (12.a campana): el nivel N junta el nivel N de las otras 11 (misma dificultad, mismo objetivo y 10 preguntas).
+     Cada partida sortea 10 de las 11 campanas y saca una pregunta de cada una, en orden al azar; cada pregunta conserva
+     su tipo (bandera, pista, retrato...), su reloj (15 o 18 s) y la puntuacion de su campana de origen. */
+  if (classic.length) {
+    const src = classic.slice(), base = src[0];
+    classic.push({
+      id: "c-mix", mode: "classic", title: CLASSIC_META.mix.t, blurb: CLASSIC_META.mix.d, home: base.home,
+      levels: base.levels.map((L0, li) => {
+        const row = src.map(c => c.levels[li]), secs = [...new Set(row.map(L => L.seconds))].sort((a, b) => a - b);
+        return {
+          tier: L0.tier, name: levelName({ kind: "mixed", region: "world", diff: A.CLASSIC[0].levels[li].diff }), kind: "mixed", region: "world", bonus: false, plainName: true,
+          seconds: secs[0], secText: secs.length > 1 ? secs[0] + "–" + secs[secs.length - 1] : null, advance: L0.advance, maxPerQ: L0.maxPerQ,
+          score: (q, km, timeLeft) => row[q.src || 0].score(q, km, timeLeft),
+          questions() {
+            const order = row.map((_, i) => i); for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+            const seen = new Set(), out = [];
+            for (const i of order) {
+              if (out.length >= PLAY_Q) break;
+              for (let k = 0; k < 6; k++) { const q = row[i].one(); if (!seen.has(q.cid[0])) { seen.add(q.cid[0]); out.push({ ...q, src: i }); break; } }   // nunca dos veces el mismo lugar en una partida
+            }
+            return out;
+          },
+        };
+      }),
+    });
+  }
 
   /* El antiguo modo Extendido (x-atlas, x-history) no tenia entrada en ningun menu y duplicaba el Clasico
    * (Mundo, Eventos, Pistas): se quito. A.LEVELS y A.HISTORY siguen alimentando la Enciclopedia. */

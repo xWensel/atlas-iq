@@ -53,6 +53,7 @@ window.AIQ = window.AIQ || {};
     "kind.clue": ["Pista", "Clue", "Indice", "Pista", "Hinweis", "Indizio", "Pista", "线索", "단서", "ヒント", "Подсказка", "Wskazówka"],
     "kind.battle": ["Batalla", "Battle", "Bataille", "Batalha", "Schlacht", "Battaglia", "Batalla", "战役", "전투", "戦い", "Битва", "Bitwa"],
     "kind.event": ["Suceso", "Event", "Événement", "Evento", "Ereignis", "Evento", "Suceso", "事件", "사건", "出来事", "Событие", "Wydarzenie"],
+    "kind.mixed": ["De todo", "Mixed bag", "Un peu de tout", "De tudo", "Gemischt", "Un po' di tutto", "De todo", "大杂烩", "믹스", "ミックス", "Всё подряд", "Mieszanka"],
     "kind.flag": ["Bandera", "Flag", "Drapeau", "Bandeira", "Flagge", "Bandiera", "Bandera", "国旗", "국기", "国旗", "Флаг", "Flaga"],
     "kind.character": ["¿Dónde nació?", "Birthplace", "Né(e) où ?", "Onde nasceu?", "Wo geboren?", "Dove è nato?", "¿Dónde nació?", "出生地", "출생지", "出生地", "Где родился?", "Gdzie się urodził?"],
     "res.timeout": ["¡Tiempo!", "Time's up!", "Temps écoulé !", "Tempo esgotado!", "Zeit abgelaufen!", "Tempo scaduto!", "¡Se acabó el tiempo!", "时间到！", "시간 종료!", "タイムアップ！", "Время вышло!", "Koniec czasu!"],

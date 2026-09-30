@@ -4,6 +4,11 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.29.1** - Mezcla: la 12.ª campaña del Clásico.
+- Nueva campaña «Mezcla»: de todo un poco. Cada uno de sus 10 niveles junta el mismo nivel de las otras 11 campañas (misma dificultad y misma meta) y sortea 10 preguntas, una de cada campaña distinta y en orden al azar: ciudades, capitales, banderas, pistas, sucesos, personajes... Cada pregunta conserva su tipo (bandera, retrato, pista), su reloj (15 o 18 s) y la puntuación de su campaña. En los 12 idiomas.
+- Con 12 cartas la pantalla del Clásico queda en dos columnas iguales de 6, sin huecos.
+- Fuera la sombra oscura pegada a la parte de abajo de la pantalla del Clásico (detrás del botón de empezar): cortaba la pantalla.
+
 **v0.28.1** - Lo primero, el estudio.
 - La pantalla de carga ya no es la verde con el logo de Geolite: ahora es negro puro, sin nada, y al abrir el juego lo primero que aparece es la intro de Cousins Studios (también sobre negro, así que sale sin costuras). La pantalla verde de «pulsa para entrar» sigue después del estudio.
 - En Steam/escritorio, la ventana también nace en negro (antes, verde oscuro).

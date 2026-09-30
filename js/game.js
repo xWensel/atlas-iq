@@ -149,7 +149,7 @@
     const o = q(); if (!o) return;
     $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : o.kind || lv().kind));
     if (o.clue && o.answer && !(o.sub && (o.sub.en || o.sub.es))) o.sub = A.blankObj(o.answer);        // descripcion: debajo, la casilla de cada letra
-    const flagRound = lv().kind === "flag" || !!(S.run && o.t === "c" && A.adv.isFlagRound && A.adv.isFlagRound());
+    const flagRound = (o.kind || lv().kind) === "flag" || !!(S.run && o.t === "c" && A.adv.isFlagRound && A.adv.isFlagRound());
     const portrait = !flagRound && !!o.img;
     $("askName").classList.toggle("ask-flag-wrap", flagRound);
     $("askName").classList.toggle("ask-person-wrap", portrait);
@@ -500,7 +500,7 @@
     if (S.run) el.innerHTML = A.adv.introHtml(L); else
     el.innerHTML = `<div class="intro-in"><div class="intro-num">${pad2(S.level + 1)}</div><div class="intro-body">
       <span class="tag">${L.bonus ? A.t("intro.bonus") : A.t("kind." + L.kind)}</span><h2>${A.tx(L.name)}</h2>
-      <p>${A.t("intro.q", { n: S.qs.length })} · ${A.t("intro.t", { s: L.seconds })}${L.advance > 1 ? " · " + A.t("intro.goal", { a: A.fmt(L.advance) }) : ""}</p></div></div>`;
+      <p>${A.t("intro.q", { n: S.qs.length })} · ${A.t("intro.t", { s: L.secText || L.seconds })}${L.advance > 1 ? " · " + A.t("intro.goal", { a: A.fmt(L.advance) }) : ""}</p></div></div>`;
     A.sfx.intro(); map.animateTo(map.home(), 1100);
     let done = false, ms = S.run ? (L.boss ? 4200 : 3300) : 2600, talking = false, timeUp = false;
     /* la intro no se cierra sola mientras el crupier habla: espera a su ultima frase y a su segundo de mas, aunque vaya con retraso
@@ -510,7 +510,7 @@
     S.skipIntro = end; el.onclick = end; setTimeout(() => { timeUp = true; if (!talking) end(); }, ms); setTimeout(end, ms + 15000);   // red de seguridad: nunca se queda colgada
   }
   function nextQuestion() {
-    S.phase = "asking"; S.paused = false; S.tense = false; S.limit = lv().seconds; S.t0 = performance.now(); S.pausedAcc = 0; S.lastTick = -1; S.lastTimeStr = "";
+    S.phase = "asking"; S.paused = false; S.tense = false; S.limit = (!S.run && q() && q().tpq) || lv().seconds; S.t0 = performance.now(); S.pausedAcc = 0; S.lastTick = -1; S.lastTimeStr = "";
     map.clearMarks(); map.animateTo(map.home(), 800); map.setPick(true); A.music.mode(1);
     closeDialog(); setPrompt(); setTimer(S.limit);
     $("plate").classList.remove("hidden", "hurry"); $("pauseBtn").classList.remove("hidden"); $("factText").textContent = "";
