@@ -571,7 +571,7 @@
   /* pista de la Enciclopedia en el ticket: los umbrales de ESTA pregunta (x2 en mares, naturaleza y estrechos) y en millas si toca;
      la frase traducida trae 300/150/75 con su unidad (km, 公里, км) y aqui se sustituyen */
   const cxTip = o => {
-    const lim = A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0] }) : [300, 150, 75], mi = S.units === "mi";
+    const lim = A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid }) : [300, 150, 75], mi = S.units === "mi";
     return A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km su historia y a menos de 75 km su dato clave.", "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.")
       .replace(/(?<!\d)(300|150|75)(\s*)(km|公里|км)/g, (m, n, sp, u) => { const v = lim[[300, 150, 75].indexOf(+n)]; return mi ? fmtKm(v) : A.fmt(v) + sp + u; });
   };
@@ -635,7 +635,7 @@
 
     const last = S.qi === S.qs.length - 1 || (S.run && A.adv.infDone && A.adv.infDone());
     const place = o.answer ? A.tx(o.answer) : A.tx(o.name) + (A.tx(o.sub) ? ", " + A.tx(o.sub) : "");
-    const from = !guess ? "" : isC ? A.t("res.border", { name: A.tx(o.name) }) : o.clue ? "" : A.t("res.from", { name: place });
+    const from = !guess ? "" : isC ? A.t("res.border", { name: A.tx(o.clue ? o.answer : o.name) }) : o.clue ? "" : A.t("res.from", { name: place });
     const showKm = guess && !(isC && km === 0);
     dialog(`<div class="sheet ticket">
       <div class="tk-band"><span>${S.run && A.adv.isInfinite && A.adv.isInfinite() ? A.t("ask.inf", { n: pad2(S.qi + 1) }) : A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : o.kind || L.kind))}</span></div>
@@ -653,7 +653,7 @@
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
       ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${adv.coins === 1 ? A.pick6("doblón|doubloon|doublon|dobrão|Dublone|doblone||枚金币|도블론|ダブロン|дублон|dublon") : A.T("doblones", "doubloons")}</div>` : ""}
       ${guess ? `<div class="tk-cx l${cxr.level}" data-tt="${A.t("codex.title")}
-${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style="--jd:${jpAt(i)}"></u>`).join("")}</i><b style="--jd:${jpAt(Math.max(0, cxr.level - 1))}">${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;" + fmtKm(A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0] })[0] : 300)}</b></div>` : ""}
+${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style="--jd:${jpAt(i)}"></u>`).join("")}</i><b style="--jd:${jpAt(Math.max(0, cxr.level - 1))}">${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;" + fmtKm(A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid })[0] : 300)}</b></div>` : ""}
       <button class="btn-ink" id="nextBtn" data-primary><span>${!last ? A.t("btn.next") : S.run ? A.pick6("Terminar ronda|Finish round|Terminer la manche|Concluir rodada|Runde beenden|Termina il round||结束本回合|라운드 종료|ラウンドを終了|Завершить раунд|Zakończ rundę") : A.t("btn.finish")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
     </div>`, "side");
     requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });

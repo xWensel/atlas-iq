@@ -4,6 +4,15 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.21.1** - Aventura: todo el banco sale en las 12 rondas y pesa más saber que clavar.
+- Todas las preguntas del banco (1.525 lugares, 196 banderas y 188 pistas) tienen salida en las 12 rondas; antes la Aventura solo preguntaba 806 lugares y la Enciclopedia no se podía completar jugando.
+- Nivel 1-10 dentro de cada categoría (panel de 3 jueces, `data/dificultad.js` y `data/niveles.js`); cada ronda da 3 fáciles, 1 media y 1 difícil. Ciudades, monumentos y banderas tienen dos rondas (niveles 1-5 y 6-10); la ronda 5 pasa a Grandes ciudades y la 11 a Maravillas del mundo; las capitales 9-10 son invitadas en la 5.
+- Azar vivo: todo puede repetirse, pero lo que menos te ha salido pesa más; el Reto diario sigue igual para todos. Máximo 2 del mismo continente y ningún país repetido por ronda.
+- Ronda 10 nueva: 188 apodos y pistas inequívocas en 11 idiomas (`data/pistas.js`); nunca descripciones genéricas. Las pistas desbloquean la tarjeta de su lugar.
+- Puntuación: el margen se estrecha un 3 % por ronda (antes 6 %), el objetivo sube 250 por ronda (antes 350), el jefe final pide 4.777 y cada Ascensión suma un 5 % (antes 10 %).
+- Todo lugar lleva país debajo salvo mares y océanos; si lo comparten dos, los dos (`data/paises-lugares.js`).
+- Carretes editables en `data/carretes.js` (`npx electron tools/build-carretes.cjs`) y documento de balance en `docs/carrete-aventura.html`.
+
 **v0.20.1** - El crupier te conoce: su relación contigo crece partida a partida, sin hablar más.
 - Tú contra la banca: marcador histórico, su apuesta de en qué ronda caerás, tu némesis y su tarjeta de socio que sella al subir de categoría (habitual, rival, socio); si ganas en Ascensión 5, se jubila.
 - El ticket te lee: chincheta trampa, racha rota, «te vi pararte encima», el país en el que caíste, meta alcanzada y victorias por los pelos.

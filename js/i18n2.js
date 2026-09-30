@@ -122,7 +122,7 @@ window.AIQ = window.AIQ || {};
     "?": ["?", "?", "?", "?", "?", "？", "?", "？", "?", "?"],
     "Achievement: ": ["Succès : ", "Conquista: ", "Erfolg: ", "Obiettivo: ", "Logro: ", "成就：", "업적: ", "実績: ", "Достижение: ", "Osiągnięcie: "],
     "Standard": ["Standard", "Padrão", "Standard", "Standard", "Estándar", "标准", "표준", "スタンダード", "Стандарт", "Standard"],
-    "+50%, −5 s. Legends only": ["+50 %, −5 s. Réservé aux légendes", "+50%, −5 s. Só para lendas", "+50 %, −5 s. Nur für Legenden", "+50%, −5 s. Solo per leggende", "+50%, −5 s. Solo para leyendas", "+50%，−5 秒。仅限传奇难度", "+50%, −5초. 레전드 전용", "+50%、−5秒。レジェンド専用", "+50%, −5 с. Только для легенд", "+50%, −5 s. Tylko dla legend"],
+    "+25%, −5 s. Legends only": ["+25 %, −5 s. Réservé aux légendes", "+25%, −5 s. Só para lendas", "+25 %, −5 s. Nur für Legenden", "+25%, −5 s. Solo per leggende", "+25%, −5 s. Solo para leyendas", "+25%，−5 秒。仅限传奇难度", "+25%, −5초. 레전드 전용", "+25%、−5秒。レジェンド専用", "+25%, −5 с. Только для легенд", "+25%, −5 s. Tylko dla legend"],
     "Continue": ["Continuer", "Continuar", "Weiter", "Continua", "Continuar", "继续", "계속하기", "続ける", "Продолжить", "Kontynuuj"],
     "Starting deck": ["Paquet de départ", "Baralho inicial", "Startdeck", "Mazzo iniziale", "Baraja inicial", "初始套牌", "시작 덱", "初期デッキ", "Стартовая колода", "Talia startowa"],
     "Ascension": ["Ascension", "Ascensão", "Aufstieg", "Ascensione", "Ascensión", "飞升", "어센션", "アセンション", "Восхождение", "Wniebowstąpienie"],

@@ -126,7 +126,8 @@ window.AIQ = window.AIQ || {};
     if (A.PLACES && A.PLACES.length) {
       const neBy = {}; A.PLACES.forEach(r => { if (r[1] === "country") neBy[r[6].en] = r[0].slice(2); });
       A.PLACES.forEach(([id, kind, tier, lat, lon, qc, names]) => {
-        const cnEn = qc && A.PCOUNTRY && A.PCOUNTRY[qc] && A.PCOUNTRY[qc].en, ne = (cnEn && (neBy[cnEn] || (world.byName[cnEn] ? cnEn : null))) || null;
+        /* v0.20: el pais que se ve debajo (data/paises-lugares.js) */
+        const qc1 = (A.PLACE_COUNTRIES && A.PLACE_COUNTRIES[id] && A.PLACE_COUNTRIES[id][0]) || qc, cnEn = qc1 && A.PCOUNTRY && A.PCOUNTRY[qc1] && A.PCOUNTRY[qc1].en, ne = (cnEn && (neBy[cnEn] || (world.byName[cnEn] ? cnEn : null))) || null;
         const type = kind === "history" ? (/^(battle|siege|fall of|.*\bwar\b|bombing|attack|normandy|gallipoli|dunkirk|tet )/i.test(names.en) ? "battle" : "event")   // igual que el tipo de la pregunta (js/adventure.js)
           : kind === "nature" ? (/\b(sea|ocean|gulf|bay)\b/i.test(names.en) ? "water" : /\b(strait|channel|canal|cape|drake|bosporus|bosphorus)\b/i.test(names.en) ? "strait" : "nature") : kind;
         const rar = Math.min(3, tier + (kind === "history" || kind === "nature" ? 1 : 0));
@@ -223,7 +224,7 @@ window.AIQ = window.AIQ || {};
   A.codexUnlock = (q, km) => {
     const out = { added: [], level: 0 };
     if (km == null || !q.cid) return out;
-    const first = E[q.cid[0]], sc = (first && SCALE[first.type]) || 1;
+    const first = q.cid.map(c => E[c]).find(Boolean), sc = (first && SCALE[first.type]) || 1;   // las pistas llevan antes su propio id ("clue:<id>") y luego el del lugar
     const level = km <= LIM[2] * sc ? 3 : km <= LIM[1] * sc ? 2 : km <= LIM[0] * sc ? 1 : 0;
     out.level = level; if (!level) return out;
     const lateral = x => (E[x].type === "event" || E[x].type === "battle") ? 2 : 3;
@@ -240,7 +241,7 @@ window.AIQ = window.AIQ || {};
   };
   const byType = () => { const cnt = {}; order.forEach(id => { const e = E[id], c = cnt[e.type] || (cnt[e.type] = [0, 0]); c[1]++; if (isUnlocked(id)) c[0]++; }); return cnt; };
   const emitStats = () => { if (A.ach) { const st = stats(); A.ach.emit("codex", { u: st.u, t: st.t, by: byType() }); } };
-  A.codexLimits = e => { const sc = (E[(e && e.parent) || (e && e.id)] && SCALE[E[(e && e.parent) || e.id].type]) || 1; return LIM.map(x => x * sc); };
+  A.codexLimits = e => { const id = (e && e.cids && e.cids.find(c => E[c])) || (e && (e.parent || e.id)), sc = (E[id] && SCALE[E[id].type]) || 1; return LIM.map(x => x * sc); };   // cids: las pistas llevan antes "clue:<id>"
   A.continent = continent; A.continentMap = continentMap;
 
   /* ================================================================== contenido empaquetado (data/wiki + assets/wiki): nunca se consulta Wikipedia al jugar */

@@ -26,7 +26,7 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ temas de ronda (cada uno con un banco enorme) */
   const TOPIC_NAMES = {
-    capital: [L6("Capitales del mundo (fáciles)|World capitals (easy)|Capitales du monde (faciles)|Capitais do mundo (fáceis)|Hauptstädte der Welt (leicht)|Capitali del mondo (facili)||世界首都（简单）|세계의 수도 (쉬움)|世界の首都（かんたん）|Столицы мира (лёгкие)|Stolice świata (łatwe)"), L6("Capitales del mundo (difíciles)|World capitals (hard)|Capitales du monde (difficiles)|Capitais do mundo (difíceis)|Hauptstädte der Welt (schwer)|Capitali del mondo (difficili)||世界首都（困难）|세계의 수도 (어려움)|世界の首都（むずかしい）|Столицы мира (сложные)|Stolice świata (trudne)")],
+    capital: [L6("Capitales del mundo|World capitals|Capitales du monde|Capitais do mundo|Hauptstädte der Welt|Capitali del mondo||世界首都|세계의 수도|世界の首都|Столицы мира|Stolice świata"), L6("Capitales del mundo (difíciles)|World capitals (hard)|Capitales du monde (difficiles)|Capitais do mundo (difíceis)|Hauptstädte der Welt (schwer)|Capitali del mondo (difficili)||世界首都（困难）|세계의 수도 (어려움)|世界の首都（むずかしい）|Столицы мира (сложные)|Stolice świata (trudne)")],
     landmark: [L6("Monumentos y lugares famosos|Landmarks and famous places|Monuments et lieux célèbres|Monumentos e lugares famosos|Wahrzeichen und berühmte Orte|Monumenti e luoghi famosi||地标与著名地点|랜드마크와 유명한 장소|名所と有名な場所|Достопримечательности и известные места|Zabytki i słynne miejsca"), L6("Maravillas del mundo (difíciles)|World wonders (hard)|Merveilles du monde (difficiles)|Maravilhas do mundo (difíceis)|Weltwunder (schwer)|Meraviglie del mondo (difficili)||世界奇观（困难）|세계의 경이 (어려움)|世界の驚異（むずかしい）|Чудеса света (сложные)|Cuda świata (trudne)"), L6("Tesoros escondidos|Hidden treasures|Trésors cachés|Tesouros escondidos|Verborgene Schätze|Tesori nascosti||隐藏的宝藏|숨겨진 보물|隠れた名所|Скрытые сокровища|Ukryte skarby")],
     city: [L6("Grandes ciudades|Big cities|Grandes villes|Grandes cidades|Große Städte|Grandi città||大城市|대도시|大都市|Большие города|Wielkie miasta"), L6("Ciudades importantes|Important cities|Villes importantes|Cidades importantes|Wichtige Städte|Città importanti||重要城市|주요 도시|主要都市|Важные города|Ważne miasta"), L6("Ciudades difíciles|Hard cities|Villes difficiles|Cidades difíceis|Schwere Städte|Città difficili||高难城市|어려운 도시|難しい都市|Сложные города|Trudne miasta")],
     country: [L6("Países (haz clic dentro)|Countries (click inside)|Pays (clique dedans)|Países (clique dentro)|Länder (klicke hinein)|Paesi (clicca dentro)||国家（点击国境内）|국가 (안쪽을 클릭)|国（国内をクリック）|Страны (кликни внутри)|Kraje (kliknij w środku)"), L6("Países difíciles|Hard countries|Pays difficiles|Países difíceis|Schwere Länder|Paesi difficili||高难国家|어려운 국가|難しい国|Сложные страны|Trudne kraje")],
@@ -37,11 +37,12 @@ window.AIQ = window.AIQ || {};
     flag: [L6("Banderas del mundo|World flags|Drapeaux du monde|Bandeiras do mundo|Flaggen der Welt|Bandiere del mondo||世界国旗|세계의 국기|世界の国旗|Флаги мира|Flagi świata"), L6("El coleccionista de banderas|The flag collector|Le collectionneur de drapeaux|O colecionador de bandeiras|Der Flaggensammler|Il collezionista di bandiere||国旗收藏家|국기 수집가|国旗コレクター|Коллекционер флагов|Kolekcjoner flag")],
   };
   const KIND_FACTOR = { capital: 1, city: 1, landmark: 0.9, nature: 1.5, battle: 0.9, event: 0.9, country: 0.7, clue: 1, water: 1.6, strait: 1.4 };
-  /* 12 rondas: 3 actos de 4 (la 4.a es el jefe). Empieza facil y va cambiando de tema y subiendo el nivel. */
+  /* 12 rondas: 3 actos de 4 (la 4.a es el jefe). Empieza facil y va cambiando de tema y subiendo el nivel.
+     v0.20 (usuario): ciudades y monumentos tienen dos rondas (son la mayor parte del banco); capitales e historia, una; banderas siguen dobles. */
   const ROUNDS = [
     { topic: "capital", tier: 0 }, { topic: "landmark", tier: 0 }, { topic: "flag", tier: 0 }, { topic: "country", tier: 0, boss: true },
-    { topic: "capital", tier: 1 }, { topic: "history", tier: 0 }, { topic: "nature", tier: 0 }, { topic: "flag", tier: 1, boss: true },
-    { topic: "city", tier: 1 }, { topic: "clue", tier: 1 }, { topic: "history", tier: 1 }, { topic: "mixed", tier: 1, boss: true },
+    { topic: "city", tier: 0 }, { topic: "history", tier: 0 }, { topic: "nature", tier: 0 }, { topic: "flag", tier: 1, boss: true },
+    { topic: "city", tier: 1 }, { topic: "clue", tier: 1 }, { topic: "landmark", tier: 1 }, { topic: "mixed", tier: 1, boss: true },
   ];
   const roundDefOf = r => (r < ROUNDS.length ? ROUNDS[r] : (() => { const b = ROUNDS[4 + ((r - 4) % 8)]; return { ...b, tier: Math.min(2, b.tier + 1), boss: (r % 4) === 3 }; })());
 
@@ -49,19 +50,33 @@ window.AIQ = window.AIQ || {};
   let POOLS = null;
   const kindOfHistory = t => (/^(battle|siege|fall of|.*\bwar\b|bombing|attack|normandy|gallipoli|dunkirk|tet )/i.test(t) ? "battle" : "event");
   const kindOfNature = t => (/\b(sea|ocean|gulf|bay)\b/i.test(t) ? "water" : /\b(strait|channel|canal|cape|drake|bosporus|bosphorus)\b/i.test(t) ? "strait" : "nature");
+  /* v0.20 (usuario): todo lugar lleva pais debajo salvo mares y oceanos; si lo comparten dos, los dos ("Nepal · China"); si mas, el principal (data/paises-lugares.js) */
+  const joinCountries = qids => { const ns = qids.map(q => A.PCOUNTRY && A.PCOUNTRY[q]).filter(Boolean); if (!ns.length) return null; const o = {}; Object.keys(ns[0]).forEach(l => (o[l] = ns.map(n => n[l] || n.en).join(" · "))); return o; };
   function placeQ(row) {
-    const [id, kind, tier, lat, lon, qc, names, fame] = row, cn = qc && A.PCOUNTRY && A.PCOUNTRY[qc], en = names.en;
-    if (kind === "country") { const key = id.slice(2); if (!C().world.byName[key]) return null; return { t: "c", key, name: names, sub: { es: "", en: "" }, clue: false, answer: null, fact: {}, cid: [id], kind: "country", topic: "country", tier, fame: fame || 0 }; }
+    const [id, kind, tier, lat, lon, qc0, names, fame] = row, extra = A.PLACE_COUNTRIES && A.PLACE_COUNTRIES[id], qc = extra && extra.length ? extra[0] : qc0;
+    const cn = (extra && extra.length > 1 && joinCountries(extra)) || (qc && A.PCOUNTRY && A.PCOUNTRY[qc]), en = names.en;
+    const cEn = (extra && extra.length ? extra : qc0 ? [qc0] : []).map(q => A.PCOUNTRY && A.PCOUNTRY[q] && A.PCOUNTRY[q].en).filter(Boolean);   // paises en ingles: la regla "un pais por ronda" y el Pase VIP
+    if (kind === "country") { const key = id.slice(2); if (!C().world.byName[key]) return null; return { t: "c", key, name: names, sub: { es: "", en: "" }, clue: false, answer: null, fact: {}, cid: [id], kind: "country", topic: "country", tier, fame: fame || 0, cEn: [en], cks: [countryKey(en)] }; }
     if (lat == null) return null;
     const k = kind === "history" ? kindOfHistory(en) : kind === "nature" ? kindOfNature(en) : kind;
-    return { t: "p", lat, lon, name: names, sub: cn || { es: "", en: "" }, clue: false, answer: null, fact: {}, cid: [id], kind: k, topic: kind, tier, fame: fame || 0 };
+    return { t: "p", lat, lon, name: names, sub: cn || { es: "", en: "" }, clue: false, answer: null, fact: {}, cid: [id], kind: k, topic: kind, tier, fame: fame || 0, cEn, cks: cEn.map(countryKey) };
   }
+  const countryKey = e => { const k = String(e || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, ""); return k === "republicofireland" ? "ireland" : k; };   // el mismo pais como pregunta de pais, bandera, pista o lugar
   function pools() {
     if (POOLS) return POOLS; POOLS = {};
     const add = (topic, tier, q) => { const key = topic + "|" + tier; (POOLS[key] = POOLS[key] || []).push(q); };
     const seen = new Set();
     (A.PLACES || []).forEach(row => { const q = placeQ(row); if (q && !seen.has(q.cid[0])) { seen.add(q.cid[0]); add(q.topic, q.tier, q); } });
-    // apodos (pistas) y respaldo con las preguntas antiguas si aun no existe el banco nuevo
+    /* v0.20: banco propio de pistas (data/pistas.js): apodos y pistas inequivocas en 11 idiomas, cada una atada a un lugar del banco.
+       cid: ["clue:<id>", <id>]: la primera identifica la pregunta (carretes, repetidos); la segunda desbloquea la tarjeta del lugar en la Enciclopedia al acertarla.
+       La pista va en el nombre, la respuesta en answer y el pais solo por dentro (cks: regla de un pais por ronda), para que debajo salgan las casillas de letras */
+    const byId = {}; (A.PLACES || []).forEach(row => (byId[row[0]] = row));
+    (A.CLUES || []).forEach(([id, diff, txt]) => {
+      const row = byId[id], q = row && placeQ(row); if (!q || seen.has("clue:" + id)) return;
+      seen.add("clue:" + id);
+      add("clue", 1, { ...q, name: txt, answer: q.name, sub: { es: "", en: "" }, clue: true, cid: ["clue:" + id, id], topic: "clue", tier: 1, fame: diff });
+    });
+    // apodos antiguos del Clasico (descripciones de Wikidata): solo si no existe el banco nuevo de pistas; y respaldo con las preguntas antiguas si aun no existe el banco de lugares
     for (const camp of A.CAMPAIGNS) {
       if (!camp.levels[0] || !camp.levels[0].all) continue;
       for (const Lv of camp.levels) for (const q of Lv.all()) {
@@ -69,6 +84,7 @@ window.AIQ = window.AIQ || {};
         const kind = q.clue ? "clue" : Lv.kind, topic = { capital: "capital", city: "city", landmark: "landmark", country: "country", place: "landmark", nature: "nature", water: "nature", strait: "nature", battle: "history", event: "history", clue: "clue" }[kind];
         if (!topic) continue;
         if (topic !== "clue" && (A.PLACES || []).length > 200) continue;               // con el banco nuevo, solo aportan las pistas
+        if (topic === "clue" && (A.CLUES || []).length) continue;                       // ...y con el banco de pistas, ni eso
         const key = topic === "clue" ? "clue:" + id : id;                              // una pista es otra pregunta aunque su respuesta ya este en el banco (Las Vegas...): antes se descartaban 78 de 80 y la ronda 10 salia con 2 lugares
         if (seen.has(key)) continue;
         seen.add(key); add(topic, clamp(Lv.tier || 0, 0, 2), { ...q, kind, topic, tier: clamp(Lv.tier || 0, 0, 2) });
@@ -76,50 +92,84 @@ window.AIQ = window.AIQ || {};
     }
     return POOLS;
   }
-  const ROUND_POOL = 80;                                             // lugares distintos por ronda: de ahi salen las preguntas de cada ronda
-  const CAP = { 1: 99, 2: 12, 3: 12, 4: 99, 5: 99, 6: 10, 7: 12, 8: 8, 9: 8, 10: 8, 11: 10, 12: 6 };   // maximo de lugares del mismo pais por ronda (ronda 1..12)
-  const ROUND_KIND = ["capital", "landmark", "country", "country", "capital", "history", "nature", "country", "city", "clue", "history", "mixed"];
-  const byDiff = (a, b) => (a.tier - b.tier) || ((a.fame || 0) - (b.fame || 0));   // de mas facil a mas dificil dentro de un tipo
+  /* v0.20 (usuario, 2026-09-30): TODAS las preguntas del banco tienen salida en las 12 rondas (la Enciclopedia y sus logros se completan jugando la Aventura).
+     - Cada pregunta tiene una dificultad 0-100 (A.QDIFF, data/dificultad.js: panel de 3 jueces) y un NIVEL 1-10 DENTRO DE SU CATEGORIA (A.QLEVEL, data/niveles.js:
+       deciles; usuario: "todas las categorias con dificultades de 1 a 10"). Las banderas van aparte ("flag:c:<Pais>").
+     - Cada tema se reparte entre SUS rondas (data/carretes.js, sin tamano fijo): con dos rondas, la primera lleva los niveles 1-5 y la segunda los 6-10.
+       Sin techo por ronda (el usuario lo quito el 2026-09-30).
+     - En cada ronda: 3 del 60 % mas facil de su carrete, 1 del 20 % medio y 1 del 20 % mas dificil, asi todas salen con la misma frecuencia.
+     - Azar vivo (usuario, 2026-09-30): nada de mazos; todas las preguntas estan siempre en su pool y pueden repetirse, pero las que menos te han salido
+       pesan algo mas en el sorteo (perfil: adv.seen). El Reto diario sortea solo con su semilla (igual para todos).
+     - En una ronda, si se puede: como mucho 2 del mismo continente, nunca 2 del mismo pais ni un nombre ya preguntado en la expedicion. */
+  const ROUND_THEME = ["capital", "landmark", "flag", "country", "city", "history", "nature", "flag", "city", "clue", "landmark", "mixed"];
+  const qidOf = (q, topic) => (topic === "flag" ? "flag:" + q.cid[0] : q.cid[0]);
+  const diffOf = (q, topic) => { const d = A.QDIFF && A.QDIFF[qidOf(q, topic)]; return d == null ? 50 : d; };
+  const levelOf = d => clamp(Math.ceil(d / 10), 1, 10);
+  const lvOf = (q, topic) => (A.QLEVEL && A.QLEVEL[qidOf(q, topic)]) || levelOf(diffOf(q, topic));   // nivel 1-10 dentro de su categoria
+  const byLevel = topic => (a, b) => (lvOf(a, topic || a.topic) - lvOf(b, topic || b.topic)) || (diffOf(a, topic || a.topic) - diffOf(b, topic || b.topic));
   const nk = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  const nameKeys = q => [nk(q.name && q.name.en), nk(q.name && q.name.es)].filter(Boolean);
-  /* Reparto de lugares entre las 12 rondas: cada lugar cae en UNA sola ronda (sin repetidos), la primera ronda de cada tema se queda con lo mas conocido,
-     las siguientes con muestras repartidas del resto por dificultad, y el Jackpot con una mezcla de lo que sobra. Un maximo de lugares por pais mantiene variedad. */
+  const nameKeys = q => [nk(q.name && q.name.en), nk(q.name && q.name.es)].concat(q.clue && q.answer ? [nk(q.answer.en), nk(q.answer.es)] : []).filter(Boolean);
+  const cksOf = q => q.cks || [];
+  let ALLQ = null;                                                   // cid -> pregunta (un pais es la misma pregunta como nombre y como bandera: la ronda decide como se ve)
+  const allQ = () => { if (ALLQ) return ALLQ; ALLQ = {}; Object.values(pools()).forEach(l => l.forEach(q => { ALLQ[q.cid[0]] = ALLQ[q.cid[0]] || q; })); return ALLQ; };
   let ASSIGN = null;
-  function assign() {
+  function assign() {                                                // carrete de cada ronda (0-11), de mas facil a mas dificil
     if (ASSIGN) return ASSIGN;
-    const P = pools(), out = Array.from({ length: 12 }, () => []), usedName = new Set(), left = [];
-    const kindList = k => [].concat(...[0, 1, 2].map(t => P[k + "|" + t] || [])).sort(byDiff);
-    const ctry = q => (q.t === "c" ? q.cid[0] : (q.sub && q.sub.en) || "");
-    const spread = arr => { const n = arr.length, first = new Set(); if (n <= ROUND_POOL) return arr; for (let i = 0; i < ROUND_POOL; i++) first.add(Math.floor(i * n / ROUND_POOL)); return arr.filter((_, j) => first.has(j)).concat(arr.filter((_, j) => !first.has(j))); };   // primero un muestreo uniforme, luego el resto (de reserva)
-    const pick = (cands, rnd) => {                                                                   // coge hasta 80 respetando el tope por pais y sin repetir nombres
-      const cnt = {}, got = [], cap = CAP[rnd + 1];
-      for (const q of cands) {
-        if (got.length >= ROUND_POOL) break; const nm = nameKeys(q), c = ctry(q);
-        if (nm.some(k => usedName.has(k)) || (c && (cnt[c] || 0) >= cap)) continue;
-        nm.forEach(k => usedName.add(k)); if (c) cnt[c] = (cnt[c] || 0) + 1; got.push(q);
-      }
-      return got;
-    };
-    for (const kind of ["capital", "landmark", "city", "country", "history", "nature", "clue"]) {
-      const rounds = ROUND_KIND.map((k, i) => (k === kind ? i : -1)).filter(i => i >= 0);
-      let rest = kindList(kind);
-      rounds.forEach((r, idx) => {
-        let cands;
-        if (idx === 0) cands = rest;                                                                   // la primera ronda: lo mas facil
-        else { const per = Math.ceil(rest.length / (rounds.length - idx)); cands = spread(rest.slice(0, per)); }   // las demas: muestra repartida del tramo siguiente
-        const got = pick(cands, r).sort(byDiff); out[r] = got;
-        const taken = new Set(got.map(q => q.cid[0])); rest = rest.filter(q => !taken.has(q.cid[0]));
-      });
-      rest.forEach(q => left.push(q));
+    const fixed = A.CARRETES && A.CARRETES.length === 12, out = new Set(A.CARRETES_FUERA || []), all = allQ(), auto = autoAssign();
+    const lists = (fixed ? A.CARRETES : auto).map(ids => ids.filter(id => !out.has(id)));
+    if (fixed) {                                                     // una pregunta nueva del banco que aun no esta en data/carretes.js entra donde la pondria el reparto automatico
+      const has = [new Set(), new Set()]; lists.forEach((l, i) => l.forEach(id => has[ROUND_THEME[i] === "flag" ? 0 : 1].add(id)));
+      auto.forEach((l, i) => l.forEach(id => { const h = has[ROUND_THEME[i] === "flag" ? 0 : 1]; if (!h.has(id) && !out.has(id)) { lists[i].push(id); h.add(id); } }));
     }
-    const groups = {}; left.filter(q => !nameKeys(q).some(k => usedName.has(k))).sort(byDiff).forEach(q => (groups[q.topic] = groups[q.topic] || []).push(q));
-    const lists = Object.values(groups).map(spread), mixed = [];                                   // el Jackpot reparte a partes iguales entre temas
-    for (let i = 0; mixed.length < ROUND_POOL * 3 && lists.some(l => i < l.length); i++) lists.forEach(l => { if (i < l.length) mixed.push(l[i]); });
-    out[11] = pick(mixed, 11);
-    return (ASSIGN = out);
+    return (ASSIGN = lists.map((ids, i) => ids.map(id => all[id]).filter(Boolean).sort(byLevel(ROUND_THEME[i] === "mixed" ? null : ROUND_THEME[i]))));
   }
-  /* carrete de una ronda (0-11); la Leyenda (12+) repite las rondas 5-12 */
-  const poolFor = r => assign()[r < 12 ? r : 4 + ((r - 4) % 8)];
+  function autoAssign() {                                            // ids por ronda (la 12 no tiene carrete propio: saca de todo el banco)
+    const P = pools(), out = ROUND_THEME.map(() => []);
+    const byTopic = t => [].concat(...[0, 1, 2].map(x => P[(t === "flag" ? "country" : t) + "|" + x] || []));
+    for (const t of ["capital", "landmark", "flag", "country", "city", "history", "nature", "clue"]) {
+      const rs = ROUND_THEME.map((x, i) => (x === t ? i : -1)).filter(i => i >= 0), list = byTopic(t).sort(byLevel(t));
+      list.forEach(q => out[t === "capital" && lvOf(q, t) >= 9 ? 4 : rs[Math.min(rs.length - 1, Math.floor((lvOf(q, t) - 1) * rs.length / 10))]].push(q.cid[0]));   // dos rondas: niveles 1-5 y 6-10; las capitales 9-10, invitadas en Grandes ciudades (R5) para suavizar la R1
+    }
+    return out;
+  }
+  const poolFor = r => assign()[r < 12 ? r : 4 + ((r - 4) % 8)];   // la Leyenda (12+) repite las rondas 5-12
+  let BANDS = {};
+  function bandsOf(slot) {                                           // franjas de una ronda: [facil 60 %, media 20 %, dificil 20 %]; la 12 saca de todo el banco (sin banderas)
+    if (BANDS[slot]) return BANDS[slot];
+    let list = poolFor(slot), topic = ROUND_THEME[slot < 12 ? slot : 4 + ((slot - 4) % 8)], tail = null;
+    if (topic === "mixed") {
+      const seen = new Set(); tail = new Set(assign()[11].map(q => q.cid[0])); list = [];
+      assign().forEach((l, i) => { if (ROUND_THEME[i] !== "flag") l.forEach(q => { if (!seen.has(q.cid[0])) { seen.add(q.cid[0]); list.push(q); } }); });
+      list.sort(byLevel(null));                                        // cada pregunta con el nivel de su categoria: la 12 tiene faciles y dificiles de todas
+    }
+    const own = topic === "mixed" ? list : list.filter(q => q.topic === (topic === "flag" ? "country" : topic)), guests = topic === "mixed" ? [] : list.filter(q => !own.includes(q));   // invitadas: p. ej. capitales 9-10 en la R5
+    const n = own.length, a = Math.ceil(n * 0.6), b = Math.ceil(n * 0.8);
+    return (BANDS[slot] = { topic, tail, bands: [{ k: "e", n: 3, list: own.slice(0, a) }, { k: "m", n: 1, list: own.slice(a, b) }, { k: "h", n: 1, list: own.slice(b).concat(guests) }] });
+  }
+  /* saca n preguntas de una franja por sorteo con peso: todas siguen en el pool y pueden repetirse, pero las que menos te han salido pesan mas
+     (peso 1 / (1 + veces - minimo de la franja): nunca vista = 1, una vez mas que la que menos = 1/2...). En el Reto diario todas pesan igual y manda la semilla.
+     Reglas que se relajan si no hay otra: 2) continente y pais; 1) nada ya preguntado en la expedicion; 0) lo que sea. first: preguntas con prioridad (x4). */
+  const seenStore = () => { if (run._scratch) return run._scratch; const P = A.profile.get(); if (P.adv.decks) delete P.adv.decks; return (P.adv.seen = P.adv.seen || {}); };
+  const seenKey = (q, topic) => qidOf(q, topic || q.topic);
+  function takeFrom(band, n, rr, taken, ctx, first) {
+    const got = [], seen = run.board ? null : seenStore(), cnt = q => (seen && seen[seenKey(q, ctx.topic)]) || 0;
+    const min = band.reduce((m, q) => Math.min(m, cnt(q)), Infinity), w = q => (first && first.has(q.cid[0]) ? 4 : 1) / (1 + cnt(q) - (min === Infinity ? 0 : min));
+    const fits = (q, lvl) => {
+      if (taken.includes(q)) return false;
+      if (lvl >= 1 && (ctx.used.has(q.cid[0]) || nameKeys(q).some(k => ctx.names.has(k)))) return false;
+      if (lvl >= 2) { const c = continentOf(q), cs = cksOf(q); if (taken.filter(x => continentOf(x) === c).length >= 2 || (cs.length && taken.some(x => cksOf(x).some(k => cs.includes(k))))) return false; }
+      return true;
+    };
+    for (const lvl of [2, 1, 0]) while (got.length < n) {
+      const cand = band.filter(q => fits(q, lvl)); if (!cand.length) break;
+      let r = rr() * cand.reduce((t, q) => t + w(q), 0), q = cand[cand.length - 1];
+      for (const c of cand) { r -= w(c); if (r <= 0) { q = c; break; } }
+      got.push(q); taken.push(q); nameKeys(q).forEach(k => ctx.names.add(k));
+    }
+    return got;
+  }
+  /* cuenta cada pregunta jugada (Aventura normal): con eso las que menos han salido pesan mas en el sorteo */
+  const countSeen = (q, topic) => { if (!q || !run || run.board) return; const S = seenStore(), k = seenKey(q, topic); S[k] = (S[k] || 0) + 1; if (!run._scratch) A.profile.save(); };
   const CONT = { af: L("África", "Africa"), na: L("Norteamérica", "North America"), sa: L("Sudamérica", "South America"), as: L("Asia", "Asia"), eu: L("Europa", "Europe"), oc: L("Oceanía", "Oceania"), an: L("Antártida", "Antarctica") };   // sin "an" el Pasaporte diria "el mar" en cualquier lugar de la Antartida
   const centre = o => { const f = C().world.byName[o.key], big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a)); return [(big.bbox[1] + big.bbox[3]) / 2, (big.bbox[0] + big.bbox[2]) / 2]; };
   const latlon = o => (o.t === "c" ? centre(o) : [o.lat, o.lon]);
@@ -152,10 +202,14 @@ window.AIQ = window.AIQ || {};
   A.adv = { get run() { return run; }, hasSave(daily) { try { return !!localStorage.getItem(keyOf(daily)); } catch (e) { return false; } } };
   A.adv.poolStats = () => Object.fromEntries(Object.entries(pools()).map(([k, v]) => [k, v.length]));
   A.adv.roundPlaces = r => poolFor(r);
+  A.adv.countSeen = countSeen;
+  A.adv._autoAssign = () => autoAssign();                            // solo para tools/: regenerar data/carretes.js desde el reparto automatico (ids)
+  A.adv._pools = () => pools();                                      // solo para tools/: el banco entero por tema (documento de carretes)
+  A.adv._pickTest = (slot, fresh, realSeen) => { if (fresh) run.used = []; if (!realSeen) run._scratch = run._scratch || {}; run.act = Math.floor(slot / 4); run.round = slot % 4; run.attempt = (run.attempt || 0) + 1; run.curQ = null; const qs = pickQuestions(5); const t = ROUND_THEME[slot]; qs.forEach(q => A.adv.countSeen(q, t === "flag" ? "flag" : q.topic)); return qs.map(q => q.cid[0]); };   // solo para pruebas (dev/): sorteo de una ronda y la cuenta de vistas (aparte, salvo realSeen)
   A.adv.roundPool = r => poolFor(r).length;
   const persist = () => { try { if (run) localStorage.setItem(slot, JSON.stringify(run)); else localStorage.removeItem(slot); } catch (e) { /* sin almacenamiento */ } };
 
-  const ascFx = a => ({ target: 1 + 0.1 * a, secs: -a, lives: a >= 3 ? -1 : 0, price: 1 + 0.1 * a, boss2: a >= 4 });
+  const ascFx = a => ({ target: 1 + 0.05 * a, secs: -a, lives: a >= 3 ? -1 : 0, price: 1 + 0.1 * a, boss2: a >= 4 });
   const roundNo = () => run.act * 4 + run.round;
   /* Reto diario: la ruta del dia baraja las rondas de cada acto (run.route[hueco] = ronda original); el jefe sigue siendo el 4.o hueco de cada acto */
   const slotOf = r => (run && run.route && r < 12 ? run.route[r] : r);
@@ -167,8 +221,9 @@ window.AIQ = window.AIQ || {};
   const has = flag => perkList().some(p => p[flag]);
   const sumFlag = flag => perkList().reduce((n, p) => n + (p[flag] || 0), 0);
   const owned = id => run.perks.includes(id);
-  /* objetivo: escalera lineal, +350 por ronda de 2.000 (ronda 1) a 5.500 (ronda 11); el jefe final (ronda 12) es 5.777 exactos. Redondeado a 50 (salvo ese 5.777 sin ascension ni perks de ronda) */
-  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = r >= 11 ? 5777 : 2000 + 350 * r, m = ascFx(run.asc).target * t.target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };
+  /* objetivo: escalera lineal, +250 por ronda de 2.000 (ronda 1) a 4.500 (ronda 11); el jefe final (ronda 12) es 4.777 exactos. Redondeado a 50 (salvo ese 4.777 sin ascension ni perks de ronda).
+     v0.20 (usuario, 2026-09-30): que pese mas SABER que clavar; antes +350 por ronda, 5.777 y +10 % por Ascension hacian imposibles las rondas 11-12 aunque supieras las cinco */
+  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = r >= 11 ? 4777 : 2000 + 250 * r, m = ascFx(run.asc).target * t.target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };
   const shopCtx = () => { const x = { price: 0, freeReroll: 0, slots: 3 }; perkList().forEach(p => p.shop && p.shop(x, run)); return x; };
   const inflation = () => 1 + 0.25 * run.act;                            // todo cuesta mas en cada acto: el dinero pesa mas segun avanzas
   const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price * inflation()) + shopCtx().price);
@@ -277,7 +332,7 @@ window.AIQ = window.AIQ || {};
     else if (run.phase === "retry") openShop(false);                                        // ronda fallida: vuelves al campamento para reintentar
     else if (run.phase === "round" && (run.inf ? run.infOver : run.curQ && run.qi >= run.qn)) endSaved();   // guardaste en el ticket de la ultima pregunta: la ronda se cierra (antes se repetia entera sin perder provision)
     else if (run.phase === "round" && run.inf) startInfinite(true);                         // sigue en el modo infinito donde lo dejaste
-    else if (run.phase === "round" && run.qi < run.qn && run.curQ) { run.used = run.used.filter(id => !run.curQ.includes(id)); startRound(true); }   // sigue en la misma pregunta con las mismas preguntas (tambien en la primera: antes salir y volver daba 5 lugares nuevos y las herramientas recargadas)
+    else if (run.phase === "round" && run.qi < run.qn && run.curQ) { run.used = run.used.filter(id => !run.curQ.includes(id)); startRound(true); }   // pickQuestions(n, true) repone las mismas (run.curQ)   // sigue en la misma pregunta con las mismas preguntas (tambien en la primera: antes salir y volver daba 5 lugares nuevos y las herramientas recargadas)
     else startRound();
     return true;
   };
@@ -308,15 +363,35 @@ window.AIQ = window.AIQ || {};
   /* ---------------- ronda ---------------- */
   /* el pais siempre a la vista: si el lugar no tiene pais (mares, desiertos, cordilleras...), se muestra su continente */
   const withSub = q => { if (q.t === "p" && !q.clue && !(q.sub && (q.sub.en || q.sub.es))) { const c = CONT[continentOf(q)]; if (c) q.sub = { es: c.es, en: c.en }; } return q; };
-  function pickQuestions(n) {
-    const def = rdef(), list = poolFor(slotOf(roundNo())), rr = A.rng(`${run.seed}:q:${roundNo()}:${run.attempt}`), used = new Set(run.used);
-    let cand = list.filter(q => !used.has(q.cid[0]));
-    if (cand.length < n) { run.used = []; cand = list.slice(); }
-    const out = rr.shuffle(cand).slice(0, n);
-    run.curQ = out.map(q => q.cid[0]); run.used = run.used.concat(run.curQ);
+  /* v0.20: 3 faciles, 1 media y 1 dificil de las franjas de la ronda (ver bandsOf/takeFrom), en orden barajado; al reanudar, las mismas de antes */
+  const QV = 2;                                                      // version del sorteo: una partida guardada con el de antes (v0.19) no reutiliza sus preguntas al reanudar
+  const ctxOf = (pos, usedIds, topic) => { const all = allQ(), ctx = { used: new Set(usedIds), names: new Set(), topic: topic === "mixed" ? null : topic }; usedIds.forEach(id => all[id] && nameKeys(all[id]).forEach(k => ctx.names.add(k))); return ctx; };
+  function drawRound(pos, attempt, usedIds, n = 5) {                 // n preguntas de la ronda de la posicion pos (0-11, y la Leyenda): 3 faciles, 1 media y 1 dificil, en orden barajado
+    const slot = slotOf(pos), B = bandsOf(slot), rr = A.rng(`${run.seed}:q:${pos}:${attempt}`), ctx = ctxOf(pos, usedIds, B.topic), taken = [];
+    for (const b of [B.bands[2], B.bands[1], B.bands[0]]) takeFrom(b.list, Math.round(b.n * n / 5), rr, taken, ctx, b.k === "h" ? B.tail : null);   // primero la dificil y la media: las faciles tienen mas donde elegir
+    for (const b of B.bands) if (taken.length < n) takeFrom(b.list, n - taken.length, rr, taken, ctx, null);   // franja corta: se completa con las otras
+    return rr.shuffle(taken).slice(0, n);
+  }
+  /* Reto diario: "ya preguntado" sale solo de la semilla (los primeros intentos de las rondas anteriores y los intentos previos de esta), nunca de lo que haya hecho
+     cada jugador (reintentos, Carta de cambio): asi todos ven las mismas preguntas en el mismo intento */
+  let DU = { seed: null, memo: {} };
+  function dailyUsed(pos) {
+    if (DU.seed !== run.seed) DU = { seed: run.seed, memo: {} };
+    if (DU.memo[pos]) return DU.memo[pos];
+    const prev = pos > 0 ? dailyUsed(pos - 1) : [];
+    return (DU.memo[pos] = pos > 0 ? prev.concat(drawRound(pos - 1, 0, prev).map(q => q.cid[0])) : []);
+  }
+  function pickQuestions(n, keep) {
+    const all = allQ();
+    if (keep && run.qv === QV && run.curQ && run.curQ.length === n && run.curQ.every(id => all[id])) { run.used = run.used.concat(run.curQ.filter(id => !run.used.includes(id))); return run.curQ.map(id => withSub({ ...all[id] })); }
+    const pos = roundNo();
+    let used = run.used;
+    if (run.board) { used = dailyUsed(pos); for (let a = 0; a < run.attempt; a++) used = used.concat(drawRound(pos, a, used, n).map(q => q.cid[0])); }
+    const out = drawRound(pos, run.attempt, used, n);
+    run.qv = QV; run.curQ = out.map(q => q.cid[0]); run.used = run.used.concat(run.curQ);
     return out.map(q => withSub({ ...q }));
   }
-  function roundLevel() {
+  function roundLevel(keep) {
     const r = roundNo(), boss = isBoss(), def = rdef(), cf = chalFor(r), halve = 1;
     const ctx = { seconds: clamp(Math.round(26 - 1.0 * r + ascFx(run.asc).secs), 10, 28), target: 1 };
     perkList().forEach(p => p.round && p.round(ctx, run));
@@ -327,7 +402,7 @@ window.AIQ = window.AIQ || {};
     if (rules.includes("clock")) ctx.seconds = Math.max(6, Math.round(ctx.seconds * (1 - 0.45 * halve)));
     run.boss = rules; run.wind = null;
     if (rules.includes("wind")) { const wr = A.rng(`${run.seed}:wind:${r}:${run.attempt}`); run.wind = { brg: Math.round(wr() * 360), km: Math.round((160 + 40 * run.act) * halve) }; }
-    const qs = pickQuestions(run.qn), info = actInfo(run.act), tn = TOPIC_NAMES[def.topic][Math.min(def.tier, TOPIC_NAMES[def.topic].length - 1)];
+    const qs = pickQuestions(run.qn, keep), info = actInfo(run.act), tn = TOPIC_NAMES[def.topic][Math.min(def.tier, TOPIC_NAMES[def.topic].length - 1)];
     run.topic = def.topic; run.tier = def.tier;
     return {
       name: `${A.tx(info.n)} · ${boss ? A.T("Jefe", "Boss") : A.tf("Ronda {n}/3", "Round {n}/3", { n: run.round + 1 })}`, topicName: tn, topic: def.topic, kind: "adventure", boss: !!boss,
@@ -338,7 +413,7 @@ window.AIQ = window.AIQ || {};
   function startRound(keep) {
     run.phase = "round";
     if (!keep) { run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.rBulls = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
-    const Lv = roundLevel(), S = C().S;
+    const Lv = roundLevel(keep), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
     A.dealer.enable(true); A.chal.begin(run.chal, A.chal.fx(perkList()), { seed: run.seed, round: roundNo(), halve: run.chalHalve });
@@ -428,7 +503,7 @@ window.AIQ = window.AIQ || {};
     const Lv = C().S.camp.levels[0], limit = C().S.limit || Lv.seconds, halve = 1, boss = run.boss || [], S = C().S;
     const r = roundNo(), c = {
       o, km, left, limit, kind: o.kind || (o.clue ? "clue" : "place"), topic: o.topic || "mixed", cont: continentOf(o), coins: 0, lines: [], xmult: 1, mult: 1, streakStep: 0.2, luck: false,
-      scale: clamp(1500 * Math.pow(0.94, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1),
+      scale: clamp(1500 * Math.pow(0.97, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1),   // v0.20: el margen se estrecha un 3 % por ronda (antes 6 %)
     };
     perkList().forEach(p => p.q && p.q(c, run));
     if (km != null) perkList().forEach(p => p.km && p.km(c, run));
@@ -450,6 +525,7 @@ window.AIQ = window.AIQ || {};
   let reactT = 0, abSwapped = false;                                                     // reaccion pendiente del crupier a la ultima respuesta
   A.adv.afterQuestion = function (res) {
     clearTimers();
+    { const S0 = C().S, q0 = S0.qs && S0.qs[S0.qi]; A.adv.countSeen(q0, run.topic === "flag" ? "flag" : q0 && q0.topic); }   // v0.20: veces que ha salido cada pregunta
     run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) { run.stats.bulls++; run.rBulls = (run.rBulls || 0) + 1; } run.stats.best = Math.max(run.stats.best, res.total);
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
     const prevStreak = run.streak || 0, prevScore = run.roundScore - res.total, goalLv = C().S.camp && C().S.camp.levels && C().S.camp.levels[0];
@@ -492,7 +568,7 @@ window.AIQ = window.AIQ || {};
   };
   function revealCountry(o) {
     if (o.t === "c") { noteH(A.T("Continente: ", "Continent: ") + continentName(o), "passport"); return; }
-    const ne = neOf(o.sub && o.sub.en);
+    const ne = o.clue ? null : (o.cEn && o.cEn.length ? o.cEn : [o.sub && o.sub.en]).map(neOf).find(Boolean);   // lugares con dos paises: el primero que exista en el mapa; en las pistas, solo el continente (como antes)
     if (ne && C().world.byName[ne]) { C().map.setMarks({ highlight: ne }); noteH(A.tx(o.sub), "passport"); }
     else noteH(A.T("Continente: ", "Continent: ") + continentName(o), "passport");
   }
@@ -571,10 +647,17 @@ window.AIQ = window.AIQ || {};
   };
   /* Carta de cambio: otro lugar de la ronda en vez del actual */
   function swapQuestion() {
-    const S = C().S, list = poolFor(slotOf(roundNo())), used = new Set(run.used), cand = list.filter(q => !used.has(q.cid[0]));
-    if (!cand.length) { noteH(A.T("No quedan lugares para cambiar.", "No places left to swap.")); return false; }
-    const q = withSub({ ...A.rng(`${run.seed}:swap:${roundNo()}:${S.qi}:${run.qTotal}`).pick(cand) });
-    if (run.curQ) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]); S.qs[S.qi] = q;
+    const S = C().S, cur = S.qs[S.qi], rr = A.rng(`${run.seed}:swap:${roundNo()}:${S.qi}:${run.qTotal}`); let pick = null;
+    if (!cur) return false;
+    if (run.inf) { const used = new Set(run.used), cand = infPool().filter(q => !used.has(q.cid[0])); pick = cand.length ? rr.pick(cand) : null; }   // modo infinito: del banco entero
+    else {                                                           // v0.20: otra de la misma franja (facil por facil, dificil por dificil), con las reglas de la ronda y del mazo
+      const pos = roundNo(), slot = slotOf(pos), B = bandsOf(slot), bi = Math.max(0, B.bands.findIndex(b => b.list.some(q => q.cid[0] === cur.cid[0]))), b = B.bands[bi];
+      const others = S.qs.filter((q, i) => q && i !== S.qi);
+      pick = takeFrom(b.list, 1, rr, others.slice(), ctxOf(pos, run.used, B.topic), null)[0] || null;
+    }
+    if (!pick) { noteH(A.T("No quedan lugares para cambiar.", "No places left to swap.")); return false; }
+    const q = withSub({ ...pick });
+    if (run.curQ && !run.inf) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]); S.qs[S.qi] = q;
     C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; A.adv.onQuestion(); A.sfx.card(); return true;
   }
   const continentName = o => A.tx(CONT[continentOf(o)] || L("el mar", "the sea"));
