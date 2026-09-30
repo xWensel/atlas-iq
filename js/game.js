@@ -354,6 +354,7 @@
     const cur = () => (host && host.windowMode ? host.windowMode() : document.fullscreenElement ? "full" : "window");
     seg.addEventListener("click", e => {
       const b = e.target.closest("button"); if (!b) return; const v = b.dataset.v; A.sfx.ui();
+      if (v !== cur() && A.dealer && A.dealer.noteWindow) A.dealer.noteWindow(v);           // el crupier lo comenta al volver
       if (host && host.setWindowMode) host.setWindowMode(v);
       else if (v === "full" && !document.fullscreenElement) toggleFs(); else if (v === "window" && document.fullscreenElement) toggleFs();
       setTimeout(() => segSet(seg, cur()), 120);
@@ -487,6 +488,7 @@
     startLevel_(S.startLevel);
   }
   function startLevel_(idx) {
+    if (!S.run && A.dealer && A.dealer.noteClassic) A.dealer.noteClassic();     // juegas al Clasico: al volver a la portada, el crupier lo comenta
     document.body.classList.remove("title-on"); S.level = idx; S.qs = lv().questions(); S.qi = 0; S.levelScore = 0; S.streak = 0; S.hits = 0; S.phase = "intro"; S.runMax0 = S.runMax;   // maximo acumulado al empezar el nivel (Reintentar vuelve a el)
     closeDialog(); $("plate").classList.add("hidden"); $("pauseBtn").classList.add("hidden"); $("streakChip").classList.add("hidden");
     chrome(true); $("factText").textContent = ""; odoNow($("scLevel"), 0); updateHud();
@@ -592,6 +594,7 @@
     if (S.run) {                                                   // Aventura: reliquias, jefes y fichas x mult
       adv = A.adv.score(o, guess ? km : null, left, false); sc = adv.sc; S.streak = adv.streak; chips = adv.chips; mult = adv.mult * adv.xmult; total = adv.total;
       const lt = map.lastTap; map.lastTap = null;                                  // el crupier compara tu mano de verdad con el pin (solo lo comenta)
+      adv.guess = guess || null;
       if (guess && lt && performance.now() - lt.at < 1500) { const d = ll => (isC ? A.geo.distToFeature(ll[0], ll[1], world.byName[o.key]) : A.geo.haversine(ll[1], ll[0], o.lat, o.lon)); try { adv.hand = { raw: d(lt.raw), plain: d(lt.plain) }; } catch (e) { adv.hand = null; } }
       A.adv.afterQuestion(adv);
     } else {
@@ -804,7 +807,9 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
   $("pauseBtn").onclick = togglePause;
   function toggleFs() {
     const host = window.geoliteHost;
-    if (host && host.setWindowMode) { host.setWindowMode(host.windowMode() === "full" ? "window" : "full"); return; }
+    const to = host && host.windowMode ? (host.windowMode() === "full" ? "window" : "full") : document.fullscreenElement ? "window" : "full";
+    if (A.dealer && A.dealer.noteWindow) A.dealer.noteWindow(to);
+    if (host && host.setWindowMode) { host.setWindowMode(to); return; }
     if (document.fullscreenElement) document.exitFullscreen();
     else (document.documentElement.requestFullscreen || (() => {})).call(document.documentElement);
   }
@@ -858,10 +863,12 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
   }
   function runBoot() {
     const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden");
-    const showGate = () => { $("studio").classList.add("hidden"); gate.classList.remove("hidden"); };
+    let gateAt = 0;
+    const showGate = () => { $("studio").classList.add("hidden"); gate.classList.remove("hidden"); gateAt = performance.now(); };
     let entered = false;
     const enter = () => {
       if (entered) return; entered = true; A.audio.unlock(false); requestFs();
+      if (gateAt && A.dealer && A.dealer.noteGate) A.dealer.noteGate(performance.now() - gateAt);   // cuanto tardaste en entrar
       gate.classList.add("hidden"); finishBoot();
     };
     gate.addEventListener("pointerdown", enter);

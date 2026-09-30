@@ -416,5 +416,6 @@ window.AIQ = window.AIQ || {};
     else if (e.repeat && (e.key === "Enter" || e.key === " ")) e.preventDefault();                       // dejarlo pulsado no se salta la trastada
   }
 
-  A.salir = { button, wire, open, isOpen: () => !!st, stats: () => ({ quits: store.quits || 0, stays: store.stays || 0, opens: store.opens || 0, trolls: store.trolls || 0, last: store.last || "" }), _troll: k => { forced = TROLLS.includes(k) ? k : null; } };   // _troll: la proxima trastada (pruebas)
+  A.salir = { tv: { off: crtOff, on: crtOn },                                            // la tele que se apaga, tambien para la jubilacion del crupier (js/dealer.js)
+    button, wire, open, isOpen: () => !!st, stats: () => ({ quits: store.quits || 0, stays: store.stays || 0, opens: store.opens || 0, trolls: store.trolls || 0, last: store.last || "" }), _troll: k => { forced = TROLLS.includes(k) ? k : null; } };   // _troll: la proxima trastada (pruebas)
 })(window.AIQ);

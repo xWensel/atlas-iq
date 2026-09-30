@@ -78,6 +78,10 @@ function buildWindow(mode, url) {
   }
   const w = new BrowserWindow(opts);
   if (mode !== "border") w.center();
+  /* el crupier nota que mueves la ventana a otro monitor (js/dealer.js: "me cambias de pantalla") */
+  let disp = null; const dispOf = () => { try { return screen.getDisplayMatching(w.getBounds()).id; } catch (e) { return null; } };
+  w.once("ready-to-show", () => { disp = dispOf(); });
+  w.on("moved", () => { const d = dispOf(); if (disp != null && d != null && d !== disp && !w.isDestroyed()) w.webContents.send("host:display"); if (d != null) disp = d; });
   w.once("ready-to-show", () => w.show());
   wireWindow(w);
   w.loadURL(url);

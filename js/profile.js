@@ -212,6 +212,7 @@ window.AIQ = window.AIQ || {};
     if (!el) { el = document.createElement("div"); el.id = "achToast"; el.className = "ach-toast hidden"; (document.getElementById("leftCol") || document.getElementById("app")).appendChild(el); }
     el.innerHTML = `<span class="ach-ico">${A.badge(a.id)}</span><span class="ach-t"><em>${A.T("Logro desbloqueado", "Achievement unlocked")}</em><b>${A.tx(a.name)}</b><i>${A.tx(a.desc)}</i></span>`;
     el.classList.remove("hidden", "in"); A.restyle(el); el.classList.add("in"); A.sfx.ach();
+    if (A.dealer && A.dealer.noteAch) A.dealer.noteAch(a);                       // el crupier lo comenta a veces (js/dealer.js)
     setTimeout(() => { el.classList.add("hidden"); showing = false; setTimeout(toast, 250); }, 4600);
   }
   /* EL LOGRO FALSO del crupier (js/dealer.js): identico a un aviso de verdad (mismo sonido), con su cara en la ficha; al segundo le cae el sello

@@ -4,6 +4,13 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.20.1** - El crupier te conoce: su relación contigo crece partida a partida, sin hablar más.
+- Tú contra la banca: marcador histórico, su apuesta de en qué ronda caerás, tu némesis y su tarjeta de socio que sella al subir de categoría (habitual, rival, socio); si ganas en Ascensión 5, se jubila.
+- El ticket te lee: chincheta trampa, racha rota, «te vi pararte encima», el país en el que caíste, meta alcanzada y victorias por los pelos.
+- Fuera de la mesa: el funeral de la expedición que tiras, el botón de abandonar que cambia al rozarlo, lo que tardaste en cruzar la puerta, te lee la carta que miras, ventana y pantalla completa, borrar datos, abrir el juego dos veces, saltarte su tutorial.
+- Carga medida de nuevo con jugadores simulados (nuevo y veterano): ~1 de cada 4 respuestas comentadas y casi ninguna frase repetida literal; «otro país» y «ya tienes la meta» esperan su turno, la reliquia contra su truco no se repite, una sola frase de fórmula por intro y el Campamento una visita sí y otra no.
+- Logros secretos comentados y escena bajo el foco con el último de los 100; el podio de la Clasificación, tu vuelta del Clásico, el idioma de tu ordenador, la Torre de Babel anunciada en otro idioma, el engranaje de Ajustes y el cambio de monitor.
+
 **v0.19.1** - El crupier, en todas partes: rompe la cuarta pared en todo el juego, habla menos y cuando cuenta.
 - Nunca se le corta a media frase: si su pantalla cambia se lleva la frase o la termina en su esquina; calla en la Enciclopedia; no habla invisible en ventanas bajas; asoma también en pantallas de más de 2000 px.
 - Presupuesto de voz (medido con un jugador simulado): calma tras una racha de frases, ~1 de cada 4 respuestas comentadas, un comentario por ronda mientras piensas y la portada más espaciada. Más frases en las reacciones y los trucos no se repiten literal.

@@ -80,6 +80,7 @@ window.AIQ = window.AIQ || {};
     const tour = cur; cur = null; const el = $("tour"); if (el) { el.classList.remove("on"); setTimeout(() => el.classList.add("hidden"), 220); }
     removeEventListener("resize", onResize); removeEventListener("keydown", onKey, true); freeze(false);
     if (tour) { P().tour = P().tour || {}; P().tour[tour.id] = 1; if (skipAll) { P().tour.q = P().tour.camp = 1; } A.profile.save(); }
+    if (tour && skipAll && A.dealer && A.dealer.tourSkip) A.dealer.tourSkip();         // "¿Saltarte MI tutorial?"
   }
   const onResize = () => { if (cur) show(true); };                                   // recolocar sin repetir el sonido de carta en cada evento de resize
   const onKey = e => {

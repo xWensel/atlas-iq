@@ -156,6 +156,13 @@ window.AIQ = window.AIQ || {};
   }
   P.mods = () => { P.m = A.chal && A.chal.ptrMods ? A.chal.ptrMods() : null; };
   P.effective = () => (P.on ? [P.x, P.y] : null);
+  /* para el crupier (js/dealer.js): lon/lat bajo el reticulo (lo que ya se calcula a ~30 Hz) y el pais de un punto */
+  P.ll = () => (P.on ? lastLL : null);
+  P.countryAt = (lon, lat) => {                                                     // en la costa el mapa simplificado deja fuera muchas ciudades: el pais mas cercano a menos de 40 km
+    if (!map || !map.world) return ""; let f = countryAt(lon, lat);
+    if (!f) { let best = 40; for (const g of map.world.features) { if (!g.polys.some(p => lon >= p.bbox[0] - 1 && lon <= p.bbox[2] + 1 && lat >= p.bbox[1] - 1 && lat <= p.bbox[3] + 1)) continue; const d = A.geo.distToFeature(lon, lat, g); if (d < best) { best = d; f = g; } } }
+    return f ? countryName(f) : "";
+  };
   /* termometro: azul (lejos) -> rojo (cerca), por franjas */
   const HOT = [[6000, "#3b6bff"], [3000, "#35a7ff"], [1500, "#3fe0c8"], [700, "#7be04a"], [350, "#f2e03a"], [150, "#ffa53a"], [0, "#ff3b3b"]];
   const hotColor = km => { for (const [k, c] of HOT) if (km >= k) return c; return HOT[HOT.length - 1][1]; };

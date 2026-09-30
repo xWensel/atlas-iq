@@ -20,4 +20,6 @@ contextBridge.exposeInMainWorld("geoliteHost", {
   quit: () => ipcRenderer.send("app:quit"),
   /* abres el juego otra vez con este abierto: main trae esta ventana al frente y el crupier lo comenta (js/dealer.js) */
   onAgain: (cb) => ipcRenderer.on("host:again", () => cb()),
+  /* mueves la ventana a otro monitor (el crupier lo comenta) */
+  onDisplay: (cb) => ipcRenderer.on("host:display", () => cb()),
 });

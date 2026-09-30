@@ -447,11 +447,12 @@ window.AIQ = window.AIQ || {};
     c.sc = { dist, time, distMax: 1000, timeMax: 400 };
     return c;
   };
-  let reactT = 0;                                                     // reaccion pendiente del crupier a la ultima respuesta
+  let reactT = 0, abSwapped = false;                                                     // reaccion pendiente del crupier a la ultima respuesta
   A.adv.afterQuestion = function (res) {
     clearTimers();
     run.coins += res.coins; run.stats.coinsEarned += res.coins; if (res.dist >= 960) { run.stats.bulls++; run.rBulls = (run.rBulls || 0) + 1; } run.stats.best = Math.max(run.stats.best, res.total);
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
+    const prevStreak = run.streak || 0, prevScore = run.roundScore - res.total, goalLv = C().S.camp && C().S.camp.levels && C().S.camp.levels[0];
     run.streak = res.streak || 0; run.qi++; run.qTools = 0;
     if (run.inf && !run.infOver) {
       const S = C().S, Lv = S.camp.levels[0];
@@ -469,7 +470,13 @@ window.AIQ = window.AIQ || {};
     const qAt = C().S.qi, still = () => { const S2 = C().S; return !!run && S2.qi === qAt && S2.phase === "reveal"; };   // pasaste a la siguiente: ya no la comenta
     /* lo que el crupier sabe de esta respuesta: el lugar, tu mano de verdad y si es "ese sitio otra vez" (js/dealer.js) */
     const oq = C().S.qs[qAt], info = { valid: still, km: res.km, dist: res.dist, hand: res.hand || null, chal: (run.chal || []).map(c => c.id), rk: run.act + ":" + run.round + ":" + (run.attempt || 0),
-      place: oq ? A.tx(oq.clue ? oq.answer : oq.name) : "", key: oq ? (oq.cid ? oq.cid[0] : oq.key || (oq.name && (oq.name.en || oq.name.es))) : "" };
+      place: oq ? A.tx(oq.clue ? oq.answer : oq.name) : "", key: oq ? (oq.cid ? oq.cid[0] : oq.key || (oq.name && (oq.name.en || oq.name.es))) : "",
+      dwell: A.dealer.trackEnd ? A.dealer.trackEnd() : 0, streakEnd: prevStreak >= 5 && !run.streak ? prevStreak : 0,
+      goal: !run.inf && !!goalLv && prevScore < goalLv.advance && run.roundScore >= goalLv.advance && run.qi < run.qn };
+    /* en que pais cayo tu pin y cual se buscaba; y si picaste en una chincheta trampa (solo para lo que dice el crupier) */
+    const g = res.guess, P0 = A.pointer;
+    if (g && res.km != null && P0 && P0.countryAt) { info.pinC = P0.countryAt(g.lon, g.lat); info.tgtC = oq && oq.t === "c" ? A.tx(oq.clue ? oq.answer : oq.name) : oq ? P0.countryAt(oq.lon, oq.lat) : ""; }
+    const dcs = C().map && C().map.decoys; if (g && dcs && dcs.length) info.decoy = dcs.some(d => A.geo.haversine(g.lat, g.lon, d.lat, d.lon) < 90);
     if (A.dealer.noteAnswer) A.dealer.noteAnswer(info);
     clearTimeout(reactT); reactT = setTimeout(() => { if (still()) A.dealer.react(kind || "quiet", info); }, 1300);
   };
@@ -501,6 +508,7 @@ window.AIQ = window.AIQ || {};
   document.addEventListener("visibilitychange", () => { if (document.hidden) snapSpent(); });
   addEventListener("pagehide", snapSpent);
   A.adv.onQuestion = function () {
+    { const o0 = C().S.qs[C().S.qi]; if (A.dealer.trackQ) A.dealer.trackQ(o0 && o0.t !== "c" ? o0.lat : null, o0 && o0.t !== "c" ? o0.lon : null); }   // te vio encima (js/dealer.js)
     if (run && run.qSpent) { if (run.qSpent.k === qKey()) C().S.t0 -= run.qSpent.ms; run.qSpent = null; }
     clearTimers(); hints.length = 0; run.qTools = 0; run.probes = []; run.tool = null; run.windOff = false; const S = C().S; S.tool = null; renderBars();
     const o = S.qs[S.qi]; if (!o) return;
@@ -631,6 +639,7 @@ window.AIQ = window.AIQ || {};
     if (run.inf) { run.score += C().S.levelScore; run.sup = {}; persist(); A.adv.hideBars(); return endRun(true); }   // modo infinito: sin provisiones, se cobra directamente
     const S = C().S, Lv = S.camp.levels[0], pass = S.levelScore >= Lv.advance, boss = isBoss();
     if (A.dealer.noteTricks) A.dealer.noteTricks((run.chal || []).map(c => c.id), pass);   // el historial de cada truco (lo cuenta el crupier en la intro)
+    if (A.dealer.noteRound) A.dealer.noteRound(pass);                                     // el marcador historico: tu contra la banca
     S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); clearTimeout(reactT); A.chal.end(); C().map.setStyle(mapStyleFor());
     if (pass) {
       run.score += S.levelScore; run.cleared++; S.runTotal = run.score;
@@ -654,7 +663,7 @@ window.AIQ = window.AIQ || {};
         stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : "win",
         buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => { if (boss && run.act < 2 && !run.chestStuckDone && Math.random() < 0.6) { run.chestStuckDone = true; persist(); return stuckChest(); } afterVerdict(boss); } }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
       });
-      const wb = { big: lt.margin >= 3, c: got, p: pctOf(S.levelScore - Lv.advance, Lv.advance), rn: roundNo() + 1 };   // aplastar la meta (+50 %) tiene sus propias frases
+      const wb = { big: lt.margin >= 3, c: got, p: pctOf(S.levelScore - Lv.advance, Lv.advance), rn: roundNo() + 1, close: S.levelScore - Lv.advance < Lv.advance * 0.05 ? S.levelScore - Lv.advance : null };   // close: por los pelos   // aplastar la meta (+50 %) tiene sus propias frases
       setTimeout(() => A.dealer.react("roundWin", wb), 700);                // el crupier protesta (antes estas frases nunca se decian)
     } else {
       const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
@@ -675,6 +684,7 @@ window.AIQ = window.AIQ || {};
       });
       const lives = run.lives; setTimeout(() => A.dealer.react("roundFail", { lives, conso }), 700);
       A.dealer.hover($("abBtn"), "hoverAbandon");                            // si el cursor va hacia Abandonar, el crupier lo ve
+      { const ab = $("abBtn"); if (ab && !abSwapped) ab.addEventListener("pointerenter", () => { if (abSwapped || !ab.isConnected) return; abSwapped = true; const sp = ab.querySelector("span"); if (sp) sp.textContent = A.pick6("Abandonar (y dejarle ganar)|Abandon (and let him win)|Abandonner (et le laisser gagner)|Abandonar (e deixar ele ganhar)|Aufgeben (und ihn gewinnen lassen)|Abbandona (e lascialo vincere)||放弃（让他赢）|포기 (그가 이기게 두기)|やめる（彼を勝たせる）|Сдаться (и дать ему выиграть)|Poddaj się (i daj mu wygrać)"); if (A.sfx.buzz) A.sfx.buzz(1); }); }   // el boton dice la verdad (una vez por sesion)
     }
     if (run.sup && run.sup.seguro) run.segN = (run.segN || 0) + 1;         // Seguro gastado: el siguiente cuesta 2 mas
     run.sup = {}; persist();                                                // los suministros solo valen para una ronda
@@ -928,7 +938,7 @@ window.AIQ = window.AIQ || {};
       A.ach.emit("daily", {});
     }
     const r = run; run = null; persist(); C().S.run = null; A.chal.end(); A.dealer.enable(true);
-    const fell = { r: r.cleared + 1, won: !!r.won, record: rec && hadBest, daily };           // {r}: la ronda en la que caiste
+    const fell = { r: r.cleared + 1, won: !!r.won, record: rec && hadBest, daily, retire: !!(win && r.won && !daily && r.asc === 5) };   // retire: ganas en Ascension 5 (el crupier se jubila)           // {r}: la ronda en la que caiste
     A.dealer.noteRun(fell);
     /* v0.37: si aun no sabe tu nombre, te lo pregunta bajo un foco (js/nombre.js) y despues solo te invita a jugar otra */
     const asks = A.nombre && A.nombre.maybeAsk({ won: !!win, after: () => A.dealer.tempt({ ...fell, won: !!win }) });

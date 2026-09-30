@@ -126,7 +126,7 @@ window.AIQ = window.AIQ || {};
     st.phase = "done"; st.doneAt = Date.now(); P().nameAsk = (P().nameAsk || 0) + 1; A.profile.save();
     const inp = $("nmIn"); inp.readOnly = true; inp.blur();
     root.classList.add("skipped"); A.sfx.card();
-    A.dealer.say(A.dealer.pick("nameSkip"), { mood: "angry", hold: 0, force: true, done: () => later(close, 700) });
+    A.dealer.say(A.dealer.pick(P().nameAsk >= 3 ? "nameSkipLast" : "nameSkip"), { mood: "angry", hold: 0, force: true, done: () => later(close, 700) });   // el tercero: no te lo vuelve a preguntar (y te pondra un mote)
     later(close, 12000);
   }
   function close() {
