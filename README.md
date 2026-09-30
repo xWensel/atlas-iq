@@ -4,6 +4,12 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.24.1** - Intro del estudio nueva: Cousins Studio sobre negro.
+- Fondo negro puro en la intro (y en la transición hacia la pantalla de entrada).
+- Logo nuevo «Cousins Studio», dibujado a mano como trazos (sin fuentes), de la familia del de Vault Raiders: «Cousins» grande y «studio» debajo, letras gruesas y redondeadas con la t y la d de corte inclinado, en metal perla lavanda con filo de luz arriba y sombra violeta abajo.
+- Coreografía al ritmo del sonido: «Cousins» sale de la oscuridad y se enciende con el primer golpe grave (0,62 s); «studio» con el segundo (1,26 s), mientras se abren dos filetes finos a sus lados; una luz cálida cruza el metal (1,85 s) y la cámara avanza despacio con un empujón en cada golpe. Sin destellos ni partículas.
+- Fluida: cada letra es su propia capa y solo se animan transform y opacidad (más un filtro de color por palabra). 0 fotogramas perdidos a CPU x1 y x4. Se ve bien en 1280x720, en móvil y con «reducir movimiento».
+
 **v0.23.1** - Continentes movidos sin trampas: fuera «Continentes cambiados», ningún clic perdido y el Sonar, arreglado.
 - Adiós a «Continentes cambiados»: jugaba como Pangea, pero peor. Cada semilla sigue sacando los mismos retos salvo en las rondas donde salía (2.508 de 43.200 planes; en el Reto diario, 236 de 4.572). Si lo tenías sobornado en una partida guardada, se te devuelve el soborno. Sus jefes cambian: Falsa alarma (Big bang + Fronteras falsas), Baraja revuelta (Continentes torcidos + Apagón + Tinta borrada) y Bandera al revés del mundo (con Mundo del revés).
 - Con los continentes movidos ya no se pierde ningún clic (con Pangea se ignoraba hasta el 47 % del mapa): en tierra cuenta el continente que ves y en el mar, el de la pregunta si su costa está a menos de 260 km o si no el más cercano en pantalla. Tu chincheta cae justo donde tocas.

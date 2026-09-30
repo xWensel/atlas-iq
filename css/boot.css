@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Entrada (idioma + pantalla completa) y secuencia de estudio "Vault Raiders":
-   dial de camara acorazada -> clunk -> la puerta se abre -> el logo rebota -> destello
+   Entrada (idioma + pantalla completa) y secuencia del estudio "Cousins Studio":
+   sobre negro, "Cousins" se enciende con el primer golpe, "studio" con el segundo y una luz calida recorre el metal
    ========================================================================== */
-#boot { position: fixed; inset: 0; z-index: 100; background: #0c0616; color: var(--paper); display: grid; place-items: center; overflow: hidden; }
+#boot { position: fixed; inset: 0; z-index: 100; background: #000; color: var(--paper); display: grid; place-items: center; overflow: hidden; }
 #boot.out { animation: boot-out .8s ease forwards; } @keyframes boot-out { to { opacity: 0; visibility: hidden; } }
 
 /* ---- pantalla de entrada: mismo verde que la pantalla de carga, solo logo + "pulsa para entrar" (pantalla completa automatica al pulsar) ---- */
@@ -21,25 +21,55 @@
 @keyframes breathe { 50% { opacity: .35; } }
 @keyframes st-fade { from { opacity: 0; } to { opacity: 1; } }
 
-/* ---- secuencia del estudio (~3,4 s): el logo entra con calma, dos golpes graves, un brillo suave recorre las letras y se va ---- */
-.studio { position: absolute; inset: 0; overflow: hidden; background: #0c0616; }
-.st-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, #2f1648 0%, #180c28 48%, #0c0616 88%); animation: st-fade 1s ease both; }
-.st-bg::after { content: ""; position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse at 50% 50%, rgba(214, 140, 255, .38), transparent 55%); animation: st-beat 3.3s ease both; }
-@keyframes st-beat { 0%, 100% { opacity: 0; } 17% { opacity: .9; } 26% { opacity: .15; } 37% { opacity: 1; } 50% { opacity: .25; } 62% { opacity: .1; } }
+/* ---- secuencia del estudio (~3,5 s, fondo negro). Las letras de "Cousins" salen de la oscuridad en metal violeta apagado y se encienden
+   con el primer golpe grave (0,62 s); "studio" igual con el segundo (1,26 s) mientras sus filetes se abren hacia fuera; una luz calida
+   cruza el metal (1,85 s) y la camara avanza despacio todo el rato. Cada letra es una capa propia (js/logo.js) y solo se animan
+   transform/opacity de esas capas y un filtro de color por palabra (dos capas): la tarjeta grafica lo mueve todo, sin repintar ---- */
+.studio { position: absolute; inset: 0; overflow: hidden; background: #000; }
+.st-bg { position: absolute; inset: 0; opacity: 0; animation: st-bg 3.5s linear both;
+  background: radial-gradient(ellipse 46% 34% at 50% 50%, rgba(84, 38, 150, .04), rgba(84, 38, 150, .028) 30%, rgba(84, 38, 150, .012) 58%, rgba(84, 38, 150, .004) 82%, rgba(84, 38, 150, 0)); }
+@keyframes st-bg { 0%, 16% { opacity: 0; } 19% { opacity: 1; } 34% { opacity: .75; } 37% { opacity: 1; } 100% { opacity: .85; } }
 
-.st-logo { position: absolute; left: 50%; top: 50%; width: min(calc(70 * var(--vw)), 720px); transform: translate(-50%, -50%); animation: st-push 3.4s ease-out both; }
-@keyframes st-push { 0% { transform: translate(-50%, -50%) scale(.97); } 17% { transform: translate(-50%, -50%) scale(1.004); } 37% { transform: translate(-50%, -50%) scale(1.012); } 100% { transform: translate(-50%, -50%) scale(1.03); } }
-.st-logo .vr-logo { width: 100%; height: auto; display: block; overflow: visible; filter: drop-shadow(0 12px 44px rgba(214, 140, 255, .42)); }
-.st-logo .vr-img { width: 100%; height: auto; display: block; animation: vr-in .8s cubic-bezier(.16, 1, .3, 1) .3s both; }
-.vr-l { opacity: 0; animation: vr-in .75s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(.28s + var(--i) * 70ms); transform-box: fill-box; transform-origin: 50% 60%; }
-.vr-l.vr-small { animation-duration: .6s; animation-delay: calc(.95s + var(--i) * 45ms); }
-@keyframes vr-in { 0% { opacity: 0; transform: translateY(16px) scale(.965); filter: blur(7px); } 100% { opacity: 1; transform: none; filter: blur(0); } }
-.vr-shine { transform: translateX(-300px) skewX(-16deg); animation: vr-shine 1.2s cubic-bezier(.45, 0, .25, 1) 1.85s both; }
-@keyframes vr-shine { from { transform: translateX(-300px) skewX(-16deg); } to { transform: translateX(1200px) skewX(-16deg); } }
-/* si se usa el PNG original del estudio, el brillo se recorta con su silueta */
-.st-logo.has-png::after { content: ""; position: absolute; inset: 0; pointer-events: none; -webkit-mask: var(--vr-url) center / contain no-repeat; mask: var(--vr-url) center / contain no-repeat;
-  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .85) 50%, transparent 65%) -160% 0 / 60% 100% no-repeat; animation: st-png-shine 1.2s cubic-bezier(.45, 0, .25, 1) 1.85s both; }
-@keyframes st-png-shine { to { background-position: 260% 0; } }
+.st-logo { position: absolute; left: 50%; top: 50%; width: min(calc(52 * var(--vw)), calc(120 * var(--vh)), 960px); transform: translate(-50%, -50%); animation: st-push 3.6s linear both; }
+/* la camara avanza despacio y da un pequeno empujon con cada golpe grave (0,62 y 1,26 s) */
+@keyframes st-push { 0% { transform: translate(-50%, -50%) scale(.95); }
+  17.2% { transform: translate(-50%, -50%) scale(.957); animation-timing-function: cubic-bezier(.2, .7, .3, 1); } 20% { transform: translate(-50%, -50%) scale(.966); animation-timing-function: linear; }
+  35% { transform: translate(-50%, -50%) scale(.975); animation-timing-function: cubic-bezier(.2, .7, .3, 1); } 37.8% { transform: translate(-50%, -50%) scale(.983); animation-timing-function: cubic-bezier(.3, .1, .3, 1); }
+  100% { transform: translate(-50%, -50%) scale(1); } }
+.cs-anim { position: relative; width: 100%; }
+.cs-defs, .cs-glow, .cs-w, .cs-shine { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cs-defs { visibility: hidden; pointer-events: none; }
+/* halo violeta con forma de letra, uno por palabra (lienzo fijo, js/logo.js): estalla con su golpe y se queda en un rastro que no tine las contraformas */
+.cs-glow { display: block; opacity: 0; }
+.cs-gb { animation: cs-glow-b 3.5s linear both; }
+.cs-gs { animation: cs-glow-s 3.5s linear both; }
+@keyframes cs-glow-b { 0% { opacity: 0; } 17.6% { opacity: .2; } 17.8% { opacity: 1; } 22% { opacity: .56; } 27% { opacity: .36; } 34% { opacity: .26; } 36.2% { opacity: .34; } 64% { opacity: .2; } 100% { opacity: .15; } }
+@keyframes cs-glow-s { 0%, 29% { opacity: 0; } 35.8% { opacity: .2; } 36% { opacity: 1; } 40% { opacity: .56; } 46% { opacity: .36; } 55% { opacity: .26; } 68% { opacity: .2; } 100% { opacity: .15; } }
+/* cada letra sube, se acerca y se cierra hacia el centro de su palabra (escalonadas); "studio" algo mas deprisa */
+.cs-l { position: absolute; display: block; overflow: visible; opacity: 0; transform-origin: 50% 80%; will-change: transform, opacity;
+  animation: cs-rise 1.1s cubic-bezier(.22, .75, .25, 1) both; animation-delay: calc(.1s + var(--i) * 45ms); }
+@keyframes cs-rise { 0% { opacity: 0; transform: translate(var(--dx, 0), 12%) scale(.95); } 55% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+.cs-ws .cs-l { animation-duration: .95s; animation-delay: calc(.86s + var(--i) * 40ms); }
+.cs-ws .cs-rule { animation: cs-draw 1.3s cubic-bezier(.16, 1, .3, 1) 1.26s both; }
+.cs-rl { transform-origin: 100% 50%; } .cs-rr { transform-origin: 0 50%; }
+@keyframes cs-draw { 0% { opacity: 0; transform: scaleX(0); } 20% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+/* el encendido (un filtro de color por palabra): la palabra llega en penumbra violeta (primero se oscurece y luego se tine: asi el perla
+   tambien coge color) y en el golpe salta de una vez casi al blanco (steps: sin pasar por otros tonos) y se enfria hasta quedar sin filtro */
+.cs-wb { animation: cs-lit-b 2.4s linear backwards; }   /* sin "forwards": al acabar la palabra se queda sin filtro (none), no con uno neutro que seguiria costando una capa */
+.cs-ws { animation: cs-lit-s 3s linear backwards; }
+@keyframes cs-lit-b { 0% { filter: brightness(.14) sepia(1) hue-rotate(226deg) saturate(2.7); }
+  25.8% { filter: brightness(.27) sepia(1) hue-rotate(226deg) saturate(2.7); animation-timing-function: steps(1, end); }
+  25.9% { filter: brightness(1.55) sepia(0) hue-rotate(0deg) saturate(1); animation-timing-function: cubic-bezier(.2, .6, .3, 1); } 100% { filter: none; } }
+@keyframes cs-lit-s { 0% { filter: brightness(.14) sepia(1) hue-rotate(226deg) saturate(2.7); }
+  41.9% { filter: brightness(.27) sepia(1) hue-rotate(226deg) saturate(2.7); animation-timing-function: steps(1, end); }
+  42% { filter: brightness(1.55) sepia(0) hue-rotate(0deg) saturate(1); animation-timing-function: cubic-bezier(.2, .6, .3, 1); } 100% { filter: none; } }
+/* la luz: una franja calida que cruza una vez, recortada con la silueta del logo (mascara fija; solo se desplaza la franja) */
+.cs-shine { pointer-events: none; overflow: hidden; -webkit-mask: var(--cs-mask) 0 0 / 100% 100% no-repeat; mask: var(--cs-mask) 0 0 / 100% 100% no-repeat;
+  animation: cs-wake 1ms .3s both; }   /* la mascara se pinta a los 0,3 s y no en el primer fotograma, que ya carga con las letras (alli costaba un fotograma) */
+@keyframes cs-wake { from { visibility: hidden; } to { visibility: visible; } }
+.cs-band { position: absolute; top: 0; bottom: 0; left: 0; width: 36%; transform: translateX(-100%); animation: cs-sweep 1.35s cubic-bezier(.4, 0, .22, 1) 1.85s both;
+  background: linear-gradient(102deg, rgba(255, 206, 150, 0), rgba(255, 214, 170, .14) 28%, rgba(255, 228, 196, .5) 43%, rgba(255, 253, 246, 1) 50%, rgba(255, 228, 196, .5) 57%, rgba(255, 214, 170, .14) 72%, rgba(255, 206, 150, 0)); }
+@keyframes cs-sweep { from { transform: translateX(-100%); } to { transform: translateX(285%); } }
 
 .st-skip { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: rgba(242, 233, 214, .38); opacity: 0; animation: st-fade 1s ease 1.2s both; z-index: 7; }
 .studio.leave { animation: boot-out .6s ease forwards; }
