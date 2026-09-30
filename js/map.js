@@ -39,10 +39,13 @@ window.AIQ = window.AIQ || {};
   };
 
   /* ------------------------------------------------------------------ shaders */
-  /* deformaciones de los retos: cada continente puede girar sobre su centro y desplazarse (Pangea, continentes cambiados de sitio...) */
+  /* deformaciones de los retos: cada continente puede girar sobre su centro, encogerse y desplazarse (Pangea, Big bang, Continentes torcidos).
+     ct lleva el continente (0-6) y, en ct/8, la vuelta al mundo de esa copia del poligono respecto a la suya propia (2 = la propia; 1 y 3 = una vuelta
+     a cada lado). Las copias que cruzan el antimeridiano se mueven CON su original (antes giraban y se encogian alrededor del centro del
+     continente desde el otro lado del mundo y aparecia una Rusia fantasma encima de Europa) */
   const DISTORT = `
 uniform vec2 u_dsh[8]; uniform float u_drot[8]; uniform vec2 u_dcen[8]; uniform float u_dsc[8];
-vec2 xf(vec2 a, float ct){ int c=int(ct+0.5); vec2 cen=u_dcen[c]; vec2 d=a-cen; float ca=cos(u_drot[c]), sa=sin(u_drot[c]); return cen+u_dsc[c]*vec2(ca*d.x-sa*d.y, sa*d.x+ca*d.y)+u_dsh[c]; }`;
+vec2 xf(vec2 a, float ct){ int code=int(ct+0.5); int w=code/8; int c=code-w*8; vec2 o=vec2(float(w-2)*6.283185307179586,0.0); vec2 cen=u_dcen[c]; vec2 d=a-o-cen; float ca=cos(u_drot[c]), sa=sin(u_drot[c]); return cen+u_dsc[c]*vec2(ca*d.x-sa*d.y, sa*d.x+ca*d.y)+u_dsh[c]+o; }`;
   const VS_FILL = `#version 300 es
 layout(location=0) in vec2 a_pos; layout(location=1) in float a_ci; layout(location=2) in float a_ct;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform vec2 u_off;
@@ -260,6 +263,75 @@ void main(){
     };
   }
 
+  /* ================================================================== sondas (Sonar y Brujula), para el mapa de la GPU y el de respaldo 2D */
+  /* cada sonda conserva el momento en que aparecio (antes, cada sonda nueva hacia crecer y rebotar otra vez todos los anillos) */
+  const keepT0 = (old, list) => { const now = performance.now(); return list.map((p, i) => ({ ...p, t0: old && old[i] && old[i].lon === p.lon && old[i].lat === p.lat ? old[i].t0 : now })); };
+  A.keepT0 = keepT0;
+  const R_KM = 6371, destLL = (lat, lon, brg, km) => { const d = km / R_KM, la = lat * D2R, lo = lon * D2R, b = brg * D2R; const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b)); const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); return [((lo2 / D2R + 540) % 360) - 180, la2 / D2R]; };
+  const rgbaOf = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+  /* Cada sonda se dibuja entera en el marco del clic (p.ct): con los continentes movidos el anillo sale redondo alrededor de donde tocaste. La
+     etiqueta va junto a su marcador (fuera del anillo si este es pequeño; en la Brujula, al otro lado de la flecha) y se aparta de las demas:
+     antes iba en el punto norte del anillo, que a menudo era justo el objetivo, y varias se apilaban. Encima del objetivo (p.inside) no hay
+     anillo ni flecha: el marcador late y dice "¡Dentro del pais!" (antes no se veia nada). Devuelve true si hay que seguir dibujando */
+  A.drawProbes = (map, c, now) => {
+    const sk = map.sk || {}, ink = sk.ink || "#14232b", brass = sk.brass || "#c8963e", font = `600 13px ${map._fm ? map._fm() : "'DM Mono', monospace"}`;
+    const P = map.probes.map(p => map.lonLatToScreen(p.lon, p.lat, p.ct == null ? 6 : p.ct)), labels = [];
+    const taken = (map.avoid || []).concat(P.map(q => [q[0] - 11, q[1] - 11, q[0] + 11, q[1] + 11]));   // map.avoid: el HUD (lo pone la Aventura al sondear)
+    let anim = false;
+    map.probes.forEach((p, idx) => {
+      const k = clamp((now - p.t0) / 700, 0, 1), e = easeOutBounce(k), P0 = P[idx]; if (k < 1) anim = true;
+      let R = 0, dir = null;
+      c.save(); c.lineJoin = "round";
+      if (p.dr) {                                                        // continentes movidos: circulo en el mapa que ves, alrededor del marcador y por el objetivo
+        const W0 = map.sceneOf(p.lon, p.lat, p.ct), r = p.dr * k; c.beginPath();
+        for (let i = 0; i <= 96; i++) { const t = (i / 96) * Math.PI * 2, q = map.toScreen(W0[0] + Math.cos(t) * r, W0[1] + Math.sin(t) * r); i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]); R = Math.max(R, Math.hypot(q[0] - P0[0], q[1] - P0[1])); }
+        c.setLineDash([10, 8]); c.lineDashOffset = -now / 60; c.lineWidth = 5; c.strokeStyle = rgbaOf(ink, 0.75); c.stroke();
+        c.lineWidth = 2.2; c.strokeStyle = rgbaOf(brass, 0.95); c.stroke(); c.fillStyle = rgbaOf(brass, 0.07); c.fill();
+        anim = true;
+      } else if (p.km) {
+        c.beginPath(); let prev = null, split = false;
+        for (let i = 0; i <= 96; i++) {
+          const [lo, la] = destLL(p.lat, p.lon, (i / 96) * 360, p.km * k), q = map.lonLatToScreen(lo, la, p.ct == null ? 6 : p.ct);   // sin marco (mapa sin continentes movidos): sin mover, sin buscar el continente de cada punto en cada fotograma
+          if (!prev || Math.abs(q[0] - prev[0]) > map.W * 0.6) { if (prev) split = true; c.moveTo(q[0], q[1]); } else c.lineTo(q[0], q[1]);
+          prev = q; R = Math.max(R, Math.hypot(q[0] - P0[0], q[1] - P0[1]));
+        }
+        c.setLineDash([10, 8]); c.lineDashOffset = -now / 60; c.lineWidth = 5; c.strokeStyle = rgbaOf(ink, 0.75); c.stroke();
+        c.lineWidth = 2.2; c.strokeStyle = rgbaOf(brass, 0.95); c.stroke();
+        if (!split && Math.abs(p.lat) + p.km / 111 < 89) { c.fillStyle = rgbaOf(brass, 0.07); c.fill(); }   // si rodea un polo o se parte en el antimeridiano, sin relleno (rellenaba la zona de fuera)
+        anim = true;                                                     // el borde discontinuo se mueve
+      }
+      if (p.bearing != null) {                                           // rumbo medido en el mapa que ves (p.bearing: grados desde el norte del mapa)
+        const W0 = map.sceneOf(p.lon, p.lat, p.ct == null ? 6 : p.ct), b = p.bearing * D2R, F = map.toScreen(W0[0] + Math.sin(b) * 0.3, W0[1] + Math.cos(b) * 0.3);
+        let dx = F[0] - P0[0], dy = F[1] - P0[1]; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L; dir = [dx, dy];
+        const len = 76 * e, x2 = P0[0] + dx * len, y2 = P0[1] + dy * len, nx = -dy, ny = dx;
+        c.setLineDash([]); c.lineCap = "round"; c.lineWidth = 8; c.strokeStyle = rgbaOf(ink, 0.85); c.beginPath(); c.moveTo(P0[0], P0[1]); c.lineTo(x2, y2); c.stroke();
+        c.lineWidth = 4; c.strokeStyle = brass; c.stroke();
+        c.fillStyle = brass; c.strokeStyle = rgbaOf(ink, 0.85); c.lineWidth = 2.4; c.beginPath(); c.moveTo(x2 + dx * 14, y2 + dy * 14); c.lineTo(x2 + nx * 10, y2 + ny * 10); c.lineTo(x2 - nx * 10, y2 - ny * 10); c.closePath(); c.stroke(); c.fill();
+        R = len + 14; for (let s = 12; s <= len + 14; s += 10) { const sx = P0[0] + dx * s, sy = P0[1] + dy * s; taken.push([sx - 8, sy - 8, sx + 8, sy + 8]); }   // la flecha ocupa sitio: la etiqueta no se le monta encima
+      }
+      if (p.inside) { const t = (now / 1000) % 1; c.setLineDash([]); c.strokeStyle = rgbaOf(brass, 0.9 * (1 - t)); c.lineWidth = 3; c.beginPath(); c.arc(P0[0], P0[1], 9 + t * 26, 0, Math.PI * 2); c.stroke(); anim = true; }
+      c.setLineDash([]); c.fillStyle = ink; c.strokeStyle = brass; c.lineWidth = 2.6; c.beginPath(); c.arc(P0[0], P0[1], 7 * e, 0, Math.PI * 2); c.fill(); c.stroke();
+      c.restore();
+      if (p.label && k >= 1) labels.push({ p, P0, R, dir });
+    });
+    /* etiquetas encima de todo, cada una en el primer sitio libre junto a su marcador */
+    if (labels.length) { if (map._setFont) map._setFont(c, font); else c.font = font; }
+    const W = map.W, H = map.H, hit = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+    for (const { p, P0, R, dir } of labels) {
+      const w = c.measureText(p.label).width + 22, h = 28, off = p.km && R < 64 ? Math.max(26, R + 20) : 26;
+      const back = dir ? [[Math.abs(dir[0]) > 0.3 ? -Math.sign(dir[0]) * (w / 2 + 14) : 0, Math.abs(dir[1]) > 0.3 ? -Math.sign(dir[1]) * (h / 2 + 14) : 0]] : [];   // Brujula: al otro lado de la flecha
+      const cands = back.concat([[0, off], [0, -off], [w / 2 + 16, 0], [-w / 2 - 16, 0], [0, off + 32], [0, -off - 32], [w / 2 + 16, off], [-w / 2 - 16, off]]);
+      let best = null;
+      for (const [ox, oy] of cands) {
+        const rx = clamp(P0[0] + ox - w / 2, 8, W - w - 8), ry = clamp(P0[1] + oy - h / 2, 8, H - h - 8), r = [rx, ry, rx + w, ry + h];
+        if (!best) best = r; if (!taken.some(t => hit(t, r))) { best = r; break; }
+      }
+      taken.push(best);
+      map._chip(c, p.label, best[0], best[1] + h / 2, { font });
+    }
+    return anim;
+  };
+
   /* ================================================================== MapViewGL */
   class MapViewGL {
     static supported() {
@@ -311,20 +383,28 @@ void main(){
       for (const f of this.world.features) {
         f.gl = { i0: idx.length, n: 0, s0: segs.length / 4, sn: 0 };
         for (const poly of f.polys) {
+          const flat0 = [], holes = []; let off = 0;
+          poly.rings.forEach((ring, ri) => {
+            if (ri > 0) holes.push(off);
+            for (const [lo, la] of ring) { const [x, y] = project(lo, clamp(la, -89.99, 89.99)); flat0.push(x, y); }
+            off += ring.length;
+          });
+          const tri = earcutFn()(flat0, holes, 2);                        // una traslacion no cambia la triangulacion: vale para todas las copias
+          /* copia "propia": la que queda del lado de su continente (las Aleutianas al oeste de Alaska, las Gilbert de Kiribati junto a sus otras islas,
+             el este de Fiyi junto a Fiyi). Es la que se mueve con el; las demas copias la siguen a una vuelta al mundo */
+          const pc = poly.ct, x0 = poly.bbox[0] * D2R, x1 = poly.bbox[2] * D2R, own = pc < 6 ? TWO_PI * Math.round((this.contCen[pc][0] - (x0 + x1) / 2) / TWO_PI) : 0;
           const copy = shift => {
-            const base = pos.length / 2, flat = [], holes = []; let off = 0;
-            poly.rings.forEach((ring, ri) => {
-              if (ri > 0) holes.push(off);
-              for (const [lo, la] of ring) { const [x, y] = project(lo, clamp(la, -89.99, 89.99)); flat.push(x + shift, y); }
-              off += ring.length;
-            });
-            const tri = earcutFn()(flat, holes, 2);
-            for (let i = 0; i < flat.length; i += 2) { pos.push(flat[i], flat[i + 1]); ci.push(f.ci); ct.push(f.ct); }
+            const w = pc < 6 ? Math.round((shift - own) / TWO_PI) : 0, code = pc + 8 * (w + 2);
+            const base = pos.length / 2;
+            for (let i = 0; i < flat0.length; i += 2) { pos.push(flat0[i] + shift, flat0[i + 1]); ci.push(f.ci); ct.push(code); }
             for (let i = 0; i < tri.length; i++) idx.push(base + tri[i]);
             let o = 0;
-            for (const ring of poly.rings) { for (let i = 0; i < ring.length - 1; i++) { segs.push(flat[(o + i) * 2], flat[(o + i) * 2 + 1], flat[(o + i + 1) * 2], flat[(o + i + 1) * 2 + 1]); sct.push(f.ct); } o += ring.length; }
+            for (const ring of poly.rings) { for (let i = 0; i < ring.length - 1; i++) { segs.push(flat0[(o + i) * 2] + shift, flat0[(o + i) * 2 + 1], flat0[(o + i + 1) * 2] + shift, flat0[(o + i + 1) * 2 + 1]); sct.push(code); } o += ring.length; }
           };
-          copy(0); if (poly.bbox[2] > 180) copy(-TWO_PI); if (poly.bbox[0] < -180) copy(TWO_PI);
+          const shifts = [0]; if (poly.bbox[2] > 180) shifts.push(-TWO_PI); if (poly.bbox[0] < -180) shifts.push(TWO_PI);
+          if (!shifts.includes(own)) shifts.push(own);                    // la propia cae fuera del mundo en reposo (no se ve hasta que el continente se mueve)
+          if (pc < 6 && x1 - x0 < 0.25 && poly.bbox[3] - poly.bbox[1] < 14) for (const s of [own - TWO_PI, own + TWO_PI]) if (!shifts.includes(s) && x1 + s > BX0 - 0.8 && x0 + s < BX1 + 0.8) shifts.push(s);   // islas cerca del borde: si su continente las empuja fuera, entran por el otro lado (Samoa, Tonga y Niue desaparecian). Solo las pequeñas: las grandes no llegan a cruzarlo (lo impide la colocacion) y duplicarlas costaria GPU
+          shifts.forEach(copy);
         }
         f.gl.n = idx.length - f.gl.i0; f.gl.sn = segs.length / 4 - f.gl.s0;
       }
@@ -372,10 +452,12 @@ void main(){
 
     /* ---------- tamano / camara ---------- */
     _emptyMarks() { return { guess: null, answer: null, highlight: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
-    setMarks(m) { this.marks = { ...this._emptyMarks(), ...m, t0: performance.now() }; this.fxDirty = this.dirty = true; }
+    setMarks(m) { const hl = m.highlight && this.world.byName[m.highlight]; this.marks = { ...this._emptyMarks(), gct: m.guess ? this.pickCt : null, act: hl ? hl.ct : null, ...m, t0: performance.now() }; this.fxDirty = this.dirty = true; }
     clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.dirty = true; }
     /* sondas de la Aventura: [{lon,lat,km?,bearing?,label}] -> anillo de distancia y flecha de rumbo, siempre nitidos (vector 2D) */
-    setProbes(list) { this.probes = list.map(p => ({ ...p, t0: performance.now() })); this.fxDirty = this.dirty = true; this._probeAnim = performance.now() + 1400; }
+    setProbes(list) { this.probes = keepT0(this.probes, list); this.fxDirty = this.dirty = true; }
+    /* punto real -> coordenadas del mapa tal como se ve (deformado, sin la camara): la Brujula mide ahi el rumbo hacia el objetivo */
+    sceneOf(lon, lat, ct) { const [x, y] = project(lon, lat); if (!this.dist.spec) return [x, y]; const p = this._dispFwd(x, y, ct == null ? this._ctOf(lon, lat) : ct); if (p[0] > BX1 || p[0] < BX0) p[0] -= TWO_PI * Math.round(p[0] / TWO_PI); return p; }
     setPick(on) { this.pickEnabled = on; this.fxDirty = true; for (const c of [this.cv, this.fx]) c.classList.toggle("aiming", on); }
     setQuality(q) { this.quality = q; this.rs = 1; this._capInit = false; this.idleMs = 40; this.slow = 0; this.resize(true); }
 
@@ -451,30 +533,51 @@ void main(){
     }
     _toWorld(px, py, v = this.viewJ || this.view) { [px, py] = this._outToScene(px, py); return [v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s]; }
     toScreen(x, y, v = this.viewJ || this.view) { return this._sceneToOut(this.W / 2 + (x - v.cx) * v.s, this.H / 2 - (y - v.cy) * v.s); }
-    lonLatToScreen(lon, lat) { let [x, y] = project(lon, lat); if (this.dist.spec) [x, y] = this._dispFwd(x, y, this._ctOf(lon, lat)); return this.toScreen(x, y); }   // _ctOf solo con el mapa deformado: en el mar recorre el mundo entero y las sondas (97 puntos por anillo) vaciaban su cache en cada fotograma
+    /* punto real -> pantalla. Con el mapa deformado, ct es el marco (continente) con el que se mueve el punto; por defecto el del pais que lo
+       contiene o el mas cercano (_ctOf solo con el mapa deformado: en el mar recorre el mundo entero). Tu chincheta y las sondas del Sonar pasan
+       el marco con el que se leyo el clic: asi el anillo sale entero (antes cada punto del anillo se movia con su continente y quedaba hecho trizas).
+       lon puede venir con una vuelta de mas (+-360, la linea de la chincheta a la respuesta): esa vuelta se respeta */
+    lonLatToScreen(lon, lat, ct) {
+      if (!this.dist.spec || !this._moved()) { const [x, y] = project(lon, lat); return this.toScreen(x, y); }
+      const lo = ((lon + 180) % 360 + 360) % 360 - 180, turn = Math.round((lon - lo) / 360) * TWO_PI;   // redondeada: una longitud ya normalizada dejaba un resto de 1e-15 y el punto no daba la vuelta
+      let [x, y] = this._dispFwd(...project(lo, lat), ct == null ? this._ctOf(lo, lat) : ct);
+      if (x > BX1 || x < BX0) x -= TWO_PI * Math.round(x / TWO_PI);   // lo que sale por un lado del mundo entra por el otro
+      return this.toScreen(x + turn, y);
+    }
 
     /* ---------- continentes, deformaciones y orientacion (retos) ---------- */
     _initContinents() {
       const IDX = { af: 0, na: 1, sa: 2, as: 3, eu: 4, oc: 5 };
-      this.contFeat = [[], [], [], [], [], [], []]; const acc = [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0, 0]);
+      this.contFeat = [[], [], [], [], [], [], []]; this._allParts = null; const acc = [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0, 0]);
       for (const f of this.world.features) {
         const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a));
         const lo = (big.bbox[0] + big.bbox[2]) / 2, la = (big.bbox[1] + big.bbox[3]) / 2;
-        const cf = A.continentMap || A.continent, k = cf ? cf(la, lo) : null; f.ct = k in IDX ? IDX[k] : 6; this.contFeat[f.ct].push(f);
+        const cf = A.continentMap || A.continent, k = cf ? cf(la, lo) : null; f.ct = k in IDX ? IDX[k] : 6;
+        /* v0.23: los territorios a mas de 3.000 km de su pais (y lejos del antimeridiano) se mueven con el continente donde estan de verdad: la Guayana
+           y las Antillas francesas, Reunion, Mayotte, el Caribe neerlandes y la Papua indonesia (con el resto de Nueva Guinea). Antes viajaban con
+           Europa o con Asia y, al girar o juntar los continentes, chocaban con los demas: Europa torcida acababa en la otra punta del mapa.
+           contFeat[c] lleva los paises (o sus trozos, con .ct propio) que se mueven con el continente c */
+        const parts = {};
+        for (const p of f.polys) {
+          p.ct = f.ct;
+          if (p !== big && f.ct < 6 && cf) {
+            const pla = (p.bbox[1] + p.bbox[3]) / 2, plo = ((((p.bbox[0] + p.bbox[2]) / 2 + 180) % 360) + 360) % 360 - 180, pk = cf(pla, plo), pc = pk in IDX ? IDX[pk] : f.ct;
+            if (pc !== f.ct && pc < 6 && Math.abs(plo) <= 150 && A.geo.distToFeature(plo, pla, { polys: [big] }, 3000) >= 3000) p.ct = pc;
+          }
+          (parts[p.ct] = parts[p.ct] || []).push(p);
+        }
+        for (const c in parts) this.contFeat[c].push(parts[c].length === f.polys.length ? f : { name: f.name, polys: parts[c], ct: +c, of: f });
         const [x, y] = project(lo, clamp(la, -85, 85)), w = (big.bbox[2] - big.bbox[0]) * (big.bbox[3] - big.bbox[1]) + 1; acc[f.ct][0] += x * w; acc[f.ct][1] += y * w; acc[f.ct][2] += w;
       }
       this.contCen = acc.map(a => (a[2] ? [a[0] / a[2], a[1] / a[2]] : [0, 0])); this.contCen.push([0, 0]);
-      // caja envolvente de cada continente (coordenadas proyectadas) para colocarlos sin que se pisen
-      this.contBox = [0, 1, 2, 3, 4, 5, 6].map(() => ({ x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 }));
-      for (const f of this.world.features) { const b = this.contBox[f.ct]; for (const poly of f.polys) { for (const [lo, la] of [[poly.bbox[0], poly.bbox[1]], [poly.bbox[2], poly.bbox[3]]]) { const [x, y] = project(lo, clamp(la, -84, 84)); b.x0 = Math.min(b.x0, x); b.x1 = Math.max(b.x1, x); b.y0 = Math.min(b.y0, y); b.y1 = Math.max(b.y1, y); } } }
-      this.contBox.forEach(b => { b.cx = (b.x0 + b.x1) / 2; b.cy = (b.y0 + b.y1) / 2; b.hw = (b.x1 - b.x0) / 2; b.hh = (b.y1 - b.y0) / 2; });
     }
     /* continente al que pertenece el pais que contiene el punto (el mismo con el que se dibuja y se desplaza); si es mar, el pais mas cercano o la heuristica */
     _ctOf(lon, lat) {
       const key = lon.toFixed(2) + "," + lat.toFixed(2), C = this._ctCache = this._ctCache || new Map(); if (C.has(key)) return C.get(key);
       let ct = null;
-      for (const f of this.world.features) { let near = false; for (const p of f.polys) if (lon >= p.bbox[0] - 0.5 && lon <= p.bbox[2] + 0.5 && lat >= p.bbox[1] - 0.5 && lat <= p.bbox[3] + 0.5) { near = true; break; } if (near && A.geo.inFeature(lon, lat, f)) { ct = f.ct; break; } }
-      if (ct === null) { let best = 150; for (const f of this.world.features) { const d = A.geo.distToFeature(lon, lat, f, best); if (d < best) { best = d; ct = f.ct; } } }
+      const all = this._allParts = this._allParts || this.contFeat.flat();   // paises o trozos de pais, cada uno con el continente con el que se mueve
+      for (const f of all) { let near = false; for (const p of f.polys) if (lon >= p.bbox[0] - 0.5 && lon <= p.bbox[2] + 0.5 && lat >= p.bbox[1] - 0.5 && lat <= p.bbox[3] + 0.5) { near = true; break; } if (near && A.geo.inFeature(lon, lat, f)) { ct = f.ct; break; } }
+      if (ct === null) { let best = 150; for (const f of all) { const d = A.geo.distToFeature(lon, lat, f, best); if (d < best) { best = d; ct = f.ct; } } }
       if (ct === null) { const IDX = { af: 0, na: 1, sa: 2, as: 3, eu: 4, oc: 5 }, cf = A.continentMap || A.continent, k = cf ? cf(lat, lon) : null; ct = k in IDX ? IDX[k] : 6; }
       if (C.size > 400) C.clear(); C.set(key, ct); return ct;
     }
@@ -494,93 +597,143 @@ void main(){
     _sceneToOut(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = (x - this.W / 2) / o.sx, cy = y - this.H / 2; return [o.c * cx + o.s * cy + this.W / 2, -o.s * cx + o.c * cy + this.H / 2]; }
     _dispFwd(x, y, ct) {
       const e = this._eff(); if (!this.dist.spec) return [x, y];
-      const c = ct == null ? 6 : ct, cx = this.contCen[c][0], cy = this.contCen[c][1], dx = x - cx, dy = y - cy, a = e.rot[c], ca = Math.cos(a), sa = Math.sin(a), sc = e.sc[c];
+      const c = ct == null ? 6 : ct, cx = this.contCen[c][0], cy = this.contCen[c][1];
+      if (c < 6) x += TWO_PI * Math.round((cx - x) / TWO_PI);           // del lado del mundo de su continente, como su copia propia en la GPU (islas del otro lado del antimeridiano)
+      const dx = x - cx, dy = y - cy, a = e.rot[c], ca = Math.cos(a), sa = Math.sin(a), sc = e.sc[c];
       return [cx + sc * (ca * dx - sa * dy) + e.sh[c * 2], cy + sc * (sa * dx + ca * dy) + e.sh[c * 2 + 1]];
     }
-    _nearCont(c, lon, lat, km) { for (const f of this.contFeat[c] || []) if (A.geo.distToFeature(lon, lat, f) < km) return true; return false; }
+    _moved(e = this._eff()) { return e.sh.some(v => Math.abs(v) > 1e-4) || e.rot.some(v => Math.abs(v) > 1e-4) || e.sc.some(v => Math.abs(v - 1) > 1e-4); }   // hay continentes movidos (no solo giro del mapa entero, temblor o fronteras falsas)
+    _nearCont(c, lon, lat, km) { for (const f of this.contFeat[c] || []) if (A.geo.distToFeature(lon, lat, f, km) < km) return true; return false; }   // con tope: los paises lejanos se descartan por su caja
     _inCont(c, lon, lat) { for (const f of this.contFeat[c] || []) if (A.geo.inFeature(lon, lat, f)) return true; return false; }
-    /* punto tocado en el mapa deformado -> coordenada real (se prefiere el continente de la pregunta si hay solape) */
-    _undisp(x, y) {
-      const d = this.dist; if (!d.spec) return [x, y]; const e = this._eff();
-      if (!e.sh.some(v => Math.abs(v) > 1e-4) && !e.rot.some(v => Math.abs(v) > 1e-4) && !e.sc.some(v => Math.abs(v - 1) > 1e-4)) return [x, y];
-      const order = [d.ct, 0, 1, 2, 3, 4, 5].filter((c, i, a) => c != null && c < 6 && a.indexOf(c) === i);
-      const cand = c => { const cx = this.contCen[c][0], cy = this.contCen[c][1], sc = e.sc[c] || 1, vx = (x - e.sh[c * 2] - cx) / sc, vy = (y - e.sh[c * 2 + 1] - cy) / sc, a = -e.rot[c], ca = Math.cos(a), sa = Math.sin(a); return [cx + ca * vx - sa * vy, cy + sa * vx + ca * vy]; };
-      for (const c of order) { const [x0, y0] = cand(c), [lo, la] = unproject(x0, y0); if (c === d.ct ? this._nearCont(c, lo, la, 260) : this._inCont(c, lo, la)) return [x0, y0]; }
-      if (d.ct < 6) return cand(d.ct);
-      return [x, y];
+    /* distancia (unidades del mapa) de un punto del mapa deformado a la tierra movida del continente c (celdas de su mascara), con el mundo dando la vuelta */
+    _dispDist(c, x, y, e) {
+      const L = this.masks.cells[c], cx = this.contCen[c][0], cy = this.contCen[c][1], sc = e.sc[c], a = e.rot[c], ca = Math.cos(a), sa = Math.sin(a), tx = cx + e.sh[c * 2] - x, ty = cy + e.sh[c * 2 + 1] - y;
+      let best = 1e18;
+      for (let q = 0; q < L.length; q += 2) { const dx = L[q] - cx, dy = L[q + 1] - cy; let X = sc * (ca * dx - sa * dy) + tx; const Y = sc * (sa * dx + ca * dy) + ty; X -= TWO_PI * Math.round(X / TWO_PI); const dd = X * X + Y * Y; if (dd < best) best = dd; }
+      return Math.sqrt(best);
     }
+    /* punto tocado en el mapa deformado -> coordenada real (sin normalizar). En tierra, el continente cuyo trozo movido lo contiene (primero el de la
+       pregunta); en el mar, el de la pregunta si su costa real queda a menos de 260 km y si no, el continente cuya tierra movida esta mas cerca en
+       el mapa que ves. Ningun clic se pierde: antes el mar se leia siempre con el continente de la pregunta y, si este se habia ido lejos, el punto
+       caia fuera del mundo y el clic no hacia nada. this.lastCt: marco con el que se ha leido (null si el mapa no esta deformado) */
+    _undisp(x, y) {
+      const d = this.dist; this.lastCt = null; if (!d.spec) return [x, y]; const e = this._eff();
+      if (!this._moved(e)) return [x, y];
+      const inv = (c, xx) => { const cx = this.contCen[c][0], cy = this.contCen[c][1], sc = e.sc[c] || 1, vx = (xx - e.sh[c * 2] - cx) / sc, vy = (y - e.sh[c * 2 + 1] - cy) / sc, a = -e.rot[c], ca = Math.cos(a), sa = Math.sin(a); return [cx + ca * vx - sa * vy, cy + sa * vx + ca * vy]; };
+      /* de las copias del punto (el mundo da la vuelta), la que queda a menos de media vuelta del centro de su continente: la misma regla con la que
+         se dibuja (_dispFwd) y con la que se eligio la copia propia de cada poligono. Asi lo que lees es lo que ves, tambien con los continentes girados */
+      const cand = c => { const cx = this.contCen[c][0], cy = this.contCen[c][1]; let best = null, bd = 1e18; for (const w of [0, -TWO_PI, TWO_PI]) { const p = inv(c, x + w), dx = Math.abs(p[0] - cx), dd = (dx > Math.PI ? 1e6 * dx : 0) + dx * dx + (p[1] - cy) ** 2; if (dd < bd) { bd = dd; best = p; } } return best; };
+      const own = (c, p) => Math.abs(p[0] - this.contCen[c][0]) <= Math.PI;   // solo esa copia puede caer en su tierra dibujada (con un continente muy encogido, las otras quedan lejos)
+      const q = d.ct != null && d.ct < 6 ? d.ct : null, order = [q, 0, 1, 2, 3, 4, 5].filter((c, i, a) => c != null && a.indexOf(c) === i);
+      for (const c of order) { const p = cand(c); if (!own(c, p)) continue; const [lo, la] = unproject(p[0], p[1]); if (this._inCont(c, lo, la)) { this.lastCt = c; return p; } }
+      if (q != null) { const p = cand(q); if (own(q, p)) { const [lo, la] = unproject(p[0], p[1]); if (this._nearCont(q, lo, la, 260)) { this.lastCt = q; return p; } } }
+      /* mar abierto: el continente mas cercano en el mapa que ves; el de la pregunta cuenta como si estuviera algo mas cerca (un mar lejos de la costa se
+         lee con el marco en el que se dibuja) y nunca un marco que lleve el toque mas alla del polo (la chincheta saldria lejos del dedo) */
+      let bc = q != null ? q : 0, bd = 1e18;
+      for (let c = 0; c < 6; c++) { const p = cand(c), dd = this._dispDist(c, x, y, e) * (c === q ? 0.6 : 1) + (own(c, p) ? 0 : 1e3) + (Math.abs(unproject(p[0], p[1])[1]) > 89 ? 500 : 0); if (dd < bd) { bd = dd; bc = c; } }
+      this.lastCt = bc; return cand(bc);
+    }
+    /* coordenadas del mapa (ya sin deformar) -> lon/lat. Deformado, la lectura puede dar la vuelta al mundo o pasarse del polo: se normaliza
+       (antes se tiraba el clic); sin deformar, fuera del mundo sigue sin haber nada */
+    _real(x, y) { const [lon, lat] = unproject(x, y); return this.lastCt == null ? [lon, lat] : [((lon + 180) % 360 + 360) % 360 - 180, clamp(lat, -89.5, 89.5)]; }
     /* Mascaras de tierra por continente (rejilla gruesa en coordenadas del mapa): sirven para comprobar SOLAPES REALES entre continentes, no cajas. */
+    /* Solo cuenta la copia propia de cada poligono (la que se mueve con su continente) y la rejilla sobra por los lados: Rusia llega a 190° y las
+       islas del otro lado del antimeridiano se colocan junto a su continente. Asi las mascaras son lo que de verdad se dibuja al moverlo */
     _buildMasks(pos, ctv, idx) {
-      const CS = 0.06, NX = Math.ceil((BX1 - BX0) / CS), NY = Math.ceil((BY1 - BY0) / CS), m0 = [0, 1, 2, 3, 4, 5, 6].map(() => new Uint8Array(NX * NY));
-      const cell = (x, y) => [Math.floor((x - BX0) / CS), Math.floor((y - BY0) / CS)];
+      const CS = 0.06, X0 = BX0 - 0.6, NX = Math.ceil((BX1 + 0.6 - X0) / CS), NY = Math.ceil((BY1 - BY0) / CS), m0 = [0, 1, 2, 3, 4, 5, 6].map(() => new Uint8Array(NX * NY));
+      const cell = (x, y) => [Math.floor((x - X0) / CS), Math.floor((y - BY0) / CS)];
       const cov = new Uint8Array(NX * NY), miss = [];
       for (let t = 0; t < idx.length; t += 3) {
-        const ia = idx[t], ib = idx[t + 1], ic = idx[t + 2], c = ctv[ia], M = m0[c];
+        const ia = idx[t], ib = idx[t + 1], ic = idx[t + 2], code = ctv[ia], c = code & 7, M = m0[c];
+        if (code >> 3 !== 2) continue;                                   // copias a una vuelta al mundo: se mueven con la propia, no se cuentan aparte
         const ax = pos[ia * 2], ay = pos[ia * 2 + 1], bx = pos[ib * 2], by = pos[ib * 2 + 1], cx = pos[ic * 2], cy = pos[ic * 2 + 1];
         const x0 = Math.min(ax, bx, cx), x1 = Math.max(ax, bx, cx), y0 = Math.min(ay, by, cy), y1 = Math.max(ay, by, cy);
-        if (x1 < BX0 || x0 > BX1 || y1 < BY0 || y0 > BY1) continue;
-        const i0 = Math.max(0, Math.floor((x0 - BX0) / CS)), i1 = Math.min(NX - 1, Math.floor((x1 - BX0) / CS)), j0 = Math.max(0, Math.floor((y0 - BY0) / CS)), j1 = Math.min(NY - 1, Math.floor((y1 - BY0) / CS));
+        if (x1 < X0 || x0 > X0 + NX * CS || y1 < BY0 || y0 > BY1) continue;
+        const i0 = Math.max(0, Math.floor((x0 - X0) / CS)), i1 = Math.min(NX - 1, Math.floor((x1 - X0) / CS)), j0 = Math.max(0, Math.floor((y0 - BY0) / CS)), j1 = Math.min(NY - 1, Math.floor((y1 - BY0) / CS));
         const den = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy); let hit = false;
         if (Math.abs(den) > 1e-12) for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
-          const px = BX0 + (i + 0.5) * CS, py = BY0 + (j + 0.5) * CS, w1 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / den, w2 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / den;
+          const px = X0 + (i + 0.5) * CS, py = BY0 + (j + 0.5) * CS, w1 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / den, w2 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / den;
           if (w1 >= 0 && w2 >= 0 && w1 + w2 <= 1) { M[j * NX + i] = 1; cov[j * NX + i] = 1; hit = true; }
         }
         if (!hit) miss.push(c, (ax + bx + cx) / 3, (ay + by + cy) / 3);
       }
       for (let q = 0; q < miss.length; q += 3) { const [ci, cj] = cell(miss[q + 1], miss[q + 2]); if (ci >= 0 && ci < NX && cj >= 0 && cj < NY && !cov[cj * NX + ci]) m0[miss[q]][cj * NX + ci] = 1; }   // islas menores que una celda (solo si esa celda esta libre: las astillas de frontera no cuentan)
       const m1 = m0.map(M => { const D = new Uint8Array(NX * NY); for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) if (M[j * NX + i]) for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ii = i + di, jj = j + dj; if (ii >= 0 && ii < NX && jj >= 0 && jj < NY) D[jj * NX + ii] = 1; } return D; });
-      const cells = m0.map(M => { const L = []; for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) if (M[j * NX + i]) L.push(BX0 + (i + 0.5) * CS, BY0 + (j + 0.5) * CS); return Float32Array.from(L); });
+      const cells = m0.map(M => { const L = []; for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) if (M[j * NX + i]) L.push(X0 + (i + 0.5) * CS, BY0 + (j + 0.5) * CS); return Float32Array.from(L); });
       const mass = cells.map(L => { let sx = 0, sy = 0; const n = L.length / 2 || 1; for (let i = 0; i < L.length; i += 2) { sx += L[i]; sy += L[i + 1]; } return [sx / n, sy / n]; });
       const sd = cells.map((L, i) => { let vx = 0, vy = 0; const n = L.length / 2 || 1; for (let q = 0; q < L.length; q += 2) { vx += (L[q] - mass[i][0]) ** 2; vy += (L[q + 1] - mass[i][1]) ** 2; } return [Math.sqrt(vx / n), Math.sqrt(vy / n)]; });   // extension tipica (ignora las islas lejanas del antimeridiano)
       const ext = cells.map((L, i) => { const xs = [], ys = []; for (let q = 0; q < L.length; q += 2) { xs.push(L[q] - mass[i][0]); ys.push(L[q + 1] - mass[i][1]); } xs.sort((u, v) => u - v); ys.sort((u, v) => u - v); const n = xs.length || 1, at = (arr, f) => arr[Math.min(n - 1, Math.max(0, Math.floor(n * f)))] || 0; return [at(xs, 0.05), at(xs, 0.95), at(ys, 0.005), at(ys, 0.995)]; });   // extension robusta (ignora islas lejanas)
-      const cellsS = cells.map(L => { const o = []; for (let q = 0; q < L.length; q += 2) { const ix = Math.round((L[q] - BX0) / CS - 0.5), iy = Math.round((L[q + 1] - BY0) / CS - 0.5); if (!(ix & 1) && !(iy & 1)) o.push(L[q], L[q + 1]); } return Float32Array.from(o); });   // 1 de cada 4 celdas: busqueda rapida
-      this.masks = { CS, NX, NY, m0, m1, cells, cellsS, mass, sd, ext };
+      const cellsS = cells.map(L => { const o = []; for (let q = 0; q < L.length; q += 2) { const ix = Math.round((L[q] - X0) / CS - 0.5), iy = Math.round((L[q + 1] - BY0) / CS - 0.5); if (!(ix & 1) && !(iy & 1)) o.push(L[q], L[q + 1]); } return Float32Array.from(o); });   // 1 de cada 4 celdas: busqueda rapida
+      this.masks = { CS, X0, NX, NY, m0, m1, cells, cellsS, mass, sd, ext };
     }
     /* ¿Algun trozo del continente i (con su transformacion) cae dentro del continente j (con la suya)? gap=1: j se engorda una celda (deja hueco). */
     _hits(i, j, T, gap, coarse) {
-      const K = this.masks, Li = coarse ? K.cellsS[i] : K.cells[i], Mj = gap ? K.m1[j] : K.m0[j], CS = K.CS, NX = K.NX, NY = K.NY, ci = this.contCen[i], cj = this.contCen[j], ti = T[i], tj = T[j];
+      const K = this.masks, Li = coarse ? K.cellsS[i] : K.cells[i], Mj = gap ? K.m1[j] : K.m0[j], CS = K.CS, X0 = K.X0, NX = K.NX, NY = K.NY, ci = this.contCen[i], cj = this.contCen[j], ti = T[i], tj = T[j];
+      const inJ = (wx, wy) => { const vx = (wx - tj.x - cj[0]) / tj.s, vy = (wy - tj.y - cj[1]) / tj.s, ux = cj[0] + tj.c * vx + tj.n * vy, uy = cj[1] - tj.n * vx + tj.c * vy, ix = Math.floor((ux - X0) / CS), iy = Math.floor((uy - BY0) / CS); return ix >= 0 && ix < NX && iy >= 0 && iy < NY && Mj[iy * NX + ix] === 1; };
       for (let q = 0; q < Li.length; q += 2) {
         const dx = Li[q] - ci[0], dy = Li[q + 1] - ci[1];
         const wx = ci[0] + ti.s * (ti.c * dx - ti.n * dy) + ti.x, wy = ci[1] + ti.s * (ti.n * dx + ti.c * dy) + ti.y;
-        const vx = (wx - tj.x - cj[0]) / tj.s, vy = (wy - tj.y - cj[1]) / tj.s, ux = cj[0] + tj.c * vx + tj.n * vy, uy = cj[1] - tj.n * vx + tj.c * vy;
-        const ix = Math.floor((ux - BX0) / CS), iy = Math.floor((uy - BY0) / CS);
-        if (ix >= 0 && ix < NX && iy >= 0 && iy < NY && Mj[iy * NX + ix]) return true;
+        if (inJ(wx, wy)) return true;
+        if ((wx > BX1 - 0.7 && inJ(wx - TWO_PI, wy)) || (wx < BX0 + 0.7 && inJ(wx + TWO_PI, wy))) return true;   // el mundo da la vuelta: lo que sale por un lado entra por el otro
       }
       return false;
     }
     _clash(i, placed, T, gap, coarse) { for (const j of placed) if (this._hits(i, j, T, gap, coarse) || this._hits(j, i, T, gap, coarse)) return true; return false; }
-    /* Coloca los continentes segun un tipo (pangea | shuffle | spread | hold) SIN que se pisen NUNCA.
+    /* Coloca los continentes segun un tipo (pangea | spread | hold) SIN que se pisen NUNCA.
        Se van colocando de uno en uno; cada continente va lo mas cerca posible de su destino y, si ahi hay otro (comprobado con las mascaras de tierra reales), se busca el hueco libre mas cercano.
-       En Pangea se encogen un poco para encajar. Si algo no cabe, todo se encoge hasta que quepa. k: fuerza 0..1; rr: generador aleatorio con shuffle(); rot: giro final de cada continente (tilt).
+       En Pangea se encogen un poco para encajar. Si algo no cabe, todo se encoge hasta que quepa. k: fuerza 0..1; rot: giro final de cada continente (tilt).
        Devuelve { shift: [[dx,dy] x7], scale: [x7], ok } en unidades del mapa. */
-    layout(kind, k, rr, rot) {
-      const ord = kind === "shuffle" ? rr.shuffle([0, 1, 2, 3, 4, 5]) : null, perm = []; if (ord) ord.forEach((c, i) => { perm[c] = ord[(i + 1) % 6]; });
-      const base = { pangea: 1 - 0.26 * k, shuffle: 1 - 0.16 * k, spread: 1 - 0.16 * k, hold: 0.9 }[kind] || 1;   // los continentes no caben a tamano real sin pisarse: se encogen segun el reto
-      return this._layout(kind, k, perm, rot, base);
+    layout(kind, k, rr, rot, zones) {
+      const base = { pangea: 1 - 0.26 * k, spread: 1 - 0.16 * k, hold: 0.9 }[kind] || 1;   // los continentes no caben a tamano real sin pisarse: se encogen segun el reto
+      return this._layout(kind, k, rot, base, zones);
     }
-    _layout(kind, k, perm, rot, base) {
+    /* tierra del continente c, colocado con t, que queda fuera de la vista de inicio o debajo del HUD (celdas gruesas). Z: { view:[x0,y0,x1,y1],
+       rects:[[x0,y0,x1,y1]...] } en unidades del mapa. Sin rest devuelve que celdas quedan tapadas; con rest (las tapadas en su sitio), la parte (0..1)
+       que se tapa de nuevo: no vale cambiar Alaska, tapada de siempre, por la costa de Seattle */
+    _hidden(c, t, Z, rest) {
+      const L = this.masks.cellsS[c], cc = this.contCen[c], V = Z.view, out = rest ? null : new Uint8Array(L.length / 2); let n = 0;
+      for (let q = 0, i = 0; q < L.length; q += 2, i++) {
+        const dx = L[q] - cc[0], dy = L[q + 1] - cc[1], x = cc[0] + t.s * (t.c * dx - t.n * dy) + t.x, y = cc[1] + t.s * (t.n * dx + t.c * dy) + t.y;
+        let h = x < V[0] || x > V[2] || y < V[1] || y > V[3];
+        if (!h) for (const r of Z.rects) if (x >= r[0] && x <= r[2] && y >= r[1] && y <= r[3]) { h = true; break; }
+        if (out) out[i] = h ? 1 : 0; else if (h && !rest[i]) n++;
+      }
+      return out || (L.length ? n / (L.length / 2) : 0);
+    }
+    _layout(kind, k, rot, base, Z) {
       const K = this.masks, home = K.mass, anchor = [0.05, 0.3], tg = [], R = rot || [0, 0, 0, 0, 0, 0, 0];
       for (let c = 0; c < 6; c++) {
         const h = home[c];
-        if (kind === "pangea") tg[c] = [h[0] + (anchor[0] - h[0]) * k, h[1] + (anchor[1] - h[1]) * k];
+        if (kind === "pangea") tg[c] = [h[0] + (anchor[0] - h[0]) * k * 0.95, h[1] + (anchor[1] - h[1]) * k * 0.95];   // cada uno se acerca desde su lado: al llegar todos al mismo punto (nivel 3) se colocaban en cualquier lado y el mapa quedaba barajado
         else if (kind === "spread") tg[c] = [h[0] + (h[0] - anchor[0]) * k * 0.45, h[1] + (h[1] - anchor[1]) * k * 0.45];
-        else if (kind === "shuffle") tg[c] = [h[0] + (home[perm[c]][0] - h[0]) * k, h[1] + (home[perm[c]][1] - h[1]) * k];
         else tg[c] = h.slice();
       }
       if (!this._offs) { const o = [], st = 0.06, RMAX = 3.0, n = Math.round(RMAX / st); for (let a = -n; a <= n; a++) for (let b = -n; b <= n; b++) { const d = Math.hypot(a, b) * st; if (d <= RMAX) o.push([a * st, b * st, d]); } o.sort((p, q) => p[2] - q[2]); this._offs = o; }
       const order = [0, 1, 2, 3, 4, 5].sort((a, b) => kind === "pangea" ? Math.hypot(tg[a][0] - anchor[0], tg[a][1] - anchor[1]) - Math.hypot(tg[b][0] - anchor[0], tg[b][1] - anchor[1]) : K.cells[b].length - K.cells[a].length);
       const gap = 1, order2 = order.slice().reverse();
+      /* juego limpio: la tierra que se ve con el continente en su sitio sigue viendose al moverlo (como mucho un 4 % se tapa por el HUD o sale de la
+         vista). Antes podia acabar un continente entero debajo del marcador (Oceania con la pregunta de Papua Nueva Guinea) */
+      const hid0 = Z ? [0, 1, 2, 3, 4, 5].map(c => this._hidden(c, { x: 0, y: 0, s: 1, c: 1, n: 0 }, Z)) : null;
       const attempt = (S0, ord) => {
         const T = [0, 1, 2, 3, 4, 5, 6].map(c => ({ x: 0, y: 0, s: c === 6 ? 1 : S0, c: Math.cos(R[c] || 0), n: Math.sin(R[c] || 0) })), placed = [6];
         for (const c of ord) {
           const E = K.ext[c], big = R[c] ? Math.max(Math.abs(E[0]), E[1], Math.abs(E[2]), E[3]) * 0.75 : 0, ex0 = big ? -big : E[0], ex1 = big || E[1], ey0 = big ? -big : E[2], ey1 = big || E[3], t = T[c];
-          const lx = BX0 - 0.4 - ex0 * S0, hx = BX1 + 0.4 - ex1 * S0, ly = BY0 + 0.18 - ey0 * S0, hy = BY1 - 0.05 - ey1 * S0;   // el continente (sin islas sueltas) queda dentro del mundo y lejos de la Antartida
-          let found = false;
-          for (const [ox, oy] of this._offs) {
-            t.x = tg[c][0] - home[c][0] + ox; t.y = tg[c][1] - home[c][1] + oy;
-            const m = this._massAt(c, T, K.mass); if (m[0] < lx || m[0] > hx || m[1] < ly || m[1] > hy) continue;
-            if (!this._clash(c, placed, T, gap, true) && !this._clash(c, placed, T, gap, false)) { found = true; break; }
-          }
+          const hx0 = home[c][0] - anchor[0], hy0 = home[c][1] - anchor[1], hl = Math.hypot(hx0, hy0) || 1;
+          const place = (sc, maxD, sided) => {                           // hueco libre mas cercano a su destino (a menos de maxD), con el continente a escala sc
+            t.s = sc; const lx = BX0 - 0.4 - ex0 * sc, hx = BX1 + 0.4 - ex1 * sc, ly = BY0 + 0.18 - ey0 * sc, hy = BY1 - 0.05 - ey1 * sc;   // el continente (sin islas sueltas) queda dentro del mundo y lejos de la Antartida
+            for (const [ox, oy, d] of this._offs) {
+              if (d > maxD) return false;
+              t.x = tg[c][0] - home[c][0] + ox; t.y = tg[c][1] - home[c][1] + oy;
+              const m = this._massAt(c, T, K.mass); if (m[0] < lx || m[0] > hx || m[1] < ly || m[1] > hy) continue;
+              if (sided) { const mx = m[0] - anchor[0], my = m[1] - anchor[1]; if (mx * hx0 + my * hy0 < 0.7 * hl * Math.hypot(mx, my)) continue; }   // Pangea: se arrima por su lado (a menos de 45 grados), no por el otro
+              if (hid0 && this._hidden(c, t, Z, hid0[c]) > 0.04) continue;
+              if (!this._clash(c, placed, T, gap, true) && !this._clash(c, placed, T, gap, false)) return true;
+            }
+            return false;
+          };
+          /* Big bang y Continentes torcidos: cada continente se queda junto a su sitio aunque tenga que encogerse un poco (antes Europa, girada, no
+             cabia entre Asia y Africa y acababa en la otra punta del mapa); solo si ni asi cabe, al hueco libre mas cercano */
+          const found = kind === "pangea" ? place(S0, Infinity, true) || place(S0, Infinity) : [[1, 0.55], [0.88, 0.55], [0.77, 0.55], [1, 0.9], [0.88, 0.9], [0.77, 0.9], [0.66, 0.9]].some(([f, d]) => place(S0 * f, d)) || place(S0, Infinity);
           if (!found) { this._layFail = c; return null; }
           placed.push(c);
         }
@@ -615,7 +768,7 @@ void main(){
       } else d.kk = d.k;
     }
     /* punto de pantalla (px CSS del lienzo) -> lon/lat reales, teniendo en cuenta orientacion y continentes movidos */
-    screenToLonLat(px, py) { let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); return unproject(x, y); }
+    screenToLonLat(px, py) { let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); return this._real(x, y); }
     /* lupa de fronteras verdaderas (Sello de aduana / Teodolito): {x,y,r} en px CSS o null */
     setLens(l) {                                                        // la lupa solo obliga a repintar si hay deformacion del mapa y cambia de sitio
       const o = this.lens; if (!o && !l) return;
@@ -700,8 +853,9 @@ void main(){
       if (!this.pickEnabled) return;
       const rx = px, ry = py;
       const ef = A.pointer && A.pointer.effective && A.pointer.effective(); if (ef) { px = ef[0]; py = ef[1]; }     // el puntero puede tener retos (temblor, retraso, invertido...)
-      let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); const [lon, lat] = unproject(x, y);
+      let [x, y] = this._toWorld(px, py); [x, y] = this._undisp(x, y); const [lon, lat] = this._real(x, y);
       if (lon < -180 || lon > 180 || lat > 90 || lat < -90) return;
+      this.pickCt = this.lastCt;                                         // marco del clic: la chincheta y el anillo del Sonar se dibujan justo donde has tocado
       /* para el crupier (js/dealer.js): donde estaba tu raton de verdad y donde habrias clicado en el mapa sin girar ni mover continentes */
       try { const v = this.viewJ || this.view; this.lastTap = { raw: ef ? this.screenToLonLat(rx, ry) : [lon, lat], plain: unproject(v.cx + (px - this.W / 2) / v.s, v.cy - (py - this.H / 2) / v.s), at: performance.now() }; } catch (e) { this.lastTap = null; }
       this.onPick(lon, lat);
@@ -924,7 +1078,7 @@ void main(){
         const lon0 = Math.max(-180, Math.floor(wx0 / D2R / step) * step), lon1 = Math.min(180, Math.ceil(wx1 / D2R / step) * step);
         for (let lo = lon0; lo <= lon1 + 1e-9; lo += step) if (Math.abs(lo % 30) < 1e-9 || step < 30) c.fillText(fmtCoord(lo, "E", "W").replace(".00", ""), this.toScreen(lo * D2R, 0)[0] + 4, H - 16);
         const lat0 = Math.max(-90, Math.floor(latBot / step) * step), lat1 = Math.min(90, Math.ceil(latTop / step) * step);
-        for (let la = lat0; la <= lat1 + 1e-9; la += step) if (Math.abs(la % 30) < 1e-9 || step < 30) c.fillText(fmtCoord(la, "N", "S").replace(".00", ""), 8, this.lonLatToScreen(0, la)[1] + 3);
+        for (let la = lat0; la <= lat1 + 1e-9; la += step) if (Math.abs(la % 30) < 1e-9 || step < 30) c.fillText(fmtCoord(la, "N", "S").replace(".00", ""), 8, this.toScreen(0, project(0, la)[1])[1] + 3);   // la reticula no se deforma: antes cada latitud se movia con el continente del meridiano 0 y salian desordenadas
       };
       draw(gp.a, 1); if (gp.b !== gp.a) draw(gp.b, gp.t);
     }
@@ -935,7 +1089,7 @@ void main(){
       if (this.probes.length) this._drawProbes(c, now);
       const age = now - m.t0;
       if (m.guess || m.answer || m.labelAt) {
-        const G = m.guess && this.lonLatToScreen(m.guess[0], m.guess[1]), Aa = m.answer && this.lonLatToScreen(m.answer[0], m.answer[1]);
+        const G = m.guess && this.lonLatToScreen(m.guess[0], m.guess[1], m.gct), Aa = m.answer && this.lonLatToScreen(m.answer[0], m.answer[1]);
         const ds = G && Aa ? this._line(c, m, G, Aa, age) : null;
         if (Aa) {
           const k = clamp((age - 480) / 600, 0, 1);
@@ -948,7 +1102,7 @@ void main(){
         }
         if (G) this._pin(c, G[0], G[1], sk.ink, sk.paper, age, 1);
         if (ds) this._distChip(c, m, ds, age);                            // encima de las chinchetas (antes quedaba debajo y la tapaba el pin de la respuesta)
-        const at = Aa || (m.labelAt && this.lonLatToScreen(m.labelAt[0], m.labelAt[1]));
+        const at = Aa || (m.labelAt && this.lonLatToScreen(m.labelAt[0], m.labelAt[1], m.act));
         if (at && m.label && age > 520) this._chip(c, m.label, at[0], at[1] - (Aa ? 66 : 10), { center: true, font: `italic 700 17px ${this._fd()}`, alpha: Math.min(1, (age - 520) / 300) });
         if (G && m.pop && age > 700) {
           const t = Math.min(1, (age - 700) / 1700), y = G[1] - 52 - easeIO(t) * 46;
@@ -960,39 +1114,7 @@ void main(){
       if (this.decoys && this.decoys.length) for (const d of this.decoys) { const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.a == null ? 0.9 : d.a; this._pin(c, q[0], q[1], sk.red, sk.paper, 2000, 1); c.restore(); }
       if (this.pickEnabled && this.mouse && !this.pointers.size && !this.hideReticle) this._reticle(c, this.mouse.x, this.mouse.y);
     }
-    _drawProbes(c, now) {
-      const sk = this.sk, D2R = Math.PI / 180;
-      const dest = (lat, lon, brg, km) => { const d = km / 6371, la = lat * D2R, lo = lon * D2R, b = brg * D2R; const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b)); const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); return [((lo2 / D2R + 540) % 360) - 180, la2 / D2R]; };
-      for (const p of this.probes) {
-        const k = clamp((now - p.t0) / 700, 0, 1), e = easeOutBounce(k), P0 = this.lonLatToScreen(p.lon, p.lat);
-        c.save(); c.lineJoin = "round";
-        if (p.km) {
-          c.beginPath(); let prev = null;
-          for (let i = 0; i <= 96; i++) {
-            const [lo, la] = dest(p.lat, p.lon, (i / 96) * 360, p.km * k), q = this.lonLatToScreen(lo, la);
-            if (prev && Math.abs(q[0] - prev[0]) > this.W * 0.6) c.moveTo(q[0], q[1]); else if (i === 0 || !prev) c.moveTo(q[0], q[1]); else c.lineTo(q[0], q[1]);
-            prev = q;
-          }
-          c.setLineDash([10, 8]); c.lineDashOffset = -now / 60; c.lineWidth = 5; c.strokeStyle = this._rgba(sk.ink, 0.75); c.stroke();
-          c.lineWidth = 2.2; c.strokeStyle = this._rgba(sk.brass, 0.95); c.stroke();
-          c.fillStyle = this._rgba(sk.brass, 0.07); c.fill();
-          const top = dest(p.lat, p.lon, 0, p.km), T = this.lonLatToScreen(top[0], top[1]);
-          if (p.label && k >= 1) this._chip(c, p.label, T[0], T[1] - 4, { center: true, font: `600 13px ${this._fm()}` });
-        }
-        if (p.bearing != null) {
-          const f = dest(p.lat, p.lon, p.bearing, 400), F = this.lonLatToScreen(f[0], f[1]);
-          let dx = F[0] - P0[0], dy = F[1] - P0[1]; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
-          const len = 76 * e, x2 = P0[0] + dx * len, y2 = P0[1] + dy * len, nx = -dy, ny = dx;
-          c.setLineDash([]); c.lineCap = "round"; c.lineWidth = 8; c.strokeStyle = this._rgba(sk.ink, 0.85); c.beginPath(); c.moveTo(P0[0], P0[1]); c.lineTo(x2, y2); c.stroke();
-          c.lineWidth = 4; c.strokeStyle = sk.brass; c.stroke();
-          c.fillStyle = sk.brass; c.strokeStyle = this._rgba(sk.ink, 0.85); c.lineWidth = 2.4; c.beginPath(); c.moveTo(x2 + dx * 14, y2 + dy * 14); c.lineTo(x2 + nx * 10, y2 + ny * 10); c.lineTo(x2 - nx * 10, y2 - ny * 10); c.closePath(); c.stroke(); c.fill();
-          if (p.label && k >= 1) this._chip(c, p.label, P0[0], P0[1] + 26, { center: true, font: `600 13px ${this._fm()}` });
-        }
-        c.setLineDash([]); c.fillStyle = sk.ink; c.strokeStyle = sk.brass; c.lineWidth = 2.6; c.beginPath(); c.arc(P0[0], P0[1], 7 * e, 0, Math.PI * 2); c.fill(); c.stroke();
-        c.restore();
-      }
-      if (now < this._probeAnim || this.probes.some(p => p.km || p.bearing != null)) this.fxDirty = true;   // el borde discontinuo se anima
-    }
+    _drawProbes(c, now) { if (A.drawProbes(this, c, now)) this.fxDirty = true; }   // el borde discontinuo y el latido se animan
     /* familias de letra del tema: solo cambian con el idioma o el tema, asi que se leen del CSS una vez (leerlas en cada fotograma forzaba
        un recalculo de estilos de la pagina entera en mitad del dibujo del mapa, justo cuando una pantalla nueva estaba entrando) */
     _font(v, def) { const h = document.documentElement, key = h.lang + "|" + h.dataset.skin; if (this._fk !== key) { this._fk = key; this._fc = {}; } return this._fc[v] || (this._fc[v] = getComputedStyle(h).getPropertyValue(v) || def); }
@@ -1010,7 +1132,7 @@ void main(){
       c.save(); c.setLineDash([1, 9]); c.lineCap = "round"; c.lineWidth = 4; c.strokeStyle = this._rgba(this.sk.ink, 0.9);
       const segs = [];
       for (const s of [-360, 0, 360]) {
-        if (Math.abs(m.guess[0] + s - m.answer[0]) <= 180) segs.push([this.lonLatToScreen(m.guess[0] + s, m.guess[1]), Aa]);
+        if (Math.abs(m.guess[0] + s - m.answer[0]) <= 180) segs.push([this.lonLatToScreen(m.guess[0] + s, m.guess[1], m.gct), Aa]);
         if (s !== 0 && Math.abs(m.answer[0] + s - m.guess[0]) <= 180) segs.push([G, this.lonLatToScreen(m.answer[0] + s, m.answer[1])]);
       }
       const trace = () => { c.beginPath(); for (const [a, b] of segs) { c.moveTo(a[0], a[1]); c.lineTo(a[0] + (b[0] - a[0]) * e, a[1] + (b[1] - a[1]) * e); } c.stroke(); };

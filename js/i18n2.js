@@ -62,6 +62,7 @@ window.AIQ = window.AIQ || {};
     "Continent: ": ["Continent : ", "Continente: ", "Kontinent: ", "Continente: ", "Continente: ", "大洲：", "대륙: ", "大陸: ", "Континент: ", "Kontynent: "],
     "the sea": ["la mer", "o mar", "das Meer", "il mare", "el mar", "海洋", "바다", "海", "море", "morze"],
     "Inside the country!": ["Dans le pays !", "Dentro do país!", "Im Land!", "Dentro il paese!", "¡Dentro del país!", "在国境内！", "국가 안쪽!", "国の中！", "Внутри страны!", "W granicach kraju!"],
+    "Right here!": ["Juste ici !", "Bem aqui!", "Genau hier!", "Proprio qui!", "¡Aquí mismo!", "就在这里！", "바로 여기!", "まさにここ！", "Прямо здесь!", "Właśnie tutaj!"],
     "Starts with “{l}” and lies in {c}.": ["Commence par « {l} » et se trouve en {c}.", "Começa com “{l}” e fica em {c}.", "Beginnt mit „{l}“ und liegt in {c}.", "Inizia con «{l}» e si trova in {c}.", "Empieza con “{l}” y está en {c}.", "以“{l}”开头，位于 {c}。", "“{l}”로 시작하며 {c}에 있습니다.", "「{l}」で始まり、{c}にある。", "Начинается на «{l}» и находится в {c}.", "Zaczyna się na „{l}” i leży w: {c}."],
     "Round cleared": ["Manche réussie", "Rodada superada", "Runde geschafft", "Round superato", "Ronda superada", "回合通过", "라운드 클리어", "ラウンドクリア", "Раунд пройден", "Runda zaliczona"],
     "Boss defeated!": ["Boss vaincu !", "Chefe derrotado!", "Boss besiegt!", "Boss sconfitto!", "¡Jefe derrotado!", "击败首领！", "보스 처치!", "ボス撃破！", "Босс побеждён!", "Boss pokonany!"],

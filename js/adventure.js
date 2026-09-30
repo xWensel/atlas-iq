@@ -321,6 +321,14 @@ window.AIQ = window.AIQ || {};
     const dead = Object.keys(r.tools).filter(id => !TOOLS[id]); dead.forEach(id => { delete r.tools[id]; r.coins += 3; });
     if ((r.stock || []).some(s => (s.k === "perk" && !A.RELICS[s.id]) || (s.k === "tool" && !TOOLS[s.id]))) { r.stock = null; r.stockKey = null; }
     if (r.cjk == null) r.cjk = A.chal.noLatin();                    // v0.4.1: partidas de antes sin run.cjk: se fija una vez con el idioma de ahora
+    /* v0.23: retos que ya no existen ("Continentes cambiados"): fuera de la partida guardada, y el soborno que se pago por quitarlo se devuelve
+       (en esa ronda sale otro reto en su lugar) */
+    if (r.chal) r.chal = r.chal.filter(c => A.CHAL[c.id]);
+    for (const k in r.bribed || {}) {
+      const gone = r.bribed[k].filter(id => !A.CHAL[id]); if (!gone.length) continue;
+      r.bribed[k] = r.bribed[k].filter(id => A.CHAL[id]); r.bribeN = Math.max(0, (r.bribeN || 0) - gone.length);
+      r.coins += gone.length * Math.max(2, Math.round(10 * (+k % 4 === 3 ? 2 : 1) * (1 + 0.5 * r.bribeN) * ascFx(r.asc).price * (1 + 0.25 * Math.floor(+k / 4))));   // lo mas que podia costar sobornarlo en esa ronda (truco de mapa de nivel 3): nunca se devuelve de menos
+    }
   }
   A.adv.resume = function (daily = false) {
     slot = keyOf(daily); run = loadSlot(daily);
@@ -586,9 +594,11 @@ window.AIQ = window.AIQ || {};
   A.adv.onQuestion = function () {
     { const o0 = C().S.qs[C().S.qi]; if (A.dealer.trackQ) A.dealer.trackQ(o0 && o0.t !== "c" ? o0.lat : null, o0 && o0.t !== "c" ? o0.lon : null); }   // te vio encima (js/dealer.js)
     if (run && run.qSpent) { if (run.qSpent.k === qKey()) C().S.t0 -= run.qSpent.ms; run.qSpent = null; }
-    clearTimers(); hints.length = 0; run.qTools = 0; run.probes = []; run.tool = null; run.windOff = false; const S = C().S; S.tool = null; renderBars();
-    const o = S.qs[S.qi]; if (!o) return;
+    const S = C().S, o = S.qs[S.qi], kept = o && run.probes && run.probes.length && run.probesK === qKey() + ":" + o.cid[0] ? run.probes : null;   // al reanudar la misma pregunta, las sondas siguen ahi (las cargas ya estaban gastadas)
+    clearTimers(); hints.length = 0; run.qTools = 0; run.probes = kept || []; run.tool = null; run.windOff = false; S.tool = null; renderBars();
+    if (!o) return;
     const fx = A.chal.fx(perkList()); A.chal.question(o, run.qi);
+    if (kept) { C().map.avoid = hudRects(); C().map.setProbes(kept); renderBars(); }
     A.pointer.set({ tool: null, fx, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; return oo.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[oo.key]) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
     const api = {
       fact: o2 => { const txt = A.tx(o2.fact) || (A.factOf && A.factOf(o2)) || ""; if (txt) noteH(txt, "journal"); },
@@ -602,7 +612,7 @@ window.AIQ = window.AIQ || {};
   };
   /* el viento EMPUJA el puntero: se ve moverse (racha lenta incluida) y el clic cae exactamente donde esta el puntero. Devuelve el desplazamiento en pantalla. */
   const gust = () => 1 + 0.22 * Math.sin(performance.now() / 1000 * 1.9) + 0.08 * Math.sin(performance.now() / 1000 * 5.3);
-  const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat, gust()), p = m.lonLatToScreen(a.lon, a.lat); return [p[0] - px, p[1] - py]; };
+  const windGhost = (px, py) => { const m = C().map; if (!run || !run.wind || run.windOff) return null; const [lon, lat] = m.screenToLonLat(px, py), a = A.adv.adjust(lon, lat, gust()), p = m.lonLatToScreen(a.lon, a.lat, m.lastCt); return [p[0] - px, p[1] - py]; };
   A.adv.decorate = o => A.chal.decorate(o);
   /* ronda de banderas: la placa muestra la bandera (SVG empaquetado en assets/flags por tools/bundle-media.py; credito en data/flags.js) en vez del nombre */
   A.adv.isFlagRound = () => !!(run && run.topic === "flag");
@@ -629,11 +639,10 @@ window.AIQ = window.AIQ || {};
   A.adv.useTool = function (id) {
     const S = C().S; if (!run || S.phase !== "asking" || S.paused) return;
     const t = run.tools[id], def = TOOLS[id]; if (!t) return;
-    if ((run.boss || []).includes("silence")) { A.sfx.deny(); noteH(A.T("El Silencio anula tus herramientas.", "Silence cancels your tools.")); return; }
+    if ((run.boss || []).includes("silence")) { A.sfx.deny(); const w = A.T("El Silencio anula tus herramientas.", "Silence cancels your tools."); if (hints[hints.length - 1] !== w) noteH(w); return; }   // el aviso, una vez (antes se repetia en cada pulsacion)
     if (t.left <= 0) { A.sfx.deny(); return; }
-    if (def.kind === "probe") {
+    if (def.kind === "probe") {                                      // la pista ("Toca el mapa...") sale encima de la carta: en la nota, esta crecia y la carta saltaba 63 px bajo el raton
       S.tool = S.tool === id ? null : id; A.sfx.flip(!!S.tool); C().map.setPick(true);
-      note(S.tool ? (id === "sonar" ? A.T("Toca el mapa para lanzar una sonda…", "Tap the map to send a probe…") : A.T("Toca el mapa para orientar la brújula…", "Tap the map to aim the compass…")) : "");
       renderBars(); return;
     }
     t.left--; run.qTools++; run.rTools++; A.sfx.buy();
@@ -661,22 +670,41 @@ window.AIQ = window.AIQ || {};
     C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; A.adv.onQuestion(); A.sfx.card(); return true;
   }
   const continentName = o => A.tx(CONT[continentOf(o)] || L("el mar", "the sea"));
-  const note = (txt, icon) => { const el = $("factText"); el.textContent = txt || ""; if (txt && icon) el.insertAdjacentHTML("afterbegin", A.icon(icon, "sm")); };
+  /* distancia aproximada del Sonar, redondeada en la unidad que ves (antes se redondeaba en km y en millas salian cosas como "≈ 621 mi") */
+  const approx = km => { const mi = C().S.units === "mi", v = mi ? km / 1.609344 : km, st = v > 500 ? 50 : 10, r = Math.max(st, Math.round(v / st) * st); return "≈ " + A.fmtDist(mi ? r * 1.609344 : r); };
+  /* donde se ve el objetivo en el mapa (coordenadas del mapa tal como se dibuja, cada trozo de pais con su continente): el punto del objetivo mas
+     cercano a a. La Brujula apunta ahi y, con los continentes movidos, el anillo del Sonar pasa por ahi aunque sondees desde otro continente */
+  const seenTarget = (o, f, a, map) => {
+    if (!f) return map.sceneOf(o.lon, o.lat);
+    let best = null, bd = Infinity;
+    for (const p of f.polys) for (const ring of p.rings) for (const [lo, la] of ring) { const q = map.sceneOf(lo, la, p.ct), d = (q[0] - a[0]) ** 2 + (q[1] - a[1]) ** 2; if (d < bd) { bd = d; best = q; } }
+    return best;
+  };
+  /* lo que tapa el HUD en el lienzo del mapa (px): las etiquetas de las sondas lo esquivan. Se lee al sondear, no en cada fotograma */
+  const hudRects = () => { const cv = C().map.cv.getBoundingClientRect(); return ["plate", "advBar", "ledger", "rail", "dock", "note", "toolBar"].map(id => $(id)).filter(e => e && e.getClientRects().length).map(e => { const b = e.getBoundingClientRect(), up = e.id === "toolBar" ? 56 : 4; return [b.left - cv.left - 4, b.top - cv.top - up, b.right - cv.left + 4, b.bottom - cv.top + 4]; }); };
   A.adv.probe = function (lon, lat) {
-    const S = C().S, id = S.tool, t = run.tools[id]; if (!t || t.left <= 0) { S.tool = null; renderBars(); return; }
-    const o = S.qs[S.qi]; t.left--; run.qTools++; run.rTools++; S.tool = null;
-    const km = o.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[o.key]) : A.geo.haversine(lat, lon, o.lat, o.lon);
-    const list = (run.probes = run.probes || []), P = { lon, lat };
-    if (id === "sonar") {
-      const fz = (A.rng(run.seed + ":sn:" + roundNo() + ":" + S.qi + ":" + list.length)() - 0.5) * (has("sonarErr") ? 0.04 : 0.12), shown = km * (1 + fz);
-      P.km = Math.max(0, shown); P.label = km === 0 && o.t === "c" ? A.T("¡Dentro del país!", "Inside the country!") : "≈ " + A.fmtDist(Math.round(shown / (shown > 500 ? 50 : 10)) * (shown > 500 ? 50 : 10));
-      if (km === 0 && o.t === "c") P.km = 0;
+    const S = C().S, id = S.tool, t = run.tools[id], map = C().map; if (!t || t.left <= 0) { S.tool = null; renderBars(); return; }
+    const o = S.qs[S.qi]; t.left--; run.qTools++; run.rTools++; S.tool = null; S.probeAt = performance.now();   // un doble clic ya no responde la pregunta (ver onPick)
+    const f = o.t === "c" ? C().world.byName[o.key] : null, km = f ? A.geo.distToFeature(lon, lat, f) : A.geo.haversine(lat, lon, o.lat, o.lon);
+    const list = (run.probes = run.probes || []), P = { lon, lat, ct: map.pickCt };   // ct: marco del mapa deformado donde tocaste (la sonda se dibuja entera alli)
+    run.probesK = qKey() + ":" + o.cid[0];
+    if (f ? km === 0 : km < 5) { P.inside = true; P.label = f ? A.T("¡Dentro del país!", "Inside the country!") : A.T("¡Aquí mismo!", "Right here!"); A.sfx.sonar(1); }   // encima del objetivo: ni anillo ni flecha
+    else if (id === "sonar") {
+      const fz = (A.rng(run.seed + ":sn:" + roundNo() + ":" + S.qi + ":" + list.length)() - 0.5) * (has("sonarErr") ? 0.04 : 0.12);
+      P.km = Math.min(20015, km * (1 + fz)); P.label = approx(P.km);   // nunca mas de media vuelta al mundo
+      if (P.ct != null) { const a = map.sceneOf(lon, lat, P.ct), b = seenTarget(o, f, a, map); P.dr = Math.hypot(b[0] - a[0], b[1] - a[1]) * (1 + fz); }   // continentes movidos: el anillo se mide en el mapa que ves (los km siguen siendo los de verdad)
       A.sfx.sonar(clamp(1 - km / 8000, 0, 1));
-    } else { const brg = bearing(lat, lon, latlon(o)), step = has("compass16") ? 22.5 : 45, snap = Math.round(brg / step) * step; P.bearing = snap; P.label = dirName(snap); A.sfx.sonar(0.8); }
-    list.push(P); C().map.setProbes(list); persist(); note(hints.join("  ·  ")); renderBars();
+    } else {
+      /* Brujula: rumbo en el mapa que ves, hacia el punto del objetivo mas cercano tal como se dibuja. Antes era el rumbo de salida de la ruta por
+         el globo, hacia el centro de la caja del pais: en un mapa plano la flecha se desviaba mas de 45 grados en casi la mitad de las sondas
+         lejanas, y con los continentes movidos apuntaba a donde no estaba el objetivo */
+      const a = map.sceneOf(lon, lat, P.ct), b = seenTarget(o, f, a, map);
+      const brg = (Math.atan2(b[0] - a[0], b[1] - a[1]) * 180 / Math.PI + 360) % 360, step = has("compass16") ? 22.5 : 45, snap = (Math.round(brg / step) * step) % 360;
+      P.bearing = snap; P.label = dirName(snap); A.sfx.sonar(0.8);
+    }
+    list.push(P); map.avoid = hudRects(); map.setProbes(list); persist(); renderBars();   // el resultado tambien encima de las cartas (renderBars): con el apagon o el mapa borroso la etiqueta del mapa no se lee
     if (list.length >= 3) A.ach.emit("adv", { kind: "probe", n: list.length });
   };
-  function bearing(la1, lo1, p2) { const D = Math.PI / 180, la2 = p2[0] * D, dl = (p2[1] - lo1) * D, y = Math.sin(dl) * Math.cos(la2), x = Math.cos(la1 * D) * Math.sin(la2) - Math.sin(la1 * D) * Math.cos(la2) * Math.cos(dl); return (Math.atan2(y, x) / D + 360) % 360; }
 
   /* ---------------- barras de estado (durante la partida) ---------------- */
   function ensureBars() {
@@ -707,7 +735,9 @@ window.AIQ = window.AIQ || {};
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</span></div>` : ""}`;
     const ids = Object.keys(run.tools);
     tb.classList.toggle("hidden", !ids.length || C().S.phase !== "asking");
-    tb.innerHTML = ids.map((id, i) => { const t = run.tools[id], on = C().S.tool === id, off = t.left <= 0 || silenced; return `<button class="tool pc-hand${on ? " on" : ""}${off ? " off" : ""}" data-tool="${id}" style="--r:${((i - (ids.length - 1) / 2) * 6).toFixed(1)}deg" title="${A.tx(TOOLS[id].n)} — ${A.tx(TOOLS[id].d)}"><span class="tl-ico felt">${ic(TOOLS[id].ico)}</span><b>${A.tx(TOOLS[id].n)}</b><span class="tl-pips">${Array.from({ length: toolMax(id) }, (_, k) => `<i class="${k < t.left ? "on" : ""}"></i>`).join("")}</span><kbd>${i + 1}</kbd></button>`; }).join("");
+    const aim = id => (id === "sonar" ? A.T("Toca el mapa para lanzar una sonda…", "Tap the map to send a probe…") : A.T("Toca el mapa para orientar la brújula…", "Tap the map to aim the compass…"));
+    const res = !C().S.tool && (run.probes || []).length ? `<i class="tl-res">${run.probes.map(p => p.label).join("  ·  ")}</i>` : "";   // lo que han dicho las sondas de esta pregunta
+    tb.innerHTML = res + ids.map((id, i) => { const t = run.tools[id], on = C().S.tool === id, off = t.left <= 0 || silenced; return `<button class="tool pc-hand${on ? " on" : ""}${off ? " off" : ""}" data-tool="${id}" style="--r:${((i - (ids.length - 1) / 2) * 6).toFixed(1)}deg" title="${A.tx(TOOLS[id].n)} — ${A.tx(TOOLS[id].d)}">${on && TOOLS[id].kind === "probe" ? `<i class="tl-aim">${aim(id)}</i>` : ""}<span class="tl-ico felt">${ic(TOOLS[id].ico)}</span><b>${A.tx(TOOLS[id].n)}</b><span class="tl-pips">${Array.from({ length: toolMax(id) }, (_, k) => `<i class="${k < t.left ? "on" : ""}"></i>`).join("")}</span><kbd>${i + 1}</kbd></button>`; }).join("");
     tb.querySelectorAll(".tool").forEach(b => (b.onclick = () => A.adv.useTool(b.dataset.tool)));
     if (A.pointer) A.pointer.set({ tool: C().S.tool });
   }
@@ -715,7 +745,7 @@ window.AIQ = window.AIQ || {};
   A.adv.hideBars = () => { const a = $("advBar"), b = $("toolBar"), l = $("scLoot"); if (a) a.classList.add("hidden"); if (b) b.classList.add("hidden"); if (l) l.classList.add("hidden"); };
   A.adv.hudTitle = () => { const Lv = C().S.camp.levels[0]; return run && run.inf ? `${A.tx(Lv.name)} · ${A.tx(Lv.topicName)} · ${A.fmt1(Lv.seconds)} s` : `${A.tx(Lv.name)} · ${A.tx(Lv.topicName)} · ${A.T("Objetivo", "Target")} ${A.fmt(Lv.advance)}`; };
   A.adv.toolKey = n => { const ids = run ? Object.keys(run.tools) : []; if (ids[n]) A.adv.useTool(ids[n]); };
-  A.adv.cancelTool = () => { const S = C().S; if (S.tool) { S.tool = null; note(hints.join("  ·  ")); renderBars(); } };
+  A.adv.cancelTool = () => { const S = C().S; if (S.tool) { S.tool = null; renderBars(); } };
 
   /* ---------------- fin de ronda ---------------- */
   A.adv.roundEnd = function () {

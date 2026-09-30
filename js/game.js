@@ -562,6 +562,7 @@
   function onPick(lon, lat) {
     if (S.phase !== "asking" || S.paused) return;
     if (performance.now() - S.t0 < 350) return;                             // doble clic en "Siguiente": el segundo clic caia en el mapa y respondia la pregunta nueva sin verla
+    if (performance.now() - (S.probeAt || 0) < 600) return;                 // doble clic al lanzar una sonda (Windows admite hasta 500 ms entre clics): el segundo respondia la pregunta
     const ef = A.pointer && A.pointer.effective && A.pointer.effective(), at = ef ? { x: ef[0], y: ef[1] } : lastPtr;   // el destello sale donde cae el pin (con el cursor invertido, con retraso o con viento no es donde esta el raton)
     if (S.run && S.tool) { pingFx(at.x, at.y, "probe"); A.adv.probe(lon, lat); return; }
     if (S.run && !ef) ({ lon, lat } = A.adv.adjust(lon, lat));   // con puntero propio, el viento ya lo ha movido
@@ -831,7 +832,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     const k = e.key.toLowerCase();
     if (k === "escape") { if (S.settingsOpen) openSettings(false); else if (S.run && S.tool) A.adv.cancelTool(); else if (S.phase === "title" && S.hub !== "home") A.hub.screen("home"); else runMenu(); }
     else if (S.settingsOpen && !["f", "m", "n"].includes(k)) return;       // con Ajustes abierto solo valen sus atajos: Intro pulsaba el boton de la pantalla de debajo (p. ej. Jugar) y P reanudaba la pregunta tapada
-    else if (S.run && S.phase === "asking" && /^[1-4]$/.test(k)) A.adv.toolKey(+k - 1);
+    else if (S.run && S.phase === "asking" && /^[1-4]$/.test(k)) { if (!e.repeat) A.adv.toolKey(+k - 1); }   // mantener pulsada la tecla encendia y apagaba la herramienta sin parar
     else if (k === "f") toggleFs();
     else if (k === "c" && S.phase === "title") (A.codex.isOpen() ? A.codex.close() : A.codex.open());
     else if (k === "m") toggleSwitch("sfx");

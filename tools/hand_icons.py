@@ -878,14 +878,6 @@ def ch_pangea(id):
     m = dilate(m, 1, False); m = opening(m, 1); m = drop_small(m, 20)
     I.add(bevel(m, R["green"])); return I
 
-@icon("ch_shuffle")
-def ch_shuffle(id):
-    I = Icon()
-    for k, (cx, cy), rp_, f in (("sa", (17, 36), "green", .62), ("af", (46, 34), "orange", .55)):
-        lon0, lat0, sc, _ = CONT["k_" + k]
-        I.add(bevel(drop_small(despeckle(ortho_mask(continent_mask(k), lon0, lat0, sc * f, cx=cx, cy=cy, ss=4)), 8), R[rp_]))
-    curved(I, 14, 50, 11, True, "paper"); curved(I, 50, 14, 52, False, "paper"); return I
-
 @icon("ch_tilt")
 def ch_tilt(id):
     I = Icon(); lon0, lat0, sc, _ = CONT["k_af"]

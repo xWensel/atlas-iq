@@ -69,7 +69,7 @@ window.AIQ = window.AIQ || {};
     }
     _emptyMarks() { return { guess: null, answer: null, highlight: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
     setMarks(m) { this.marks = { ...this._emptyMarks(), ...m, t0: performance.now() }; this.fxDirty = this.hlDirty = true; }
-    clearMarks() { this.marks = this._emptyMarks(); this.fxDirty = this.hlDirty = true; }
+    clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.hlDirty = true; }
     setPick(on) { this.pickEnabled = on; this.fxDirty = true; for (const c of [this.cv, this.fx]) c.classList.toggle("aiming", on); }
     setQuality(q) { this.quality = q; this.resize(true); }
     setStyle() {}
@@ -396,6 +396,7 @@ window.AIQ = window.AIQ || {};
           c.lineWidth = 7; c.strokeStyle = INK; c.strokeText(m.pop, G[0], y); c.fillStyle = PAPER; c.fillText(m.pop, G[0], y); c.restore();
         }
       }
+      if (this.probes && this.probes.length && A.drawProbes(this, c, now)) this.fxDirty = true;
       if (this.pickEnabled && this.mouse && !this.pointers.size) this._reticle(c, this.mouse.x, this.mouse.y);
     }
 
@@ -463,7 +464,8 @@ window.AIQ = window.AIQ || {};
     }
 
     /* miniatura de una region (usa la textura ya dibujada: coste casi nulo) */
-    setProbes(list) { this.probes = list; }
+    setProbes(list) { this.probes = A.keepT0(this.probes, list); this.fxDirty = true; }   // antes se guardaban y no se dibujaban: el Sonar gastaba la carga sin enseñar nada
+    sceneOf(lon, lat) { return project(lon, lat); }
     drawThumb(cv, spec) {
       if (!this.landTex) return;
       const dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 120, h = cv.clientHeight || 76;

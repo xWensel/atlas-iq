@@ -1,7 +1,7 @@
 /*
  * Geolite - RETOS de la Aventura (v0.11). El crupier "toca la mesa": cada ronda trae retos que cambian
  *   - el NOMBRE del lugar (letras que tiemblan, faltan, se cambian, runas, anagramas, otro idioma, adivinanza...),
- *   - el MAPA (borroso, apagon, fronteras falsas, Pangea, continentes movidos, del reves, terremoto, deriva, lluvia, rayos...),
+ *   - el MAPA (borroso, apagon, fronteras falsas, Pangea, Big bang, continentes torcidos, del reves, terremoto, deriva, lluvia, rayos...),
  *   - el PUNTERO (tiembla, parpadea, desaparece, se emborrona, va con retraso, se mueve al reves, marea...) y
  *   - las REGLAS (viento, tormenta, silencio).
  * No tocan la puntuacion: solo hacen mas dificil encontrar el sitio. Los perks los mitigan (ver `fx` en js/relics.js).
@@ -44,7 +44,6 @@ window.AIQ = window.AIQ || {};
   def("wrongborders", "map", "ch_wrongborders", "Fronteras falsas|False borders|Fausses frontières|Fronteiras falsas|Falsche Grenzen|Confini falsi||虚假边界|가짜 국경|偽の国境|Ложные границы|Fałszywe granice", "Las fronteras dibujadas mienten.|The drawn borders are lying.|Les frontières dessinées mentent.|As fronteiras desenhadas mentem.|Die gezeichneten Grenzen lügen.|I confini disegnati mentono.||画出的边界是假的。|그려진 국경이 거짓말을 합니다.|描かれた国境はウソだ。|Нарисованные границы лгут.|Narysowane granice kłamią.", ["customs"]);
   def("noborders", "map", "ch_noborders", "Mapa mudo|Blank map|Carte muette|Mapa mudo|Stumme Karte|Mappa muta||空白地图|빈 지도|白地図|Немая карта|Niema mapa", "Sin fronteras en el mapa.|No borders on the map.|Pas de frontières sur la carte.|Sem fronteiras no mapa.|Keine Grenzen auf der Karte.|Nessun confine sulla mappa.||地图上没有边界。|지도에 국경이 없습니다.|地図に国境がない。|На карте нет границ.|Na mapie nie ma granic.", ["customs"]);
   def("pangea", "map", "ch_pangea", "Pangea|Pangaea|Pangée|Pangeia|Pangaea|Pangea||盘古大陆|판게아|パンゲア|Пангея|Pangea", "Los continentes se han unido en un solo supercontinente, como hace 250 millones de años.|The continents have merged into one supercontinent, like 250 million years ago.|Les continents se sont réunis en un seul supercontinent, comme il y a 250 millions d'années.|Os continentes se uniram num único supercontinente, como há 250 milhões de anos.|Die Kontinente sind zu einem Superkontinent verschmolzen, wie vor 250 Millionen Jahren.|I continenti si sono uniti in un unico supercontinente, come 250 milioni di anni fa.||各大洲合并成了一个超大陆，就像 2.5 亿年前那样。|2억 5천만 년 전처럼 대륙들이 하나의 초대륙으로 합쳐졌습니다.|2億5千万年前のように、大陸が一つの超大陸に合体した。|Континенты слились в один суперконтинент, как 250 миллионов лет назад.|Kontynenty połączyły się w jeden superkontynent, jak 250 milionów lat temu.", ["plates"]);
-  def("shuffle", "map", "ch_shuffle", "Continentes cambiados|Continents swapped|Continents échangés|Continentes trocados|Kontinente vertauscht|Continenti scambiati||大洲互换|대륙 뒤바뀜|大陸の入れ替え|Континенты поменялись|Zamienione kontynenty", "Los continentes han cambiado de sitio.|The continents have changed places.|Les continents ont changé de place.|Os continentes mudaram de lugar.|Die Kontinente haben die Plätze getauscht.|I continenti hanno cambiato posto.||各大洲互换了位置。|대륙들의 위치가 바뀌었습니다.|大陸の位置が入れ替わった。|Континенты поменялись местами.|Kontynenty zamieniły się miejscami.", ["plates"]);
   def("spread", "map", "ch_spread", "Big bang|Big bang|Big bang|Big bang|Urknall|Big bang||大爆炸|빅뱅|ビッグバン|Большой взрыв|Wielki wybuch", "Los continentes se han separado.|The continents have drifted apart.|Les continents se sont éloignés.|Os continentes se afastaram.|Die Kontinente sind auseinandergedriftet.|I continenti si sono allontanati.||各大洲漂离开了。|대륙들이 서로 멀어졌습니다.|大陸が離れ離れになった。|Континенты разошлись.|Kontynenty się rozjechały.", ["plates"]);
   def("tilt", "map", "ch_tilt", "Continentes torcidos|Crooked continents|Continents de travers|Continentes tortos|Schiefe Kontinente|Continenti storti||歪斜的大洲|비뚤어진 대륙|傾いた大陸|Кривые континенты|Krzywe kontynenty", "Cada continente está girado.|Every continent is turned.|Chaque continent est tourné.|Cada continente está girado.|Jeder Kontinent ist gedreht.|Ogni continente è ruotato.||每个大洲都被旋转了。|모든 대륙이 회전되어 있습니다.|すべての大陸が回転している。|Каждый континент повёрнут.|Każdy kontynent jest obrócony.", ["plates"]);
   def("flip", "map", "ch_flip", "Mundo del revés|Upside-down world|Monde à l'envers|Mundo de cabeça para baixo|Welt auf dem Kopf|Mondo capovolto||颠倒的世界|뒤집힌 세계|逆さまの世界|Мир вверх ногами|Świat do góry nogami", "El Sur está arriba.|South is up.|Le Sud est en haut.|O Sul está em cima.|Der Süden ist oben.|Il Sud è in alto.||南方在上。|남쪽이 위에 있습니다.|南が上にある。|Юг — наверху.|Południe jest na górze.", ["handmirror"]);
@@ -86,7 +85,11 @@ window.AIQ = window.AIQ || {};
   A.CHAL = D;
 
   const KIND = k => Object.keys(D).filter(id => D[id].kind === k);
-  const TEXT = KIND("text"), MAPC = KIND("map"), PTR = KIND("ptr"), RULE = KIND("rule"), FLAG = KIND("flag"), WALL = KIND("wall"), MAPW = [...MAPC, ...WALL];
+  const TEXT = KIND("text"), MAPC = KIND("map"), PTR = KIND("ptr"), RULE = KIND("rule"), FLAG = KIND("flag"), WALL = KIND("wall");
+  /* v0.23: "Continentes cambiados" ya no existe (jugaba como Pangea, pero peor). Su hueco sigue en el sorteo del mapa, en su sitio de siempre (tras
+     Pangea), para que cada semilla saque los mismos retos que antes (partidas guardadas, sobornos, Campamento, Reto diario): solo si el sorteo acaba
+     en el se sortea otro, aparte ("r"), sin tocar los re-sorteos de los trucos que no harian nada. Cambian justo las rondas que lo traian */
+  const GONE = "shuffle", MAPD = [...MAPC.slice(0, MAPC.indexOf("pangea") + 1), GONE, ...MAPC.slice(MAPC.indexOf("pangea") + 1), ...WALL];
   /* en una misma ronda no se juntan retos "de la misma familia" */
   const FAMILY = { wrongborders: "b", noborders: "b", pangea: "p", shuffle: "p", spread: "p", tilt: "p", flip: "o", mirrorx: "o", spin: "o", blur: "v", dark: "v", myopia: "v", blindspot: "v", clouds: "v", rain: "v", mosaic: "v", flicker: "l", lightning: "l", quake: "m", drift: "m", decoys: "d", negative: "n", crack: "w", smudge: "w", hang: "w", battery: "w" };
   const famOf = id => FAMILY[id] || (D[id].kind === "text" ? "t" : D[id].kind === "ptr" ? "c" : id);
@@ -94,11 +97,11 @@ window.AIQ = window.AIQ || {};
   const MILD_TEXT = ["shaky", "missing", "swap", "upside", "babel", "dance"], MILD_MAP = ["blur", "dark", "noborders", "clouds", "mirrorx", "negative", "rain"];
   const BOSS = [
     [["El Apagón|The Blackout|La panne|O Apagão|Der Stromausfall|Il Blackout||大停电|대정전|大停電|Великое затмение|Wielka ciemność", ["dark", "flicker"]], ["Ronda ciega|Blind round|Manche aveugle|Rodada cega|Blinde Runde|Round cieco||盲眼回合|블라인드 라운드|ブラインドラウンド|Слепой раунд|Runda na ślepo", ["blur", "missing"]], ["Un solo continente|One continent|Un seul continent|Um só continente|Ein Kontinent|Un solo continente||一块大陆|하나의 대륙|ひとつの大陸|Один континент|Jeden kontynent", ["pangea", "swap"]], ["Mareo de casino|Casino dizziness|Vertige de casino|Tontura de cassino|Casino-Schwindel|Capogiro da casinò||赌场眩晕|카지노 현기증|カジノのめまい|Казино-головокружение|Kasynowy zawrót głowy", ["dizzy", "shaky"]]],
-    [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme||虚惊一场|거짓 경보|誤報|Ложная тревога|Fałszywy alarm", ["shuffle", "wrongborders"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto||没有护照|여권 없음|パスポートなし|Без паспорта|Bez paszportu", ["nocountry", "blur"]], ["Mala visión|Bad eyesight|Mauvaise vue|Vista turva|Schlechte Sicht|Vista offuscata||视力不佳|나쁜 시력|視力低下|Плохое зрение|Słaby wzrok", ["flip", "anagram"]], ["Noche cerrada|Dead of night|Nuit noire|Noite fechada|Tiefste Nacht|Notte fonda||深夜|한밤중|真夜中|Глухая ночь|Głucha noc", ["dark", "shaky", "wind"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala||大厅地震|홀의 지진|ホールの地震|Землетрясение в зале|Trzęsienie na sali", ["quake", "decoys"]], ["Rompe la cuarta pared|Breaking the fourth wall|Briser le quatrième mur|Quebrando a quarta parede|Die vierte Wand durchbrechen|Rompere la quarta parete||打破第四面墙|제4의 벽 깨기|第四の壁を破れ|Ломая четвёртую стену|Przełamując czwartą ścianę", ["crack", "hang"]]],
-    [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio||巨镜|거대한 거울|大いなる鏡|Великое зеркало|Wielkie lustro", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato||洗乱的牌组|섞인 덱|シャッフルされたデッキ|Перетасованная колода|Potasowana talia", ["shuffle", "dark", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente||孤注一掷|모 아니면 도|オール・オア・ナッシング|Всё или ничего|Wszystko albo nic", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta||完美风暴|퍼펙트 스톰|パーフェクト・ストーム|Идеальный шторм|Sztorm doskonały", ["lightning", "rain", "tremble"]], ["Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele||巴别塔|바벨탑|バベルの塔|Вавилонская башня|Wieża Babel", ["babel", "runes", "mosaic"]], ["Pantallazo|System crash|Plantage total|Pane geral|Systemabsturz|Crash di sistema||系统崩溃|시스템 다운|システムクラッシュ|Системный сбой|Awaria systemu", ["battery", "hang", "flicker"]]],
+    [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme||虚惊一场|거짓 경보|誤報|Ложная тревога|Fałszywy alarm", ["spread", "wrongborders"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto||没有护照|여권 없음|パスポートなし|Без паспорта|Bez paszportu", ["nocountry", "blur"]], ["Mala visión|Bad eyesight|Mauvaise vue|Vista turva|Schlechte Sicht|Vista offuscata||视力不佳|나쁜 시력|視力低下|Плохое зрение|Słaby wzrok", ["flip", "anagram"]], ["Noche cerrada|Dead of night|Nuit noire|Noite fechada|Tiefste Nacht|Notte fonda||深夜|한밤중|真夜中|Глухая ночь|Głucha noc", ["dark", "shaky", "wind"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala||大厅地震|홀의 지진|ホールの地震|Землетрясение в зале|Trzęsienie na sali", ["quake", "decoys"]], ["Rompe la cuarta pared|Breaking the fourth wall|Briser le quatrième mur|Quebrando a quarta parede|Die vierte Wand durchbrechen|Rompere la quarta parete||打破第四面墙|제4의 벽 깨기|第四の壁を破れ|Ломая четвёртую стену|Przełamując czwartą ścianę", ["crack", "hang"]]],
+    [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio||巨镜|거대한 거울|大いなる鏡|Великое зеркало|Wielkie lustro", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato||洗乱的牌组|섞인 덱|シャッフルされたデッキ|Перетасованная колода|Potasowana talia", ["tilt", "dark", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente||孤注一掷|모 아니면 도|オール・オア・ナッシング|Всё или ничего|Wszystko albo nic", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta||完美风暴|퍼펙트 스톰|パーフェクト・ストーム|Идеальный шторм|Sztorm doskonały", ["lightning", "rain", "tremble"]], ["Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele||巴别塔|바벨탑|バベルの塔|Вавилонская башня|Wieża Babel", ["babel", "runes", "mosaic"]], ["Pantallazo|System crash|Plantage total|Pane geral|Systemabsturz|Crash di sistema||系统崩溃|시스템 다운|システムクラッシュ|Системный сбой|Awaria systemu", ["battery", "hang", "flicker"]]],
   ].map(a => a.map(c => ({ n: L6(c[0]), ids: c[1] })));
   /* jefe de la ronda de banderas: la bandera trae su propio filtro y el mapa se lía por su cuenta */
-  const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flaginvert", "shuffle"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur", "mosaic"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
+  const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flaginvert", "flip"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur", "mosaic"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
   const ACT1 = [["text", "map"], ["ptr", "map"], ["text", "ptr"]], ACT2 = [["text", "map", "ptr"], ["map", "ptr", "rule"], ["text", "map", "map"]];
 
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
@@ -114,7 +117,7 @@ window.AIQ = window.AIQ || {};
       let list = [], combo = null;
       /* trucos que en esta ronda no harian nada (texto en la de banderas, Sin pais o Adivinanza sin pais ni nota debajo, runas y sin vocales en zh/ja/ko):
          si el sorteo cae en uno, se sortea otro. Lo que ya salia bien no cambia (partidas guardadas y sobornos intactos) */
-      const useless = id => (flagRound && D[id].kind === "text") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
+      const useless = id => (flagRound && !!D[id] && D[id].kind === "text") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
       const noop = id => useless(id) || (cjk && (id === "runes" || id === "novowels"));
       if (boss) {
         /* v0.7.1: el jefe de una ronda de banderas (la 8 de la Aventura) ya no es siempre de banderas: la semilla sortea entre los de banderas y los
@@ -124,10 +127,10 @@ window.AIQ = window.AIQ || {};
         if (flagRound) combo = normal.length && A.rng(`${seed}:bossmix:${act}`)() < normal.length / (FLAG_BOSS.length + normal.length) ? rb.pick(normal) : rb.pick(FLAG_BOSS);
         else combo = rb.pick(normal.length ? normal : BOSS[a]);
         list = combo.ids.map((id, i) => ({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) }));
-        if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPW, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
+        if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (id === GONE || fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
         if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia
-          const fam = new Set(list.map(x => famOf(x.id))), pool = [...TEXT, ...MAPW, ...PTR].filter(id => !fam.has(famOf(id)));
-          if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (noop(id)) { const ok = pool.filter(x => !noop(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv }); }
+          const fam = new Set(list.map(x => famOf(x.id))), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id)));
+          if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (noop(id)) { const ok = pool.filter(x => !noop(x)); if (ok.length) id = rb.pick(ok); } if (id === GONE) id = rb.pick(pool.filter(x => x !== GONE && !noop(x))); list.push({ id, lv }); }
         }
         return { list, boss, combo };
       }
@@ -135,7 +138,7 @@ window.AIQ = window.AIQ || {};
       /* v0.35: el Apagon sale si o si en algun momento de la expedicion (asi el Foco del vigilante siempre tiene su momento): en una ronda
          con hueco de mapa elegida por la semilla. Si esa ronda se baraja en el Campamento, el crupier elige otra cosa (el jugador pago por ello) */
       let dark = r === A.rng(`${seed}:dark`).pick([2, 4, 5, 8, 9, 10]);
-      const add = (cat, mild) => { const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT).filter(id => !(cjk && (id === "runes" || id === "novowels")))) : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPW); let id = pickFrom(seed, cat + list.length, pool, r, used); if (noop(id)) { const ok = pool.filter(x => !noop(x)); if (ok.length) id = pickFrom(seed, cat + list.length + "b", ok, r, used); } if (cat === "map" && dark && !used.includes(famOf("dark"))) { id = "dark"; dark = false; } list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); };
+      const add = (cat, mild) => { const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT).filter(id => !(cjk && (id === "runes" || id === "novowels")))) : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPD); let id = pickFrom(seed, cat + list.length, pool, r, used); if (noop(id)) { const ok = pool.filter(x => !noop(x)); if (ok.length) id = pickFrom(seed, cat + list.length + "b", ok, r, used); } if (id === GONE) id = pickFrom(seed, cat + list.length + "r", pool.filter(x => x !== GONE && !noop(x)), r, used); if (cat === "map" && dark && !used.includes(famOf("dark"))) { id = "dark"; dark = false; } list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); };
       if (act === 0) { if (pos === 1) add("text", true); else if (pos === 2) add("map", true); }
       else if (act === 1) ACT1[pos % 3].forEach(c => add(c, false));
       else ACT2[pos % 3].forEach(c => add(c, false));
@@ -144,7 +147,7 @@ window.AIQ = window.AIQ || {};
     },
     info: id => D[id],
     /* v0.35: la ficha ya no dice que perk frena el reto (ni brilla por ello): el jugador tiene que leer y atar cabos */
-    chip(c, small) { const d = D[c.id]; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}" data-ch="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d)).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b><i class="ch-lv">${"●".repeat(c.lv || 1)}</i></span>`; },
+    chip(c, small) { const d = D[c.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}" data-ch="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d)).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b><i class="ch-lv">${"●".repeat(c.lv || 1)}</i></span>`; },
   };
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */
@@ -183,7 +186,6 @@ window.AIQ = window.AIQ || {};
     case "lightning": return { iv: [[4.5, 7], [3.2, 5.2], [2.2, 4]][i] };
     case "wrongborders": return { amp: [0.014, 0.024, 0.038][i] * h };
     case "pangea": return { k: [0.9, 0.95, 1][i] * fx.plateMul * h };
-    case "shuffle": return { k: [0.6, 0.85, 1][i] * fx.plateMul * h };
     case "spread": return { k: [0.5, 0.8, 1][i] * fx.plateMul * h };
     case "tilt": return { k: [0.4, 0.65, 0.9][i] * fx.plateMul * h };
     case "clouds": return { cover: [0.18, 0.28, 0.4][i] * fx.cloudMul * h };
@@ -341,15 +343,25 @@ window.AIQ = window.AIQ || {};
   /* la colocacion de continentes (19-76 ms de calculo) sale igual en todas las preguntas de la ronda (misma semilla, mismo reto): se calcula una vez
      y se reutiliza. Antes se repetia al empezar cada pregunta, justo cuando los continentes echan a andar */
   const LAYM = new Map();
+  /* lo que tapa el HUD durante la pregunta (px de pantalla: el HUD no escala con la ventana; medido de 1280x720 a 2000x1125, con holgura): marcador,
+     barra de la Aventura, puntos, zoom, botones, placa del nivel y herramientas. Fijo (sin leer el DOM): la colocacion se calcula en la intro, con el
+     marcador todavia oculto */
+  const hudPx = (W, H) => [[0, 0, 450, 245], [0, 0, 395, 400], [W - 245, 0, W, 155], [W - 72, H * 0.46 - 115, W, H * 0.46 + 115], [0, H - 72, 165, H], [W / 2 - 355, H - 92, W / 2 + 355, H], [W / 2 - 180, H - 215, W / 2 + 180, H - 92]];
+  const hudZones = map => {
+    const v = map._clamp({ ...map.home() }), W = map.W, H = map.H, X = px => v.cx + (px - W / 2) / v.s, Y = py => v.cy - (py - H / 2) / v.s;
+    return { view: [X(0), Y(H), X(W), Y(0)], rects: hudPx(W, H).map(([a, b, c, d]) => [X(a), Y(d), X(c), Y(b)]), key: [W, H].map(Math.round).join("x") };
+  };
+  A.chal.hudZones = hudZones;                                          // para dev/maptest.js
   const layoutMemo = (map, key, fn) => { let L = LAYM.get(key); if (!L) { L = fn(); LAYM.set(key, L); if (LAYM.size > 8) LAYM.delete(LAYM.keys().next().value); } return { ...L, shift: L.shift.map(p => p.slice()), scale: L.scale.slice() }; };
   function mapSpec(map, o) {
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}`);
-    const lay = ["pangea", "shuffle", "spread"].map(id => get(id)).find(Boolean);
+    const lay = ["pangea", "spread"].map(id => get(id)).find(Boolean);
     const tl = get("tilt"); if (tl) { const k = par(tl).k; for (let c = 0; c < 6; c++) spec.rot[c] = (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * k; any = true; }
     if (lay || tl) {                                                                                // motor de encaje con mascaras reales: los continentes nunca se pisan, tambien en Pangea
       const kind = lay ? lay.id : "hold", k = lay ? par(lay).k : 1;
-      const L = layoutMemo(map, [S.seed, S.round, kind, k, spec.rot.join()].join("|"), () => map.layout(kind, k, rr, spec.rot)); spec.shift = L.shift; spec.scale = L.scale; any = true;
+      const Z = hudZones(map), L = layoutMemo(map, [S.seed, S.round, kind, k, spec.rot.join(), Z.key].join("|"), () => map.layout(kind, k, rr, spec.rot, Z)); spec.shift = L.shift; spec.scale = L.scale; any = true;
+      if (!L.ok) spec.rot = [0, 0, 0, 0, 0, 0, 0];                    // no hubo sitio: se quedan en su sitio y sin girar (girados a tamano completo se pisarian)
       if (lay && lay.id === "pangea") { spec.smooth = true; spec.ms = 2600; }
     }
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
@@ -438,7 +450,7 @@ window.AIQ = window.AIQ || {};
       this.end(); S.list = list.slice(); S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0;
       S.map = A.core && A.core.map; if (S.map) ensureOverlay(S.map);
       /* retos que mueven continentes: su colocacion se deja calculada mientras se presenta la ronda (con el mapa ya quieto), no al empezar la pregunta */
-      if (S.map && S.map.layout && S.list.some(c => ["pangea", "shuffle", "spread", "tilt"].includes(c.id))) {
+      if (S.map && S.map.layout && S.list.some(c => ["pangea", "spread", "tilt"].includes(c.id))) {
         const idle = fn => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 0));
         later(() => idle(() => { if (S.on && S.map) try { mapSpec(S.map, null); } catch (e) { /* ya se calculara en la pregunta */ } }), 1300);
       }

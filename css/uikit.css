@@ -320,7 +320,7 @@ html body .tour-txt { font-size: 19px; } html body .dl-bubble p { font-size: inh
 #leftCol > * { pointer-events: auto; position: relative; left: auto; top: auto; right: auto; bottom: auto; transform: none; }
 #leftCol .plate-sh { width: 100%; } #leftCol #plate { min-width: 0; max-width: none; width: 100%; padding: 12px 20px 13px; }
 #leftCol .adv-bar { max-width: none; width: max-content; min-width: 210px; }
-#leftCol .ach-toast { width: 100%; padding: 8px 12px 8px 8px; gap: 10px; margin: 0; z-index: 8; }
+#leftCol .ach-toast { width: 100%; padding: 8px 12px 8px 8px; gap: 10px; margin: 0; z-index: 8; pointer-events: none; }   /* solo aviso: no se come los clics del mapa que tiene debajo (una sonda se perdia) */
 #leftCol .ach-toast.in { animation: ach-in-l .6s var(--spring) both; } @keyframes ach-in-l { from { transform: translateX(-130%); opacity: 0; } }
 #leftCol .ach-toast .ach-ico { transform: scale(.75); transform-origin: left center; margin-right: -10px; } #leftCol .ach-t i { display: none; }
 /* aviso de enciclopedia: tambien a la izquierda (antes tapaba el marcador y el ticket a la derecha) */
