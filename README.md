@@ -4,6 +4,10 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.27.1** - Cousins Studios.
+- El estudio pasa a llamarse «Cousins Studios»: «studios» gana su s final, dibujada igual que la primera y con el mismo espaciado óptico, en perla.
+- Todo recentrado: «studios» comparte eje exacto con «Cousins», y los dos filetes se acortan por igual (mismo hueco hasta la palabra y mismos extremos que «Cousins»).
+
 **v0.26.1** - Clics y chinchetas donde se ve la tierra, también en los bordes.
 - La pantalla curvada del casino no se tenía en cuenta al hacer clic: cerca de los bordes, el clic y la chincheta caían de 33 a 65 px lejos de la tierra que se veía (Anchorage salía en mitad de Alaska y Wellington en el mar). Ahora los clics, las chinchetas, las sondas, las etiquetas y la lupa de fronteras siguen la misma curva que la imagen.
 - Los rótulos de latitud y longitud del borde caen sobre sus líneas curvadas.

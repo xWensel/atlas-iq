@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Entrada (idioma + pantalla completa) y secuencia del estudio "Cousins Studio":
-   sobre negro, "Cousins" se enciende con el primer golpe, "studio" con el segundo y una luz calida recorre el metal
+   Entrada (idioma + pantalla completa) y secuencia del estudio "Cousins Studios":
+   sobre negro, "Cousins" se enciende con el primer golpe, "studios" con el segundo y una luz calida recorre el metal
    ========================================================================== */
 #boot { position: fixed; inset: 0; z-index: 100; background: #000; color: var(--paper); display: grid; place-items: center; overflow: hidden; }
 #boot.out { animation: boot-out .8s ease forwards; } @keyframes boot-out { to { opacity: 0; visibility: hidden; } }
@@ -22,7 +22,7 @@
 @keyframes st-fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* ---- secuencia del estudio (~3,5 s, fondo negro). Las letras de "Cousins" (oro) salen de la oscuridad en penumbra ambar y se encienden
-   con el primer golpe grave (0,62 s); "studio" (perla) igual con el segundo (1,26 s) mientras sus filetes se abren hacia fuera; una luz calida
+   con el primer golpe grave (0,62 s); "studios" (perla) igual con el segundo (1,26 s) mientras sus filetes se abren hacia fuera; una luz calida
    cruza el metal (1,85 s) y la camara avanza despacio todo el rato. Cada letra es una capa propia (js/logo.js) y solo se animan
    transform/opacity de esas capas y un filtro de color por palabra (dos capas): la tarjeta grafica lo mueve todo, sin repintar ---- */
 .studio { position: absolute; inset: 0; overflow: hidden; background: #000; }
@@ -45,7 +45,7 @@
 .cs-gs { animation: cs-glow-s 3.5s linear both; }
 @keyframes cs-glow-b { 0% { opacity: 0; } 17.6% { opacity: .2; } 17.8% { opacity: 1; } 22% { opacity: .56; } 27% { opacity: .36; } 34% { opacity: .26; } 36.2% { opacity: .34; } 64% { opacity: .2; } 100% { opacity: .15; } }
 @keyframes cs-glow-s { 0%, 29% { opacity: 0; } 35.8% { opacity: .2; } 36% { opacity: 1; } 40% { opacity: .56; } 46% { opacity: .36; } 55% { opacity: .26; } 68% { opacity: .2; } 100% { opacity: .15; } }
-/* cada letra sube, se acerca y se cierra hacia el centro de su palabra (escalonadas); "studio" algo mas deprisa */
+/* cada letra sube, se acerca y se cierra hacia el centro de su palabra (escalonadas); "studios" algo mas deprisa */
 .cs-l { position: absolute; display: block; overflow: visible; opacity: 0; transform-origin: 50% 80%; will-change: transform, opacity;
   animation: cs-rise 1.1s cubic-bezier(.22, .75, .25, 1) both; animation-delay: calc(.1s + var(--i) * 45ms); }
 @keyframes cs-rise { 0% { opacity: 0; transform: translate(var(--dx, 0), 12%) scale(.95); } 55% { opacity: 1; } 100% { opacity: 1; transform: none; } }
