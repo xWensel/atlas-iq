@@ -133,6 +133,7 @@ icons({
  "ch_wrongborders": "a folded map with a crooked red wavy border line and a warning triangle", "ch_noborders": "a globe with erased dotted border lines and an eraser",
  "ch_pangea": "one giant supercontinent glued together from puzzle pieces",
  "ch_flip": "an upside down globe with a curved turning arrow", "ch_clouds": "puffy grey smoke clouds covering a small map",
+ # OJO: dealer_neutral tambien va dentro de la tarjeta de Aventura: si cambia, regenerar con tools/card_adv.py (ver CLAUDE.md)
  "dealer_neutral": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves fanning playing cards, sly confident smile, facing front",
  "dealer_laugh": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves, laughing loudly with mouth wide open and tears of joy, facing front",
  "dealer_angry": "a mysterious casino croupier bust portrait, tall dark purple top hat with a small globe pin, golden half masquerade mask, neat black mustache, red bow tie, white gloves, angry frowning with gritted teeth and slammed fists, facing front",

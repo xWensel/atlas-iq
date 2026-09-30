@@ -4,6 +4,11 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.30.1** - Aventura: tarjeta nueva, cara a cara con el crupier.
+- Nueva ilustración del modo Aventura en la portada: el crupier de sus frases preside la mesa del mapamundi y, subido al tapete y de espaldas, el explorador le planta cara con su brújula entre las fichas en juego.
+- Todo sobre la misma retícula de píxel que el crupier (mismo tamaño de píxel y contorno de 1 px): tapete repintado con el mapamundi real, filete dorado y el foco sobre el explorador; fichas dibujadas píxel a píxel; telón en penumbra.
+- La escena se genera con `tools/card_adv.py` (piezas en `tools/art/card_adv/`); si el crupier cambia, la tarjeta se regenera con él (regla en `CLAUDE.md`).
+
 **v0.29.1** - Mezcla: la 12.ª campaña del Clásico.
 - Nueva campaña «Mezcla»: de todo un poco. Cada uno de sus 10 niveles junta el mismo nivel de las otras 11 campañas (misma dificultad y misma meta) y sortea 10 preguntas, una de cada campaña distinta y en orden al azar: ciudades, capitales, banderas, pistas, sucesos, personajes... Cada pregunta conserva su tipo (bandera, retrato, pista), su reloj (15 o 18 s) y la puntuación de su campaña. En los 12 idiomas.
 - Con 12 cartas la pantalla del Clásico queda en dos columnas iguales de 6, sin huecos.
