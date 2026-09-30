@@ -56,6 +56,11 @@
 .plq-tag .ic { flex: none; width: 15px; height: 15px; margin: 0; filter: none; }
 .plq-tag.bar::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: max(3px, var(--p)); background: var(--c1); }   /* progreso, del color de la placa */
 html body .plq-tag > span { font-size: 14px; }
+/* Clasificacion: sin etiqueta (no es solo de la Aventura); el titulo, mas grande, ocupa su sitio */
+.plq-rank .plq-tag { display: none; }
+.plq-rank .plq-t > b { font-size: 32px; }
+@media (max-width: 700px) and (orientation: portrait) { .plq-rank .plq-t > b { font-size: clamp(16px, calc(4.8 * var(--vw)), 22px); } }
+@media (max-height: 520px) and (orientation: landscape) { .plq-rank .plq-t > b { font-size: 23px; } }
 
 /* tu puesto mundial: cinta de neon centrada arriba, como "Modo principal" en la carta de la Aventura */
 .plq-rib { position: absolute; z-index: 3; top: -23px; left: 50%; display: none; align-items: center; gap: 5px; font-family: var(--mono); font-style: normal; font-size: 14px; letter-spacing: .05em; line-height: 1; color: #fff; background: var(--red);

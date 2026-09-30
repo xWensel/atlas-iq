@@ -22,7 +22,7 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ boton de la portada: la placa dorada del centro (bajo la carta de la Aventura).
      La cinta de neon es tu puesto MUNDIAL en la Aventura (sin servidor no se ensena: seria "#1 de 1"); no mueve nada al aparecer */
-  const button = () => A.hub.plaque("plq-rank", "rankBtn", "m_rank", TITLE(), A.T("Aventura", "Adventure"), null,
+  const button = () => A.hub.plaque("plq-rank", "rankBtn", "m_rank", TITLE(), "", null,   // sin etiqueta: la clasificacion es de varios modos, el titulo es el protagonista
     `aria-haspopup="dialog" aria-expanded="false" ${A.ttAttr(TITLE(), A.tip6("El podio de la Aventura y las mejores puntuaciones de hoy y de ayer.|The Adventure podium, plus the best scores of today and yesterday.|Le podium de l'Aventure et les meilleurs scores d'aujourd'hui et d'hier.|O pódio da Aventura e as melhores pontuações de hoje e de ontem.|Das Podest des Abenteuers und die besten Punktzahlen von heute und gestern.|Il podio dell'Avventura e i migliori punteggi di oggi e di ieri.||冒险模式的领奖台，以及今天和昨天的最高分。|모험 시상대와 오늘·어제의 최고 점수.|アドベンチャーの表彰台と、今日と昨日のベストスコア。|Пьедестал Приключения и лучшие результаты за сегодня и вчера.|Podium Przygody oraz najlepsze wyniki z dziś i wczoraj."))}`,
     `<em class="plq-rib" id="rkMine"></em>`);
   /* cambio de pantalla (o la portada se vuelve a pintar): fuera el podio al instante, sin sonido y sin tocar al crupier (lo gobierna la pantalla nueva) */

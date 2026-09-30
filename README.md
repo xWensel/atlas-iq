@@ -4,6 +4,11 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.22.1** - El crupier, pulido: más pícaro, menos muletillas.
+- La muletilla «Bueno, … un poco» baja de 30 frases a 14 (se queda como guiño); «Lo veo todo», «No se lo digas a nadie» y la silla ya no se repiten entre situaciones.
+- Los datos curiosos de la portada ya no rematan siempre con «Y tú sin saber…» (fuera el del Chad; entra el lago Chad); las pullas bordes («cobarde», «tu cara ahora mismo») pasan a pícaras y «suerte de principiante» ya no se le dice a un veterano. 35 frases reescritas en los 12 idiomas.
+- La placa de Clasificación de la portada, sin etiqueta y con el título más grande (es de varios modos, no solo de la Aventura).
+
 **v0.21.1** - Aventura: todo el banco sale en las 12 rondas y pesa más saber que clavar.
 - Todas las preguntas del banco (1.525 lugares, 196 banderas y 188 pistas) tienen salida en las 12 rondas; antes la Aventura solo preguntaba 806 lugares y la Enciclopedia no se podía completar jugando.
 - Nivel 1-10 dentro de cada categoría (panel de 3 jueces, `data/dificultad.js` y `data/niveles.js`); cada ronda da 3 fáciles, 1 media y 1 difícil. Ciudades, monumentos y banderas tienen dos rondas (niveles 1-5 y 6-10); la ronda 5 pasa a Grandes ciudades y la 11 a Maravillas del mundo; las capitales 9-10 son invitadas en la 5.
