@@ -593,8 +593,21 @@ void main(){
       return e;
     }
     _orient() { const e = this._eff(), sx = 1 - 2 * e.mx; return { c: Math.cos(e.oa), s: Math.sin(e.oa), sx: Math.abs(sx) < 0.02 ? 0.02 : sx, on: e.on }; }
-    _outToScene(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = x - this.W / 2, cy = y - this.H / 2; const rx = (o.c * cx - o.s * cy) * o.sx, ry = o.s * cx + o.c * cy; return [rx + this.W / 2, ry + this.H / 2]; }
-    _sceneToOut(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = (x - this.W / 2) / o.sx, cy = y - this.H / 2; return [o.c * cx + o.s * cy + this.W / 2, -o.s * cx + o.c * cy + this.H / 2]; }
+    /* pantalla CRT del casino: el post-proceso curva la imagen (q *= 1 + 0,045·|q|², con q de -1 a 1 en cada eje). Los clics y todo lo que se dibuja
+       encima (chinchetas, sondas, etiquetas, la lupa de fronteras) pasan por la misma curva: antes, cerca de los bordes, el clic y la chincheta caian
+       de 33 a 65 px lejos de la tierra que se veia. inv: de la imagen sin curvar a la pantalla (Newton, 4 pasos) */
+    _crt(x, y, inv) {
+      if (!this.sk || !this.sk.crt) return [x, y];
+      const qx = (2 * x) / this.W - 1, qy = (2 * y) / this.H - 1, r2 = qx * qx + qy * qy; if (!r2) return [x, y];
+      let f = 1 + 0.045 * r2;
+      if (inv) { const rs = Math.sqrt(r2); let r = rs; for (let i = 0; i < 4; i++) r -= (r + 0.045 * r * r * r - rs) / (1 + 0.135 * r * r); f = r / rs; }
+      return [((qx * f + 1) * this.W) / 2, ((qy * f + 1) * this.H) / 2];
+    }
+    /* pantalla -> escena: la curva CRT y despues el giro del mapa (del reves, espejo, ruleta), en el mismo orden que el post-proceso */
+    _outToScene(x, y) { [x, y] = this._crt(x, y); return this._orientOut(x, y); }
+    _sceneToOut(x, y) { const [a, b] = this._orientIn(x, y); return this._crt(a, b, true); }
+    _orientOut(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = x - this.W / 2, cy = y - this.H / 2; const rx = (o.c * cx - o.s * cy) * o.sx, ry = o.s * cx + o.c * cy; return [rx + this.W / 2, ry + this.H / 2]; }
+    _orientIn(x, y) { const o = this._orient(); if (!o.on) return [x, y]; const cx = (x - this.W / 2) / o.sx, cy = y - this.H / 2; return [o.c * cx + o.s * cy + this.W / 2, -o.s * cx + o.c * cy + this.H / 2]; }
     _dispFwd(x, y, ct) {
       const e = this._eff(); if (!this.dist.spec) return [x, y];
       const c = ct == null ? 6 : ct, cx = this.contCen[c][0], cy = this.contCen[c][1];
@@ -812,7 +825,7 @@ void main(){
         if (e.pointerType === "mouse") { const r = cv.getBoundingClientRect(); this.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; this.fxDirty = true; }
         const p = this.pointers.get(e.pointerId); if (!p) return;
         let dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
-        if (this._orient().on) { const [a0, b0] = this._outToScene(0, 0), [a1, b1] = this._outToScene(dx, dy); dx = a1 - a0; dy = b1 - b0; }
+        if (this._orient().on) { const [a0, b0] = this._orientOut(0, 0), [a1, b1] = this._orientOut(dx, dy); dx = a1 - a0; dy = b1 - b0; }   // arrastrar: solo el giro (la curva CRT no cambia el sentido)
         if (Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > (e.pointerType === "touch" ? 10 : 5)) p.moved = true;
         if (this.pointers.size === 1 && p.moved) {
           this.anim = null; this.view.cx -= (dx * A.mapSens.pan) / this.view.s; this.view.cy += (dy * A.mapSens.pan) / this.view.s; this._clamp(this.view);
@@ -1070,15 +1083,16 @@ void main(){
     _drawGridLabels(c) {
       const { W, H } = this, gp = this._gridParams();
       this._setFont(c, `400 10px ${this._fm()}`); c.textBaseline = "top";
-      const [wx0, wyTop] = this._toWorld(0, 0), [wx1, wyBot] = this._toWorld(W, H);
+      /* cada rotulo sobre su linea de la reticula en el borde donde se escribe (con la curva CRT, la linea se curva hacia los bordes) */
+      const [wx0, wyB] = this._toWorld(0, H - 12), [wx1] = this._toWorld(W, H - 12), [wxL, wyTop] = this._toWorld(12, 0), [, wyBot] = this._toWorld(12, H);
       const latTop = unproject(0, wyTop)[1], latBot = unproject(0, wyBot)[1];
       const draw = (step, alpha) => {
         if (alpha < 0.03) return;
         c.fillStyle = `rgba(190,225,230,${0.55 * alpha})`;
         const lon0 = Math.max(-180, Math.floor(wx0 / D2R / step) * step), lon1 = Math.min(180, Math.ceil(wx1 / D2R / step) * step);
-        for (let lo = lon0; lo <= lon1 + 1e-9; lo += step) if (Math.abs(lo % 30) < 1e-9 || step < 30) c.fillText(fmtCoord(lo, "E", "W").replace(".00", ""), this.toScreen(lo * D2R, 0)[0] + 4, H - 16);
+        for (let lo = lon0; lo <= lon1 + 1e-9; lo += step) if (Math.abs(lo % 30) < 1e-9 || step < 30) c.fillText(fmtCoord(lo, "E", "W").replace(".00", ""), this.toScreen(lo * D2R, wyB)[0] + 4, H - 16);
         const lat0 = Math.max(-90, Math.floor(latBot / step) * step), lat1 = Math.min(90, Math.ceil(latTop / step) * step);
-        for (let la = lat0; la <= lat1 + 1e-9; la += step) if (Math.abs(la % 30) < 1e-9 || step < 30) c.fillText(fmtCoord(la, "N", "S").replace(".00", ""), 8, this.toScreen(0, project(0, la)[1])[1] + 3);   // la reticula no se deforma: antes cada latitud se movia con el continente del meridiano 0 y salian desordenadas
+        for (let la = lat0; la <= lat1 + 1e-9; la += step) if (Math.abs(la % 30) < 1e-9 || step < 30) c.fillText(fmtCoord(la, "N", "S").replace(".00", ""), 8, this.toScreen(wxL, project(0, la)[1])[1] + 3);   // la reticula no se deforma: antes cada latitud se movia con el continente del meridiano 0 y salian desordenadas
       };
       draw(gp.a, 1); if (gp.b !== gp.a) draw(gp.b, gp.t);
     }
