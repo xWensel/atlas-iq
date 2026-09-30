@@ -4,6 +4,10 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.28.1** - Lo primero, el estudio.
+- La pantalla de carga ya no es la verde con el logo de Geolite: ahora es negro puro, sin nada, y al abrir el juego lo primero que aparece es la intro de Cousins Studios (también sobre negro, así que sale sin costuras). La pantalla verde de «pulsa para entrar» sigue después del estudio.
+- En Steam/escritorio, la ventana también nace en negro (antes, verde oscuro).
+
 **v0.27.1** - Cousins Studios.
 - El estudio pasa a llamarse «Cousins Studios»: «studios» gana su s final, dibujada igual que la primera y con el mismo espaciado óptico, en perla.
 - Todo recentrado: «studios» comparte eje exacto con «Cousins», y los dos filetes se acortan por igual (mismo hueco hasta la palabra y mismos extremos que «Cousins»).

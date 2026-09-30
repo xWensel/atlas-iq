@@ -68,7 +68,7 @@ function buildWindow(mode, url) {
   const frame = hasFrame(mode);
   const opts = {
     minWidth: 960, minHeight: 600, useContentSize: true, autoHideMenuBar: true,
-    backgroundColor: "#0a140f", frame, show: false, icon: path.join(ROOT, "assets", "desktop", "icon.ico"),
+    backgroundColor: "#000000", frame, show: false, icon: path.join(ROOT, "assets", "desktop", "icon.ico"),
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, preload: path.join(ROOT, "preload.js") },
   };
   if (mode === "border") {

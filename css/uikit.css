@@ -261,11 +261,11 @@ html[data-skin="casino"] #askSub { font-family: inherit; }
 .idcard img.ic { width: 58px; height: 58px; }
 
 /* Geolite es pixel art de verdad: nada de suavizado al ampliar logos e iconos */
-.hh-logo, .gate-logo img, #splash img, .brand-rose, .menu-rose { image-rendering: pixelated; }
+.hh-logo, .gate-logo img, .brand-rose, .menu-rose { image-rendering: pixelated; }
 /* escalas enteras del logo (200 px nativos): 2x en pantallas normales, 1x en pantallas pequenas */
-.hh-logo, .gate-logo img, #splash img { width: 400px !important; height: auto !important; max-height: none !important; max-width: none !important; }
-@media (max-width: 700px), (max-height: 560px) { .hh-logo, .gate-logo img, #splash img { width: 200px !important; } }
-@media (min-width: 1500px) and (min-height: 900px) { .hh-logo, .gate-logo img, #splash img { width: 600px !important; } .hh-logo { width: 400px !important; } }
+.hh-logo, .gate-logo img { width: 400px !important; height: auto !important; max-height: none !important; max-width: none !important; }
+@media (max-width: 700px), (max-height: 560px) { .hh-logo, .gate-logo img { width: 200px !important; } }
+@media (min-width: 1500px) and (min-height: 900px) { .hh-logo, .gate-logo img { width: 600px !important; } .hh-logo { width: 400px !important; } }
 .brand-rose { width: 32px; height: 32px; } .menu-rose { width: 64px; height: 64px; }
 .gate-logo { width: auto !important; display: flex; justify-content: center; }
 
