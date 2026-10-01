@@ -1032,6 +1032,7 @@ window.AIQ = window.AIQ || {};
       if (!(ui.view.k === "group" && ui.view.g === key)) { hov = null; mapTip(null); go({ k: "group", g: key }); }
     });
   }
+  document.addEventListener("aiq:mapcanvas", () => { if (map && map._cxBound) { map._cxBound = false; mapBind(); } });   // el mapa recreo su lienzo (la GPU se reinicio): los gestos de la Enciclopedia se vuelven a enganchar
   /* +, - y la casa: los mismos gestos que en partida (zoomBy anima y frena como la rueda) */
   function zoomStep(f) {
     if (!stageOn()) return; const r = $("cxStage").getBoundingClientRect();

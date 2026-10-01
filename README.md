@@ -4,6 +4,11 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.40.1** - Arreglo: el fondo ya no se queda en blanco y parpadeando al salir del juego y volver.
+- Al volver de otra aplicación (o de suspender) Windows puede reiniciar la GPU y el mapa perdía su contexto WebGL; si el navegador no lo devolvía, el mapa quedaba sin dibujar para siempre (la portada sin fondo, parpadeando). Ahora, si no vuelve solo en 1,5 s, el mapa recrea su lienzo y se redibuja (js/map.js `_revive`); la Enciclopedia y el puntero se reenganchan al lienzo nuevo.
+- El bucle de dibujo ya no muere por una excepción suelta en un fotograma, y una restauración fallida del contexto se reintenta en vez de dejar el mapa a medias.
+- Electron ya no bloquea WebGL tras varios reinicios de GPU seguidos (`disableDomainBlockingFor3DAPIs` en main.js).
+
 **v0.39.1** - Enciclopedia: la etiqueta «Nueva» ya no se corta y se quita con solo pasar el ratón.
 - En la última columna la etiqueta asomaba fuera de la carta y el borde de la página la cortaba al hacer scroll; ahora va dentro de la carta (css/codex.css).
 - Pasar el ratón por una carta «Nueva» ya cuenta como verla: la etiqueta desaparece sin tener que abrirla y queda guardado (js/codex.js).

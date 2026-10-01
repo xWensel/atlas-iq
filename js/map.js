@@ -594,7 +594,7 @@ void main(){
 
     constructor(canvas, world, onPick) {
       this.cv = canvas; this.world = world; this.onPick = onPick || (() => {}); this.onView = null; this.onMotion = null;
-      this.gl = canvas.getContext("webgl2", { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: "high-performance" });
+      this.gl = this._glOf(canvas);
       this.fx = document.createElement("canvas"); this.fx.id = "fx"; canvas.after(this.fx); this.fctx = this.fx.getContext("2d");
       this.view = { cx: 0, cy: 0.3, s: 100 }; this.tv = null; this.inertia = null;
       this.homeSpec = { lat: 0, lon: 0, zoom: 1 };
@@ -607,11 +607,39 @@ void main(){
       this.dist = { spec: null, k: 0, kk: 0, kl: 0, ko: 0, from: 0, to: 0, lfrom: 0, lto: 0, ofrom: 0, oto: 0, t0: 0, ms: 0, ct: 6 }; this.lens = null; this.hideReticle = false;
       this.sk = A.MAPSTYLES.casino || A.MAPSTYLES.expedicion; this.ms = this._prepStyle(this.sk);
       this._initGL(); this._bind(); this.resize(true);
-      canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); this.lost = true; });
-      canvas.addEventListener("webglcontextrestored", () => { this.lost = false; this._initGL(); this.resize(true); });
       if (document.fonts) document.fonts.ready.then(() => { this.dirty = this.fxDirty = true; });
-      const loop = t => { this._frame(t); requestAnimationFrame(loop); };
+      /* el bucle nunca se rompe: una excepcion suelta en un fotograma (p. ej. la GPU se reinicia a medio dibujar) dejaba el mapa congelado para siempre */
+      let errN = 0;
+      const loop = t => { try { this._frame(t); } catch (e) { if (errN++ < 5) console.error("Mapa:", e); } requestAnimationFrame(loop); };
       requestAnimationFrame(loop);
+    }
+
+    /* ---------- contexto WebGL: perdida, restauracion y rescate ---------- */
+    _glOf(canvas) {
+      const gl = canvas.getContext("webgl2", { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: "high-performance" });
+      canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); if (canvas === this.cv) this.lost = true; });
+      canvas.addEventListener("webglcontextrestored", () => { if (canvas === this.cv) this._regl(); });
+      return gl;
+    }
+    /* la GPU devolvio el contexto: se reconstruye todo. Si falla (se pierde otra vez a medio camino) se queda perdido y lo rescata _frame */
+    _regl() {
+      try { this._initGL(); this.lost = false; this._lostSeen = 0; this.resize(true); }
+      catch (e) { console.warn("Mapa: no se pudo restaurar el contexto WebGL:", e.message); this.lost = true; }
+    }
+    /* Windows reinicia la GPU al volver de otra aplicacion o de suspender, y si ya lo hizo varias veces Chromium deja el contexto perdido sin devolverlo
+       jamas (el mapa se quedaba en blanco y la portada sin fondo). Un lienzo nuevo trae un contexto nuevo: se cambia por el viejo, en su mismo sitio */
+    _revive() {
+      const old = this.cv;
+      try {
+        const nu = old.cloneNode(false), gl = this._glOf(nu);                    // clona id, clases y estilo: el CSS y quien busque #map lo siguen encontrando
+        if (!gl || gl.isContextLost()) return false;
+        old.replaceWith(nu); this.cv = nu; this.gl = gl; this.pointers.clear();
+        if (this._ro) this._ro.disconnect();
+        this._bind(); this._initGL(); this.resize(true);
+        this._lostSeen = 0; this.lost = false; this.dirty = this.fxDirty = true;
+        document.dispatchEvent(new CustomEvent("aiq:mapcanvas"));                // la Enciclopedia y el puntero vuelven a engancharse al lienzo nuevo
+        return true;
+      } catch (e) { console.warn("Mapa: no se pudo recrear el lienzo:", e.message); this.lost = true; return false; }
     }
 
     /* ---------- estilo ---------- */
@@ -1125,7 +1153,7 @@ void main(){
         e.preventDefault(); const r = cv.getBoundingClientRect();
         this.zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.012 : 0.0018) * A.mapSens.zoom), e.clientX - r.left, e.clientY - r.top);
       }, { passive: false });
-      new ResizeObserver(() => this.resize()).observe(cv);
+      this._ro = new ResizeObserver(() => this.resize()); this._ro.observe(cv);
     }
     _pinchState() { const [a, b] = [...this.pointers.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; }
     _tap(px, py) {
@@ -1161,7 +1189,14 @@ void main(){
     /* tapado del todo por una pantalla opaca (Ajustes, Enciclopedia): no se dibuja lo que no se ve. Al destaparse, se redibuja en ese mismo fotograma */
     setHold(on) { this.hold = !!on; this._holdN = 0; if (!on) this.dirty = this.fxDirty = true; }
     _frame(now) {
-      if (this.lost) return;
+      if (!this.lost && this.gl.isContextLost()) this.lost = true;             // por si el aviso de perdida no llego
+      if (this.lost) {
+        /* se espera un poco a que el navegador lo restaure solo; si en 1,5 s de fotogramas visibles no vuelve (o el rescate falla), lienzo nuevo cada 3 s */
+        if (!this._lostSeen) this._lostSeen = now;
+        else if (now - this._lostSeen > 1500) { this._lostSeen = now + 1500; if (!this._revive()) return; }
+        else return;
+        if (this.lost) return;
+      }
       if (this.hold) { this.lastT = this._rawT = now; if (!(this.holdCheck && ++this._holdN % 15 === 0 && !this.holdCheck())) return; }
       const dt = this.lastT ? Math.min(0.05, (now - this.lastT) / 1000) : 0.016; this.lastT = now;
       this._adapt(now); this._stepDistort(now); this._stepMotion(now, dt);

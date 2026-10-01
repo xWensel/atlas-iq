@@ -183,7 +183,8 @@ window.AIQ = window.AIQ || {};
     }, { passive: true });
     window.addEventListener("pointerdown", e => { if (P.on && e.target === map.cv && e.button === 0) P.press = 100; }, true);   // solo el boton principal (el mapa ignora el derecho)
     document.addEventListener("pointerleave", () => show(false));
-    new MutationObserver(() => { if (!map.pickEnabled) show(false); }).observe(map.cv, { attributes: true, attributeFilter: ["class"] });
+    const mo = new MutationObserver(() => { if (!map.pickEnabled) show(false); }), watch = () => mo.observe(map.cv, { attributes: true, attributeFilter: ["class"] });
+    watch(); document.addEventListener("aiq:mapcanvas", () => { mo.disconnect(); watch(); });   // el mapa recreo su lienzo (la GPU se reinicio)
     raf = requestAnimationFrame(frame);
   };
   /* estado desde la Aventura: herramienta activa, efectos de reliquias, pregunta de paises... */

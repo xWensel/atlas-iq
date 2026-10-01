@@ -122,6 +122,9 @@ ipcMain.on("win:setMode", (e, mode) => setWindowMode(mode));
  * js/art.js), asi que aqui solo se deja disable-gpu-sandbox (framerate
  * normal, confirmado). */
 app.commandLine.appendSwitch("disable-gpu-sandbox");
+/* Si la GPU se reinicia varias veces (volver de otra aplicacion, suspender, cambiar de monitor), Chromium bloquea WebGL para el origen hasta
+ * reiniciar y el mapa se quedaba en blanco y parpadeando. Sin el bloqueo, el contexto vuelve (js/map.js lo reconstruye o recrea el lienzo). */
+app.disableDomainBlockingFor3DAPIs();
 
 const ROOT = __dirname;
 const PORT = 47815;
