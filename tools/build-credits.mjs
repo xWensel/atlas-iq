@@ -42,11 +42,11 @@ th{position:sticky;top:0;background:#12231a;color:var(--brass)} td:nth-child(2){
 #q{width:100%;box-sizing:border-box;padding:9px 12px;margin:10px 0;border-radius:6px;border:1px solid var(--line);background:#12231a;color:var(--ink);font:inherit}
 .n{color:var(--dim);font-size:13px}
 </style></head><body><main>
-<h1>Geolite</h1><p>Credits and licenses · v${esc(VERSION)} · Vault Raiders</p>
+<h1>Geolite</h1><p>Credits and licenses · v${esc(VERSION)} · Cousins Studios</p>
 
 <h2>Game</h2>
 <ul>
-<li><b>Design, code, art and soundtrack:</b> Vault Raiders. The soundtrack was composed and produced by the author of the game.</li>
+<li><b>Design, code, art and soundtrack:</b> Cousins Studios. The soundtrack was composed and produced by the author of the game.</li>
 </ul>
 
 <h2>Encyclopedia texts</h2>

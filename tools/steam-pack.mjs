@@ -43,7 +43,7 @@ try {
     name, executableName: DEMO ? "GeoliteDemo" : "Geolite", appVersion: pkg.version,
     electronVersion: JSON.parse(fs.readFileSync(path.join(ROOT, "node_modules/electron/package.json"), "utf8")).version,
     asar: false, prune: false, ignore, icon: path.join(ROOT, "assets/desktop/icon.ico"),
-    win32metadata: { CompanyName: "Vault Raiders", ProductName: name, FileDescription: name },
+    win32metadata: { CompanyName: "Cousins Studios", ProductName: name, FileDescription: name },
   });
   /* steamworks.js carga steam_api64.dll desde la carpeta del ejecutable */
   fs.copyFileSync(path.join(ROOT, "node_modules/steamworks.js/dist/win64/steam_api64.dll"), path.join(dir, "steam_api64.dll"));

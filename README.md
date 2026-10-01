@@ -1,8 +1,10 @@
 # Geolite
 
-> Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
+> Antes llamado **Atlas IQ**. Desde la v0.15 el juego es **Geolite** (estudio Cousins Studios; antes Vault Raiders). Por compatibilidad de partidas guardadas, las claves internas del navegador siguen siendo `atlasiq.*` y el espacio de nombres del codigo `window.AIQ`.
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
+
+**v0.42.1** - El estudio firma como **Cousins Studios** en los creditos y en el ejecutable de Steam (CompanyName), en lugar de Vault Raiders.
 
 **v0.41.1** - Logo del estudio nuevo: "Cousins" pasa a letra script retro dorada con una cola que la subraya; en la intro las letras suben una a una y la cola se traza mientras la palabra se enciende (generador en `tools/brand/cousins_script.py`, base Yellowtail, Apache 2.0, citada en los creditos).
 
