@@ -4,6 +4,8 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.34.1** - El aviso de cancion nueva pasa a la esquina inferior derecha para no molestar en la partida.
+
 **v0.33.1** - Cofre del jefe: vender con la mochila llena.
 - En el cofre del jefe ya puedes vender reliquias de la mochila (al mismo precio que en el Campamento). Con la mochila llena, vendes una y eliges la del cofre gratis; antes solo te dejaba pasar.
 - Si abres el cofre con la mochila llena, la nota lo avisa: «Mochila llena: vende una reliquia.»
