@@ -870,7 +870,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     const enter = () => {
       if (entered) return; entered = true; A.audio.unlock(false); requestFs();
       if (gateAt && A.dealer && A.dealer.noteGate) A.dealer.noteGate(performance.now() - gateAt);   // cuanto tardaste en entrar
-      gate.classList.add("hidden"); finishBoot();
+      finishBoot();   // la entrada se funde con la portada junto con #boot (ocultarla antes dejaba un fogonazo negro hasta que la portada empezaba a aparecer)
     };
     gate.addEventListener("pointerdown", enter);
     addEventListener("keydown", function k(e) { if (entered) { removeEventListener("keydown", k); return; } if (e.key === "Enter" || e.key === " ") { e.preventDefault(); enter(); } });

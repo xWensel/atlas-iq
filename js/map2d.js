@@ -260,8 +260,10 @@ window.AIQ = window.AIQ || {};
         if (k >= 1) this.anim = null;
         this.dirty = this.fxDirty = this.hlDirty = true;
       } else if (this.drift) {
-        const t = (now - this.drift.t0) / 1000, b = this.drift.base;
-        this.view = this._clamp({ cx: b.cx + Math.sin(t * 0.09) * 1.1, cy: b.cy + Math.sin(t * 0.07 + 1) * 0.16, s: b.s });
+        /* la deriva sale de donde se paro el mapa, sin salto (antes empezaba con cy desplazado sin(1) * 0,16 y el mapa se recolocaba de golpe
+           1,5 s despues de abrir la portada) y arranca despacio: el reloj u acelera durante los primeros 4 s, asi la velocidad crece desde 0 */
+        const t = (now - this.drift.t0) / 1000, u = t < 4 ? t * t / 8 : t - 2, b = this.drift.base;
+        this.view = this._clamp({ cx: b.cx + Math.sin(u * 0.09) * 1.1, cy: b.cy + Math.sin(u * 0.07) * 0.16, s: b.s });
         this.dirty = this.fxDirty = this.hlDirty = true;
       }
       if (this.dirty) { this.lastMove = now; this.sharpStale = true; }

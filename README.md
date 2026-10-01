@@ -4,6 +4,8 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.44.1** - Al entrar en el juego la portada ya no da un salto: el mapa de fondo se recolocaba de golpe 1,5 s despues de aparecer (la deriva lenta empezaba desplazada en vertical); ahora arranca justo donde se para y acelera poco a poco. Ademas, al pulsar la pantalla de entrada esta se funde directamente con la portada, sin el fogonazo negro de antes.
+
 **v0.43.1** - La C de "Cousins" pasa a ser una letra dibujada a medida (fuera de la fuente): trazo de pluma con cabeza enroscada en bola y una panza que no termina, sigue por debajo y es ella misma la cola que subraya la palabra. En la intro la cola sale trazandose desde la panza de la C (`tools/brand/cousins_c.py`, opciones en `cousins-c.html`).
 
 **v0.42.1** - El estudio firma como **Cousins Studios** en los creditos y en el ejecutable de Steam (CompanyName), en lugar de Vault Raiders.
