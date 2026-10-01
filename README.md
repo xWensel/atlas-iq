@@ -4,6 +4,17 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.35.1** - Aventura: Campamento premium y ruta de la expedición nueva.
+- Ruta del Campamento, arriba: siempre las 12 rondas en sus tres actos y el modo infinito al final. Antes era una ventana de 12 casillas que se corría hacia la izquierda y llegaba a enseñar rondas 13 a 18, que no existen. Lo jugado son fichas de oro con su marca, el camino se pinta de oro según avanzas y la próxima ronda va encendida, con la chincheta roja del mapa encima. Al pasar el ratón, el tema de cada ronda. Ahora también se ve en pantallas de 720 y 768 px de alto (antes se escondía).
+- El jefe del acto es la chistera del crupier (los mismos píxeles de su retrato, `tools/crupier/chistera.py`): en la ruta, en la próxima ronda, en la ficha roja de su presentación y en el botón de «Ir al matadero». Adiós a la calavera con gorro de bufón.
+- Pantallas de Aventura y Reto diario: la ruta de la expedición en tres paneles, uno por acto con su nombre, y el infinito al final. Fuera el subtítulo largo.
+- Próxima ronda: el tema en grande con su icono y, en la línea pequeña, la ronda y el objetivo. En el jefe, su nombre en grande y el tema entre «Jefe del acto» y el objetivo. Cada reto en dos líneas: el nombre y «Sobornar» a la misma altura, con el botón más estrecho, y debajo lo que hace; con cuatro retos, en 2 × 2. El panel ocupa bastante menos (en 1080p, de 231 a 179 px con un reto). Con el Ojo en el cielo, la ronda siguiente en una sola línea.
+- Cartas mucho más grandes y legibles: en 720p pasan de 267 × 152 a unos 220 × 316 px y su texto de 10 a 15 px (en 1080p, de 15 a 22). Con la mesa llena (jefe con muchos retos, Ojo en el cielo, avisos) la letra baja un escalón en vez de encoger toda la pantalla. Fuera la frase «Tres cartas sobre la mesa…»; se quedan los avisos que cambian algo (revancha, cofre, mochila llena). «Cambiar cartas» pasa a la derecha de las cartas.
+- Suministros en placas de casino con costura dorada; al comprar uno, la placa se vuelve de oro y le cae el sello «Activo».
+- Mochila: las reliquias son cartas pequeñas con el color de su rareza, casi el doble de grandes. Al pasar el ratón, su nombre y lo que hace; un clic la levanta y aparece «Vender» con su precio, y el segundo clic la vende (antes se vendía con un solo clic, sin preguntar). También en el cofre del jefe. Las herramientas, en el mismo formato y con sus cargas; las provisiones, con su contador.
+- El botón de «estoy listo» es grande y dorado, con la ficha de la ronda que viene (la misma de su presentación) y su tema; antes del jefe se vuelve rojo.
+- Sin desplazamiento ni solapes ni textos cortados a 1280 × 720, 1366 × 768, 1920 × 1080 y 2560 × 1440 (español, inglés, alemán, francés, ruso, polaco, japonés, chino y coreano; prueba de humo en los 12 idiomas). Fluidez medida ×1 y con la CPU ×4: igual que antes al comprar, cambiar cartas, pasar el ratón y volver al Campamento; la primera apertura del Campamento de cada sesión pierde un fotograma más (unos 33 ms).
+
 **v0.34.1** - El aviso de cancion nueva pasa a la esquina inferior derecha para no molestar en la partida.
 
 **v0.33.1** - Cofre del jefe: vender con la mochila llena.

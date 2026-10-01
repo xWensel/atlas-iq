@@ -16,3 +16,5 @@
   Si el crupier cambia (retrato nuevo, retoque, otro traje o tamano), en la misma entrega hay que regenerar la tarjeta con
   `python tools/card_adv.py` y revisarla para que se adapte: posicion `DEALER_AT`, que la mesa le tape el busto, que la pajarita
   siga a la vista y que el explorador no le tape la cara. Las piezas de la escena estan en `tools/art/card_adv/`.
+- El icono del jefe del acto (`assets/icons/boss_hat.webp`: ruta de la expedicion, proxima ronda, ficha roja del jefe) es la chistera del crupier,
+  sacada de su capa `hat`. Si el crupier cambia, en la misma entrega: `python tools/crupier/chistera.py`.

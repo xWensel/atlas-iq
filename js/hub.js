@@ -116,7 +116,6 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ Aventura */
   let advSel = { deck: "explorer", asc: 0 };
-  const TOPIC_ICON = { capital: "t_capital", landmark: "t_landmark", city: "t_city", country: "t_country", history: "t_battle", nature: "t_nature", clue: "t_curio", mixed: "slot", flag: "t_country" };
   const DECK_CARD = { explorer: ["A", "s_compass"], historian: ["K", "s_peak"], navigator: ["Q", "s_palm"], blind: ["J", "s_pin"] };
   const STAKE_CHIP = ["blank_small", "blank_teal", "blank_gold", "blank_big", "blank_boss", "blank_boss"];
   const ascTexts = () => [T("Estándar", "Standard"), T("Objetivos +5 %, −1 s, tienda +10 %", "Targets +5%, −1 s, shop +10%"), T("+10 %, −2 s. Desde el acto 2, un reto de regla (viento, tormenta o silencio) en cada ronda", "+10%, −2 s. From act 2, a rule challenge (wind, storm or silence) every round"), T("+15 %, −3 s, retos un nivel más fuertes y una provisión menos", "+15%, −3 s, challenges one level stronger and one fewer provision"), T("+20 %, −4 s. Los jefes traen un poder extra", "+20%, −4 s. Bosses bring one extra power"), T("+25 %, −5 s. Solo para leyendas", "+25%, −5 s. Legends only")];
@@ -132,12 +131,11 @@ window.AIQ = window.AIQ || {};
     const ASC_TXT = ascTexts();
     let stakes = ""; for (let i = 0; i <= 5; i++) stakes += `<button class="stake${advSel.asc === i ? " sel" : ""}" data-asc="${i}" ${i > adv.asc ? "disabled" : ""} ${A.ttAttr(T("Ascensión", "Ascension") + " " + i, i > adv.asc ? A.tip6("Bloqueada: supera la ascensión anterior para desbloquearla.|Locked: beat the previous ascension to unlock it.|Verrouillée : réussis l'ascension précédente pour la débloquer.|Bloqueada: vença a ascensão anterior para desbloqueá-la.|Gesperrt: schließe die vorige Stufe ab, um sie freizuschalten.|Bloccata: supera l'ascensione precedente per sbloccarla.||已锁定：通过上一级飞升即可解锁。|잠김: 이전 어센션을 클리어하면 열립니다.|ロック中：前のアセンションをクリアすると解除。|Заблокировано: пройди предыдущее восхождение, чтобы открыть.|Zablokowane: pokonaj poprzednie wniebowstąpienie, żeby odblokować.") : ASC_TXT[i])}>${A.icon(STAKE_CHIP[i])}<b>${i}</b></button>`;
     const ascTxt = ASC_TXT[advSel.asc];
-    const road = A.ADV.ROUNDS.map((r, i) => `<span class="rm-node${r.boss ? " boss" : ""}" ${A.roundTip(i)}><span class="rm-ic">${A.icon(r.boss ? "skull" : TOPIC_ICON[r.topic])}</span><em>${i + 1}</em></span>`).join("");
     c.dialog(scr(T("Aventura", "Adventure"), `<div class="adv-setup">
       <section class="as-main">
         ${saved ? `<div class="resume"><span class="tag">${T("Partida guardada", "Saved run")}</span><b>${runInfo}</b><div><button class="btn-ink" id="contBtn" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line danger" id="abandonBtn">${T("Descartar partida", "Discard run")}</button></div></div>` : ""}
         <h4 class="hub-sub">${T("Baraja inicial", "Starting deck")}</h4><div class="deckrow">${decks}</div>
-        <h4 class="hub-sub">${T("Ruta de la expedición", "Expedition route")} <em>${T("12 rondas en 3 actos, cada una de un tema distinto; el jefe cierra el acto", "12 rounds in 3 acts, each on a different topic; a boss closes the act")}</em></h4><div class="roadmap">${road}</div>
+        <h4 class="hub-sub">${T("Ruta de la expedición", "Expedition route")}</h4>${A.adv.road({ size: "plan" })}
       </section>
       <aside class="as-side">
         <h4 class="hub-sub">${T("Ascensión", "Ascension")}</h4><div class="stakes">${stakes}</div><p class="as-asc">${ascTxt}</p>
@@ -177,7 +175,6 @@ window.AIQ = window.AIQ || {};
     if (st.live && !sv) { DY.finish(day, st.live, 0); st = DY.get(day); }
     const h = DY.hand(day), deck = A.ADV.DECKS[h.deck], gift = h.gift && A.RELICS[h.gift], next = st.tries.length + 1, locked = deck.unlock && !P.ach[deck.unlock], hist = DY.stats();
     const kit = (ico, lbl, val, tip) => `<div class="dr-k" ${tip}><span class="dr-ki">${ico}</span><span class="dr-kt"><i class="sq-fit">${lbl}</i><b class="sq-fit">${val}</b></span></div>`;
-    const road = h.route.map((ri, i) => { const boss = i % 4 === 3; return `<span class="rm-node${boss ? " boss" : ""}" ${A.roundTip(i, h.route)}><span class="rm-ic">${A.icon(boss ? "skull" : TOPIC_ICON[A.ADV.ROUNDS[ri].topic])}</span><em>${i + 1}</em></span>`; }).join("");
     const tries = [1, 2, 3].map(k => {
       const t = st.tries[k - 1], live = !!(t && t.live), cls = live ? "live" : t ? "done" : k === next && !st.live ? "next" : "free";
       const big = live ? A.fmt(sv ? sv.score : 0) : t ? A.fmt(t.s || 0) : "—";
@@ -205,7 +202,7 @@ window.AIQ = window.AIQ || {};
               ${gift ? kit(A.icon(h.gift), P6("Regalo|Gift|Cadeau|Presente|Geschenk|Regalo||赠礼|선물|贈り物|Подарок|Prezent"), A.tx(gift.n), A.ttAttr(P6("Regalo del día|Gift of the day|Cadeau du jour|Presente do dia|Geschenk des Tages|Regalo del giorno||今日赠礼|오늘의 선물|今日の贈り物|Подарок дня|Prezent dnia") + ": " + A.tx(gift.n), A.tx(gift.d))) : ""}
             </div>
           </div>
-          <div class="dr-rt"><h4 class="hub-sub">${P6("Ruta del día|Today's route|Route du jour|Rota do dia|Route des Tages|Percorso del giorno||今日路线|오늘의 경로|今日のルート|Маршрут дня|Trasa dnia")}</h4><div class="roadmap dr-road">${road}</div></div>
+          <div class="dr-rt"><h4 class="hub-sub">${P6("Ruta del día|Today's route|Route du jour|Rota do dia|Route des Tages|Percorso del giorno||今日路线|오늘의 경로|今日のルート|Маршрут дня|Trasa dnia")}</h4><div class="dr-road2">${A.adv.road({ size: "plan", route: h.route })}</div></div>
         </div>
         <div class="dr-play">
           <div class="dr-sum"><i>${P6("Puntuación global|Global score|Score global|Pontuação global|Gesamtpunktzahl|Punteggio globale||总分|총점|総合スコア|Общий счёт|Wynik łączny")}</i><b>${A.fmt(st.total)}</b><em>${P6("Suma de tus 3 intentos|Sum of your 3 attempts|Somme de tes 3 essais|Soma das suas 3 tentativas|Summe deiner 3 Versuche|Somma dei tuoi 3 tentativi||你 3 次尝试的总和|도전 3번의 합계|3回の挑戦の合計|Сумма трёх попыток|Suma twoich 3 podejść")}</em></div>

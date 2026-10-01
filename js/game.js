@@ -390,7 +390,7 @@
   let lastHover = null, ptr = "mouse";
   document.addEventListener("pointerover", e => (ptr = e.pointerType), true);
   document.addEventListener("mouseover", e => {
-    const el = e.target.closest && e.target.closest(MENU6 + ", .go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear, .cx-strip, .mode-card, .deck:not(:disabled), .asc:not(:disabled), .tool, .buy:not(:disabled), .hub-back, .inv-perk, .pd-tabs button, .pd-x");
+    const el = e.target.closest && e.target.closest(MENU6 + ", .go, .camp, .btn-ink, .btn-line, .lv:not(:disabled), #dock button, #rail button, .seg button, .menu-gear, .cx-strip, .mode-card, .deck:not(:disabled), .asc:not(:disabled), .tool, .buy:not(:disabled), .hub-back, .inv-perk, .go2, .sup, .nr-buy, .pd-tabs button, .pd-x");
     if (el && el !== lastHover) { if (!el.matches(MENU6)) A.sfx.hover(); else if (ptr === "mouse") A.sfx.menuHover(menuK(el)); }
     lastHover = el;
   });

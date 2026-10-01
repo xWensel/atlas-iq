@@ -193,13 +193,32 @@ window.AIQ = window.AIQ || {};
     navigator: { ico: "deck_navigator", n: L("Navegante", "Navigator"), d: L6("Dos brújulas y la Ruleta de 16 rumbos. Nunca te pierdes.|Two compasses and the 16-point roulette. You never get lost.|Deux boussoles et la Roulette à 16 directions. Tu ne te perds jamais.|Duas bússolas e a Roleta de 16 rumos. Você nunca se perde.|Zwei Kompasse und das 16-Feld-Roulette. Du verirrst dich nie.|Due bussole e la Roulette a 16 direzioni. Non ti perdi mai.||两个指南针加十六方位轮盘。你永远不会迷路。|나침반 두 개와 16방위 룰렛. 절대 길을 잃지 않습니다.|2つのコンパスと16方位ルーレット。決して迷わない。|Два компаса и 16-румбовая рулетка. Ты никогда не заблудишься.|Dwa kompasy i Ruletka na 16 pól. Nigdy się nie zgubisz."), tools: ["compass", "compass"], perks: ["compass16"], coins: 3, lives: 3, unlock: "adv_boss" },
     blind: { ico: "deck_blind", n: L("Aventurero ciego", "Blind adventurer"), d: L6("Sin herramientas, con el Foco del vigilante y 4 provisiones.|No tools, with the Pit boss's spotlight and 4 provisions.|Sans outils, avec le Projecteur du chef de table et 4 provisions.|Sem ferramentas, com o Holofote do supervisor e 4 provisões.|Ohne Werkzeuge, mit dem Scheinwerfer des Pitbosses und 4 Proviant.|Senza strumenti, con il Faro del capotavolo e 4 provviste.||没有工具，携带场务经理的聚光灯与 4 份补给。|도구 없이 플로어 매니저의 스포트라이트와 식량 4개.|道具なし、ピットボスのスポットライトと4つのプロビジョン。|Без инструментов, с прожектором пит-босса и 4 запасами.|Bez narzędzi, z reflektorem szefa sali i 4 zapasami."), tools: [], perks: ["miner"], coins: 6, lives: 4, unlock: "adv_win" },
   };
-  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, roundDefOf, chalFor: r => chalFor(r) };
+  const TOPIC_ICON = { capital: "t_capital", landmark: "t_landmark", city: "t_city", country: "t_country", history: "t_battle", nature: "t_nature", clue: "t_curio", mixed: "slot", flag: "t_country" };
+  const BOSS_IC = "boss_hat";                                        // v0.35: el jefe del acto es la chistera del crupier (los mismos pixeles de su retrato: tools/crupier/chistera.py)
+  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, TOPIC_ICON, BOSS_IC, roundDefOf, chalFor: r => chalFor(r) };
 
   /* ------------------------------------------------------------------ partida (run) */
   let run = null, slot = RUNKEY;                                     // slot: ranura de la partida activa (expedicion normal o intento del Reto diario)
   const keyOf = daily => (daily ? DAILYKEY : RUNKEY);
   const loadSlot = daily => { try { return JSON.parse(localStorage.getItem(keyOf(daily)) || "null"); } catch (e) { return null; } };
   A.adv = { get run() { return run; }, hasSave(daily) { try { return !!localStorage.getItem(keyOf(daily)); } catch (e) { return false; } } };
+  /* ---------------- la ruta de la expedicion: 12 rondas en 3 actos (el jefe cierra cada acto) y el modo infinito al final ----------------
+     v0.35 (usuario): antes el Campamento ensenaba una ventana de 12 casillas que se corria y llegaba a rondas 13-18 que no existen.
+     size "bar": la barra del Campamento (lo jugado, ficha de oro con su marca; la proxima, encendida y con la chincheta encima).
+     size "plan": la de las pantallas de Aventura y Reto diario (un panel por acto con su nombre).
+     route: la ruta barajada del Reto diario (route[hueco] = ronda original). cur: la proxima ronda que se juega (-1: aun no ha empezado) */
+  const INF_N = L6("Infinito|Infinite|Infini|Infinito|Endlos|Infinito||无尽|무한|エンドレス|Бесконечный|Nieskończony");
+  const INF_D = L6("Tras el último jefe: preguntas sin parar, cada vez con menos tiempo, hasta que se acaben tus provisiones.|After the last boss: nonstop questions, with less time each, until your provisions run out.|Après le dernier boss : des questions sans fin, avec de moins en moins de temps, jusqu'à épuiser tes provisions.|Depois do último chefe: perguntas sem parar, com cada vez menos tempo, até acabarem suas provisões.|Nach dem letzten Boss: Fragen ohne Ende, mit immer weniger Zeit, bis dein Proviant aufgebraucht ist.|Dopo l'ultimo boss: domande senza sosta, con sempre meno tempo, finché non finiscono le provviste.||击败最后一个首领后：问题接连不断，时间越来越少，直到补给耗尽。|마지막 보스 이후: 식량이 떨어질 때까지 점점 짧아지는 시간 속에 문제가 끝없이 이어집니다.|最後のボスの後：プロビジョンが尽きるまで、時間がどんどん短くなる問題が続く。|После последнего босса: вопросы без остановки, со всё меньшим временем, пока не кончатся запасы.|Po ostatnim bossie: pytania bez końca, z coraz krótszym czasem, aż skończą się zapasy.");
+  A.adv.road = ({ size = "bar", route = null, cur = -1 } = {}) => {
+    const def = i => (route ? { ...ROUNDS[route[i]], boss: i % 4 === 3 } : ROUNDS[i]);
+    const node = i => { const d = def(i), st = i < cur ? " done" : i === cur ? " next" : "";
+      return `<span class="rd-n${d.boss ? " boss" : ""}${st}" ${A.roundTip(i, route)}><span class="rd-ic">${ic(d.boss ? BOSS_IC : TOPIC_ICON[d.topic])}</span>${size === "plan" ? `<em>${i + 1}</em>` : ""}</span>`; };
+    const acts = [0, 1, 2].map(a => { const st = cur >= 4 * (a + 1) ? " done" : cur >= 4 * a ? " now" : "";
+      const head = size === "plan" ? `<header class="rd-h"><b>${A.tx(ACTS[a].n)}</b><i>${A.tx(ACTS[a].t)}</i></header>` : `<i class="rd-k">${ROMAN[a]}</i>`;
+      return `<div class="rd-act${st}">${head}<div class="rd-row">${[0, 1, 2, 3].map(k => node(4 * a + k)).join("")}</div></div>`; }).join("");
+    const inf = `<div class="rd-act rd-inf">${size === "plan" ? "" : `<i class="rd-k"></i>`}<div class="rd-row"><span class="rd-n inf" ${A.ttAttr(A.T("Modo infinito", "Infinite mode"), A.tx(INF_D))}><span class="rd-ic"><b>∞</b></span>${size === "plan" ? `<em>${A.tx(INF_N)}</em>` : ""}</span></div></div>`;
+    return `<div class="rd ${size}">${acts}${inf}</div>`;
+  };
   A.adv.poolStats = () => Object.fromEntries(Object.entries(pools()).map(([k, v]) => [k, v.length]));
   A.adv.roundPlaces = r => poolFor(r);
   A.adv.countSeen = countSeen;
@@ -482,7 +501,7 @@ window.AIQ = window.AIQ || {};
     const Pv = A.profile.get(); run._virgin = !run.attempt && (Pv.adv.runs || 0) >= 2 && roundNo() + 1 > (Pv.adv.bestRound || 0) && !run.virginShown; if (run._virgin) run.virginShown = true;
     const NEW = A.pick6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||新领域|새 영역|未踏|Впервые|Nowe");
     const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</em>` : ""}</div></div>`; }).join("");
-    const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? "skull" : run.round === 0 ? "s_pin" : "s_compass";
+    const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? BOSS_IC : run.round === 0 ? "s_pin" : "s_compass";
     return `<div class="intro-in adv${Lv.boss ? " is-boss" : ""}"><div class="intro-left"><div class="intro-num blind">${A.blind(kind, inner)}</div><div class="intro-body">
       <span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${A.tx(Lv.topicName)}</h2>
       ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
@@ -871,21 +890,25 @@ window.AIQ = window.AIQ || {};
         newAct: run.round === 0 && run.act > 0 && !run.attempt, cheapest: costs.length ? Math.min(...costs) : 0 });
     }
   }
-  /* "proxima ronda" del Campamento: una tarjeta por ronda con cada truco explicado (que hace y cuanto pesa).
-     El jefe del acto es una tarjeta grande con su nombre y numero de poderes; con el Ojo en el cielo tambien se ve la ronda siguiente.
+  /* "proxima ronda" del Campamento: el tema de la ronda (o el jefe) y cada truco en dos lineas: nombre y soborno arriba, lo que hace debajo.
+     v0.35 (usuario): antes cada truco ocupaba tres lineas (el soborno debajo) y no decia de que tema era la ronda. En el jefe, su nombre en grande
+     y en la linea pequena, entre "Jefe del acto" y el objetivo, el tema. Con el Ojo en el cielo, debajo, la ronda siguiente en una linea.
      v0.35: ya no dice que reliquia frena cada truco (ni las cartas contra que truco sirven): el jugador tiene que leer y atar cabos. */
   const nextHtml = () => {
     const r = roundNo(), rows = [r]; if (has("spy") && r < LAST) rows.push(r + 1);   // tras la ronda 12 no hay mas trucos (antes el Ojo en el cielo ensenaba una "Ronda 1" que no existe)
+    const dot = "<i>·</i>";
     const html = rows.map((rr, k) => {
-      const cf = chalFor(rr), n = cf.list.length, done = cf.paid, main = k === 0;   // sobornados que estaban en esta tirada (un soborno de un truco retirado o que ya no sale no se pinta)
-      const title = cf.boss ? A.T("JEFE DEL ACTO", "ACT BOSS") : A.T("Ronda", "Round") + " " + ((rr % 4) + 1);
-      const head = `<div class="nx-head">${ic(cf.boss ? "skull" : "dice")}<span class="nx-t">${main ? A.T("Próxima ronda", "Next round") + " · " : A.T("Después", "Then") + " · "}${title}</span>${cf.boss && cf.combo ? `<b class="nx-name">${A.tx(cf.combo.n)}</b>` : ""}<span class="nx-n">${n ? n + " " + (n === 1 ? A.T("reto", "challenge") : A.T("retos", "challenges")) : A.T("Sin retos", "No challenges")}</span>${main && n ? `<button class="chipbtn ch-reroll" id="chalReroll" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : ""}</div>`;
-      if (!main) return `<div class="nx-card far${cf.boss ? " boss" : ""}">${head}<div class="nx-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div></div>`;
-      const lis = cf.list.map(c => { const d = A.CHAL[c.id];
-        return `<li class="nx-row k-${d.kind}"><span class="nx-ic">${ic(d.ico)}</span><div class="nx-body"><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><p>${A.tx(d.d)}</p><div class="nx-foot">
-          <button class="ch-buy" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")} <span class="cb-p">${CN()}${bribePrice(c, cf.boss)}</span></button></div></div></li>`; }).join("")
-        + done.map(id => `<li class="nx-row done"><span class="nx-ic">${ic(A.CHAL[id].ico)}</span><div class="nx-body"><b>${A.tx(A.CHAL[id].n)}</b><em class="nx-have">${A.T("Sobornado", "Bribed")}</em></div></li>`).join("");
-      return `<div class="nx-card${cf.boss ? " boss" : ""}">${head}${lis ? `<ul class="nx-list">${lis}</ul>` : `<p class="nx-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
+      const cf = chalFor(rr), n = cf.list.length, done = cf.paid, main = k === 0, d = defAt(rr), TN = TOPIC_NAMES[d.topic], topic = A.tx(TN[Math.min(d.tier, TN.length - 1)]);
+      const named = cf.boss && cf.combo, name = named ? A.tx(cf.combo.n) : topic;
+      const kick = [main ? A.T("Próxima ronda", "Next round") : A.T("Después", "Then"), cf.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + ((rr % 4) + 1)].concat(named ? [topic] : []).join(dot);
+      const badge = `<span class="nr-badge">${ic(cf.boss ? BOSS_IC : TOPIC_ICON[d.topic])}</span>`;
+      const count = `<span class="nr-n">${n ? n + " " + (n === 1 ? A.T("reto", "challenge") : A.T("retos", "challenges")) : A.T("Sin retos", "No challenges")}</span>`;
+      if (!main) return `<div class="nr far${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}</span><b class="nr-name">${name}</b></div><div class="nr-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div>${count}</div></div>`;
+      const shuffle = n ? `<button class="chipbtn nr-shuffle" id="chalReroll" type="button" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : "";
+      const lis = cf.list.map(c => { const dd = A.CHAL[c.id];
+        return `<li class="nr-row k-${dd.kind}"><span class="nr-ic">${ic(dd.ico)}</span><b class="nr-rn">${A.tx(dd.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><button class="nr-buy" type="button" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")}<span class="nr-p">${CN()}${bribePrice(c, cf.boss)}</span></button><p>${A.tx(dd.d)}</p></li>`; }).join("")
+        + done.map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.T("Sobornado", "Bribed")}</em></li>`).join("");
+      return `<div class="nr${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}${dot}${A.T("Objetivo", "Target")} <b>${A.fmt(target())}</b></span><b class="nr-name">${name}</b></div>${count}${shuffle}</div>${lis ? `<ul class="nr-list n${Math.min(6, n + done.length)}">${lis}</ul>` : `<p class="nr-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
     }).join("");
     return `<div class="tb-next">${html}</div>`;
   };
@@ -906,7 +929,7 @@ window.AIQ = window.AIQ || {};
     run.coins -= cost; run.salt = run.salt || {}; run.salt[r] = (run.salt[r] || 0) + 1; A.sfx.reroll(); persist();   // los sobornos pagados se quedan: si el truco vuelve a salir, sigue fuera
     A.dealer.enable(true); A.dealer.say(A.dealer.line("reroll"), { mood: "laugh", hold: 1800 }); renderShop(run.phase === "chest");
   }
-  const routeHtml = () => { let h = ""; const cur = roundNo(); for (let i = Math.max(0, cur - 3); i < Math.max(0, cur - 3) + 12; i++) h += `<i class="${i < cur ? "done" : i === cur ? "cur" : ""}${i % 4 === 3 ? " boss" : ""}" ${A.roundTip(i, run.route)}>${i % 4 === 3 ? ic("skull") : ""}</i>`; return h; };
+  const routeHtml = () => A.adv.road({ size: "bar", route: run.route, cur: roundNo() });   // siempre las 12 rondas y el infinito (antes, una ventana de 12 que se corria)
   const rerollCost = () => { const sx = shopCtx(); return run.freeUsed < sx.freeReroll ? 0 : 3 + run.rerolls; };
   /* precio de una carta de la tienda: la de la revancha (s.fix) va a mitad de precio */
   const cardCost = s => { const full = price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost); return s.fix ? Math.max(1, Math.ceil(full / 2)) : full; };
@@ -923,40 +946,65 @@ window.AIQ = window.AIQ || {};
     }
     return `<div class="offer pc life${bought ? " sold" : ""}" data-i="${i}" data-suit="red">${ixs("♥", "heart")}<span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico felt">${ic("heart")}</div><b class="of-n">+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${bought || run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${lifePrice()}</button></div>`;
   }
+  /* v0.35 (usuario): Campamento premium. La mochila son cartas pequenas con el color de su rareza: un clic levanta la reliquia y ensena
+     "Vender" encima; el segundo clic, en ese boton, la vende (antes un solo clic la vendia sin preguntar). Tambien en el cofre del jefe.
+     El boton de "estoy listo" lleva la ficha de la ronda que viene (la misma de su presentacion) y su tema. */
+  let relicSel = null;                                                 // reliquia levantada en la mochila
+  const SELL = "Vender|Sell|Vendre|Vender|Verkaufen|Vendi||出售|판매|売る|Продать|Sprzedaj";
+  const TAKE = "Te llevas|You take|Tu prends|Você leva|Du bekommst|Prendi||你获得|획득|もらう|Получишь|Dostajesz";
   function renderShop(chest) {
-    const slots = 5, info = actInfo(run.act), rc = rerollCost();
+    const slots = 5, info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
+    if (relicSel && !run.perks.includes(relicSel)) relicSel = null;
     /* la mochila no avisa de que una reliquia ya no sirve: saber cuando venderla tambien es cosa del jugador */
-    const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b><em>${A.T("vender", "sell")} ${sellValue(id)}</em></button>` : `<span class="inv-empty"></span>`; }).join("");
+    const relics = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; if (!id) return `<span class="tr-slot"></span>`; const p = A.RELICS[id];
+      return `<div class="tr-card tr-relic r${p.r}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${ic(id)}</button><button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button></div>`; }).join("");
+    const tools = Object.keys(run.tools).map(id => `<span class="tr-card tr-tool" ${A.kitTip("tool", id)}><span class="tr-face">${ic(TOOLS[id].ico)}<span class="tr-pips">${Array.from({ length: toolMax(id) }, () => "<i></i>").join("")}</span></span></span>`).join("") || `<i class="tr-none">${A.T("Ninguna", "None")}</i>`;
+    /* fuera la frase de siempre ("Tres cartas sobre la mesa..."): solo los avisos que cambian algo (revancha, cofre, mochila llena) */
     const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));
+    const note = chest ? (run.perks.length >= slots ? A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.") : A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")) : retryNote ? A.tx(ETX.retry) : "";
     /* antes del jefe, el crupier te reescribe el boton (funciona igual) */
-    const doom = !chest && !!chalFor(roundNo()).boss, DOOM = A.pick6("Ir al matadero|To the slaughter|À l'abattoir|Pro matadouro|Zur Schlachtbank|Al macello||去送死|도살장으로|処刑台へ|На убой|Na rzeź");   // revancha: queda la carta a mitad de precio que frena los trucos de la ronda que repites
-    C().dialog(`<div class="table${chest ? " chest" : ""}">
+    const doom = !chest && !!cf.boss, DOOM = A.pick6("Ir al matadero|To the slaughter|À l'abattoir|Pro matadouro|Zur Schlachtbank|Al macello||去送死|도살장으로|処刑台へ|На убой|Na rzeź");
+    const nd = defAt(r), TN = TOPIC_NAMES[nd.topic], topic = A.tx(TN[Math.min(nd.tier, TN.length - 1)]);
+    /* letra de las cartas segun lo llena que va la mesa (retos de la proxima ronda, Ojo en el cielo, avisos): se decide aqui, sin medir nada
+       (con container queries cada maquetacion del Campamento costaba el doble y la primera apertura perdia un fotograma) */
+    const full = (cf.list.length + cf.paid.length >= 3 ? 1 : 0) + (has("spy") && r < LAST ? 1 : 0) + (note ? 1 : 0) - (chest ? 1 : 0);   // el cofre no lleva suministros: le sobra sitio
+    const dense = Math.max(0, Math.min(2, full + (full > 0 && /^(ru|pl)$/.test(A.lang) ? 1 : 0)));   // ruso y polaco, los textos mas largos de las cartas
+    const chip = chest ? ic("chest") : A.blind(cf.boss ? "boss" : run.round === 0 ? "small" : "big", cf.boss ? BOSS_IC : run.round === 0 ? "s_pin" : "s_compass");
+    const goB = chest ? A.T("Continuar sin elegir", "Continue without picking") : doom ? DOOM : A.T("Siguiente ronda", "Next round");
+    const goI = chest ? `${A.pick6(TAKE)} ${CN()}+${gain(chestSkip())}` : cf.boss ? A.T("Jefe del acto", "Act boss") + (cf.combo ? " · " + A.tx(cf.combo.n) : "") : A.T("Ronda", "Round") + " " + (run.round + 1) + " · " + topic;
+    C().dialog(`<div class="table mesa d${dense}${chest ? " chest" : ""}${run.stock.length > 3 ? " many" : ""}">
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
-        <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
+        ${routeHtml()}<div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
       ${nextHtml()}
-      ${chest ? `<p class="tb-note">${run.perks.length >= slots ? A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.") : A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${retryNote ? A.tx(ETX.retry) : A.T("Tres cartas sobre la mesa. ¿Compras una o pides otras?", "Three cards on the table. Buy one, or ask for new ones?")}</p>${supHtml()}`}
-      <section class="offers">${cards}</section>
-      <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Cambiar cartas", "New cards")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
-        </div>
-      <footer class="tb-tray"><div class="tray-col"><h4>${A.T("Reliquias", "Relics")} ${run.perks.length}/${slots}</h4><div class="tray-row">${relicSlots}</div></div>
-        <div class="tray-col"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${Object.keys(run.tools).map(id => `<span class="inv-tool" ${A.kitTip("tool", id)}>${ic(TOOLS[id].ico)}<b>${toolMax(id)}</b></span>`).join("") || `<i class="empty">${A.T("Ninguna", "None")}</i>`}</div></div>
-        <div class="tray-col"><h4>${A.T("Provisiones", "Provisions")}</h4><div class="tray-row hearts">${hearts()}</div></div>
-        <button class="btn-ink go-next${doom ? " doom" : ""}" id="goRound" data-primary><span>${chest ? A.T("Continuar sin elegir", "Continue without picking") : doom ? DOOM : A.T("Siguiente ronda", "Next round")}</span>${chest ? `<em class="gn-coins">${CN()}+${gain(chestSkip())}</em>` : ""}<span class="ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
+      ${chest ? "" : supHtml()}
+      <section class="tb-shop">${note ? `<p class="tb-note">${note}</p>` : ""}<section class="offers">${cards}</section>
+        ${chest ? "" : `<div class="tb-actions"><button class="chipbtn" id="rerollBtn" type="button">${ic("dice", "sm")}<span>${A.T("Cambiar cartas", "New cards")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button></div>`}</section>
+      <footer class="tb-tray">
+        <div class="tray-col tr-relics"><h4>${A.T("Reliquias", "Relics")} <b>${run.perks.length}/${slots}</b></h4><div class="tray-row">${relics}</div></div>
+        <div class="tray-col tr-tools"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${tools}</div></div>
+        <div class="tray-col tr-prov"><h4>${A.T("Provisiones", "Provisions")} <b>${run.lives}/${run.maxLives}</b></h4><div class="tray-row hearts">${hearts()}</div></div>
+        <button class="go2${doom ? " doom" : ""}${chest ? " skip" : ""}" id="goRound" type="button" data-primary><span class="go2-chip">${chip}</span><span class="go2-t"><b>${goB}</b><i>${goI}</i></span><span class="go2-ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
     document.querySelectorAll(".offer").forEach((el, i) => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); if (!chest) el.addEventListener("pointerenter", e => { if (e.pointerType === "mouse" && A.dealer.campHover) A.dealer.campHover(i); }); });
-    document.querySelectorAll(".inv-perk").forEach(b => (b.onclick = () => sell(b.dataset.sell, chest)));   // tambien en el cofre del jefe: con la mochila llena, vendes una y eliges
+    /* la mochila: un clic levanta la reliquia y ensena su boton de vender; otro clic en ella (o fuera) la baja. Tambien en el cofre del jefe:
+       con la mochila llena, vendes una y eliges la del cofre gratis */
+    const lift = id => { relicSel = id; document.querySelectorAll("#dlg .tr-relic").forEach(x => x.classList.toggle("sel", x.dataset.relic === relicSel)); };
+    document.querySelectorAll("#dlg .tr-relic").forEach(c => { const id = c.dataset.relic;
+      c.querySelector(".tr-face").onclick = e => { e.stopPropagation(); lift(relicSel === id ? null : id); A.sfx.card(); };
+      c.querySelector(".tr-sell").onclick = e => { e.stopPropagation(); relicSel = null; sell(id, chest); }; });
+    const tb = document.querySelector("#dlg .table.mesa"); if (tb) tb.addEventListener("click", () => { if (relicSel) lift(null); });
     if ($("rerollBtn")) $("rerollBtn").onclick = () => {
       const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll();
       if (c > 0 && !run.shellDone && (run.paidRerolls = (run.paidRerolls || 0) + 1) >= 2) { run.shellDone = true; persist(); if (A.dealer.campShell) A.dealer.campShell(); return shellCards(() => openShop(false)); }   // el trile: una vez por expedicion
       openShop(false);
     };
     $("shopMenu").onclick = () => C().runMenu();
-    document.querySelectorAll(".ch-buy").forEach(b => (b.onclick = () => bribe(b.dataset.id)));
+    document.querySelectorAll("#dlg .nr-buy").forEach(b => (b.onclick = () => bribe(b.dataset.id)));
     if ($("chalReroll")) $("chalReroll").onclick = rerollChal;
     if (!chest) wireSup();
     $("goRound").onclick = () => {
       if (!chest && !run.visitBuys && !run.skipSaid && run.coins >= 8 && Math.random() < 0.5 && A.dealer.campSkip) { run.skipSaid = true; A.dealer.campSkip(run.coins); }   // te vas sin comprar nada (una vez por expedicion)
-      run.stock = null;
+      run.stock = null; relicSel = null;
       if (chest) { const k = gain(chestSkip()); run.coins += k; run.stats.coinsEarned += k; A.sfx.sell(); }   // dejar el cofre sin abrir tambien se cobra (con la mochila llena, el cofre no es papel mojado)
       persist(); chest ? openShop(false) : startRound();
     };
@@ -970,15 +1018,17 @@ window.AIQ = window.AIQ || {};
     { id: "seguro", cost: 8, ico: "shield", n: A.L("Seguro de ronda", "Round insurance"), d: A.L("Si fallas la próxima ronda, no pierdes provisión", "If you fail next round, you keep your provision") },
   ];
   const supCost = s => price(s.cost + (s.id === "seguro" ? 2 * (run.segN || 0) : 0));   // cada Seguro de ronda gastado encarece el siguiente (como las provisiones): no se puede fallar gratis para siempre
+  let supFresh = null;                                                 // el suministro recien comprado: solo a ese le cae el sello
   function supHtml() {
-    const sup = run.sup || {}, items = SUPS.filter(s => s.id !== "kit" || Object.keys(run.tools).length).map(s =>`<button class="sup${sup[s.id] ? " on" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span><em>${sup[s.id] ? A.T("Activo", "On") : CN() + supCost(s)}</em></button>`).join("");
+    const sup = run.sup || {}, items = SUPS.filter(s => s.id !== "kit" || Object.keys(run.tools).length).map(s => `<button class="sup sp-${s.id}${sup[s.id] ? " on" : ""}${supFresh === s.id ? " fresh" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span>${sup[s.id] ? `<em class="sp-on">${A.T("Activo", "On")}</em>` : `<em class="sp-p">${CN()}${supCost(s)}</em>`}</button>`).join("");
+    supFresh = null;
     return `<div class="tb-sup">${items}</div>`;
   }
   function wireSup() {
     document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {
       const s = SUPS.find(x => x.id === b.dataset.sup), c = supCost(s); run.sup = run.sup || {};
       if (run.sup[s.id]) { run.coins += typeof run.sup[s.id] === "number" ? run.sup[s.id] : c; run.sup[s.id] = false; A.sfx.sell(); }   // devuelve lo que pagaste (vender el Vale entre medias ya no regala 1)
-      else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = c; run.visitBuys = (run.visitBuys || 0) + 1; A.sfx.buy(); if (SUPS.every(x => run.sup[x.id])) A.ach.emit("adv", { kind: "supplies" }); }
+      else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = c; supFresh = s.id; run.visitBuys = (run.visitBuys || 0) + 1; A.sfx.buy(); if (SUPS.every(x => run.sup[x.id])) A.ach.emit("adv", { kind: "supplies" }); }
       persist(); renderShop(false);
     }));
   }
@@ -1032,7 +1082,7 @@ window.AIQ = window.AIQ || {};
     renderShop(chest);
   }
   function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0) return; run.perks.splice(k, 1); run.coins += sellValue(id); if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
-  function flash(t) { const n = document.querySelector(".tb-note"); if (!n) return; const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.after(m); setTimeout(() => m.remove(), 2200); }
+  function flash(t) { const n = document.querySelector("#dlg .tb-shop"); if (!n) return; n.querySelectorAll(".shop-flash").forEach(x => x.remove()); const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.appendChild(m); setTimeout(() => m.remove(), 2200); }   // flotando sobre las cartas: no empuja nada
 
   /* ---------------- fin de la expedicion ---------------- */
   function endRun(win) {
