@@ -16,7 +16,8 @@ const UA = { "User-Agent": "Geolite-builder/1.0 (https://github.com/xWensel/geol
 /* ---- paises: los mismos 196 nombres en ingles que ya usa el juego (data/places.js, filas kind="country") ---- */
 const ctx = { window: {} }; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "data", "places.js"), "utf8"), ctx);
-const COUNTRIES = ctx.window.AIQ.PLACES.filter(r => r[1] === "country").map(r => r[6].en);
+const COUNTRIES = ctx.window.AIQ.PLACES.filter(r => r[1] === "country").map(r => r[6].en)
+  .concat(["Curaçao", "Aruba", "Greenland"]);                        // + los territorios con ficha de pais en la Enciclopedia (no tienen pregunta propia)
 
 /* ---- red con limite de concurrencia y reintentos (mismo patron que build-places.mjs) ---- */
 let active = 0, last = 0; const waiters = [];

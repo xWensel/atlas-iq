@@ -1,7 +1,7 @@
 /*
  * Geolite - publica las fotos de la Enciclopedia en GitHub Pages (gratis, sin tarjeta): Vercel no admite ~1 GB de fotos.
  * Van repartidas en dos repositorios publicos para no pasar del limite de 1 GB de cada web de GitHub Pages:
- *   xWensel/geolite-media     -> assets/wiki/card  (https://xwensel.github.io/geolite-media/)
+ *   xWensel/geolite-media     -> assets/wiki/card y assets/wiki/th  (https://xwensel.github.io/geolite-media/)
  *   xWensel/geolite-media-hd  -> assets/wiki/hd    (https://xwensel.github.io/geolite-media-hd/)
  * Cada repositorio se clona junto a la carpeta del juego (../geolite-media, ../geolite-media-hd) y se deja como copia exacta:
  * copia lo nuevo o cambiado, borra lo que ya no esta en el juego, y hace commit + push. El juego las busca ahi via A.media (js/support.js).
@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OWNER = "xWensel";
 const TARGETS = [
-  { repo: "geolite-media", dirs: ["assets/wiki/card"], what: "tarjetas (960 px)" },
+  { repo: "geolite-media", dirs: ["assets/wiki/card", "assets/wiki/th"], what: "tarjetas (960 px) y miniaturas (320 px)" },
   { repo: "geolite-media-hd", dirs: ["assets/wiki/hd"], what: "fotos HD (hasta 1920 px)" },
 ];
 const DRY = process.argv.includes("--dry");

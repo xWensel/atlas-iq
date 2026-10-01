@@ -1,12 +1,12 @@
 /* Geolite - textos ES/EN, calculo de IQ e insignia. */
 window.AIQ = window.AIQ || {};
 (function (A) {
-  A.VERSION = "0.36.1";
+  A.VERSION = "0.37.1";
   A.lang = "es";
   /* fotos de la Enciclopedia: en la web salen de GitHub Pages (pesan ~1 GB y Vercel no las admite), repartidas en dos webs para no pasar
      del limite de 1 GB de cada una; en local y en Electron (127.0.0.1) salen de la carpeta del juego. Las publica tools/publish-media.mjs.
      La musica sigue saliendo de la propia web. */
-  const MEDIA = { "assets/wiki/card/": "https://xwensel.github.io/geolite-media/", "assets/wiki/hd/": "https://xwensel.github.io/geolite-media-hd/" };
+  const MEDIA = { "assets/wiki/card/": "https://xwensel.github.io/geolite-media/", "assets/wiki/th/": "https://xwensel.github.io/geolite-media/", "assets/wiki/hd/": "https://xwensel.github.io/geolite-media-hd/" };   // th: miniaturas de 320 px de la Enciclopedia
   const LOCAL = typeof location === "undefined" || !/^https?:$/.test(location.protocol) || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   A.media = p => { if (!LOCAL) for (const k in MEDIA) if (p.startsWith(k)) return MEDIA[k] + p; return p; };
   /* enlace para compartir: en Electron (y en local) la direccion es 127.0.0.1:puerto, que no le sirve a nadie: se comparte la web publica */

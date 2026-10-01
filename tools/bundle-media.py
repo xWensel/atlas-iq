@@ -5,7 +5,8 @@ Geolite - empaqueta las fotos de la Enciclopedia y las banderas dentro del juego
   python tools/bundle-media.py            descarga lo que falte (reanudable) y convierte a WebP
   python tools/bundle-media.py --flags    solo banderas
 
-Fotos (data/wiki/img.json):  assets/wiki/hd/<id>.webp (lado mayor hasta 1920 px) y assets/wiki/card/<id>.webp (960 px de ancho)
+Fotos (data/wiki/img.json):  assets/wiki/hd/<id>.webp (lado mayor hasta 1920 px), assets/wiki/card/<id>.webp (960 px de ancho)
+                             y assets/wiki/th/<id>.webp (miniatura de 320 px para las cartas pequenas: tools/wiki-thumbs.py)
 Banderas (data/flags.js):    assets/flags/<pais>.svg (original vectorial de Wikimedia Commons)
 Los creditos y licencias siguen en img.json / flags.js y el juego los muestra junto a cada imagen.
 """
@@ -95,5 +96,7 @@ if __name__ == "__main__":
     if "--flags" not in sys.argv:
         IMG = json.loads((ROOT / "data/wiki/img.json").read_text(encoding="utf-8"))
         run(photo, list(IMG.items()), "fotos")
+        import importlib.util                                        # miniaturas de 320 px para las cartas de la Enciclopedia (tools/wiki-thumbs.py)
+        spec = importlib.util.spec_from_file_location("wiki_thumbs", ROOT / "tools/wiki-thumbs.py"); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); m.main()
     total = sum(f.stat().st_size for d in (HD, CARD, FLAGS) for f in d.iterdir())
     print("tamano total: %.1f MB" % (total / 1e6))

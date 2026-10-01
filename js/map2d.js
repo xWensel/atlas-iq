@@ -70,6 +70,8 @@ window.AIQ = window.AIQ || {};
     _emptyMarks() { return { guess: null, answer: null, highlight: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
     setMarks(m) { this.marks = { ...this._emptyMarks(), ...m, t0: performance.now() }; this.fxDirty = this.hlDirty = true; }
     clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.hlDirty = true; }
+    setPaint() { /* sin WebGL la Enciclopedia no tine paises (el mapa sigue igual) */ }
+    setHighlight(name) { this.marks = { ...this.marks, highlight: name || null }; this.fxDirty = this.hlDirty = true; }
     setPick(on) { this.pickEnabled = on; this.fxDirty = true; for (const c of [this.cv, this.fx]) c.classList.toggle("aiming", on); }
     setQuality(q) { this.quality = q; this.resize(true); }
     setStyle() {}

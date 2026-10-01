@@ -4,6 +4,15 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.37.1** - Enciclopedia nueva: un atlas sobre el mapa del juego, con medallas por precisión.
+- Se recorre como un atlas: índice con Resumen, los 7 continentes (con Mares y océanos) y Por afinar; dentro, 31 familias de países vecinos (Península Ibérica, Balcanes, Levante y Mesopotamia, Cono Sur, Caribe, Melanesia...) y cada país con sus lugares por secciones (capital y ciudades, monumentos, naturaleza, batallas y sucesos, personajes, curiosidades), lo más conocido primero.
+- Cada lugar es UNA carta con tres medallas: bronce a menos de 300 km (su ficha), plata a menos de 150 km (su historia) y oro a menos de 75 km (su dato clave); mares y naturaleza, el doble. Antes salía tres veces. El marco toma el color de la mejor medalla y lo que falta dice qué distancia pide. Por dentro siguen siendo las mismas 4.966 entradas: logros, Steam y partidas guardadas no cambian.
+- Qué te falta: lo no descubierto sale boca abajo con el icono de su tipo; los países sin descubrir, con su silueta y "???"; Por afinar reúne por continentes lo que conoces pero no has clavado ("A un paso del oro", "Te faltan la plata y el oro", "Países por dominar"). Personajes y sucesos dicen qué lugar los desbloquea.
+- El mapa es el MISMO del juego: la Enciclopedia se posa sobre la mesa de la portada y deja verlo y tocarlo (arrastrar, rueda, + / − / casa). Cada país se tiñe según lo que llevas (en penumbra, turquesa u oro; js/map.js setPaint), se resalta al pasar el ratón con su nombre y su %, y un clic lo abre. El mapa vuela al continente, al país o al lugar (con la chincheta del juego) y al cerrar vuelve como estaba. Abierta en plena partida no toca su mapa.
+- El crupier enseña 3 s algo bloqueado aunque no haya cartas a la vista: una ficha de país o, en el Resumen, un país del mapa con su bandera.
+- Fluidez: banderas ya rasterizadas (`tools/flags-raster.cjs`, assets/flags/r), miniaturas de 320 px para las cartas (`tools/wiki-thumbs.py`, publicadas en GitHub Pages junto a las demás fotos), cartas por tandas y sin capas de GPU en reposo. Con CPU x4, bajar por cientos de cartas: 27 fotogramas perdidos (peor 67 ms) frente a 138 (1.167 ms).
+- Banderas de Curazao, Aruba y Groenlandia (Commons, dominio público); créditos y auditoría de licencias al día. Textos nuevos en los 12 idiomas; revisión independiente con 42 fallos confirmados y corregidos (Esc tras pulsar un botón, volver al mismo sitio en páginas largas, palabras partidas en ruso y coreano...).
+
 **v0.36.1** - El crupier del Campamento ya no tapa nada.
 - Se sienta un poco más arriba, en el hueco libre a la izquierda de las cartas y por encima de la mochila: ya no pisa el botón «Vender» de la reliquia levantada, y su globo termina antes de la carta (que gira y crece al pasar el ratón). Comprobado a 1280 × 720, 1366 × 768, 1920 × 1080 y 2560 × 1440, sin tocar la barra de suministros.
 

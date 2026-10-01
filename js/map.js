@@ -705,6 +705,10 @@ void main(){
     _emptyMarks() { return { guess: null, answer: null, highlight: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
     setMarks(m) { const hl = m.highlight && this.world.byName[m.highlight]; this.marks = { ...this._emptyMarks(), gct: m.guess ? this.pickCt : null, act: hl ? hl.ct : null, ...m, t0: performance.now() }; this.fxDirty = this.dirty = true; }
     clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.dirty = true; }
+    /* paises tenidos por encima de la tierra ({ "Spain": [r, g, b, a] }, 0-1): la Enciclopedia pinta asi lo que llevas descubierto. null = nada */
+    setPaint(p) { this.paint = p || null; this.dirty = this.fxDirty = true; }
+    /* resalta un pais sin reiniciar las marcas (la chincheta no vuelve a caer): el pais bajo el raton en la Enciclopedia */
+    setHighlight(name) { const f = name && this.world.byName[name]; this.marks = { ...this.marks, highlight: f ? name : null, act: f ? f.ct : null }; this.fxDirty = this.dirty = true; }
     /* sondas de la Aventura: [{lon,lat,km?,bearing?,label}] -> anillo de distancia y flecha de rumbo, siempre nitidos (vector 2D) */
     setProbes(list) { this.probes = keepT0(this.probes, list); this.fxDirty = this.dirty = true; }
     /* punto real -> coordenadas del mapa tal como se ve (deformado, sin la camara): la Brujula mide ahi el rumbo hacia el objetivo */
@@ -1290,6 +1294,11 @@ void main(){
       gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);
 
       gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      if (this.paint) {                                                  // tintes por pais (setPaint): encima de la tierra y debajo del resalte y las fronteras
+        gl.useProgram(P.solid); this._setDist(P.solid); this._u(P.solid, "u_off", 0, 0);
+        this._u(P.solid, "u_center", v.cx, v.cy); this._u(P.solid, "u_scale", sc); this._u(P.solid, "u_res", sw, sh);
+        for (const f of this.world.features) { const c = this.paint[f.name]; if (c && f.gl && f.gl.n) { this._u(P.solid, "u_col", c[0], c[1], c[2], c[3]); gl.drawElements(gl.TRIANGLES, f.gl.n, gl.UNSIGNED_INT, f.gl.i0 * 4); } }
+      }
       const hl = this.marks.highlight && this.world.byName[this.marks.highlight];
       if (hl) {
         const k = Math.min(1, (now - this.marks.t0) / 500);
