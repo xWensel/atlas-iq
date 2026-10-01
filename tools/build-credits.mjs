@@ -71,6 +71,7 @@ ${flags.map(([n, c]) => row(n, c)).join("\n")}
 <ul>
 <li><b>Silkscreen</b>, <b>Pixelify Sans</b>, <b>Jersey 15</b>, <b>Tiny5</b> — SIL Open Font License 1.1 (<a href="fonts/LICENSE-silkscreen.txt">Silkscreen</a>, <a href="fonts/LICENSE-pixelify-sans.txt">Pixelify Sans</a>, <a href="fonts/LICENSE-jersey.txt">Jersey</a>, <a href="fonts/LICENSE-tiny5.txt">Tiny5</a>).</li>
 <li><b>Fusion Pixel Font</b> (Chinese, Japanese and Korean glyphs) — <a href="fonts/LICENSE-fusion-pixel.txt">license</a>.</li>
+<li><b>Yellowtail</b> by Astigmatic (base of the Cousins Studios lettering) — Apache License 2.0 (<a href="fonts/LICENSE-yellowtail.txt">text</a>).</li>
 </ul>
 
 <h2>Map data and software</h2>

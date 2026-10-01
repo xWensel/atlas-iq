@@ -4,6 +4,8 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.41.1** - Logo del estudio nuevo: "Cousins" pasa a letra script retro dorada con una cola que la subraya; en la intro las letras suben una a una y la cola se traza mientras la palabra se enciende (generador en `tools/brand/cousins_script.py`, base Yellowtail, Apache 2.0, citada en los creditos).
+
 **v0.40.1** - Arreglo: el fondo ya no se queda en blanco y parpadeando al salir del juego y volver.
 - Al volver de otra aplicación (o de suspender) Windows puede reiniciar la GPU y el mapa perdía su contexto WebGL; si el navegador no lo devolvía, el mapa quedaba sin dibujar para siempre (la portada sin fondo, parpadeando). Ahora, si no vuelve solo en 1,5 s, el mapa recrea su lienzo y se redibuja (js/map.js `_revive`); la Enciclopedia y el puntero se reenganchan al lienzo nuevo.
 - El bucle de dibujo ya no muere por una excepción suelta en un fotograma, y una restauración fallida del contexto se reintenta en vez de dejar el mapa a medias.

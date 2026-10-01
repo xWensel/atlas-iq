@@ -52,6 +52,8 @@
 .cs-ws .cs-l { animation-duration: .95s; animation-delay: calc(.86s + var(--i) * 40ms); }
 .cs-ws .cs-rule { animation: cs-draw 1.3s cubic-bezier(.16, 1, .3, 1) 1.26s both; }
 .cs-rl { transform-origin: 100% 50%; } .cs-rr { transform-origin: 0 50%; }
+/* la cola de "Cousins" se traza de izquierda a derecha mientras la palabra se enciende */
+.cs-wb .cs-tail { transform-origin: 0 50%; animation: cs-draw 1.2s cubic-bezier(.16, 1, .3, 1) .45s both; }
 @keyframes cs-draw { 0% { opacity: 0; transform: scaleX(0); } 20% { opacity: 1; } 100% { opacity: 1; transform: none; } }
 /* el encendido (un filtro de color por palabra): la palabra llega en penumbra (el oro, oscurecido y
    calentado hacia el ambar; la perla, gris neutro) y en el golpe salta de una vez casi al blanco (steps: sin pasar por otros tonos) y se enfria hasta quedar sin filtro */
