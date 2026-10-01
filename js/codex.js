@@ -506,6 +506,12 @@ window.AIQ = window.AIQ || {};
     mapBind();
     /* sonido flojito al pasar por lo que se puede abrir (el resto de menus lo pone js/game.js) */
     let lastH = null;
+    /* pasar el raton por una carta "Nueva" ya cuenta como verla: se quita la etiqueta sin tener que abrirla */
+    root.addEventListener("mouseover", e => {
+      const f = e.target.closest(".cx-card.fresh"); if (!f) return;
+      f.classList.remove("fresh"); const n = f.querySelector(".cx-new"); if (n) n.remove();
+      let ch = 0; idsOf(f.dataset.id).forEach(x => { if (pump.fr) pump.fr.delete(x); if (U(x) && !store.seen[x]) { store.seen[x] = 1; ch = 1; } }); if (ch) { save(); dirty(); }
+    });
     root.addEventListener("mouseover", e => { const el = e.target.closest(".cx-nv, .cx-ct, .cx-card, .cx-jump, .cx-rel, .cx-crumb a, .cx-back, .cx-step, .cx-readc"); if (el && el !== lastH && A.sfx.hover) A.sfx.hover(); lastH = el; });
     root.addEventListener("pointermove", e => { const c = e.target.closest(".cx-card, .cx-big"); if (c) tiltMove(c, e, c.classList.contains("cx-big") ? 10 : 7); });
     root.addEventListener("pointerout", e => { const c = e.target.closest(".cx-card, .cx-big"); if (c && !c.contains(e.relatedTarget)) tiltReset(c); });

@@ -4,6 +4,10 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.39.1** - Enciclopedia: la etiqueta «Nueva» ya no se corta y se quita con solo pasar el ratón.
+- En la última columna la etiqueta asomaba fuera de la carta y el borde de la página la cortaba al hacer scroll; ahora va dentro de la carta (css/codex.css).
+- Pasar el ratón por una carta «Nueva» ya cuenta como verla: la etiqueta desaparece sin tener que abrirla y queda guardado (js/codex.js).
+
 **v0.37.1** - Enciclopedia nueva: un atlas sobre el mapa del juego, con medallas por precisión.
 - Se recorre como un atlas: índice con Resumen, los 7 continentes (con Mares y océanos) y Por afinar; dentro, 31 familias de países vecinos (Península Ibérica, Balcanes, Levante y Mesopotamia, Cono Sur, Caribe, Melanesia...) y cada país con sus lugares por secciones (capital y ciudades, monumentos, naturaleza, batallas y sucesos, personajes, curiosidades), lo más conocido primero.
 - Cada lugar es UNA carta con tres medallas: bronce a menos de 300 km (su ficha), plata a menos de 150 km (su historia) y oro a menos de 75 km (su dato clave); mares y naturaleza, el doble. Antes salía tres veces. El marco toma el color de la mejor medalla y lo que falta dice qué distancia pide. Por dentro siguen siendo las mismas 4.966 entradas: logros, Steam y partidas guardadas no cambian.

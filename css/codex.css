@@ -135,7 +135,7 @@ body.cx-on .cx-toast { display: none !important; }                     /* su car
 .cx-rh > div { display: grid; gap: 4px; min-width: 0; } .cx-rh b { font-family: var(--serif); font-weight: 900; font-size: 34px; line-height: 1; text-shadow: 0 3px 0 rgba(5, 12, 8, .6); }
 .cx-rh i { font-style: normal; font-family: var(--mono); font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: rgba(242, 233, 214, .6); }
 .cx-rh-r { display: grid; justify-items: end; gap: 8px; } .cx-rh-r em { font-style: normal; font-family: var(--serif); font-weight: 900; font-size: 27px; line-height: 1; color: var(--cx1); } .cx-rh-r .cx-mb { width: 160px; }
-.cx-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.cx-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; padding: 8px 6px 0 0; }   /* sitio para la insignia de novedades de la ultima columna */
 .cx-ct { position: relative; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 12px; row-gap: 8px; align-items: center; padding: 10px 12px 10px 10px;
   border: 0; border-radius: 14px; cursor: pointer; text-align: left; color: var(--paper); background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--ring), 0 6px 0 rgba(0, 0, 0, .28); transition: transform .2s var(--spring), box-shadow .15s, background .15s; }
 .cx-ct:hover { transform: translateY(-3px); background: #13301f; box-shadow: inset 0 0 0 2px var(--cx1), 0 9px 0 rgba(0, 0, 0, .28); }
@@ -207,7 +207,7 @@ body.cx-on .cx-toast { display: none !important; }                     /* su car
 .cx-sub { display: block; margin-top: 2px; font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cx-card .cx-pips, .cx-card .cx-kind { margin-top: auto; padding-top: 7px; }
 .cx-kind { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
-.cx-card .cx-new { top: 2px; right: -6px; transform: rotate(4deg); }
+.cx-card .cx-new { top: 12px; right: 12px; transform: rotate(4deg); }   /* dentro de la carta: en la ultima columna el borde de la pagina la cortaba */
 /* boca abajo: el reverso de la carta, con la silueta del tipo en relieve */
 .cx-card.locked, .cx-big.locked { --fr: #0b2d36; color: rgba(159, 233, 214, .55);
   background: repeating-linear-gradient(45deg, rgba(78, 227, 193, .07) 0 2px, transparent 2px 11px), repeating-linear-gradient(-45deg, rgba(78, 227, 193, .07) 0 2px, transparent 2px 11px), linear-gradient(160deg, #175062, #0f3442);
