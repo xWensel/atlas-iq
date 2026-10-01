@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Cousins Studios - "Cousins" en script retro (base Yellowtail, Apache 2.0, Astigmatic) con cola que subraya la palabra.
+"""Cousins Studios - "Cousins" en script retro (o..s de Yellowtail, Apache 2.0, Astigmatic) con una C dibujada a medida.
 
-Saca los contornos de la fuente, une la palabra en una sola forma (las uniones del script se solapan), la coloca como en la
-maqueta elegida (tools/brand/cousins-alternativas.html, opcion 1) y la trocea en una pieza por letra con cortes inclinados
-siguiendo la inclinacion del script, mas la cola. Los filos de luz y de sombra se calculan sobre la forma ENTERA (letra menos ella misma
+La C es la opcion "Subraya" de tools/brand/cousins_c.py (cousins-c.html): su panza no termina y sigue como la cola que subraya
+la palabra. Las letras de la fuente se colocan como en la maqueta elegida (tools/brand/cousins-alternativas.html, opcion 1) y se trocean
+en una pieza por letra con cortes inclinados siguiendo la inclinacion del script; la C es su propia pieza y su cola, desde la panza, otra. Los filos de luz y de sombra se calculan sobre la forma ENTERA (letra menos ella misma
 desplazada) y luego se reparten por pieza: al juntarse las capas no queda ninguna costura en las uniones.
 
 Escribe las entradas "big" y "tail" de A.CS_LETTERS y el viewBox (VB) en js/logo.js; "studios" y los filetes no se tocan.
@@ -25,6 +25,12 @@ BOX = (1420, -30, 300)         # ancho maximo y franja vertical de la tinta (com
 EDGE = 5.0                     # grosor de los filos de luz / sombra
 SLANT = math.tan(math.radians(17))   # inclinacion de los cortes entre letras (la del script)
 CUT_DX = {}                    # retoque a mano de cada corte (unidades del logo) respecto al origen de la letra que empieza
+TAIL_X = 300                   # donde la panza de la C pasa a ser la cola (por debajo de la linea base)
+
+
+def cut(k, y, origins, base):
+    """x del corte entre letras k-1 y k a la altura y (inclinado como el script)"""
+    return origins[k] + CUT_DX.get(k, 0) + (base - y) * SLANT
 OVER = 4                       # solape entre piezas vecinas: ~1 px a tamano de pantalla, sin rendija de antialias
 
 U, D, I = pathops.PathOp.UNION, pathops.PathOp.DIFFERENCE, pathops.PathOp.INTERSECTION
@@ -78,29 +84,35 @@ def build():
     l, t, r, b = union([glyph_path(gs, n, (1, 0, 0, -1, ox, 0)) for n, ox in zip(names, pens)]).bounds
     s = min(BOX[0] / (r - l), (BOX[2] - BOX[1]) / (b - t))
     tx, base = CX - (l + r) / 2 * s, (BOX[1] + BOX[2]) / 2 - (t + b) / 2 * s
-    word = union([glyph_path(gs, n, (s, 0, 0, -s, tx + ox * s, base)) for n, ox in zip(names, pens)]); word.simplify()
+    # o..s de la fuente en su sitio (la colocacion sigue midiendo con la C de la fuente, para no mover nada); la C es propia
+    letters = union([glyph_path(gs, n, (s, 0, 0, -s, tx + ox * s, base)) for n, ox in zip(names[1:], pens[1:])]); letters.simplify()
     origins = [tx + ox * s for ox in pens]
-    L, T, R, B = word.bounds
-    # la cola, como en la maqueta: de debajo de la C hasta pasada la ultima s, subiendo hacia la derecha
-    tail = crescent(L + 30, B + 50, R + 10, B - 10, 22, 70); tail.simplify()
-    whole = pathops.op(word, tail, U); whole.simplify()
+    import cousins_c
+    stroke = cousins_c.c_subraya()[0]                  # la C "Subraya": su panza sigue y es la cola que subraya la palabra
+    whole = pathops.op(letters, stroke, U); whole.simplify()
+    L, T, R, B = whole.bounds
     # filos sobre la forma entera: la forma menos ella misma bajada (luz, bordes que miran arriba) / subida (sombra)
     hi = pathops.op(whole, shifted(whole, 0, EDGE), D)
     lo = pathops.op(whole, shifted(whole, 0, -EDGE), D)
-    # bandas inclinadas: el corte k pasa por el origen de la letra k en la linea base
-    top, bot = T - 200, B + 200
-    cut = lambda k, y: origins[k] + CUT_DX.get(k, 0) + (base - y) * SLANT
-    xl = lambda k, y: L - 400 if k == 0 else cut(k, y) - OVER
-    xr = lambda k, y: R + 400 if k == len(WORD) - 1 else cut(k + 1, y) + OVER
+    def edges_of(face):                            # los filos de la forma entera que caen en esta pieza (ensanchada lo justo)
+        g = union([face] + [shifted(face, dx, dy) for dx, dy in ((EDGE, 0), (-EDGE, 0), (0, EDGE), (0, -EDGE))])
+        return pathops.op(hi, g, I), pathops.op(lo, g, I)
     out = []
-    for k in range(len(WORD)):
+    # la C y su cola: se separan bajo la panza (x > TAIL_X por debajo de la linea base); la cola se traza en la intro desde ahi
+    tail_zone = lambda x0: poly([(x0, 250), (R + 600, 250), (R + 600, B + 400), (x0, B + 400)])
+    c_face = pathops.op(stroke, tail_zone(TAIL_X), D); c_face.simplify()
+    out.append(("big", c_face) + edges_of(c_face))
+    # o..s: bandas inclinadas; el corte k pasa por el origen de la letra k en la linea base
+    top, bot = T - 200, B + 200
+    xl = lambda k, y: L - 400 if k == 1 else cut(k, y, origins, base) - OVER   # la o se queda todo lo que hay a su izquierda (la C va aparte)
+    xr = lambda k, y: R + 400 if k == len(WORD) - 1 else cut(k + 1, y, origins, base) + OVER
+    for k in range(1, len(WORD)):
         band = poly([(xl(k, bot), bot), (xl(k, top), top), (xr(k, top), top), (xr(k, bot), bot)])
-        face = pathops.op(word, band, I); face.simplify()
-        out.append(("big", face, pathops.op(hi, band, I), pathops.op(lo, band, I)))
-    tail_only = pathops.op(tail, word, D); tail_only.simplify()
-    grow = union([shifted(tail_only, dx, dy) for dx, dy in ((OVER, 0), (-OVER, 0), (0, OVER), (0, -OVER))] + [tail_only])
-    out.append(("tail", tail_only, pathops.op(hi, grow, I), pathops.op(lo, grow, I)))
-    cuts = [((cut(k, bot), bot), (cut(k, top), top)) for k in range(1, len(WORD))]
+        face = pathops.op(letters, band, I); face.simplify()
+        out.append(("big", face) + edges_of(face))
+    tail = pathops.op(pathops.op(stroke, tail_zone(TAIL_X - OVER), I), letters, D); tail.simplify()
+    out.append(("tail", tail) + edges_of(tail))
+    cuts = [((cut(k, bot, origins, base), bot), (cut(k, top, origins, base), top)) for k in range(1, len(WORD))] + [((TAIL_X, 250), (TAIL_X, B + 60))]
     return out, cuts, s
 
 
