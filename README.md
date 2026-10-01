@@ -4,6 +4,9 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.36.1** - El crupier del Campamento ya no tapa nada.
+- Se sienta un poco más arriba, en el hueco libre a la izquierda de las cartas y por encima de la mochila: ya no pisa el botón «Vender» de la reliquia levantada, y su globo termina antes de la carta (que gira y crece al pasar el ratón). Comprobado a 1280 × 720, 1366 × 768, 1920 × 1080 y 2560 × 1440, sin tocar la barra de suministros.
+
 **v0.35.1** - Aventura: Campamento premium y ruta de la expedición nueva.
 - Ruta del Campamento, arriba: siempre las 12 rondas en sus tres actos y el modo infinito al final. Antes era una ventana de 12 casillas que se corría hacia la izquierda y llegaba a enseñar rondas 13 a 18, que no existen. Lo jugado son fichas de oro con su marca, el camino se pinta de oro según avanzas y la próxima ronda va encendida, con la chincheta roja del mapa encima. Al pasar el ratón, el tema de cada ronda. Ahora también se ve en pantallas de 720 y 768 px de alto (antes se escondía).
 - El jefe del acto es la chistera del crupier (los mismos píxeles de su retrato, `tools/crupier/chistera.py`): en la ruta, en la próxima ronda, en la ficha roja de su presentación y en el botón de «Ir al matadero». Adiós a la calavera con gorro de bufón.

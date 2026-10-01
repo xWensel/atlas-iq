@@ -2203,10 +2203,12 @@ window.AIQ = window.AIQ || {};
   let campAt = 0, doubtN = 0, doubtLast = -1, doubtSaid = false, fundsSaid = false, campBox = null, campSpoke = false;
   function campRoom() {
     const of = document.querySelector("#dlg .offers"), first = of && of.querySelector(".offer"), app = $("app"); if (!of || !first || !app) return null;
-    const R = of.getBoundingClientRect(), f = first.getBoundingClientRect(), A0 = app.getBoundingClientRect();
-    const room = Math.floor(f.left - R.left - 24), sn = A.crupier.snap(Math.min(224, Math.round(room * 0.6), Math.round(R.height - 110))), hf = sn.css;   // v0.32: el busto a pixel entero (x2 o x1)
-    if (room < 200 || !sn.k) return null;
-    return { l: Math.round(R.left - A0.left + 6), b: Math.round(A0.bottom - R.bottom + 4), hf, hb: Math.min(380, room) };
+    const R = of.getBoundingClientRect(), f = first.getBoundingClientRect(), A0 = app.getBoundingClientRect(), k = A.uiK ? A.uiK() : 1;
+    /* v0.36: que no tape (casi) nada. Se sienta en el hueco libre de la izquierda, un poco mas arriba que antes: sus pies quedan por encima de la mochila y del
+       boton "Vender" que sale sobre la reliquia levantada (18 px del lienzo), y el globo termina antes de la carta (que gira y crece al pasar el raton) */
+    const lift = Math.round(18 * k), room = Math.floor(f.left - R.left - 26 * k), sn = A.crupier.snap(Math.min(224, Math.round(room * 0.6), Math.round(R.height - lift - 110))), hf = sn.css;   // v0.32: el busto a pixel entero (x2 o x1)
+    if (room < 190 || !sn.k) return null;
+    return { l: Math.round(R.left - A0.left + 6), b: Math.round(A0.bottom - R.bottom + 4 + lift), hf, hb: Math.min(380, room) };
   }
   function campSay(t, mood) {
     if (!t || held || D.host || tourOn() || HOME_MQ.matches || phase() !== "shop") return false;
