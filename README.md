@@ -4,6 +4,10 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.33.1** - Cofre del jefe: vender con la mochila llena.
+- En el cofre del jefe ya puedes vender reliquias de la mochila (al mismo precio que en el Campamento). Con la mochila llena, vendes una y eliges la del cofre gratis; antes solo te dejaba pasar.
+- Si abres el cofre con la mochila llena, la nota lo avisa: «Mochila llena: vende una reliquia.»
+
 **v0.32.1** - Don Crupier, pulido y animado.
 - El crupier de siempre, pulido píxel a píxel: chistera lisa (fuera los restos del broche), máscara sin manchas, cartas sin índices, guante con volumen y brillo en los ojos. Todas sus caras y gestos salen de ese único retrato partido en capas, así que la chistera, la máscara, la pajarita y las cartas son los mismos píxeles siempre.
 - 18 caras (pícaro, presumido, guiño, sospecha, carcajada, pena, sorpresa, aburrido, nervioso, reverencia, yo no he sido, enfado, rabieta, desafiante, desconcertado, dormido y dos a oscuras) y 48 gestos (reverencia quitándose la chistera, bote de chistera, barajar, repartir, abanicarse, chitón, dedo que dice no, reloj de bolsillo, sellazo, doblón, pase de mago…). Respira, parpadea, mueve la boca al ritmo de las letras y, en reposo, hace algún gesto suelto.

@@ -927,7 +927,7 @@ window.AIQ = window.AIQ || {};
     const slots = 5, info = actInfo(run.act), rc = rerollCost();
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     /* la mochila no avisa de que una reliquia ya no sirve: saber cuando venderla tambien es cosa del jugador */
-    const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b>${chest ? "" : `<em>${A.T("vender", "sell")} ${sellValue(id)}</em>`}</button>` : `<span class="inv-empty"></span>`; }).join("");
+    const relicSlots = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; return id ? `<button class="inv-perk" data-sell="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}<b class="ivn">${A.RELICS[id].cost}</b><em>${A.T("vender", "sell")} ${sellValue(id)}</em></button>` : `<span class="inv-empty"></span>`; }).join("");
     const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));
     /* antes del jefe, el crupier te reescribe el boton (funciona igual) */
     const doom = !chest && !!chalFor(roundNo()).boss, DOOM = A.pick6("Ir al matadero|To the slaughter|À l'abattoir|Pro matadouro|Zur Schlachtbank|Al macello||去送死|도살장으로|処刑台へ|На убой|Na rzeź");   // revancha: queda la carta a mitad de precio que frena los trucos de la ronda que repites
@@ -935,7 +935,7 @@ window.AIQ = window.AIQ || {};
       <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
         <div class="route">${routeHtml()}</div><div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
       ${nextHtml()}
-      ${chest ? `<p class="tb-note">${A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${retryNote ? A.tx(ETX.retry) : A.T("Tres cartas sobre la mesa. ¿Compras una o pides otras?", "Three cards on the table. Buy one, or ask for new ones?")}</p>${supHtml()}`}
+      ${chest ? `<p class="tb-note">${run.perks.length >= slots ? A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.") : A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")}</p>` : `<p class="tb-note">${retryNote ? A.tx(ETX.retry) : A.T("Tres cartas sobre la mesa. ¿Compras una o pides otras?", "Three cards on the table. Buy one, or ask for new ones?")}</p>${supHtml()}`}
       <section class="offers">${cards}</section>
       <div class="tb-actions">${chest ? "" : `<button class="chipbtn" id="rerollBtn">${ic("dice", "sm")}<span>${A.T("Cambiar cartas", "New cards")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button>`}
         </div>
@@ -944,7 +944,7 @@ window.AIQ = window.AIQ || {};
         <div class="tray-col"><h4>${A.T("Provisiones", "Provisions")}</h4><div class="tray-row hearts">${hearts()}</div></div>
         <button class="btn-ink go-next${doom ? " doom" : ""}" id="goRound" data-primary><span>${chest ? A.T("Continuar sin elegir", "Continue without picking") : doom ? DOOM : A.T("Siguiente ronda", "Next round")}</span>${chest ? `<em class="gn-coins">${CN()}+${gain(chestSkip())}</em>` : ""}<span class="ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
     document.querySelectorAll(".offer").forEach((el, i) => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); if (!chest) el.addEventListener("pointerenter", e => { if (e.pointerType === "mouse" && A.dealer.campHover) A.dealer.campHover(i); }); });
-    document.querySelectorAll(".inv-perk").forEach(b => (b.onclick = () => { if (chest) return; sell(b.dataset.sell); }));
+    document.querySelectorAll(".inv-perk").forEach(b => (b.onclick = () => sell(b.dataset.sell, chest)));   // tambien en el cofre del jefe: con la mochila llena, vendes una y eliges
     if ($("rerollBtn")) $("rerollBtn").onclick = () => {
       const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll();
       if (c > 0 && !run.shellDone && (run.paidRerolls = (run.paidRerolls || 0) + 1) >= 2) { run.shellDone = true; persist(); if (A.dealer.campShell) A.dealer.campShell(); return shellCards(() => openShop(false)); }   // el trile: una vez por expedicion
@@ -1031,7 +1031,7 @@ window.AIQ = window.AIQ || {};
     if (chest) { run.stock = null; run.bought = []; persist(); return openShop(false); }
     renderShop(chest);
   }
-  function sell(id) { const k = run.perks.indexOf(id); if (k < 0) return; run.perks.splice(k, 1); run.coins += sellValue(id); if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(false); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
+  function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0) return; run.perks.splice(k, 1); run.coins += sellValue(id); if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
   function flash(t) { const n = document.querySelector(".tb-note"); if (!n) return; const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.after(m); setTimeout(() => m.remove(), 2200); }
 
   /* ---------------- fin de la expedicion ---------------- */
