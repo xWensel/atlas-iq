@@ -566,7 +566,7 @@ window.AIQ = window.AIQ || {};
     if (km != null && ratio < 0.6 && S.streak > 0 && has("guard") && !run.guardUsed) { streak = S.streak; if (!noSide) run.guardUsed = true; c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
     c.streak = streak; c.mult = 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);
     c.qi = run.qi;
-    if (km != null) perkList().forEach(p => { if (!p.post) return; const tx = p.post(c, run); if (tx) c.lines.push([p.ico, A.tx(p.n), tx]); });
+    if (km != null) perkList().forEach(p => { if (!p.post) return; const tx = p.post(c, run); if (tx) { c.lines.push([p.ico, A.tx(p.n), tx]); if (!noSide) A.adv.flash(p.id, 0, tx); } });
     c.total = km == null ? 0 : Math.round(c.chips * c.mult * c.xmult);
     c.coinsBase = km == null ? 0 : dist >= 960 ? 1 : 0;                         // solo las dianas dan doblon
     c.coins += c.coinsBase; c.coins = gain(c.coins);
@@ -666,7 +666,14 @@ window.AIQ = window.AIQ || {};
       /* cuando queden `sec` segundos del reloj de la pregunta: se recalcula en cada espera (la pausa y el Reloj de arena mueven el momento; antes una pausa lo perdia) */
       later: (sec, fn) => { const tick = () => { if (S.phase !== "asking") return; const left = S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000; if (!S.paused && left <= sec) return fn(); timers.push(setTimeout(tick, S.paused ? 250 : Math.max(50, (left - sec) * 1000))); }; tick(); },
     };
-    perkList().forEach(p => p.open && p.open(api, o, run));
+    /* las pistas gratis se lucen la primera vez que dan algo en cada ronda (tambien las que esperan a mitad de tiempo) */
+    const rk = run.act + ":" + run.round + ":" + run.attempt;
+    perkList().forEach(p => {
+      if (!p.open) return;
+      const mark = () => { run.hintFl = run.hintFl || {}; if (run.hintFl[p.id] !== rk) { run.hintFl[p.id] = rk; A.adv.flash(p.id, 0); } };
+      p.open({ ...api, fact: x => { mark(); api.fact(x); }, note: (t, i) => { mark(); return api.note(t, i); }, country: x => { mark(); return api.country(x); } }, o, run);
+    });
+    if (S.qi === 0 && !run.inf && run.rfK !== rk) { run.rfK = rk; timers.push(setTimeout(() => { if (C().S.phase === "asking") roundFlashes(); }, 650)); }
     if (run.qTotal === 0 && A.tour) A.tour.maybe("q");
   };
   /* el viento EMPUJA el puntero: se ve moverse (racha lenta incluida) y el clic cae exactamente donde esta el puntero. Devuelve el desplazamiento en pantalla. */
@@ -783,15 +790,60 @@ window.AIQ = window.AIQ || {};
     el.innerHTML = `<span>${A.tx(ETX.loot)}</span><b>${CN()}+${got}</b><i>${lt.next ? et("next", { c: gain(lt.base + lt.margin + 1), s: A.fmt(lt.next) }) : A.tx(ETX.max)}</i>`;
   }
   if (A.tips) A.tips.loot = () => A.tx(ETX.lootTip) + "\n" + A.tx(ETX.lootTipD);
+  /* ---------------- lucirse (tanda 2): cuando una reliquia TUYA actua, su icono salta en la barra, suena y, si es un premio, tiembla.
+     Antes de comprar no cambia nada (ni cartas, ni panel de proxima ronda, ni fichas de reto). lv 0 = aviso (brinco y ficha, sin temblor:
+     tambien mientras respondes), 1 = premio flojo (brillo y moneda), 2 = premio medio (brillo, dos fichas y temblor 1, nunca mientras respondes).
+     Cola: un aviso tras otro, al ritmo del sonido. La primera vez que actua cada reliquia en la expedicion, el crupier la nombra (frase soft,
+     una por ronda como mucho, pasa por su presupuesto) */
+  const flashQ = [], flashOn = {};
+  let flashBusy = false, flashK = 0;
+  A.adv.flash = (id, lv = 0, label = "", snd) => { if (!run || !A.RELICS[id] || !owned(id)) return; flashQ.push({ id, lv, label, snd }); if (!flashBusy) flashNext(); };
+  function flashPaint(el, f) {
+    el.classList.remove("fl0", "fl1", "fl2"); A.restyle(el); el.classList.add("fl" + f.lv);
+    if (f.label) { const old = el.querySelector(".ab-lbl"); if (old) old.remove(); el.insertAdjacentHTML("beforeend", `<i class="ab-lbl">${f.label}</i>`); }
+  }
+  function flashNext() {
+    const f = flashQ.shift(); if (!f || !run) { flashBusy = false; return; } flashBusy = true;
+    const el = document.querySelector(`#advBar .ab-perk[data-id="${f.id}"]`), k = flashK++ % 4, asking = C().S.phase === "asking";
+    flashOn[f.id] = { f, t: performance.now() }; if (el) flashPaint(el, f);
+    if (f.snd) f.snd(); else if (f.lv === 0) A.sfx.chip(0.15 + Math.random() * 0.7); else { A.sfx.coin(k); if (f.lv === 2) setTimeout(() => A.sfx.chip(0.4 + Math.random() * 0.5), 120); }
+    if (f.lv === 2 && !asking && C().jpShake) C().jpShake(1);                           // nada tiembla mientras respondes
+    run.relicSeen = run.relicSeen || {}; const rk = run.act + ":" + run.round;
+    if (!run.relicSeen[f.id] && run.relicSaidR !== rk && !run.inf && A.dealer.react("relic", { p: A.tx(A.RELICS[f.id].n) })) { run.relicSeen[f.id] = 1; run.relicSaidR = rk; }   // solo cuenta si de verdad habla (si estaba ocupado, lo intenta la siguiente)
+    setTimeout(flashNext, f.lv ? 420 : 300);
+  }
+  /* premio en el veredicto (la barra esta oculta): suena una moneda por linea de reliquia al aparecer y tiembla una vez (1); lv 2 = premio medio */
+  function relicPay(ids, lv = 1) {
+    ids = ids.filter(Boolean); if (!ids.length) return;
+    ids.forEach((id, i) => setTimeout(() => { A.sfx.coin(i % 4); if (lv === 2) setTimeout(() => A.sfx.chip(0.4 + Math.random() * 0.5), 120); }, 520 + i * 120));
+    setTimeout(() => { if (C().jpShake) C().jpShake(1); }, 560);
+    run.relicSeen = run.relicSeen || {}; const id = ids.find(x => !run.relicSeen[x]); if (id) run.relicSeen[id] = 1;   // el veredicto ya habla de ella: el crupier no la presenta luego
+  }
+  /* renderBars rehace la barra: lo que acaba de lucirse (en los ultimos 700 ms) se vuelve a pintar en el icono nuevo */
+  function flashKeep(bar) { const now = performance.now(); for (const id in flashOn) { const x = flashOn[id]; if (now - x.t > 700) { delete flashOn[id]; continue; } const el = bar.querySelector(`.ab-perk[data-id="${id}"]`); if (el) flashPaint(el, x.f); } }
+  /* lo que hacen tus reliquias al empezar la ronda (en la 1.a pregunta, tras la intro): quitar o suavizar retos, segundos de mas, cargas de mas, la provision de Por cuenta de la casa */
+  function roundFlashes() {
+    const r = roundNo(), plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk).list, bribed = (run.bribed && run.bribed[r]) || [];
+    const left = plan.filter(c => !bribed.includes(c.id)), pl = perkList();
+    pl.forEach(p => {
+      if (p.skipFirst && left.length) A.adv.flash(p.id, 0);
+      if (p.softenBoss && r % 4 === 3 && left.length) A.adv.flash(p.id, 0);
+      if ((p.immune || []).some(id => left.some(c => c.id === id))) A.adv.flash(p.id, 0);
+      if (p.toolBonus && Object.keys(run.tools).length) A.adv.flash(p.id, 0, "+" + p.toolBonus);
+      if (p.round) { const x = { seconds: 0 }; p.round(x, run); if (x.seconds) A.adv.flash(p.id, 0, "+" + x.seconds + " s"); }
+    });
+    if (run.healAct === run.act && run.round === 0 && !run.attempt) { run.healAct = -1; A.adv.flash("medkit", 1, "+1"); }
+  }
   function renderBars() {
     ensureBars(); const bar = $("advBar"), tb = $("toolBar"); renderLoot();
     if (!run || !C().S.camp || C().S.camp.mode !== "adventure" || ["title", "levelEnd", "shop"].includes(C().S.phase)) { bar.classList.add("hidden"); tb.classList.add("hidden"); return; }
     const info = actInfo(run.act), silenced = (run.boss || []).includes("silence");
     bar.classList.remove("hidden");
     bar.innerHTML = `<div class="ab-top"><span class="ab-act" data-tf="abact">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins" data-tf="abcoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts" data-tf="abhearts">${hearts()}</span></div>
-      <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}</span>`).join("")}</div>
+      <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" data-id="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}</span>`).join("")}</div>
       ${(run.chal || []).length ? `<div class="ab-chal">${run.chal.map(c => A.chal.chip(c, true)).join("")}</div>` : ""}
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</span></div>` : ""}`;
+    flashKeep(bar);
     const ids = Object.keys(run.tools);
     tb.classList.toggle("hidden", !ids.length || C().S.phase !== "asking");
     const aim = id => (id === "sonar" ? A.T("Toca el mapa para lanzar una sonda…", "Tap the map to send a probe…") : A.T("Toca el mapa para orientar la brújula…", "Tap the map to aim the compass…"));
@@ -818,9 +870,9 @@ window.AIQ = window.AIQ || {};
       const lt = loot(S.levelScore, Lv.advance, boss), x = { coins: lt.base + lt.margin }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + lt.base]];
       if (lt.margin) lines.push([et("margin", { p: pctOf(S.levelScore - Lv.advance, Lv.advance) }), "+" + lt.margin]);   // cuanto mas por encima del objetivo, mas doblones
       const cap = sumFlag("interest") || 2, interest = Math.min(cap, Math.floor(run.coins / 10));
-      if (interest) { x.coins += interest; lines.push([A.T("Interés (1 por cada 10)", "Interest (1 per 10)"), "+" + interest]); }
-      perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins]); } } });
-      const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins)]);
+      if (interest) { x.coins += interest; lines.push([A.T("Interés (1 por cada 10)", "Interest (1 per 10)"), "+" + interest, interest > 2 ? (perkList().find(p => p.interest) || {}).id : null]); }   // por encima de 2, es el Banquero
+      perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins, p.id]); } } });
+      const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins), (perkList().find(p => p.coinX) || {}).id]);
       run.coins += got; run.stats.coinsEarned += got;
       A.ach.emit("adv", { kind: "clear", tools: run.rTools, bulls: run.rBulls || 0 }); if (boss) { A.ach.emit("adv", { kind: "boss", lives: run.lives }); A.profile.get().adv.boss++; }
       A.sfx.stamp(); setTimeout(A.sfx.clear, 300);
@@ -835,6 +887,7 @@ window.AIQ = window.AIQ || {};
         stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : "win",
         buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => { if (boss && run.act < 2 && !run.chestStuckDone && Math.random() < 0.6) { run.chestStuckDone = true; persist(); return stuckChest(); } afterVerdict(boss); } }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
       });
+      relicPay(lines.filter(l => l[2]).map(l => l[2]));
       const wb = { big: lt.margin >= 3, c: got, p: pctOf(S.levelScore - Lv.advance, Lv.advance), rn: roundNo() + 1, close: S.levelScore - Lv.advance < Lv.advance * 0.05 ? S.levelScore - Lv.advance : null };   // close: por los pelos   // aplastar la meta (+50 %) tiene sus propias frases
       setTimeout(() => A.dealer.react("roundWin", wb), 700);                // el crupier protesta (antes estas frases nunca se decian)
     } else {
@@ -850,11 +903,12 @@ window.AIQ = window.AIQ || {};
       if (run.lives <= 0) return endRun(false);
       C().verdict({
         kind: "", level: roundNo() + 1, tag: `${A.tx(actInfo(run.act).n)} · ${boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + (run.round + 1)}`, title: A.T("No llegaste al objetivo", "Target missed"),
-        text: (insured ? A.pick6(SAVED_SUP) : shielded ? A.pick6(SAVED_PERK) : "") + (run.lives === 1 ? A.tf("Te quedaste en {s} de {a}. Te queda {n} provisión.", "You scored {s} of {a}. You have {n} provision left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives }) : A.tf("Te quedaste en {s} de {a}. Te quedan {n} provisiones.", "You scored {s} of {a}. You have {n} provisions left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives })),   // cada seguro con su frase: se sabe cual te ha salvado
+        text: (insured ? A.pick6(SAVED_SUP) : shielded ? ic("shield", "sm") + " " + A.pick6(SAVED_PERK) : "") + (run.lives === 1 ? A.tf("Te quedaste en {s} de {a}. Te queda {n} provisión.", "You scored {s} of {a}. You have {n} provision left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives }) : A.tf("Te quedaste en {s} de {a}. Te quedan {n} provisiones.", "You scored {s} of {a}. You have {n} provisions left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives })),   // cada seguro con su frase: se sabe cual te ha salvado
         lines: conso ? [[et("conso", { p: pctOf(S.levelScore, Lv.advance) }), "+" + conso]] : [],
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), Lv.advance], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives), art: "lose",
         buttons: [{ id: "rtBtn", cls: "btn-ink", label: A.T("Reintentar con lugares nuevos", "Retry with new places"), arrow: true, primary: true, onclick: () => openShop(false) }, { id: "abBtn", cls: "btn-line", label: A.T("Abandonar", "Abandon"), onclick: () => endRun(false) }],
       });
+      if (shielded && !insured) relicPay(["shield"], 2);
       const lives = run.lives; setTimeout(() => A.dealer.react("roundFail", { lives, conso }), 700);
       A.dealer.hover($("abBtn"), "hoverAbandon");                            // si el cursor va hacia Abandonar, el crupier lo ve
       { const ab = $("abBtn"); if (ab && !abSwapped) ab.addEventListener("pointerenter", () => { if (abSwapped || !ab.isConnected) return; abSwapped = true; const sp = ab.querySelector("span"); if (sp) sp.textContent = A.pick6("Abandonar (y dejarle ganar)|Abandon (and let him win)|Abandonner (et le laisser gagner)|Abandonar (e deixar ele ganhar)|Aufgeben (und ihn gewinnen lassen)|Abbandona (e lascialo vincere)||放弃（让他赢）|포기 (그가 이기게 두기)|やめる（彼を勝たせる）|Сдаться (и дать ему выиграть)|Poddaj się (i daj mu wygrać)"); if (A.sfx.buzz) A.sfx.buzz(1); }); }   // el boton dice la verdad (una vez por sesion)
@@ -872,7 +926,7 @@ window.AIQ = window.AIQ || {};
   }
   function afterVerdict(boss) { if (boss && run.act + 1 === 3 && !run.won) return winScreen(); nextStep(boss); }
   function nextStep(boss) {
-    if (boss) { run.act++; run.round = 0; run.attempt = 0; perkList().forEach(p => p.actStart && p.actStart(run)); openShop(true); }
+    if (boss) { run.act++; run.round = 0; run.attempt = 0; const l0 = run.lives; perkList().forEach(p => p.actStart && p.actStart(run)); if (run.lives > l0) run.healAct = run.act; openShop(true); }   // healAct: Por cuenta de la casa se luce en la 1.a pregunta del acto
     else { run.round++; run.attempt = 0; openShop(false); }
   }
   function winScreen() {

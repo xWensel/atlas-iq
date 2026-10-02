@@ -1244,6 +1244,13 @@ window.AIQ = window.AIQ || {};
       "Se acabó la racha de {n}. Descanse en paz.|The streak of {n} is over. Rest in peace.|Fin de la série de {n}. Qu'elle repose en paix.|Acabou a sequência de {n}. Descanse em paz.|Die Serie von {n} ist vorbei. Ruhe in Frieden.|È finita la serie di {n}. Riposi in pace.||{n}连击结束了。安息吧。|{n}연속 기록 끝. 편히 잠들길.|{n}連続の記録は終わりだ。安らかに眠れ。|Серия из {n} окончена. Покойся с миром.|Koniec serii {n}. Spoczywaj w pokoju.",
       "Racha de {n}, rota. Qué pena. Qué pena tan bonita.|Streak of {n}: broken. What a shame. What a lovely shame.|Série de {n} : brisée. Quel dommage. Quel joli dommage.|Sequência de {n}: quebrada. Que pena. Que pena mais bonita.|Serie von {n}: gerissen. Wie schade. Wie wunderbar schade.|Serie di {n}: spezzata. Che peccato. Che peccato meraviglioso.||{n}连击，断了。真可惜。可惜得真美妙。|{n}연속, 깨졌네. 아쉽네. 참 기분 좋게 아쉬워.|{n}連続、途切れたな。残念だ。実に素敵な残念だ。|Серия из {n} прервана. Как жаль. Как чудесно жаль.|Seria {n}: przerwana. Jaka szkoda. Jaka piękna szkoda."
     ],
+    /* ---- tanda 2: una reliquia tuya actua por primera vez en la expedicion ({p} = su nombre). Soft: pasa por el presupuesto */
+    relicOn: [
+      "{p} ya trabaja para ti. Y yo que te lo vendí barato.|{p} is already working for you. And I sold it to you cheap.|{p} travaille déjà pour toi. Et dire que je te l'ai vendu pas cher.|{p} já trabalha para você. E eu que vendi barato.|{p} arbeitet schon für dich. Und ich hab's dir billig verkauft.|{p} lavora già per te. E pensare che te l'ho venduto a poco.||{p}已经开始替你干活了。亏我还卖得那么便宜。|{p}, 벌써 네 편에서 일하고 있네. 싸게 판 내가 바보지.|{p}がもう君のために働いている。安く売るんじゃなかった。|{p} уже работает на тебя. А я ещё продал дёшево.|{p} już dla ciebie pracuje. A ja sprzedałem tanio.",
+      "Anotado: {p}. La casa tiene memoria, ¿sabes?|Noted: {p}. The house has a long memory, you know.|C'est noté : {p}. La maison a de la mémoire, tu sais.|Anotado: {p}. A casa tem memória, sabia?|Notiert: {p}. Das Haus vergisst nichts, weißt du?|Annotato: {p}. La casa ha buona memoria, sai?||记下了：{p}。赌场的记性可好着呢。|기록해 뒀어: {p}. 하우스는 기억력이 좋거든.|メモしたぞ：{p}。ハウスは忘れないからな。|Записал: {p}. У заведения хорошая память, знаешь ли.|Zanotowane: {p}. Kasyno ma dobrą pamięć, wiesz?",
+      "Mira quién se ha puesto a trabajar: {p}. Qué descaro.|Look who clocked in: {p}. The nerve.|Regarde qui s'est mis au boulot : {p}. Quel culot.|Olha quem começou a trabalhar: {p}. Que atrevimento.|Sieh mal, wer da anpackt: {p}. Frechheit.|Guarda chi si è messo al lavoro: {p}. Che faccia tosta.||看看谁开工了：{p}。真是胆大包天。|누가 일 시작했나 봐: {p}. 뻔뻔하기도 하지.|誰が働き出したか見てみろ：{p}。図々しい。|Смотри-ка, кто взялся за дело: {p}. Ну и наглость.|Patrz, kto zabrał się do roboty: {p}. Co za tupet.",
+      "Lo he visto. {p}, en tu mochila, jugando contra mí.|I saw that. {p}, in your bag, playing against me.|J'ai vu. {p}, dans ton sac, qui joue contre moi.|Eu vi. {p}, na sua mochila, jogando contra mim.|Hab ich gesehen. {p}, in deinem Rucksack, spielt gegen mich.|L'ho visto. {p}, nel tuo zaino, che gioca contro di me.||我看见了。{p}在你的背包里，跟我作对。|다 봤어. 네 가방 속 {p}, 나한테 덤비고 있네.|見えたぞ。君の鞄の{p}が、私に逆らっている。|Я видел. {p} у тебя в рюкзаке играет против меня.|Widziałem. {p} w twoim plecaku gra przeciwko mnie.",
+    ],
     /* ---- por los pelos: pasas la ronda por menos de un 5 % ({n} puntos de margen) */
     closeCall: [
       "Por {n} puntos. Por los pelos. Lo he medido con regla.|By {n} points. By a whisker. I measured it with a ruler.|À {n} points près. De justesse. Je l'ai mesuré à la règle.|Por {n} pontos. Por um fio. Medi com régua.|Mit {n} Punkten. Haarscharf. Ich hab's mit dem Lineal nachgemessen.|Per {n} punti. Per un pelo. L'ho misurato col righello.||只多{n}分。险之又险。我拿尺子量过了。|{n}점 차이. 아슬아슬하게. 자로 재봤어.|{n}点差。ギリギリだ。定規で測ったぞ。|На {n} очков. Впритык. Я мерил линейкой.|O {n} punktów. O włos. Mierzyłem linijką.",
@@ -1493,7 +1500,7 @@ window.AIQ = window.AIQ || {};
     campArrive1: ["sly", "card_reveal"], campClean: ["suspicious"], campBoss: ["dare", "hat_low"], campRetry: ["suspicious", "shuffle"],
     campBroke: ["smug", "cards_hide"], campAct: ["sly", "coin_toss"], campDoubt: ["bored", "cards_tap"], campNoFunds: ["bored", "stamp"],
     "campNoFunds#1": ["sly", "stamp"], campShell: ["wink", "shuffle"], chestStuck: ["wink", "tremble_body"], campHabit: ["smug", "nod"],
-    campLegend: ["shock", "hat_pop"], "campLegend#1": ["sly", "facepalm"], "campLegend#2": ["laugh", "pocket_coin"],
+    campLegend: ["shock", "hat_pop"], relicOn: ["sly", "hat_tip"], "relicOn#1": ["sly", "stamp"], "relicOn#2": ["suspicious", "pinch"], "relicOn#3": ["sly", "point"], "campLegend#1": ["sly", "facepalm"], "campLegend#2": ["laugh", "pocket_coin"],
     campSkip: ["smug"], "campSkip#1": ["sly", "pocket_coin"], secondWin: ["shock", "hat_pop"], "secondWin#1": ["sly"], cxFirst: ["sly", "fan_open"],
     cxPace: ["puzzled"], cxPaceSlow: ["laugh"], cxNothing: ["bored"], lockMine: ["suspicious", "finger_wag"], cxTease: ["sly", "cards_hide"],
     fileFirst: ["wink", "shh"], forgetBye: ["sad", "hand_heart"], dejavu: ["puzzled", "lean_in"], pauseWait: ["sly", "shuffle"],
@@ -2663,6 +2670,7 @@ window.AIQ = window.AIQ || {};
     const big = kind === "roundWin" || kind === "roundFail" || kind === "runWin" || kind === "runLose";
     if (!big && (Date.now() < quietUntil || typing || pend)) return;                    // acaba de decir algo que no conviene pisar, o aun lo esta diciendo (las pequenas no esperan: llegarian tarde)
     if (!big && kind !== "counter" && (calmNow() || sinceSaid() < BUDGET.smallGap)) return;   // el presupuesto: las pequenas no se amontonan
+    if (kind === "relic") { const t = say1("relicOn", { p: o.p }); if (t) { D.say(t, { mood: "sly", valid: o.valid, hold: holdFor(t) }); return true; } return; }   // tanda 2: nombra tu reliquia (la primera vez que actua), con presupuesto
     if (kind === "counter") { if (Date.now() - counterAt < 240000) return; counterAt = Date.now(); }   // v0.20: tu reliquia contra su truco, como mucho cada 4 min (solo tiene 3 frases)
     const p = { bull: 0.8, miss: 0.55, timeout: 0.75, good: 0.2, streak: 0.4, counter: 1, roundWin: 1, roundFail: 1, runWin: 1, runLose: 1 }[kind];
     if (p == null || Math.random() > (soft ? Math.max(p, 0.5) : p)) return;

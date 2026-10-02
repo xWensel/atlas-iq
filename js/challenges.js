@@ -186,6 +186,7 @@ window.AIQ = window.AIQ || {};
         else fx[k] = fx[k] || f[k];
       }
     }
+    fx.ids = perks.map(p => p.id);                                   // tus reliquias: el aviso de contra (counterFx) las busca aqui (sin esto no sonaba nunca)
     return fx;
   };
 
@@ -574,7 +575,9 @@ window.AIQ = window.AIQ || {};
   const counterOf = id => { const ids = (S.on && S.fx && S.fx.ids) || []; return (D[id].counters || []).find(p => ids.includes(p)); };
   function counterFx(qi) {
     const hit = S.list.filter(c => counterOf(c.id)); if (!hit.length || qi !== 0) return;
-    later(() => hit.forEach((c, i) => later(() => say("counter", i), i * 140)), 650);
+    /* tanda 2: la reliquia que ya es tuya se luce (su icono salta en la barra) con el sonido de contra; la ficha del reto no cambia */
+    const ids = [...new Set(hit.map(c => counterOf(c.id)))];
+    later(() => ids.forEach((id, i) => (A.adv && A.adv.flash ? A.adv.flash(id, 0, "", () => say("counter", i)) : later(() => say("counter", i), i * 140))), 650);
   }
 
   /* ------------------------------------------------------------------ puntero: parametros para js/pointer.js */
