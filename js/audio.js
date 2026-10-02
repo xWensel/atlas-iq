@@ -242,8 +242,9 @@ window.AIQ = window.AIQ || {};
      Enciclopedia, Perfil y Clasificacion (abajo, mas graves y tambien subiendo: Enciclopedia, Clasificacion, Perfil) y Ajustes (arriba, el mas agudo).
      Todo entre do5 y re6 */
   const HOV_DEG = [7, 8, 9, 6, 8, 10, 7];
-  let hovT = -1, hovLast = 0;
+  let hovT = -1, hovLast = 0, landLast = 0;
   const JP_GAP = 0.46;                    // segundos entre jackpots de la Enciclopedia: el ticket enciende sus casillas y el movil vibra a este mismo ritmo
+  const JP_LEAD = 0.12;                   // con cuanta antelacion se crean los nodos de cada golpe del jackpot
   A.audio.jpGap = JP_GAP;
   /* vibracion del movil (Android; en iPhone y en escritorio no existe y no hace nada). Va aparte del sonido: tambien vibra con los efectos
      apagados. La apaga el ajuste Vibracion (game.js pone A.haptic.on), el mismo que quita el temblor de pantalla */
@@ -377,15 +378,25 @@ window.AIQ = window.AIQ || {};
     boss: go(t => { [0, 0.28, 0.56].forEach(d => thump(t + d, { vol: 0.42, f0: 95, f1: 34, dur: 0.32 })); pad([38, 41, 44, 50], t, 2.6, 0.09); pluck(50, t + 0.85, { vol: 0.14, dur: 1.4, bright: 2, rev: 0.7 }); pluck(47, t + 1.1, { vol: 0.14, dur: 1.8, bright: 2, rev: 0.8 }); A.music.duck(0.3, 2600); }),
     clear: go(t => { thump(t, { vol: 0.3, f0: 130, f1: 40, dur: 0.25 }); [72, 76, 79, 84, 88].forEach((m, i) => pluck(m, t + 0.08 + i * 0.075, { vol: 0.13, dur: 0.9, rev: 0.5 })); bell(96, t + 0.5, { vol: 0.08, dur: 1.4, rev: 0.7 }); A.music.duck(0.35, 1800); }),
     lose: go(t => { thump(t, { vol: 0.4, f0: 80, f1: 28, dur: 0.6 }); [57, 53, 50, 45].forEach((m, i) => pluck(m, t + i * 0.16, { vol: 0.12, dur: 1.3, bright: 1.5, rev: 0.7 })); noise(t, 0.6, { lp: 500, vol: 0.08 }); A.music.duck(0.25, 2400); }),
+    /* legendaria del cofre (js/adventure.js, legendary): la carta sube al centro (soplo de banda que se abre) y aterriza en su hueco de la
+       mochila (golpe de fieltro + campana); tono y filtro al azar dentro de su rango, y el aterrizaje nunca repite la nota de la vez anterior */
+    lift: go(t => noise(t, 0.4, { lp: 440 + Math.random() * 120, sweepTo: 4400 + Math.random() * 1200, vol: 0.05, type: "bandpass", q: 1.3 })),
+    land: go(t => {
+      const N = [84, 86, 88, 91]; let m = N[Math.floor(Math.random() * 4)]; if (m === landLast) m = N[(N.indexOf(m) + 1 + Math.floor(Math.random() * 3)) % 4]; landLast = m;
+      thump(t, { vol: 0.2, f0: 140 + Math.random() * 20, f1: 58, dur: 0.1 }); bell(m, t + 0.02, { vol: 0.06, dur: 0.6 }); pluck(m - 12, t, { vol: 0.07, dur: 0.3, rev: 0.3 });
+    }),
     ach: go(t => { [79, 83, 86, 91].forEach((m, i) => bell(m, t + i * 0.08, { vol: 0.09, dur: 1.2, rev: 0.6 })); pluck(67, t, { vol: 0.12, dur: 0.6, rev: 0.4 }); noise(t + 0.25, 0.5, { hp: 5000, vol: 0.03, sweepTo: 12000, type: "highpass" }); }),
     /* Enciclopedia: 1, 2 o 3 jackpots segun el nivel (300 / 150 / 75 km). Cada jackpot es palanca + arpegio de campanas y pitidos
        + timbre + monedas, y el siguiente sube un peldano del mismo acorde de Do mayor (el bajo hace do-mi-sol) y pega mas fuerte.
-       Tras el ultimo cae la lluvia de monedas, mas larga cuanto mas alto el nivel; el 3 es el premio gordo: golpe grave, acorde de fondo y destellos */
+       Tras el ultimo cae la lluvia de monedas, mas larga cuanto mas alto el nivel; el 3 es el premio gordo: golpe grave, acorde de fondo y destellos.
+       Los nodos de cada golpe se crean poco antes de que suene (JP_LEAD), no todos al principio: el 3 son ~800 nodos y crearlos de golpe
+       daba un tiron de ~60 ms con CPU lenta. Si algo se retrasa mas de 50 ms (ventana oculta), ese trozo no suena */
     jackpot: go((t, level = 1) => {
       const n = Math.max(1, Math.min(3, level | 0));
       const ARP = [[72, 76, 79, 84], [76, 79, 84, 88], [76, 79, 84, 88, 91]], RING = [[84, 79], [88, 84], [91, 88]];
       const P = [1.15, 1.3, 1.5], KICK = [[0.24, 160, 50, 0.14], [0.3, 145, 44, 0.2], [0.45, 110, 30, 0.6]];
-      for (let k = 0; k < n; k++) {
+      const at = (when, fn) => { const ms = (when - JP_LEAD - ctx.currentTime) * 1000; if (ms <= 4) fn(); else setTimeout(() => { if (ctx.currentTime < when + 0.05) fn(); }, ms); };
+      const hit = k => {
         const t0 = t + k * JP_GAP, a = ARP[k], p = P[k], [kv, f0, f1, kd] = KICK[k];
         thump(t0, { vol: kv, f0, f1, dur: kd }); noise(t0, 0.04, { hp: 3000, vol: 0.08 * p });            // la palanca
         a.forEach((m, i) => {
@@ -395,13 +406,14 @@ window.AIQ = window.AIQ || {};
         pluck(a[a.length - 1] - 24, t0, { vol: 0.1 * p, dur: 0.55, bright: 3, rev: 0.3 });
         ring(RING[k][0], RING[k][1], t0 + 0.19, k === n - 1 ? [9, 11, 17][k] : 5, 0.045 * p);
         coins(t0 + 0.05, 3 + k * 2, 0.28, 0.026 * p);
-      }
-      const tl = t + (n - 1) * JP_GAP;
-      coins(tl + 0.22, [8, 14, 28][n - 1], [0.5, 0.8, 1.5][n - 1], 0.03);
+      };
+      for (let k = 0; k < n; k++) at(t + k * JP_GAP, () => hit(k));
+      const tl = t + (n - 1) * JP_GAP, rain = [8, 14, 28][n - 1], span = [0.5, 0.8, 1.5][n - 1], cut = tl + 0.22 + span * 0.45;
+      at(tl + 0.22, () => coins(tl + 0.22, Math.ceil(rain / 2), span * 0.45, 0.03));                       // la lluvia final, en dos tandas
+      at(cut, () => coins(cut, Math.floor(rain / 2), span * 0.55, 0.03));
       if (n === 3) {
-        noise(tl + 0.02, 1.1, { hp: 2600, vol: 0.045, sweepTo: 12000, type: "highpass" });
-        pad([48, 55, 60, 64, 67, 72], tl + 0.05, 2.8, 0.065, sfxBus);
-        [96, 100, 103, 108].forEach((m, i) => bell(m, tl + 0.78 + i * 0.07, { vol: 0.035, dur: 0.9, rev: 0.7 }));
+        at(tl, () => { noise(tl + 0.02, 1.1, { hp: 2600, vol: 0.045, sweepTo: 12000, type: "highpass" }); pad([48, 55, 60, 64, 67, 72], tl + 0.05, 2.8, 0.065, sfxBus); });
+        at(tl + 0.78, () => [96, 100, 103, 108].forEach((m, i) => bell(m, tl + 0.78 + i * 0.07, { vol: 0.035, dur: 0.9, rev: 0.7 })));
       }
       A.music.duck([0.5, 0.38, 0.25][n - 1], [1300, 1900, 3200][n - 1]);
     }),

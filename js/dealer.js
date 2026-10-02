@@ -1017,6 +1017,13 @@ window.AIQ = window.AIQ || {};
     chestStuck: [
       "Está atascado. Bueno, lo estoy sujetando yo.|It's stuck. Well, I'm the one holding it shut.|Il est coincé. Bon, c'est moi qui le retiens.|Está emperrado. Tá, sou eu que estou segurando.|Klemmt. Na ja, ich halte ihn zu.|È bloccato. Be', lo sto tenendo chiuso io.|Está trabado. Bueno, lo estoy sujetando yo.|卡住了。好吧，是我在按着它。|안 열리네. 사실 내가 잡고 있는 거야.|開かないな。まあ、私が押さえてるんだが。|Заело. Ну ладно, это я его держу.|Zacięła się. No dobra, to ja ją trzymam."
     ],
+    /* ---- PAN DE ORO (v0.51): eliges una legendaria en el cofre del jefe. Evento raro: se salta el presupuesto de frases y rompe la cuarta pared
+       (tu captura de pantalla, el que reparte soy yo, la casa siempre cobra). En bolsa: no se repite ninguna hasta decir las tres */
+    campLegend: [
+      "Haz captura. Nadie se va a creer esto.|Take a screenshot. Nobody's going to believe this.|Fais une capture d'écran. Personne ne va y croire.|Tira um print. Ninguém vai acreditar nisso.|Mach einen Screenshot. Das glaubt dir sonst keiner.|Fai uno screenshot. Nessuno ci crederà.|Toma captura. Nadie se va a creer esto.|快截图。说出去都没人信。|캡처해 둬. 아무도 안 믿을 테니까.|スクショを撮っておけ。誰も信じないぞ。|Сделай скриншот. Никто же не поверит.|Zrób zrzut ekranu. Nikt w to nie uwierzy.",
+      "Voy a quejarme al que reparte. Ah, no, que soy yo.|I'm going to complain to the dealer. Oh, wait. That's me.|Je vais me plaindre au croupier. Ah non, c'est moi.|Vou reclamar com o crupiê. Ah, não, sou eu.|Ich beschwer mich beim Croupier. Ach nee, das bin ja ich.|Vado a lamentarmi col croupier. Ah, no, sono io.|Voy a quejarme con el que reparte. Ah, no, si soy yo.|我要去找荷官投诉。哦，等等，荷官就是我。|딜러한테 따져야겠어. 아, 잠깐. 딜러가 나지.|ディーラーに文句を言ってやる。……ああ、私だった。|Пойду пожалуюсь крупье. А, нет, это же я.|Pójdę poskarżyć się krupierowi. A nie, to przecież ja.",
+      "Llévatela. La casa ya se cobrará la diferencia.|Take it. The house will collect the difference later.|Prends-la. La maison récupérera la différence.|Leva. A casa cobra a diferença depois.|Nimm sie. Die Differenz holt sich das Haus schon noch.|Prendila. La differenza, la casa se la riprende dopo.|Llévatela. La casa ya se va a cobrar la diferencia.|拿去吧。差价嘛，庄家迟早会收回来的。|가져가. 차액은 하우스가 나중에 챙길 테니까.|持っていけ。差額はハウスがいずれ取り立てる。|Бери. Разницу заведение потом с тебя возьмёт.|Bierz. Różnicę kasyno i tak sobie odbierze."
+    ],
     campHabit: [
       "¿Otra vez {p}? Eres una criatura de costumbres.|{p} again? You're a creature of habit.|{p}, encore ? Tu es un animal d'habitudes.|{p} de novo? Você é uma criatura de hábitos.|Schon wieder {p}? Du bist ein Gewohnheitstier.|Di nuovo {p}? Sei una creatura abitudinaria.||又是{p}？你真是个习惯动物。|또 {p}? 넌 습관의 동물이구나.|また{p}か？君は習慣の生き物だな。|Опять «{p}»? Ты раб привычки.|Znowu {p}? Jesteś stworzeniem przyzwyczajeń.",
       "{p}, como siempre. Si fuera tú, variaría. Por suerte, no lo soy.|{p}, as always. If I were you, I'd mix it up. Luckily, I'm not.|{p}, comme toujours. À ta place, je varierais. Heureusement, je ne suis pas toi.|{p}, como sempre. Se eu fosse você, variaria. Ainda bem que não sou.|{p}, wie immer. An deiner Stelle würde ich mal was anderes nehmen. Zum Glück bin ich's nicht.|{p}, come sempre. Se fossi in te, cambierei. Per fortuna non lo sono.||{p}，老样子。换我就换换口味。还好我不是你。|{p}, 늘 그렇듯. 나라면 바꿔보겠어. 다행히 난 네가 아니지만.|{p}、いつも通りだな。私なら変えるね。幸い、君じゃないが。|«{p}», как всегда. На твоём месте я бы разнообразил. К счастью, я не ты.|{p}, jak zawsze. Na twoim miejscu bym to zmienił. Na szczęście nie jestem tobą."
@@ -1486,6 +1493,7 @@ window.AIQ = window.AIQ || {};
     campArrive1: ["sly", "card_reveal"], campClean: ["suspicious"], campBoss: ["dare", "hat_low"], campRetry: ["suspicious", "shuffle"],
     campBroke: ["smug", "cards_hide"], campAct: ["sly", "coin_toss"], campDoubt: ["bored", "cards_tap"], campNoFunds: ["bored", "stamp"],
     "campNoFunds#1": ["sly", "stamp"], campShell: ["wink", "shuffle"], chestStuck: ["wink", "tremble_body"], campHabit: ["smug", "nod"],
+    campLegend: ["shock", "hat_pop"], "campLegend#1": ["sly", "facepalm"], "campLegend#2": ["laugh", "pocket_coin"],
     campSkip: ["smug"], "campSkip#1": ["sly", "pocket_coin"], secondWin: ["shock", "hat_pop"], "secondWin#1": ["sly"], cxFirst: ["sly", "fan_open"],
     cxPace: ["puzzled"], cxPaceSlow: ["laugh"], cxNothing: ["bored"], lockMine: ["suspicious", "finger_wag"], cxTease: ["sly", "cards_hide"],
     fileFirst: ["wink", "shh"], forgetBye: ["sad", "hand_heart"], dejavu: ["puzzled", "lean_in"], pauseWait: ["sly", "shuffle"],
@@ -1578,14 +1586,14 @@ window.AIQ = window.AIQ || {};
   const flush = () => { const p = pend; pend = null; if (p) D.say(p[0], p[1]); if (!typing) D.hide(); };   // si la que esperaba ya no toca, la anterior se va igual
   /* dice una frase con voz arcade y maquina de escribir. Nunca se le corta a media frase ni se le quita su segundo de mas: si aun esta escribiendo
      (o acaba de terminar), la nueva espera su turno (si llegan varias, solo la ultima). Solo las escenas forzadas (o.force, js/nombre.js) entran ya.
-     o.fx: efecto de pantalla (rabieta) que sale justo cuando empieza la frase */
+     o.fx: efecto de pantalla (rabieta) que sale justo cuando empieza la frase; o.start, igual: aviso de que por fin empieza (si esperaba turno) */
   D.say = (line, o = {}) => {
     if (!o.force && (held || (!D.on && !D.onHome))) return;
     if (o.valid && !o.valid()) return;                                // la frase ya no toca (p. ej. la reaccion a una pregunta que ya paso)
     if (el) ensure();
     const left = D.busy && el ? (typing ? Infinity : doneAt + LINGER - Date.now()) : 0;   // tambien las escenas (force) esperan a que acabe la frase en curso
     if (left > 0) { if (!pend && left !== Infinity) later(flush, left); pend = [line, o]; return; }
-    ensure(); clear(); leaving = false; clearTimeout(leaveT); const me = ++lineN; if (o.fx) D.fx(o.fx);
+    ensure(); clear(); leaving = false; clearTimeout(leaveT); const me = ++lineN; if (o.fx) D.fx(o.fx); if (o.start) o.start();
     if (!o.force && !D.host) noteSaid();
     const X = faceFor(line, o), mood = o.mood || "sly", text = o.force ? (typeof line === "string" ? line : A.tx(line)) : personal(typeof line === "string" ? line : A.tx(line));
     const inline = !!el.closest("#vdDealer"), home = D.onHome && !D.host && !inline && homeCorner ? " home " + homeCorner : "";
@@ -2201,19 +2209,19 @@ window.AIQ = window.AIQ || {};
      Al llegar: con tus datos (40 % de las visitas normales; siempre antes del jefe, en la revancha, sin dinero o en un acto nuevo). Y responde a lo que
      haces: dudar entre cartas, intentar comprar sin fondos, barajar, tu reliquia de siempre, irte sin comprar. Nunca dice que carta sirve para que */
   let campAt = 0, doubtN = 0, doubtLast = -1, doubtSaid = false, fundsSaid = false, campBox = null, campSpoke = false;
-  function campRoom() {
+  function campRoom(wide) {
     const of = document.querySelector("#dlg .offers"), first = of && of.querySelector(".offer"), app = $("app"); if (!of || !first || !app) return null;
-    const R = of.getBoundingClientRect(), f = first.getBoundingClientRect(), A0 = app.getBoundingClientRect(), k = A.uiK ? A.uiK() : 1;
+    const R = of.getBoundingClientRect(), f = wide ? { left: R.left + (R.width - wide) / 2 } : first.getBoundingClientRect(), A0 = app.getBoundingClientRect(), k = A.uiK ? A.uiK() : 1;   // wide: la mesa esta vacia salvo una carta de ese ancho en el centro (la legendaria)
     /* v0.36: que no tape (casi) nada. Se sienta en el hueco libre de la izquierda, un poco mas arriba que antes: sus pies quedan por encima de la mochila y del
        boton "Vender" que sale sobre la reliquia levantada (18 px del lienzo), y el globo termina antes de la carta (que gira y crece al pasar el raton) */
     const lift = Math.round(18 * k), room = Math.floor(f.left - R.left - 26 * k), sn = A.crupier.snap(Math.min(224, Math.round(room * 0.6), Math.round(R.height - lift - 110))), hf = sn.css;   // v0.32: el busto a pixel entero (x2 o x1)
     if (room < 190 || !sn.k) return null;
     return { l: Math.round(R.left - A0.left + 6), b: Math.round(A0.bottom - R.bottom + 4 + lift), hf, hb: Math.min(380, room) };
   }
-  function campSay(t, mood) {
+  function campSay(t, mood, o2) {
     if (!t || held || D.host || tourOn() || HOME_MQ.matches || phase() !== "shop") return false;
-    const box = campRoom(); if (!box) return false;
-    ensure(); campBox = box; campSpoke = true; el.classList.remove("hidden"); D.say(t, { mood: mood || "sly", hold: holdFor(t), force: true, camp: true }); return true;
+    const box = campRoom(o2 && o2.wide); if (!box) return false;
+    ensure(); campBox = box; campSpoke = true; el.classList.remove("hidden"); D.say(t, { mood: mood || "sly", hold: holdFor(t), force: true, camp: true, done: o2 && o2.done, start: o2 && o2.start }); return true;
   }
   D.campArrive = x => {
     campAt = Date.now(); doubtN = 0; doubtLast = -1;
@@ -2239,6 +2247,12 @@ window.AIQ = window.AIQ || {};
     const R0 = DS.relics || (DS.relics = {}), e = R0[id] || (R0[id] = { n: 0, s: "" });
     if (e.s !== seed) { e.n++; e.s = seed; saveStore(); if (e.n === 3 || e.n === 6) setTimeout(() => campSay(say1("campHabit", { p: name }), "laugh"), 400); }
   };
+  /* PAN DE ORO (v0.51, js/adventure.js): eliges una legendaria en el cofre del jefe. Evento raro: habla aunque esta visita ya hablara y sin gastar
+     presupuesto (force). Las otras cartas ya se han caido de la mesa y la legendaria esta en el centro (w: su ancho en pantalla): se sienta a su
+     izquierda. start: cuando empieza a decirla (si estaba a media frase, espera turno: la carta vuela entonces). done: al acabar la frase y su segundo
+     de mas (el cofre espera a eso para no cortarle). false: esta vez no cabe o no toca */
+  const LEG_MOOD = ["shock", "sly", "laugh"];
+  D.campLegend = (w, done, start) => { const t = say1("campLegend"), id = t && lineOf.get(t); return campSay(t, LEG_MOOD[id ? id[1] : 1] || "sly", { wide: w, done, start }); };
   D.chestStuck = () => { const t = say1("chestStuck"); if (t) D.say(t, { mood: "laugh", hold: holdFor(t) }); };
   /* SOLO HAY UN CRUPIER: abres el juego otra vez con el primero abierto; Electron trae esta ventana al frente y avisa (preload: onAgain) */
   let againAt = 0;

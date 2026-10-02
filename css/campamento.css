@@ -176,7 +176,8 @@
 .table.mesa .offer.pc .buy { font-size: 18px; padding: 6px 8px; margin-top: 3px; white-space: nowrap; }
 .table.mesa.d1 .offer.pc .of-n { font-size: 19px; } .table.mesa.d1 .offer.pc > p { font-size: 14px; } .table.mesa.d1 .offer.pc .buy { font-size: 16px; }
 .table.mesa.d2 .offer.pc .of-n { font-size: 17px; } .table.mesa.d2 .offer.pc > p { font-size: 12.5px; } .table.mesa.d2 .offer.pc .buy { font-size: 15px; }
-.table.mesa.chest .offer.pc .buy { font-size: 15px; width: 84%; }
+.table.mesa.chest .offer.pc .buy { font-size: 15px; width: auto; min-width: 84%; max-width: 100%; padding-inline: 12px; justify-content: safe center; }   /* crece con su texto y, si aun no cabe ("Prendre gratuitement" se salia 30 px), A.squeeze lo aprieta (.sq-fit) */
+.table.mesa.chest .offer.pc .buy.sq-wrap { white-space: normal; line-height: 1.1; }
 .table.mesa .tb-actions { position: absolute; right: 0; bottom: 8px; z-index: 2; padding: 0; } .table.mesa .tb-actions .chipbtn { font-size: 13px; padding: 7px 18px 6px; }
 .table.mesa.many .tb-actions { position: static; padding: 4px 0 6px; }   /* con 4-5 cartas no queda hueco a su derecha: vuelve debajo */
 .table.mesa .shop-flash { position: absolute; left: 50%; top: 2px; z-index: 6; transform: translateX(-50%); margin: 0; padding: 6px 16px 5px; border-radius: 999px; white-space: nowrap;
@@ -191,7 +192,7 @@
 .table.mesa .tr-face { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 10px; cursor: pointer; background: #f6efdc;
   box-shadow: 0 0 0 2px #16241c, inset 0 0 0 3px var(--rc, #b7bfc4), inset 0 -5px 0 rgba(22, 36, 28, .12), 0 5px 0 rgba(0, 0, 0, .45); transition: transform .22s var(--spring), box-shadow .2s; }
 .table.mesa .tr-face .ic { width: 44px; height: 44px; image-rendering: pixelated; filter: drop-shadow(0 2px 0 rgba(22, 36, 28, .35)); transition: transform .3s var(--spring); }
-.table.mesa .tr-relic { --rc: #b7bfc4; } .table.mesa .tr-relic.r1 { --rc: #4fb6a0; } .table.mesa .tr-relic.r2 { --rc: #c78bf0; } .table.mesa .tr-relic.r3 { --rc: #ffc93c; }
+.table.mesa .tr-relic { --rc: #b7bfc4; } .table.mesa .tr-relic.r1 { --rc: #4fb6a0; } .table.mesa .tr-relic.r2 { --rc: #c78bf0; } .table.mesa .tr-relic.r3 { --rc: #ffd95a; }
 .table.mesa .tr-relic:hover .tr-face { transform: translateY(-6px) rotate(-2deg); } .table.mesa .tr-relic:hover .tr-face .ic { transform: scale(1.08); }
 .table.mesa .tr-relic.sel .tr-face { transform: translateY(-14px); box-shadow: 0 0 0 2px #16241c, inset 0 0 0 3px var(--rc), 0 0 0 5px #ffd98a, 0 0 24px 5px rgba(255, 208, 107, .55), 0 10px 0 rgba(0, 0, 0, .35); }
 .table.mesa .tr-face:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
@@ -229,6 +230,56 @@
 .go2.doom::after { box-shadow: 0 0 26px 4px rgba(254, 95, 85, .65); }
 .go2.skip { background: linear-gradient(180deg, #eef2f0, #b9c4c0); } .go2.skip::after { animation: none; }
 
+/* ---------------------------------------------------------------- PAN DE ORO (v0.51): la carta legendaria
+   Marco de oro con bisel de pixel (luz arriba a la izquierda, sombra abajo a la derecha), placa de laton que pisa el borde de arriba (R_NAMES[3]),
+   terciopelo de joyero detras del icono, halo de oro a dos pasos que late a saltos y el brillo que la barre (lienzo .lg-clip, js/adventure.js: Gold).
+   La letra es la de las demas cartas (d0/d1/d2): la placa sale del flujo y su hueco se lo queda el icono. No gira ni crece al pasar el raton (el
+   pixel se queda entero) y bota a saltos de 1 px. El halo esta dentro de la carta (inset 0): no ensancha lo que mide A.fitK */
+.table.mesa .offer.pc.r3 { --g0: #fff6c8; --g1: #ffd95a; --g2: #f5a623; --g3: #c46a1b; isolation: isolate; overflow: visible; padding-top: 16px; animation-timing-function: var(--spring), steps(8, jump-end);
+  box-shadow: 0 0 0 3px #16241c, inset 3px 3px 0 0 var(--g0), inset -3px -3px 0 0 var(--g3), inset 0 0 0 6px var(--g1), inset 0 0 0 9px #16241c, 0 12px 0 3px rgba(0, 0, 0, .42); }
+.table.mesa .offer.pc.r3:nth-child(n) { transform: none; }   /* ni girada ni levantada en el centro: la placa no pisa el aviso de encima */
+.table.mesa .offer.pc.r3:hover { transform: translateY(-3px);   /* sube 3 px: su sombra crece esos 3 px (12 + 3), no los 12 de las cartas que suben 18 */
+  box-shadow: 0 0 0 3px #16241c, inset 3px 3px 0 0 var(--g0), inset -3px -3px 0 0 var(--g3), inset 0 0 0 6px var(--g1), inset 0 0 0 9px #16241c, 0 15px 0 3px rgba(0, 0, 0, .45); }
+.table.mesa .offer.pc.r3.hit { box-shadow: 0 0 0 3px #16241c, inset 3px 3px 0 0 #fff, inset -3px -3px 0 0 var(--g1), inset 0 0 0 6px var(--g0), inset 0 0 0 9px #16241c, 0 12px 0 3px rgba(0, 0, 0, .42); }
+.table.mesa .offer.pc.r3 .of-r { position: absolute; top: -10px; left: 50%; translate: -50% 0; z-index: 6; padding: 5px 10px 4px 12px; border-radius: 3px; white-space: nowrap;
+  font-weight: 700; letter-spacing: .16em; color: #4e1530; background: linear-gradient(180deg, var(--g0) 0 3px, var(--g1) 3px 50%, var(--g2) 50% calc(100% - 3px), var(--g3) calc(100% - 3px));
+  box-shadow: 0 0 0 3px #16241c, 0 4px 0 3px rgba(0, 0, 0, .35); }
+.table.mesa .offer.pc.r3 .of-ico { border-color: #16241c; box-shadow: inset 0 0 0 3px var(--g3), inset 0 0 0 5px rgba(0, 0, 0, .4), inset 0 -12px 18px rgba(0, 0, 0, .45);
+  background: repeating-linear-gradient(0deg, rgba(255, 201, 60, .09) 0 2px, transparent 2px 16px), repeating-linear-gradient(90deg, rgba(255, 201, 60, .09) 0 2px, transparent 2px 16px), radial-gradient(ellipse at 50% 30%, #3b2c40, #140f18 76%); }
+.table.mesa .offer.pc.r3 > .of-n, .table.mesa .offer.pc.r3 > p { position: relative; z-index: 4; }
+.table.mesa .offer.pc.r3 .buy { z-index: 4; box-shadow: inset 0 0 0 2px var(--g1), 0 5px 0 rgba(0, 0, 0, .35); }
+/* halo (a dos pasos; el tercero late con opacidad, que no repinta la carta) y el lienzo del brillo, recortado a la carta */
+.lg-halo { position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; box-shadow: 0 0 0 3px #16241c, 0 0 0 6px rgba(255, 201, 60, .34), 0 0 0 9px rgba(255, 201, 60, .14); }
+.lg-halo::after { content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: 0; animation: lg-halo 1.8s steps(1) infinite;
+  box-shadow: 0 0 0 3px #16241c, 0 0 0 6px rgba(255, 201, 60, .24), 0 0 0 9px rgba(255, 201, 60, .12), 0 0 0 12px rgba(255, 201, 60, .08); }
+@keyframes lg-halo { 50% { opacity: 1; } }
+.table.mesa .offer.pc.r3:hover .lg-halo { box-shadow: 0 0 0 3px #16241c, 0 0 0 6px rgba(255, 217, 90, .6), 0 0 0 9px rgba(255, 201, 60, .3), 0 0 0 12px rgba(255, 201, 60, .12); }
+.table.mesa .offer.pc.r3.hit .lg-halo { box-shadow: 0 0 0 3px #16241c, 0 0 0 6px rgba(255, 246, 200, .8), 0 0 0 9px rgba(255, 201, 60, .5), 0 0 0 12px rgba(255, 201, 60, .25), 0 0 0 15px rgba(255, 201, 60, .1); }
+.table.mesa .offer.pc.r3:hover .lg-halo::after, .table.mesa .offer.pc.r3.hit .lg-halo::after { animation: none; }
+.lg-clip { position: absolute; inset: 0; z-index: 3; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.lg-clip canvas { position: absolute; left: 0; top: 0; image-rendering: pixelated; }
+/* en la mochila: el mismo marco con bisel a 56 x 72, su halo y su brillo (el icono, por encima del brillo) */
+.table.mesa .tr-relic.r3 .tr-face { isolation: isolate; box-shadow: 0 0 0 2px #16241c, inset 3px 3px 0 0 #fff6c8, inset -3px -3px 0 0 #c46a1b, inset 0 0 0 3px #ffd95a, inset 0 -5px 0 rgba(22, 36, 28, .12), 0 5px 0 rgba(0, 0, 0, .45); }
+.table.mesa .tr-relic.r3.sel .tr-face { box-shadow: 0 0 0 2px #16241c, inset 3px 3px 0 0 #fff6c8, inset -3px -3px 0 0 #c46a1b, inset 0 0 0 3px #ffd95a, 0 0 0 5px #ffd98a, 0 0 24px 5px rgba(255, 208, 107, .55), 0 10px 0 rgba(0, 0, 0, .35); }
+.table.mesa .tr-relic.r3 .tr-face .ic { position: relative; z-index: 4; }
+.table.mesa .tr-relic.r3 .lg-halo { box-shadow: 0 0 0 2px #16241c, 0 0 0 4px rgba(255, 201, 60, .4); }
+.table.mesa .tr-relic.r3 .lg-halo::after { box-shadow: 0 0 0 2px #16241c, 0 0 0 4px rgba(255, 201, 60, .25), 0 0 0 6px rgba(255, 201, 60, .16); }
+.table.mesa .tr-face .lg-ico { background: center / contain no-repeat; }
+/* la secuencia al elegirla en el cofre (js/adventure.js, legendary): la mesa inerte, las cartas quietas, la legendaria por encima de la sala oscura y los doblones por encima de ella
+   (sin la perspectiva de las ofertas, que la encerraba en su propio contexto de apilado). Llega a la mochila: aparece y su hueco destella en oro */
+.table.mesa.lg-seq .offers { perspective: none; }
+.table.mesa.lg-seq .offer.pc { animation-play-state: paused; }
+.table.mesa.lg-seq .tb-note, .table.mesa.lg-seq .go2 { opacity: 0; transition: opacity .3s; }   /* ya has elegido: fuera "Elige UNA..." y "Continuar sin elegir" */
+.table.mesa .offer.pc.lg-hero { z-index: 20; }
+.lg-dim { position: absolute; inset: 0; z-index: 8; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at var(--lx, 50%) var(--ly, 46%), rgba(48, 30, 6, .5), rgba(4, 7, 5, .9) 72%); }
+.lg-fx { position: absolute; inset: 0; z-index: 21; pointer-events: none; overflow: hidden; }   /* los doblones saltan por delante de la carta (si no, la carta tapaba casi todos) */
+.lg-coin { position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; background: url("../assets/icons/coin.webp") center / contain no-repeat; }
+.table.mesa .tr-relic.lg-in .tr-face { animation: lg-pop .45s var(--spring) both; }
+@keyframes lg-pop { from { opacity: 0; transform: translateY(-10px) scale(.6); } }
+.table.mesa .tr-relic.lg-in::after { content: ""; position: absolute; inset: -9px; z-index: 5; border-radius: 16px; pointer-events: none; opacity: 0; box-shadow: 0 0 0 3px #ffd95a, 0 0 0 6px rgba(255, 217, 90, .35); animation: lg-flash .7s steps(1); }
+@keyframes lg-flash { 0% { opacity: 1; } 30% { opacity: .2; } 50% { opacity: 1; } 75% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .lg-halo::after { animation: none; } }
+
 /* reducir movimiento (Ajustes o el sistema): sin chincheta que bota, ficha que gira ni brillo que late */
 html.reduce-motion .rd.bar .rd-n.next::after, html.reduce-motion .go2-chip .bc-base, html.reduce-motion .table.mesa .sup.fresh .sp-on { animation: none; }
 html.reduce-motion .go2::after { animation: none; opacity: .6; }
@@ -240,7 +291,7 @@ html.reduce-motion .go2::after { animation: none; opacity: .6; }
   .table.mesa .tb-head > .tb-right { grid-column: 2; }
   .table.mesa .tb-sup { flex-direction: column; }
   .table.mesa .tb-shop { flex: none; min-height: 0; }
-  .table.mesa .offers { flex: none; flex-wrap: wrap; gap: 12px; }
+  .table.mesa .offers { flex: none; flex-wrap: wrap; gap: 22px 12px; }   /* entre filas, sitio para la placa de la legendaria (sobresale por arriba) */
   .table.mesa .offer.pc, .table.mesa.chest .offer.pc { flex: 0 0 min(44vw, 230px); height: auto; aspect-ratio: auto; }
   .table.mesa .tb-actions { position: static; padding: 4px 0 6px; }
   .table.mesa .tb-tray { flex-wrap: wrap; gap: 14px 22px; }

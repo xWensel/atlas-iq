@@ -34,6 +34,9 @@ R = {   # claro -> oscuro: brillo, luz, base, sombra, sombra profunda
     "sand": ramp("fff8d8", "ffe39a", "f2c46a", "c98f4a", "8a5a3a"),
     "paper": ramp("ffffff", "ffffff", "fff5de", "e6d2b0", "a88c6e"),
     "dark": ramp("6a6f96", "4a4d72", "33345a", "24234a", "181636"),
+    "wine": ramp("8a3a6a", "5e2450", "441a3c", "32112c", "220a1e"),     # placa del rotulo de neon (ch_flaghue): no azul noche, que es la de ch_dark
+    "g_hi": ramp("ffffff", "f4f4f8", "dfe0e8", "b4b7c7", "8a8ea6"),     # grises de la bandera destenida (ch_flaggray)
+    "g_lo": ramp("8a8ea6", "6c7090", "50536f", "3a3b58", "2a2a44"),
 }
 WHITE = hexc("ffffff")
 
@@ -1165,6 +1168,80 @@ def wind_icon(id):
     for y, l, curl in ((16, 38, 1), (32, 50, 1), (50, 30, -1)):
         pts = [(4, y), (4 + l, y)] + [(4 + l + 7 * math.sin(t), y - curl * (7 - 7 * math.cos(t))) for t in np.linspace(0, math.pi * 1.3, 8)]
         I.add(bevel(thick_line(pts, 5), R["ice"], soft=False))
+    return I
+
+# ============================================================ retos de bandera: Luces de neon y Sin colores (antes con iconos prestados)
+def cloth(x0, x1, top, h, amp=3.0, per=28.0, ph=0.0):
+    """tela que ondea: fija en el mastil (x0) y con mas vuelo hacia la punta. Devuelve mascara, u (0-1 a lo ancho), v (0-1 a lo alto) y pendiente"""
+    yy, xx = np.mgrid[0:N, 0:N]
+    u = (xx + .5 - x0) / (x1 - x0); a = amp * np.clip(u, 0, 1) ** .8
+    w = 2 * math.pi * (xx + .5 - x0) / per + ph
+    off = a * np.sin(w); yt = np.round(top + off)
+    m = (xx >= x0) & (xx < x1) & (yy >= yt) & (yy < yt + h)
+    v = (yy + .5 - yt) / h; slope = a * 2 * math.pi / per * np.cos(w)
+    return m, u, v, slope
+
+def paint_cloth(m, names, slope, k=.22):
+    """cada pixel con su rampa (names: matriz de nombres); pliegues por la pendiente y bisel de borde (brillo arriba, sombra abajo-derecha)"""
+    idx = np.full((N, N), 2); idx[slope < -k] = 1; idx[slope > k] = 3
+    idx[m & edge(m, 0, -1)] = np.minimum(idx[m & edge(m, 0, -1)], 1) - 1
+    idx[m & (edge(m, 0, 1) | edge(m, 1, 0))] = 4
+    idx = np.clip(idx, 0, 4)
+    c = np.zeros((N, N, 4), np.uint8)
+    for nm in np.unique(names[m]):
+        for i in range(5):
+            s = m & (names == nm) & (idx == i)
+            if s.any(): c[s] = R[nm][i]
+    return c
+
+def stripes_v(m, u, cols):
+    names = np.full((N, N), cols[0], dtype="<U8")
+    for i, c in enumerate(cols): names[u >= i / len(cols)] = c
+    return names
+
+def pole(I, x, y0, y1, rp="gold", knob=True):
+    I.add(bevel(rect(x, y0, 3, y1 - y0), R[rp], soft=False))
+    if knob: I.add(sphere(circle(x + 1.5, y0 - 1, 3.4), x + 1, y0 - 2, 3.4, R[rp]))
+
+def drop(cx, top, s):
+    """gota: cabeza redonda abajo y punta arriba"""
+    return circle(cx, top + s * .62, s * .38) | poly([(cx, top), (cx + s * .34, top + s * .55), (cx - s * .34, top + s * .55)])
+
+@icon("ch_flaghue")
+def ch_flaghue(id):   # Luces de neon: la bandera hecha con tubos de neon en un cartel del casino
+    I = Icon(); board = rrect(2, 6, 60, 52, 6); I.add(bevel(board, R["wine"]))
+    inner = erode(board, 3)
+    for x, y in ((6, 10), (56, 10), (6, 52), (56, 52)): I.put(rect(x, y, 2, 2), R["gold"][1])     # tornillos
+    yy, xx = np.indices((N, N))
+    def tube(pts, rp, w=3):                       # tubo encendido con halo de 2 px (el de fuera, tramado)
+        t = thick_line(pts, w) & inner; core = thick_line(pts, 1) & inner
+        g1 = dilate(t, 1, False) & ~t & inner; g2 = dilate(t, 2, False) & ~t & ~g1 & inner
+        I.put(g2 & ((xx + yy) % 2 == 0), R[rp][4]); I.put(g1, R[rp][3]); I.put(t, R[rp][1]); I.put(core, R[rp][0])
+    W = lambda y0, x0=20, x1=50, n=31: [(x0 + (x1 - x0) * i / (n - 1), y0 + 2.6 * math.sin(2 * math.pi * i / (n - 1))) for i in range(n)]
+    top, bot = W(15), W(37)
+    tube([(15, 14), (15, 51)], "teal")             # mastil
+    tube(top + bot[::-1] + [top[0]], "pink")       # silueta de la tela
+    tube(W(26, 23, 47, 25), "gold", 2)             # franja del medio
+    return I
+
+@icon("ch_flaggray")
+def ch_flaggray(id):  # Sin colores: la bandera se queda gris y sus colores se le escurren en gotas
+    I = Icon(); pole(I, 8, 6, 62, "grey")
+    m, u, v, sl = cloth(11, 60, 8, 28, amp=3, per=30)
+    c = paint_cloth(m, stripes_v(m, u, ["g_hi", "grey", "g_lo"]), sl)
+    yy, xx = np.indices((N, N)); bot = np.zeros(N, int)
+    for x in range(N):
+        col = np.where(m[:, x])[0]
+        if len(col): bot[x] = col.max()
+    for i, rp_ in enumerate(("red", "gold", "blue")):                  # restos de color en el bajo de cada franja
+        band = m & (u >= i / 3) & (u < (i + 1) / 3) & (yy >= bot[xx] - 5) & ~edge(m, 0, 1)
+        c[band & ((xx + yy) % 2 == 0) & (yy >= bot[xx] - 2)] = R[rp_][2]; c[band & ((xx + 2 * yy) % 4 == 0) & (yy < bot[xx] - 2)] = R[rp_][2]
+    I.add(c)
+    for i, (rp_, ln, dy, s_) in enumerate((("red", 5, 9, 10), ("gold", 8, 13, 11), ("blue", 4, 8, 10))):
+        cx = int(11 + 49 * (i + .5) / 3); yb = bot[cx]
+        st = rect(cx - 1, yb - 2, 3, ln + 2) | circle(cx + .5, yb + ln, 2.3)                   # el chorrete sale de la tela: sin tinta en la union
+        I.a[dilate(st, 1) & ~st & (I.a[..., 3] == 0)] = INK; part = bevel(st, R[rp_], soft=False); I.a[st] = part[st]
+        d = drop(cx + .5, yb + ln + dy - s_ * .3, s_); cc = bevel(d, R[rp_]); cc[circle(cx - 1, yb + ln + dy + s_ * .25, 1.3) & d] = WHITE; I.add(cc)
     return I
 
 # ============================================================ salida

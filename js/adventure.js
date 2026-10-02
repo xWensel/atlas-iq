@@ -204,6 +204,9 @@ window.AIQ = window.AIQ || {};
   let run = null, slot = RUNKEY;                                     // slot: ranura de la partida activa (expedicion normal o intento del Reto diario)
   const keyOf = daily => (daily ? DAILYKEY : RUNKEY);
   const loadSlot = daily => { try { return JSON.parse(localStorage.getItem(keyOf(daily)) || "null"); } catch (e) { return null; } };
+  /* el logro de la legendaria del cofre se queda en deuda (run.legAch) hasta la tienda: su aviso no tapa la secuencia. Se paga ahi, al reanudar
+     o, si la partida se cierra a mitad y no se continua, al abandonarla o al empezar otra encima. Pagar dos veces no hace nada */
+  const payLeg = r => { if (r && r.legAch) { r.legAch = 0; A.ach.emit("adv", { kind: "legend", chest: true }); } };
   A.adv = { get run() { return run; }, hasSave(daily) { try { return !!localStorage.getItem(keyOf(daily)); } catch (e) { return false; } } };
   /* ---------------- la ruta de la expedicion: 12 rondas en 3 actos (el jefe cierra cada acto) y el modo infinito al final ----------------
      v0.35 (usuario): antes el Campamento ensenaba una ventana de 12 casillas que se corria y llegaba a rondas 13-18 que no existen.
@@ -331,7 +334,7 @@ window.AIQ = window.AIQ || {};
 
   A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null, dailyTry = 0, route = null, gift = null } = {}) {
     const d = DECKS[deck] || DECKS.explorer, bonus = gift && A.RELICS[gift] && !d.perks.includes(gift) ? A.RELICS[gift] : null;
-    slot = keyOf(!!board);
+    slot = keyOf(!!board); payLeg(loadSlot(!!board));
     /* cjk (sin runas ni sin vocales) se fija al empezar: cambiar de idioma a media expedicion no mueve los trucos ni los sobornos (ver A.chal.plan) */
     run = {
       v: 2, seed: seed || "run-" + Math.random().toString(36).slice(2, 10), cjk: A.chal.noLatin(), deck, asc, ranked, board, dailyTry, route: route ? route.slice(0, 12) : null, gift: bonus ? gift : null,
@@ -394,7 +397,7 @@ window.AIQ = window.AIQ || {};
   /* descarta la partida guardada de una ranura (por defecto, la de la partida activa si la hay; si no, la expedicion normal).
      Un intento del Reto diario no se tira: se cierra con los puntos que llevaba y cuenta para la puntuacion global del dia. */
   A.adv.abandon = (daily = !!(run && run.board)) => {
-    const act = !!run && !!run.board === daily, r = act ? run : loadSlot(daily), key = act ? slot : keyOf(daily);
+    const act = !!run && !!run.board === daily, r = act ? run : loadSlot(daily), key = act ? slot : keyOf(daily); payLeg(r);
     if (daily && r && r.board && r.dailyTry) A.rank.daily.finish(r.board, r.dailyTry, finalOf(r), { r: r.cleared, won: !!r.won });
     if (act) run = null;
     try { localStorage.removeItem(key); } catch (e) { /* sin almacenamiento */ }
@@ -920,6 +923,7 @@ window.AIQ = window.AIQ || {};
     if (newVisit) run.visitBuys = 0;
     if (!run.stock || run.stockKey !== key) { run.stock = offers(chest); run.stockKey = key; run.bought = []; if (run.shopKey !== visit) { run.shopKey = visit; run.rerolls = 0; run.freeUsed = 0; } }
     persist(); renderShop(chest);
+    if (!chest && run.legAch) { const r0 = run; setTimeout(() => { if (run === r0) payLeg(r0); }, 900); }   // el logro de la legendaria del cofre: ya en la tienda, un poco despues de pintarla
     if (newVisit && A.dealer.campArrive) {                                            // el crupier se sienta a la mesa (js/dealer.js)
       const cf = chalFor(roundNo()), costs = (run.stock || []).map(s => (s.k === "life" ? lifePrice() : cardCost(s)));
       A.dealer.campArrive({ chest, coins: run.coins, n: cf.list.length, r: roundNo() + 1, boss: !!cf.boss && !chest, bossName: cf.combo ? A.tx(cf.combo.n) : "", retry: run.attempt > 0,
@@ -970,11 +974,86 @@ window.AIQ = window.AIQ || {};
   /* precio de una carta de la tienda: la de la revancha (s.fix) va a mitad de precio */
   const cardCost = s => { const full = price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost); return s.fix ? Math.max(1, Math.ceil(full / 2)) : full; };
   const costHtml = s => (s.fix ? `${CN()}<s class="of-was">${price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost)}</s>${cardCost(s)}` : CN() + cardCost(s));
+  /* ---------------- PAN DE ORO (v0.51): la carta legendaria ----------------
+     El marco de oro con bisel de pixel, la placa de laton, el terciopelo y el halo van en css/campamento.css. Aqui, el brillo de oro que la barre
+     a saltos de pixel (como la clase Holo del prototipo aprobado): un lienzo pequeno por carta, 1 pixel de arte = 3 px del lienzo de 1280x720
+     redondeado al pixel real de la pantalla (escala entera), pintado a ~20 fps SOLO mientras pasa el brillo (0,9 s de cada 3,6) y la carta sigue
+     en pantalla (IntersectionObserver: la mesa del Campamento sigue en el documento durante la ronda, con #layer oculto); el resto del tiempo
+     duerme. El tamano llega por ResizeObserver en pixeles reales: nada se mide por fotograma. Con "reducir movimiento", un brillo quieto (salvo
+     en la secuencia del cofre) */
+  const GLINT = `<span class="lg-halo"></span><span class="lg-clip"><canvas></canvas></span>`;
+  const RMQ = matchMedia("(prefers-reduced-motion: reduce)");           // una sola consulta: leer .matches no cuesta nada
+  const Gold = (() => {
+    const BAY = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5], WH = [255, 255, 255], G0 = [255, 246, 200], G1 = [255, 217, 90], PER = 3.6, DUR = 0.9;
+    const live = new Set(); let raf = 0, tm = 0, last = 0;
+    const still = () => { const S = C().S; return !!(S && S.reduce) || RMQ.matches; };
+    const wake = () => { clearTimeout(tm); tm = 0; if (!raf) raf = requestAnimationFrame(frame); };
+    const ro = window.ResizeObserver ? new ResizeObserver(es => { es.forEach(e => e.target._gold && e.target._gold.note(e)); wake(); }) : null;
+    /* se ve o no (display:none de un padre o fuera de la pantalla): lo dice el navegador al cambiar, sin medir nada */
+    const io = window.IntersectionObserver ? new IntersectionObserver(es => { es.forEach(e => { if (e.target._gold) e.target._gold.vis = e.isIntersecting; }); wake(); }) : null;
+    class Glint {
+      constructor(cv) { this.cv = cv; this.clip = cv.parentNode; this.el = this.clip.parentNode; this.ctx = this.im = null; this.t0 = Math.random() * PER; this.W = this.H = this.P = 0; this.pend = null; this.c = null; this.at0 = null; this.dur = DUR; this.live = false; this.vis = !io; this.clip._gold = this; }
+      /* el aviso del ResizeObserver solo se apunta: el lienzo cambia de tamano en el fotograma siguiente (no en el de pintar la mesa, el mas cargado) */
+      note(e) {
+        const b = e.contentBoxSize && e.contentBoxSize[0], d = e.devicePixelContentBoxSize && e.devicePixelContentBoxSize[0];
+        const cw = b ? b.inlineSize : e.contentRect.width, ch = b ? b.blockSize : e.contentRect.height;
+        if (cw && ch) this.pend = [cw, ch, d ? d.inlineSize : 0, d ? d.blockSize : 0];
+      }
+      /* lienzo a escala entera de pixel real: P pixeles reales por pixel de arte (3 en 1280x720; 5 a 1,5x) */
+      size() {
+        const [cw, ch, dw, dh] = this.pend; this.pend = null;
+        const r = dw ? dw / cw : (this.el.currentCSSZoom || 1) * (devicePixelRatio || 1), P = Math.max(2, Math.round(3 * r + 0.01));   // +0,01: a 1,5x (4,5) siempre 5, igual en la carta y en la mochila
+        const W = Math.ceil((dw || cw * r) / P), H = Math.ceil((dh || ch * r) / P);
+        if (W === this.W && H === this.H && P === this.P) return;
+        this.W = W; this.H = H; this.P = P; this.cv.width = W; this.cv.height = H; this.cv.style.width = (W * P) / r + "px"; this.cv.style.height = (H * P) / r + "px";
+        this.im = null; this.c = null;                                   // cambiar el tamano deja el lienzo en blanco; el contexto y su imagen, al primer brillo
+      }
+      /* el brillo ahora: la diagonal x + y = c (o null si no pasa). sweep() lo lanza ya, durante dur segundos */
+      at(t) {
+        let ts, dur = DUR;
+        if (this.at0 != null) { ts = t - this.at0; dur = this.dur; if (ts > dur) { this.at0 = null; return null; } } else ts = (t + this.t0) % PER;
+        return ts >= 0 && ts < dur ? Math.round(-14 + ((this.W + this.H + 28) * ts) / dur) : null;
+      }
+      wait(t) { return PER - ((t + this.t0) % PER); }
+      sweep(dur) { this.at0 = performance.now() / 1000; this.dur = dur; wake(); }
+      /* franja blanca de 3 pixeles, filos crema y un tramado de oro a los lados (Bayer 4x4): solo se recorre la franja */
+      paint(c) {
+        if (c === this.c || !this.W) return; this.c = c;
+        if (!this.im) { this.ctx = this.ctx || this.cv.getContext("2d"); this.im = this.ctx.createImageData(this.W, this.H); }
+        const W = this.W, H = this.H, d = this.im.data; d.fill(0);
+        if (c != null) for (let y = 0; y < H; y++) for (let x = Math.max(0, c - 6 - y), x1 = Math.min(W - 1, c + 6 - y); x <= x1; x++) {
+          const dd = x + y - c, ad = dd < 0 ? -dd : dd, col = ad <= 1 ? WH : ad === 2 || ad === 4 ? G0 : BAY[(y & 3) * 4 + (x & 3)] < 6 ? G1 : null;
+          if (!col) continue; const i = (y * W + x) * 4; d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = ad <= 1 ? 170 : ad === 2 ? 130 : ad === 4 ? 110 : 85;
+        }
+        this.ctx.putImageData(this.im, 0, 0);
+      }
+    }
+    function frame(now) {
+      raf = 0; const t = now / 1000, rm = still(), due = now - last >= 30; let act = false, soon = Infinity;
+      for (const g of live) {
+        if (!g.el.isConnected) { live.delete(g); if (ro) ro.unobserve(g.clip); if (io) io.unobserve(g.clip); continue; }
+        if (!g.vis) continue;                                              // no se ve: ni pinta ni cuenta para despertar el bucle (con todas ocultas, duerme)
+        if (g.pend) g.size();
+        if (!g.W) continue;
+        if (rm && !g.live) { g.paint(Math.round((g.W + g.H) * 0.32)); continue; }       // quieto: un reflejo fijo
+        const c = g.at(t);
+        if (c != null || g.c != null || g.at0 != null) act = true; else soon = Math.min(soon, g.wait(t));
+        if (due) g.paint(c);
+      }
+      if (due) last = now;
+      if (act) tm = setTimeout(wake, 40); else if (soon < Infinity) tm = setTimeout(wake, Math.max(16, soon * 1000 - 24));   // ~20 fps: un rAF por pintada, no 60
+    }
+    return {
+      /* tras pintar la mesa: un brillo por lienzo nuevo (el tamano llega con el primer aviso del ResizeObserver, ya maquetado) */
+      mount: root => { if (!ro) return; root.querySelectorAll(".lg-clip > canvas").forEach(cv => { if (cv.parentNode._gold) return; const g = new Glint(cv); live.add(g); ro.observe(g.clip, { box: "device-pixel-content-box" }); if (io) io.observe(g.clip); }); },
+      of: el => { const c = el && el.querySelector(".lg-clip"); return (c && c._gold) || null; },
+    };
+  })();
   function cardHtml(s, i, chest) {
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
@@ -988,13 +1067,17 @@ window.AIQ = window.AIQ || {};
   let relicSel = null;                                                 // reliquia levantada en la mochila
   const SELL = "Vender|Sell|Vendre|Vender|Verkaufen|Vendi||出售|판매|売る|Продать|Sprzedaj";
   const TAKE = "Te llevas|You take|Tu prends|Você leva|Du bekommst|Prendi||你获得|획득|もらう|Получишь|Dostajesz";
+  /* la reliquia en la mochila: carta pequena con el color de su rareza (la legendaria, con su marco de oro y su brillo).
+     face: el dibujo como fondo y sin boton de vender (la que aparece al final de la secuencia: ninguna imagen nueva, que haria reajustar la pantalla) */
+  const relicHtml = (id, face) => { const p = A.RELICS[id];
+    return `<div class="tr-card tr-relic r${p.r}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}</button>${face ? "" : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
   function renderShop(chest) {
+    legOn = 0;                                                           // mesa nueva: si la legendaria se estaba luciendo en la anterior, esa secuencia ya no sigue
     const slots = 5, info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     if (relicSel && !run.perks.includes(relicSel)) relicSel = null;
     /* la mochila no avisa de que una reliquia ya no sirve: saber cuando venderla tambien es cosa del jugador */
-    const relics = Array.from({ length: slots }, (_, k) => { const id = run.perks[k]; if (!id) return `<span class="tr-slot"></span>`; const p = A.RELICS[id];
-      return `<div class="tr-card tr-relic r${p.r}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${ic(id)}</button><button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button></div>`; }).join("");
+    const relics = Array.from({ length: slots }, (_, k) => (run.perks[k] ? relicHtml(run.perks[k]) : `<span class="tr-slot"></span>`)).join("");
     const tools = Object.keys(run.tools).map(id => `<span class="tr-card tr-tool" ${A.kitTip("tool", id)}><span class="tr-face">${ic(TOOLS[id].ico)}<span class="tr-pips">${Array.from({ length: toolMax(id) }, () => "<i></i>").join("")}</span></span></span>`).join("") || `<i class="tr-none">${A.T("Ninguna", "None")}</i>`;
     /* fuera la frase de siempre ("Tres cartas sobre la mesa..."): solo los avisos que cambian algo (revancha, cofre, mochila llena) */
     const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));
@@ -1021,6 +1104,7 @@ window.AIQ = window.AIQ || {};
         <div class="tray-col tr-tools"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${tools}</div></div>
         <div class="tray-col tr-prov"><h4>${A.T("Provisiones", "Provisions")} <b>${run.lives}/${run.maxLives}</b></h4><div class="tray-row hearts">${hearts()}</div></div>
         <button class="go2${doom ? " doom" : ""}${chest ? " skip" : ""}" id="goRound" type="button" data-primary><span class="go2-chip">${chip}</span><span class="go2-t"><b>${goB}</b><i>${goI}</i></span><span class="go2-ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
+    Gold.mount($("dlg"));                                                // el brillo de oro de las legendarias (mesa y mochila)
     document.querySelectorAll(".offer").forEach((el, i) => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); if (!chest) el.addEventListener("pointerenter", e => { if (e.pointerType === "mouse" && A.dealer.campHover) A.dealer.campHover(i); }); });
     /* la mochila: un clic levanta la reliquia y ensena su boton de vender; otro clic en ella (o fuera) la baja. Tambien en el cofre del jefe:
        con la mochila llena, vendes una y eliges la del cofre gratis */
@@ -1039,6 +1123,7 @@ window.AIQ = window.AIQ || {};
     if ($("chalReroll")) $("chalReroll").onclick = rerollChal;
     if (!chest) wireSup();
     $("goRound").onclick = () => {
+      if (legOn) return;                                                 // la legendaria del cofre aun se esta luciendo (Intro pulsa este boton)
       if (!chest && !run.visitBuys && !run.skipSaid && run.coins >= 8 && Math.random() < 0.5 && A.dealer.campSkip) { run.skipSaid = true; A.dealer.campSkip(run.coins); }   // te vas sin comprar nada (una vez por expedicion)
       run.stock = null; relicSel = null;
       if (chest) { const k = gain(chestSkip()); run.coins += k; run.stats.coinsEarned += k; A.sfx.sell(); }   // dejar el cofre sin abrir tambien se cobra (con la mochila llena, el cofre no es papel mojado)
@@ -1098,6 +1183,7 @@ window.AIQ = window.AIQ || {};
     setTimeout(one, 380);
   }
   function buy(el, chest) {
+    if (legOn) return;
     const i = +el.dataset.ix, s = run.stock[i]; if (!s || run.bought.includes(i)) return;   // data-ix (no data-i: cambiar de idioma reescribe todo [data-i] con A.t)
     if (s.k === "life") { const c = lifePrice(); if (run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } if (run.coins < c) return noFunds(el); run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
     if (s.k === "perk") {
@@ -1105,7 +1191,7 @@ window.AIQ = window.AIQ || {};
       if (run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
       if (run.coins < c) return noFunds(el);
       if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);
-      run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run); if (p.r === 3 && chest) A.ach.emit("adv", { kind: "legend", chest: true });   // Botin legendario: solo la del cofre del jefe
+      run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run); if (p.r === 3 && chest) run.legAch = 1;   // Botin legendario: solo la del cofre del jefe. Se concede en la tienda (openShop): su aviso no tapa la secuencia
     } else {
       const c = cardCost(s);
       if (!run.tools[s.id] && Object.keys(run.tools).length >= 4) { A.sfx.deny(); shake(el); flash(A.T("Solo 4 herramientas distintas.", "Only 4 different tools.")); return; }
@@ -1113,10 +1199,105 @@ window.AIQ = window.AIQ || {};
       run.coins -= c; addTool(s.id);
     }
     if (s.fix) run.fixUsed = `${roundNo()}:${run.attempt}`;              // ya cobraste la rebaja de esta revancha
-    run.bought.push(i); run.visitBuys = (run.visitBuys || 0) + 1; A.sfx.buy(); persist();
-    if (chest) { run.stock = null; run.bought = []; persist(); return openShop(false); }
+    const leg = chest && s.k === "perk" && A.RELICS[s.id].r === 3;       // la legendaria del cofre: su propia secuencia (y sus sonidos)
+    run.bought.push(i); run.visitBuys = (run.visitBuys || 0) + 1; if (!leg) A.sfx.buy(); persist();
+    if (chest) { run.stock = null; run.bought = []; if (leg) run.phase = "shop"; persist(); return leg ? legendary(el) : openShop(false); }   // guardada ya en la tienda: si se cierra a mitad, la reliquia es tuya y no vuelve el cofre
     renderShop(chest);
   }
+  /* PAN DE ORO: al elegir la legendaria en el cofre del jefe (~2 s, la secuencia del prototipo aprobado). Las otras cartas caen de la mesa y la sala
+     se oscurece en ambar; la legendaria sube al centro con un bote (pasa por x1,12 y se posa a x1: el pixel queda entero) mientras suena su subida
+     y la barre el brillo; jackpot(3) con sus tres golpes (A.audio.jpGap): en cada uno el marco se enciende, saltan 3, 5 y 9 doblones por delante y
+     la pantalla tiembla 1, 2 y 3 (Vibracion y "reducir movimiento" mandan, como en jpShake); al final habla el crupier (js/dealer.js, campLegend) y,
+     en cuanto empieza su frase, la sala se enciende y la carta vuela a su hueco de la mochila, que destella en oro. Despues, la tienda: cuando el
+     crupier acaba su frase y su segundo de mas (nunca se le corta). Antes de empezar la reliquia ya esta comprada y guardada (y el logro, en deuda:
+     su aviso sale en la tienda). Sin clics mientras dura (mesa inerte; Esc tampoco abre el menu: A.adv.busy). Se mide todo una vez al empezar;
+     despues solo transform y opacity */
+  let legOn = 0, legN = 0;                                             // legOn: la secuencia en curso (0: ninguna); legN: contador, nunca se repite
+  const legWait = ms => new Promise(r => setTimeout(r, ms));
+  const legPaint = () => new Promise(r => { requestAnimationFrame(() => setTimeout(r, 0)); setTimeout(r, 60); });   // tras pintar el fotograma de ahora (o 60 ms, con la ventana oculta)
+  function legCoins(fx, x, y, n) {                                       // doblones que saltan de la carta (en px del lienzo: la mesa lleva su zoom)
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement("i"); c.className = "lg-coin"; c.style.left = x + "px"; c.style.top = y + "px"; fx.appendChild(c);
+      const ang = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, v = 150 + Math.random() * 170, dx = Math.cos(ang) * v, up = Math.sin(ang) * v, fall = 260 + Math.random() * 160;
+      c.animate([{ transform: "translate(0, 0) scale(.6)", opacity: 1 }, { transform: `translate(${(dx * 0.55).toFixed(1)}px, ${up.toFixed(1)}px) scale(1)`, opacity: 1, offset: 0.38, easing: "cubic-bezier(.2, .6, .5, 1)" },
+        { transform: `translate(${dx.toFixed(1)}px, ${(up + fall).toFixed(1)}px) scale(.9)`, opacity: 0 }], { duration: 900 + Math.random() * 300, easing: "cubic-bezier(.3, 0, .8, .6)" }).onfinish = () => c.remove();
+    }
+  }
+  async function legendary(el) {
+    const tok = (legOn = ++legN), r0 = run, tb = el.closest(".table");
+    const alive = () => legOn === tok && run === r0 && tb.isConnected;
+    const end = () => {                                                  // si saliste a la portada entretanto, nada
+      if (legOn !== tok) return; if (!(run === r0 && tb && tb.isConnected)) { legOn = 0; return; }
+      if (A.dealer.release) A.dealer.release();                          // ya dijo su frase y su segundo de mas: se va, y la tienda llega un poco despues (no en el mismo fotograma)
+      setTimeout(() => { if (legOn !== tok) return; legOn = 0; if (run === r0 && tb.isConnected) openShop(false); }, 140);
+    };
+    try {                                                                // si algo falla a mitad, la tienda llega igual (la mesa no se queda inerte)
+      const id = r0.perks[r0.perks.length - 1], S = C().S, rm = !!(S && S.reduce) || RMQ.matches;
+      if (!tb || !A.RELICS[id]) return end();
+      const offers = tb.querySelector(".offers"), others = [...offers.querySelectorAll(".offer")].filter(o => o !== el), g = Gold.of(el);
+      const slot = tb.querySelectorAll(".tr-relics .tray-row > *")[r0.perks.length - 1], icoSrc = (el.querySelector(".of-ico img") || {}).src || "";
+      tb.classList.add("lg-seq"); el.classList.add("lg-hero"); tb.inert = true;
+      /* medir (una sola vez, ya con la mesa quieta): en pixeles de pantalla; las animaciones van en px del lienzo (/k, la mesa lleva zoom) */
+      const k = el.currentCSSZoom || A.uiK(), lr = el.getBoundingClientRect(), or = offers.getBoundingClientRect(), dr = tb.parentNode.getBoundingClientRect(), sr = slot ? slot.getBoundingClientRect() : null;
+      const from = getComputedStyle(el).transform, m = from && from !== "none" ? new DOMMatrixReadOnly(from) : null, tx = m ? m.m41 : 0, ty = m ? m.m42 : 0, w0 = el.offsetWidth || 1, sw = slot ? slot.offsetWidth : 56;
+      const lx = lr.left + lr.width / 2, ly = lr.top + lr.height / 2, cx = rm ? lx : or.left + or.width / 2, cy = rm ? ly : Math.max(dr.top + lr.height * 0.56 + 8, Math.min(dr.top + dr.height * 0.46, or.top + or.height / 2));
+      const to = (x, y, sc) => `translate(${((x - lx) / k + tx).toFixed(2)}px, ${((y - ly) / k + ty).toFixed(2)}px) scale(${sc})`, up = to(cx, cy, 1);
+      const dim = document.createElement("i"), fx = document.createElement("i"); dim.className = "lg-dim"; fx.className = "lg-fx";
+      dim.style.setProperty("--lx", (((cx - dr.left) / dr.width) * 100).toFixed(1) + "%"); dim.style.setProperty("--ly", (((cy - dr.top) / dr.height) * 100).toFixed(1) + "%");
+      tb.append(dim, fx);
+      const fxX = (cx - dr.left) / k, fxY = (cy - dr.top) / k;
+      /* 0,0 s: las otras caen de la mesa y la sala se oscurece; 0,1 s: la legendaria sube al centro (bote: x1,12 a medio camino y se posa a x1),
+         suena su subida (A.sfx.lift) y el brillo la barre */
+      A.sfx.card();
+      others.forEach((o, i) => o.animate(rm ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1 }, { opacity: 0, transform: `translateY(70px) rotate(${i ? 9 : -9}deg)` }], { duration: 380, easing: "cubic-bezier(.5, 0, .75, 0)", fill: "forwards" }));
+      dim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, fill: "forwards" });
+      if (!rm) el.animate([{ transform: from && from !== "none" ? from : "none", easing: "cubic-bezier(.25, 1.25, .5, 1)" }, { transform: to(cx, cy, 1.12), offset: 0.62, easing: "cubic-bezier(.45, 0, .4, 1)" }, { transform: up }], { duration: 440, delay: 100, fill: "both" });
+      if (g) { g.live = true; setTimeout(() => g.sweep(0.5), 100); }
+      setTimeout(() => { if (alive()) A.sfx.lift(); }, 100);
+      await legWait(520); if (!alive()) return end();
+      /* 0,5 s: jackpot(3). En cada golpe: el marco se enciende, saltan 3, 5 y 9 doblones y la pantalla tiembla 1, 2 y 3. El golpe 1 se pinta ANTES
+         de sintetizar el jackpot (el jackpot crea los nodos de cada golpe poco antes de que suene, pero el primero va al momento): el temblor, los
+         doblones y la carta ya van por el compositor y el sonido llega un fotograma despues (el oido lo acepta; al reves, no). Los golpes 2 y 3, al compas del sonido */
+      const gap = A.audio.jpGap * 1000;
+      const hit = n => {
+        if (C().jpShake) C().jpShake(n + 1);
+        el.classList.add("hit"); setTimeout(() => el.classList.remove("hit"), 150);
+        if (g) g.sweep(0.38);
+        if (!rm) legCoins(fx, fxX, fxY, [3, 5, 9][n]);
+        if (n === 2 && !rm) el.animate([{ transform: "scale(1)" }, { transform: "scale(1.09)" }, { transform: "scale(1)" }], { duration: 300, easing: "steps(6, end)", composite: "add" });
+      };
+      hit(0);
+      await legPaint(); if (!alive()) return end();
+      const t1 = performance.now(); A.sfx.jackpot(3); A.haptic.jackpot(3);
+      for (let n = 1; n < 3; n++) { await legWait(Math.max(0, t1 + n * gap - performance.now())); if (!alive()) return end(); hit(n); }
+      await legWait(560); if (!alive()) return end();
+      /* 2,0 s: habla el crupier. Si estaba a media frase, la suya espera turno (nunca se le corta) y la carta, en el centro con la sala a oscuras,
+         espera con ella: la sala se enciende y la carta vuela a la mochila cuando EMPIEZA su frase (como mucho 7 s) */
+      let said, done; const start = new Promise(r => (said = r)), talk = new Promise(r => (done = r));
+      if (!(A.dealer.campLegend && A.dealer.campLegend(Math.max(1, rm ? 1 : lr.width * 1.12), () => { said(); done(); }, said))) { said(); done(); }
+      await Promise.race([start, legWait(7000)]); if (!alive()) return end();
+      dim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: "forwards" });
+      if (rm) await el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: "forwards" }).finished.catch(() => {});
+      if (!rm) {
+        await legWait(120); if (!alive()) return end();
+        const fly = sr ? to(sr.left + sr.width / 2, sr.top + sr.height / 2, (sw / w0).toFixed(4)) : up;
+        await el.animate([{ transform: up }, { transform: fly, opacity: 1, offset: 0.92 }, { transform: fly, opacity: 0 }], { duration: 460, easing: "cubic-bezier(.55, 0, .3, 1)", fill: "forwards" }).finished.catch(() => {});
+        if (!alive()) return end();
+      }
+      /* llega: la reliquia aparece en su hueco con su marco de oro y el hueco destella (el icono va de fondo: una imagen nueva haria reajustar la pantalla).
+         Suena el aterrizaje (A.sfx.land: golpe y campana en una nota de la pentatonica al azar, nunca la de la vez anterior) */
+      if (slot && slot.isConnected) {
+        const face = icoSrc ? `<i class="ic lg-ico" style="background-image:url('${icoSrc}')"></i>` : "";
+        slot.insertAdjacentHTML("afterend", relicHtml(id, face)); const mini = slot.nextElementSibling; slot.remove();
+        if (mini) { mini.classList.add("lg-in"); Gold.mount(mini); }
+        const cnt = tb.querySelector(".tr-relics h4 b"); if (cnt) cnt.textContent = `${r0.perks.length}/5`;
+      }
+      A.sfx.land(); A.haptic([30]);
+      await Promise.all([Promise.race([talk, legWait(9000)]), legWait(800)]);   // red de seguridad: nunca se queda la mesa bloqueada
+      end();
+    } catch (e) { console.error(e); end(); }
+  }
+  A.adv.busy = () => legOn !== 0;                                        // la legendaria del cofre se esta luciendo (js/game.js: Esc no abre el menu)
   function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0) return; run.perks.splice(k, 1); run.coins += sellValue(id); if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
   function flash(t) { const n = document.querySelector("#dlg .tb-shop"); if (!n) return; n.querySelectorAll(".shop-flash").forEach(x => x.remove()); const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.appendChild(m); setTimeout(() => m.remove(), 2200); }   // flotando sobre las cartas: no empuja nada
 

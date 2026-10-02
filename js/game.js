@@ -830,7 +830,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     A.audio.unlock(!S.booting);
     if (S.booting) return;
     const k = e.key.toLowerCase();
-    if (k === "escape") { if (S.settingsOpen) openSettings(false); else if (S.run && S.tool) A.adv.cancelTool(); else if (S.phase === "title" && S.hub !== "home") A.hub.screen("home"); else runMenu(); }
+    if (k === "escape") { if (A.adv.busy && A.adv.busy()) return; if (S.settingsOpen) openSettings(false); else if (S.run && S.tool) A.adv.cancelTool(); else if (S.phase === "title" && S.hub !== "home") A.hub.screen("home"); else runMenu(); }   // busy: la legendaria del cofre se esta luciendo (~5 s); el menu no la tapa ni la deja temblando debajo
     else if (S.settingsOpen && !["f", "m", "n"].includes(k)) return;       // con Ajustes abierto solo valen sus atajos: Intro pulsaba el boton de la pantalla de debajo (p. ej. Jugar) y P reanudaba la pregunta tapada
     else if (S.run && S.phase === "asking" && /^[1-4]$/.test(k)) { if (!e.repeat) A.adv.toolKey(+k - 1); }   // mantener pulsada la tecla encendia y apagaba la herramienta sin parar
     else if (k === "f") toggleFs();
@@ -878,7 +878,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     if (S.intro) playStudio(showGate); else showGate();
   }
 
-  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, refreshPrompt: () => { setPrompt(); }, updateHud, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet };
+  A.core = { S, map, world, dialog, closeDialog, verdict, prog, save, toggleFs, openSettings, openLangPop, runMenu, refreshPrompt: () => { setPrompt(); }, updateHud, newRun, prepareRun, startLevel: startLevel_, showHub: showTitle, odoSet, jpShake };   // jpShake: el temblor de los jackpots (tambien la legendaria del cofre, js/adventure.js)
 
   applyLang(); syncSettings();
   const start = () => {
