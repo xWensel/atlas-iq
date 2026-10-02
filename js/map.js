@@ -1471,7 +1471,7 @@ void main(){
       }
       if (this.decoys && this.decoys.length) {                          // tanda 7: con t0, la chincheta cae del cielo a su hora (y la capa sigue animada mientras caen)
         let live = false;
-        for (const d of this.decoys) { const age = d.t0 ? now - d.t0 : 2000; if (age < 0) { live = true; continue; } if (age < 1400) live = true; const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.a == null ? 0.9 : d.a; this._pinRain(c, q[0], q[1], sk.red, sk.paper, age); c.restore(); }
+        for (const d of this.decoys) { const age = d.t0 ? now - d.t0 : 2000; if (age < 0) { live = true; continue; } if (age < 1400) live = true; const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.chip ? 1 : d.a == null ? 0.9 : d.a; if (d.chip) this._tokenRain(c, q[0], q[1], age); else this._pinRain(c, q[0], q[1], sk.red, sk.paper, age); c.restore(); }
         if (live) this.fxDirty = true;
       }
       if (this.pickEnabled && this.mouse && !this.pointers.size && !this.hideReticle) this._reticle(c, this.mouse.x, this.mouse.y);
@@ -1538,6 +1538,24 @@ void main(){
       const b = age - F, hop = -Math.abs(Math.sin((b / 150) * Math.PI)) * 10 * Math.exp(-b / 160);
       this._pin(c, x, y + hop, fill, ring, 2000, 1);
       if (b < 360) { const q = b / 360; c.save(); c.fillStyle = `rgba(240,225,200,${(0.5 * (1 - q)).toFixed(3)})`; for (let i = 0; i < 6; i++) { const a = Math.PI + (i / 5) * Math.PI, d = 6 + q * 18; c.beginPath(); c.arc(x + Math.cos(a) * d * 1.4, y + Math.sin(a) * d * 0.5, 2.2 * (1 - q) + 0.6, 0, Math.PI * 2); c.fill(); } c.restore(); }
+    }
+    /* tanda 10: la ficha dorada del Pase VIP (marca un punto con su centro): cae, bota y brilla al posarse */
+    _token(c, x, y, noShadow) {
+      const T = Math.PI * 2, ink = this.sk.ink; c.save();
+      if (!noShadow) { c.fillStyle = "rgba(0,0,0,.32)"; c.beginPath(); c.ellipse(x, y + 12, 10, 3.4, 0, 0, T); c.fill(); }
+      c.beginPath(); c.arc(x, y, 12.5, 0, T); c.fillStyle = ink; c.fill();
+      c.beginPath(); c.arc(x, y, 11, 0, T); c.fillStyle = "#f8b449"; c.fill();
+      c.fillStyle = "#fff4d6"; for (let k = 0; k < 6; k++) { c.save(); c.translate(x, y); c.rotate((k / 6) * T); c.fillRect(-1.8, -11, 3.6, 3.6); c.restore(); }
+      c.beginPath(); c.arc(x, y, 6.4, 0, T); c.fillStyle = "#c97f22"; c.fill(); c.lineWidth = 1.3; c.strokeStyle = ink; c.stroke();
+      c.beginPath(); c.arc(x - 3.6, y - 4, 2.2, 0, T); c.fillStyle = "rgba(255,255,255,.8)"; c.fill();
+      c.restore();
+    }
+    _tokenRain(c, x, y, age) {
+      const F = 480;
+      if (age >= F + 600) return this._token(c, x, y);
+      if (age < F) { const k = age / F; c.save(); c.fillStyle = `rgba(0,0,0,${(0.06 + 0.24 * k).toFixed(3)})`; c.beginPath(); c.ellipse(x, y + 12, 10 * (0.3 + 0.7 * k), 3.4 * (0.3 + 0.7 * k), 0, 0, Math.PI * 2); c.fill(); c.restore(); return this._token(c, x, y - (y + 40) * (1 - k * k), true); }
+      const b = age - F; this._token(c, x, y - Math.abs(Math.sin((b / 130) * Math.PI)) * 8 * Math.exp(-b / 140));
+      if (b < 320) { const q = b / 320; c.save(); c.strokeStyle = `rgba(255,215,120,${(0.85 * (1 - q)).toFixed(3)})`; c.lineWidth = 2; c.beginPath(); c.arc(x, y, 13 + q * 16, 0, Math.PI * 2); c.stroke(); c.restore(); }
     }
     _reticle(c, x, y) {
       const sk = this.sk;
