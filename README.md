@@ -4,6 +4,8 @@
 
 > **Versiones:** cada entrega sube la version menor y termina en 1 (0.2.1 -> 0.3.1 -> 0.4.1...), en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.45.1** - Ruleta sin "marco": al girar el mapa ya no se ve el rectangulo del mapa dando vueltas con esquinas negras. El giro se hace ahora en la propia geometria (tierra, fronteras, reticula, tropicos y aguas someras) en vez de girar la imagen final, asi que el fondo (degradado del oceano y remolino del casino) se queda quieto llenando toda la pantalla y solo gira el mapa. Lo mismo al dar la media vuelta de Mundo del reves. Ademas la Ruleta gira a 60 fps (antes a ~20, a saltos) y las chinchetas giran con el mapa en cada fotograma (antes se quedaban atras). Clics, chinchetas y lupa usan el mismo angulo que se ve (mapTest: ida y vuelta 0 px).
+
 **v0.44.1** - Al entrar en el juego la portada ya no da un salto: el mapa de fondo se recolocaba de golpe 1,5 s despues de aparecer (la deriva lenta empezaba desplazada en vertical); ahora arranca justo donde se para y acelera poco a poco. Ademas, al pulsar la pantalla de entrada esta se funde directamente con la portada, sin el fogonazo negro de antes.
 
 **v0.43.1** - La C de "Cousins" pasa a ser una letra dibujada a medida (fuera de la fuente): trazo de pluma con cabeza enroscada en bola y una panza que no termina, sigue por debajo y es ella misma la cola que subraya la palabra. En la intro la cola sale trazandose desde la panza de la C (`tools/brand/cousins_c.py`, opciones en `cousins-c.html`).

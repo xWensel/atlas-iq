@@ -46,15 +46,24 @@ window.AIQ = window.AIQ || {};
      ct lleva el continente (0-6) y, en ct/8, la vuelta al mundo de esa copia del poligono respecto a la suya propia (2 = la propia; 1 y 3 = una vuelta
      a cada lado). Las copias que cruzan el antimeridiano se mueven CON su original (antes giraban y se encogian alrededor del centro del
      continente desde el otro lado del mundo y aparecia una Rusia fantasma encima de Europa) */
+  /* giro del mapa entero (Ruleta, Mundo del reves, Espejo): se aplica a la geometria, en pixeles del objetivo y alrededor de su centro, no a la imagen
+     final. Antes el post-proceso giraba la foto entera del mapa y se veia el rectangulo girando con esquinas negras y el degradado del oceano torcido;
+     ahora el fondo se queda quieto llenando la pantalla y solo gira el mapa. Es la inversa exacta de _orientOut (lo que se ve es lo que se toca).
+     u_ori: (cos, sin, escala x del espejo, activo) */
+  const ORI = `
+uniform vec4 u_ori;
+vec2 orp(vec2 p){ if(u_ori.w<0.5) return p; p.x/=u_ori.z; return vec2(u_ori.x*p.x-u_ori.y*p.y, u_ori.y*p.x+u_ori.x*p.y); }
+vec2 ori_inv(vec2 p){ if(u_ori.w<0.5) return p; p=vec2(u_ori.x*p.x+u_ori.y*p.y, -u_ori.y*p.x+u_ori.x*p.y); p.x*=u_ori.z; return p; }`;
   const DISTORT = `
 uniform vec2 u_dsh[8]; uniform float u_drot[8]; uniform vec2 u_dcen[8]; uniform float u_dsc[8];
-vec2 xf(vec2 a, float ct){ int code=int(ct+0.5); int w=code/8; int c=code-w*8; vec2 o=vec2(float(w-2)*6.283185307179586,0.0); vec2 cen=u_dcen[c]; vec2 d=a-o-cen; float ca=cos(u_drot[c]), sa=sin(u_drot[c]); return cen+u_dsc[c]*vec2(ca*d.x-sa*d.y, sa*d.x+ca*d.y)+u_dsh[c]+o; }`;
+vec2 xf(vec2 a, float ct){ int code=int(ct+0.5); int w=code/8; int c=code-w*8; vec2 o=vec2(float(w-2)*6.283185307179586,0.0); vec2 cen=u_dcen[c]; vec2 d=a-o-cen; float ca=cos(u_drot[c]), sa=sin(u_drot[c]); return cen+u_dsc[c]*vec2(ca*d.x-sa*d.y, sa*d.x+ca*d.y)+u_dsh[c]+o; }
+${ORI}`;
   const VS_FILL = `#version 300 es
 layout(location=0) in vec2 a_pos; layout(location=1) in float a_ci; layout(location=2) in float a_ct;
 uniform vec2 u_center; uniform float u_scale; uniform vec2 u_res; uniform vec2 u_off;
 ${DISTORT}
 flat out float v_ci;
-void main(){ vec2 p=(xf(a_pos,a_ct)-u_center)*u_scale+u_off; gl_Position=vec4(p/(0.5*u_res),0.0,1.0); v_ci=a_ci; }`;
+void main(){ vec2 p=orp((xf(a_pos,a_ct)-u_center)*u_scale)+u_off; gl_Position=vec4(p/(0.5*u_res),0.0,1.0); v_ci=a_ci; }`;
 
   const FS_SIL = `#version 300 es
 precision mediump float; out vec4 o; void main(){ o=vec4(1.0); }`;
@@ -104,7 +113,7 @@ ${DISTORT}
 out float v_d; out float v_hw; out float v_brd;
 vec2 wob(vec2 p){ return u_wob*vec2(sin(p.y*9.0+p.x*3.7+u_wt), cos(p.x*8.0-p.y*4.3+u_wt*1.3)) + u_wob*0.5*vec2(sin(p.y*23.0+u_wt*0.7), cos(p.x*19.0-u_wt*0.9)); }
 void main(){
-  vec2 p0=(xf(a_seg.xy+wob(a_seg.xy)*a_brd,a_sct)-u_center)*u_scale+u_off, p1=(xf(a_seg.zw+wob(a_seg.zw)*a_brd,a_sct)-u_center)*u_scale+u_off;   // solo las fronteras interiores bailan: las costas quedan fijas
+  vec2 p0=orp((xf(a_seg.xy+wob(a_seg.xy)*a_brd,a_sct)-u_center)*u_scale)+u_off, p1=orp((xf(a_seg.zw+wob(a_seg.zw)*a_brd,a_sct)-u_center)*u_scale)+u_off;   // solo las fronteras interiores bailan: las costas quedan fijas
   vec2 dir=p1-p0; float len=length(dir); dir=len>0.0001?dir/len:vec2(1.0,0.0);
   vec2 nrm=vec2(-dir.y,dir.x);
   float hw=u_width*0.5+1.0;
@@ -138,6 +147,7 @@ uniform vec4 u_gp; // stepA, stepB, tB, gridAlpha
 out vec4 o;
 const float D2R=0.017453292519943295;
 ${NOISE}
+${ORI}
 float lineAlpha(float dpx){ return clamp(0.5*u_dpr*1.2+0.5-dpx,0.0,1.0); }
 float gridLevel(float stp, vec2 wp, float lonDeg, float latDeg, float pxPerDeg){
   float dl=abs(mod(lonDeg+stp*0.5,stp)-stp*0.5);
@@ -152,7 +162,8 @@ float gridLevel(float stp, vec2 wp, float lonDeg, float latDeg, float pxPerDeg){
 }
 void main(){
   vec2 frag=gl_FragCoord.xy; vec2 uv=frag/u_res;
-  vec2 wp=u_center+(frag-0.5*u_res)/u_scale;
+  vec2 sfr=ori_inv(frag-0.5*u_res)+0.5*u_res;                    // el mismo punto en el mapa sin girar: reticula y tropicos giran con el mapa; degradado, brillo y remolino se quedan quietos
+  vec2 wp=u_center+(sfr-0.5*u_res)/u_scale;
   float lonDeg=wp.x/D2R; float latDeg=degrees(2.5*(atan(exp(0.8*wp.y))-0.78539816339));
   float pxPerDeg=u_scale*D2R;
   vec3 ocean=mix(u_oBot,u_oTop,uv.y);
@@ -168,7 +179,7 @@ void main(){
   float g=max(ga,gb)*u_gp.w;
   ocean=mix(ocean,u_grid,g);
   // ecuador y tropicos punteados
-  float dash=step(0.5,fract(frag.x/(11.0*u_dpr)));
+  float dash=step(0.5,fract(sfr.x/(11.0*u_dpr)));
   float dE=abs(wp.y)*u_scale;
   float yT=1.25*log(tan(0.78539816339+0.4*23.4366*D2R));
   float dT=min(abs(wp.y-yT),abs(wp.y+yT))*u_scale;
@@ -207,14 +218,13 @@ void main(){ o=vec4(swirl(gl_FragCoord.xy),1.0); }`;
   const FS_POST = `#version 300 es
 precision highp float;
 uniform sampler2D u_scene; uniform vec2 u_res; uniform vec2 u_zc; uniform float u_zv; uniform vec2 u_pv; uniform float u_vig; uniform float u_grain; uniform vec3 u_tint; uniform float u_time;
-uniform float u_crt; uniform float u_dpr; uniform vec4 u_ori; uniform float u_lite;
+uniform float u_crt; uniform float u_dpr; uniform float u_lite;
 out vec4 o;
 ${NOISE}
 void main(){
   vec2 frag=gl_FragCoord.xy; vec2 uv=frag/u_res;
   if(u_crt>0.5){ vec2 q=uv*2.0-1.0; q*=1.0+dot(q,q)*0.045; uv=q*0.5+0.5; }
-  vec2 suv=uv;
-  if(u_ori.w>0.5){ vec2 c=vec2(uv.x*u_res.x,(1.0-uv.y)*u_res.y)-0.5*u_res; vec2 r=vec2(u_ori.x*c.x-u_ori.y*c.y, u_ori.y*c.x+u_ori.x*c.y); r.x*=u_ori.z; vec2 pp=r+0.5*u_res; suv=vec2(pp.x/u_res.x,1.0-pp.y/u_res.y); }
+  vec2 suv=uv;                                                  // la escena ya viene girada (Ruleta, Mundo del reves): aqui solo la curva CRT
   float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0);
   vec2 fr=uv*u_res;
   vec2 toC=(u_zc-fr);
@@ -880,7 +890,7 @@ void main(){
       }
       e.wob = sp ? (sp.wob || 0) * k : 0; e.lineA = sp && sp.lineA != null ? 1 + (sp.lineA - 1) * d.kl : 1;
       const ko = sp ? (d.ko || 0) : 0; e.oa = sp && sp.orient ? sp.orient.rot * ko : 0; e.mx = sp && sp.orient ? (sp.orient.mx || 0) * ko : 0;
-      if (sp && sp.spin) e.oa += sp.spin.amp * Math.sin(performance.now() / 1000 * sp.spin.speed) * k;
+      if (sp && sp.spin) e.oa += sp.spin.amp * Math.sin((this._tNow || performance.now()) / 1000 * sp.spin.speed) * k;   // reloj del fotograma: mapa, chinchetas y clics con el mismo angulo
       e.on = !!(sp && (sp.spin || sp.orient) && (Math.abs(e.oa) > 1e-4 || e.mx > 1e-4));
       return e;
     }
@@ -1102,6 +1112,7 @@ void main(){
       if (p.u.u_drot !== undefined) gl.uniform1fv(p.u.u_drot, e.rot);
       if (p.u.u_dcen !== undefined) gl.uniform2fv(p.u.u_dcen, e.cen);
       if (p.u.u_dsc !== undefined) gl.uniform1fv(p.u.u_dsc, e.sc);
+      if (p.u.u_ori !== undefined) { const o = this._orient(); gl.uniform4f(p.u.u_ori, o.c, o.s, o.sx, o.on ? 1 : 0); }
     }
     zoomLevel() { return this.view.s / this.minS; }
 
@@ -1199,7 +1210,8 @@ void main(){
       }
       if (this.hold) { this.lastT = this._rawT = now; if (!(this.holdCheck && ++this._holdN % 15 === 0 && !this.holdCheck())) return; }
       const dt = this.lastT ? Math.min(0.05, (now - this.lastT) / 1000) : 0.016; this.lastT = now;
-      this._adapt(now); this._stepDistort(now); this._stepMotion(now, dt);
+      this._tNow = now; this._adapt(now); this._stepDistort(now); this._stepMotion(now, dt);
+      { const sp = this.dist.spec; if (sp && sp.spin && (this.dist.kk || 0) > 0.001) this.dirty = this.fxDirty = true; }   // Ruleta: el giro es continuo, cada fotograma (a 25 fps se veia a saltos y las chinchetas se quedaban atras)
       if (this.anim) {
         const a = this.anim, k = Math.min(1, (now - a.t0) / a.ms), e = easeIO(k), dip = 1 - a.dip * Math.sin(Math.PI * e);
         this.view = { cx: a.from.cx + (a.to.cx - a.from.cx) * e, cy: a.from.cy + (a.to.cy - a.from.cy) * e, s: Math.max(this.minS, a.from.s * Math.pow(a.to.s / a.from.s, e) * dip) };
@@ -1247,7 +1259,7 @@ void main(){
     /* lupa (Sello de aduana / Teodolito) en pixeles del objetivo de dibujo: [x, y, radio] (radio 0 = sin lupa) */
     _lensU(k, H, e) {
       if (!(this.lens && this.lens.r > 0 && this.dist.spec && (e.wob > 0.002 || e.lineA < 0.98))) return [0, 0, 0];
-      const [lx, ly] = this._outToScene(this.lens.x, this.lens.y); return [lx * k, (H - ly) * k, this.lens.r * k];
+      const [lx, ly] = this._crt(this.lens.x, this.lens.y); return [lx * k, (H - ly) * k, this.lens.r * k];   // la escena ya se pinta girada: solo la curva CRT
     }
     _gridParams() {
       const STEPS = [0.25, 0.5, 1, 2, 5, 10, 15, 30], pxDeg = this.view.s * D2R, MIN = 84;
@@ -1282,7 +1294,7 @@ void main(){
       }
 
       // 1) silueta de tierra a baja resolucion (solo se repite si la vista o las deformaciones cambian)
-      const e0 = this._eff(), key = [v.cx, v.cy, v.s, silW, silH, ...e0.sh, ...e0.rot, ...e0.sc, ...e0.cen];
+      const e0 = this._eff(), key = [v.cx, v.cy, v.s, silW, silH, ...e0.sh, ...e0.rot, ...e0.sc, ...e0.cen, e0.oa, e0.mx];   // la silueta va girada con el mapa (aguas someras y sombreado de costa en su sitio)
       const same = this._silKey && this._silTex === bW.tex && this._silKey.length === key.length && this._silKey.every((x, i) => x === key[i]);
       if (!same) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, sil.fbo); gl.viewport(0, 0, silW, silH); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -1308,7 +1320,7 @@ void main(){
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.ocean.u.u_blurN, 0);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, bW.tex); gl.uniform1i(P.ocean.u.u_blurW, 1);
       if (swT) { gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, swT.tex); gl.uniform1i(P.ocean.u.u_swirl, 2); }
-      this._u(P.ocean, "u_center", v.cx, v.cy); this._u(P.ocean, "u_scale", sc); this._u(P.ocean, "u_res", sw, sh); this._u(P.ocean, "u_dpr", dpr * RS);
+      this._u(P.ocean, "u_center", v.cx, v.cy); this._u(P.ocean, "u_scale", sc); this._u(P.ocean, "u_res", sw, sh); this._u(P.ocean, "u_dpr", dpr * RS); this._setDist(P.ocean);
       this._u(P.ocean, "u_oTop", ...ms.oTop); this._u(P.ocean, "u_oBot", ...ms.oBot); this._u(P.ocean, "u_shallow", ...ms.shallow); this._u(P.ocean, "u_grid", ...ms.grid); this._u(P.ocean, "u_tropic", ...ms.tropic);
       this._u(P.ocean, "u_gp", gp.a, gp.b, gp.t, st.gridA);
       this._u(P.ocean, "u_time", this.fxOn === false ? 0 : now / 1000); gl.uniform1i(P.ocean.u.u_style, st.style || 0);
@@ -1357,7 +1369,7 @@ void main(){
       this._u(P.line, "u_width", lw); this._u(P.line, "u_off", 0, 0); this._u(P.line, "u_col", st.line[0], st.line[1], st.line[2], st.line[3] * lcov);
       const lensOn = this.lens && this.lens.r > 0 && this.dist.spec && (this._eff().wob > 0.002 || this._eff().lineA < 0.98);
       if (lensOn) {                                                     // fuera de la lupa: fronteras deformadas; dentro: las verdaderas
-        const [lx, ly] = this._outToScene(this.lens.x, this.lens.y), k = dpr * RS, e = this._eff();
+        const [lx, ly] = this._crt(this.lens.x, this.lens.y), k = dpr * RS, e = this._eff();
         this._u(P.line, "u_lens", lx * k, (H - ly) * k, this.lens.r * k);
         this._u(P.line, "u_lmode", 1); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
         this._u(P.line, "u_wob", 0); this._u(P.line, "u_lineA", 1); this._u(P.line, "u_lmode", 2); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.segCount);
@@ -1383,7 +1395,6 @@ void main(){
       this._u(P.post, "u_res", this.cv.width, this.cv.height); this._u(P.post, "u_zc", zc[0] * dpr, (H - zc[1]) * dpr);
       const fxk = this.fxOn === false ? 0 : 1;
       this._u(P.post, "u_zv", this.zv * fxk); this._u(P.post, "u_pv", this.pv[0] * dpr * 0.06 * fxk, -this.pv[1] * dpr * 0.06 * fxk);
-      { const o = this._orient(); this._u(P.post, "u_ori", o.c, o.s, o.sx, o.on ? 1 : 0); }
       this._u(P.post, "u_crt", st.crt ? 1 : 0); this._u(P.post, "u_lite", this.lite ? 1 : 0); this._u(P.post, "u_dpr", dpr);
       this._u(P.post, "u_vig", st.vignette); this._u(P.post, "u_grain", st.postGrain); this._u(P.post, "u_tint", ...st.tint); this._u(P.post, "u_time", now / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
