@@ -69,6 +69,7 @@ window.AIQ = window.AIQ || {};
       for (const [a2, b2] of [[0, -2], [0, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [0, 1], [0, 2]]) px(sx + a2, sy + b2, col);
     }
     if (P.m && P.m.tremble) { const hb = Math.min(1, beat(now)); if (hb > 0.2) { circle(cx, cy, Math.round(R) + 3, `rgba(254,95,85,${(hb * 0.9).toFixed(2)})`); circle(cx, cy, Math.round(R) + 4, `rgba(254,95,85,${(hb * 0.45).toFixed(2)})`); } }   // el latido se ve en el reticulo
+    if (P.st.calm) { circle(cx, cy, Math.round(R) + 3, "rgba(150,230,255,.9)"); for (let k = 0; k < 4; k++) { const a = t * 0.4 + (k * Math.PI) / 2, sx = cx + Math.cos(a) * (R + 3), sy = cy + Math.sin(a) * (R + 3); for (const [a2, b2] of [[0, -2], [0, 2], [-2, 0], [2, 0], [0, 0], [-1, -1], [1, 1], [1, -1], [-1, 1]]) px(sx + a2, sy + b2, k % 2 ? WHITE : CYAN); } }   // Sangre fria (tanda 9): halo de escarcha
     if (P.m && P.m.cblur) defocus(P.m.cblur.px, t);
   }
   /* Cursor borroso: desenfoque optico de verdad (vision doble con aberracion cromatica), no una mancha */

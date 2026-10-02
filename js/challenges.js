@@ -240,7 +240,7 @@ window.AIQ = window.AIQ || {};
     /* v0.35: la ficha ya no dice que perk frena el reto (ni brilla por ello): el jugador tiene que leer y atar cabos */
     /* v0.52: durante una pregunta en la que la Torre de Babel no puede cambiar el nombre, su ficha ensena el reto que sale en su lugar (y por que) */
     NEW_TAG: L6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||初登场|첫 등장|初登場|Новинка|Nowość"),
-    chip(c, small) { const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b>${c.isNew ? `<span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""}<i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
+    chip(c, small) { const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}${c.calm ? " ch-calm" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b>${c.isNew ? `<span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""}<i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
   };
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */
@@ -729,9 +729,10 @@ window.AIQ = window.AIQ || {};
     active: () => S.pub.slice(),
     has,
     lensRadius: () => (S.suspended ? 0 : has("wrongborders") ? S.fx.trueR : has("noborders") ? S.fx.peekR : 0),
-    question(o, qi = 0) {
+    question(o, qi = 0, opt = {}) {
       const map = S.map = (A.core && A.core.map) || S.map; if (!map || !S.on) return; S.q = qi; S.suspended = false; clearTimers(); ensureOverlay(map);
       decorate(o);
+      S.calm = opt.calm || null; if (S.calm) S.qlist = cur().filter(c => !S.calm.includes(D[c.id].fam));   // tanda 9: Sangre fria apaga en esta pregunta los retos de puntero y pantalla
       const spec = map.setDistort ? mapSpec(map, o) : null, app = $("app");
       if (spec) { map.setDistort(spec, spec.ms || 900); say("chal"); } else if (map.clearDistort) map.clearDistort(300);
       if (spec && spec.deal && A.core && A.core.S) A.core.S.limit += spec.ms / 1000;   // mientras se reparten las cartas no se puede responder: ese tiempo se devuelve
@@ -746,7 +747,7 @@ window.AIQ = window.AIQ || {};
       if (dk && !PX) { const p = par(dk); app.style.setProperty("--dr", p.r + "px"); app.style.setProperty("--da", p.a.toFixed(3)); K.classList.add("on"); H.classList.add("on"); H.classList.toggle("warm", !!S.fx.halo); } else { K.classList.remove("on"); H.classList.remove("on"); }
       if (dk) say("dark");
       if (cl && !PX) fxStart("smoke", par(cl).cover); else if (rn && !CX) fxStart("rain", par(rn).dens); else fxStop();
-      if (CX) { CX.clear(); CX.set(S.list, par, S.fx); }
+      if (CX) { CX.clear(); CX.set(cur(), par, S.fx); }
       /* tanda 7: las Chinchetas trampa llueven durante la primera mitad larga de la pregunta, una tras otra, por todo el mapa */
       if (map.setDecoys) { if (dc) { const L = decoyList(map, o, par(dc).n), lim = ((A.core && A.core.S && A.core.S.limit) || 20) * 1000, t0 = performance.now() + 450, gap = (lim * 0.55) / Math.max(1, L.length), rr = A.rng(`${S.seed}:dr:${S.round}:${S.q}`); L.forEach((d, k) => { d.t0 = t0 + k * gap + rr() * gap * 0.6; later(() => say("pinFall", k), Math.max(0, d.t0 - performance.now())); }); map.setDecoys(L); } else map.setDecoys([]); }
       layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; flickerLoop(); lightningLoop(); quakeLoop();

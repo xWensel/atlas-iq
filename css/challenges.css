@@ -105,6 +105,13 @@ html:lang(zh), html:lang(ja), html:lang(ko), html:lang(ru) { --dll: .889; }
 #askName .lt.dot , #askSub .lt.dot { color: #6d5d92; } #askName .lt.faint , #askSub .lt.faint { opacity: .32; filter: blur(.7px); }
 #askName .lt.rune , #askSub .lt.rune { color: #a56cff; text-shadow: 0 0 6px rgba(165, 108, 255, .65); }
 #askName.ch-upside , #askSub.ch-upside { display: block; transform: rotate(180deg); }
+/* tanda 9: Sangre fria: las fichas de los retos que apaga, heladas */
+.ch-chip.ch-calm { filter: saturate(.35) brightness(.92); box-shadow: inset 0 0 0 2px rgba(150, 230, 255, .85), 0 0 10px rgba(150, 230, 255, .35); }
+.ch-chip.ch-calm::after { content: "\2744"; color: #9fe6ff; margin-left: 1px; font-size: .9em; }
+/* tanda 9: lo que lleva dentro la Hucha y Barajar gratis con el Ojo en el cielo */
+.ab-perk, .tr-relic { position: relative; }
+.hc-n { position: absolute; right: -4px; bottom: -5px; min-width: 16px; padding: 1px 3px 0; border-radius: 8px; background: #f8b449; color: #16241c; font: 800 11px/1.2 var(--mono, monospace); text-align: center; box-shadow: 0 0 0 2px #16241c; pointer-events: none; }
+.nr-shuffle .nr-free { color: #ffd76a; font-style: normal; display: inline-flex; align-items: center; gap: 3px; text-transform: uppercase; }
 /* tanda 6b: la etiqueta NUEVO de un reto que nunca has visto */
 .ch-new, .adv-debuff .ch-new { display: inline-block; width: auto; font-family: inherit; font-weight: 700; margin: 0 4px; padding: 1px 5px 0; border: 2px solid #e2483d; color: #e2483d; background: rgba(255, 244, 228, .92); font-style: normal; font-size: .72em; line-height: 1.1; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; border-radius: 3px; }
 .ch-chip .ch-new { font-size: .62em; padding: 0 4px; margin: 0 3px; }
