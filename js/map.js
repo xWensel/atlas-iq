@@ -1458,7 +1458,11 @@ void main(){
           c.lineWidth = 7; c.strokeStyle = sk.ink; c.strokeText(m.pop, G[0], y); c.fillStyle = sk.paper; c.fillText(m.pop, G[0], y); c.restore();
         }
       }
-      if (this.decoys && this.decoys.length) for (const d of this.decoys) { const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.a == null ? 0.9 : d.a; this._pin(c, q[0], q[1], sk.red, sk.paper, 2000, 1); c.restore(); }
+      if (this.decoys && this.decoys.length) {                          // tanda 7: con t0, la chincheta cae del cielo a su hora (y la capa sigue animada mientras caen)
+        let live = false;
+        for (const d of this.decoys) { const age = d.t0 ? now - d.t0 : 2000; if (age < 0) { live = true; continue; } if (age < 1400) live = true; const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.a == null ? 0.9 : d.a; this._pinRain(c, q[0], q[1], sk.red, sk.paper, age); c.restore(); }
+        if (live) this.fxDirty = true;
+      }
       if (this.pickEnabled && this.mouse && !this.pointers.size && !this.hideReticle) this._reticle(c, this.mouse.x, this.mouse.y);
     }
     _drawProbes(c, now) { if (A.drawProbes(this, c, now)) this.fxDirty = true; }   // el borde discontinuo y el latido se animan
@@ -1500,15 +1504,29 @@ void main(){
       c.shadowColor = "transparent"; c.strokeStyle = sk.ink; c.lineWidth = 1.3; c.stroke();
       c.fillStyle = sk.ink; c.textBaseline = "middle"; c.fillText(text, rx + 11, ry + h / 2 + 1); c.restore();
     }
-    _pin(c, x, y, fill, ring, age, alpha) {
+    _pin(c, x, y, fill, ring, age, alpha, noShadow) {
       if (age < 0 || alpha <= 0) return;
       const k = Math.min(1, age / 520), drop = (1 - easeOutBounce(k)) * -90;
       c.save(); c.globalAlpha = alpha;
-      c.fillStyle = "rgba(0,0,0,.32)"; c.beginPath(); c.ellipse(x, y + 1, 9 * (0.4 + 0.6 * k), 3.6 * (0.4 + 0.6 * k), 0, 0, Math.PI * 2); c.fill();
+      if (!noShadow) { c.fillStyle = "rgba(0,0,0,.32)"; c.beginPath(); c.ellipse(x, y + 1, 9 * (0.4 + 0.6 * k), 3.6 * (0.4 + 0.6 * k), 0, 0, Math.PI * 2); c.fill(); }
       c.translate(x, y + drop);
       c.beginPath(); c.moveTo(0, 0); c.bezierCurveTo(-4, -10, -13, -15, -13, -26); c.arc(0, -26, 13, Math.PI, 0); c.bezierCurveTo(13, -15, 4, -10, 0, 0); c.closePath();
       c.fillStyle = fill; c.fill(); c.lineWidth = 2.5; c.strokeStyle = ring; c.stroke();
       c.beginPath(); c.arc(0, -26, 4.6, 0, Math.PI * 2); c.fillStyle = ring; c.fill(); c.restore();
+    }
+    /* tanda 7: Chinchetas trampa que llueven: caen desde arriba de la pantalla (acelerando y girando), se clavan con un rebote y levantan polvo */
+    _pinRain(c, x, y, fill, ring, age) {
+      const F = 620;
+      if (age >= F + 700) return this._pin(c, x, y, fill, ring, 2000, 1);
+      if (age < F) {
+        const k = age / F, yy = y - (y + 70) * (1 - k * k), rot = (1 - k) * 0.9 * (Math.sin(x * 0.37) > 0 ? 1 : -1);
+        c.save(); c.fillStyle = `rgba(0,0,0,${(0.06 + 0.26 * k).toFixed(3)})`; c.beginPath(); c.ellipse(x, y + 1, 9 * (0.3 + 0.7 * k), 3.6 * (0.3 + 0.7 * k), 0, 0, Math.PI * 2); c.fill();
+        c.translate(x, yy); c.rotate(rot); this._pin(c, 0, 0, fill, ring, 2000, 1, true); c.restore();
+        return;
+      }
+      const b = age - F, hop = -Math.abs(Math.sin((b / 150) * Math.PI)) * 10 * Math.exp(-b / 160);
+      this._pin(c, x, y + hop, fill, ring, 2000, 1);
+      if (b < 360) { const q = b / 360; c.save(); c.fillStyle = `rgba(240,225,200,${(0.5 * (1 - q)).toFixed(3)})`; for (let i = 0; i < 6; i++) { const a = Math.PI + (i / 5) * Math.PI, d = 6 + q * 18; c.beginPath(); c.arc(x + Math.cos(a) * d * 1.4, y + Math.sin(a) * d * 0.5, 2.2 * (1 - q) + 0.6, 0, Math.PI * 2); c.fill(); } c.restore(); }
     }
     _reticle(c, x, y) {
       const sk = this.sk;

@@ -27,7 +27,7 @@ window.AIQ = window.AIQ || {};
 
   let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [];
   const U = {}, t0 = performance.now(), timers = [];
-  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [] };
+  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [], sparks: [], shades: [], wipes: [] };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
   const ptr = () => (A.chal && A.chal.state && A.chal.state.px) || { x: W / 2, y: H / 2 };
 
@@ -36,7 +36,7 @@ window.AIQ = window.AIQ || {};
 void main(){ vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2)); gl_Position = vec4(p * 2. - 1., 0., 1.); }`;
   const FS = `#version 300 es
 precision highp float;
-uniform vec2 uR, uP; uniform float uK, uT, uFlash; uniform vec4 uDark, uSpot, uSmoke, uCut;
+uniform vec2 uR, uP; uniform float uK, uT, uFlash; uniform vec4 uDark, uSpot, uSmoke, uCut; uniform sampler2D uMask; uniform vec3 uPush;
 out vec4 o;
 const float TAU = 6.2831853;
 float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
@@ -47,7 +47,7 @@ void main(){
   vec2 fc = gl_FragCoord.xy, px = vec2(fc.x, uR.y - fc.y) / uK, vw = uR / uK;
   float T = uT; vec4 c = vec4(0.);
   if (uSmoke.x > 0.) {                                   // humo de puro: ruido con dominio deformado, iluminado por las lamparas de la sala
-    vec2 q = px / 290. + uSmoke.w * vec2(7.3, 3.1);
+    vec2 dp = px - uP, q = (px - uPush.xy * exp(-dot(dp, dp) / 52000.)) / 290. + uSmoke.w * vec2(7.3, 3.1);   // tanda 7: el raton empuja el humo
     vec2 w = vec2(fbm(q * 1.3 + vec2(T * .045, -T * .02)), fbm(q * 1.3 + vec2(5.2, 1.3) + vec2(-T * .03, T * .035)));
     vec2 qq = q + 2.2 * w + vec2(T * .06, T * .015);
     float d = fbm(qq), d2 = fbm(qq + vec2(.11, .15)), wisp = fbm(q * 3.1 + w * 1.4 - vec2(T * .09, 0.));
@@ -58,6 +58,7 @@ void main(){
     float haze = .14 * smoothstep(th - .2, th + .08, d) + .1 * smoothstep(.55, .8, wisp) * smoothstep(th - .3, th, d);
     a = clamp(a * .95 + haze, 0., .965) * uSmoke.x;
     if (uSmoke.z > 0.) a *= smoothstep(uSmoke.z * .55, uSmoke.z, length(px - uP));
+    a *= 1. - texture(uMask, px / vw).a * .97;                       // tanda 7: lo que has barrido (se cierra solo)
     c = over(c, vec4(col * a, a));
   }
   if (uDark.x > 0.) {                                    // apagon: linterna viva (borde que respira), grano en la sombra y motas de polvo en el haz
@@ -121,7 +122,7 @@ void main(){
     if (linked) return true; if (!gl || !prog) return false;
     if (psc && !gl.getProgramParameter(prog, psc.COMPLETION_STATUS_KHR)) return false;
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn("chfx: sin WebGL2", gl.getProgramInfoLog(prog), ...shs.map(s => gl.getShaderInfoLog(s))); gl = null; return false; }
-    for (const n of ["uR", "uP", "uK", "uT", "uFlash", "uDark", "uSpot", "uSmoke", "uCut"]) U[n] = gl.getUniformLocation(prog, n);
+    for (const n of ["uR", "uP", "uK", "uT", "uFlash", "uDark", "uSpot", "uSmoke", "uCut", "uMask", "uPush"]) U[n] = gl.getUniformLocation(prog, n);
     return (linked = true);
   }
   /* se deja compilando en un rato libre nada mas arrancar: cuando llegue el primer reto ya esta listo */
@@ -155,7 +156,7 @@ void main(){
     cv.width = Math.max(2, Math.round(W * D2)); cv.height = Math.max(2, Math.round(H * D2));
     return true;
   }
-  const busy = () => !!(E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length);
+  const busy = () => !!(E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length);
   function kick() { if (!raf && ov) { last = performance.now(); raf = requestAnimationFrame(tick); } }
   function tick(now) {
     raf = 0; if (!ov || !ov.isConnected) return;
@@ -181,6 +182,9 @@ void main(){
     E.bolts = E.bolts.filter(b => now - b.t0 < 1400);
     E.puffs = E.puffs.filter(p => now - p.t0 < 700);
     E.trail = E.trail.filter(p => now - p.t < 260);
+    if (E.smoke && E.smoke.on) sweepStep(dt, now);
+    if (E.sparks.length) { for (const s of E.sparks) { s.vy += 900 * dt; s.x += s.vx * dt; s.y += s.vy * dt; } E.sparks = E.sparks.filter(s => now - s.t0 < s.life); }
+    E.shades = E.shades.filter(s => now - s.t0 < s.ms); E.wipes = E.wipes.filter(w => now - w.t0 < 420);
     if (E.seal) { const r = A.chal && A.chal.lensRadius ? A.chal.lensRadius() : 0; if (r > 0) E.seal.r = r; else E.seal.on = 0; }
   }
   function rebuild() {
@@ -199,18 +203,25 @@ void main(){
     gl.uniform4f(U.uDark, d ? d.k : 0, d ? d.r : 0, d ? d.a : 0, d && d.warm ? 1 : 0);
     gl.uniform4f(U.uSpot, s ? s.k : 0, s ? s.r : 0, 0, 0);
     gl.uniform4f(U.uSmoke, m ? m.k : 0, m ? m.cover : 0, m ? m.hole : 0, m ? m.seed : 0);
+    /* la mascara del humo barrido (96x54): una textura siempre enlazada (sin ella el navegador avisa en cada fotograma); con humo, se sube la de ahora */
+    if (!SM.tex) { SM.tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, SM.tex); for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4)); }
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, SM.tex); if (m && SM.cv) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SM.cv);
+    gl.uniform1i(U.uMask, 0); gl.uniform3f(U.uPush, clamp(SM.push[0], -170, 170), clamp(SM.push[1], -170, 170), 0);
     gl.uniform4f(U.uCut, E.cut.v, E.cut.e, E.cut.b, 0); gl.uniform1f(U.uFlash, E.flash);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function draw2D(now) {
-    const need = !!(E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.bolts.length || E.puffs.length || E.trail.length);
+    const need = !!(E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length);
     cv.classList.toggle("on", need); if (!need) return;
     const g = g2; g.setTransform(D2, 0, 0, D2, 0, 0); g.clearRect(0, 0, W, H);
     if (E.film) drawFilm(g, E.film);
     if (E.prints) drawPrints(g, E.prints);
     if (E.rain) drawRain(g, E.rain, now);
     if (E.crack) drawCrack(g, E.crack, now);
+    if (E.shades.length) drawShades(g, now);
     if (E.bolts.length) drawBolts(g, now);
+    if (E.wipes.length) drawWipes(g, now);
+    if (E.sparks.length) drawSparks(g, now);
     if (E.seal) drawSeal(g, E.seal, now);
     if (E.lens) drawLens(g, E.lens);
     if (E.trail.length) drawTrail(g, now);
@@ -219,22 +230,36 @@ void main(){
 
   /* ------------------------------------------------------------------ lluvia: estelas en 3 profundidades, salpicaduras, gotas en el cristal */
   function rainOn(dens) {
-    const r = E.rain = keep(E.rain && E.rain.on ? E.rain : null, { dens, st: [], sp: [], drops: [], tr: [], tt: 0 });
+    const r = E.rain = keep(E.rain && E.rain.on ? E.rain : null, { dens, st: [], sp: [], drops: [], tr: [], tt: 0, wet: 0.35, wb: -1, sh: null, wipeAt: 0 });
     const n = Math.round(60 + dens * 250); for (let i = 0; i < n; i++) r.st.push(streak(true));
     const box = part("chx-drops"); box.innerHTML = ""; box.classList.add("on");
     const low = game().quality === "low";                                           // en calidad baja, menos gotas con backdrop-filter
-    for (let i = 0, m = Math.round((low ? 3 : 6) + dens * (low ? 9 : 24)); i < m; i++) r.drops.push(glassDrop(box, true));
-    const wet = part("chx-wet"); wet.style.setProperty("--wb", (0.5 + dens * 1.6).toFixed(2) + "px"); wet.classList.add("on");
+    for (let i = 0, m = Math.round((low ? 4 : 10) + dens * (low ? 12 : 34)); i < m; i++) r.drops.push(glassDrop(box, true));   // tanda 7: mas gotas
+    part("chx-wet").classList.add("on");
     say("rain", dens);
   }
   function streak(init) { const z = rnd(), end = H * (0.06 + rnd() * 0.98); return { x: rnd() * (W + 260) - 200, y: init ? rnd() * end : -20 - rnd() * 180, end, z, v: 650 + z * 1150, l: 9 + z * 30 + (z > 0.93 ? 34 : 0) }; }
   function glassDrop(box, init) {
     const el = document.createElement("i"); el.className = "chx-drop"; const s = 6 + rnd() ** 2.2 * 34;
     el.style.width = s.toFixed(1) + "px"; el.style.height = (s * (1.04 + rnd() * 0.18)).toFixed(1) + "px"; box.appendChild(el);
-    return { el, x: rnd() * W, y: init ? rnd() * H : -30, s, vy: 0, slide: false, tt: 0 };
+    return { el, x: rnd() * W, y: init ? rnd() * H : -30, s, vy: 0, slide: false, tt: 0, th: rnd() * 0.9, gone: false };   // th: con cuanta humedad vuelve a salir tras limpiar
+  }
+  /* tanda 7: la lluvia empana poco a poco (r.wet, de 0 a 1) y se limpia AGITANDO el raton: 3 cambios de sentido en 0,65 s */
+  function rainShake(r, now) {
+    const p = ptr(), S = r.sh || (r.sh = { lx: p.x, ly: p.y, dx: 0, dy: 0, ax: 0, ay: 0, rev: [] });
+    for (const [d, dk, ak] of [[p.x - S.lx, "dx", "ax"], [p.y - S.ly, "dy", "ay"]]) {
+      if (Math.abs(d) < 2) continue; const s = Math.sign(d);
+      if (s !== S[dk]) { if (S[ak] > 36) S.rev.push(now); S[ak] = 0; S[dk] = s; }
+      S[ak] += Math.abs(d);
+    }
+    S.lx = p.x; S.ly = p.y; S.rev = S.rev.filter(t => now - t < 650);
+    if (S.rev.length >= 3 && now - r.wipeAt > 550) { S.rev = []; r.wipeAt = now; r.wet = 0.05; E.wipes.push({ t0: now, dir: S.dx || 1 }); for (const d of r.drops) { d.gone = true; d.el.style.opacity = 0; } r.tr.length = 0; say("wipe"); }
   }
   function stepRain(r, dt, now) {
     const sl = 0.2;
+    if (r.on) { rainShake(r, now); r.wet = Math.min(1, r.wet + dt * (0.2 + r.dens * 0.22)); }
+    const wb = (0.6 + r.dens * 2.4) * r.wet; if (Math.abs(wb - r.wb) > 0.04) { r.wb = wb; part("chx-wet").style.setProperty("--wb", wb.toFixed(2) + "px"); }   // solo si cambia
+    for (const d of r.drops) if (d.gone && r.wet > d.th + 0.08) { Object.assign(d, { x: rnd() * W, y: rnd() * H * 0.9, vy: 0, slide: false, gone: false }); d.el.style.opacity = ""; }
     for (const s of r.st) { s.y += s.v * dt; s.x += s.v * dt * sl; if (s.y >= s.end) { if (s.z > 0.42 && r.sp.length < 90) r.sp.push({ x: s.x, y: s.end, t: now, z: s.z }); Object.assign(s, streak(false)); } }
     r.sp = r.sp.filter(p => now - p.t < 340);
     for (const d of r.drops) {
@@ -273,12 +298,14 @@ void main(){
     for (let i = 0; i < it; i++) { const nx = []; for (let j = 0; j < pts.length - 1; j++) { const a = pts[j], b = pts[j + 1], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, o = (rnd() - 0.5) * amp; nx.push(a, [(a[0] + b[0]) / 2 - (dy / l) * o, (a[1] + b[1]) / 2 + (dx / l) * o]); } nx.push(pts[pts.length - 1]); pts = nx; amp *= 0.55; }
     return pts;
   }
-  X.strike = () => {
+  /* tanda 7: o.near = probabilidad de caer cerca del puntero; o.shade = ms de la sombra que deja (la imagen quemada en la retina) */
+  X.strike = (o = {}) => {
     if (!ov) return; kick(); size();
-    const now = performance.now(), x1 = W * (0.18 + rnd() * 0.64), y1 = H * (0.42 + rnd() * 0.45), x0 = clamp(x1 + (rnd() - 0.5) * W * 0.4, 20, W - 20), y0 = -10, len = Math.hypot(x1 - x0, y1 - y0);
+    const p = ptr(), near = !!o.near && rnd() < o.near, now = performance.now(), x1 = near ? clamp(p.x + (rnd() - 0.5) * 240, 40, W - 40) : W * (0.18 + rnd() * 0.64), y1 = near ? clamp(p.y + (rnd() - 0.5) * 170, H * 0.2, H - 40) : H * (0.42 + rnd() * 0.45), x0 = clamp(x1 + (rnd() - 0.5) * W * 0.4, 20, W - 20), y0 = -10, len = Math.hypot(x1 - x0, y1 - y0);
     const main = boltPts(x0, y0, x1, y1, len * 0.17, 7), br = [], dir = Math.atan2(y1 - y0, x1 - x0);
     for (let i = 0, nb = 2 + Math.floor(rnd() * 3); i < nb; i++) { const p = main[2 + Math.floor(rnd() * main.length * 0.6)], a = dir + (rnd() < 0.5 ? -1 : 1) * (0.35 + rnd() * 0.6), l = (0.16 + rnd() * 0.3) * len; br.push(boltPts(p[0], p[1], p[0] + Math.cos(a) * l, p[1] + Math.sin(a) * l, l * 0.2, 5)); }
     const sf = soft(); E.bolts.push({ t0: now, main, br, x: x1, y: y1, soft: sf }); E.fseq = { t0: now, soft: sf };
+    if (o.shade) E.shades.push({ x: x1, y: y1, t0: now + 60, ms: o.shade, r: 120 + rnd() * 60 });
     later(() => say("thunder"), 40 + rnd() * 160);
   };
   const boltA = t => (t < 55 ? 1 : t < 120 ? 0.25 : t < 200 ? 1 : Math.exp(-(t - 200) / 230));
@@ -299,15 +326,17 @@ void main(){
   }
 
   /* ------------------------------------------------------------------ corte de luz (lo dispara js/challenges.js a intervalos) */
-  X.cut = (len, dim, done) => {
+  X.cut = (len, dim, done, pat = "normal") => {
     if (!ov) return done && done(); kick();
     const on = dim ? 0.62 : 1, sf = E.cut.soft = soft();
+    /* tanda 7: cada corte, a su manera (tartamudo, amago, largo); en Destellos suaves, siempre el fundido */
+    const PAT = { stutter: [[on, 50, 1], [0, 60, 0], [on, 50, 1], [0, 60, 0], [on, 50, 1], [0, 70, 0], [on, len, 2], [0, 0, 3]], tease: [[on * 0.55, 90, 1], [0, 80, 0], [on * 0.7, 70, 1], [0, 60, 0], [on, len * 0.7, 2], [0, 0, 3]], long: [[on, 70, 1], [0, 90, 0], [on, len * 1.6, 2], [on * 0.3, 40, 0], [on, 120, 1], [0, 0, 3]] };
     /* suave: se va y vuelve con un fundido, sin los chispazos ni el fogonazo al volver (a oscuras, casi lo mismo que el corte intenso: 270 ms + len) */
-    const seq = sf ? [[on, len + 230, 2], [0, 0, 3]] : [[on, 70, 1], [0, 90, 0], [on, 60, 1], [0.25, 40, 0], [on, len, 2], [0, 45, 0], [on * 0.7, 35, 1], [0, 0, 3]];
+    const seq = sf ? [[on, len + 230, 2], [0, 0, 3]] : PAT[pat] || [[on, 70, 1], [0, 90, 0], [on, 60, 1], [0.25, 40, 0], [on, len, 2], [0, 45, 0], [on * 0.7, 35, 1], [0, 0, 3]];
     const go = i => {
       if (i >= seq.length || !ov) return done && done();
       const [v, ms, snd] = seq[i]; E.cut.tv = v; if (!sf) { E.cut.v = v; E.cut.bt = performance.now() + 70; } kick();
-      if (snd === 1) say("buzz", i); else if (snd === 2) say("powerdown"); else if (snd === 3) { say("restore"); if (!sf) E.flash = Math.max(E.flash, 0.16); }
+      if (snd === 1) { say("buzz", i); if (!sf && rnd() < 0.7) sparkBurst(); } else if (snd === 2) say("powerdown"); else if (snd === 3) { say("restore"); if (!sf) E.flash = Math.max(E.flash, 0.16); }
       if (i === seq.length - 1) return done && done();
       later(() => go(i + 1), ms);
     };
@@ -328,7 +357,8 @@ void main(){
     if (!E.crack || !E.crack.on) return; renderHit(h); h.at = performance.now(); kick();
     say("glass"); const app = document.getElementById("app");
     if (app && !reduce()) { app.classList.remove("chx-punch"); A.restyle(app); app.classList.add("chx-punch"); later(() => app.classList.remove("chx-punch"), 260); }
-    const sh = document.createElement("i"), r = h.Rpx * 0.34, rr = seeded(h.seed + ":s"), poly = [];
+    const sh = document.createElement("i"), r = h.Rpx * 0.6, rr = seeded(h.seed + ":s"), poly = [];   // tanda 7: la zona danada tapa de verdad (antes 0,34): mueve o acerca el mapa para ver debajo
+    sh.style.setProperty("--sb", (7 + 5 * Math.sqrt(h.glass)).toFixed(1) + "px");
     for (let i = 0; i < 16; i++) { const a = (i / 16) * TAU, q = 0.62 + rr() * 0.38; poly.push(`${(50 + Math.cos(a) * 50 * q).toFixed(1)}% ${(50 + Math.sin(a) * 50 * q).toFixed(1)}%`); }
     sh.className = "chx-shard"; Object.assign(sh.style, { left: (h.fx * W - r) + "px", top: (h.fy * H - r) + "px", width: 2 * r + "px", height: 2 * r + "px", clipPath: `polygon(${poly.join(",")})` });
     part("chx-shards").appendChild(sh); part("chx-shards").classList.add("on");
@@ -481,20 +511,81 @@ void main(){
     if (!dim) { dim = document.createElement("div"); dim.id = "chxDim"; document.body.appendChild(dim); }
     if (!hud) { hud = document.createElement("div"); hud.id = "chxBat"; hud.innerHTML = `<div class="cb-cell"><i class="cb-lvl"></i></div><b class="cb-pct"></b><div class="cb-toast"><b></b><span></span></div>`; document.body.appendChild(hud); }
     hud.querySelector(".cb-toast b").textContent = tx(BT.low); hud.querySelector(".cb-toast span").textContent = tx(BT.plug);
-    hud.classList.remove("toast", "crit", "charge"); hud.classList.add("on");
-    E.batt = { on: 1, k: 0, max, pct: -1, toast: false, dim, hud };
+    let dead = document.getElementById("chxDead"); if (!dead) { dead = document.createElement("div"); dead.id = "chxDead"; dead.innerHTML = `<div class="cd-bat"><i></i></div><b></b>`; document.body.appendChild(dead); }
+    dead.querySelector("b").textContent = tx(BT.plug); dead.classList.remove("on");
+    hud.classList.remove("toast", "crit", "charge", "save"); hud.classList.add("on");
+    /* tanda 7: como un movil de verdad: empieza con un 14-26 %, se descarga a saltos (zumbido y parpadeo), avisa al 20, 10 y 5 % y, desde el nivel 2, se apaga un momento al 2 % */
+    E.batt = { on: 1, k: 0, max, pct: -1, toast: false, dim, hud, dead, start: Math.round(14 + rnd() * 12), drain: 0, toasts: {}, died: false, flick: 0, nextS: 0 };
   }
   function stepBatt(b, dt, now) {
     const S = game(), asking = S.phase === "asking" && !S.paused && !(A.chal && A.chal.suspended && A.chal.suspended());
     const el = asking && S.t0 ? (performance.now() - S.t0 - (S.pausedAcc || 0)) / 1000 : 0, pr = b.on ? clamp(el / Math.max(1, S.limit || 10), 0, 1) : 0;
     const tgt = b.on && asking ? b.max * (pr * pr * (3 - 2 * pr) * 0.85 + pr * 0.15) : 0;
     b.k += (tgt - b.k) * (1 - Math.exp(-dt / (b.on ? 0.25 : 0.12)));
-    b.dim.style.opacity = b.k.toFixed(3);
+    if (b.on && asking) { if (!b.nextS) b.nextS = now + 1500 + rnd() * 2500; if (now > b.nextS) { b.nextS = now + 2200 + rnd() * 3500; b.drain += 1 + Math.floor(rnd() * 3); b.flick = now; say("buzz", 1); } }   // un bajon de carga
+    const fl = now - b.flick < 240 ? (Math.floor((now - b.flick) / 60) % 2 ? 0 : 0.35) : 0;
+    b.dim.style.opacity = Math.min(0.97, b.k + fl).toFixed(3);
     if (b.on) {
-      const pct = Math.max(1, Math.round(15 - 14 * pr));
-      if (pct !== b.pct) { b.pct = pct; b.hud.querySelector(".cb-pct").textContent = pct + "%"; b.hud.querySelector(".cb-lvl").style.width = Math.max(6, pct * 5.5) + "%"; b.hud.classList.toggle("crit", pct <= 5); }
-      if (!b.toast && pct <= 10) { b.toast = true; b.hud.classList.add("toast"); say("lowbat"); later(() => b.hud && b.hud.classList.remove("toast"), 2600); }
+      const pct = Math.max(1, Math.round(b.start * (1 - pr) - b.drain));
+      if (pct !== b.pct) { b.pct = pct; b.hud.querySelector(".cb-pct").textContent = pct + "%"; b.hud.querySelector(".cb-lvl").style.width = Math.max(6, pct * 3.6) + "%"; b.hud.classList.toggle("crit", pct <= 5); b.hud.classList.toggle("save", pct <= 20 && pct > 5); }
+      for (const th of [20, 10, 5]) if (pct <= th && b.start > th && !b.toasts[th]) {
+        b.toasts[th] = 1; b.hud.querySelector(".cb-toast b").textContent = tx(BT.low) + " · " + th + " %"; b.hud.classList.add("toast"); say("lowbat");
+        clearTimeout(b.tT); b.tT = later(() => b.hud && b.hud.classList.remove("toast"), 2200);
+      }
+      if (pct <= 2 && !b.died && asking && b.max >= 0.6) { b.died = true; b.dead.classList.add("on"); say("powerdown"); later(() => { b.dead.classList.remove("on"); say("restore"); }, 650 + rnd() * 300); }   // se apaga un momento
     } else if (b.k < 0.01) { b.dim.style.opacity = 0; b.hud.classList.remove("on", "charge"); E.batt = null; }
+  }
+
+  /* ------------------------------------------------------------------ tanda 7: humo barrido, sombra del rayo, limpieza de la lluvia y chispas */
+  /* el humo se barre con el raton: mascara de 96x54 (blanca = barrido) que se cierra sola en ~2,5 s; empuja el humo en la direccion del gesto */
+  const SM = { cv: null, g: null, tex: null, lx: null, ly: null, acc: 0, at: 0, push: [0, 0] };
+  function sweepReset() { if (SM.g) SM.g.clearRect(0, 0, 96, 54); SM.lx = null; SM.push = [0, 0]; SM.acc = 0; }
+  function sweepStep(dt, now) {
+    if (!SM.cv) { SM.cv = document.createElement("canvas"); SM.cv.width = 96; SM.cv.height = 54; SM.g = SM.cv.getContext("2d"); }
+    const g = SM.g, p = ptr(), sx = 96 / Math.max(1, W), sy = 54 / Math.max(1, H);
+    g.globalCompositeOperation = "destination-out"; g.fillStyle = `rgba(0,0,0,${(1 - Math.exp(-dt / 2.4)).toFixed(4)})`; g.fillRect(0, 0, 96, 54);
+    if (SM.lx != null) {
+      const dx = p.x - SM.lx, dy = p.y - SM.ly, d = Math.hypot(dx, dy);
+      if (d > 1.5) {
+        const v = d / dt, R = clamp(34 + v * 0.045, 34, 120), a = clamp(0.22 + v / 4200, 0.22, 0.75), n = Math.min(24, Math.ceil(d / (R * 0.4)));
+        g.globalCompositeOperation = "source-over";
+        for (let i = 1; i <= n; i++) { const x = (SM.lx + (dx * i) / n) * sx, y = (SM.ly + (dy * i) / n) * sy, r = R * sx, gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(255,255,255,${a.toFixed(3)})`); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
+        SM.push[0] += dx * 0.6; SM.push[1] += dy * 0.6; SM.acc += d;
+      }
+    }
+    SM.lx = p.x; SM.ly = p.y;
+    const f = Math.exp(-dt / 0.5); SM.push[0] *= f; SM.push[1] *= f;
+    SM.acc *= Math.exp(-dt / 0.3); if (SM.acc > 260 && now - SM.at > 420) { SM.at = now; say("sweep", clamp(SM.acc / 900, 0.2, 1)); SM.acc = 0; }
+  }
+  /* el rayo deja donde cae una sombra: la imagen quemada en la retina, oscura con un halo verdoso */
+  function drawShades(g, now) {
+    for (const s of E.shades) {
+      const t = now - s.t0; if (t < 0) continue; const q = t / s.ms, a = q < 0.45 ? 1 : Math.max(0, 1 - (q - 0.45) / 0.55), r = s.r * (1 + q * 0.12);
+      const gr = g.createRadialGradient(s.x, s.y, 0, s.x, s.y, r); gr.addColorStop(0, `rgba(6,4,18,${(0.94 * a).toFixed(3)})`); gr.addColorStop(0.55, `rgba(14,8,34,${(0.82 * a).toFixed(3)})`); gr.addColorStop(0.85, `rgba(60,30,110,${(0.35 * a).toFixed(3)})`); gr.addColorStop(1, "rgba(60,30,110,0)");
+      g.fillStyle = gr; g.fillRect(s.x - r, s.y - r, 2 * r, 2 * r);
+      g.strokeStyle = `rgba(150,255,210,${(0.26 * a).toFixed(3)})`; g.lineWidth = 3; g.beginPath(); g.arc(s.x, s.y, r * 0.72, 0, TAU); g.stroke();
+    }
+  }
+  /* la escobilla que limpia la lluvia: una banda de cristal limpio que cruza la pantalla en el sentido del gesto */
+  function drawWipes(g, now) {
+    for (const w of E.wipes) {
+      const q = Math.min(1, (now - w.t0) / 380), e = q * q * (3 - 2 * q), x = w.dir > 0 ? -160 + (W + 320) * e : W + 160 - (W + 320) * e, a = q < 0.8 ? 1 : (1 - q) / 0.2;
+      const gr = g.createLinearGradient(x - 150, 0, x + 40, 0); gr.addColorStop(0, "rgba(220,240,255,0)"); gr.addColorStop(0.75, `rgba(220,240,255,${(0.16 * a).toFixed(3)})`); gr.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = gr; g.fillRect(x - 150, 0, 190, H);
+      g.strokeStyle = `rgba(255,255,255,${(0.55 * a).toFixed(3)})`; g.lineWidth = 2; g.beginPath(); g.moveTo(x + 30, 0); g.lineTo(x + 30, H); g.stroke();
+      g.fillStyle = `rgba(225,242,255,${(0.6 * a).toFixed(3)})`; for (let i = 0; i < 14; i++) { const y = ((i * 97 + w.t0) % H), dx = (w.dir > 0 ? 1 : -1) * (6 + ((i * 31) % 22)) * e; g.fillRect(x + 34 + dx, y, 2, 2); }   // gotitas que salen despedidas
+    }
+  }
+  /* chispas de la lampara al fallar la luz */
+  function sparkBurst() {
+    if (reduce() || !ov) return; const now = performance.now(), x0 = W * (0.12 + rnd() * 0.76), n = 10 + Math.floor(rnd() * 8);
+    for (let i = 0; i < n; i++) E.sparks.push({ x: x0 + (rnd() - 0.5) * 20, y: -4, vx: (rnd() - 0.5) * 260, vy: 40 + rnd() * 160, t0: now, life: 500 + rnd() * 500 });
+    say("spark"); kick();
+  }
+  function drawSparks(g, now) {
+    g.save(); g.globalCompositeOperation = "lighter"; g.lineCap = "round"; g.lineWidth = 2;
+    for (const s of E.sparks) { const q = (now - s.t0) / s.life; g.strokeStyle = `rgba(255,${Math.round(210 - 100 * q)},90,${(1 - q).toFixed(3)})`; g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(s.x - s.vx * 0.025, s.y - s.vy * 0.025); g.stroke(); }
+    g.restore();
   }
 
   /* ------------------------------------------------------------------ ayudas (perks): bisel de la lupa, anillo del sello */
@@ -553,7 +644,7 @@ void main(){
     const get = id => list.find(c => c.id === id), gl_ = !!gl, off = n => { if (E[n]) E[n].on = 0; };
     const dk = gl_ && get("dark"); if (dk) { const p = par(dk); E.dark = keep(E.dark, { r: p.r, a: p.a, warm: !!fx.halo }); } else off("dark");
     const bs = gl_ && get("blindspot"); if (bs) E.spot = keep(E.spot, { r: par(bs).r }); else off("spot");
-    const cl = gl_ && get("clouds"); if (cl) E.smoke = keep(E.smoke, { cover: par(cl).cover, hole: fx.cloudClear || 0, seed: rnd() }); else off("smoke");
+    const cl = gl_ && get("clouds"); if (cl) { if (!E.smoke || !E.smoke.on) sweepReset(); E.smoke = keep(E.smoke, { cover: par(cl).cover, hole: fx.cloudClear || 0, seed: rnd() }); } else off("smoke");
     const rn = get("rain"); if (rn) rainOn(par(rn).dens); else if (E.rain) { E.rain.on = 0; part("chx-wet").classList.remove("on"); say("rain", 0); }
     if (get("blur") && fx.lensR > 0) E.lens = keep(E.lens, { r: fx.lensR }); else off("lens");
     if ((get("wrongborders") && fx.trueR > 0) || (get("noborders") && fx.peekR > 0)) E.seal = keep(E.seal, { r: 110 }); else off("seal");
@@ -571,6 +662,8 @@ void main(){
     E.wins = null;
     if (E.crack) E.crack.on = 0;
     if (E.prints) E.prints.on = 0;
+    { const dd = document.getElementById("chxDead"); if (dd) dd.classList.remove("on"); }
+    E.sparks.length = 0; E.shades.length = 0; E.wipes.length = 0;
     if (E.batt && E.batt.on) { E.batt.on = 0; E.batt.hud.classList.add("charge"); E.batt.hud.classList.remove("toast", "crit"); if (E.batt.k > 0.05) say("charge"); }
     E.cut.v = E.cut.tv = 0; E.fseq = null; E.bolts.length = 0;
     const app = document.getElementById("app"); if (app) app.classList.remove("chx-punch");

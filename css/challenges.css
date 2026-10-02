@@ -185,7 +185,7 @@ html:lang(zh), html:lang(ja), html:lang(ko), html:lang(ru) { --dll: .889; }
   background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .78) 0 7%, rgba(255, 255, 255, 0) 21%), radial-gradient(circle at 62% 80%, rgba(255, 255, 255, .2) 0 9%, rgba(255, 255, 255, 0) 22%), radial-gradient(circle at 50% 50%, rgba(160, 200, 240, 0) 55%, rgba(10, 30, 60, .3) 100%);
   box-shadow: inset -1.5px -2.5px 3px rgba(0, 20, 40, .35), inset 1.5px 1.5px 2px rgba(255, 255, 255, .35), 0 1.5px 1.5px rgba(0, 10, 20, .3); }
 /* cristal roto: el nucleo del golpe queda lechoso y emborronado */
-.chx-shards > i { position: absolute; -webkit-backdrop-filter: blur(5px) brightness(1.25) saturate(.55) contrast(.9); backdrop-filter: blur(5px) brightness(1.25) saturate(.55) contrast(.9); background: radial-gradient(circle, rgba(235, 245, 255, .3), rgba(235, 245, 255, .06) 70%); animation: chx-shard-in .18s ease-out both; }
+.chx-shards > i { position: absolute; -webkit-backdrop-filter: blur(var(--sb, 9px)) brightness(1.2) saturate(.45) contrast(.85); backdrop-filter: blur(var(--sb, 9px)) brightness(1.2) saturate(.45) contrast(.85); background: radial-gradient(circle, rgba(235, 245, 255, .3), rgba(235, 245, 255, .06) 70%); animation: chx-shard-in .18s ease-out both; }
 @keyframes chx-shard-in { from { opacity: 0; transform: scale(.4); } }
 #app.chx-punch { animation: chx-punch .24s cubic-bezier(.3, .7, .4, 1); }
 @keyframes chx-punch { 15% { transform: translate(-9px, 6px) rotate(-.3deg); } 35% { transform: translate(7px, -5px) rotate(.25deg); } 60% { transform: translate(-4px, 3px); } 80% { transform: translate(2px, -1px); } 100% { transform: none; } }
@@ -226,6 +226,13 @@ html:lang(zh), html:lang(ja), html:lang(ko), html:lang(ru) { --dll: .889; }
 .cb-toast b { font-size: 14px; } .cb-toast span { font-size: 12.5px; font-weight: 500; opacity: .8; }
 #chxBat.toast .cb-toast { opacity: 1; transform: none; }
 @keyframes cb-blink { 50% { opacity: .35; } }
+/* tanda 7: bateria como un movil: modo ahorro en amarillo y el apagon con la pila vacia */
+#chxBat.save .cb-lvl { background: #ffd60a; }
+#chxDead { position: fixed; inset: 0; z-index: 99002; display: grid; place-content: center; justify-items: center; gap: 18px; background: #000; opacity: 0; pointer-events: none; transition: opacity .07s; font: 600 15px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; color: rgba(255, 255, 255, .72); }
+#chxDead.on { opacity: 1; }
+#chxDead .cd-bat { position: relative; width: 120px; height: 56px; border: 5px solid #ff3b30; border-radius: 12px; animation: cb-blink .5s steps(2, end) infinite; }
+#chxDead .cd-bat::after { content: ""; position: absolute; right: -14px; top: 15px; width: 8px; height: 16px; border-radius: 0 4px 4px 0; background: #ff3b30; }
+#chxDead .cd-bat i { position: absolute; left: 5px; top: 5px; bottom: 5px; width: 9px; border-radius: 3px; background: #ff3b30; }
 @media (max-width: 720px) { #chxBat { bottom: auto; top: 12px; right: 12px; } .cb-toast { bottom: auto; top: 30px; } }
 
 /* vision: miopia en dos capas (el enfoque cae de verdad), mapa borroso con halo suave y ventana nitida pegada al bisel de la lupa */

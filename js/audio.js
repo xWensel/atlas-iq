@@ -442,6 +442,12 @@ window.AIQ = window.AIQ || {};
     /* v0.36 marcador (js/marcador.js): el ticket sale del marcador (avance de papel, flojito), se arranca al pasar de pregunta,
        la barra toca la meta (la firma sol-do-re, rapida y una octava arriba) y cada escalon de botin (una moneda, mas aguda cada vez) */
     feed: go(t => { for (let i = 0; i < 5; i++) { noise(t + i * 0.05, 0.014, { hp: 2800 + i * 250, vol: 0.026 }); thump(t + i * 0.05, { vol: 0.035, f0: 520, f1: 260, dur: 0.025 }); } noise(t + 0.02, 0.26, { lp: 1800, sweepTo: 3600, vol: 0.02, type: "bandpass", q: 0.9 }); }),
+    /* tanda 7: retos premium. Barrer el humo (un soplo), limpiar la lluvia (goma sobre cristal), la chincheta que cae del cielo (silbido y clavo)
+       y las chispas de la lampara. Flojitos y nunca iguales */
+    sweep: go((t, k = 0.5) => { noise(t, 0.32 + Math.random() * 0.14, { lp: 500 + k * 900, sweepTo: 1800 + Math.random() * 900, vol: 0.02 + k * 0.03, type: "bandpass", q: 0.8 }); }),
+    wipe: go(t => { noise(t, 0.26, { lp: 700, sweepTo: 3200 + Math.random() * 600, vol: 0.05, type: "bandpass", q: 1.4 }); const os = ctx.createOscillator(), g = ctx.createGain(); os.type = "triangle"; os.frequency.setValueAtTime(820 + Math.random() * 120, t + 0.05); os.frequency.exponentialRampToValueAtTime(1250 + Math.random() * 150, t + 0.2); os.connect(g).connect(sfxBus); env(g, t + 0.05, 0.01, 0.018, 0.16); os.start(t + 0.05); os.stop(t + 0.3); }),
+    pinFall: go(t => { const os = ctx.createOscillator(), g = ctx.createGain(), f = 2100 + Math.random() * 500; os.type = "sine"; os.frequency.setValueAtTime(f, t); os.frequency.exponentialRampToValueAtTime(f * 0.42, t + 0.6); os.connect(g).connect(sfxBus); env(g, t, 0.05, 0.008, 0.55); os.start(t); os.stop(t + 0.7); thump(t + 0.62, { vol: 0.09, f0: 340 + Math.random() * 80, f1: 130, dur: 0.05 }); noise(t + 0.62, 0.035, { hp: 2600, vol: 0.028 }); }),
+    spark: go(t => { for (let i = 0; i < 5; i++) noise(t + i * 0.022 + Math.random() * 0.02, 0.012, { hp: 3800 + Math.random() * 2000, vol: 0.035 + Math.random() * 0.02 }); }),
     tear: go(t => { noise(t, 0.13, { lp: 1100, sweepTo: 5600, vol: 0.075, type: "bandpass", q: 1.3 }); for (let i = 0; i < 6; i++) noise(t + 0.008 + i * 0.016 + Math.random() * 0.006, 0.009, { hp: 3800, vol: 0.045 }); thump(t, { vol: 0.06, f0: 240, f1: 120, dur: 0.05 }); }),
     goal: go(t => {
       thump(t, { vol: 0.26, f0: 150, f1: 48, dur: 0.18 }); noise(t, 0.05, { hp: 2600, vol: 0.06 });
