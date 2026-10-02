@@ -105,6 +105,9 @@ html:lang(zh), html:lang(ja), html:lang(ko), html:lang(ru) { --dll: .889; }
 #askName .lt.dot , #askSub .lt.dot { color: #6d5d92; } #askName .lt.faint , #askSub .lt.faint { opacity: .32; filter: blur(.7px); }
 #askName .lt.rune , #askSub .lt.rune { color: #a56cff; text-shadow: 0 0 6px rgba(165, 108, 255, .65); }
 #askName.ch-upside , #askSub.ch-upside { display: block; transform: rotate(180deg); }
+/* tanda 6b: la etiqueta NUEVO de un reto que nunca has visto */
+.ch-new, .adv-debuff .ch-new { display: inline-block; width: auto; font-family: inherit; font-weight: 700; margin: 0 4px; padding: 1px 5px 0; border: 2px solid #e2483d; color: #e2483d; background: rgba(255, 244, 228, .92); font-style: normal; font-size: .72em; line-height: 1.1; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; border-radius: 3px; }
+.ch-chip .ch-new { font-size: .62em; padding: 0 4px; margin: 0 3px; }
 /* tanda 6: Nombre girado a tope, cada palabra a su manera */
 #askName .wd.w-m, #askSub .wd.w-m { transform: scaleX(-1); }
 #askName .wd.w-u, #askSub .wd.w-u { transform: rotate(180deg); }

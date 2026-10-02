@@ -86,7 +86,7 @@ window.AIQ = window.AIQ || {};
   A.CHAL = D;
   /* tanda 3: FAMILIAS de sensacion (lo que contesta un amuleto). Lo que estorba se conjura: LETRAS, LUZ, VISTA, SITIO, PUNTERO y PANTALLA tienen
      un amuleto cada una. Lo que miente o calla se vence sabiendo (SABER, MENTIRAS), la tormenta se sufre (TORMENTA) y las reglas de la casa se
-     sobornan o se aguantan (REGLAS). counters (tienda, intro y aviso de contra) sale de aqui; FAMILY (el sorteo) no cambia hasta la tanda 6 */
+     sobornan o se aguantan (REGLAS). counters (tienda, intro y aviso de contra) sale de aqui, y desde la tanda 6b tambien el sorteo (famOf) */
   const FAMC = {
     shaky: "letras", missing: "letras", anagram: "letras", runes: "letras", mirror: "letras", memory: "letras",
     riddle: "saber", nocountry: "saber", babel: "saber",
@@ -135,11 +135,15 @@ window.AIQ = window.AIQ || {};
      los retos de siempre y donde salia aquel sale este (entre la v0.23 y la v0.28 esas rondas sorteaban otro) */
   const MAPD = [...MAPC, ...WALL];
   /* en una misma ronda no se juntan retos "de la misma familia" */
-  const FAMILY = { wrongborders: "b", noborders: "b", spread: "p", tilt: "p", flip: "o", spin: "o", blur: "v", dark: "v", myopia: "v", clouds: "v", rain: "v", mosaic: "v", flicker: "l", lightning: "l", quake: "m", decoys: "d", crack: "w", hang: "w", battery: "w" };
-  const famOf = id => FAMILY[id] || (D[id].kind === "text" ? "t" : D[id].kind === "ptr" ? "c" : id);
+  /* tanda 6b: en una ronda no se juntan dos retos de la misma familia (las de js/challenges.js FAMC: letras, saber, luz, tormenta, vista, sitio,
+     puntero, pantalla, mentiras y reglas) */
+  const famOf = id => (D[id] && D[id].fam) || id;
   const NOLATIN = () => /^(zh|ja|ko)/.test(A.lang || "");                     // runas y sin vocales no tienen sentido con nombres en chino, japones o coreano
-  /* v0.52: el Apagon ya no sale en la lista suave ni en el bombo de mapa (salia 1,71 veces por expedicion): solo el obligatorio y su jefe */
-  const MILD_TEXT = ["shaky", "missing", "anagram", "mirror", "babel"], MILD_MAP = ["blur", "noborders", "clouds", "rain", "spread", "flicker"];   // tanda 6: a nivel 1 (Big bang: se separan)
+  /* tanda 6b: la LISTA SUAVE de R1-R3 (a nivel 1): estorban sin desorientar. Fuera: Controles invertidos, Mundo del reves, las reglas, lo que
+     calla la placa y el Apagon (que solo sale una vez, en R5, R6, R9, R10 u R11). En la ronda de banderas, un reto de bandera */
+  const SOFT = ["shaky", "missing", "noborders", "flicker", "blur", "clouds", "rain", "spread", "lag", "crack", "flaghue", "flagblur", "flagdark", "flaggray"];
+  /* retos por ronda fuera de los jefes en A0 (27 por expedicion con los de los jefes: R4 2, R8 3, R12 3). R1 sin reto en tu primera expedicion */
+  const COUNT = [1, 1, 1, 0, 2, 2, 3, 0, 3, 3, 3, 0];
   /* parejas que no se juntan en una ronda: las ventanas de No responde y la Bateria baja te hacen perder el nombre de Memoria de pez sin culpa tuya */
   const CLASH = { memory: ["hang", "battery"], hang: ["memory"], battery: ["memory"] };
   const clashes = (id, ids) => (CLASH[id] || []).some(x => ids.includes(x));
@@ -157,65 +161,86 @@ window.AIQ = window.AIQ || {};
   /* jefe de la ronda de banderas: la bandera trae su propio filtro y el mapa se lía por su cuenta. v0.52: Cine mudo (Sin colores y Mapa mudo):
      Sin colores no salia nunca en la Aventura */
   const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flaginvert", "flip"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur", "mosaic"]], ["Cine mudo|Silent movie|Cinéma muet|Cinema mudo|Stummfilm|Cinema muto||默片|무성 영화|サイレント映画|Немое кино|Kino nieme", ["flaggray", "noborders"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
-  const ACT1 = [["text", "map"], ["ptr", "map"], ["text", "ptr"]], ACT2 = [["text", "map", "ptr"], ["map", "ptr", "rule"], ["text", "map", "map"]];
   const A2R = [4, 6, 8, 10];                                          // tanda 3: la regla de Ascension 2 sale en R5, R7, R9 y R11 (sin Tapones, ya no tiene contra)
-  const rulesIn = (x, asc) => { const act = Math.floor(x / 4), pos = x % 4; if (pos === 3 || act === 0) return 0; return (act === 1 ? ACT1 : ACT2)[pos % 3].filter(c => c === "rule").length + (asc >= 2 && A2R.includes(x) ? 1 : 0); };   // reglas que saca la ronda x (para la bolsa)
-
+  /* tanda 6b: sorteo con peso. Familia: 1/(1 + veces que ya ha salido en la expedicion), LUZ a la mitad (el Apagon obligatorio cuenta como suya);
+     reto: 1/(1 + veces que ha salido ese reto). Las veces salen del plan BASE (la semilla de la expedicion, sin barajar ni nada comprado) */
+  const wpick = (rr, items, w) => { const ws = items.map(w), t = ws.reduce((a, b) => a + b, 0); let x = rr() * t; for (let k = 0; k < items.length; k++) { x -= ws[k]; if (x <= 0) return items[k]; } return items[items.length - 1]; };
+  const famW = (H, f) => (f === "luz" ? 0.5 : 1) / (1 + (H.fam[f] || 0));
+  const draw = (rr, pool, H) => { const fams = [...new Set(pool.map(famOf))], f = wpick(rr, fams, x => famW(H, x)); return wpick(rr, pool.filter(x => famOf(x) === f), x => 1 / (1 + (H.id[x] || 0))); };
+  const darkRound = base => A.rng(`${base}:dark`).pick([4, 5, 8, 9, 10]);
+  const tally = lists => { const fam = {}, id = {}; lists.forEach(l => l.forEach(c => { const f = famOf(c.id); fam[f] = (fam[f] || 0) + 1; id[c.id] = (id[c.id] || 0) + 1; })); return { fam, id }; };
+  /* historial del plan base (memo por semilla, Ascension, idioma, temas de la ruta y primera expedicion) */
+  const HIST = new Map();
+  function baseHist(base, asc, cjk, topics, first, r) {
+    const T = Array.from({ length: Math.max(12, r + 1) }, (_, x) => { try { return topics(x); } catch (e) { return undefined; } }), key = [base, asc, cjk ? 1 : 0, first ? 1 : 0, T.join(",")].join("|");
+    let h = HIST.get(key); if (!h) { h = []; HIST.set(key, h); if (HIST.size > 8) HIST.delete(HIST.keys().next().value); }
+    while (h.length < r) h.push(planCore(base, h.length, asc, T[h.length], cjk, { base, first, H: tally(h) }).list);
+    return tally(h.slice(0, r));
+  }
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
-  const pickFrom = (seed, tag, list, r, avoid) => { const ok = list.filter(id => !avoid.includes(famOf(id))), l = ok.length ? ok : list; return A.rng(`${seed}:${tag}:${Math.floor(r / 4)}:${r % 4}`).pick(l); };
+
+  /* el plan de una ronda (determinista por semilla y ronda); ctx.H: lo que ya ha salido en las rondas de antes del plan base */
+  function planCore(seed, r, asc, topic, cjk, ctx) {
+    const flagRound = topic === "flag";
+    const act = Math.floor(r / 4), pos = r % 4, boss = pos === 3, a = Math.min(act, 2);
+    const lv = clamp(a + 1 + (asc >= 3 ? 1 : 0), 1, 3);
+    let list = [], combo = null;
+    /* trucos que en esta ronda no harian nada (texto en la de banderas, Sin pais o Adivinanza sin pais ni nota debajo, runas y sin vocales en zh/ja/ko):
+       si el sorteo cae en uno, se sortea otro. Lo que ya salia bien no cambia (partidas guardadas y sobornos intactos). v0.52: tambien en los jefes
+       y en el poder extra de la Ascension 4. Babel donde el nombre no cambia se resuelve pregunta a pregunta (ver babelAlt) */
+    const useless = id => (flagRound && !!D[id] && D[id].kind === "text") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
+    const noop = id => useless(id) || (cjk && (id === "runes" || id === "novowels"));
+    if (boss) {
+      /* v0.7.1: el jefe de una ronda de banderas (la 8 de la Aventura) ya no es siempre de banderas: la semilla sortea entre los de banderas y los
+         del acto que sirven en esa ronda (sin trucos de texto: la bandera manda), cada combinacion con la misma probabilidad. Los jefes que no
+         cambian de ronda salen igual que antes (misma semilla y misma lista), y si sale uno de banderas es el mismo de siempre */
+      const normal = BOSS[a].filter(c => !c.ids.some(noop)), flags = FLAG_BOSS.filter(c => !c.ids.some(noop)), rb = A.rng(`${seed}:boss:${act}`);
+      if (flagRound) combo = normal.length && A.rng(`${seed}:bossmix:${act}`)() < normal.length / (flags.length + normal.length) ? rb.pick(normal) : rb.pick(flags);
+      else combo = rb.pick(normal.length ? normal : BOSS[a]);
+      list = combo.ids.map((id, i) => canon({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) })).filter(c => !noop(c.id));   // tanda 6: Un solo continente es Big bang a nivel 2 (Pangea), Baraja revuelta a nivel 3...   // por si ninguna combinacion sirve: nunca un reto que no hace nada
+      if (act === 1) {                                                            // tanda 6b: el jefe de R8 trae tres ingredientes (su combinacion y uno mas)
+          const fs = new Set(list.map(c => famOf(c.id))), ids = list.map(c => c.id), flagIn = list.some(c => D[c.id].kind === "flag"), txt = list.some(c => D[c.id].kind === "text");
+          const pool = [...TEXT, ...MAPD, ...PTR, ...FLAG].filter(id => id !== "dark" && !noop(id) && !fs.has(famOf(id)) && !clashes(id, ids) && (D[id].kind === "flag" ? flagRound && !flagIn : true) && !(D[id].kind === "text" && (flagRound || txt)));
+          if (pool.length) list.push({ id: draw(A.rng(`${seed}:boss3:${act}`), pool, ctx.H), lv });
+        }
+        if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
+      if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia (ni el Apagon ni una pareja que choque)
+        const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids);
+        if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv }); }
+      }
+      return { list, boss, combo };
+    }
+      const H = ctx.H, POOL = [...TEXT, ...MAPD, ...PTR, ...RULE, ...FLAG], soft = act === 0, a2 = asc >= 2 && A2R.includes(r);
+      const ids = [], fams = new Set(); let placa = false, flagN = 0;
+      const put = id => { list.push({ id, lv: soft ? clamp(1 + (asc >= 3 ? 1 : 0), 1, 3) : lv }); ids.push(id); fams.add(famOf(id)); if (D[id].kind === "text") placa = true; if (D[id].kind === "flag") flagN++; };
+      /* el Apagon, una vez por expedicion (asi el Foco siempre tiene su momento); si barajas esa ronda, el crupier saca otra cosa (pagaste por ello) */
+      if (seed === ctx.base && r === darkRound(ctx.base)) put("dark");
+      const n = ctx.first && r === 0 ? 0 : COUNT[r] != null ? COUNT[r] : 3;
+      const rr = A.rng(`${seed}:fam:${r}`);
+      while (list.length < n) {
+        const needFlag = flagRound && !flagN;                          // ronda de banderas: su primer reto va sobre la bandera
+        const pool = POOL.filter(id => id !== "dark" && !noop(id) && !clashes(id, ids) && !fams.has(famOf(id)) && (!soft || SOFT.includes(id))
+          && (D[id].kind === "flag" ? needFlag : !needFlag) && !(D[id].kind === "text" && (flagRound || placa)) && !(D[id].kind === "rule" && a2));
+        if (!pool.length) break;
+        put(draw(rr, pool, H));
+      }
+      if (a2) { let ruleN = 0; for (let x = 0; x < r; x++) if (A2R.includes(x)) ruleN++; put(ruleBag(seed, ruleN)); }   // Ascension 2: la regla de la bolsa
+      return { list, boss, combo };
+    }
   A.chal = {
     DEFS: D, TEXT, MAPC, PTR, RULE, FLAG, WALL, noLatin: NOLATIN, FAMC, AMULET, SUB, EXPAND, expand, canon, formOf,
     /* cjk: sin runas ni sin vocales. v0.4.1: la expedicion lo fija al empezar (run.cjk); con el idioma de cada momento, cambiarlo a media
        expedicion cambiaba el truco de texto de la ronda y el soborno ya pagado dejaba de coincidir con nada */
-    plan(seed, r, asc = 0, topic, cjk = NOLATIN()) {
-      const flagRound = topic === "flag";
-      const act = Math.floor(r / 4), pos = r % 4, boss = pos === 3, a = Math.min(act, 2);
-      const lv = clamp(a + 1 + (asc >= 3 ? 1 : 0), 1, 3);
-      let list = [], combo = null;
-      /* trucos que en esta ronda no harian nada (texto en la de banderas, Sin pais o Adivinanza sin pais ni nota debajo, runas y sin vocales en zh/ja/ko):
-         si el sorteo cae en uno, se sortea otro. Lo que ya salia bien no cambia (partidas guardadas y sobornos intactos). v0.52: tambien en los jefes
-         y en el poder extra de la Ascension 4. Babel donde el nombre no cambia se resuelve pregunta a pregunta (ver babelAlt) */
-      const useless = id => (flagRound && !!D[id] && D[id].kind === "text") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
-      const noop = id => useless(id) || (cjk && (id === "runes" || id === "novowels"));
-      if (boss) {
-        /* v0.7.1: el jefe de una ronda de banderas (la 8 de la Aventura) ya no es siempre de banderas: la semilla sortea entre los de banderas y los
-           del acto que sirven en esa ronda (sin trucos de texto: la bandera manda), cada combinacion con la misma probabilidad. Los jefes que no
-           cambian de ronda salen igual que antes (misma semilla y misma lista), y si sale uno de banderas es el mismo de siempre */
-        const normal = BOSS[a].filter(c => !c.ids.some(noop)), flags = FLAG_BOSS.filter(c => !c.ids.some(noop)), rb = A.rng(`${seed}:boss:${act}`);
-        if (flagRound) combo = normal.length && A.rng(`${seed}:bossmix:${act}`)() < normal.length / (flags.length + normal.length) ? rb.pick(normal) : rb.pick(flags);
-        else combo = rb.pick(normal.length ? normal : BOSS[a]);
-        list = combo.ids.map((id, i) => canon({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) })).filter(c => !noop(c.id));   // tanda 6: Un solo continente es Big bang a nivel 2 (Pangea), Baraja revuelta a nivel 3...   // por si ninguna combinacion sirve: nunca un reto que no hace nada
-        if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
-        if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia (ni el Apagon ni una pareja que choque)
-          const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids);
-          if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv }); }
-        }
-        return { list, boss, combo };
-      }
-      const used = [], ids = [];
-      /* v0.35: el Apagon sale si o si en algun momento de la expedicion (asi el Foco del vigilante siempre tiene su momento): en una ronda
-         con hueco de mapa elegida por la semilla. Si esa ronda se baraja en el Campamento, el crupier elige otra cosa (el jugador pago por ello).
-         v0.52: es la unica vez (fuera del bombo) y ya no cae en la ronda 3, que en la de banderas trae un reto de bandera y no de mapa */
-      let dark = r === A.rng(`${seed}:dark`).pick([4, 5, 8, 9, 10]), ruleN = 0;
-      for (let x = 0; x < r; x++) ruleN += rulesIn(x, asc);
-      const add = (cat, mild) => {
-        const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT).filter(id => !(cjk && (id === "runes" || id === "novowels")))) : cat === "flag" ? FLAG : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPD);
-        const bad = x => noop(x) || (cat === "map" && x === "dark") || clashes(x, ids);
-        let id = cat === "rule" ? ruleBag(seed, ruleN++) : pickFrom(seed, cat + list.length, pool, r, used);
-        if (cat !== "rule" && bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = pickFrom(seed, cat + list.length + "b", ok, r, used); }
-        if (cat === "map" && dark && !used.includes(famOf("dark"))) { id = "dark"; dark = false; }
-        list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); ids.push(id);
-      };
-      if (act === 0) { if (pos === 1) add("text", true); else if (pos === 2) add(flagRound ? "flag" : "map", true); }   // v0.52: la ronda 3 de banderas sortea un reto de bandera
-      else if (act === 1) ACT1[pos % 3].forEach(c => add(c, false));
-      else ACT2[pos % 3].forEach(c => add(c, false));
-      if (asc >= 2 && A2R.includes(r)) add("rule", false);
-      return { list, boss, combo };
+    /* tanda 6b: opt = { base: semilla de la expedicion sin barajar, topics: x -> tema de la ronda x, first: primera expedicion (R1 sin reto) } */
+    plan(seed, r, asc = 0, topic, cjk = NOLATIN(), opt = {}) {
+      const base = opt.base || seed, first = !!opt.first, H = baseHist(base, asc, cjk, opt.topics || (() => undefined), first, r);
+      return planCore(seed, r, asc, topic, cjk, { base, first, H });
     },
     info: id => D[id],
     /* v0.35: la ficha ya no dice que perk frena el reto (ni brilla por ello): el jugador tiene que leer y atar cabos */
     /* v0.52: durante una pregunta en la que la Torre de Babel no puede cambiar el nombre, su ficha ensena el reto que sale en su lugar (y por que) */
-    chip(c, small) { const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b><i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
+    NEW_TAG: L6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||初登场|첫 등장|初登場|Новинка|Nowość"),
+    chip(c, small) { const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b>${c.isNew ? `<span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""}<i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
   };
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */

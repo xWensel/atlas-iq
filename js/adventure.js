@@ -274,14 +274,17 @@ window.AIQ = window.AIQ || {};
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   const chestSkip = () => Math.round(2.5 * inflation());                // dejar el cofre del jefe sin abrir: 3 doblones al empezar el acto II, 4 al empezar el III (el Toque de Midas los duplica, como todo lo que ganas)
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades); pl: otra mano de perks (la tienda valora cada reliquia sin contarla a ella) */
+  /* tanda 6b: el plan de la ronda r (barajada si la barajaste), con el historial del plan base de la expedicion */
+  const planOf = r => A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk, { base: run.seed, topics: x => defAt(x).topic, first: !!run.first });
   const chalFor = (r, pl = perkList()) => {
-    const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk), boss = r % 4 === 3;
+    const plan = planOf(r), boss = r % 4 === 3;
     let list = A.adv._force ? A.adv._force.map(id => { const [i, l] = String(id).split("@"); return A.chal.canon({ id: i, lv: +l || 2 }); }) : plan.list.slice();
     const bribed = (run.bribed && run.bribed[r]) || [], paid = list.filter(c => bribed.includes(c.id)).map(c => c.id); if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento (paid: los que estaban en esta tirada; barajar no borra los sobornos)
     const sum = f => pl.reduce((n, p) => n + (p[f] || 0), 0), nulled = [];
     for (let k = sum("skipHardest"); k > 0 && list.length; k--) { const RK = { map: 5, wall: 4, ptr: 3, rule: 2 }, w = c => (c.lv || 1) * 10 + (RK[A.CHAL[c.id].kind] || 1); const top = list.reduce((a, c) => (w(c) > w(a) ? c : a)); nulled.push(top.id); list = list.filter(c => c !== top); }   // Comodin: fuera el reto mas fuerte
     if (boss) { let soft = sum("softenBoss"); list = list.map((c, i) => (i < soft ? { ...c, lv: 1 } : c)); }
     list = list.filter(c => !pl.some(p => (p.immune || []).includes(c.id)));
+    if (run.chSeen0 && !run.board && run.asc < 3 && !A.adv._force) list = list.map(c => (run.chSeen0.includes(c.id) ? c : { ...c, lv: 1, isNew: true }));   // S12: lo que nunca has visto se estrena a nivel 1
     return { list, combo: plan.combo, boss, paid, nulled };
   };
 
@@ -355,6 +358,7 @@ window.AIQ = window.AIQ || {};
     run = {
       v: 2, seed: seed || "run-" + Math.random().toString(36).slice(2, 10), cjk: A.chal.noLatin(), deck, asc, ranked, board, dailyTry, route: route ? route.slice(0, 12) : null, gift: bonus ? gift : null,
       act: 0, round: 0, attempt: 0, coins: d.coins, lives: d.lives + ascFx(asc).lives, maxLives: d.lives + ascFx(asc).lives,
+      first: !board && !A.profile.get().adv.runs, chSeen0: !board && asc < 3 && A.dealer && A.dealer.trickSeen ? A.dealer.trickSeen() : null,
       perks: d.perks.concat(bonus ? [gift] : []), tools: {}, score: 0, cleared: 0, used: [], rerolls: 0, freeUsed: 0, shopN: 0, phase: "round", qi: 0, qn: 5, qTools: 0, rTools: 0, luckUsed: false, guardUsed: false,
       livesLostAct: 0, shieldAct: -1, leftSum: 0, roundScore: 0, rGood: 0, qTotal: 0, stats: { bulls: 0, best: 0, coinsEarned: 0 }, t0: Date.now(),
     };
@@ -552,7 +556,7 @@ window.AIQ = window.AIQ || {};
     /* territorio nuevo: una ronda mas alla de tu mejor ronda de siempre (desde la 2.a expedicion, una vez por expedicion): sello "Nuevo" y el crupier lo dice */
     const Pv = A.profile.get(); run._virgin = !run.attempt && (Pv.adv.runs || 0) >= 2 && roundNo() + 1 > (Pv.adv.bestRound || 0) && !run.virginShown; if (run._virgin) run.virginShown = true;
     const NEW = A.pick6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||新领域|새 영역|未踏|Впервые|Nowe");
-    const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</em>` : ""}</div></div>`; }).join("");
+    const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)}${c.isNew ? ` <span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</em>` : ""}</div></div>`; }).join("");
     const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? BOSS_IC : run.round === 0 ? "s_pin" : "s_compass";
     return `<div class="intro-in adv${Lv.boss ? " is-boss" : ""}"><div class="intro-left"><div class="intro-num blind">${A.blind(kind, inner)}</div><div class="intro-body">
       <span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${A.tx(Lv.topicName)}</h2>
@@ -572,7 +576,7 @@ window.AIQ = window.AIQ || {};
     const seq = D.introSeq({
       boss: !!Lv.boss, last: roundNo() === 11, inf: !!run.inf, fresh: run.act === 0 && run.round === 0 && !run.qTotal && !run.attempt, resumed: resumedIntro, ranked: !!run.ranked,
       dailyTry: run.dailyTry || 0, dailyTotal: run.board && run.dailyTry ? A.rank.daily.get(run.board).total : 0,
-      act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), form: list.slice(0, Lv.boss ? 3 : 2).map(c => A.chal.formOf(c)), counters,
+      act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), form: list.slice(0, Lv.boss ? 3 : 2).map(c => A.chal.formOf(c)), isNew: list.slice(0, Lv.boss ? 3 : 2).map(c => !!c.isNew), counters,
       rn: roundNo() + 1, bossName: Lv.boss && run.chalName ? A.tx(run.chalName) : "", virgin: !!run._virgin,
     });
     resumedIntro = false;
@@ -895,7 +899,7 @@ window.AIQ = window.AIQ || {};
   };
   /* lo que hacen tus reliquias al empezar la ronda (en la 1.a pregunta, tras la intro): quitar o suavizar retos, segundos de mas, cargas de mas, la provision de Por cuenta de la casa */
   function roundFlashes() {
-    const r = roundNo(), plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk).list, bribed = (run.bribed && run.bribed[r]) || [];
+    const r = roundNo(), plan = planOf(r).list, bribed = (run.bribed && run.bribed[r]) || [];
     const left = plan.filter(c => !bribed.includes(c.id)), pl = perkList();
     pl.forEach(p => {
       if (p.skipHardest && left.length) A.adv.flash(p.id, 0);
@@ -1075,7 +1079,7 @@ window.AIQ = window.AIQ || {};
       if (!main) return `<div class="nr far${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}</span><b class="nr-name">${name}</b></div><div class="nr-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div>${count}</div></div>`;
       const shuffle = n ? `<button class="chipbtn nr-shuffle" id="chalReroll" type="button" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : "";
       const lis = cf.list.map(c => { const dd = A.CHAL[c.id];
-        return `<li class="nr-row k-${dd.kind}"><span class="nr-ic">${ic(dd.ico)}</span><b class="nr-rn">${A.tx(dd.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><button class="nr-buy" type="button" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")}<span class="nr-p">${CN()}${bribePrice(c, cf.boss)}</span></button><p>${A.tx(dd.d)}</p></li>`; }).join("")
+        return `<li class="nr-row k-${dd.kind}"><span class="nr-ic">${ic(dd.ico)}</span><b class="nr-rn">${A.tx(dd.n)}${c.isNew ? ` <span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><button class="nr-buy" type="button" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")}<span class="nr-p">${CN()}${bribePrice(c, cf.boss)}</span></button><p>${A.tx(dd.d)}</p></li>`; }).join("")
         + done.map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.T("Sobornado", "Bribed")}</em></li>`).join("")
         + (cf.nulled || []).map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.tx(NULLED)}</em></li>`).join("");   // los que quita tu Comodin
       return `<div class="nr${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}${dot}${A.T("Objetivo", "Target")} ${baseTarget() > target() && rr === roundNo() ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(target())}</b></span><b class="nr-name">${name}</b></div>${count}${shuffle}</div>${lis ? `<ul class="nr-list n${Math.min(6, n + done.length)}">${lis}</ul>` : `<p class="nr-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;

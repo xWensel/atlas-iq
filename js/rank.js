@@ -145,7 +145,7 @@ window.AIQ = window.AIQ || {};
     const cs = Object.keys(A.CHAL).filter(c => (A.CHAL[c].counters || []).includes(id));
     if (!cs.length || p.open || p.round || p.clear || p.post || p.shop || p.buy || p.actStart) return true;          // no es una contra pura
     const pl = D.perks.map(x => A.RELICS[x]).filter(Boolean), skip = pl.reduce((n, x) => n + (x.skipFirst || 0), 0);   // como chalFor, con las reliquias de la baraja
-    const hits = (k, cjk) => route.some((ri, r) => A.chal.plan(DY.trySeed(board, k), r, asc, A.ADV.ROUNDS[ri].topic, cjk).list.slice(skip).some(c => cs.includes(c.id) && !pl.some(x => (x.immune || []).includes(c.id))));
+    const hits = (k, cjk) => route.some((ri, r) => A.chal.plan(DY.trySeed(board, k), r, asc, A.ADV.ROUNDS[ri].topic, cjk, { topics: x => (A.ADV.ROUNDS[route[x]] || {}).topic }).list.slice(skip).some(c => cs.includes(c.id) && !pl.some(x => (x.immune || []).includes(c.id))));
     return [1, 2, 3].every(k => hits(k, false) && hits(k, true));
   };
   const DY = R.daily = {

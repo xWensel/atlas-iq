@@ -2063,13 +2063,17 @@ window.AIQ = window.AIQ || {};
     if (!ids || !ids.length) return; mergeTricks(); const T = DS.tricks || (DS.tricks = {});
     ids.forEach(id => { const h = T[id] || (T[id] = { s: 0, w: 0 }); h.s++; if (won) h.w++; }); saveStore();
   };
-  function trickLine(id, form) {
+  /* tanda 6b: los retos que ya conoces (la Aventura los congela al empezar: los que no, salen a nivel 1 con la etiqueta NUEVO) */
+  D.trickSeen = () => { mergeTricks(); const T = DS.tricks || {}; return Object.keys(T).filter(id => T[id].s > 0); };
+  function trickLine(id, form, isNew) {
     mergeTricks(); const T = DS.tricks || (DS.tricks = {}); if (DS.trickVet == null) { DS.trickVet = advRuns() > 1; saveStore(); }
     const h = T[id] || { s: 0, w: 0 }, c = A.CHAL && A.CHAL[id], name = c ? tx6(c.n) : "";
     if (!name) return D.line(form || id);
     /* v0.20: como mucho UNA frase de formula por intro (estreno, marcador del truco, "otra vez"): dos seguidas con el mismo molde suenan a loro.
        Los estrenos, los 3 primeros de la sesion siempre; despues, 1 de cada 3 (el resto, la frase propia del truco) */
-    const fm = !seqFormula, fk = form || id; const own = () => { if (ownSaid[fk]) return null; ownSaid[fk] = 1; return D.line(fk); };   // la frase de su forma (Big bang a nivel 2: la de Pangea)
+    const fm = !seqFormula, fk = form || id;
+    if (isNew && fm) { seqFormula = true; (DS.debuted || (DS.debuted = {}))[id] = 1; saveStore(); return say1("trickDebut", { t: name }); }   // NUEVO: el crupier lo presenta (una frase por intro)
+    const own = () => { if (ownSaid[fk]) return null; ownSaid[fk] = 1; return D.line(fk); };   // la frase de su forma (Big bang a nivel 2: la de Pangea)
     if (fm && !h.s && !DS.trickVet) { const dv = DS.debuted || (DS.debuted = {}); if (!dv[id] && (debutN < 3 || Math.random() < 0.35)) { dv[id] = 1; debutN++; seqFormula = true; saveStore(); return say1("trickDebut", { t: name }); } }
     if (fm && [10, 25, 50].includes(h.s)) { seqFormula = true; return say1("trickVet", { t: name, n: h.s + 1 }); }
     if (fm && h.s >= 2 && Math.random() < 0.5) { seqFormula = true; const house = h.s - h.w; return say1(house >= h.w ? "trickHouse" : "trickYou", { t: name, h: house, y: h.w }); }
@@ -2622,7 +2626,7 @@ window.AIQ = window.AIQ || {};
     if (o.boss && !o.inf) add(o.last ? say1("finalBoss") : o.bossName && Math.random() < 0.7 ? say1("bossNamed", { j: o.bossName }) : D.line("boss"), "boss");
     if (!seq.length) { const k = o.chal.length ? "newHand" : "calm"; if (!once[k]) { once[k] = 1; add(D.line(k)); } }   // una vez por sesion: luego hablan los trucos
     if (o.lives === 1 && !o.inf) { dangerKey = o.act + ":" + o.round + ":" + o.attempt; add(say1("runDanger"), "laugh"); }
-    o.chal.slice(0, seq.length > 1 ? 1 : o.boss ? 3 : 2).forEach((id, k) => { const b = id === "babel" && babelTrick(); if (b) seq.push({ line: b.t, mood: "sly", lang: b.lang }); else add(trickLine(id, o.form && o.form[k])); });   // la Torre de Babel la anuncia en otro idioma
+    o.chal.slice(0, seq.length > 1 ? 1 : o.boss ? 3 : 2).forEach((id, k) => { const b = id === "babel" && babelTrick(); if (b) seq.push({ line: b.t, mood: "sly", lang: b.lang }); else add(trickLine(id, o.form && o.form[k], o.isNew && o.isNew[k])); });   // la Torre de Babel la anuncia en otro idioma
     if (o.counters && Date.now() - counterAt > 240000) { counterAt = Date.now(); add(pickLine("counter"), "angry"); }
     return seq;
   };
