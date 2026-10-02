@@ -126,7 +126,7 @@ window.AIQ = window.AIQ || {};
   function eff(now) {
     const dt = Math.min(0.05, Math.max(0.001, (now - (lastNow || now)) / 1000)); lastNow = now;
     let x = P.rx, y = P.ry; const m = P.m, W = map.W, H = map.H;
-    if (m && m.cmirror) { x = W - x; if (m.cmirror.both) y = H - y; }
+    if (m && m.cmirror) { if (m.cmirror.x) x = W - x; if (m.cmirror.y) y = H - y; }   // tanda 6: izquierda y derecha, arriba y abajo o los dos
     if (m && m.lag) { const a = 1 - Math.exp(-dt * 1000 / Math.max(1, m.lag.tau)); sx += (x - sx) * a; sy += (y - sy) * a; x = sx; y = sy; } else { sx = x; sy = y; }
     if (m && m.dizzy) { const t = now / 1000; x += Math.cos(t * 3.4) * m.dizzy.r; y += Math.sin(t * 3.4) * m.dizzy.r; }
     if (m && m.tremble) { if (now - tj > 45) { tj = now; jx = (Math.random() - 0.5) * 2 * m.tremble.px; jy = (Math.random() - 0.5) * 2 * m.tremble.px; } x += jx; y += jy; }

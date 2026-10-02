@@ -276,7 +276,7 @@ window.AIQ = window.AIQ || {};
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades); pl: otra mano de perks (la tienda valora cada reliquia sin contarla a ella) */
   const chalFor = (r, pl = perkList()) => {
     const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk), boss = r % 4 === 3;
-    let list = A.adv._force ? A.adv._force.map(id => ({ id, lv: 2 })) : plan.list.slice();
+    let list = A.adv._force ? A.adv._force.map(id => { const [i, l] = String(id).split("@"); return A.chal.canon({ id: i, lv: +l || 2 }); }) : plan.list.slice();
     const bribed = (run.bribed && run.bribed[r]) || [], paid = list.filter(c => bribed.includes(c.id)).map(c => c.id); if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento (paid: los que estaban en esta tirada; barajar no borra los sobornos)
     const sum = f => pl.reduce((n, p) => n + (p[f] || 0), 0), nulled = [];
     for (let k = sum("skipHardest"); k > 0 && list.length; k--) { const RK = { map: 5, wall: 4, ptr: 3, rule: 2 }, w = c => (c.lv || 1) * 10 + (RK[A.CHAL[c.id].kind] || 1); const top = list.reduce((a, c) => (w(c) > w(a) ? c : a)); nulled.push(top.id); list = list.filter(c => c !== top); }   // Comodin: fuera el reto mas fuerte
@@ -384,7 +384,7 @@ window.AIQ = window.AIQ || {};
     if (r.cjk == null) r.cjk = A.chal.noLatin();                    // v0.4.1: partidas de antes sin run.cjk: se fija una vez con el idioma de ahora
     /* v0.23: retos que ya no existen ("Continentes cambiados"): fuera de la partida guardada, y el soborno que se pago por quitarlo se devuelve
        (en esa ronda sale otro reto en su lugar) */
-    if (r.chal) r.chal = r.chal.filter(c => A.CHAL[c.id]);
+    if (r.chal) r.chal = r.chal.filter(c => A.CHAL[c.id]).map(c => A.chal.canon(c));   // tanda 6: los gemelos de antes pasan al reto que los absorbe
     /* v0.29: y los sobornos de un reto que ya no sale en esa ronda (entre la v0.23 y la v0.28 alli se sorteaba otro; ahora salen Continentes barajados) */
     const now = r.act * 4 + r.round;
     for (const k in r.bribed || {}) {
@@ -478,8 +478,8 @@ window.AIQ = window.AIQ || {};
     if (run.sup && run.sup.cafe) ctx.seconds += 4;                                       // suministro: Cafe doble
     ctx.seconds = Math.max(6, ctx.seconds);
     run.chal = cf.list; run.chalName = cf.combo ? cf.combo.n : null; run.chalHalve = halve;
-    const rules = cf.list.map(c => (c.id === "storm" ? "clock" : c.id)).filter(id => ["wind", "clock", "silence"].includes(id));
-    if (rules.includes("clock")) ctx.seconds = Math.max(6, Math.round(ctx.seconds * (1 - 0.45 * halve)));
+    const rules = cf.list.map(c => (c.id === "storm" ? "clock" : c.id)).filter(id => ["wind", "clock", "silence"].includes(id)), st = cf.list.find(c => c.id === "storm");
+    if (st) ctx.seconds = Math.max(6, Math.round(ctx.seconds * [0.75, 0.65, 0.55][clamp((st.lv || 1) - 1, 0, 2)]));   // Contrarreloj (tanda 6): 0,75 / 0,65 / 0,55 del tiempo
     run.boss = rules; run.wind = null;
     if (rules.includes("wind")) { const wr = A.rng(`${run.seed}:wind:${r}:${run.attempt}`); run.wind = { brg: Math.round(wr() * 360), km: Math.round((160 + 40 * run.act) * halve) }; }
     run.qn = has("sleeve") && !run.inf ? 6 : 5;
@@ -572,7 +572,7 @@ window.AIQ = window.AIQ || {};
     const seq = D.introSeq({
       boss: !!Lv.boss, last: roundNo() === 11, inf: !!run.inf, fresh: run.act === 0 && run.round === 0 && !run.qTotal && !run.attempt, resumed: resumedIntro, ranked: !!run.ranked,
       dailyTry: run.dailyTry || 0, dailyTotal: run.board && run.dailyTry ? A.rank.daily.get(run.board).total : 0,
-      act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), counters,
+      act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), form: list.slice(0, Lv.boss ? 3 : 2).map(c => A.chal.formOf(c)), counters,
       rn: roundNo() + 1, bossName: Lv.boss && run.chalName ? A.tx(run.chalName) : "", virgin: !!run._virgin,
     });
     resumedIntro = false;

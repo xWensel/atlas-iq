@@ -888,7 +888,7 @@ void main(){
         const on = k >= 0.5, f = on ? 2 * k - 1 : 1 - 2 * k;
         e.sh[c * 2] = on ? t[0] : 0; e.sh[c * 2 + 1] = on ? t[1] : 0; e.sc[c] = Math.max(0.001, (on ? s1 : 1) * f);
       }
-      e.wob = sp ? (sp.wob || 0) * k : 0; e.lineA = sp && sp.lineA != null ? 1 + (sp.lineA - 1) * d.kl : 1;
+      e.wob = sp ? (sp.wob || 0) * k : 0; e.lineA = sp && sp.lineA != null ? 1 + (sp.lineA - 1) * d.kl : 1; e.flat = sp && sp.flat != null ? sp.flat * d.kl : Math.max(0, 1 - e.lineA);   // tanda 6: Mapa mudo decide aparte cuanto color de pais queda
       const ko = sp ? (d.ko || 0) : 0; e.oa = sp && sp.orient ? sp.orient.rot * ko : 0; e.mx = sp && sp.orient ? (sp.orient.mx || 0) * ko : 0;
       if (sp && sp.spin) e.oa += sp.spin.amp * Math.sin((this._tNow || performance.now()) / 1000 * sp.spin.speed) * k;   // reloj del fotograma: mapa, chinchetas y clics con el mismo angulo
       e.on = !!(sp && (sp.spin || sp.orient) && (Math.abs(e.oa) > 1e-4 || e.mx > 1e-4));
@@ -1349,7 +1349,7 @@ void main(){
       gl.useProgram(P.land); this._setDist(P.land); this._u(P.land, "u_off", 0, 0);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, bN.tex); gl.uniform1i(P.land.u.u_blurN, 0);
       gl.uniform1i(P.land.u.u_style, st.style || 0); this._u(P.land, "u_dpr", dpr * RS);
-      { const ef = this._eff(), fl = Math.max(0, 1 - ef.lineA), lu = this._lensU(dpr * RS, H, ef); this._u(P.land, "u_flat", fl); this._u(P.land, "u_flatc", ...ms.pal[0]); this._u(P.land, "u_lens", lu[0], lu[1], lu[2]); }
+      { const ef = this._eff(), fl = ef.flat != null ? ef.flat : Math.max(0, 1 - ef.lineA), lu = this._lensU(dpr * RS, H, ef); this._u(P.land, "u_flat", fl); this._u(P.land, "u_flatc", ...ms.pal[0]); this._u(P.land, "u_lens", lu[0], lu[1], lu[2]); }
       this._u(P.land, "u_center", v.cx, v.cy); this._u(P.land, "u_scale", sc); this._u(P.land, "u_res", sw, sh); this._u(P.land, "u_fx", st.ao, st.grain, 0, 0);
       if (this._palFor !== ms) { this._palFor = ms; this._pal = new Float32Array(24); ms.pal.forEach((c, i) => this._pal.set(c, i * 3)); } gl.uniform3fv(P.land.u.u_pal, this._pal);
       gl.drawElements(gl.TRIANGLES, this.idxCount, gl.UNSIGNED_INT, 0);

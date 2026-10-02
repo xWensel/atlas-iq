@@ -23,16 +23,16 @@ window.AIQ = window.AIQ || {};
   const D = {};
   const def = (id, kind, ico, n, d, counters) => { D[id] = { id, kind, ico, n: L6(n), d: L6(d), counters: counters || [] }; };
   /* --- nombre del lugar --- */
-  def("shaky", "text", "ch_shaky", "Letras temblorosas|Shaky letters|Lettres tremblantes|Letras trêmulas|Zitternde Buchstaben|Lettere tremanti||颤抖的字母|떨리는 글자|震える文字|Дрожащие буквы|Drżące litery", "El nombre tiembla y cuesta leerlo.|The name trembles and is hard to read.|Le nom tremble et se lit mal.|O nome treme e é difícil de ler.|Der Name zittert und ist schwer lesbar.|Il nome trema ed è difficile da leggere.||名字在颤抖，很难看清。|이름이 떨려서 읽기 어렵습니다.|名前が震えて読みにくい。|Название дрожит, его трудно прочесть.|Nazwa drży i trudno ją przeczytać.", ["steadyhand", "spectacles"]);
-  def("missing", "text", "ch_missing", "Tinta borrada|Faded ink|Encre effacée|Tinta apagada|Verblasste Tinte|Inchiostro sbiadito||褪色的墨水|바랜 잉크|かすれたインク|Выцветшие чернила|Wyblakły atrament", "Faltan letras del nombre.|Some letters of the name are missing.|Il manque des lettres du nom.|Faltam letras do nome.|Im Namen fehlen Buchstaben.|Mancano lettere del nome.||名字缺了几个字母。|이름의 일부 글자가 빠져 있습니다.|名前の文字がいくつか欠けている。|В названии не хватает букв.|W nazwie brakuje liter.", ["dictionary", "spectacles"]);
+  def("shaky", "text", "ch_shaky", "Letras temblorosas|Shaky letters|Lettres tremblantes|Letras trêmulas|Zitternde Buchstaben|Lettere tremanti||颤抖的字母|떨리는 글자|震える文字|Дрожащие буквы|Drżące litery", "El nombre baila y tiembla: cuesta leerlo.|The name dances and shakes: hard to read.|Le nom danse et tremble : difficile à lire.|O nome dança e treme: difícil de ler.|Der Name tanzt und zittert: schwer zu lesen.|Il nome balla e trema: difficile da leggere.||名字又跳又抖，很难看清。|이름이 춤추고 떨려서 읽기 어렵습니다.|名前が踊って震え、読みにくい。|Название пляшет и дрожит: его трудно прочесть.|Nazwa tańczy i drży: trudno ją przeczytać.", ["steadyhand", "spectacles"]);
+  def("missing", "text", "ch_missing", "Tinta borrada|Faded ink|Encre effacée|Tinta apagada|Verblasste Tinte|Inchiostro sbiadito||褪色的墨水|바랜 잉크|かすれたインク|Выцветшие чернила|Wyblakły atrament", "Se borran letras del nombre; a más nivel, todas las vocales.|Letters fade from the name; at higher levels, every vowel.|Des lettres s'effacent du nom ; plus haut, toutes les voyelles.|Letras do nome se apagam; nos níveis altos, todas as vogais.|Buchstaben im Namen verblassen; auf höheren Stufen alle Vokale.|Lettere del nome svaniscono; ai livelli alti, tutte le vocali.||名字里的字会褪掉；等级越高，消失得越多。|이름의 글자가 지워지고, 높은 단계에서는 더 많이 사라집니다.|名前の文字が消えていく。レベルが上がるほど多く消える。|Буквы названия стираются; на высоких уровнях — все гласные.|Litery nazwy znikają; na wyższych poziomach wszystkie samogłoski.", ["dictionary", "spectacles"]);
   def("swap", "text", "ch_swap", "Letras cambiadas|Swapped letters|Lettres échangées|Letras trocadas|Vertauschte Buchstaben|Lettere scambiate||错位的字母|뒤바뀐 글자|入れ替わった文字|Переставленные буквы|Zamienione litery", "Algunas letras están intercambiadas.|Some letters are swapped around.|Certaines lettres sont échangées.|Algumas letras estão trocadas.|Manche Buchstaben sind vertauscht.|Alcune lettere sono scambiate.||有些字母互换了位置。|일부 글자의 위치가 바뀌어 있습니다.|いくつかの文字が入れ替わっている。|Некоторые буквы поменялись местами.|Niektóre litery zamieniły się miejscami.", ["spectacles", "dictionary"]);
-  def("mirror", "text", "ch_mirror", "Espejo|Mirror|Miroir|Espelho|Spiegel|Specchio||镜子|거울|鏡|Зеркало|Lustro", "El nombre está escrito en espejo.|The name is written in mirror image.|Le nom est écrit en miroir.|O nome aparece espelhado.|Der Name ist gespiegelt.|Il nome è scritto a specchio.||名字是镜像书写的。|이름이 거울에 비친 것처럼 쓰여 있습니다.|名前が鏡文字で書かれている。|Название написано зеркально.|Nazwa jest napisana w lustrzanym odbiciu.", ["handmirror"]);
+  def("mirror", "text", "ch_mirror", "Nombre girado|Flipped name|Nom retourné|Nome virado|Gedrehter Name|Nome capovolto||翻转的名字|뒤집힌 이름|ひっくり返った名前|Перевёрнутое название|Odwrócona nazwa", "El nombre sale en espejo, boca abajo o cada palabra a su manera.|The name shows mirrored, upside down or each word its own way.|Le nom apparaît en miroir, à l'envers ou chaque mot à sa façon.|O nome aparece espelhado, de cabeça para baixo ou cada palavra do seu jeito.|Der Name erscheint gespiegelt, kopfüber oder jedes Wort anders.|Il nome appare a specchio, capovolto o ogni parola a modo suo.||名字会镜像、倒置，或者每个词各转各的。|이름이 거울처럼, 거꾸로, 또는 단어마다 제멋대로 뒤집힙니다.|名前が鏡文字、逆さま、または単語ごとにバラバラに回転する。|Название зеркальное, вверх ногами или каждое слово по-своему.|Nazwa jest w lustrze, do góry nogami albo każde słowo inaczej.", ["handmirror"]);
   def("memory", "text", "ch_memory", "Memoria de pez|Goldfish memory|Mémoire de poisson|Memória de peixe|Fischgedächtnis|Memoria di pesce||金鱼记忆|금붕어 기억력|金魚の記憶力|Память как у рыбки|Pamięć złotej rybki", "El nombre se desvanece: recuérdalo.|The name fades away: remember it.|Le nom s'efface : retiens-le.|O nome desaparece: memorize-o.|Der Name verblasst: merk ihn dir.|Il nome svanisce: ricordalo.||名字会渐渐消失：记住它。|이름이 사라집니다: 기억해두세요.|名前が消えていく：覚えておこう。|Название исчезает: запомни его.|Nazwa znika: zapamiętaj ją.", ["spectacles"]);
   def("upside", "text", "ch_upside", "Boca abajo|Upside down|La tête en bas|De cabeça para baixo|Kopfüber|Sottosopra||倒过来|거꾸로|逆さま|Вверх ногами|Do góry nogami", "El nombre está del revés.|The name is upside down.|Le nom est à l'envers.|O nome está de cabeça para baixo.|Der Name steht auf dem Kopf.|Il nome è capovolto.||名字是倒过来的。|이름이 뒤집혀 있습니다.|名前が逆さまになっている。|Название перевёрнуто.|Nazwa jest odwrócona do góry nogami.", ["handmirror"]);
   def("runes", "text", "ch_runes", "Runas|Runes|Runes|Runas|Runen|Rune||符文|룬 문자|ルーン文字|Руны|Runy", "Letras sustituidas por símbolos parecidos.|Letters swapped for look-alike symbols.|Lettres remplacées par des symboles qui leur ressemblent.|Letras trocadas por símbolos parecidos.|Buchstaben durch ähnliche Symbole ersetzt.|Lettere sostituite da simboli simili.||字母被换成了形似的符号。|글자가 비슷하게 생긴 기호로 바뀌었습니다.|文字が似た形の記号に置き換えられている。|Буквы заменены похожими символами.|Litery zastąpiono podobnymi symbolami.", ["spectacles"]);
   def("scroll", "text", "ch_scroll", "Marquesina|Ticker sign|Enseigne défilante|Letreiro|Laufschrift|Insegna scorrevole||滚动字幕|전광판|電光掲示板|Бегущая строка|Świetlna reklama", "El nombre pasa como un letrero luminoso.|The name scrolls by like a neon sign.|Le nom défile comme une enseigne lumineuse.|O nome passa como um letreiro luminoso.|Der Name läuft wie eine Leuchtschrift vorbei.|Il nome scorre come un'insegna luminosa.||名字像霓虹灯招牌一样滚动而过。|이름이 네온사인처럼 흘러갑니다.|名前がネオンサインのように流れていく。|Название проплывает, как неоновая вывеска.|Nazwa przesuwa się jak neon.", ["steadyhand"]);
   def("novowels", "text", "ch_novowels", "Sin vocales|No vowels|Sans voyelles|Sem vogais|Ohne Vokale|Senza vocali||没有元音|모음 없음|母音なし|Без гласных|Bez samogłosek", "Las vocales han desaparecido.|The vowels are gone.|Les voyelles ont disparu.|As vogais sumiram.|Die Vokale sind verschwunden.|Le vocali sono sparite.||元音全都消失了。|모음이 사라졌습니다.|母音が消えてしまった。|Гласные исчезли.|Samogłoski zniknęły.", ["dictionary"]);
-  def("anagram", "text", "ch_anagram", "Anagrama|Anagram|Anagramme|Anagrama|Anagramm|Anagramma||字谜|애너그램|アナグラム|Анаграмма|Anagram", "Las letras del interior están mezcladas.|The inner letters are shuffled.|Les lettres intérieures sont mélangées.|As letras internas estão embaralhadas.|Die inneren Buchstaben sind gemischt.|Le lettere interne sono mescolate.||中间的字母被打乱了。|가운데 글자들이 섞여 있습니다.|中の文字がシャッフルされている。|Внутренние буквы перемешаны.|Środkowe litery są pomieszane.", ["dictionary"]);
+  def("anagram", "text", "ch_anagram", "Letras revueltas|Scrambled letters|Lettres en vrac|Letras embaralhadas|Wirre Buchstaben|Lettere rimescolate||打乱的字母|뒤섞인 글자|ごちゃまぜの文字|Перепутанные буквы|Pomieszane litery", "Las letras del nombre cambian de sitio.|The name's letters swap places.|Les lettres du nom changent de place.|As letras do nome trocam de lugar.|Die Buchstaben des Namens tauschen die Plätze.|Le lettere del nome cambiano posto.||名字里的字母换了位置。|이름의 글자들이 자리를 바꿉니다.|名前の文字が入れ替わる。|Буквы названия меняются местами.|Litery nazwy zamieniają się miejscami.", ["dictionary"]);
   def("dance", "text", "ch_dance", "Baile de letras|Dancing letters|Lettres qui dansent|Letras dançantes|Tanzende Buchstaben|Lettere che ballano||跳舞的字母|춤추는 글자|踊る文字|Танцующие буквы|Tańczące litery", "Las letras saltan arriba y abajo.|The letters bounce up and down.|Les lettres sautent de haut en bas.|As letras pulam para cima e para baixo.|Die Buchstaben hüpfen auf und ab.|Le lettere saltellano su e giù.||字母上下跳动。|글자들이 위아래로 튑니다.|文字が上下に跳ねる。|Буквы прыгают вверх и вниз.|Litery podskakują w górę i w dół.", ["steadyhand", "spectacles"]);
   def("riddle", "text", "ch_riddle", "Adivinanza|Riddle|Devinette|Adivinha|Rätsel|Indovinello||谜语|수수께끼|なぞなぞ|Загадка|Zagadka", "En vez del nombre, una pista con el nombre tapado.|A clue with the name blanked out replaces the name.|Un indice au nom masqué remplace le nom.|Uma pista com o nome tapado substitui o nome.|Statt des Namens ein Hinweis mit verdecktem Namen.|Al posto del nome, un indizio con il nome coperto.||名字被替换成一条遮住名字的线索。|이름 대신 이름이 가려진 단서가 나옵니다.|名前の代わりに、名前を伏せたヒントが表示される。|Вместо названия — подсказка, где название скрыто.|Zamiast nazwy pojawia się wskazówka z zakrytą nazwą.", ["almanac"]);
   def("babel", "text", "ch_babel", "Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele||巴别塔|바벨탑|バベルの塔|Вавилонская башня|Wieża Babel", "El nombre aparece en otro idioma.|The name appears in another language.|Le nom apparaît dans une autre langue.|O nome aparece em outro idioma.|Der Name erscheint in einer anderen Sprache.|Il nome appare in un'altra lingua.||名字以另一种语言显示。|이름이 다른 언어로 나타납니다.|名前が別の言語で表示される。|Название появляется на другом языке.|Nazwa pojawia się w innym języku.", ["dictionary"]);
@@ -42,12 +42,12 @@ window.AIQ = window.AIQ || {};
   def("dark", "map", "ch_dark", "Apagón|Blackout|Panne de courant|Apagão|Stromausfall|Blackout||停电|정전|停電|Отключение света|Awaria prądu", "El casino se queda a oscuras: solo ves cerca del puntero.|The casino goes dark: you only see near your pointer.|Le casino s'éteint : tu ne vois qu'autour du pointeur.|O cassino fica às escuras: só se vê perto do ponteiro.|Das Casino wird dunkel: du siehst nur um den Zeiger.|Il casinò si spegne: vedi solo vicino al puntatore.||赌场一片漆黑：你只能看到指针附近。|카지노가 어두워집니다: 포인터 주변만 보입니다.|カジノが暗くなる：ポインターの周りしか見えない。|В казино гаснет свет: видно только возле курсора.|W kasynie gaśnie światło: widzisz tylko wokół kursora.", ["miner"]);
   def("flicker", "map", "ch_flicker", "Luces parpadeantes|Flickering lights|Lumières clignotantes|Luzes piscando|Flackerndes Licht|Luci intermittenti||闪烁的灯光|깜빡이는 조명|点滅する照明|Мигающий свет|Migające światła", "Las luces se apagan a ratos y el mapa desaparece.|The lights cut out and the map vanishes for a moment.|Les lumières s'éteignent et la carte disparaît un instant.|As luzes apagam e o mapa some por um instante.|Das Licht fällt aus und die Karte verschwindet kurz.|Le luci si spengono e la mappa sparisce per un attimo.||灯光熄灭，地图会短暂消失。|불이 꺼지고 지도가 잠시 사라집니다.|明かりが消え、地図が一瞬見えなくなる。|Свет гаснет, и карта на миг исчезает.|Światła gasną, a mapa na chwilę znika.", ["miner"]);
   def("wrongborders", "map", "ch_wrongborders", "Fronteras falsas|False borders|Fausses frontières|Fronteiras falsas|Falsche Grenzen|Confini falsi||虚假边界|가짜 국경|偽の国境|Ложные границы|Fałszywe granice", "Las fronteras dibujadas mienten.|The drawn borders are lying.|Les frontières dessinées mentent.|As fronteiras desenhadas mentem.|Die gezeichneten Grenzen lügen.|I confini disegnati mentono.||画出的边界是假的。|그려진 국경이 거짓말을 합니다.|描かれた国境はウソだ。|Нарисованные границы лгут.|Narysowane granice kłamią.", ["customs"]);
-  def("noborders", "map", "ch_noborders", "Mapa mudo|Blank map|Carte muette|Mapa mudo|Stumme Karte|Mappa muta||空白地图|빈 지도|白地図|Немая карта|Niema mapa", "Sin fronteras en el mapa.|No borders on the map.|Pas de frontières sur la carte.|Sem fronteiras no mapa.|Keine Grenzen auf der Karte.|Nessun confine sulla mappa.||地图上没有边界。|지도에 국경이 없습니다.|地図に国境がない。|На карте нет границ.|Na mapie nie ma granic.", ["customs"]);
+  def("noborders", "map", "ch_noborders", "Mapa mudo|Blank map|Carte muette|Mapa mudo|Stumme Karte|Mappa muta||空白地图|빈 지도|白地図|Немая карта|Niema mapa", "Sin fronteras ni colores de país; a tope, en negativo.|No borders or country colors; at full power, in negative.|Ni frontières ni couleurs de pays ; à fond, en négatif.|Sem fronteiras nem cores de país; no máximo, em negativo.|Keine Grenzen, keine Länderfarben; voll aufgedreht als Negativ.|Niente confini né colori dei paesi; al massimo, in negativo.||没有边界，也没有国家的颜色；最高等级时变成负片。|국경도 국가 색도 없고, 최고 단계에선 네거티브가 됩니다.|国境も国の色もない。最高レベルではネガになる。|Ни границ, ни цветов стран; на максимуме — негатив.|Bez granic i kolorów krajów; na maksa w negatywie.", ["customs"]);
   def("pangea", "map", "ch_pangea", "Pangea|Pangaea|Pangée|Pangeia|Pangaea|Pangea||盘古大陆|판게아|パンゲア|Пангея|Pangea", "Los continentes se han unido en un solo supercontinente, como hace 250 millones de años.|The continents have merged into one supercontinent, like 250 million years ago.|Les continents se sont réunis en un seul supercontinent, comme il y a 250 millions d'années.|Os continentes se uniram num único supercontinente, como há 250 milhões de anos.|Die Kontinente sind zu einem Superkontinent verschmolzen, wie vor 250 Millionen Jahren.|I continenti si sono uniti in un unico supercontinente, come 250 milioni di anni fa.||各大洲合并成了一个超大陆，就像 2.5 亿年前那样。|2억 5천만 년 전처럼 대륙들이 하나의 초대륙으로 합쳐졌습니다.|2億5千万年前のように、大陸が一つの超大陸に合体した。|Континенты слились в один суперконтинент, как 250 миллионов лет назад.|Kontynenty połączyły się w jeden superkontynent, jak 250 milionów lat temu.", ["plates"]);
   def("deal", "map", "ch_deal", "Continentes barajados|Shuffled continents|Continents mélangés|Continentes embaralhados|Gemischte Kontinente|Continenti mescolati||洗乱的大洲|섞인 대륙|シャッフルされた大陸|Перетасованные континенты|Potasowane kontynenty", "El crupier ha barajado los continentes y los ha repartido sobre la mesa.|The dealer has shuffled the continents and dealt them across the table.|Le croupier a mélangé les continents et les a distribués sur la table.|O crupiê embaralhou os continentes e os distribuiu pela mesa.|Der Croupier hat die Kontinente gemischt und auf dem Tisch ausgeteilt.|Il croupier ha mescolato i continenti e li ha distribuiti sul tavolo.||荷官把各大洲洗乱，再发到了牌桌上。|딜러가 대륙들을 섞어서 테이블 위에 나눠 놓았습니다.|ディーラーが大陸をシャッフルして、テーブルに配った。|Крупье перетасовал континенты и разложил их по столу.|Krupier potasował kontynenty i rozłożył je na stole.", ["plates"]);
-  def("spread", "map", "ch_spread", "Big bang|Big bang|Big bang|Big bang|Urknall|Big bang||大爆炸|빅뱅|ビッグバン|Большой взрыв|Wielki wybuch", "Los continentes se han separado.|The continents have drifted apart.|Les continents se sont éloignés.|Os continentes se afastaram.|Die Kontinente sind auseinandergedriftet.|I continenti si sono allontanati.||各大洲漂离开了。|대륙들이 서로 멀어졌습니다.|大陸が離れ離れになった。|Континенты разошлись.|Kontynenty się rozjechały.", ["plates"]);
+  def("spread", "map", "ch_spread", "Big bang|Big bang|Big bang|Big bang|Urknall|Big bang||大爆炸|빅뱅|ビッグバン|Большой взрыв|Wielki wybuch", "Los continentes se separan, se juntan en uno o se barajan.|The continents drift apart, merge into one or get shuffled.|Les continents s'écartent, fusionnent en un seul ou se mélangent.|Os continentes se afastam, se juntam num só ou se embaralham.|Die Kontinente driften auseinander, verschmelzen zu einem oder werden gemischt.|I continenti si allontanano, si fondono in uno o si mescolano.||各大洲会分开、合成一块，或者被洗乱。|대륙들이 흩어지거나, 하나로 합쳐지거나, 뒤섞입니다.|大陸が離れたり、ひとつに合体したり、シャッフルされたりする。|Континенты расходятся, сливаются в один или перемешиваются.|Kontynenty rozjeżdżają się, łączą w jeden albo się tasują.", ["plates"]);
   def("tilt", "map", "ch_tilt", "Continentes torcidos|Crooked continents|Continents de travers|Continentes tortos|Schiefe Kontinente|Continenti storti||歪斜的大洲|비뚤어진 대륙|傾いた大陸|Кривые континенты|Krzywe kontynenty", "Cada continente está girado.|Every continent is turned.|Chaque continent est tourné.|Cada continente está girado.|Jeder Kontinent ist gedreht.|Ogni continente è ruotato.||每个大洲都被旋转了。|모든 대륙이 회전되어 있습니다.|すべての大陸が回転している。|Каждый континент повёрнут.|Każdy kontynent jest obrócony.", ["plates"]);
-  def("flip", "map", "ch_flip", "Mundo del revés|Upside-down world|Monde à l'envers|Mundo de cabeça para baixo|Welt auf dem Kopf|Mondo capovolto||颠倒的世界|뒤집힌 세계|逆さまの世界|Мир вверх ногами|Świat do góry nogami", "El Sur está arriba.|South is up.|Le Sud est en haut.|O Sul está em cima.|Der Süden ist oben.|Il Sud è in alto.||南方在上。|남쪽이 위에 있습니다.|南が上にある。|Юг — наверху.|Południe jest na górze.", ["handmirror"]);
+  def("flip", "map", "ch_flip", "Mundo del revés|Upside-down world|Monde à l'envers|Mundo de cabeça para baixo|Welt auf dem Kopf|Mondo capovolto||颠倒的世界|뒤집힌 세계|逆さまの世界|Мир вверх ногами|Świat do góry nogami", "El mapa se da la vuelta: el Sur arriba, en espejo o las dos cosas.|The map turns over: South up, mirrored or both.|La carte se retourne : le Sud en haut, en miroir ou les deux.|O mapa vira: o Sul em cima, espelhado ou as duas coisas.|Die Karte dreht sich: Süden oben, gespiegelt oder beides.|La mappa si ribalta: il Sud in alto, a specchio o tutte e due.||地图翻了过来：南方朝上、左右镜像，或者两者都有。|지도가 뒤집힙니다: 남쪽이 위로, 거울처럼, 또는 둘 다.|地図がひっくり返る。南が上、鏡写し、またはその両方。|Карта переворачивается: юг наверху, зеркально или и то и другое.|Mapa się odwraca: południe na górze, w lustrze albo jedno i drugie.", ["handmirror"]);
   def("mirrorx", "map", "ch_mirrorx", "Espejo del mapa|Mirror map|Carte miroir|Mapa espelhado|Spiegelkarte|Mappa a specchio||镜像地图|거울 지도|鏡の地図|Зеркальная карта|Lustrzana mapa", "Este y Oeste están intercambiados.|East and West are swapped.|L'Est et l'Ouest sont échangés.|Leste e Oeste estão trocados.|Ost und West sind vertauscht.|Est e Ovest sono scambiati.||东西颠倒了。|동쪽과 서쪽이 바뀌었습니다.|東と西が入れ替わっている。|Восток и запад поменялись местами.|Wschód i zachód zamieniły się miejscami.", ["handmirror"]);
   def("spin", "map", "ch_spin", "Ruleta|Roulette|Roulette|Roleta|Roulette|Roulette||轮盘|룰렛|ルーレット|Рулетка|Ruletka", "El mapa gira despacio.|The map slowly spins.|La carte tourne lentement.|O mapa gira devagar.|Die Karte dreht sich langsam.|La mappa gira lentamente.||地图在缓慢旋转。|지도가 천천히 회전합니다.|地図がゆっくり回転する。|Карта медленно вращается.|Mapa powoli się kręci.", ["shockabsorber"]);
   def("clouds", "map", "ch_clouds", "Humo de sala|Smoky room|Salle enfumée|Sala esfumaçada|Verrauchter Saal|Sala fumosa||烟雾弥漫的房间|연기 자욱한 방|煙だらけの部屋|Прокуренный зал|Zadymiona sala", "El humo tapa partes del mapa.|Smoke covers parts of the map.|La fumée cache des parties de la carte.|A fumaça cobre partes do mapa.|Rauch verdeckt Teile der Karte.|Il fumo copre parti della mappa.||烟雾遮住了部分地图。|연기가 지도의 일부를 가립니다.|煙が地図の一部を覆っている。|Дым закрывает части карты.|Dym zasłania fragmenty mapy.", ["umbrella"]);
@@ -56,24 +56,24 @@ window.AIQ = window.AIQ || {};
   def("blindspot", "map", "ch_blindspot", "Punto ciego|Blind spot|Angle mort|Ponto cego|Blinder Fleck|Punto cieco||盲点|사각지대|死角|Слепое пятно|Martwe pole", "Un círculo negro tapa donde apuntas.|A black circle hides where you aim.|Un cercle noir cache ta visée.|Um círculo preto esconde onde você mira.|Ein schwarzer Kreis verdeckt dein Ziel.|Un cerchio nero copre dove miri.||一个黑圈遮住了你瞄准的地方。|검은 원이 조준하는 곳을 가립니다.|黒い円が狙っている場所を隠す。|Чёрный круг закрывает место прицела.|Czarne koło zasłania miejsce, w które celujesz.", ["divingmask"]);
   def("mosaic", "map", "ch_mosaic", "Píxeles gordos|Chunky pixels|Gros pixels|Pixels gordos|Grobe Pixel|Pixel giganti||粗大像素|큼직한 픽셀|粗いピクセル|Крупные пиксели|Grube piksele", "El mapa se ve a muy baja resolución.|The map is shown in very low resolution.|La carte est en très basse résolution.|O mapa aparece em baixíssima resolução.|Die Karte hat eine sehr niedrige Auflösung.|La mappa è a bassissima risoluzione.||地图以极低的分辨率显示。|지도가 매우 낮은 해상도로 표시됩니다.|地図がとても低い解像度で表示される。|Карта показана в очень низком разрешении.|Mapa jest w bardzo niskiej rozdzielczości.", ["lens"]);
   def("negative", "map", "ch_negative", "Negativo|Negative|Négatif|Negativo|Negativ|Negativo||负片|네거티브|ネガ|Негатив|Negatyw", "Los colores están invertidos.|The colors are inverted.|Les couleurs sont inversées.|As cores estão invertidas.|Die Farben sind invertiert.|I colori sono invertiti.||颜色被反转了。|색이 반전되어 있습니다.|色が反転している。|Цвета инвертированы.|Kolory są odwrócone.", ["customs"]);
-  def("quake", "map", "ch_quake", "Terremoto|Earthquake|Tremblement de terre|Terremoto|Erdbeben|Terremoto||地震|지진|地震|Землетрясение|Trzęsienie ziemi", "El mapa tiembla sin parar.|The map shakes nonstop.|La carte tremble sans cesse.|O mapa treme sem parar.|Die Karte bebt ununterbrochen.|La mappa trema senza sosta.||地图不停地晃动。|지도가 쉬지 않고 흔들립니다.|地図が絶え間なく揺れる。|Карта трясётся без остановки.|Mapa trzęsie się bez przerwy.", ["shockabsorber"]);
+  def("quake", "map", "ch_quake", "Terremoto|Earthquake|Tremblement de terre|Terremoto|Erdbeben|Terremoto||地震|지진|地震|Землетрясение|Trzęsienie ziemi", "El mapa se desliza solo y tiembla.|The map slides on its own and shakes.|La carte glisse toute seule et tremble.|O mapa desliza sozinho e treme.|Die Karte gleitet von allein und bebt.|La mappa scivola da sola e trema.||地图会自己滑动，还会摇晃。|지도가 저절로 미끄러지고 흔들립니다.|地図がひとりでに滑り、揺れる。|Карта сама сползает и трясётся.|Mapa sama się przesuwa i trzęsie.", ["shockabsorber"]);
   def("drift", "map", "ch_drift", "Deriva|Drift|Dérive|Deriva|Abdrift|Deriva||漂移|표류|漂流|Дрейф|Dryf", "El mapa se desliza solo.|The map slides on its own.|La carte glisse toute seule.|O mapa desliza sozinho.|Die Karte gleitet von allein.|La mappa scivola da sola.||地图会自己滑动。|지도가 저절로 미끄러집니다.|地図がひとりでに滑っていく。|Карта сама сползает.|Mapa sama się przesuwa.", ["shockabsorber"]);
   def("decoys", "map", "ch_decoys", "Chinchetas trampa|Decoy pins|Épingles leurres|Pinos falsos|Lockvogel-Pins|Pin esca|Chinches trampa|诱饵图钉|가짜 핀|おとりピン|Ложные булавки|Fałszywe pinezki", "Falsas chinchetas confunden el mapa.|Fake pins clutter the map.|De fausses épingles brouillent la carte.|Pinos falsos confundem o mapa.|Falsche Pins verwirren die Karte.|Pin falsi confondono la mappa.|Chinches falsas confunden el mapa.|假图钉让地图杂乱不堪。|가짜 핀들이 지도를 어지럽힙니다.|偽のピンが地図を埋め尽くす。|Фальшивые булавки загромождают карту.|Fałszywe pinezki zaśmiecają mapę.", ["customs"]);
   def("lightning", "map", "ch_lightning", "Rayos|Lightning|Éclairs|Raios|Blitze|Fulmini||闪电|번개|稲妻|Молния|Błyskawica", "Destellos que ciegan un instante.|Flashes that blind for an instant.|Des éclairs qui aveuglent un instant.|Clarões que cegam por um instante.|Blitze, die kurz blenden.|Lampi che accecano per un istante.||让人瞬间目眩的闪光。|순간적으로 눈을 멀게 하는 섬광.|一瞬目がくらむ閃光。|Вспышки, ослепляющие на мгновение.|Błyski, które na chwilę oślepiają.", ["umbrella"]);
   /* --- puntero --- */
-  def("tremble", "ptr", "ch_tremble", "Pulso tembloroso|Shaky hand|Main tremblante|Mão trêmula|Zittrige Hand|Mano tremante||手抖|떨리는 손|震える手|Дрожащая рука|Drżąca ręka", "Tu puntero tiembla, y el clic también.|Your pointer shakes, and so does your click.|Ton pointeur tremble, et ton clic aussi.|Seu ponteiro treme, e o clique também.|Dein Zeiger zittert, und dein Klick auch.|Il puntatore trema, e anche il clic.||你的指针在抖，点击也跟着抖。|포인터가 떨리고, 클릭도 흔들립니다.|ポインターが震え、クリックもぶれる。|Курсор дрожит, а вместе с ним и клик.|Kursor drży, a razem z nim twoje kliknięcie.", ["steadyhand"]);
+  def("tremble", "ptr", "ch_tremble", "Pulso|Shaky hand|Main tremblante|Mão trêmula|Zittrige Hand|Mano tremante||手抖|떨리는 손|震える手|Дрожащая рука|Drżąca ręka", "Tu puntero tiembla y da vueltas, y el clic también.|Your pointer shakes and circles, and so does your click.|Ton pointeur tremble et tourne, et ton clic aussi.|Seu ponteiro treme e gira, e o clique também.|Dein Zeiger zittert und kreist, und dein Klick auch.|Il puntatore trema e gira, e anche il clic.||你的指针又抖又转，点击也一样。|포인터가 떨리고 빙글빙글 돌고, 클릭도 그렇습니다.|ポインターが震えて回り、クリックもぶれる。|Курсор дрожит и кружит, а с ним и клик.|Kursor drży i krąży, a z nim twoje kliknięcie.", ["steadyhand"]);
   def("blink", "ptr", "ch_blink", "Cursor parpadeante|Blinking cursor|Curseur clignotant|Cursor piscante|Blinkender Zeiger|Cursore lampeggiante||闪烁的光标|깜빡이는 커서|点滅するカーソル|Мигающий курсор|Migający kursor", "El puntero parpadea y se apaga a ratos.|The pointer blinks on and off.|Le pointeur clignote.|O ponteiro pisca e apaga.|Der Zeiger blinkt.|Il puntatore lampeggia.||指针时隐时现。|포인터가 깜빡입니다.|ポインターが点いたり消えたりする。|Курсор то появляется, то пропадает.|Kursor miga.", ["gamer"]);
-  def("ghost", "ptr", "ch_ghost", "Cursor fantasma|Ghost cursor|Curseur fantôme|Cursor fantasma|Geisterzeiger|Cursore fantasma||幽灵光标|유령 커서|幽霊カーソル|Курсор-призрак|Kursor widmo", "El puntero desaparece unos segundos.|The pointer vanishes for a few seconds.|Le pointeur disparaît quelques secondes.|O ponteiro some por alguns segundos.|Der Zeiger verschwindet für einige Sekunden.|Il puntatore sparisce per qualche secondo.||指针会消失几秒钟。|포인터가 몇 초 동안 사라집니다.|ポインターが数秒間消える。|Курсор исчезает на несколько секунд.|Kursor znika na kilka sekund.", ["spareeye"]);
+  def("ghost", "ptr", "ch_ghost", "Cursor fantasma|Ghost cursor|Curseur fantôme|Cursor fantasma|Geisterzeiger|Cursore fantasma||幽灵光标|유령 커서|幽霊カーソル|Курсор-призрак|Kursor widmo", "El puntero desaparece y parpadea como un neón.|The pointer vanishes and flickers like neon.|Le pointeur disparaît et clignote comme un néon.|O ponteiro some e pisca como um neon.|Der Zeiger verschwindet und flackert wie Neon.|Il puntatore sparisce e lampeggia come un neon.||指针会消失，还会像霓虹灯一样闪烁。|포인터가 사라지고 네온처럼 깜빡입니다.|ポインターが消え、ネオンのように点滅する。|Курсор исчезает и мигает, как неон.|Kursor znika i miga jak neon.", ["spareeye"]);
   def("cblur", "ptr", "ch_cblur", "Cursor borroso|Blurry cursor|Curseur flou|Cursor borrado|Verschwommener Zeiger|Cursore sfocato||模糊的光标|흐릿한 커서|ぼやけたカーソル|Размытый курсор|Rozmyty kursor", "El puntero se ve desenfocado.|The pointer looks out of focus.|Le pointeur est flou.|O ponteiro fica desfocado.|Der Zeiger ist unscharf.|Il puntatore è sfocato.||指针看起来失焦了。|포인터가 초점이 맞지 않아 보입니다.|ポインターのピントがずれている。|Курсор выглядит размытым.|Kursor jest nieostry.", ["divingmask"]);
   def("lag", "ptr", "ch_lag", "Cursor con retraso|Laggy cursor|Curseur en retard|Cursor com atraso|Verzögerter Zeiger|Cursore in ritardo||延迟的光标|느린 커서|遅れるカーソル|Запаздывающий курсор|Spóźniony kursor", "El puntero va con retraso.|The pointer lags behind.|Le pointeur est en retard.|O ponteiro anda atrasado.|Der Zeiger hinkt hinterher.|Il puntatore è in ritardo.||指针跟不上你的动作。|포인터가 뒤처집니다.|ポインターが遅れてついてくる。|Курсор отстаёт.|Kursor nie nadąża.", ["gamer"]);
   def("cmirror", "ptr", "ch_cmirror", "Controles invertidos|Reversed controls|Commandes inversées|Controles invertidos|Umgekehrte Steuerung|Comandi invertiti||反向操作|반전된 조작|逆操作|Обратное управление|Odwrócone sterowanie", "El puntero se mueve al revés.|The pointer moves the opposite way.|Le pointeur bouge à l'envers.|O ponteiro se move ao contrário.|Der Zeiger bewegt sich verkehrt herum.|Il puntatore si muove al contrario.||指针朝相反方向移动。|포인터가 반대 방향으로 움직입니다.|ポインターが逆方向に動く。|Курсор движется в обратную сторону.|Kursor porusza się w przeciwną stronę.", ["handmirror"]);
   def("dizzy", "ptr", "ch_dizzy", "Mareo|Dizzy|Vertige|Tontura|Schwindel|Capogiro||眩晕|어지러움|めまい|Головокружение|Zawrót głowy", "El puntero da vueltas a tu alrededor.|The pointer circles around you.|Le pointeur tourne autour de toi.|O ponteiro gira ao seu redor.|Der Zeiger kreist um dich.|Il puntatore ti gira intorno.||指针绕着你打转。|포인터가 빙글빙글 돕니다.|ポインターがぐるぐる回る。|Курсор кружит вокруг тебя.|Kursor krąży wokół ciebie.", ["steadyhand"]);
   /* --- reglas --- */
   def("wind", "rule", "wind", "Vendaval|Gale|Rafale|Vendaval|Sturm|Bufera||狂风|질풍|疾風|Шквал|Wichura", "El viento desvía tu pin.|The wind pushes your pin.|Le vent dévie ton épingle.|O vento desvia seu pino.|Der Wind lenkt deinen Pin ab.|Il vento sposta il tuo pin.||风会推动你的图钉。|바람이 핀을 밀어냅니다.|風がピンを押し流す。|Ветер сдувает твою булавку.|Wiatr spycha twoją pinezkę.", ["weathervane"]);
-  def("storm", "rule", "storm", "Tormenta|Storm|Tempête|Tempestade|Gewitter|Tempesta||风暴|폭풍|嵐|Буря|Burza", "Solo tienes el 55 % del tiempo.|You only get 55% of the time.|Tu n'as que 55 % du temps.|Você só tem 55% do tempo.|Du hast nur 55 % der Zeit.|Hai solo il 55% del tempo.||你只有 55% 的时间。|시간의 55%만 주어집니다.|時間は55%しか与えられない。|У тебя есть только 55% времени.|Masz tylko 55% czasu.", ["earplugs"]);
+  def("storm", "rule", "storm", "Contrarreloj|Against the clock|Contre la montre|Contra o relógio|Gegen die Uhr|Contro il tempo||争分夺秒|시간과의 싸움|時間との勝負|Наперегонки со временем|Wyścig z czasem", "Tienes menos tiempo en cada pregunta.|You get less time for every question.|Tu as moins de temps à chaque question.|Você tem menos tempo em cada pergunta.|Du hast für jede Frage weniger Zeit.|Hai meno tempo per ogni domanda.||每道题的时间都变少了。|문제마다 시간이 줄어듭니다.|各問の時間が短くなる。|На каждый вопрос меньше времени.|Na każde pytanie masz mniej czasu.", ["earplugs"]);
   def("silence", "rule", "silence", "Silencio|Silence|Silence|Silêncio|Stille|Silenzio||沉默|침묵|静寂|Тишина|Cisza", "Tus herramientas no funcionan.|Your tools don't work.|Tes outils ne marchent pas.|Suas ferramentas não funcionam.|Deine Werkzeuge funktionieren nicht.|I tuoi strumenti non funzionano.||你的工具无法使用。|도구를 사용할 수 없습니다.|道具が使えない。|Твои инструменты не работают.|Twoje narzędzia nie działają.", ["earplugs"]);
   /* --- cuarta pared: el crupier sale del juego y se mete en TU pantalla (v0.33) --- */
-  def("crack", "wall", "ch_crack", "Cristal roto|Cracked screen|Écran fissuré|Tela rachada|Gesprungener Bildschirm|Schermo incrinato||屏幕碎裂|깨진 화면|割れた画面|Треснувший экран|Pęknięty ekran", "El crupier golpea tu pantalla: las grietas tapan parte del mapa.|The dealer punches your screen: the cracks cover part of the map.|Le croupier frappe ton écran : les fissures cachent une partie de la carte.|O crupiê soca a sua tela: as rachaduras cobrem parte do mapa.|Der Croupier schlägt auf deinen Bildschirm: Die Risse verdecken einen Teil der Karte.|Il croupier colpisce il tuo schermo: le crepe coprono parte della mappa.||荷官一拳砸在你的屏幕上：裂痕遮住了部分地图。|딜러가 화면을 내리칩니다: 금이 간 부분이 지도를 가립니다.|ディーラーが画面を殴りつける：ひびが地図の一部を隠す。|Крупье бьёт по твоему экрану: трещины закрывают часть карты.|Krupier uderza w twój ekran: pęknięcia zasłaniają część mapy.", ["protector"]);
+  def("crack", "wall", "ch_crack", "Cristal roto|Cracked screen|Écran fissuré|Tela rachada|Gesprungener Bildschirm|Schermo incrinato||屏幕碎裂|깨진 화면|割れた画面|Треснувший экран|Pęknięty ekran", "El crupier pringa y golpea tu pantalla: el mapa se ve a trozos.|The dealer smears and punches your screen: the map shows in pieces.|Le croupier graisse et frappe ton écran : la carte se voit par morceaux.|O crupiê lambuza e soca a sua tela: o mapa aparece aos pedaços.|Der Croupier verschmiert und schlägt deinen Bildschirm: Die Karte ist nur stückweise zu sehen.|Il croupier unge e colpisce il tuo schermo: la mappa si vede a pezzi.||荷官把你的屏幕弄脏又砸裂：地图只能看到一部分。|딜러가 화면을 더럽히고 내리칩니다: 지도가 조각조각 보입니다.|ディーラーが画面を汚して殴りつける。地図が切れ切れにしか見えない。|Крупье пачкает и бьёт твой экран: карта видна кусками.|Krupier brudzi i uderza twój ekran: mapę widać w kawałkach.", ["protector"]);
   def("smudge", "wall", "ch_smudge", "Pantalla sucia|Greasy screen|Écran gras|Tela engordurada|Fettiger Bildschirm|Schermo unto||油腻的屏幕|기름 묻은 화면|脂っぽい画面|Жирный экран|Tłusty ekran", "Huellas de dedos grasientos emborronan zonas del mapa.|Greasy fingerprints smear parts of the map.|Des traces de doigts gras brouillent des zones de la carte.|Marcas de dedos engordurados borram partes do mapa.|Fettige Fingerabdrücke verschmieren Teile der Karte.|Impronte di dita unte offuscano zone della mappa.||油腻的指纹把地图的部分区域弄模糊了。|기름진 지문이 지도 일부를 번지게 합니다.|脂ぎった指紋が地図のあちこちをにじませる。|Жирные отпечатки пальцев размазывают части карты.|Tłuste odciski palców rozmazują fragmenty mapy.", ["protector", "divingmask"]);
   def("hang", "wall", "ch_hang", "No responde|Not responding|Ne répond pas|Não está respondendo|Reagiert nicht|Non risponde||无响应|응답 없음|応答なし|Не отвечает|Nie odpowiada", "Ventanas de error falsas tapan el mapa: ciérralas para seguir.|Fake error windows cover the map: close them to carry on.|De fausses fenêtres d'erreur cachent la carte : ferme-les pour continuer.|Janelas de erro falsas cobrem o mapa: feche-as para continuar.|Falsche Fehlerfenster verdecken die Karte: Schließ sie, um weiterzumachen.|Finte finestre di errore coprono la mappa: chiudile per continuare.||虚假的错误窗口挡住了地图：关掉它们才能继续。|가짜 오류 창이 지도를 가립니다: 닫아야 계속할 수 있습니다.|偽のエラーウィンドウが地図を隠す：閉じて先へ進もう。|Фальшивые окна ошибок закрывают карту: закрой их, чтобы продолжить.|Fałszywe okna błędów zasłaniają mapę: zamknij je, by grać dalej.", ["taskmgr"]);
   def("battery", "wall", "ch_battery", "Batería baja|Low battery|Batterie faible|Bateria fraca|Akku schwach|Batteria scarica||电量不足|배터리 부족|バッテリー残量低下|Низкий заряд|Słaba bateria", "Tu pantalla se va apagando mientras piensas.|Your screen keeps dimming while you think.|Ton écran s'assombrit pendant que tu réfléchis.|Sua tela vai escurecendo enquanto você pensa.|Dein Bildschirm wird dunkler, während du nachdenkst.|Il tuo schermo si scurisce mentre pensi.||你思考的时候，屏幕越来越暗。|생각하는 동안 화면이 점점 어두워집니다.|考えている間に画面がどんどん暗くなる。|Пока ты думаешь, экран становится всё темнее.|Ekran ciemnieje, gdy się zastanawiasz.", ["powerbank"]);
@@ -82,37 +82,64 @@ window.AIQ = window.AIQ || {};
   def("flaghue", "flag", "ch_flaghue", "Luces de neón|Neon lights|Néons|Luzes neon|Neonlicht|Luci al neon||霓虹灯|네온 조명|ネオンライト|Неоновые огни|Neony", "Las luces del casino cambian los colores de la bandera.|The casino lights shift the flag's colors.|Les néons du casino changent les couleurs du drapeau.|As luzes do cassino mudam as cores da bandeira.|Die Casino-Lichter verändern die Farben der Flagge.|Le luci del casinò cambiano i colori della bandiera.||赌场的灯光改变了国旗的颜色。|카지노 조명이 국기의 색을 바꿉니다.|カジノの照明が国旗の色を変えてしまう。|Огни казино искажают цвета флага.|Światła kasyna zmieniają kolory flagi.", ["lens"]);
   def("flagblur", "flag", "ch_blur", "Bandera borrosa|Blurry flag|Drapeau flou|Bandeira desfocada|Unscharfe Flagge|Bandiera sfocata||模糊的国旗|흐릿한 국기|ぼやけた国旗|Размытый флаг|Rozmyta flaga", "La bandera está desenfocada.|The flag is out of focus.|Le drapeau est flou.|A bandeira está desfocada.|Die Flagge ist unscharf.|La bandiera è sfocata.||国旗失焦了。|국기의 초점이 맞지 않습니다.|国旗のピントが合っていない。|Флаг не в фокусе.|Flaga jest nieostra.", ["divingmask"]);
   def("flagdark", "flag", "ch_dark", "Bandera a oscuras|Flag in the dark|Drapeau dans le noir|Bandeira no escuro|Flagge im Dunkeln|Bandiera al buio||黑暗中的国旗|어둠 속의 국기|暗闇の国旗|Флаг в темноте|Flaga w ciemności", "La bandera casi no se distingue en la penumbra.|The flag is barely visible in the dim light.|Le drapeau se distingue à peine dans la pénombre.|A bandeira quase não se distingue na penumbra.|Die Flagge ist im Dämmerlicht kaum zu erkennen.|La bandiera si distingue a malapena nella penombra.||昏暗中几乎看不清国旗。|어두운 조명 속에서 국기가 거의 보이지 않습니다.|薄明かりの中で国旗がほとんど見えない。|В тусклом свете флаг едва виден.|W półmroku flagę ledwo widać.", ["miner"]);
-  def("flaggray", "flag", "ch_flaggray", "Sin colores|No colors|Sans couleurs|Sem cores|Ohne Farben|Senza colori||没有颜色|색 없음|色なし|Без цвета|Bez kolorów", "La bandera se ve en blanco y negro.|The flag shows in black and white.|Le drapeau apparaît en noir et blanc.|A bandeira aparece em preto e branco.|Die Flagge ist schwarz-weiß.|La bandiera appare in bianco e nero.||国旗以黑白显示。|국기가 흑백으로 표시됩니다.|国旗が白黒で表示される。|Флаг показан в чёрно-белом цвете.|Flaga jest czarno-biała.", ["lens"]);
+  def("flaggray", "flag", "ch_flaggray", "Bandera desteñida|Faded flag|Drapeau délavé|Bandeira desbotada|Verblasste Flagge|Bandiera sbiadita||褪色的国旗|바랜 국기|色あせた国旗|Выцветший флаг|Wyblakła flaga", "La bandera pierde sus colores; a tope, en negativo.|The flag loses its colors; at full power, in negative.|Le drapeau perd ses couleurs ; à fond, en négatif.|A bandeira perde as cores; no máximo, em negativo.|Die Flagge verliert ihre Farben; voll aufgedreht als Negativ.|La bandiera perde i colori; al massimo, in negativo.||国旗失去了颜色；最高等级时变成负片。|국기가 색을 잃고, 최고 단계에선 네거티브가 됩니다.|国旗の色が抜ける。最高レベルではネガになる。|Флаг теряет цвета; на максимуме — негатив.|Flaga traci kolory; na maksa w negatywie.", ["lens"]);
   A.CHAL = D;
   /* tanda 3: FAMILIAS de sensacion (lo que contesta un amuleto). Lo que estorba se conjura: LETRAS, LUZ, VISTA, SITIO, PUNTERO y PANTALLA tienen
      un amuleto cada una. Lo que miente o calla se vence sabiendo (SABER, MENTIRAS), la tormenta se sufre (TORMENTA) y las reglas de la casa se
      sobornan o se aguantan (REGLAS). counters (tienda, intro y aviso de contra) sale de aqui; FAMILY (el sorteo) no cambia hasta la tanda 6 */
   const FAMC = {
-    shaky: "letras", dance: "letras", scroll: "letras", missing: "letras", novowels: "letras", swap: "letras", anagram: "letras", runes: "letras", mirror: "letras", upside: "letras", memory: "letras",
+    shaky: "letras", missing: "letras", anagram: "letras", runes: "letras", mirror: "letras", memory: "letras",
     riddle: "saber", nocountry: "saber", babel: "saber",
     dark: "luz", battery: "luz", flagdark: "luz",
     flicker: "tormenta", lightning: "tormenta",
-    blur: "vista", myopia: "vista", blindspot: "vista", mosaic: "vista", clouds: "vista", rain: "vista", flagblur: "vista",
-    pangea: "sitio", deal: "sitio", spread: "sitio", tilt: "sitio", flip: "sitio", mirrorx: "sitio", spin: "sitio", quake: "sitio", drift: "sitio",
-    tremble: "puntero", dizzy: "puntero", blink: "puntero", ghost: "puntero", cblur: "puntero", lag: "puntero", cmirror: "puntero",
-    crack: "pantalla", smudge: "pantalla", hang: "pantalla",
-    wrongborders: "mentiras", noborders: "mentiras", negative: "mentiras", decoys: "mentiras", flaginvert: "mentiras", flaghue: "mentiras", flaggray: "mentiras",
+    blur: "vista", myopia: "vista", mosaic: "vista", clouds: "vista", rain: "vista", flagblur: "vista",
+    spread: "sitio", tilt: "sitio", flip: "sitio", spin: "sitio", quake: "sitio",
+    tremble: "puntero", ghost: "puntero", lag: "puntero", cmirror: "puntero",
+    crack: "pantalla", hang: "pantalla",
+    wrongborders: "mentiras", noborders: "mentiras", decoys: "mentiras", flaghue: "mentiras", flaggray: "mentiras",
     wind: "reglas", storm: "reglas", silence: "reglas",
   };
   const AMULET = { letras: "dictionary", luz: "miner", vista: "divingmask", sitio: "plates", puntero: "steadyhand", pantalla: "protector" };
-  for (const id in D) { D[id].fam = FAMC[id] || "reglas"; D[id].counters = AMULET[D[id].fam] ? [AMULET[D[id].fam]] : []; }
+  /* tanda 6: FUSIONES. Los retos gemelos se funden en uno con tres niveles que se notan; los absorbidos (SUB) quedan como efectos internos: ya no
+     salen en el sorteo ni tienen ficha. EXPAND dice que efectos de verdad pone cada reto en cada nivel (a veces los de sus gemelos de antes) */
+  const SUB = { dance: "shaky", novowels: "missing", swap: "anagram", upside: "mirror", negative: "noborders", mirrorx: "flip", blindspot: "myopia", drift: "quake", dizzy: "tremble", blink: "ghost", cblur: "ghost", smudge: "crack", flaginvert: "flaggray", pangea: "spread", deal: "spread", scroll: "shaky" };
+  for (const id in SUB) D[id].sub = SUB[id];
+  for (const id in D) { D[id].fam = FAMC[id] || FAMC[SUB[id]] || "reglas"; D[id].counters = AMULET[D[id].fam] ? [AMULET[D[id].fam]] : []; }
+  const EXPAND = {
+    shaky: [[["dance", 2]], [["shaky", 2]], [["shaky", 3], ["dance", 2]]],                       // bailan / tiemblan / tiemblan y bailan
+    missing: [[["missing", 1]], [["novowels", 1]], [["novowels", 1], ["missing", 1]]],           // 1/3 de las letras / sin vocales / sin vocales y sin 1/3 de las consonantes
+    anagram: [[["swap", 2]], [["anagram", 2]], [["anagram", 3]]],                               // 2 parejas / el interior barajado / todo salvo la 1.a, tambien en palabras de 3
+    mirror: [[["mirror", 1]], [["upside", 1]], [["mirror", 3]]],                                // espejo / boca abajo / cada palabra a su manera
+    noborders: [[["noborders", 1]], [["noborders", 2]], [["noborders", 3], ["negative", 1]]],    // sin fronteras / y de un color / y en negativo
+    flaggray: [[["flaggray", 1]], [["flaggray", 2]], [["flaggray", 3], ["flaginvert", 1]]],      // casi gris / gris / negativo en gris
+    myopia: [[["myopia", 1]], [["myopia", 2]], [["myopia", 3], ["blindspot", 2]]],               // 120 / 150 / 190 px con el punto negro
+    flip: [[["flip", 1]], [["mirrorx", 1]], [["flip", 3]]],                                     // el Sur arriba / espejo / las dos cosas
+    quake: [[["drift", 2]], [["quake", 2]], [["quake", 3], ["drift", 1]]],                       // se desliza / sacudidas / sacudidas y deriva
+    tremble: [[["dizzy", 1]], [["tremble", 2]], [["tremble", 3], ["dizzy", 2]]],                 // gira 12 px / salta 10 / salta 12 y gira 14
+    ghost: [[["ghost", 1]], [["blink", 2]], [["blink", 2], ["ghost", 3], ["cblur", 2]]],         // 1 s de cada 5 / neon / neon, desapariciones y vision doble
+    crack: [[["smudge", 2]], [["crack", 1], ["smudge", 1]], [["crack", 3]]],                     // huellas / un golpe y huellas / golpes
+    spread: [[["spread", 2]], [["pangea", 2]], [["deal", 3]]],                                  // Big bang: se separan / Pangea / barajados
+  };
+  const MISSING_CJK = [[["missing", 1]], [["missing", 2]], [["missing", 3]]];                    // en chino, japones y coreano no hay vocales: la mitad y dos tercios
+  const lvOf = c => clamp(c.lv || 1, 1, 3);
+  const expand = list => list.flatMap(c => { const e = c.id === "missing" && NOLATIN() ? MISSING_CJK : EXPAND[c.id]; return e ? e[lvOf(c) - 1].map(([id, lv]) => ({ id, lv, of: c.id })) : [c]; });
+  /* partidas guardadas y combinaciones de jefe con ids de antes: el reto que los absorbe (con su forma si la combinacion vive de ella) */
+  const FORCE = { pangea: 2, deal: 3, mirrorx: 2, negative: 3, flaginvert: 3 };
+  const canon = c => (D[c.id] && D[c.id].sub ? { ...c, id: D[c.id].sub, lv: FORCE[c.id] || c.lv } : c);
+  /* la frase del crupier de cada forma (Big bang a nivel 2 es Pangea): el primer efecto, si es de un gemelo de antes */
+  const formOf = c => { const e = expand([canon(c)])[0]; return e && e.id !== c.id && D[e.id] && D[e.id].sub ? e.id : null; };
 
-  const KIND = k => Object.keys(D).filter(id => D[id].kind === k);
+  const KIND = k => Object.keys(D).filter(id => D[id].kind === k && !D[id].sub);   // tanda 6: los absorbidos no salen en el sorteo
   const TEXT = KIND("text"), MAPC = KIND("map"), PTR = KIND("ptr"), RULE = KIND("rule"), FLAG = KIND("flag"), WALL = KIND("wall");
   /* v0.29: "Continentes barajados" ocupa en el sorteo el sitio exacto del antiguo "Continentes cambiados" (tras Pangea): cada semilla vuelve a sacar
      los retos de siempre y donde salia aquel sale este (entre la v0.23 y la v0.28 esas rondas sorteaban otro) */
   const MAPD = [...MAPC, ...WALL];
   /* en una misma ronda no se juntan retos "de la misma familia" */
-  const FAMILY = { wrongborders: "b", noborders: "b", pangea: "p", deal: "p", spread: "p", tilt: "p", flip: "o", mirrorx: "o", spin: "o", blur: "v", dark: "v", myopia: "v", blindspot: "v", clouds: "v", rain: "v", mosaic: "v", flicker: "l", lightning: "l", quake: "m", drift: "m", decoys: "d", negative: "n", crack: "w", smudge: "w", hang: "w", battery: "w" };
+  const FAMILY = { wrongborders: "b", noborders: "b", spread: "p", tilt: "p", flip: "o", spin: "o", blur: "v", dark: "v", myopia: "v", clouds: "v", rain: "v", mosaic: "v", flicker: "l", lightning: "l", quake: "m", decoys: "d", crack: "w", hang: "w", battery: "w" };
   const famOf = id => FAMILY[id] || (D[id].kind === "text" ? "t" : D[id].kind === "ptr" ? "c" : id);
   const NOLATIN = () => /^(zh|ja|ko)/.test(A.lang || "");                     // runas y sin vocales no tienen sentido con nombres en chino, japones o coreano
   /* v0.52: el Apagon ya no sale en la lista suave ni en el bombo de mapa (salia 1,71 veces por expedicion): solo el obligatorio y su jefe */
-  const MILD_TEXT = ["shaky", "missing", "swap", "upside", "babel", "dance"], MILD_MAP = ["blur", "noborders", "clouds", "mirrorx", "negative", "rain"];
+  const MILD_TEXT = ["shaky", "missing", "anagram", "mirror", "babel"], MILD_MAP = ["blur", "noborders", "clouds", "rain", "spread", "flicker"];   // tanda 6: a nivel 1 (Big bang: se separan)
   /* parejas que no se juntan en una ronda: las ventanas de No responde y la Bateria baja te hacen perder el nombre de Memoria de pez sin culpa tuya */
   const CLASH = { memory: ["hang", "battery"], hang: ["memory"], battery: ["memory"] };
   const clashes = (id, ids) => (CLASH[id] || []).some(x => ids.includes(x));
@@ -137,7 +164,7 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
   const pickFrom = (seed, tag, list, r, avoid) => { const ok = list.filter(id => !avoid.includes(famOf(id))), l = ok.length ? ok : list; return A.rng(`${seed}:${tag}:${Math.floor(r / 4)}:${r % 4}`).pick(l); };
   A.chal = {
-    DEFS: D, TEXT, MAPC, PTR, RULE, FLAG, WALL, noLatin: NOLATIN, FAMC, AMULET,
+    DEFS: D, TEXT, MAPC, PTR, RULE, FLAG, WALL, noLatin: NOLATIN, FAMC, AMULET, SUB, EXPAND, expand, canon, formOf,
     /* cjk: sin runas ni sin vocales. v0.4.1: la expedicion lo fija al empezar (run.cjk); con el idioma de cada momento, cambiarlo a media
        expedicion cambiaba el truco de texto de la ronda y el soborno ya pagado dejaba de coincidir con nada */
     plan(seed, r, asc = 0, topic, cjk = NOLATIN()) {
@@ -157,7 +184,7 @@ window.AIQ = window.AIQ || {};
         const normal = BOSS[a].filter(c => !c.ids.some(noop)), flags = FLAG_BOSS.filter(c => !c.ids.some(noop)), rb = A.rng(`${seed}:boss:${act}`);
         if (flagRound) combo = normal.length && A.rng(`${seed}:bossmix:${act}`)() < normal.length / (flags.length + normal.length) ? rb.pick(normal) : rb.pick(flags);
         else combo = rb.pick(normal.length ? normal : BOSS[a]);
-        list = combo.ids.map((id, i) => ({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) })).filter(c => !noop(c.id));   // por si ninguna combinacion sirve: nunca un reto que no hace nada
+        list = combo.ids.map((id, i) => canon({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) })).filter(c => !noop(c.id));   // tanda 6: Un solo continente es Big bang a nivel 2 (Pangea), Baraja revuelta a nivel 3...   // por si ninguna combinacion sirve: nunca un reto que no hace nada
         if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
         if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia (ni el Apagon ni una pareja que choque)
           const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids);
@@ -209,48 +236,49 @@ window.AIQ = window.AIQ || {};
   };
 
   /* ------------------------------------------------------------------ estado y capas */
-  const S = A.chal.state = { list: [], fx: A.chal.fx([]), halve: 1, on: false, suspended: false, timers: [], ov: null, map: null, px: { x: innerWidth / 2, y: innerHeight / 2 } };
+  const S = A.chal.state = { list: [], pub: [], fx: A.chal.fx([]), halve: 1, on: false, suspended: false, timers: [], ov: null, map: null, px: { x: innerWidth / 2, y: innerHeight / 2 } };
   const say = (k, ...a) => { try { A.sfx[k] && A.sfx[k](...a); } catch (e) { /* audio no listo */ } };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); S.timers.push(t); return t; };
   const clearTimers = () => { S.timers.forEach(clearTimeout); S.timers = []; };
   const phaseOk = () => { const g = A.core && A.core.S; return g && g.phase === "asking" && !g.paused; };
   const lvi = c => clamp((c.lv || 1) - 1, 0, 2);
+  /* tanda 6: niveles reales (los de los retos fundidos salen de EXPAND: cada efecto con su nivel) */
   const par = c => { const i = lvi(c), h = S.halve, fx = S.fx; switch (c.id) {
     case "shaky": return { amp: [2.2, 3.6, 5.4][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };            // Mano de crupier: 75 % menos de verdad (antes el suelo 0,35 lo dejaba en 65 %)
     case "dance": return { amp: [0.16, 0.26, 0.38][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };
     case "missing": return { frac: [0.34, 0.5, 0.65][i] * fx.textMul * h };
     case "swap": return { pairs: [1, 2, 3][i] * fx.textMul * h };                                       // con decimales: la Visera deja media pareja de media (antes redondeaba 0,5 a 1 y en nivel 1 no hacia nada)
     case "runes": return { frac: [0.4, 0.6, 0.85][i] * fx.textMul * h };
-    case "memory": return { ms: [2600, 1800, 1200][i] / Math.max(0.3, fx.textMul * h) };
+    case "memory": return { ms: [3000, 2000, 1400][i] / Math.max(0.3, fx.textMul * h) };
     case "blur": return { px: [4.5, 7, 10][i] * fx.blurMul * h };
     case "dark": return { r: [230, 170, 120][i] * fx.darkR / Math.max(0.5, h), a: [0.975, 0.988, 0.997][i] * (1 - fx.darkDim) };
-    case "flicker": return { iv: [[5.5, 8.5], [3.8, 6], [2.5, 4.2]][i], len: [250, 450, 700][i] * fx.blackoutMul * h };
-    case "lightning": return { iv: [[4.5, 7], [3.2, 5.2], [2.2, 4]][i] };
+    case "flicker": return { iv: [[4, 6], [2.5, 4], [1.5, 3]][i], len: [250, 450, 700][i] * fx.blackoutMul * h };   // tanda 6: mas cortes
+    case "lightning": return { iv: [[3.5, 4.5], [2.2, 2.8], [1.3, 1.7]][i] };   // tanda 6: un rayo cada 4 / 2,5 / 1,5 s
     case "wrongborders": return { amp: [0.014, 0.024, 0.038][i] * h };
     case "pangea": return { k: [0.6, 0.8, 1][i] * fx.plateMul * h };                    // v0.48: antes 0,9/0,95/1 y los niveles 2 y 3 salian casi iguales
     case "deal": return { k: [0.6, 0.85, 1][i] * fx.plateMul * h };                      // < 0,7: una pareja; < 0,95: cuatro; si no, los seis en la mesa (el Nivel de crupier deja una pareja)
     case "spread": return { k: [0.5, 0.8, 1][i] * fx.plateMul * h };
     case "tilt": return { k: [0.4, 0.65, 0.9][i] * fx.plateMul * h };
-    case "clouds": return { cover: [0.18, 0.28, 0.4][i] * fx.cloudMul * h };
+    case "clouds": return { cover: [0.2, 0.3, 0.42][i] * fx.cloudMul * h };
     case "rain": return { dens: [0.45, 0.75, 1][i] * fx.rainMul * fx.cloudMul * h };
     case "myopia": return { r: [120, 150, 190][i] * fx.focusMul * h };
     case "blindspot": return { r: [60, 85, 115][i] * fx.focusMul * h };
     case "mosaic": return { res: clamp([0.11, 0.08, 0.06][i] + (1 - fx.mosaicMul) * 0.16, 0.05, 0.4) };
-    case "quake": return { px: [3, 6, 10][i] * fx.quakeMul * h };
+    case "quake": return { px: [3, 6, 8][i] * fx.quakeMul * h };
     case "drift": return { px: [22, 36, 54][i] * fx.quakeMul * h };
     case "spin": return { amp: [0.28, 0.45, 0.7][i] * fx.quakeMul * h };
     case "decoys": return { n: [4, 7, 11][i] };
-    case "tremble": return { px: [7, 13, 21][i] * fx.ptrShakeMul * h };
+    case "tremble": return { px: [7, 10, 12][i] * fx.ptrShakeMul * h };
     case "blink": return { period: [0.55, 0.42, 0.3][i], duty: 0.45 };
-    case "ghost": return { every: [5.5, 4.2, 3.2][i], off: [0.9, 1.4, 2.0][i] * fx.ghostMul };
+    case "ghost": return { every: [5, 4.2, 4][i], off: [1, 1.4, 1.5][i] * fx.ghostMul };
     case "cblur": return { px: [3, 5, 8][i] * fx.ptrBlurMul * h };
-    case "lag": return { tau: [140, 240, 380][i] * fx.lagMul * h };
-    case "cmirror": return { both: c.lv >= 3 };
-    case "dizzy": return { r: [14, 22, 32][i] * fx.ptrShakeMul * h };
+    case "lag": return { tau: [140, 240, 320][i] * fx.lagMul * h };
+    case "cmirror": return { x: (c.lv || 1) !== 2, y: (c.lv || 1) >= 2 };   // izquierda y derecha / arriba y abajo / los dos ejes
+    case "dizzy": return { r: [12, 14, 32][i] * fx.ptrShakeMul * h };
     case "flaghue": return { deg: [70, 130, 200][i] * fx.colorMul };                    // Lupa del tasador: el neon apenas cambia los colores
     case "flagblur": return { px: [3, 6, 10][i] * fx.blurMul * h };
     case "flagdark": return { b: 1 - (1 - [0.55, 0.35, 0.18][i]) * (fx.darkR > 1 ? 0.35 : 1) };   // el Foco del vigilante alumbra la bandera
-    case "flaggray": return { amt: [0.6, 0.85, 1][i] * fx.colorMul };                   // Lupa del tasador: casi todo el color vuelve
+    case "flaggray": return { amt: [0.8, 1, 1][i] * fx.colorMul };                   // Lupa del tasador: casi todo el color vuelve
     case "crack": return { n: Math.max(1, Math.round([1, 2, 3][i] * h)) };
     case "smudge": return { n: Math.max(1, Math.round([2, 3, 5][i] * h)), px: [3, 4.5, 6][i] * fx.glassBlurMul * h };
     case "hang": return { n: Math.max(1, Math.round([1, 2, 3][i] * h)) };
@@ -394,15 +422,15 @@ window.AIQ = window.AIQ || {};
   }
   /* si el nombre no cambia en ningun idioma (54 % de las ciudades, 30 % de las capitales), esa pregunta trae otro reto de letras en su lugar: uno de los
      que frena el mismo Diccionario (asi la tienda y los sobornos siguen cuadrando), que no este ya en la ronda. Su ficha lo ensena mientras dura */
-  const BABEL_SUB = ["missing", "swap", "anagram", "novowels"];
+  const BABEL_SUB = ["missing", "anagram"];
   const BABEL_NOTE = L6("En lugar de la Torre de Babel: este nombre es igual en todos sus idiomas.|Instead of the Tower of Babel: this name is the same in every language.|À la place de la Tour de Babel : ce nom est le même dans toutes ses langues.|No lugar da Torre de Babel: este nome é igual em todos os idiomas.|Statt Turmbau zu Babel: Dieser Name ist in allen Sprachen gleich.|Al posto della Torre di Babele: questo nome è uguale in tutte le lingue.||代替巴别塔：这个名字在所有语言里都一样。|바벨탑 대신: 이 이름은 모든 언어에서 똑같습니다.|バベルの塔の代わり：この名前はどの言語でも同じ。|Вместо Вавилонской башни: это название одинаково на всех языках.|Zamiast Wieży Babel: ta nazwa brzmi tak samo w każdym języku.");
   function babelSwap(o) {
-    const b = S.list.find(c => c.id === "babel"), pool = BABEL_SUB.filter(id => !S.list.some(c => c.id === id) && !(NOLATIN() && id === "novowels")); if (!b || !pool.length) return;
+    const b = S.pub.find(c => c.id === "babel"), pool = BABEL_SUB.filter(id => !S.pub.some(c => c.id === id)); if (!b || !pool.length) return;
     S.qsub = { of: "babel", id: A.rng(`${S.seed}:bsub:${S.round}:${S.q}:${A.tx(o.name)}`).pick(pool), lv: b.lv };
-    S.qlist = S.list.map(c => (c === b ? { id: S.qsub.id, lv: b.lv } : c));
+    S.qlist = S.list.filter(c => c.id !== "babel").concat(expand([{ id: S.qsub.id, lv: b.lv }]));
   }
   /* la ficha de Babel en la barra de la Aventura: la del suplente mientras dura la pregunta (renderBars ya la pinta asi; esto cubre el cambio) */
-  const syncChips = () => { const b = S.list.find(c => c.id === "babel"); if (!b) return; document.querySelectorAll('#advBar .ch-chip[data-of="babel"]').forEach(el => { const want = S.qsub ? S.qsub.id : "babel"; if (el.dataset.ch !== want) el.outerHTML = A.chal.chip(b, el.classList.contains("sm")); }); };
+  const syncChips = () => { const b = S.pub.find(c => c.id === "babel"); if (!b) return; document.querySelectorAll('#advBar .ch-chip[data-of="babel"]').forEach(el => { const want = S.qsub ? S.qsub.id : "babel"; if (el.dataset.ch !== want) el.outerHTML = A.chal.chip(b, el.classList.contains("sm")); }); };
   /* el nombre y el pais de debajo sufren los mismos retos de texto (el pais tambien tiembla, se borra, se cambia...) */
   function decorate(o) {
     const el = $("askName"), sub = $("askSub"); if (!el || !o) return; clearText();
@@ -430,9 +458,9 @@ window.AIQ = window.AIQ || {};
     let chars = [...text]; const orig = chars.slice(), isL = i => isLetter(chars[i] || " ");
     const letters = chars.map((c, i) => (isLetter(c) ? i : -1)).filter(i => i >= 0), fixed = new Set(), hidden = new Set(), dots = new Set(), runes = new Set();
     if (!riddle) {
-      const an = get("anagram");
-      if (an && letters.length >= 4) {
-        let i = 0; while (i < chars.length) { if (!isL(i)) { i++; continue; } let j = i; while (j < chars.length && isL(j)) j++; if (j - i >= 4) { const was = chars.slice(i + 1, j - 1); let mid = rnd.shuffle(was); if (mid.join("") === was.join("") && new Set(mid).size > 1) mid.push(mid.shift()); for (let k = 0; k < mid.length; k++) { chars[i + 1 + k] = mid[k]; fixed.add(i + 1 + k); } } i = j; }
+      const an = get("anagram"), full = !!an && an.lv >= 3;            // a tope: todo menos la 1.a letra, tambien en palabras de 3
+      if (an && letters.length >= (full ? 3 : 4)) {
+        let i = 0; while (i < chars.length) { if (!isL(i)) { i++; continue; } let j = i; while (j < chars.length && isL(j)) j++; if (j - i >= (full ? 3 : 4)) { const e = full ? j : j - 1, was = chars.slice(i + 1, e); let mid = rnd.shuffle(was); if (mid.join("") === was.join("") && new Set(mid).size > 1) mid.push(mid.shift()); for (let k = 0; k < mid.length; k++) { chars[i + 1 + k] = mid[k]; fixed.add(i + 1 + k); } } i = j; }
       }
       const sw = get("swap");
       if (sw && letters.length >= 3) { const pk = par(sw).pairs, want = Math.floor(pk) + (pk % 1 && rnd() < pk % 1 ? 1 : 0); let done = 0, tries = 0; while (done < want && tries++ < 20) { const k = letters[Math.floor(rnd() * (letters.length - 1))]; if (isL(k + 1) && chars[k] !== chars[k + 1] && !fixed.has(k)) { [chars[k], chars[k + 1]] = [chars[k + 1], chars[k]]; fixed.add(k); fixed.add(k + 1); done++; } } }
@@ -440,7 +468,8 @@ window.AIQ = window.AIQ || {};
       if (rn) { const p = par(rn), pool = letters.filter(i => lookOf(chars[i])); rnd.shuffle(pool).slice(0, Math.max(2, Math.round(letters.length * p.frac))).forEach(i => { chars[i] = lookOf(chars[i]); runes.add(i); }); }
       if (get("novowels")) letters.forEach(i => { if (VOWELS.test(orig[i]) && i > 0) dots.add(i); });
       const ms = get("missing");
-      if (ms && letters.length >= 3) { const p = par(ms), n = clamp(Math.round(letters.length * p.frac), 2, Math.max(2, Math.floor(letters.length * 0.7))), pool = rnd.shuffle ? rnd.shuffle(letters.slice()) : letters.slice(); for (const k of pool) { if (hidden.size >= n) break; hidden.add(k); } }
+      const ml = dots.size ? letters.filter(i => !dots.has(i)) : letters;   // tanda 6: sin vocales y ademas tinta borrada: se borran consonantes
+      if (ms && ml.length >= 3) { const p = par(ms), n = clamp(Math.round(ml.length * p.frac), 2, Math.max(2, Math.floor(ml.length * 0.7))), pool = rnd.shuffle ? rnd.shuffle(ml.slice()) : ml.slice(); for (const k of pool) { if (hidden.size >= n) break; hidden.add(k); } }
     }
     const sh = get("shaky"), amp = sh ? par(sh).amp : 0, dn = get("dance"), damp = dn ? par(dn).amp : 0, memOn = !!get("memory");
     const parts = chars.map((ch, i) => {                              // data-n (no data-i: cambiar de idioma reescribe todo [data-i] con A.t)
@@ -460,7 +489,11 @@ window.AIQ = window.AIQ || {};
     el.innerHTML = html + (word ? `<span class="wd">${word}</span>` : "");
     if (amp) el.classList.add("ch-shaky");
     if (damp) el.classList.add("ch-dance");
-    if (has("mirror") && !fx.unmirrorText) el.classList.add("ch-mirror");
+    const mr = get("mirror");
+    if (mr && !fx.unmirrorText) {
+      if (mr.lv >= 3) { const ws = el.querySelectorAll(".wd"), T = ["w-m", "w-u", "w-v"], s0 = Math.floor(rnd() * 3); ws.forEach((w, k) => w.classList.add(ws.length === 1 ? "w-v" : T[(s0 + k) % 3])); }   // a tope, cada palabra a su manera (una sola: del reves de arriba abajo)
+      else el.classList.add("ch-mirror");
+    }
     if (has("upside") && !fx.unmirrorText) el.classList.add("ch-upside");
     if (riddle) { el.classList.add("ch-riddle"); if (text.length > 190) el.classList.add("ch-long"); fitRiddle(el); }
     if (has("scroll") && !fx.noMarquee) { el.innerHTML = `<span class="ch-marq">${el.innerHTML}</span>`; el.classList.add("ch-scroll"); }
@@ -522,7 +555,7 @@ window.AIQ = window.AIQ || {};
       if (kind === "mix") { spec.smooth = true; spec.ms = 1800; spec.deal = true; }   // como cartas: se encogen en su sitio y aparecen en el nuevo (sin cruzarse ni pasarse de largo)
     }
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
-    if (has("noborders")) { spec.lineA = 0; any = true; }
+    const nb = get("noborders"); if (nb) { spec.lineA = 0; spec.flat = [0.55, 1, 1][lvi(nb)]; any = true; }   // tanda 6: a nivel 1 aun se adivinan los colores de cada pais
     const fl = get("flip"); if (fl && !S.fx.unmirrorMap) { spec.orient = { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 }; any = true; }   // el Espejo del ilusionista tambien endereza el Sur arriba
     if (has("mirrorx") && !S.fx.unmirrorMap) { spec.orient = { rot: 0, mx: 1 }; any = true; }
     const sp = get("spin"); if (sp) { spec.spin = { amp: par(sp).amp, speed: 0.55 }; any = true; }
@@ -609,29 +642,33 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ bandera: filtro CSS para js/adventure.js (renderFlag) */
   A.chal.flagFx = () => {
     if (S.suspended || !S.on) return null;
-    const c = kindOn("flag")[0]; if (!c) return null;
-    const p = par(c);
-    switch (c.id) {
-      case "flaginvert": return S.fx.noNegative ? null : "invert(1)";                // el Sello de la casa le devuelve sus colores
-      case "flaghue": return `hue-rotate(${p.deg}deg)`;
-      case "flagblur": return `blur(${p.px}px)`;
-      case "flagdark": return `brightness(${p.b})`;
-      case "flaggray": return `grayscale(${p.amt})`;
-      default: return null;
-    }
+    const f = kindOn("flag").map(c => {
+      const p = par(c);
+      switch (c.id) {
+        case "flaginvert": return S.fx.noNegative ? null : "invert(1)";              // el Sello de la casa le devuelve sus colores
+        case "flaghue": return `hue-rotate(${p.deg}deg)`;
+        case "flagblur": return `blur(${p.px}px)`;
+        case "flagdark": return `brightness(${p.b})`;
+        case "flaggray": return `grayscale(${p.amt})`;
+        default: return null;
+      }
+    }).filter(Boolean);
+    return f.length ? f.join(" ") : null;
   };
 
   function flagClass(el) {
-    const img = el && el.querySelector(".ask-flag"), c = !S.suspended && S.on && kindOn("flag")[0]; if (!img || !c) return;
-    const p = par(c); img.classList.add("fx-" + c.id);
-    if (c.id === "flaghue") { img.style.setProperty("--fh0", (p.deg * 0.6) + "deg"); img.style.setProperty("--fh1", (p.deg * 1.4) + "deg"); }
-    if (c.id === "flagdark") img.style.setProperty("--fb", p.b);
+    const img = el && el.querySelector(".ask-flag"); if (!img || S.suspended || !S.on) return;
+    kindOn("flag").forEach(c => {
+      const p = par(c); img.classList.add("fx-" + c.id);
+      if (c.id === "flaghue") { img.style.setProperty("--fh0", (p.deg * 0.6) + "deg"); img.style.setProperty("--fh1", (p.deg * 1.4) + "deg"); }
+      if (c.id === "flagdark") img.style.setProperty("--fb", p.b);
+    });
   }
 
   /* ------------------------------------------------------------------ API */
   Object.assign(A.chal, {
     begin(list, fx, ctx = {}) {
-      this.end(); S.list = list.slice(); S.qlist = null; S.qsub = null; S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0;
+      this.end(); S.pub = list.map(canon); S.list = expand(S.pub); S.qlist = null; S.qsub = null; S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0;   // tanda 6: S.pub, los retos de la ronda; S.list, sus efectos
       S.map = A.core && A.core.map; if (S.map) ensureOverlay(S.map);
       /* retos que mueven continentes: su colocacion se deja calculada mientras se presenta la ronda (con el mapa ya quieto), no al empezar la pregunta */
       if (S.map && S.map.layout && S.list.some(c => ["pangea", "spread", "tilt", "deal"].includes(c.id))) {
@@ -642,7 +679,7 @@ window.AIQ = window.AIQ || {};
         clearTimeout(S.preT); S.preT = setTimeout(next, 1300);       // fuera de S.timers: si saltas la intro, la pregunta no lo cancela (se calculaba todo de golpe al empezarla)
       }
     },
-    active: () => S.list.slice(),
+    active: () => S.pub.slice(),
     has,
     lensRadius: () => (S.suspended ? 0 : has("wrongborders") ? S.fx.trueR : has("noborders") ? S.fx.peekR : 0),
     question(o, qi = 0) {
@@ -679,7 +716,7 @@ window.AIQ = window.AIQ || {};
     suspend() { S.suspended = true; this.reveal(500); const o = A.core && A.core.S.qs[A.core.S.qi]; if (o) decorate(o); if (A.pointer && A.pointer.mods) A.pointer.mods(); },
     upright() { const map = S.map; if (map && map.setOrient) map.setOrient(false, 900); },
     end() {
-      clearTimers(); clearTimeout(S.preT); fxStop(); if (A.chfx) A.chfx.clear(); S.on = false; S.list = []; S.qlist = null; S.qsub = null; const map = S.map || (A.core && A.core.map);
+      clearTimers(); clearTimeout(S.preT); fxStop(); if (A.chfx) A.chfx.clear(); S.on = false; S.list = []; S.pub = []; S.qlist = null; S.qsub = null; const map = S.map || (A.core && A.core.map);
       if (map && map.clearDistort) { map.clearDistort(300); map.setLens && map.setLens(null); map.setDecoys && map.setDecoys([]); }
       const app = $("app"); if (app) app.classList.remove("ch-negative");
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }

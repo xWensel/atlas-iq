@@ -105,6 +105,10 @@ html:lang(zh), html:lang(ja), html:lang(ko), html:lang(ru) { --dll: .889; }
 #askName .lt.dot , #askSub .lt.dot { color: #6d5d92; } #askName .lt.faint , #askSub .lt.faint { opacity: .32; filter: blur(.7px); }
 #askName .lt.rune , #askSub .lt.rune { color: #a56cff; text-shadow: 0 0 6px rgba(165, 108, 255, .65); }
 #askName.ch-upside , #askSub.ch-upside { display: block; transform: rotate(180deg); }
+/* tanda 6: Nombre girado a tope, cada palabra a su manera */
+#askName .wd.w-m, #askSub .wd.w-m { transform: scaleX(-1); }
+#askName .wd.w-u, #askSub .wd.w-u { transform: rotate(180deg); }
+#askName .wd.w-v, #askSub .wd.w-v { transform: scaleY(-1); }
 #askName.ch-dance .lt[data-dn] , #askSub.ch-dance .lt[data-dn] { animation: lt-dance .9s ease-in-out infinite; animation-delay: calc(var(--di, 0) * -.11s); }
 @keyframes lt-dance { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(calc(var(--dy, .2em) * -1)); } }
 #askName.ch-scroll , #askSub.ch-scroll { overflow: hidden; white-space: nowrap; }
