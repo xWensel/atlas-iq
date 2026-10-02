@@ -267,6 +267,7 @@ window.AIQ = window.AIQ || {};
   const AMU_LV = 2, AMU_DECK = 6, isAmu = id => !!(A.RELICS[id] && A.RELICS[id].amulet);
   const AMU_TAG = L6("Amuleto|Amulet|Amulette|Amuleto|Amulett|Amuleto||护身符|부적|お守り|Амулет|Amulet"), AMU_RE = L6("+2 cargas|+2 charges|+2 charges|+2 cargas|+2 Ladungen|+2 cariche||+2次充能|충전 +2회|+2回分|+2 заряда|+2 ładunki");
   const VTG_TAG = L6("Ventaja|Edge|Atout|Vantagem|Vorteil|Vantaggio||优势|어드밴티지|アドバンテージ|Преимущество|Atut"), VTG_SWAP = L6("cambiar por esta|swap for this one|échanger contre celle-ci|trocar por esta|dagegen tauschen|scambiala con questa||换成这张|이걸로 교체|これと交換|заменить на эту|zamień na tę");
+  const OTRA = L6("¡Otra!|Again!|Encore !|De novo!|Noch mal!|Ancora!||再来！|한 번 더!|もう一回！|Ещё!|Jeszcze!"), BEST5 = L6("5 mejores|best 5|5 meilleures|5 melhores|beste 5|5 migliori||取前5|상위 5개|上位5つ|5 лучших|5 najlepszych");
   const NULLED = L6("Anulado|Voided|Annulé|Anulado|Annulliert|Annullato||已作废|무효|無効|Отменён|Anulowany"), SAVED_BY = L6("te ha salvado|saved you|t'a sauvé|te salvou|hat dich gerettet|ti ha salvato||救了你|덕분에 살았어요|に救われた|спас тебя|cię uratował");
   const AMU_BROKE = L6("se parte|breaks|se brise|se quebra|zerbricht|si spezza||碎了|부서졌어요|砕けた|раскололся|pęka");
   const pips = (n, cls) => `<span class="${cls}">${Array.from({ length: Math.max(0, n) }, () => "<i></i>").join("")}</span>`;
@@ -452,13 +453,21 @@ window.AIQ = window.AIQ || {};
     const prev = pos > 0 ? dailyUsed(pos - 1) : [];
     return (DU.memo[pos] = pos > 0 ? prev.concat(drawRound(pos - 1, 0, prev).map(q => q.cid[0])) : []);
   }
+  /* As en la manga (tanda 5): el 6.o lugar, de la franja DIFICIL del tema, con su propia sub-semilla (":manga"): las 5 de siempre no cambian */
+  function drawExtra(pos, attempt, usedIds) {
+    const slot = slotOf(pos), B = bandsOf(slot), rr = A.rng(`${run.seed}:q:${pos}:${attempt}:manga`), ctx = ctxOf(pos, usedIds, B.topic), taken = [];
+    takeFrom(B.bands[2].list, 1, rr, taken, ctx, B.tail);
+    for (const b of B.bands) if (!taken.length) takeFrom(b.list, 1, rr, taken, ctx, null);
+    return taken.slice(0, 1);
+  }
   function pickQuestions(n, keep) {
     const all = allQ();
     if (keep && run.qv === QV && run.curQ && run.curQ.length === n && run.curQ.every(id => all[id])) { run.used = run.used.concat(run.curQ.filter(id => !run.used.includes(id))); return run.curQ.map(id => withSub({ ...all[id] })); }
     const pos = roundNo();
     let used = run.used;
-    if (run.board) { used = dailyUsed(pos); for (let a = 0; a < run.attempt; a++) used = used.concat(drawRound(pos, a, used, n).map(q => q.cid[0])); }
-    const out = drawRound(pos, run.attempt, used, n);
+    if (run.board) { used = dailyUsed(pos); for (let a = 0; a < run.attempt; a++) used = used.concat(drawRound(pos, a, used, Math.min(n, 5)).map(q => q.cid[0])); }
+    const out = drawRound(pos, run.attempt, used, Math.min(n, 5));
+    if (n > 5) out.push(...drawExtra(pos, run.attempt, used.concat(out.map(q => q.cid[0]))));   // la 6.a, la ultima
     run.qv = QV; run.curQ = out.map(q => q.cid[0]); run.used = run.used.concat(run.curQ);
     return out.map(q => withSub({ ...q }));
   }
@@ -473,6 +482,7 @@ window.AIQ = window.AIQ || {};
     if (rules.includes("clock")) ctx.seconds = Math.max(6, Math.round(ctx.seconds * (1 - 0.45 * halve)));
     run.boss = rules; run.wind = null;
     if (rules.includes("wind")) { const wr = A.rng(`${run.seed}:wind:${r}:${run.attempt}`); run.wind = { brg: Math.round(wr() * 360), km: Math.round((160 + 40 * run.act) * halve) }; }
+    run.qn = has("sleeve") && !run.inf ? 6 : 5;
     const qs = pickQuestions(run.qn, keep), info = actInfo(run.act), tn = TOPIC_NAMES[def.topic][Math.min(def.tier, TOPIC_NAMES[def.topic].length - 1)];
     run.topic = def.topic; run.tier = def.tier;
     return {
@@ -483,7 +493,7 @@ window.AIQ = window.AIQ || {};
   }
   function startRound(keep) {
     run.phase = "round";
-    if (!keep) { run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.rBulls = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
+    if (!keep) { run.qPts = []; run.qi = 0; run.luckUsed = false; run.guardUsed = false; run.rTools = 0; run.rBulls = 0; run.leftSum = 0; run.roundScore = 0; run.rGood = 0; run.streak = 0; refillTools(); }
     const Lv = roundLevel(keep), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
@@ -548,7 +558,7 @@ window.AIQ = window.AIQ || {};
       <span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${A.tx(Lv.topicName)}</h2>
       ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
       <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}${run._virgin ? ` <b class="intro-new">${NEW}</b>` : ""}</p>
-      <p class="adv-goal">${A.T("Objetivo", "Target")} ${!run.inf && baseTarget() > Lv.advance ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
+      <p class="adv-goal">${A.T("Objetivo", "Target")} ${!run.inf && baseTarget() > Lv.advance ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")}${run.qn > 5 ? " · " + A.tx(BEST5) : ""} · ${Lv.seconds} s</p>
       ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
       <div class="intro-art">${A.pic("topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
   };
@@ -582,13 +592,21 @@ window.AIQ = window.AIQ || {};
     let dist = km == null ? 0 : Math.round(1000 * Math.exp(-c.km / c.scale));
     const time = km == null ? 0 : Math.round(400 * Math.max(0, left / limit) * (0.3 + 0.7 * dist / 1000));
     c.dist = dist; c.time = time; c.chips = dist + time;
-    const ratio = dist / 1000; let streak = km != null && ratio >= 0.6 ? S.streak + 1 : 0, guarded = false;
+    const ratio = dist / 1000, manga = has("sleeve") && !run.inf && run.qi === 5; let streak = km != null && ratio >= 0.6 ? S.streak + 1 : 0, guarded = false;
+    if (manga) streak = S.streak;                                     // As en la manga: la 6.a ni alarga ni corta la racha
     const gN = sumFlag("guard");                                       // Guardarrachas: los 2 primeros fallos de la ronda no cortan la racha (tampoco el tiempo agotado)
     if (ratio < 0.6 && S.streak > 0 && gN && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
-    c.streak = streak; c.mult = guarded ? 1 : 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);   // la respuesta salvada puntua x1
+    c.streak = streak; c.mult = guarded || manga ? 1 : 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);   // la respuesta salvada puntua x1
     c.qi = run.qi;
     if (km != null) perkList().forEach(p => { if (!p.post) return; const tx = p.post(c, run); if (tx) { c.lines.push([p.ico, A.tx(p.n), tx]); if (!noSide) A.adv.flash(p.id, 0, tx); } });
     c.total = km == null ? 0 : Math.round(c.chips * c.mult * c.xmult);
+    if (!noSide && !run.inf) { run.qPts = run.qPts || []; run.qPts[c.qi] = c.total; }
+    if (manga) {                                                       // suma solo lo que mejora a tu peor respuesta de las 5: la ronda vale tus 5 mejores
+      const prev = (run.qPts || []).slice(0, 5), worst = prev.length ? Math.min(...prev) : 0, raw = c.total; c.total = Math.max(0, raw - worst);
+      c.lines.push(["sleeve", A.tx(A.RELICS.sleeve.n), raw > worst ? "−" + A.fmt(worst) : "="]);
+      if (!noSide) setTimeout(() => { if (raw > worst) { A.adv.flash("sleeve", 2, "+" + A.fmt(raw - worst)); A.sfx.jackpot(2); } else A.adv.flash("sleeve", 0, "="); }, 450);
+    }
+    if (!noSide && km != null && ratio >= 0.6 && run.ballSaved && run.ballSaved[qKey()]) { run.ballSaved[qKey()] = 0; setTimeout(() => { A.adv.flash("reball", 2, "✓"); A.sfx.jackpot(2); }, 450); }   // la segunda bola acerto
     c.coinsBase = km == null ? 0 : dist >= 960 ? 1 : 0;                         // solo las dianas dan doblon
     c.coins += c.coinsBase; c.coins = gain(c.coins);
     c.sc = { dist, time, distMax: 1000, timeMax: 400 };
@@ -694,6 +712,7 @@ window.AIQ = window.AIQ || {};
       const mark = () => { run.hintFl = run.hintFl || {}; if (run.hintFl[p.id] !== rk) { run.hintFl[p.id] = rk; A.adv.flash(p.id, 0); } };
       p.open({ ...api, fact: x => { mark(); api.fact(x); }, note: (t, i) => { mark(); return api.note(t, i); }, country: x => { mark(); return api.country(x); } }, o, run);
     });
+    if (S.qi === 5 && has("sleeve") && !run.inf) A.adv.flash("sleeve", 0, "6");   // la 6.a sale de la manga
     if (S.qi === 0 && !run.inf && run.rfK !== rk) { run.rfK = rk; timers.push(setTimeout(() => { if (C().S.phase === "asking") roundFlashes(); }, 650)); }
     if (run.qTotal === 0 && A.tour) A.tour.maybe("q");
   };
@@ -858,6 +877,22 @@ window.AIQ = window.AIQ || {};
   }
   /* renderBars rehace la barra: lo que acaba de lucirse (en los ultimos 700 ms) se vuelve a pintar en el icono nuevo */
   function flashKeep(bar) { const now = performance.now(); for (const id in flashOn) { const x = flashOn[id]; if (now - x.t > 700) { delete flashOn[id]; continue; } const el = bar.querySelector(`.ab-perk[data-id="${id}"]`); if (el) flashPaint(el, x.f); } }
+  /* Segunda bola (tanda 5): dos veces por ronda, si tu clic no hace racha (menos de 600) no cuenta. Queda una marca fria (una sonda sin anillo
+     ni distancia: dice "aqui no", nunca "aqui si"), el reloj se para 0,4 s y vale el siguiente clic. No salta con el tiempo agotado ni con las sondas */
+  A.adv.reBall = (lon, lat) => {
+    if (!run || run.inf || !has("reball")) return false;
+    const S = C().S, o = S.qs[S.qi]; if (!o) return false;
+    const key = roundNo() + ":" + (run.attempt || 0); run.ballN = run.ballN || {}; if ((run.ballN[key] || 0) >= sumFlag("reball")) return false;
+    const f = o.t === "c" ? C().world.byName[o.key] : null, km = f ? A.geo.distToFeature(lon, lat, f) : A.geo.haversine(lat, lon, o.lat, o.lon);
+    const scale = clamp(1500 * Math.pow(0.97, roundNo()), 300, 1500) * (KIND_FACTOR[o.kind] || 1); if (1000 * Math.exp(-km / scale) >= 600) return false;
+    run.ballN[key] = (run.ballN[key] || 0) + 1; (run.ballSaved = run.ballSaved || {})[qKey()] = 1;
+    run.probes = run.probes || []; run.probes.push({ lon, lat, ct: C().map.pickCt, cold: true, label: A.tx(OTRA) }); run.probesK = qKey() + ":" + o.cid[0];
+    C().map.avoid = hudRects(); C().map.setProbes(run.probes); renderBars();
+    S.t0 += 400;                                                         // el reloj se para 0,4 s
+    A.sfx.chip(0.2); setTimeout(() => A.sfx.chip(0.65), 140);           // clac-clac de la bola que rebota
+    A.adv.flash("reball", 0, A.tx(OTRA));
+    return true;
+  };
   /* lo que hacen tus reliquias al empezar la ronda (en la 1.a pregunta, tras la intro): quitar o suavizar retos, segundos de mas, cargas de mas, la provision de Por cuenta de la casa */
   function roundFlashes() {
     const r = roundNo(), plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk).list, bribed = (run.bribed && run.bribed[r]) || [];

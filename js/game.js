@@ -572,6 +572,7 @@
     const ef = A.pointer && A.pointer.effective && A.pointer.effective(), at = ef ? { x: ef[0], y: ef[1] } : lastPtr;   // el destello sale donde cae el pin (con el cursor invertido, con retraso o con viento no es donde esta el raton)
     if (S.run && S.tool) { pingFx(at.x, at.y, "probe"); A.adv.probe(lon, lat); return; }
     if (S.run && !ef) ({ lon, lat } = A.adv.adjust(lon, lat));   // con puntero propio, el viento ya lo ha movido
+    if (S.run && A.adv.reBall && A.adv.reBall(lon, lat)) { pingFx(at.x, at.y, "probe"); return; }   // Segunda bola: este clic no cuenta
     pingFx(at.x, at.y); A.sfx.tap(); A.sfx.pin(S.streak);
     reveal({ lon, lat }, Math.max(0, S.limit - (performance.now() - S.t0 - S.pausedAcc) / 1000));
   }
