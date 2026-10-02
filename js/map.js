@@ -1115,7 +1115,18 @@ void main(){
         if (now - (this._qT || 0) > 55) { this._qT = now; const a = sp.quake * k / this.view.s; this._qj = [(Math.random() - 0.5) * 2 * a, (Math.random() - 0.5) * 2 * a]; }
         const j = this._qj || [0, 0]; this.viewJ = { cx: this.view.cx + j[0], cy: this.view.cy + j[1], s: this.view.s }; this.dirty = this.fxDirty = true;
       } else if (this.viewJ) this.viewJ = null;
+      if (this._qk) {                                                    // tanda 8: la sacudida (quakeKick) mueve el mapa de sitio y tiembla fuerte un momento
+        const q = this._qk, u = (now - q.t0) / q.ms;
+        if (u >= 1 || !sp) this._qk = null;
+        else {
+          const e = 1 - Math.pow(1 - Math.min(1, u * 4), 3), de = e - q.done; q.done = e;
+          if (!this.pointers.size) { this.view.cx += (q.jx * de) / this.view.s; this.view.cy += (q.jy * de) / this.view.s; this._clamp(this.view); }
+          const a = (q.amp * (1 - u) * (1 - u)) / this.view.s, b = this.viewJ || this.view;
+          this.viewJ = { cx: b.cx + (Math.random() - 0.5) * 2 * a, cy: b.cy + (Math.random() - 0.5) * 2 * a, s: this.view.s }; this.dirty = this.fxDirty = true;
+        }
+      }
     }
+    quakeKick(amp, jolt) { const a = Math.random() * Math.PI * 2; this._qk = { t0: performance.now(), ms: 750, amp, jx: Math.cos(a) * jolt, jy: Math.sin(a) * jolt, done: 0 }; this.dirty = this.fxDirty = true; }
     distorted() { return !!(this.dist.spec && this.dist.k > 0.01); }
     /* uniformes de deformacion para un programa */
     _setDist(p) {

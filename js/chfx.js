@@ -27,7 +27,7 @@ window.AIQ = window.AIQ || {};
 
   let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [];
   const U = {}, t0 = performance.now(), timers = [];
-  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [], sparks: [], shades: [], wipes: [] };
+  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [], sparks: [], shades: [], wipes: [], teth: null, wind: null };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
   const ptr = () => (A.chal && A.chal.state && A.chal.state.px) || { x: W / 2, y: H / 2 };
 
@@ -156,7 +156,7 @@ void main(){
     cv.width = Math.max(2, Math.round(W * D2)); cv.height = Math.max(2, Math.round(H * D2));
     return true;
   }
-  const busy = () => !!(E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length);
+  const busy = () => !!(E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length || E.teth || E.wind);
   function kick() { if (!raf && ov) { last = performance.now(); raf = requestAnimationFrame(tick); } }
   function tick(now) {
     raf = 0; if (!ov || !ov.isConnected) return;
@@ -185,6 +185,8 @@ void main(){
     if (E.smoke && E.smoke.on) sweepStep(dt, now);
     if (E.sparks.length) { for (const s of E.sparks) { s.vy += 900 * dt; s.x += s.vx * dt; s.y += s.vy * dt; } E.sparks = E.sparks.filter(s => now - s.t0 < s.life); }
     E.shades = E.shades.filter(s => now - s.t0 < s.ms); E.wipes = E.wipes.filter(w => now - w.t0 < 420);
+    if (E.teth && now - E.teth.t > 140) E.teth = null;
+    if (E.wind) windStep(E.wind, dt, now);
     if (E.seal) { const r = A.chal && A.chal.lensRadius ? A.chal.lensRadius() : 0; if (r > 0) E.seal.r = r; else E.seal.on = 0; }
   }
   function rebuild() {
@@ -211,7 +213,7 @@ void main(){
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function draw2D(now) {
-    const need = !!(E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length);
+    const need = !!(E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length || E.teth || E.wind);
     cv.classList.toggle("on", need); if (!need) return;
     const g = g2; g.setTransform(D2, 0, 0, D2, 0, 0); g.clearRect(0, 0, W, H);
     if (E.film) drawFilm(g, E.film);
@@ -224,6 +226,8 @@ void main(){
     if (E.sparks.length) drawSparks(g, now);
     if (E.seal) drawSeal(g, E.seal, now);
     if (E.lens) drawLens(g, E.lens);
+    if (E.wind) drawWind(g, E.wind);
+    if (E.teth) drawTether(g, E.teth, now);
     if (E.trail.length) drawTrail(g, now);
     if (E.puffs.length) drawPuffs(g, now);
   }
@@ -588,6 +592,29 @@ void main(){
     g.restore();
   }
 
+  /* ------------------------------------------------------------------ tanda 8: la goma del Cursor con retraso y las rachas del Vendaval */
+  X.tether = (rx, ry, x, y) => { if (!ov || reduce()) return; E.teth = { rx, ry, x, y, t: performance.now() }; kick(); };
+  function drawTether(g, t, now) {
+    const d = Math.hypot(t.x - t.rx, t.y - t.ry); if (d < 6) return; const a = clamp(d / 60, 0.25, 0.85) * (1 - (now - t.t) / 140);
+    g.save(); g.setLineDash([5, 5]); g.lineWidth = 2; g.strokeStyle = `rgba(248,180,73,${a.toFixed(3)})`; g.beginPath(); g.moveTo(t.rx, t.ry); g.lineTo(t.x, t.y); g.stroke();
+    g.setLineDash([]); g.lineWidth = 1.6; g.strokeStyle = `rgba(255,247,230,${(a * 0.9).toFixed(3)})`; g.beginPath(); g.arc(t.rx, t.ry, 5, 0, TAU); g.stroke(); g.restore();
+  }
+  /* rachas: estelas de aire que cruzan el mapa en el sentido del viento (el de la flecha del puntero) y un soplido de vez en cuando */
+  function windStep(w, dt, now) {
+    const P = A.pointer, v = P && P.wind && P.on ? P.wind : null;
+    w.k += ((v && !w.off ? 1 : 0) - w.k) * (1 - Math.exp(-dt / 0.3)); if (w.off && w.k < 0.02) { E.wind = null; return; }
+    if (v) { const L = Math.hypot(v[0], v[1]) || 1; w.ux = v[0] / L; w.uy = v[1] / L; }
+    if (w.ux == null) return;
+    while (w.st.length < 34) w.st.push({ x: rnd() * W, y: rnd() * H, l: 40 + rnd() * 90, v: 700 + rnd() * 700, a: 0.14 + rnd() * 0.3 });
+    for (const s of w.st) { s.x += w.ux * s.v * dt; s.y += w.uy * s.v * dt; if (s.x < -120 || s.x > W + 120 || s.y < -120 || s.y > H + 120) { s.x = w.ux > 0 ? -100 : W + 100; s.y = rnd() * H; if (Math.abs(w.uy) > Math.abs(w.ux)) { s.x = rnd() * W; s.y = w.uy > 0 ? -100 : H + 100; } } }
+    if (v && now > w.gt) { w.gt = now + 2600 + rnd() * 2400; say("gust"); }
+  }
+  function drawWind(g, w) {
+    if (w.ux == null || w.k < 0.02) return; g.save(); g.lineCap = "round"; g.lineWidth = 2;
+    for (const s of w.st) { g.strokeStyle = `rgba(225,240,255,${(s.a * w.k).toFixed(3)})`; g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(s.x - w.ux * s.l, s.y - w.uy * s.l); g.stroke(); }
+    g.restore();
+  }
+
   /* ------------------------------------------------------------------ ayudas (perks): bisel de la lupa, anillo del sello */
   function drawLens(g, l) {
     const p = ptr(), r = l.r + 6, a = clamp(l.k, 0, 1); if (a < 0.02) return;
@@ -652,6 +679,7 @@ void main(){
     const ck = get("crack"); if (ck) crackOn(par(ck).n, fx.glassMul || 1);
     const sm = get("smudge"); if (sm) { const p = par(sm); printsOn(p.n, p.px, fx.glassMul || 1); }
     const hg = get("hang"); if (hg) winsOn(par(hg).n, fx.hangAuto || 0);
+    if (get("wind")) { E.wind = E.wind || { k: 0, st: [], gt: 0 }; E.wind.off = false; } else if (E.wind) E.wind.off = true;   // tanda 8: rachas del Vendaval
     const bt = get("battery"); if (bt) battOn(par(bt).dim);
   };
   X.clear = () => {
@@ -663,7 +691,7 @@ void main(){
     if (E.crack) E.crack.on = 0;
     if (E.prints) E.prints.on = 0;
     { const dd = document.getElementById("chxDead"); if (dd) dd.classList.remove("on"); }
-    E.sparks.length = 0; E.shades.length = 0; E.wipes.length = 0;
+    E.sparks.length = 0; E.shades.length = 0; E.wipes.length = 0; E.teth = null; if (E.wind) E.wind.off = true;
     if (E.batt && E.batt.on) { E.batt.on = 0; E.batt.hud.classList.add("charge"); E.batt.hud.classList.remove("toast", "crit"); if (E.batt.k > 0.05) say("charge"); }
     E.cut.v = E.cut.tv = 0; E.fseq = null; E.bolts.length = 0;
     const app = document.getElementById("app"); if (app) app.classList.remove("chx-punch");

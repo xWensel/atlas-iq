@@ -106,7 +106,7 @@ window.AIQ = window.AIQ || {};
   for (const id in SUB) D[id].sub = SUB[id];
   for (const id in D) { D[id].fam = FAMC[id] || FAMC[SUB[id]] || "reglas"; D[id].counters = AMULET[D[id].fam] ? [AMULET[D[id].fam]] : []; }
   const EXPAND = {
-    shaky: [[["dance", 2]], [["shaky", 2]], [["shaky", 3], ["dance", 2]]],                       // bailan / tiemblan / tiemblan y bailan
+    shaky: [[["dance", 3], ["shaky", 1]], [["shaky", 2], ["dance", 1]], [["shaky", 3], ["dance", 3]]],   // tanda 8: bailan y tiemblan desde el nivel 1; a tope, se dispersan y vuelven
     missing: [[["missing", 1]], [["novowels", 1]], [["novowels", 1], ["missing", 1]]],           // 1/3 de las letras / sin vocales / sin vocales y sin 1/3 de las consonantes
     anagram: [[["swap", 2]], [["anagram", 2]], [["anagram", 3]]],                               // 2 parejas / el interior barajado / todo salvo la 1.a, tambien en palabras de 3
     mirror: [[["mirror", 1]], [["upside", 1]], [["mirror", 3]]],                                // espejo / boca abajo / cada palabra a su manera
@@ -269,11 +269,11 @@ window.AIQ = window.AIQ || {};
   const lvi = c => clamp((c.lv || 1) - 1, 0, 2);
   /* tanda 6: niveles reales (los de los retos fundidos salen de EXPAND: cada efecto con su nivel) */
   const par = c => { const i = lvi(c), h = S.halve, fx = S.fx; switch (c.id) {
-    case "shaky": return { amp: [2.2, 3.6, 5.4][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };            // Mano de crupier: 75 % menos de verdad (antes el suelo 0,35 lo dejaba en 65 %)
-    case "dance": return { amp: [0.16, 0.26, 0.38][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };
+    case "shaky": return { amp: [2.4, 4.4, 6.2][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };            // Mano de crupier: 75 % menos de verdad (antes el suelo 0,35 lo dejaba en 65 %)
+    case "dance": return { amp: [0.18, 0.3, 0.42][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };
     case "missing": return { frac: [0.34, 0.5, 0.65][i] * fx.textMul * h };
     case "swap": return { pairs: [1, 2, 3][i] * fx.textMul * h };                                       // con decimales: la Visera deja media pareja de media (antes redondeaba 0,5 a 1 y en nivel 1 no hacia nada)
-    case "runes": return { frac: [0.4, 0.6, 0.85][i] * fx.textMul * h };
+    case "runes": return { frac: [0.55, 0.75, 0.95][i] * fx.textMul * h };   // tanda 8: mas letras cambiadas
     case "memory": return { ms: [3000, 2000, 1400][i] / Math.max(0.3, fx.textMul * h) };
     case "blur": return { px: [4.5, 7, 10][i] * fx.blurMul * h };
     case "dark": return { r: [230, 170, 120][i] * fx.darkR / Math.max(0.5, h), a: [0.975, 0.988, 0.997][i] * (1 - fx.darkDim) };
@@ -297,7 +297,7 @@ window.AIQ = window.AIQ || {};
     case "blink": return { period: [0.55, 0.42, 0.3][i], duty: 0.45 };
     case "ghost": return { every: [5, 4.2, 4][i], off: [1, 1.4, 1.5][i] * fx.ghostMul };
     case "cblur": return { px: [3, 5, 8][i] * fx.ptrBlurMul * h };
-    case "lag": return { tau: [140, 240, 320][i] * fx.lagMul * h };
+    case "lag": return { tau: [140, 240, 320][i] * fx.lagMul * h, step: fx.lagMul < 0.5 ? 0 : [0, 60, 100][i] };   // tanda 8: a nivel 2 y 3 el reticulo va a saltos (como una conexion mala)
     case "cmirror": return { x: (c.lv || 1) !== 2, y: (c.lv || 1) >= 2 };   // izquierda y derecha / arriba y abajo / los dos ejes
     case "dizzy": return { r: [12, 14, 32][i] * fx.ptrShakeMul * h };
     case "flaghue": return { deg: [70, 130, 200][i] * fx.colorMul };                    // Lupa del tasador: el neon apenas cambia los colores
@@ -496,15 +496,16 @@ window.AIQ = window.AIQ || {};
       const ml = dots.size ? letters.filter(i => !dots.has(i)) : letters;   // tanda 6: sin vocales y ademas tinta borrada: se borran consonantes
       if (ms && ml.length >= 3) { const p = par(ms), n = clamp(Math.round(ml.length * p.frac), 2, Math.max(2, Math.floor(ml.length * 0.7))), pool = rnd.shuffle ? rnd.shuffle(ml.slice()) : ml.slice(); for (const k of pool) { if (hidden.size >= n) break; hidden.add(k); } }
     }
-    const sh = get("shaky"), amp = sh ? par(sh).amp : 0, dn = get("dance"), damp = dn ? par(dn).amp : 0, memOn = !!get("memory");
+    const sh = get("shaky"), amp = sh ? par(sh).amp : 0, dn = get("dance"), damp = dn ? par(dn).amp : 0, memOn = !!get("memory"), crazy = !!(sh && dn && sh.lv >= 3 && amp > 3);   // tanda 8: a tope, las letras se dispersan y vuelven
     const parts = chars.map((ch, i) => {                              // data-n (no data-i: cambiar de idioma reescribe todo [data-i] con A.t)
       if (ch === " ") return chars[i - 1] === "▮" && chars[i + 1] === "▮" ? '<i class="wg"></i>' : " ";
       const c = ["lt"]; let glyph = ch; if (ch === "▮") c.push("blk");
       if (hidden.has(i)) c.push("gap", "sv" + Math.floor(rnd() * 3)); else if (dots.has(i)) { c.push("dot"); glyph = "·"; } else if (get("missing") && rnd() < 0.5) c.push("faint");
       if (runes.has(i)) c.push("rune");
       const dur = (0.07 + rnd() * 0.09).toFixed(3), del = (-rnd() * 0.3).toFixed(3), ax = ((rnd() - 0.5) * 2 * amp).toFixed(2), ay = ((rnd() - 0.5) * 2 * amp).toFixed(2), ar = ((rnd() - 0.5) * amp * 1.6).toFixed(2);
-      const st = (amp ? `--dur:${dur}s;--del:${del}s;--ax:${ax}px;--ay:${ay}px;--ar:${ar}deg;` : "") + (damp ? `--dy:${(damp * (0.6 + rnd() * 0.8)).toFixed(2)}em;--di:${i};` : "") + (memOn ? `--fd:${(rnd() * 0.6).toFixed(2)}s;` : "");
-      return `<b class="${c.join(" ")}" data-n="${i}" data-g="${ch}" style="${st}"${amp ? ' data-sh="1"' : ""}${damp ? ' data-dn="1"' : ""}>${glyph}</b>`;
+      let cz = ""; if (crazy) { const sa = rnd() * Math.PI * 2, sd = 0.7 + rnd() * 0.9; cz = `--sx:${(Math.cos(sa) * sd * 1.4).toFixed(2)}em;--sy:${(Math.sin(sa) * sd).toFixed(2)}em;--sr:${((rnd() - 0.5) * 320).toFixed(0)}deg;`; }
+      const st = (amp ? `--dur:${dur}s;--del:${del}s;--ax:${ax}px;--ay:${ay}px;--ar:${ar}deg;` : "") + (damp ? `--dy:${(damp * (0.6 + rnd() * 0.8)).toFixed(2)}em;--di:${i};` : "") + (memOn ? `--fd:${(rnd() * 0.6).toFixed(2)}s;` : "") + cz;
+      return `<b class="${c.join(" ")}" data-n="${i}" data-g="${ch}" style="${st}"${amp ? ' data-sh="1"' : ""}${damp ? ' data-dn="1"' : ""}${crazy ? ' data-cz="1"' : ""}>${glyph}</b>`;
     });
     let html = "", word = "";                                        // cada palabra en un bloque que no se parte (si no, las letras sueltas saltan de linea)
     /* Adivinanza en chino o japones: sin espacios, el texto entero era un solo bloque y se salia de la placa (hasta 2.000 px). Ahi se puede cortar
@@ -513,7 +514,7 @@ window.AIQ = window.AIQ || {};
     parts.forEach((pt, i) => { if (pt === " " || pt.startsWith("<i")) { html += (word ? `<span class="wd">${word}</span>` : "") + pt; word = ""; } else { if (word && cut(i)) { html += `<span class="wd">${word}</span>`; word = ""; } word += pt; } });
     el.innerHTML = html + (word ? `<span class="wd">${word}</span>` : "");
     if (amp) el.classList.add("ch-shaky");
-    if (damp) el.classList.add("ch-dance");
+    if (crazy) el.classList.add("ch-crazy"); else if (damp) el.classList.add("ch-dance");
     const mr = get("mirror");
     if (mr && !fx.unmirrorText) {
       if (mr.lv >= 3) { const ws = el.querySelectorAll(".wd"), T = ["w-m", "w-u", "w-v"], s0 = Math.floor(rnd() * 3); ws.forEach((w, k) => w.classList.add(ws.length === 1 ? "w-v" : T[(s0 + k) % 3])); }   // a tope, cada palabra a su manera (una sola: del reves de arriba abajo)
@@ -534,7 +535,7 @@ window.AIQ = window.AIQ || {};
   /* adivinanza: la pista se encoge hasta caber en la placa (antes una nota larga se salia por debajo del crupier), tambien a lo ancho */
   const HZ = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/, HZ_CLOSE = /[、。，．！？：；）」』】〕〉》”’ー・…％ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/, HZ_OPEN = /[（「『【〔〈《“‘]/;
   const fitRiddle = el => requestAnimationFrame(() => { if (!el.classList.contains("ch-riddle")) return; let f = parseFloat(getComputedStyle(el).fontSize) || 16, n = 0; const max = Math.max(96, innerHeight * 0.22); while ((el.scrollHeight > max || el.scrollWidth > el.clientWidth + 2) && f > 11 && n++ < 18) { f -= 1; el.style.fontSize = f + "px"; } });
-  function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.style.fontSize = ""; if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
+  function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.style.fontSize = ""; if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-crazy", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
   /* la colocacion de continentes (19-76 ms de calculo) sale igual en todas las preguntas de la ronda (misma semilla, mismo reto): se calcula una vez
@@ -641,6 +642,19 @@ window.AIQ = window.AIQ || {};
       if (S.fx.flickerWarn) { const h = layer("halo"); if (h) { h.classList.add("warn"); later(() => h.classList.remove("warn"), 420); } say("warn"); later(() => go(0), 420); } else go(0);
     }
   }
+  /* tanda 8: Terremoto con SACUDIDAS: cada pocos segundos un temblor fuerte que mueve el mapa de sitio (hay que volver a buscar), retumba y hace
+     temblar la pantalla. El Ancla las deja en casi nada */
+  function quakeLoop() {
+    const q = S.pub.find(c => c.id === "quake"); if (!q || S.suspended || !S.on) return;
+    const lv = clamp(q.lv || 1, 1, 3), P = [[5.5, 8], [3.8, 5.5], [2.4, 3.8]][lv - 1], wait = (P[0] + Math.random() * (P[1] - P[0])) * 1000;
+    later(function fire() {
+      if (!phaseOk()) return later(fire, 600);
+      const m = S.map, k = S.fx.quakeMul; if (m && m.quakeKick) m.quakeKick([10, 16, 24][lv - 1] * k, [30, 55, 85][lv - 1] * k);
+      say("rumble", lv);
+      const app = $("app"); if (app && k > 0.5 && !document.documentElement.classList.contains("reduce-motion")) { app.classList.remove("ch-quaking"); A.restyle(app); app.classList.add("ch-quaking"); later(() => app.classList.remove("ch-quaking"), 700); }
+      quakeLoop();
+    }, wait);
+  }
   function lightningLoop() {
     const lg = get("lightning"); if (!lg || S.suspended || !S.on || S.fx.noFlash) return; const p = par(lg), el = layer("flash"); if (!el) return;
     const wait = (p.iv[0] + Math.random() * (p.iv[1] - p.iv[0])) * 1000;
@@ -735,7 +749,7 @@ window.AIQ = window.AIQ || {};
       if (CX) { CX.clear(); CX.set(S.list, par, S.fx); }
       /* tanda 7: las Chinchetas trampa llueven durante la primera mitad larga de la pregunta, una tras otra, por todo el mapa */
       if (map.setDecoys) { if (dc) { const L = decoyList(map, o, par(dc).n), lim = ((A.core && A.core.S && A.core.S.limit) || 20) * 1000, t0 = performance.now() + 450, gap = (lim * 0.55) / Math.max(1, L.length), rr = A.rng(`${S.seed}:dr:${S.round}:${S.q}`); L.forEach((d, k) => { d.t0 = t0 + k * gap + rr() * gap * 0.6; later(() => say("pinFall", k), Math.max(0, d.t0 - performance.now())); }); map.setDecoys(L); } else map.setDecoys([]); }
-      layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; flickerLoop(); lightningLoop();
+      layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; flickerLoop(); lightningLoop(); quakeLoop();
       if (A.pointer && A.pointer.mods) A.pointer.mods();
       counterFx(qi);
     },

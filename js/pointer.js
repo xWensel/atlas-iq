@@ -8,6 +8,9 @@ window.AIQ = window.AIQ || {};
   const $ = id => document.getElementById(id);
   const P = A.pointer = { st: { tool: null, fx: {}, noCountry: false, windFn: null, distFn: null }, x: -99, y: -99, rx: -99, ry: -99, m: null, on: false, press: 0 };
   let lastDraw = 0, sx = 0, sy = 0, jx = 0, jy = 0, tj = 0, lastNow = 0, hotCol = null, hotAt = 0, hotKm = 1e9;
+  let hx = 0, hy = 0, lagT = 0, wox = 0, woy = 0, wlx = null, wly = null, beatN = -1;   // tanda 8: retraso a saltos, oposicion del viento y latidos del Pulso
+  /* Pulso (tanda 8): el temblor va al ritmo de un corazon, dos latidos cada 0,82 s; entre latido y latido la mano se calma */
+  const BEAT = 820, beat = now => { const ph = now % BEAT; return Math.exp(-ph / 70) + (ph >= 190 ? 0.75 * Math.exp(-(ph - 190) / 70) : 0); };
   let map = null, root, cv, c, tag, windEl, mag, mctx, guideX, guideY, ghost, raf = 0, mask = null, lastLL = null, lastLand = null, lastTick = 0, lastHov = 0, lastName = "", pulse = 0;
 
   /* mascara de tierra (equirrectangular, 720x360) para saber si el puntero esta sobre mar o tierra sin coste */
@@ -65,6 +68,7 @@ window.AIQ = window.AIQ || {};
       const a = t * 3.1 + (k * Math.PI * 2) / 3, sx = Math.round(cx + Math.cos(a) * (R + 9)), sy = Math.round(cy + Math.sin(a) * (R + 9) * 0.45 - 4), col = k === 1 ? WHITE : GOLD2;
       for (const [a2, b2] of [[0, -2], [0, -1], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [0, 1], [0, 2]]) px(sx + a2, sy + b2, col);
     }
+    if (P.m && P.m.tremble) { const hb = Math.min(1, beat(now)); if (hb > 0.2) { circle(cx, cy, Math.round(R) + 3, `rgba(254,95,85,${(hb * 0.9).toFixed(2)})`); circle(cx, cy, Math.round(R) + 4, `rgba(254,95,85,${(hb * 0.45).toFixed(2)})`); } }   // el latido se ve en el reticulo
     if (P.m && P.m.cblur) defocus(P.m.cblur.px, t);
   }
   /* Cursor borroso: desenfoque optico de verdad (vision doble con aberracion cromatica), no una mancha */
@@ -126,12 +130,31 @@ window.AIQ = window.AIQ || {};
   function eff(now) {
     const dt = Math.min(0.05, Math.max(0.001, (now - (lastNow || now)) / 1000)); lastNow = now;
     let x = P.rx, y = P.ry; const m = P.m, W = map.W, H = map.H;
+    const rdx = wlx == null ? 0 : P.rx - wlx, rdy = wly == null ? 0 : P.ry - wly; wlx = P.rx; wly = P.ry;   // lo que se ha movido el raton (para el Vendaval)
     if (m && m.cmirror) { if (m.cmirror.x) x = W - x; if (m.cmirror.y) y = H - y; }   // tanda 6: izquierda y derecha, arriba y abajo o los dos
-    if (m && m.lag) { const a = 1 - Math.exp(-dt * 1000 / Math.max(1, m.lag.tau)); sx += (x - sx) * a; sy += (y - sy) * a; x = sx; y = sy; } else { sx = x; sy = y; }
+    P.pre = [x, y];                                                    // donde esta de verdad (la goma del Cursor con retraso sale de aqui)
+    if (m && m.lag) {
+      const a = 1 - Math.exp(-dt * 1000 / Math.max(1, m.lag.tau)); sx += (x - sx) * a; sy += (y - sy) * a;
+      if (m.lag.step) { if (now - lagT >= m.lag.step) { lagT = now; hx = sx; hy = sy; } x = hx; y = hy; } else { x = sx; y = sy; }   // a saltos, como una conexion mala
+    } else { sx = x; sy = y; hx = x; hy = y; }
     if (m && m.dizzy) { const t = now / 1000; x += Math.cos(t * 3.4) * m.dizzy.r; y += Math.sin(t * 3.4) * m.dizzy.r; }
-    if (m && m.tremble) { if (now - tj > 45) { tj = now; jx = (Math.random() - 0.5) * 2 * m.tremble.px; jy = (Math.random() - 0.5) * 2 * m.tremble.px; } x += jx; y += jy; }
+    if (m && m.tremble) {
+      const hb = Math.min(1, beat(now)), amp = m.tremble.px * (0.4 + 1.25 * hb);
+      if (now - tj > (hb > 0.3 ? 25 : 45)) { tj = now; jx = (Math.random() - 0.5) * 2 * amp; jy = (Math.random() - 0.5) * 2 * amp; } x += jx; y += jy;
+      const bn = Math.floor(now / BEAT); if (bn !== beatN) { beatN = bn; if (P.on && m.tremble.px >= 9 && A.sfx.heart) A.sfx.heart(); }   // un latido flojito (desde el nivel 2)
+    }
     P.wind = null;
-    if (P.st.windFn) { const w = P.st.windFn(clampN(x, 0, W), clampN(y, 0, H)); if (w) { x += w[0]; y += w[1]; P.wind = w; } }               // Vendaval: el viento empuja el puntero
+    if (P.st.windFn) {                                                 // Vendaval: el viento empuja el puntero
+      const w = P.st.windFn(clampN(x, 0, W), clampN(y, 0, H));
+      if (w) {
+        /* tanda 8: y hace OPOSICION: contra el viento el raton rinde la mitad y a favor un cuarto mas; lo perdido se recupera despacio */
+        const L = Math.hypot(w[0], w[1]) || 1, ux = w[0] / L, uy = w[1] / L, al = rdx * ux + rdy * uy;
+        if (al < 0) { wox -= al * 0.5 * ux; woy -= al * 0.5 * uy; } else { wox += al * 0.25 * ux; woy += al * 0.25 * uy; }
+        wox += ux * 26 * dt; woy += uy * 26 * dt;                        // y te arrastra: quieto, el reticulo se queda ~30 px a favor del viento
+        const f = Math.exp(-dt / 1.1), wl = Math.hypot(wox, woy); wox *= f; woy *= f; if (wl > 170) { wox *= 170 / wl; woy *= 170 / wl; }
+        x += w[0] + wox; y += w[1] + woy; P.wind = w;
+      }
+    } else { wox = woy = 0; }
     P.x = clampN(x, 0, W); P.y = clampN(y, 0, H);
   }
   function apply(now) {
@@ -147,7 +170,7 @@ window.AIQ = window.AIQ || {};
         if (gone && !ghostWas && A.chfx && A.chfx.puff) A.chfx.puff(x, y);
         ghostWas = gone;
       }
-      if (m.lag && A.chfx && A.chfx.trail) A.chfx.trail(x, y);        // Cursor con retraso: estela de fantasmas del reticulo
+      if (m.lag && A.chfx && A.chfx.trail) { A.chfx.trail(x, y); if (A.chfx.tether && P.pre) A.chfx.tether(P.pre[0], P.pre[1], x, y); }   // Cursor con retraso: estela y goma hasta donde esta el raton
     }
     if (a === 0 && fx.beacon) a = 0.28;
     cv.style.opacity = a; tag.style.opacity = a;
