@@ -185,7 +185,7 @@ window.AIQ = window.AIQ || {};
     case "flicker": return { iv: [[5.5, 8.5], [3.8, 6], [2.5, 4.2]][i], len: [250, 450, 700][i] * fx.blackoutMul * h };
     case "lightning": return { iv: [[4.5, 7], [3.2, 5.2], [2.2, 4]][i] };
     case "wrongborders": return { amp: [0.014, 0.024, 0.038][i] * h };
-    case "pangea": return { k: [0.9, 0.95, 1][i] * fx.plateMul * h };
+    case "pangea": return { k: [0.6, 0.8, 1][i] * fx.plateMul * h };                    // v0.48: antes 0,9/0,95/1 y los niveles 2 y 3 salian casi iguales
     case "deal": return { k: [0.6, 0.85, 1][i] * fx.plateMul * h };                      // < 0,7: una pareja; < 0,95: cuatro; si no, los seis en la mesa (el Nivel de crupier deja una pareja)
     case "spread": return { k: [0.5, 0.8, 1][i] * fx.plateMul * h };
     case "tilt": return { k: [0.4, 0.65, 0.9][i] * fx.plateMul * h };

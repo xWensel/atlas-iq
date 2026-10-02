@@ -993,6 +993,13 @@ void main(){
       }
       return false;
     }
+    /* margen extra (Pangea, que los aprieta): libre tambien movido una celda en las ocho direcciones. Con una sola celda de margen se
+       colaba una astilla de Asia en Europa por Turquia y el Caucaso (13 px en layoutTest) */
+    _roomy(c, placed, T, gap) {
+      const t = T[c], x = t.x, y = t.y; let ok = true;
+      for (const [dx, dy] of [[0.06, 0], [-0.06, 0], [0, 0.06], [0, -0.06], [0.04, 0.04], [-0.04, 0.04], [0.04, -0.04], [-0.04, -0.04]]) { t.x = x + dx; t.y = y + dy; if (this._clash(c, placed, T, gap, false)) { ok = false; break; } }
+      t.x = x; t.y = y; return ok;
+    }
     _clash(i, placed, T, gap, coarse) { for (const j of placed) if (this._hits(i, j, T, gap, coarse) || this._hits(j, i, T, gap, coarse)) return true; return false; }
     /* Coloca los continentes segun un tipo (pangea | spread | hold) SIN que se pisen NUNCA.
        Se van colocando de uno en uno; cada continente va lo mas cerca posible de su destino y, si ahi hay otro (comprobado con las mascaras de tierra reales), se busca el hueco libre mas cercano.
@@ -1044,15 +1051,17 @@ void main(){
               const m = this._massAt(c, T, K.mass); if (m[0] < lx || m[0] > hx || m[1] < ly || m[1] > hy) continue;
               if (sided) { const mx = m[0] - anchor[0], my = m[1] - anchor[1]; if (mx * hx0 + my * hy0 < 0.7 * hl * Math.hypot(mx, my)) continue; }   // Pangea: se arrima por su lado (a menos de 45 grados), no por el otro
               if (hid0 && this._hidden(c, t, Z, hid0[c]) > 0.04) continue;
-              if (!this._clash(c, placed, T, gap, true) && !this._clash(c, placed, T, gap, false)) return true;
+              if (!this._clash(c, placed, T, gap, true) && !this._clash(c, placed, T, gap, false) && (kind !== "pangea" || this._roomy(c, placed, T, gap))) return true;
             }
             return false;
           };
           /* Big bang y Continentes torcidos: cada continente se queda junto a su sitio aunque tenga que encogerse un poco (antes Europa, girada, no
              cabia entre Asia y Africa y acababa en la otra punta del mapa); solo si ni asi cabe, al hueco libre mas cercano.
              Pangea: si no queda hueco por su lado cerca del destino, el continente se queda mas atras, en su camino desde casa, antes que cruzar el mapa
-             (en el nivel 2 Oceania acababa siempre encima de Asia: un Continentes barajados disfrazado) */
-          const back = () => place(S0, 1.3, true) || [0.8, 0.6, 0.4, 0.2, 0].some(f => place(S0, 0.6, true, [home[c][0] + (tg[c][0] - home[c][0]) * f, home[c][1] + (tg[c][1] - home[c][1]) * f]));
+             (en el nivel 2 Oceania acababa siempre encima de Asia: un Continentes barajados disfrazado); si tampoco, se encoge un poco */
+          const path = f => [home[c][0] + (tg[c][0] - home[c][0]) * f, home[c][1] + (tg[c][1] - home[c][1]) * f];
+          const back = () => [1, 0.8, 0.6, 0.4, 0.2, 0].some(f => place(S0, 0.35, true, path(f))) || place(S0, 1.3, true) ||
+            [0.88, 0.77, 0.66].some(sc => [0.5, 0].some(f => place(S0 * sc, 0.6, true, path(f))));   // si ni asi, encogido antes que al otro lado del mapa (con fuerza 0,5 o 0,8 Asia bajaba al Indico y Oceania acababa junto a las Americas)
           const found = kind === "pangea" ? back() || place(S0, Infinity, true) || place(S0, Infinity) : [[1, 0.55], [0.88, 0.55], [0.77, 0.55], [1, 0.9], [0.88, 0.9], [0.77, 0.9], [0.66, 0.9]].some(([f, d]) => place(S0 * f, d)) || place(S0, Infinity);
           if (!found) { this._layFail = c; return null; }
           placed.push(c);

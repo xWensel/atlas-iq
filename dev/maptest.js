@@ -33,7 +33,7 @@ window.mapTest = function (seeds = ["a", "b", "c", "d", "e", "f"]) {
   const save = { spec: m.dist.spec, k: m.dist.k, kk: m.dist.kk, kl: m.dist.kl, ko: m.dist.ko, ct: m.dist.ct };
   const rest = [0, 1, 2, 3, 4, 5].map(c => m._hidden(c, { x: 0, y: 0, s: 1, c: 1, n: 0 }, Z));   // celdas tapadas en su sitio
   const rows = []; let worst = 0, rej = 0, trip = 0, hidEx = 0, jump = 0, maxMs = 0;
-  const KS = { pangea: [0.9, 0.95, 1], spread: [0.5, 0.8, 1], hold: [1, 1, 1], mix: [0.6, 0.85, 1] }, TILT = [0.4, 0.65, 0.9];
+  const KS = { pangea: [0.6, 0.8, 1], spread: [0.5, 0.8, 1], hold: [1, 1, 1], mix: [0.6, 0.85, 1] }, TILT = [0.4, 0.65, 0.9];
   try {
     for (const kind of ["pangea", "spread", "hold", "mix"]) for (let lv = 0; lv < 3; lv++) for (const seed of kind === "hold" || kind === "mix" ? seeds : seeds.slice(0, 1)) {
       const rr = A.rng(seed + ":m:" + lv), rot = kind === "hold" ? [0, 1, 2, 3, 4, 5].map(() => (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * TILT[lv]).concat([0]) : [0, 0, 0, 0, 0, 0, 0];
