@@ -2,7 +2,8 @@
 
 Lee docs/steam/achievements.json (node tools/steam-achievements.mjs) y compone cada insignia igual que el
 juego (css/premium.css .ic.badge): ficha del color de su modo a tamano completo + la ilustracion propia del
-logro (assets/icons/ach_<id>.webp, tools/gen_art.py) al 72 % y centrada, un poco por encima del canto.
+logro (assets/icons/ach_<id>.webp, tools/ach_pixel.py: 48 px nativos) al 75 % en el pixel (8, 7) de la ficha de 64:
+ficha e ilustracion comparten rejilla, asi que a 64 px cada pixel del icono es un pixel del arte (vecino mas cercano).
 La version bloqueada es la del juego: escala de grises y brillo al 60 %.
 
     python tools/steam_icons.py      -> docs/steam/icons/<id>.jpg, <id>_locked.jpg (64 px) y preview/<id>.png (256 px)
@@ -16,26 +17,24 @@ ICONS = ROOT / "assets" / "icons"
 OUT = ROOT / "docs" / "steam" / "icons"
 PREV = OUT / "preview"
 OUT.mkdir(parents=True, exist_ok=True); PREV.mkdir(parents=True, exist_ok=True)
-SIZE, WORK, INNER = 64, 512, 0.72
+SIZE, WORK = 64, 512
 BG = (26, 22, 18)                                   # fondo oscuro de la mesa: Steam no admite transparencia en JPG
 
 
 def badge(frame: str, icon: str, bg=True) -> Image.Image:
-    img = Image.new("RGBA", (WORK, WORK), (BG + (255,)) if bg else (0, 0, 0, 0))
-    base = Image.open(ICONS / f"{frame}.webp").convert("RGBA").resize((WORK, WORK), Image.LANCZOS)
-    img.alpha_composite(base)
-    inner = int(WORK * INNER); off = (WORK - inner) // 2
-    ic = Image.open(ICONS / f"{icon}.webp").convert("RGBA").resize((inner, inner), Image.LANCZOS)
-    img.alpha_composite(ic, (off, off))
-    return img
+    """insignia a 64 px nativos (un pixel por pixel de arte) ampliada x8 por vecino mas cercano"""
+    img = Image.new("RGBA", (SIZE, SIZE), (BG + (255,)) if bg else (0, 0, 0, 0))
+    img.alpha_composite(Image.open(ICONS / f"{frame}.webp").convert("RGBA").resize((SIZE, SIZE), Image.NEAREST))
+    img.alpha_composite(Image.open(ICONS / f"{icon}.webp").convert("RGBA").resize((48, 48), Image.NEAREST), (8, 7))
+    return img.resize((WORK, WORK), Image.NEAREST)
 
 
 rows = json.loads((ROOT / "docs" / "steam" / "achievements.json").read_text(encoding="utf-8"))
 for r in rows:
     big = badge(r["frame"], r["icon"])
-    got = big.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS)
+    got = big.convert("RGB").resize((SIZE, SIZE), Image.NEAREST)
     got.save(OUT / f"{r['id']}.jpg", quality=92)
     locked = ImageEnhance.Brightness(got.convert("L").convert("RGB")).enhance(0.6)
     locked.save(OUT / f"{r['id']}_locked.jpg", quality=92)
-    badge(r["frame"], r["icon"], bg=False).resize((256, 256), Image.LANCZOS).save(PREV / f"{r['id']}.png")
+    badge(r["frame"], r["icon"], bg=False).resize((256, 256), Image.NEAREST).save(PREV / f"{r['id']}.png")
 print(f"{len(rows)} logros -> {OUT} ({len(rows) * 2} iconos de 64 px + vista previa de 256 px)")

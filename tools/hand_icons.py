@@ -296,52 +296,108 @@ def ch_noborders(id):
 
 
 # ============================================================ fichas, monedas y cartas
-def chip_top(cx, cy, r, rp, spots=8, center=None, th=3):
-    """ficha de casino vista casi cenital: canto de `th` px abajo, aro con incrustaciones blancas, filete y centro"""
-    parts = []
-    side = circle(cx, cy + th, r) | (rect(int(cx - r), int(cy), int(2 * r), th) & ellipse(cx, cy + th / 2, r, r + th))
-    sc = np.zeros((N, N, 4), np.uint8); sc[side] = R[rp][4]
-    y, x = np.mgrid[0:N, 0:N]; ang = (np.degrees(np.arctan2(x + .5 - cx, -(y + .5 - cy))) + 360) % 360
-    ins = lambda w: np.minimum(ang % (360 / spots), 360 / spots - ang % (360 / spots)) < w
-    sc[side & ins(9) & ~circle(cx, cy, r - 1)] = R["cream"][3]
-    parts.append(sc)
-    top = circle(cx, cy, r); t = bevel(top, R[rp])
-    band = top & ~circle(cx, cy, r - 7) & ins(10) & erode(top, 1)
-    t[band] = R["cream"][1]; t[band & edge(band, 0, 1)] = R["cream"][2]; t[band & edge(band, 0, -1)] = R["cream"][0]
-    fil = ring(cx, cy, r - 9, r - 7.2); t[fil] = R[rp][3]
-    dash = ring(cx, cy, r - 10.4, r - 9) & ins(6); t[dash] = R["cream"][1]
-    ctr = circle(cx, cy, r - 10.4); t[ctr] = R[rp][1] if center is None else R[rp][2]
-    t[ctr & edge(ctr, 0, 1)] = R[rp][2]
-    parts.append(t)
-    return parts
+def _spokes(px, py, spots, hw, phase=0):
+    """incrustaciones de lados paralelos a lo largo de cada radio (las de 45 grados quedan en escalera 1:1 limpia)"""
+    m = np.zeros(px.shape, bool)
+    for k in range(spots):
+        t = math.radians(phase + k * 360 / spots); dx, dy = math.sin(t), -math.cos(t)
+        m |= (px * dx + py * dy > 0) & (np.abs(px * dy - py * dx) < hw)
+    return m
+
+def chip_face(cx, cy, r, rp, spots=8, aspect=1.0, phase=0):
+    """cara de una ficha de casino (sin contorno): aro con incrustaciones crema, bisel por angulo de luz (arriba-izquierda),
+    brillo corto en el aro, surco de 1 px, rayitas crema y centro hundido. aspect < 1 = ficha tumbada (cara de la pila)"""
+    y, x = np.mgrid[0:N, 0:N]; px = x + .5 - cx; py = (y + .5 - cy) / aspect
+    rho = np.sqrt(px * px + py * py); face = rho <= r
+    lit = (-px * .62 - py * .78) / np.maximum(rho, 1e-6)               # coseno con la luz
+    hw = max(1.2, r * .124); rim_in = r - max(2.2, r * .26)
+    a = np.zeros((N, N, 4), np.uint8); a[face] = R[rp][2]
+    ins = face & _spokes(px, py, spots, hw, phase) & (rho > rim_in + .9)
+    a[ins] = R["cream"][1]
+    outer = face & ~erode(face, 1)
+    for cond, base, cr in ((lit > .35, 1, 0), (lit < -.35, 3, 2)):
+        a[outer & cond & ~ins] = R[rp][base]; a[outer & cond & ins] = R["cream"][cr]
+    disc = face & (rho <= rim_in)
+    if r >= 16 and aspect > .8:
+        a[disc & ~erode(disc, 1)] = R[rp][4]                            # surco
+        d2 = erode(disc, 1); ring2 = d2 & ~erode(d2, 1)
+        a[ring2 & _spokes(px, py, spots, 1.7, phase)] = R["cream"][1]   # rayitas alineadas con las incrustaciones
+        ctr = erode(d2, 1)
+    else:
+        a[disc & ~erode(disc, 1)] = R[rp][3]; ctr = erode(disc, 1)
+    a[ctr] = R[rp][1]
+    a[ctr & ~erode(ctr, 1) & (lit > .2)] = R[rp][2]                     # el centro esta hundido: sombra arriba-izquierda
+    if r >= 9:
+        ang = (np.degrees(np.arctan2(px, -py)) + 360) % 360
+        a[face & (np.abs(rho - (r - max(1.6, r * .09))) < .55) & (ang > 292) & (ang < 333) & ~_spokes(px, py, spots, hw + 1, phase)] = R[rp][0]
+    return a
+
+def chip_edge(cx, cy, r, rp, th, spots=8, aspect=1.0, phase=0):
+    """canto de la ficha bajo su cara: color oscuro, incrustaciones que siguen las de la cara, ultima fila mas oscura
+    y luz por la izquierda. Union de caras desplazadas: simetrico y sin pixeles sueltos"""
+    face = ellipse(cx, cy, r, r * aspect); side = np.zeros_like(face)
+    for d in range(1, th + 1): side |= ellipse(cx, cy + d, r, r * aspect)
+    side &= ~face
+    y, x = np.mgrid[0:N, 0:N]; bx = np.clip(x + .5 - cx, -r, r); by = np.sqrt(np.maximum(r * r - bx * bx, 0))
+    a = np.zeros((N, N, 4), np.uint8); a[side] = R[rp][4]
+    ins = side & _spokes(bx, by, spots, max(1.2, r * .124), phase)
+    low = side & ~shift(side, 0, -1)
+    a[side & (bx < -r * .55) & ~ins] = R[rp][3]
+    a[ins] = R["cream"][3]
+    a[low & ~ins] = tuple(int(c * .78) for c in R[rp][4][:3]) + (255,); a[low & ins] = R["cream"][4]
+    return a
+
+def chip_top(cx, cy, r, rp, spots=8, th=3):
+    """ficha vista casi cenital, canto incluido (sin contorno)"""
+    e = chip_edge(cx, cy, r, rp, th, spots); f = chip_face(cx, cy, r, rp, spots)
+    m = f[..., 3] > 0; e[m] = f[m]; return e
+
+def outlined(a):
+    """contorno de tinta de 1 px alrededor de toda la silueta (vecindad en cruz: linea limpia, sin esquinas dobles)"""
+    m = a[..., 3] > 0; a = a.copy(); a[dilate(m, 1) & ~m] = INK; return a
 
 CHIP_COL = {"blank_big": "orange", "blank_boss": "red", "blank_gold": "gold", "blank_small": "blue", "blank_teal": "teal",
             "chip_b": "blue", "chip_g": "green", "chip_k": "dark", "chip_p": "purple", "chip_r": "red"}
 @icon(*CHIP_COL)
 def chip_icon(id):
-    I = Icon()
-    for p_ in chip_top(32, 30, 29.5, CHIP_COL[id]): I.add(p_, outline=False)
-    I.add(np.zeros((N, N, 4), np.uint8)); I.a[dilate(I.a[..., 3] > 0, 1) & ~(I.a[..., 3] > 0)] = INK
-    if id.startswith("chip_"): I.add(globe_part(31, 32, 30, -50, 10))
+    """ficha de 58 px simetrica respecto a x = 32 (la insignia de logro la usa de base): filas 1-63 con el contorno incluido"""
+    I = Icon(); I.add(outlined(chip_top(32, 31, 29, CHIP_COL[id])), outline=False)
+    if id.startswith("chip_"): I.add(globe_part(31, 32, 31, -50, 10))
     return I
 
-def chip_side(cx, y, rx, rp, th=5):
-    """ficha de canto (para las pilas): elipse superior + canto con rayas blancas"""
-    ry = rx * .36; parts = []
-    body = ellipse(cx, y + th, rx, ry) | (rect(int(cx - rx), int(y), int(2 * rx), th) & ellipse(cx, y + th / 2, rx, 99))
-    sc = np.zeros((N, N, 4), np.uint8); sc[body] = R[rp][3]
-    xx = np.arange(N)[None, :].repeat(N, 0); u = (xx + .5 - cx) / rx
-    stripes = body & (np.abs(((np.arcsin(np.clip(u, -1, 1)) / math.pi * 8) % 2) - 1) < .32) & ~ellipse(cx, y, rx, ry)
-    sc[stripes] = R["cream"][2]; sc[body & (xx < cx - rx * .55) & ~stripes & ~ellipse(cx, y, rx, ry)] = R[rp][2]
-    parts.append(sc)
-    top = ellipse(cx, y, rx, ry); t = np.zeros((N, N, 4), np.uint8); t[top] = R[rp][2]
-    t[top & edge(top, 0, -1)] = R[rp][0]; t[ellipse(cx, y, rx * .62, ry * .62)] = R[rp][1]
-    t[ellipse(cx, y, rx * .62, ry * .62) & ~ellipse(cx, y, rx * .5, ry * .5)] = R[rp][3]
-    parts.append(t); return parts
+def chip_side(cx, y, rx, rp, th=5, phase=0, top=False):
+    """ficha tumbada de la pila: canto con rayas crema que siguen la curva (luz a la izquierda); la de arriba lleva su cara"""
+    ry = rx * .36
+    body = np.zeros((N, N), bool)
+    for d in range(th + 1): body |= ellipse(cx, y + d, rx, ry)
+    a = np.zeros((N, N, 4), np.uint8)
+    xx = np.mgrid[0:N, 0:N][1]; u = np.clip((xx + .5 - cx) / rx, -1, 1)
+    ph = (np.arcsin(u) / math.pi * 8 + phase) % 2
+    stripes = body & (np.abs(ph - 1) < .34)
+    a[body] = R[rp][3]; a[body & (u < -.45)] = R[rp][2]; a[body & (u > .62)] = R[rp][4]
+    a[stripes] = R["cream"][2]; a[stripes & (u < -.45)] = R["cream"][1]; a[stripes & (u > .62)] = R["cream"][3]
+    if top:                                                             # cara tumbada: aro con incrustaciones, filete y centro
+        yy = np.mgrid[0:N, 0:N][0]; px = xx + .5 - cx; py = (yy + .5 - y) / (ry / rx)
+        face = ellipse(cx, y, rx, ry); a[face] = R[rp][2]
+        ins = face & ~ellipse(cx, y, rx * .74, ry * .74) & _spokes(px, py, 8, rx * .12, 22.5)
+        a[ins] = R["cream"][1]
+        topm = face & ~shift(face, 0, 1); a[topm & ~ins] = R[rp][0]; a[topm & ins] = R["cream"][0]
+        c1 = ellipse(cx, y, rx * .66, ry * .66); a[c1] = R[rp][3]
+        a[ellipse(cx, y + .5, rx * .56, ry * .56) & c1] = R[rp][1]
+    return a
 
 def stack(I, cx, base, rx, cols, th=5):
+    """pila de abajo arriba: cada ficha tapa a la anterior y una linea de tinta las separa; contorno de 1 px al conjunto"""
+    acc = np.zeros((N, N, 4), np.uint8); sil = np.zeros((N, N), bool)
     for i, c in enumerate(cols):
-        for j, p_ in enumerate(chip_side(cx, base - i * th, rx, c, th)): I.add(p_, outline=(j == 0))
+        p_ = chip_side(cx, base - i * th, rx, c, th, phase=i % 2, top=(i == len(cols) - 1))
+        m = p_[..., 3] > 0
+        if i: acc[sil & ~m & dilate(m, 1)] = INK
+        bot = m & ~shift(m, 0, -1)                                          # borde inferior de esta ficha = separacion
+        acc[m] = p_[m]
+        if i: acc[bot & sil] = INK
+        sil |= m
+    I.add(outlined(acc), outline=False)
 
 @icon("chips")
 def chips_icon(id):
@@ -351,7 +407,7 @@ def chips_icon(id):
 def allin_icon(id):
     I = Icon(); stack(I, 38, 44, 18, ["teal", "red", "gold", "purple", "teal", "red"], 5)
     stack(I, 20, 54, 16, ["red", "gold", "teal"], 5)
-    for p_ in chip_top(46, 52, 11, "gold", spots=6, th=2): I.add(p_)
+    I.add(outlined(chip_top(46, 52, 11, "gold", spots=6, th=2)), outline=False)
     return I
 
 @icon("coin")
