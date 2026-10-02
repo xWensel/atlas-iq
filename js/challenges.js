@@ -94,18 +94,27 @@ window.AIQ = window.AIQ || {};
   const FAMILY = { wrongborders: "b", noborders: "b", pangea: "p", deal: "p", spread: "p", tilt: "p", flip: "o", mirrorx: "o", spin: "o", blur: "v", dark: "v", myopia: "v", blindspot: "v", clouds: "v", rain: "v", mosaic: "v", flicker: "l", lightning: "l", quake: "m", drift: "m", decoys: "d", negative: "n", crack: "w", smudge: "w", hang: "w", battery: "w" };
   const famOf = id => FAMILY[id] || (D[id].kind === "text" ? "t" : D[id].kind === "ptr" ? "c" : id);
   const NOLATIN = () => /^(zh|ja|ko)/.test(A.lang || "");                     // runas y sin vocales no tienen sentido con nombres en chino, japones o coreano
-  const MILD_TEXT = ["shaky", "missing", "swap", "upside", "babel", "dance"], MILD_MAP = ["blur", "dark", "noborders", "clouds", "mirrorx", "negative", "rain"];
+  /* v0.52: el Apagon ya no sale en la lista suave ni en el bombo de mapa (salia 1,71 veces por expedicion): solo el obligatorio y su jefe */
+  const MILD_TEXT = ["shaky", "missing", "swap", "upside", "babel", "dance"], MILD_MAP = ["blur", "noborders", "clouds", "mirrorx", "negative", "rain"];
+  /* parejas que no se juntan en una ronda: las ventanas de No responde y la Bateria baja te hacen perder el nombre de Memoria de pez sin culpa tuya */
+  const CLASH = { memory: ["hang", "battery"], hang: ["memory"], battery: ["memory"] };
+  const clashes = (id, ids) => (CLASH[id] || []).some(x => ids.includes(x));
+  /* reglas: salen de una bolsa por expedicion (las tres barajadas; ninguna se repite hasta que han salido todas, ni en el cambio de bolsa) */
+  const ruleBag = (seed, i) => { let bag = null, prev = null; for (let j = 0; j <= Math.floor(i / 3); j++) { bag = A.rng(`${seed}:rules:${j}`).shuffle(RULE); if (bag[0] === prev) [bag[0], bag[1]] = [bag[1], bag[0]]; prev = bag[2]; } return bag[i % 3]; };
   /* jefes por acto. Acto II: solo combinaciones sin retos de texto (su jefe es la ronda de banderas, donde el texto no hace nada: Mala vision, Noche
      cerrada y Sin pasaporte no salian nunca en la Aventura; en el Reto diario, que baraja la ruta, si podian salir). Acto III: "Sin pasaporte"
-     (antes Torre de Babel, que se llamaba igual que su reto y traia runas, que no hacen nada en chino, japones y coreano) */
+     (antes Torre de Babel, que se llamaba igual que su reto y traia runas, que no hacen nada en chino, japones y coreano).
+     v0.52: Baraja revuelta trae Luces parpadeantes en vez del Apagon (el Apagon sale una vez por expedicion) */
   const BOSS = [
     [["El Apagón|The Blackout|La panne|O Apagão|Der Stromausfall|Il Blackout||大停电|대정전|大停電|Великое затмение|Wielka ciemność", ["dark", "flicker"]], ["Ronda ciega|Blind round|Manche aveugle|Rodada cega|Blinde Runde|Round cieco||盲眼回合|블라인드 라운드|ブラインドラウンド|Слепой раунд|Runda na ślepo", ["blur", "missing"]], ["Un solo continente|One continent|Un seul continent|Um só continente|Ein Kontinent|Un solo continente||一块大陆|하나의 대륙|ひとつの大陸|Один континент|Jeden kontynent", ["pangea", "swap"]], ["Mareo de casino|Casino dizziness|Vertige de casino|Tontura de cassino|Casino-Schwindel|Capogiro da casinò||赌场眩晕|카지노 현기증|カジノのめまい|Казино-головокружение|Kasynowy zawrót głowy", ["dizzy", "shaky"]]],
     [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme||虚惊一场|거짓 경보|誤報|Ложная тревога|Fałszywy alarm", ["spread", "wrongborders"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala||大厅地震|홀의 지진|ホールの地震|Землетрясение в зале|Trzęsienie na sali", ["quake", "decoys"]], ["Rompe la cuarta pared|Breaking the fourth wall|Briser le quatrième mur|Quebrando a quarta parede|Die vierte Wand durchbrechen|Rompere la quarta parete||打破第四面墙|제4의 벽 깨기|第四の壁を破れ|Ломая четвёртую стену|Przełamując czwartą ścianę", ["crack", "hang"]]],
-    [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio||巨镜|거대한 거울|大いなる鏡|Великое зеркало|Wielkie lustro", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato||洗乱的牌组|섞인 덱|シャッフルされたデッキ|Перетасованная колода|Potasowana talia", ["deal", "dark", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente||孤注一掷|모 아니면 도|オール・オア・ナッシング|Всё или ничего|Wszystko albo nic", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta||完美风暴|퍼펙트 스톰|パーフェクト・ストーム|Идеальный шторм|Sztorm doskonały", ["lightning", "rain", "tremble"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto||没有护照|여권 없음|パスポートなし|Без паспорта|Bez paszportu", ["babel", "nocountry", "mosaic"]], ["Pantallazo|System crash|Plantage total|Pane geral|Systemabsturz|Crash di sistema||系统崩溃|시스템 다운|システムクラッシュ|Системный сбой|Awaria systemu", ["battery", "hang", "flicker"]]],
+    [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio||巨镜|거대한 거울|大いなる鏡|Великое зеркало|Wielkie lustro", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato||洗乱的牌组|섞인 덱|シャッフルされたデッキ|Перетасованная колода|Potasowana talia", ["deal", "flicker", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente||孤注一掷|모 아니면 도|オール・オア・ナッシング|Всё или ничего|Wszystko albo nic", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta||完美风暴|퍼펙트 스톰|パーフェクト・ストーム|Идеальный шторм|Sztorm doskonały", ["lightning", "rain", "tremble"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto||没有护照|여권 없음|パスポートなし|Без паспорта|Bez paszportu", ["babel", "nocountry", "mosaic"]], ["Pantallazo|System crash|Plantage total|Pane geral|Systemabsturz|Crash di sistema||系统崩溃|시스템 다운|システムクラッシュ|Системный сбой|Awaria systemu", ["battery", "hang", "flicker"]]],
   ].map(a => a.map(c => ({ n: L6(c[0]), ids: c[1] })));
-  /* jefe de la ronda de banderas: la bandera trae su propio filtro y el mapa se lía por su cuenta */
-  const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flaginvert", "flip"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur", "mosaic"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
+  /* jefe de la ronda de banderas: la bandera trae su propio filtro y el mapa se lía por su cuenta. v0.52: Cine mudo (Sin colores y Mapa mudo):
+     Sin colores no salia nunca en la Aventura */
+  const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flaginvert", "flip"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur", "mosaic"]], ["Cine mudo|Silent movie|Cinéma muet|Cinema mudo|Stummfilm|Cinema muto||默片|무성 영화|サイレント映画|Немое кино|Kino nieme", ["flaggray", "noborders"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
   const ACT1 = [["text", "map"], ["ptr", "map"], ["text", "ptr"]], ACT2 = [["text", "map", "ptr"], ["map", "ptr", "rule"], ["text", "map", "map"]];
+  const rulesIn = (x, asc) => { const act = Math.floor(x / 4), pos = x % 4; if (pos === 3 || act === 0) return 0; return (act === 1 ? ACT1 : ACT2)[pos % 3].filter(c => c === "rule").length + (asc >= 2 ? 1 : 0); };   // reglas que saca la ronda x (para la bolsa)
 
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
   const pickFrom = (seed, tag, list, r, avoid) => { const ok = list.filter(id => !avoid.includes(famOf(id))), l = ok.length ? ok : list; return A.rng(`${seed}:${tag}:${Math.floor(r / 4)}:${r % 4}`).pick(l); };
@@ -119,30 +128,40 @@ window.AIQ = window.AIQ || {};
       const lv = clamp(a + 1 + (asc >= 3 ? 1 : 0), 1, 3);
       let list = [], combo = null;
       /* trucos que en esta ronda no harian nada (texto en la de banderas, Sin pais o Adivinanza sin pais ni nota debajo, runas y sin vocales en zh/ja/ko):
-         si el sorteo cae en uno, se sortea otro. Lo que ya salia bien no cambia (partidas guardadas y sobornos intactos) */
+         si el sorteo cae en uno, se sortea otro. Lo que ya salia bien no cambia (partidas guardadas y sobornos intactos). v0.52: tambien en los jefes
+         y en el poder extra de la Ascension 4. Babel donde el nombre no cambia se resuelve pregunta a pregunta (ver babelAlt) */
       const useless = id => (flagRound && !!D[id] && D[id].kind === "text") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
       const noop = id => useless(id) || (cjk && (id === "runes" || id === "novowels"));
       if (boss) {
         /* v0.7.1: el jefe de una ronda de banderas (la 8 de la Aventura) ya no es siempre de banderas: la semilla sortea entre los de banderas y los
            del acto que sirven en esa ronda (sin trucos de texto: la bandera manda), cada combinacion con la misma probabilidad. Los jefes que no
            cambian de ronda salen igual que antes (misma semilla y misma lista), y si sale uno de banderas es el mismo de siempre */
-        const normal = BOSS[a].filter(c => !c.ids.some(useless)), rb = A.rng(`${seed}:boss:${act}`);
-        if (flagRound) combo = normal.length && A.rng(`${seed}:bossmix:${act}`)() < normal.length / (FLAG_BOSS.length + normal.length) ? rb.pick(normal) : rb.pick(FLAG_BOSS);
+        const normal = BOSS[a].filter(c => !c.ids.some(noop)), flags = FLAG_BOSS.filter(c => !c.ids.some(noop)), rb = A.rng(`${seed}:boss:${act}`);
+        if (flagRound) combo = normal.length && A.rng(`${seed}:bossmix:${act}`)() < normal.length / (flags.length + normal.length) ? rb.pick(normal) : rb.pick(flags);
         else combo = rb.pick(normal.length ? normal : BOSS[a]);
-        list = combo.ids.map((id, i) => ({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) }));
+        list = combo.ids.map((id, i) => ({ id, lv: clamp(lv + (i === 0 ? 1 : 0), 1, 3) })).filter(c => !noop(c.id));   // por si ninguna combinacion sirve: nunca un reto que no hace nada
         if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
-        if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia
-          const fam = new Set(list.map(x => famOf(x.id))), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id)));
-          if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (noop(id)) { const ok = pool.filter(x => !noop(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv }); }
+        if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia (ni el Apagon ni una pareja que choque)
+          const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids);
+          if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv }); }
         }
         return { list, boss, combo };
       }
-      const used = [];
+      const used = [], ids = [];
       /* v0.35: el Apagon sale si o si en algun momento de la expedicion (asi el Foco del vigilante siempre tiene su momento): en una ronda
-         con hueco de mapa elegida por la semilla. Si esa ronda se baraja en el Campamento, el crupier elige otra cosa (el jugador pago por ello) */
-      let dark = r === A.rng(`${seed}:dark`).pick([2, 4, 5, 8, 9, 10]);
-      const add = (cat, mild) => { const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT).filter(id => !(cjk && (id === "runes" || id === "novowels")))) : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPD); let id = pickFrom(seed, cat + list.length, pool, r, used); if (noop(id)) { const ok = pool.filter(x => !noop(x)); if (ok.length) id = pickFrom(seed, cat + list.length + "b", ok, r, used); } if (cat === "map" && dark && !used.includes(famOf("dark"))) { id = "dark"; dark = false; } list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); };
-      if (act === 0) { if (pos === 1) add("text", true); else if (pos === 2) add("map", true); }
+         con hueco de mapa elegida por la semilla. Si esa ronda se baraja en el Campamento, el crupier elige otra cosa (el jugador pago por ello).
+         v0.52: es la unica vez (fuera del bombo) y ya no cae en la ronda 3, que en la de banderas trae un reto de bandera y no de mapa */
+      let dark = r === A.rng(`${seed}:dark`).pick([4, 5, 8, 9, 10]), ruleN = 0;
+      for (let x = 0; x < r; x++) ruleN += rulesIn(x, asc);
+      const add = (cat, mild) => {
+        const pool = cat === "text" ? (flagRound ? FLAG : (mild ? MILD_TEXT : TEXT).filter(id => !(cjk && (id === "runes" || id === "novowels")))) : cat === "flag" ? FLAG : cat === "ptr" ? PTR : cat === "rule" ? RULE : (mild ? MILD_MAP : MAPD);
+        const bad = x => noop(x) || (cat === "map" && x === "dark") || clashes(x, ids);
+        let id = cat === "rule" ? ruleBag(seed, ruleN++) : pickFrom(seed, cat + list.length, pool, r, used);
+        if (cat !== "rule" && bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = pickFrom(seed, cat + list.length + "b", ok, r, used); }
+        if (cat === "map" && dark && !used.includes(famOf("dark"))) { id = "dark"; dark = false; }
+        list.push({ id, lv: mild ? 1 : lv }); used.push(famOf(id)); ids.push(id);
+      };
+      if (act === 0) { if (pos === 1) add("text", true); else if (pos === 2) add(flagRound ? "flag" : "map", true); }   // v0.52: la ronda 3 de banderas sortea un reto de bandera
       else if (act === 1) ACT1[pos % 3].forEach(c => add(c, false));
       else ACT2[pos % 3].forEach(c => add(c, false));
       if (asc >= 2 && act >= 1) add("rule", false);
@@ -150,7 +169,8 @@ window.AIQ = window.AIQ || {};
     },
     info: id => D[id],
     /* v0.35: la ficha ya no dice que perk frena el reto (ni brilla por ello): el jugador tiene que leer y atar cabos */
-    chip(c, small) { const d = D[c.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}" data-ch="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d)).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b><i class="ch-lv">${"●".repeat(c.lv || 1)}</i></span>`; },
+    /* v0.52: durante una pregunta en la que la Torre de Babel no puede cambiar el nombre, su ficha ensena el reto que sale en su lugar (y por que) */
+    chip(c, small) { const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b><i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
   };
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */
@@ -218,9 +238,10 @@ window.AIQ = window.AIQ || {};
     case "battery": return { dim: Math.min(0.85, [0.55, 0.68, 0.8][i] * h) };
     default: return {};
   } };
-  const has = id => S.list.some(c => c.id === id);
-  const get = id => S.list.find(c => c.id === id);
-  const kindOn = k => S.list.filter(c => D[c.id].kind === k);
+  const cur = () => S.qlist || S.list;                                  // los retos de ESTA pregunta (la ronda, con el suplente de Babel si toca)
+  const has = id => cur().some(c => c.id === id);
+  const get = id => cur().find(c => c.id === id);
+  const kindOn = k => cur().filter(c => D[c.id].kind === k);
 
   /* capas del mapa (DOM/CSS con mascaras que siguen al puntero) */
   function ensureOverlay(map) {
@@ -339,14 +360,41 @@ window.AIQ = window.AIQ || {};
     let prev = false;                                                  // las marcas sueltas de una letra tapada se van con ella
     return chars.map((ch, i) => { if (MARK.test(ch)) return prev ? "" : ch; prev = hide.has(i); return prev ? "▮" : ch; }).join("");
   }
+  /* Torre de Babel (v0.52): de los 6 idiomas originales (nunca el tuyo ni su base: es-419 -> es), el que mas aleja el nombre del tuyo (distancia
+     de edicion sin acentos ni mayusculas, relativa a su largo; empate: al azar con la semilla). null si el nombre es el mismo en todos */
+  const lev = (a, b) => { const A1 = [...a], B1 = [...b]; let row = B1.map((_, j) => j + 1); for (let i = 0; i < A1.length; i++) { let prev = i, nx = [i + 1]; for (let j = 0; j < B1.length; j++) { const v = Math.min(row[j] + 1, nx[j] + 1, prev + (A1[i] === B1[j] ? 0 : 1)); prev = row[j]; nx.push(v); } row = nx.slice(1); } return A1.length ? (B1.length ? row[B1.length - 1] : A1.length) : B1.length; };
+  function babelAlt(o, key) {
+    const me = foldOf(A.tx(o.name)), best = []; let bd = 0;
+    for (const l of BABEL_BASE) {
+      if (l === A.lang || l === A.wlang() || !o.name || !o.name[l]) continue;
+      const f = foldOf(o.name[l]); if (f === me) continue;
+      const d = lev(f, me) / Math.max([...f].length, [...me].length, 1);
+      if (d > bd + 1e-9) { bd = d; best.length = 0; best.push(l); } else if (Math.abs(d - bd) <= 1e-9) best.push(l);
+    }
+    return best.length ? best[Math.floor(A.rng(key)() * best.length)] : null;
+  }
+  /* si el nombre no cambia en ningun idioma (54 % de las ciudades, 30 % de las capitales), esa pregunta trae otro reto de letras en su lugar: uno de los
+     que frena el mismo Diccionario (asi la tienda y los sobornos siguen cuadrando), que no este ya en la ronda. Su ficha lo ensena mientras dura */
+  const BABEL_SUB = ["missing", "swap", "anagram", "novowels"];
+  const BABEL_NOTE = L6("En lugar de la Torre de Babel: este nombre es igual en todos sus idiomas.|Instead of the Tower of Babel: this name is the same in every language.|À la place de la Tour de Babel : ce nom est le même dans toutes ses langues.|No lugar da Torre de Babel: este nome é igual em todos os idiomas.|Statt Turmbau zu Babel: Dieser Name ist in allen Sprachen gleich.|Al posto della Torre di Babele: questo nome è uguale in tutte le lingue.||代替巴别塔：这个名字在所有语言里都一样。|바벨탑 대신: 이 이름은 모든 언어에서 똑같습니다.|バベルの塔の代わり：この名前はどの言語でも同じ。|Вместо Вавилонской башни: это название одинаково на всех языках.|Zamiast Wieży Babel: ta nazwa brzmi tak samo w każdym języku.");
+  function babelSwap(o) {
+    const b = S.list.find(c => c.id === "babel"), pool = BABEL_SUB.filter(id => !S.list.some(c => c.id === id) && !(NOLATIN() && id === "novowels")); if (!b || !pool.length) return;
+    S.qsub = { of: "babel", id: A.rng(`${S.seed}:bsub:${S.round}:${S.q}:${A.tx(o.name)}`).pick(pool), lv: b.lv };
+    S.qlist = S.list.map(c => (c === b ? { id: S.qsub.id, lv: b.lv } : c));
+  }
+  /* la ficha de Babel en la barra de la Aventura: la del suplente mientras dura la pregunta (renderBars ya la pinta asi; esto cubre el cambio) */
+  const syncChips = () => { const b = S.list.find(c => c.id === "babel"); if (!b) return; document.querySelectorAll('#advBar .ch-chip[data-of="babel"]').forEach(el => { const want = S.qsub ? S.qsub.id : "babel"; if (el.dataset.ch !== want) el.outerHTML = A.chal.chip(b, el.classList.contains("sm")); }); };
   /* el nombre y el pais de debajo sufren los mismos retos de texto (el pais tambien tiembla, se borra, se cambia...) */
   function decorate(o) {
     const el = $("askName"), sub = $("askSub"); if (!el || !o) return; clearText();
-    if (o.t === "c" && A.adv && A.adv.isFlagRound && A.adv.isFlagRound()) { if (sub) sub.textContent = ""; if (A.adv.renderFlag) A.adv.renderFlag(o); flagClass(el); return; }   // ronda de banderas: la bandera manda, nunca el texto
-    const tx = S.list.filter(c => D[c.id].kind === "text"), nameTxt = A.tx(o.name), subTxt = A.tx(o.sub);
-    if (S.suspended || !tx.length) { el.textContent = nameTxt; if (sub) A.renderBlanks(sub, subTxt); return; }
+    const hadSub = !!S.qsub; S.qsub = null; S.qlist = null;
+    if (o.t === "c" && A.adv && A.adv.isFlagRound && A.adv.isFlagRound()) { if (sub) sub.textContent = ""; if (A.adv.renderFlag) A.adv.renderFlag(o); flagClass(el); if (hadSub) syncChips(); return; }   // ronda de banderas: la bandera manda, nunca el texto
+    const nameTxt = A.tx(o.name), subTxt = A.tx(o.sub);
     let alt = null;                                                   // Torre de Babel: los dos textos salen en el mismo otro idioma
-    if (has("babel") && !S.fx.noBabel) { const alts = [...new Set([...BABEL_BASE, A.lang])].filter(l => l !== A.lang && l !== A.wlang() && o.name && o.name[l] && o.name[l] !== nameTxt); if (alts.length) alt = alts[Math.floor(A.rng(`${S.seed}:t:${S.q}:${nameTxt}`)() * alts.length)]; }
+    if (!S.suspended && S.list.some(c => c.id === "babel") && !S.fx.noBabel) { alt = babelAlt(o, `${S.seed}:t:${S.q}:${nameTxt}`); if (!alt) babelSwap(o); }
+    if (hadSub || S.qsub) syncChips();
+    const tx = cur().filter(c => D[c.id].kind === "text");
+    if (S.suspended || !tx.length) { el.textContent = nameTxt; if (sub) A.renderBlanks(sub, subTxt); return; }
     deco(el, o, o.name, alt, false);
     if (sub) {
       if (has("nocountry") && subTxt && !o.clue) { sub.innerHTML = '<span class="ch-redact">▮▮▮▮▮▮</span>'; sub.classList.add("ch-nocountry"); }
@@ -465,10 +513,32 @@ window.AIQ = window.AIQ || {};
     if (o) { const f = o.t === "c" ? map.world.byName[o.key] : null; spec.ct = f ? f.ct : map._ctOf(o.lon, o.lat); }
     return any ? spec : null;
   }
+  /* Chinchetas trampa (v0.52): estorban y no senalan nada. Antes rodeaban el objetivo a 250-2.050 km con rumbo al azar y su centro caia a 340-566 km
+     del sitio (clicar ahi daba 750-800 puntos sin saber nada). Ahora se reparten por la tierra visible de todo el mapa sin mirar el objetivo:
+     candidatos al azar con la semilla de la pregunta, uniformes en la vista de inicio (de -180 a 180 y hasta 60 S), solo en tierra y separados
+     entre si. La lista de candidatos no depende de la ventana; de ella se saltan los que caerian debajo del HUD o fuera de la pantalla (en otra
+     ventana solo cambian esos). Del objetivo no se mira nada, ni para apartarse de el: un hueco alrededor del sitio tambien seria una pista */
+  let LANDP = null;
+  const onLand = (world, lon, lat) => {
+    if (!LANDP || LANDP.w !== world) { LANDP = []; LANDP.w = world; for (const f of world.features) for (const p of f.polys) LANDP.push(p); }
+    for (const p of LANDP) { const b = p.bbox; if (lat < b[1] || lat > b[3]) continue; if (((lon >= b[0] && lon <= b[2]) || (lon + 360 >= b[0] && lon + 360 <= b[2]) || (lon - 360 >= b[0] && lon - 360 <= b[2])) && A.geo.inFeature(lon, lat, { polys: [p] })) return true; }
+    return false;
+  };
   function decoyList(map, o, n) {
-    if (!o) return []; const rr = A.rng(`${S.seed}:d:${S.round}:${S.q}`);
-    const c = o.t === "c" ? (() => { const f = map.world.byName[o.key], big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a)); return [(big.bbox[1] + big.bbox[3]) / 2, (big.bbox[0] + big.bbox[2]) / 2]; })() : [o.lat, o.lon];
-    const out = []; for (let i = 0; i < n; i++) { const brg = rr() * 6.283, km = 250 + rr() * 1800, R = 6371, la = c[0] * Math.PI / 180, lo = c[1] * Math.PI / 180, d = km / R; const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(brg)), lo2 = lo + Math.atan2(Math.sin(brg) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); out.push({ lat: la2 * 180 / Math.PI, lon: ((lo2 * 180 / Math.PI + 540) % 360) - 180, a: S.fx.trapGhost ? 0.28 : 0.95 }); }
+    if (!o || !map || !map.world || !map._clamp) return [];
+    const rr = A.rng(`${S.seed}:d:${S.round}:${S.q}`), P = A.geo.project, TAU = Math.PI * 2;
+    const fl = get("flip"), ori = has("mirrorx") && !S.fx.unmirror ? { rot: 0, mx: 1 } : fl && !S.fx.unmirror ? { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 } : null;   // el mismo giro que mapSpec
+    const fy = !!(ori && ori.rot), fx = fy !== !!(ori && ori.mx), v = map._clamp({ ...map.home() }), W = map.W, H = map.H, HUD = hudPx(W, H);
+    const toPx = (x, y) => { const sx = W / 2 + (x - v.cx) * v.s, sy = H / 2 - (y - v.cy) * v.s; return [fx ? W - sx : sx, fy ? H - sy : sy]; };
+    const y0 = P(0, -60)[1], y1 = 2.1, out = [], pts = [];
+    for (let k = 0; k < 900 && out.length < n; k++) {
+      const x = -Math.PI + rr() * TAU, y = y0 + rr() * (y1 - y0), [px, py] = toPx(x, y);   // siempre dos numeros por candidato: la lista no cambia con la ventana
+      if (px < 16 || px > W - 16 || py < 44 || py > H - 6) continue;                  // la chincheta entera a la vista (cabeza 39 px por encima de la punta)
+      if (HUD.some(([a, b, c, d]) => px + 14 > a && px - 14 < c && py + 4 > b && py - 40 < d)) continue;
+      if (pts.some(q => Math.hypot(q[0] - x, q[1] - y) < (k < 450 ? 0.36 : 0.2))) continue;
+      const [lon, lat] = A.geo.unproject(x, y); if (!onLand(map.world, lon, lat)) continue;
+      pts.push([x, y]); out.push({ lat, lon, a: S.fx.trapGhost ? 0.28 : 0.95 });
+    }
     return out;
   }
 
@@ -480,8 +550,9 @@ window.AIQ = window.AIQ || {};
       if (!phaseOk()) return later(fire, 800);
       const dim = S.fx.blackoutMul < 0.9;
       if (A.chfx && A.chfx.ok()) { const run = () => A.chfx.cut(p.len, dim, () => { if (S.on && !S.suspended) flickerLoop(); }); if (S.fx.flickerWarn) { say("warn"); later(run, 420); } else run(); return; }
-      const on = dim ? 0.6 : 0.98, seq = [[on, 70], [0, 90], [on, 60], [0, 110], [on, p.len]];
-      const go = i => { if (i >= seq.length || !S.on) { el.style.opacity = 0; say("restore"); return flickerLoop(); } el.style.opacity = seq[i][0]; if (seq[i][0]) say("buzz", i); later(() => go(i + 1), seq[i][1]); };
+      const on = dim ? 0.6 : 0.98, sf = !!(A.softFlash && A.softFlash()), seq = sf ? [[on, p.len + 230]] : [[on, 70], [0, 90], [on, 60], [0, 110], [on, p.len]];   // Destellos suaves: un fundido (css)
+      el.classList.toggle("soft", sf);
+      const go = i => { if (i >= seq.length || !S.on) { el.style.opacity = 0; say("restore"); return flickerLoop(); } el.style.opacity = seq[i][0]; if (seq[i][0]) say(sf ? "powerdown" : "buzz", i); later(() => go(i + 1), seq[i][1]); };
       if (S.fx.flickerWarn) { const h = layer("halo"); if (h) { h.classList.add("warn"); later(() => h.classList.remove("warn"), 420); } say("warn"); later(() => go(0), 420); } else go(0);
     }, wait);
   }
@@ -491,7 +562,9 @@ window.AIQ = window.AIQ || {};
     later(function fire() {
       if (!phaseOk()) return later(fire, 800);
       if (A.chfx && A.chfx.ok()) { A.chfx.strike(); return later(lightningLoop, 240); }
-      const seq = [[1, 60], [0.15, 70], [0.9, 90], [0, 0]], go = i => { if (i >= seq.length || !S.on) { el.style.opacity = 0; return lightningLoop(); } el.style.opacity = seq[i][0]; if (i === 0) say("thunder"); later(() => go(i + 1), seq[i][1]); };
+      const sf = !!(A.softFlash && A.softFlash()), seq = sf ? [[0.62, 170], [0, 0]] : [[1, 60], [0.15, 70], [0.9, 90], [0, 0]];   // Destellos suaves: un solo fundido (css)
+      el.classList.toggle("soft", sf);
+      const go = i => { if (i >= seq.length || !S.on) { el.style.opacity = 0; el.classList.remove("up"); return lightningLoop(); } el.classList.toggle("up", sf && i === 0); el.style.opacity = seq[i][0]; if (i === 0) say("thunder"); later(() => go(i + 1), seq[i][1]); };
       go(0);
     }, wait);
   }
@@ -537,7 +610,7 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ API */
   Object.assign(A.chal, {
     begin(list, fx, ctx = {}) {
-      this.end(); S.list = list.slice(); S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0;
+      this.end(); S.list = list.slice(); S.qlist = null; S.qsub = null; S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0;
       S.map = A.core && A.core.map; if (S.map) ensureOverlay(S.map);
       /* retos que mueven continentes: su colocacion se deja calculada mientras se presenta la ronda (con el mapa ya quieto), no al empezar la pregunta */
       if (S.map && S.map.layout && S.list.some(c => ["pangea", "spread", "tilt", "deal"].includes(c.id))) {
@@ -585,13 +658,14 @@ window.AIQ = window.AIQ || {};
     suspend() { S.suspended = true; this.reveal(500); const o = A.core && A.core.S.qs[A.core.S.qi]; if (o) decorate(o); if (A.pointer && A.pointer.mods) A.pointer.mods(); },
     upright() { const map = S.map; if (map && map.setOrient) map.setOrient(false, 900); },
     end() {
-      clearTimers(); clearTimeout(S.preT); fxStop(); if (A.chfx) A.chfx.clear(); S.on = false; S.list = []; const map = S.map || (A.core && A.core.map);
+      clearTimers(); clearTimeout(S.preT); fxStop(); if (A.chfx) A.chfx.clear(); S.on = false; S.list = []; S.qlist = null; S.qsub = null; const map = S.map || (A.core && A.core.map);
       if (map && map.clearDistort) { map.clearDistort(300); map.setLens && map.setLens(null); map.setDecoys && map.setDecoys([]); }
       const app = $("app"); if (app) app.classList.remove("ch-negative");
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
       clearText(); if (A.pointer && A.pointer.mods) A.pointer.mods();
     },
-    decorate, par, get, fxNow: () => S.fx, suspended: () => S.suspended, cjkTail: CJK_TAIL,
+    decorate, par, get, fxNow: () => S.fx, suspended: () => S.suspended, cjkTail: CJK_TAIL, babelAlt,   // babelAlt y decoys: tambien para las pruebas
+    decoys: (o, n) => decoyList(S.map || (A.core && A.core.map), o, n),
     /* nota del pie (Libro de la casa, Nota del crupier): con la Adivinanza en la placa, la nota sale tapada igual (si no, la resolvia al instante) */
     noteMask: (o, txt) => (txt && o && S.on && !S.suspended && has("riddle") && !o.clue && riddleText(o) ? maskName(o, txt) : txt),
   });

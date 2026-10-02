@@ -10,7 +10,7 @@
     quality: "auto", settingsOpen: false, lastTimeStr: "", intro: true, reduce: false, booting: true, skin: "casino",
     hub: "home", ranked: null, run: null, tool: null, hits: 0,
     cursor: true, tips: true, songToast: true, setTab: "general",
-    panSens: 100, zoomSens: 100, units: "km", contrast: false, colorblind: "off", qSize: "n", shake: true,
+    panSens: 100, zoomSens: 100, units: "km", contrast: false, colorblind: "off", qSize: "n", shake: true, softFlash: false, flashSeen: false,
   };
   const prog = id => (S.prog[id] = S.prog[id] || { unlocked: 1, best: 0, bestIq: 0 });
   function load() {
@@ -24,10 +24,11 @@
       S.panSens = d.panSens || 100; S.zoomSens = d.zoomSens || 100; S.units = d.units === "mi" ? "mi" : "km";
       S.contrast = !!d.contrast; S.colorblind = ["protan", "deutan", "tritan"].includes(d.colorblind) ? d.colorblind : "off"; S.qSize = ["l", "xl"].includes(d.qSize) ? d.qSize : "n";
       S.shake = d.shake !== false; A.haptic.on = S.shake;
+      S.softFlash = !!d.softFlash; S.flashSeen = !!d.flashSeen;
     } catch (e) { A.lang = A.detectLang(); }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab, panSens: S.panSens, zoomSens: S.zoomSens, units: S.units, contrast: S.contrast, colorblind: S.colorblind, qSize: S.qSize, shake: S.shake })); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ lang: A.lang, sfx: A.audio.sfxOn, music: A.audio.musicOn, vol: A.audio.vol, prog: S.prog, mode: S.mode, campId: S.campId, quality: S.quality, intro: S.intro, reduce: S.reduce, skin: S.skin, cursor: S.cursor, tips: S.tips, tour: S.tour, songToast: S.songToast, setTab: S.setTab, panSens: S.panSens, zoomSens: S.zoomSens, units: S.units, contrast: S.contrast, colorblind: S.colorblind, qSize: S.qSize, shake: S.shake, softFlash: S.softFlash, flashSeen: S.flashSeen })); } catch (e) { /* sin almacenamiento */ }
   }
 
   const lv = () => S.camp.levels[S.level];
@@ -54,7 +55,7 @@
   A.codex.init(world, map); A.pointer.init(map);
   map.quality = S.quality; map.resize(true); map.fxOn = !S.reduce; A.applySkin(S.skin, map);
   document.documentElement.classList.toggle("reduce-motion", S.reduce);
-  applySens(); applyVisualFX(); applyQSize(); applyShake();
+  applySens(); applyVisualFX(); applyQSize(); applyShake(); applyFlash();
   map.animateTo(map.home(), 0);
   A.cursor.set(S.cursor); A.tt.enable(S.tips);
 
@@ -196,8 +197,9 @@
     segSet(document.querySelector('[data-seg="cb"]'), S.colorblind);
     segSet(document.querySelector('[data-seg="qsize"]'), S.qSize);
     refreshLangUIs(); if (A.syncWin) A.syncWin();
-    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast, contrast: S.contrast, shake: S.shake };
+    const st = { motion: S.reduce, intro: S.intro, cursor: S.cursor, tips: S.tips, tour: S.tour, songs: S.songToast, contrast: S.contrast, shake: S.shake, flash: S.softFlash || flashForced() };
     for (const k in st) { const el = document.querySelector('.sw[data-sw="' + k + '"]'); if (el) el.setAttribute("aria-checked", !!st[k]); }
+    { const rf = $("rowFlash"), lock = flashForced(); if (rf) { rf.classList.toggle("lock", lock); rf.querySelector(".sw").setAttribute("aria-disabled", lock); } }   // con "reducir movimiento" ya van suaves: encendido y quieto
     const sg = document.querySelector('.sw[data-sw="songs"]'); if (sg) sg.closest(".row-sw").classList.toggle("off", !A.audio.musicOn);
     $("rowCursor").classList.toggle("hidden", !A.cursor.available);
     setTab(S.setTab, true); if (A.jukebox) A.jukebox.sync();
@@ -314,6 +316,9 @@
   /* Vibracion = no: html.no-shake quita en CSS todos los temblores de pantalla (rachas, rabieta y golpes del crupier; ver uikit.css),
      jpShake no arranca y el movil no vibra. Los retos que tiemblan (Terremoto, letras...) son el propio reto y siguen */
   function applyShake() { document.documentElement.classList.toggle("no-shake", !S.shake); A.haptic.on = S.shake; }
+  /* Destellos suaves (v0.52): html.soft-flash; js/chfx.js (A.softFlash) suma "reducir movimiento" del juego o del sistema, que tambien los suaviza */
+  function applyFlash() { document.documentElement.classList.toggle("soft-flash", !!S.softFlash); }
+  function flashForced() { return !!S.reduce || matchMedia("(prefers-reduced-motion: reduce)").matches; }
   /* daltonismo (filtro SVG, ver index.html #cbDefs) + alto contraste: se combinan en un solo filter CSS */
   function applyVisualFX() {
     const cb = S.colorblind !== "off" ? `url(#cbFix_${S.colorblind})` : "";
@@ -328,8 +333,9 @@
     songs: () => { S.songToast = !S.songToast; if (!S.songToast && A.jukebox) A.jukebox.hide(); },
     contrast: () => { S.contrast = !S.contrast; applyVisualFX(); },
     shake: () => { S.shake = !S.shake; applyShake(); if (S.shake) { jpShake(1); A.haptic([40]); } },   // al encenderla, un temblor flojo de muestra
+    flash: () => { if (flashForced()) { A.sfx.deny(); return false; } S.softFlash = !S.softFlash; applyFlash(); },
   };
-  for (const sw of document.querySelectorAll(".sw[data-sw]")) if (TOG[sw.dataset.sw]) sw.addEventListener("click", () => { TOG[sw.dataset.sw](); A.sfx.flip(true); save(); syncSettings(); });
+  for (const sw of document.querySelectorAll(".sw[data-sw]")) if (TOG[sw.dataset.sw]) sw.addEventListener("click", () => { if (TOG[sw.dataset.sw]() === false) return; A.sfx.flip(true); save(); syncSettings(); });
   /* pestanas de Ajustes */
   function setTab(t, silent) {
     S.setTab = t; segSet(document.querySelector('[data-seg="settab"]'), t);
@@ -344,7 +350,7 @@
       if (!rs.classList.contains("armed")) { rs.classList.add("armed"); rs.textContent = A.t("set.reset.ask"); A.sfx.ui(); clearTimeout(tm); tm = setTimeout(() => { rs.classList.remove("armed"); syncSettings(); }, 4000); return; }
       clearTimeout(tm); rs.classList.remove("armed");
       A.audio.setVol("master", 0.85); A.audio.setVol("music", 0.7); A.audio.setVol("sfx", 0.9); A.audio.sfxOn = true; A.audio.setMusic(true); A.audio.unlock();
-      S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.tour = true; if (A.tour) A.tour.reset(); S.songToast = true; S.shake = true; applyShake(); A.cursor.set(true); A.tt.enable(true);
+      S.quality = "auto"; map.setQuality("auto"); S.reduce = false; applyMotion(); S.intro = true; S.cursor = true; S.tips = true; S.tour = true; if (A.tour) A.tour.reset(); S.songToast = true; S.shake = true; applyShake(); S.softFlash = false; applyFlash(); A.cursor.set(true); A.tt.enable(true);
       S.panSens = 100; S.zoomSens = 100; applySens(); S.units = "km"; S.contrast = false; S.colorblind = "off"; applyVisualFX(); S.qSize = "n"; applyQSize();
       save(); A.sfx.card(); syncSettings(); rs.textContent = A.t("set.reset.done"); setTimeout(syncSettings, 2200);
     }; }
@@ -862,18 +868,32 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     S.booting = false; const boot = $("boot"); boot.classList.add("out"); setTimeout(() => boot.classList.add("hidden"), 850);
     A.audio.unlock(true); showTitle();
   }
+  /* aviso de fotosensibilidad (v0.52): una sola vez, la primera vez que se abre el juego, en la propia entrada (antes de cualquier reto) y con el ajuste
+     Destellos suaves a mano. Tocar el interruptor no entra al juego; entrar lo da por leido */
+  function gateWarn() {
+    const w = $("gateWarn"); if (!w || S.flashSeen) return false;
+    const sw = $("gwSw"), sync = () => { const on = S.softFlash || flashForced(); sw.setAttribute("aria-checked", on); sw.setAttribute("aria-disabled", flashForced()); };
+    $("gwWhere").textContent = A.t("warn.where", { p: A.t("set.title") + " › " + A.t("set.tab.video") });
+    if (A.iconize) A.iconize(w);
+    if (!w.dataset.on) { w.dataset.on = "1";
+      w.addEventListener("pointerdown", e => e.stopPropagation());               // leer o tocar el aviso no entra
+      sw.addEventListener("click", e => { e.stopPropagation(); if (flashForced()) { A.sfx.deny(); return; } S.softFlash = !S.softFlash; applyFlash(); save(); sync(); A.sfx.flip(S.softFlash); }); }
+    sync(); w.classList.remove("hidden"); $("gate").classList.add("warn");
+    return true;
+  }
   function runBoot() {
     const boot = $("boot"), gate = $("gate"); boot.classList.remove("hidden");
-    let gateAt = 0;
+    let gateAt = 0; const warned = gateWarn();
     const showGate = () => { $("studio").classList.add("hidden"); gate.classList.remove("hidden"); gateAt = performance.now(); };
     let entered = false;
     const enter = () => {
       if (entered) return; entered = true; A.audio.unlock(false); requestFs();
+      if (warned) { S.flashSeen = true; save(); }
       if (gateAt && A.dealer && A.dealer.noteGate) A.dealer.noteGate(performance.now() - gateAt);   // cuanto tardaste en entrar
       finishBoot();   // la entrada se funde con la portada junto con #boot (ocultarla antes dejaba un fogonazo negro hasta que la portada empezaba a aparecer)
     };
     gate.addEventListener("pointerdown", enter);
-    addEventListener("keydown", function k(e) { if (entered) { removeEventListener("keydown", k); return; } if (e.key === "Enter" || e.key === " ") { e.preventDefault(); enter(); } });
+    addEventListener("keydown", function k(e) { if (entered) { removeEventListener("keydown", k); return; } if ((e.key === "Enter" || e.key === " ") && !(e.target && e.target.closest && e.target.closest("#gwSw"))) { e.preventDefault(); enter(); } });
     (A._debug = A._debug || {}).enterBoot = enter;
     if (S.intro) playStudio(showGate); else showGate();
   }
@@ -895,5 +915,5 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
 
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
 
-  A._debug = Object.assign(A._debug || {}, { S, map, world, reveal, startLevel_, showTitle, odoSet, setLang, finishBoot, playStudio });
+  A._debug = Object.assign(A._debug || {}, { S, map, world, reveal, startLevel_, showTitle, odoSet, setLang, finishBoot, playStudio, gateWarn });
 })(window.AIQ);

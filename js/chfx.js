@@ -17,6 +17,9 @@ window.AIQ = window.AIQ || {};
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), rnd = Math.random, TAU = Math.PI * 2;
   const say = (k, ...a) => { try { A.sfx[k] && A.sfx[k](...a); } catch (e) { /* audio no listo */ } };
   const reduce = () => document.documentElement.classList.contains("reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;   // el ajuste del juego o el del sistema, como el resto del juego
+  /* Destellos suaves (Ajustes > Imagen, apagado por defecto; "reducir movimiento" del juego o del sistema tambien lo activa): cada Rayo es un solo
+     fundido y los cortes de luz se apagan y se encienden sin chisporrotear. Sin el, todo sigue igual de intenso */
+  const soft = A.softFlash = () => document.documentElement.classList.contains("soft-flash") || reduce();
   const game = () => (A.core && A.core.S) || {};
   const seeded = s => (A.rng ? A.rng(String(s)) : Math.random);
   const L6 = s => (A.L6 ? A.L6(s) : { es: s.split("|")[0] });
@@ -24,7 +27,7 @@ window.AIQ = window.AIQ || {};
 
   let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [];
   const U = {}, t0 = performance.now(), timers = [];
-  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, e: 0, b: 0, bt: 0 }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [] };
+  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [] };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
   const ptr = () => (A.chal && A.chal.state && A.chal.state.px) || { x: W / 2, y: H / 2 };
 
@@ -152,7 +155,7 @@ void main(){
     cv.width = Math.max(2, Math.round(W * D2)); cv.height = Math.max(2, Math.round(H * D2));
     return true;
   }
-  const busy = () => !!(E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length);
+  const busy = () => !!(E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length);
   function kick() { if (!raf && ov) { last = performance.now(); raf = requestAnimationFrame(tick); } }
   function tick(now) {
     raf = 0; if (!ov || !ov.isConnected) return;
@@ -171,8 +174,9 @@ void main(){
     if (E.crack && !E.crack.on) { E.crack.k -= dt / 0.35; if (E.crack.k <= 0) { E.crack = null; part("chx-shards").innerHTML = ""; } }
     if (E.prints && !E.prints.on) { E.prints.k -= dt / 0.45; if (E.prints.k <= 0) { E.prints = null; part("chx-prints").innerHTML = ""; } }
     if (E.batt) stepBatt(E.batt, dt, now);
-    const c = E.cut; c.e += ((c.v > 0.9 ? 1 : 0) - c.e) * (1 - Math.exp(-dt / (c.v > 0.9 ? 0.35 : 0.08))); c.b = now < c.bt ? 1 : 0;
-    if (E.fseq) { const t = now - E.fseq.t0; E.flash = t < 55 ? 1 : t < 120 ? 0.18 : t < 200 ? 0.92 : 0.55 * Math.exp(-(t - 200) / 140); if (t > 900) { E.fseq = null; E.flash = 0; } }
+    const c = E.cut; if (c.v !== c.tv) c.v = c.soft ? (Math.abs(c.tv - c.v) < 0.004 ? c.tv : c.v + (c.tv - c.v) * (1 - Math.exp(-dt / 0.09))) : c.tv;   // suave: fundido de ~0,2 s
+    c.e += ((c.v > 0.9 ? 1 : 0) - c.e) * (1 - Math.exp(-dt / (c.v > 0.9 ? 0.35 : 0.08))); c.b = now < c.bt ? 1 : 0;
+    if (E.fseq) { const t = now - E.fseq.t0; E.flash = E.fseq.soft ? softA(t) * 0.62 : t < 55 ? 1 : t < 120 ? 0.18 : t < 200 ? 0.92 : 0.55 * Math.exp(-(t - 200) / 140); if (t > (E.fseq.soft ? 1500 : 900)) { E.fseq = null; E.flash = 0; } }
     else if (E.flash > 0) E.flash = E.flash < 0.004 ? 0 : E.flash * Math.exp(-dt / 0.12);
     E.bolts = E.bolts.filter(b => now - b.t0 < 1400);
     E.puffs = E.puffs.filter(p => now - p.t0 < 700);
@@ -274,15 +278,16 @@ void main(){
     const now = performance.now(), x1 = W * (0.18 + rnd() * 0.64), y1 = H * (0.42 + rnd() * 0.45), x0 = clamp(x1 + (rnd() - 0.5) * W * 0.4, 20, W - 20), y0 = -10, len = Math.hypot(x1 - x0, y1 - y0);
     const main = boltPts(x0, y0, x1, y1, len * 0.17, 7), br = [], dir = Math.atan2(y1 - y0, x1 - x0);
     for (let i = 0, nb = 2 + Math.floor(rnd() * 3); i < nb; i++) { const p = main[2 + Math.floor(rnd() * main.length * 0.6)], a = dir + (rnd() < 0.5 ? -1 : 1) * (0.35 + rnd() * 0.6), l = (0.16 + rnd() * 0.3) * len; br.push(boltPts(p[0], p[1], p[0] + Math.cos(a) * l, p[1] + Math.sin(a) * l, l * 0.2, 5)); }
-    E.bolts.push({ t0: now, main, br, x: x1, y: y1 }); E.fseq = { t0: now };
+    const sf = soft(); E.bolts.push({ t0: now, main, br, x: x1, y: y1, soft: sf }); E.fseq = { t0: now, soft: sf };
     later(() => say("thunder"), 40 + rnd() * 160);
   };
   const boltA = t => (t < 55 ? 1 : t < 120 ? 0.25 : t < 200 ? 1 : Math.exp(-(t - 200) / 230));
+  const softA = t => (t < 170 ? (t / 170) * (t / 170) * (3 - 2 * t / 170) : Math.exp(-(t - 170) / 330));   // Destellos suaves: sube en 170 ms y se apaga despacio, sin doble pico
   function drawBolts(g, now) {
     g.save(); g.globalCompositeOperation = "lighter"; g.lineJoin = "round"; g.lineCap = "round";
     const path = pts => { g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); };
     for (const b of E.bolts) {
-      const a = boltA(now - b.t0); if (a < 0.01) continue;
+      const a = (b.soft ? softA : boltA)(now - b.t0); if (a < 0.01) continue;
       const gr = g.createRadialGradient(b.x, b.y, 0, b.x, b.y, 110); gr.addColorStop(0, `rgba(190,210,255,${(0.4 * a).toFixed(3)})`); gr.addColorStop(1, "rgba(190,210,255,0)"); g.fillStyle = gr; g.fillRect(b.x - 110, b.y - 110, 220, 220);
       for (const [pts, m] of [[b.main, 1], ...b.br.map(x => [x, 0.6])]) {
         path(pts); g.strokeStyle = `rgba(120,120,255,${(0.14 * a * m).toFixed(3)})`; g.lineWidth = 28 * m; g.stroke();
@@ -296,11 +301,13 @@ void main(){
   /* ------------------------------------------------------------------ corte de luz (lo dispara js/challenges.js a intervalos) */
   X.cut = (len, dim, done) => {
     if (!ov) return done && done(); kick();
-    const on = dim ? 0.62 : 1, seq = [[on, 70, 1], [0, 90, 0], [on, 60, 1], [0.25, 40, 0], [on, len, 2], [0, 45, 0], [on * 0.7, 35, 1], [0, 0, 3]];
+    const on = dim ? 0.62 : 1, sf = E.cut.soft = soft();
+    /* suave: se va y vuelve con un fundido, sin los chispazos ni el fogonazo al volver (a oscuras, casi lo mismo que el corte intenso: 270 ms + len) */
+    const seq = sf ? [[on, len + 230, 2], [0, 0, 3]] : [[on, 70, 1], [0, 90, 0], [on, 60, 1], [0.25, 40, 0], [on, len, 2], [0, 45, 0], [on * 0.7, 35, 1], [0, 0, 3]];
     const go = i => {
       if (i >= seq.length || !ov) return done && done();
-      const [v, ms, snd] = seq[i]; E.cut.v = v; E.cut.bt = performance.now() + 70; kick();
-      if (snd === 1) say("buzz", i); else if (snd === 2) say("powerdown"); else if (snd === 3) { say("restore"); E.flash = Math.max(E.flash, 0.16); }
+      const [v, ms, snd] = seq[i]; E.cut.tv = v; if (!sf) { E.cut.v = v; E.cut.bt = performance.now() + 70; } kick();
+      if (snd === 1) say("buzz", i); else if (snd === 2) say("powerdown"); else if (snd === 3) { say("restore"); if (!sf) E.flash = Math.max(E.flash, 0.16); }
       if (i === seq.length - 1) return done && done();
       later(() => go(i + 1), ms);
     };
@@ -565,7 +572,7 @@ void main(){
     if (E.crack) E.crack.on = 0;
     if (E.prints) E.prints.on = 0;
     if (E.batt && E.batt.on) { E.batt.on = 0; E.batt.hud.classList.add("charge"); E.batt.hud.classList.remove("toast", "crit"); if (E.batt.k > 0.05) say("charge"); }
-    E.cut.v = 0; E.fseq = null; E.bolts.length = 0;
+    E.cut.v = E.cut.tv = 0; E.fseq = null; E.bolts.length = 0;
     const app = document.getElementById("app"); if (app) app.classList.remove("chx-punch");
     kick();
   };

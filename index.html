@@ -152,6 +152,7 @@
           <div class="set-card"><h3 data-i="set.gfx"></h3>
             <div class="seg s3" data-seg="gfx"><button data-v="auto" data-i="gfx.auto"></button><button data-v="high" data-i="gfx.high"></button><button data-v="saver" data-i="gfx.saver"></button><i></i></div>
             <p class="set-note" data-i="set.gfx.d"></p>
+            <div class="row-sw" id="rowFlash"><div class="rs-t"><label data-i="set.flash"></label><small data-i="set.flash.d"></small></div><button class="sw" data-sw="flash" role="switch" aria-checked="false" aria-label="Destellos suaves"><i></i></button></div>
           </div>
           <div class="set-card"><h3 data-i="set.sens"></h3>
             <div class="fader" data-range="pan"><label data-i="sens.pan"></label><output>100%</output><input type="range" min="50" max="200" step="10" value="100" aria-label="Sensibilidad de arrastre"><div class="ftrack"></div></div>
@@ -213,6 +214,12 @@
     <div class="gate hidden" id="gate">
       <div class="gate-glow"></div>
       <div class="gate-logo" id="gateLogo"><img src="assets/logo.png" alt="Geolite"></div>
+      <!-- aviso de fotosensibilidad: solo la primera vez (js/game.js, S.flashSeen), con el ajuste Destellos suaves a mano -->
+      <div class="gate-warn hidden" id="gateWarn" role="note" aria-labelledby="gwH">
+        <div class="gw-top"><i class="gw-ic" data-ic="ch_lightning" aria-hidden="true"></i><b id="gwH" data-i="warn.title"></b></div>
+        <p class="gw-p" data-i="warn.text"></p>
+        <div class="gw-row"><div class="rs-t"><label data-i="set.flash"></label><small id="gwWhere"></small></div><button class="sw" id="gwSw" type="button" role="switch" aria-checked="false" aria-label="Destellos suaves"><i></i></button></div>
+      </div>
       <button class="gate-enter" id="gateEnter" type="button"><span data-i="boot.enter"></span></button>
     </div>
   </div>
