@@ -276,3 +276,5 @@ html.reduce-motion .ab-perk .ab-lbl { animation: abLblRm 1.1s steps(1, end) forw
 .ab-perk .ab-pips i { width: 5px; height: 5px; border-radius: 1px; background: #ffd95a; box-shadow: 0 0 0 1px #16241c; }
 .v-lines li.vl-broke span { color: rgba(242, 233, 214, .6); }
 .v-lines li.vl-broke .ic { filter: grayscale(1) brightness(.75); }
+/* tanda 4: con la Mesa de minimos, el objetivo de siempre sale tachado junto al rebajado */
+.adv-goal .of-was { opacity: .6; margin-right: 3px; text-decoration-thickness: 2px; }

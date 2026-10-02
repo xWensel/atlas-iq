@@ -250,6 +250,11 @@ window.AIQ = window.AIQ || {};
   const owned = id => run.perks.includes(id);
   /* objetivo: escalera lineal, +250 por ronda de 2.000 (ronda 1) a 4.500 (ronda 11); el jefe final (ronda 12) es 4.777 exactos. Redondeado a 50 (salvo ese 4.777 sin ascension ni perks de ronda).
      v0.20 (usuario, 2026-09-30): que pese mas SABER que clavar; antes +350 por ronda, 5.777 y +10 % por Ascension hacian imposibles las rondas 11-12 aunque supieras las cinco */
+  /* tanda 4 (S21): el objetivo de la ronda se congela al empezarla (run.tgt). El margen y el consuelo se miden contra el objetivo SIN rebajas
+     (la Mesa de minimos no se paga a si misma). El panel del Campamento usa target(), en directo */
+  const tgtKey = () => roundNo() + ":" + (run.attempt || 0);
+  const roundTarget = () => { run.tgt = run.tgt || {}; const k = tgtKey(); if (run.tgt[k] == null) run.tgt[k] = target(); return run.tgt[k]; };
+  const baseTarget = () => { const r = roundNo(), base = r >= 11 ? 4777 : 2000 + 250 * r, m = ascFx(run.asc).target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };
   const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = r >= 11 ? 4777 : 2000 + 250 * r, m = ascFx(run.asc).target * t.target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };
   const shopCtx = () => { const x = { price: 0, freeReroll: 0, slots: 3 }; perkList().forEach(p => p.shop && p.shop(x, run)); return x; };
   const inflation = () => 1 + 0.25 * run.act;                            // todo cuesta mas en cada acto: el dinero pesa mas segun avanzas
@@ -261,6 +266,8 @@ window.AIQ = window.AIQ || {};
   /* amuletos (tanda 3): las contras de antes. Cargas en run.amu; 2 al comprarlo (las barajas que lo traen de serie, 6). Ver amuSpend */
   const AMU_LV = 2, AMU_DECK = 6, isAmu = id => !!(A.RELICS[id] && A.RELICS[id].amulet);
   const AMU_TAG = L6("Amuleto|Amulet|Amulette|Amuleto|Amulett|Amuleto||护身符|부적|お守り|Амулет|Amulet"), AMU_RE = L6("+2 cargas|+2 charges|+2 charges|+2 cargas|+2 Ladungen|+2 cariche||+2次充能|충전 +2회|+2回分|+2 заряда|+2 ładunki");
+  const VTG_TAG = L6("Ventaja|Edge|Atout|Vantagem|Vorteil|Vantaggio||优势|어드밴티지|アドバンテージ|Преимущество|Atut"), VTG_SWAP = L6("cambiar por esta|swap for this one|échanger contre celle-ci|trocar por esta|dagegen tauschen|scambiala con questa||换成这张|이걸로 교체|これと交換|заменить на эту|zamień na tę");
+  const NULLED = L6("Anulado|Voided|Annulé|Anulado|Annulliert|Annullato||已作废|무효|無効|Отменён|Anulowany"), SAVED_BY = L6("te ha salvado|saved you|t'a sauvé|te salvou|hat dich gerettet|ti ha salvato||救了你|덕분에 살았어요|に救われた|спас тебя|cię uratował");
   const AMU_BROKE = L6("se parte|breaks|se brise|se quebra|zerbricht|si spezza||碎了|부서졌어요|砕けた|раскололся|pęka");
   const pips = (n, cls) => `<span class="${cls}">${Array.from({ length: Math.max(0, n) }, () => "<i></i>").join("")}</span>`;
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
@@ -270,10 +277,11 @@ window.AIQ = window.AIQ || {};
     const plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk), boss = r % 4 === 3;
     let list = A.adv._force ? A.adv._force.map(id => ({ id, lv: 2 })) : plan.list.slice();
     const bribed = (run.bribed && run.bribed[r]) || [], paid = list.filter(c => bribed.includes(c.id)).map(c => c.id); if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento (paid: los que estaban en esta tirada; barajar no borra los sobornos)
-    const sum = f => pl.reduce((n, p) => n + (p[f] || 0), 0), skip = sum("skipFirst"); if (skip) list = list.slice(skip);
+    const sum = f => pl.reduce((n, p) => n + (p[f] || 0), 0), nulled = [];
+    for (let k = sum("skipHardest"); k > 0 && list.length; k--) { const RK = { map: 5, wall: 4, ptr: 3, rule: 2 }, w = c => (c.lv || 1) * 10 + (RK[A.CHAL[c.id].kind] || 1); const top = list.reduce((a, c) => (w(c) > w(a) ? c : a)); nulled.push(top.id); list = list.filter(c => c !== top); }   // Comodin: fuera el reto mas fuerte
     if (boss) { let soft = sum("softenBoss"); list = list.map((c, i) => (i < soft ? { ...c, lv: 1 } : c)); }
     list = list.filter(c => !pl.some(p => (p.immune || []).includes(c.id)));
-    return { list, combo: plan.combo, boss, paid };
+    return { list, combo: plan.combo, boss, paid, nulled };
   };
 
   /* ---------------- tienda relevante: lo que sirve cada reliquia en ESTA expedicion ----------------
@@ -402,7 +410,7 @@ window.AIQ = window.AIQ || {};
   /* la ronda ya estaba jugada entera al guardar (menu desde el ticket de la ultima pregunta, o sin provisiones en el modo infinito): se cierra sin volver a jugarla */
   function endSaved() {
     const S = C().S; S.run = run; S.levelScore = run.roundScore || 0; S.runTotal = run.score;
-    S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [{ advance: run.inf ? 1 : target(), boss: !run.inf && isBoss() }] };
+    S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [{ advance: run.inf ? 1 : roundTarget(), boss: !run.inf && isBoss() }] };
     A.adv.roundEnd();
   }
   /* descarta la partida guardada de una ranura (por defecto, la de la partida activa si la hay; si no, la expedicion normal).
@@ -469,7 +477,7 @@ window.AIQ = window.AIQ || {};
     run.topic = def.topic; run.tier = def.tier;
     return {
       name: `${A.tx(info.n)} · ${boss ? A.T("Jefe", "Boss") : A.tf("Ronda {n}/3", "Round {n}/3", { n: run.round + 1 })}`, topicName: tn, topic: def.topic, kind: "adventure", boss: !!boss,
-      seconds: ctx.seconds, advance: target(), maxPerQ: 1400, bonus: false, plainName: true, questions: () => qs,
+      seconds: ctx.seconds, advance: roundTarget(), maxPerQ: 1400, bonus: false, plainName: true, questions: () => qs,
       score: (q, km, left) => A.adv.score(q, km, left, true).sc,
     };
   }
@@ -540,7 +548,7 @@ window.AIQ = window.AIQ || {};
       <span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${A.tx(Lv.topicName)}</h2>
       ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
       <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}${run._virgin ? ` <b class="intro-new">${NEW}</b>` : ""}</p>
-      <p class="adv-goal">${A.T("Objetivo", "Target")} <b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
+      <p class="adv-goal">${A.T("Objetivo", "Target")} ${!run.inf && baseTarget() > Lv.advance ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")} · ${Lv.seconds} s</p>
       ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
       <div class="intro-art">${A.pic("topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
   };
@@ -574,9 +582,10 @@ window.AIQ = window.AIQ || {};
     let dist = km == null ? 0 : Math.round(1000 * Math.exp(-c.km / c.scale));
     const time = km == null ? 0 : Math.round(400 * Math.max(0, left / limit) * (0.3 + 0.7 * dist / 1000));
     c.dist = dist; c.time = time; c.chips = dist + time;
-    const ratio = dist / 1000; let streak = km != null && ratio >= 0.6 ? S.streak + 1 : 0;
-    if (km != null && ratio < 0.6 && S.streak > 0 && has("guard") && !run.guardUsed) { streak = S.streak; if (!noSide) run.guardUsed = true; c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
-    c.streak = streak; c.mult = 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);
+    const ratio = dist / 1000; let streak = km != null && ratio >= 0.6 ? S.streak + 1 : 0, guarded = false;
+    const gN = sumFlag("guard");                                       // Guardarrachas: los 2 primeros fallos de la ronda no cortan la racha (tampoco el tiempo agotado)
+    if (ratio < 0.6 && S.streak > 0 && gN && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
+    c.streak = streak; c.mult = guarded ? 1 : 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);   // la respuesta salvada puntua x1
     c.qi = run.qi;
     if (km != null) perkList().forEach(p => { if (!p.post) return; const tx = p.post(c, run); if (tx) { c.lines.push([p.ico, A.tx(p.n), tx]); if (!noSide) A.adv.flash(p.id, 0, tx); } });
     c.total = km == null ? 0 : Math.round(c.chips * c.mult * c.xmult);
@@ -798,7 +807,7 @@ window.AIQ = window.AIQ || {};
     const S = C().S, Lv = S.camp && S.camp.levels && S.camp.levels[0];
     const on = !!(run && !run.inf && Lv && S.camp.mode === "adventure" && ["asking", "reveal"].includes(S.phase) && S.levelScore >= Lv.advance);
     el.classList.toggle("hidden", !on); if (!on) return;
-    const lt = loot(S.levelScore, Lv.advance, isBoss()), got = gain(lt.base + lt.margin);
+    const tb = Math.max(Lv.advance, baseTarget()), lt = loot(S.levelScore, tb, isBoss()), got = gain(lt.base + (has("marginHalf") ? Math.floor(lt.margin / 2) : lt.margin));
     el.innerHTML = `<span>${A.tx(ETX.loot)}</span><b>${CN()}+${got}</b><i>${lt.next ? et("next", { c: gain(lt.base + lt.margin + 1), s: A.fmt(lt.next) }) : A.tx(ETX.max)}</i>`;
   }
   if (A.tips) A.tips.loot = () => A.tx(ETX.lootTip) + "\n" + A.tx(ETX.lootTipD);
@@ -854,7 +863,7 @@ window.AIQ = window.AIQ || {};
     const r = roundNo(), plan = A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk).list, bribed = (run.bribed && run.bribed[r]) || [];
     const left = plan.filter(c => !bribed.includes(c.id)), pl = perkList();
     pl.forEach(p => {
-      if (p.skipFirst && left.length) A.adv.flash(p.id, 0);
+      if (p.skipHardest && left.length) A.adv.flash(p.id, 0);
       if (p.softenBoss && r % 4 === 3 && left.length) A.adv.flash(p.id, 0);
       if ((p.immune || []).some(id => left.some(c => c.id === id))) A.adv.flash(p.id, 0);
       if (p.toolBonus && Object.keys(run.tools).length) A.adv.flash(p.id, 0, "+" + p.toolBonus);
@@ -895,8 +904,9 @@ window.AIQ = window.AIQ || {};
     S.phase = "levelEnd"; A.adv.hideBars(); clearTimers(); clearTimeout(reactT); A.chal.end(); C().map.setStyle(mapStyleFor());
     if (pass) {
       run.score += S.levelScore; run.cleared++; S.runTotal = run.score;
-      const lt = loot(S.levelScore, Lv.advance, boss), x = { coins: lt.base + lt.margin }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + lt.base]];
-      if (lt.margin) lines.push([et("margin", { p: pctOf(S.levelScore - Lv.advance, Lv.advance) }), "+" + lt.margin]);   // cuanto mas por encima del objetivo, mas doblones
+      const tb = Math.max(Lv.advance, baseTarget()), lt = loot(S.levelScore, tb, boss), mh = has("marginHalf"), mg = mh ? Math.floor(lt.margin / 2) : lt.margin, x = { coins: lt.base + mg }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + lt.base]];
+      if (lt.margin) lines.push([et("margin", { p: pctOf(S.levelScore - tb, tb) }) + (mh ? " · ½" : ""), "+" + mg, mh ? "minbet" : null, mh ? "half" : null]);   // la Mesa de minimos paga la mitad del margen
+      if (mh && S.levelScore < tb) lines.push([A.tx(A.RELICS.minbet.n) + " · " + A.tx(SAVED_BY), "", "minbet"]);   // ha decidido la ronda   // cuanto mas por encima del objetivo, mas doblones
       const cap = sumFlag("interest") || 2, interest = Math.min(cap, Math.floor(run.coins / 10));
       if (interest) { x.coins += interest; lines.push([A.T("Interés (1 por cada 10)", "Interest (1 per 10)"), "+" + interest, interest > 2 ? (perkList().find(p => p.interest) || {}).id : null]); }   // por encima de 2, es el Banquero
       perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins, p.id]); } } });
@@ -926,7 +936,7 @@ window.AIQ = window.AIQ || {};
       if (insured) run.segN = (run.segN || 0) + 1;                       // el Seguro de ronda se ha gastado: el siguiente cuesta 2 mas (superar la ronda no lo encarece)
       run.attempt++; run.phase = "retry";
       /* consuelo: lo que puntuaste en la ronda fallida se cobra (1 por cada tercio del objetivo) para comprar ayuda antes de la revancha */
-      const q = S.levelScore / Math.max(1, Lv.advance), conso = run.lives > 0 ? gain(consoOf(q)) : 0;
+      const q = S.levelScore / Math.max(1, Math.max(Lv.advance, baseTarget())), conso = run.lives > 0 ? gain(consoOf(q)) : 0;
       if (conso) { run.coins += conso; run.stats.coinsEarned += conso; }
       persist();
       A.sfx.stamp(); setTimeout(A.sfx.lose, 300);
@@ -983,7 +993,7 @@ window.AIQ = window.AIQ || {};
     const bag = Object.keys(R).filter(id => (!owned(id) || R[id].amulet) && (chest ? true : R[id].r < 3) && useful(id));   // un amuleto que ya llevas sale como recarga (+2 cargas)
     const cur = chalFor(roundNo()).list, up = new Set(); cur.forEach(c => (A.CHAL[c.id].counters || []).forEach(id => up.add(id)));
     const reach = {}; bag.forEach(id => { if (ctrOf(id)) reach[id] = helpRounds(id).length; });
-    const wt = id => { const r = R[id].r; return (chest ? [30, 35, 25, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1) * (reach[id] ? 0.7 + 0.3 * Math.min(4, reach[id]) : 1) * (R[id].amulet && run.act === 0 ? 0.5 : 1); };   // acto I: los amuletos pesan la mitad (que no llenen la mochila)
+    const wt = id => { const r = R[id].r; return (chest ? [30, 35, 25, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1) * (reach[id] ? 0.7 + 0.3 * Math.min(4, reach[id]) : 1) * (R[id].amulet && run.act === 0 ? 0.5 : 1) * (R[id].ventaja && !perkList().some(p => p.ventaja) ? 2 : 1); };   // sin Ventaja, pesan el doble   // acto I: los amuletos pesan la mitad (que no llenen la mochila)
     const draw = (pool = bag) => { const tot = pool.reduce((n, id) => n + wt(id), 0); let x = rr() * tot, pick = pool[pool.length - 1]; for (const id of pool) { x -= wt(id); if (x <= 0) { pick = id; break; } } bag.splice(bag.indexOf(pick), 1); return pick; };
     const canTool = id => !!run.tools[id] || Object.keys(run.tools).length < 4;   // con 4 herramientas distintas solo sirven cargas de las tuyas
     const slots = chest ? 3 : shopCtx().slots;
@@ -1031,8 +1041,9 @@ window.AIQ = window.AIQ || {};
       const shuffle = n ? `<button class="chipbtn nr-shuffle" id="chalReroll" type="button" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span><em>${CN()}${chalRerollCost()}</em></button>` : "";
       const lis = cf.list.map(c => { const dd = A.CHAL[c.id];
         return `<li class="nr-row k-${dd.kind}"><span class="nr-ic">${ic(dd.ico)}</span><b class="nr-rn">${A.tx(dd.n)} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><button class="nr-buy" type="button" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")}<span class="nr-p">${CN()}${bribePrice(c, cf.boss)}</span></button><p>${A.tx(dd.d)}</p></li>`; }).join("")
-        + done.map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.T("Sobornado", "Bribed")}</em></li>`).join("");
-      return `<div class="nr${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}${dot}${A.T("Objetivo", "Target")} <b>${A.fmt(target())}</b></span><b class="nr-name">${name}</b></div>${count}${shuffle}</div>${lis ? `<ul class="nr-list n${Math.min(6, n + done.length)}">${lis}</ul>` : `<p class="nr-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
+        + done.map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.T("Sobornado", "Bribed")}</em></li>`).join("")
+        + (cf.nulled || []).map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.tx(NULLED)}</em></li>`).join("");   // los que quita tu Comodin
+      return `<div class="nr${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}${dot}${A.T("Objetivo", "Target")} ${baseTarget() > target() && rr === roundNo() ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(target())}</b></span><b class="nr-name">${name}</b></div>${count}${shuffle}</div>${lis ? `<ul class="nr-list n${Math.min(6, n + done.length)}">${lis}</ul>` : `<p class="nr-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
     }).join("");
     return `<div class="tb-next">${html}</div>`;
   };
@@ -1137,7 +1148,7 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
@@ -1154,7 +1165,7 @@ window.AIQ = window.AIQ || {};
   /* la reliquia en la mochila: carta pequena con el color de su rareza (la legendaria, con su marco de oro y su brillo).
      face: el dibujo como fondo y sin boton de vender (la que aparece al final de la secuencia: ninguna imagen nueva, que haria reajustar la pantalla) */
   const relicHtml = (id, face) => { const p = A.RELICS[id];
-    return `<div class="tr-card tr-relic r${p.r}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${p.amulet ? pips((run.amu || {})[id] || 0, "tr-pips") : ""}</button>${face ? "" : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
+    return `<div class="tr-card tr-relic r${p.r}${p.ventaja ? " vtg" : ""}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${p.amulet ? pips((run.amu || {})[id] || 0, "tr-pips") : ""}</button>${face ? "" : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
   function renderShop(chest) {
     legOn = 0;                                                           // mesa nueva: si la legendaria se estaba luciendo en la anterior, esa secuencia ya no sigue
     const slots = 5, info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
@@ -1272,9 +1283,10 @@ window.AIQ = window.AIQ || {};
     if (s.k === "life") { const c = lifePrice(); if (run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } if (run.coins < c) return noFunds(el); run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
-      const recharge = !!p.amulet && owned(s.id);
-      if (!recharge && run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
-      if (run.coins < c) return noFunds(el);
+      const recharge = !!p.amulet && owned(s.id), swapV = p.ventaja ? perkList().find(q => q.ventaja && q.id !== s.id) : null;
+      if (!recharge && !swapV && run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
+      if (run.coins + (swapV ? sellValue(swapV.id) : 0) < c) return noFunds(el);
+      if (swapV) { run.coins += sellValue(swapV.id); run.perks.splice(run.perks.indexOf(swapV.id), 1); if (run.paid) delete run.paid[swapV.id]; A.sfx.sell(); }   // la Ventaja vieja se vende
       if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);
       run.coins -= c; run.amu = run.amu || {}; if (recharge) run.amu[s.id] += AMU_LV; else { run.perks.push(s.id); if (p.amulet) run.amu[s.id] = AMU_LV; }
       run.paid = run.paid || {}; run.paidAt = run.paidAt || {}; run.paid[s.id] = (recharge ? run.paid[s.id] || 0 : 0) + c; run.paidAt[s.id] = run.shopKey;
