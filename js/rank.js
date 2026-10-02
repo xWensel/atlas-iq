@@ -155,13 +155,13 @@ window.AIQ = window.AIQ || {};
     date: board => new Date(+board.slice(6, 10), +board.slice(10, 12) - 1, +board.slice(12, 14)),
     /* codigo corto de la semilla para ensenarlo (y compararlo entre amigos): "K7Q-2XD", sin letras que se confunden (0/O, 1/I/L) */
     code: board => { const AB = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", rr = A.rng(board + ":code"); let s = ""; for (let i = 0; i < 6; i++) s += AB[rr.int(AB.length)]; return s.slice(0, 3) + "-" + s.slice(3); },
-    trySeed: (board, k) => board + "#" + k,
+    trySeed: (board, k) => board + "#" + k + ":v2",                   // v2: el catalogo de la revision de perks (tanda 3)
     msToNext: () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1) - n; },
     hand(board) {
       if (HANDS[board]) return HANDS[board];
-      const rr = A.rng(board + ":hand"), REL = A.RELICS || {}, deck = rr.pick(DECK_IDS), asc = rr.pick(ASC_BAG);
+      const rr = A.rng(board + ":hand:v2"), REL = A.RELICS || {}, deck = rr.pick(DECK_IDS), asc = rr.pick(ASC_BAG);
       const own = ((A.ADV && A.ADV.DECKS[deck]) || { perks: [] }).perks;
-      const gifts = Object.keys(REL).filter(id => REL[id].r <= 1 && !own.includes(id)).sort(); let gift = gifts.length ? rr.pick(gifts) : null;
+      const gifts = (A.DAILY_GIFTS || []).filter(id => REL[id] && !own.includes(id)); let gift = gifts.length ? rr.pick(gifts) : null;   // lista fija: quitar o anadir reliquias no cambia el regalo de los demas dias
       const route = []; [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10]].forEach(act => route.push(...rr.shuffle(act))); route.push(11);   // el Jackpot sigue cerrando la expedicion
       /* el regalo nunca es papel mojado: si el de la semilla no sirve con la baraja del dia (o su reto no sale en los 3 intentos), se elige otro
          con una semilla aparte. Los dias en que si sirve no cambian (ni el regalo ni la ruta) */

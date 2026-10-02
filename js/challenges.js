@@ -84,6 +84,23 @@ window.AIQ = window.AIQ || {};
   def("flagdark", "flag", "ch_dark", "Bandera a oscuras|Flag in the dark|Drapeau dans le noir|Bandeira no escuro|Flagge im Dunkeln|Bandiera al buio||黑暗中的国旗|어둠 속의 국기|暗闇の国旗|Флаг в темноте|Flaga w ciemności", "La bandera casi no se distingue en la penumbra.|The flag is barely visible in the dim light.|Le drapeau se distingue à peine dans la pénombre.|A bandeira quase não se distingue na penumbra.|Die Flagge ist im Dämmerlicht kaum zu erkennen.|La bandiera si distingue a malapena nella penombra.||昏暗中几乎看不清国旗。|어두운 조명 속에서 국기가 거의 보이지 않습니다.|薄明かりの中で国旗がほとんど見えない。|В тусклом свете флаг едва виден.|W półmroku flagę ledwo widać.", ["miner"]);
   def("flaggray", "flag", "ch_flaggray", "Sin colores|No colors|Sans couleurs|Sem cores|Ohne Farben|Senza colori||没有颜色|색 없음|色なし|Без цвета|Bez kolorów", "La bandera se ve en blanco y negro.|The flag shows in black and white.|Le drapeau apparaît en noir et blanc.|A bandeira aparece em preto e branco.|Die Flagge ist schwarz-weiß.|La bandiera appare in bianco e nero.||国旗以黑白显示。|국기가 흑백으로 표시됩니다.|国旗が白黒で表示される。|Флаг показан в чёрно-белом цвете.|Flaga jest czarno-biała.", ["lens"]);
   A.CHAL = D;
+  /* tanda 3: FAMILIAS de sensacion (lo que contesta un amuleto). Lo que estorba se conjura: LETRAS, LUZ, VISTA, SITIO, PUNTERO y PANTALLA tienen
+     un amuleto cada una. Lo que miente o calla se vence sabiendo (SABER, MENTIRAS), la tormenta se sufre (TORMENTA) y las reglas de la casa se
+     sobornan o se aguantan (REGLAS). counters (tienda, intro y aviso de contra) sale de aqui; FAMILY (el sorteo) no cambia hasta la tanda 6 */
+  const FAMC = {
+    shaky: "letras", dance: "letras", scroll: "letras", missing: "letras", novowels: "letras", swap: "letras", anagram: "letras", runes: "letras", mirror: "letras", upside: "letras", memory: "letras",
+    riddle: "saber", nocountry: "saber", babel: "saber",
+    dark: "luz", battery: "luz", flagdark: "luz",
+    flicker: "tormenta", lightning: "tormenta",
+    blur: "vista", myopia: "vista", blindspot: "vista", mosaic: "vista", clouds: "vista", rain: "vista", flagblur: "vista",
+    pangea: "sitio", deal: "sitio", spread: "sitio", tilt: "sitio", flip: "sitio", mirrorx: "sitio", spin: "sitio", quake: "sitio", drift: "sitio",
+    tremble: "puntero", dizzy: "puntero", blink: "puntero", ghost: "puntero", cblur: "puntero", lag: "puntero", cmirror: "puntero",
+    crack: "pantalla", smudge: "pantalla", hang: "pantalla",
+    wrongborders: "mentiras", noborders: "mentiras", negative: "mentiras", decoys: "mentiras", flaginvert: "mentiras", flaghue: "mentiras", flaggray: "mentiras",
+    wind: "reglas", storm: "reglas", silence: "reglas",
+  };
+  const AMULET = { letras: "dictionary", luz: "miner", vista: "divingmask", sitio: "plates", puntero: "steadyhand", pantalla: "protector" };
+  for (const id in D) { D[id].fam = FAMC[id] || "reglas"; D[id].counters = AMULET[D[id].fam] ? [AMULET[D[id].fam]] : []; }
 
   const KIND = k => Object.keys(D).filter(id => D[id].kind === k);
   const TEXT = KIND("text"), MAPC = KIND("map"), PTR = KIND("ptr"), RULE = KIND("rule"), FLAG = KIND("flag"), WALL = KIND("wall");
@@ -114,12 +131,13 @@ window.AIQ = window.AIQ || {};
      Sin colores no salia nunca en la Aventura */
   const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flaginvert", "flip"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur", "mosaic"]], ["Cine mudo|Silent movie|Cinéma muet|Cinema mudo|Stummfilm|Cinema muto||默片|무성 영화|サイレント映画|Немое кино|Kino nieme", ["flaggray", "noborders"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
   const ACT1 = [["text", "map"], ["ptr", "map"], ["text", "ptr"]], ACT2 = [["text", "map", "ptr"], ["map", "ptr", "rule"], ["text", "map", "map"]];
-  const rulesIn = (x, asc) => { const act = Math.floor(x / 4), pos = x % 4; if (pos === 3 || act === 0) return 0; return (act === 1 ? ACT1 : ACT2)[pos % 3].filter(c => c === "rule").length + (asc >= 2 ? 1 : 0); };   // reglas que saca la ronda x (para la bolsa)
+  const A2R = [4, 6, 8, 10];                                          // tanda 3: la regla de Ascension 2 sale en R5, R7, R9 y R11 (sin Tapones, ya no tiene contra)
+  const rulesIn = (x, asc) => { const act = Math.floor(x / 4), pos = x % 4; if (pos === 3 || act === 0) return 0; return (act === 1 ? ACT1 : ACT2)[pos % 3].filter(c => c === "rule").length + (asc >= 2 && A2R.includes(x) ? 1 : 0); };   // reglas que saca la ronda x (para la bolsa)
 
   /* ------------------------------------------------------------------ plan (determinista por semilla y ronda) */
   const pickFrom = (seed, tag, list, r, avoid) => { const ok = list.filter(id => !avoid.includes(famOf(id))), l = ok.length ? ok : list; return A.rng(`${seed}:${tag}:${Math.floor(r / 4)}:${r % 4}`).pick(l); };
   A.chal = {
-    DEFS: D, TEXT, MAPC, PTR, RULE, FLAG, WALL, noLatin: NOLATIN,
+    DEFS: D, TEXT, MAPC, PTR, RULE, FLAG, WALL, noLatin: NOLATIN, FAMC, AMULET,
     /* cjk: sin runas ni sin vocales. v0.4.1: la expedicion lo fija al empezar (run.cjk); con el idioma de cada momento, cambiarlo a media
        expedicion cambiaba el truco de texto de la ronda y el soborno ya pagado dejaba de coincidir con nada */
     plan(seed, r, asc = 0, topic, cjk = NOLATIN()) {
@@ -164,7 +182,7 @@ window.AIQ = window.AIQ || {};
       if (act === 0) { if (pos === 1) add("text", true); else if (pos === 2) add(flagRound ? "flag" : "map", true); }   // v0.52: la ronda 3 de banderas sortea un reto de bandera
       else if (act === 1) ACT1[pos % 3].forEach(c => add(c, false));
       else ACT2[pos % 3].forEach(c => add(c, false));
-      if (asc >= 2 && act >= 1) add("rule", false);
+      if (asc >= 2 && A2R.includes(r)) add("rule", false);
       return { list, boss, combo };
     },
     info: id => D[id],
@@ -175,7 +193,7 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */
   A.chal.fx = perks => {
-    const fx = { shakeMul: 1, textMul: 1, colorMul: 1, blurMul: 1, plateMul: 1, blackoutMul: 1, cloudMul: 1, focusMul: 1, lagMul: 1, quakeMul: 1, mosaicMul: 1, rainMul: 1, ghostMul: 1, darkR: 1, darkDim: 0, lensR: 0, trueR: 0, peekR: 0, missingRate: 0, unswapMs: 0, decodeMs: 0, riddleMs: 0, unmirror: false, keepName: false, halo: false, flickerWarn: false, windPreview: false, windMul: 1, coords: false, guides: false, mag: false, country: false, thermo: false, beacon: false, noBabel: false, noMarquee: false, noNegative: false, noFlash: false, trapGhost: false, cloudClear: 0, glassMul: 1, hangAuto: 0, ids: perks.map(p => p.id) };
+    const fx = { textShakeMul: 1, ptrShakeMul: 1, ptrBlurMul: 1, glassBlurMul: 1, batteryMul: 1, unmirrorText: false, unmirrorMap: false, unmirrorPtr: false, shakeMul: 1, textMul: 1, colorMul: 1, blurMul: 1, plateMul: 1, blackoutMul: 1, cloudMul: 1, focusMul: 1, lagMul: 1, quakeMul: 1, mosaicMul: 1, rainMul: 1, ghostMul: 1, darkR: 1, darkDim: 0, lensR: 0, trueR: 0, peekR: 0, missingRate: 0, unswapMs: 0, decodeMs: 0, riddleMs: 0, unmirror: false, keepName: false, halo: false, flickerWarn: false, windPreview: false, windMul: 1, coords: false, guides: false, mag: false, country: false, thermo: false, beacon: false, noBabel: false, noMarquee: false, noNegative: false, noFlash: false, trapGhost: false, cloudClear: 0, glassMul: 1, hangAuto: 0, ids: perks.map(p => p.id) };
     for (const p of perks) {
       const f = p.fx; if (!f) continue;
       for (const k in f) {
@@ -198,8 +216,8 @@ window.AIQ = window.AIQ || {};
   const phaseOk = () => { const g = A.core && A.core.S; return g && g.phase === "asking" && !g.paused; };
   const lvi = c => clamp((c.lv || 1) - 1, 0, 2);
   const par = c => { const i = lvi(c), h = S.halve, fx = S.fx; switch (c.id) {
-    case "shaky": return { amp: [2.2, 3.6, 5.4][i] * Math.max(0.1, fx.shakeMul * fx.textMul) * h };            // Mano de crupier: 75 % menos de verdad (antes el suelo 0,35 lo dejaba en 65 %)
-    case "dance": return { amp: [0.16, 0.26, 0.38][i] * Math.max(0.1, fx.shakeMul * fx.textMul) * h };
+    case "shaky": return { amp: [2.2, 3.6, 5.4][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };            // Mano de crupier: 75 % menos de verdad (antes el suelo 0,35 lo dejaba en 65 %)
+    case "dance": return { amp: [0.16, 0.26, 0.38][i] * Math.max(0.1, fx.textShakeMul * fx.textMul) * h };
     case "missing": return { frac: [0.34, 0.5, 0.65][i] * fx.textMul * h };
     case "swap": return { pairs: [1, 2, 3][i] * fx.textMul * h };                                       // con decimales: la Visera deja media pareja de media (antes redondeaba 0,5 a 1 y en nivel 1 no hacia nada)
     case "runes": return { frac: [0.4, 0.6, 0.85][i] * fx.textMul * h };
@@ -222,21 +240,21 @@ window.AIQ = window.AIQ || {};
     case "drift": return { px: [22, 36, 54][i] * fx.quakeMul * h };
     case "spin": return { amp: [0.28, 0.45, 0.7][i] * fx.quakeMul * h };
     case "decoys": return { n: [4, 7, 11][i] };
-    case "tremble": return { px: [7, 13, 21][i] * fx.shakeMul * h };
+    case "tremble": return { px: [7, 13, 21][i] * fx.ptrShakeMul * h };
     case "blink": return { period: [0.55, 0.42, 0.3][i], duty: 0.45 };
     case "ghost": return { every: [5.5, 4.2, 3.2][i], off: [0.9, 1.4, 2.0][i] * fx.ghostMul };
-    case "cblur": return { px: [3, 5, 8][i] * fx.blurMul * h };
+    case "cblur": return { px: [3, 5, 8][i] * fx.ptrBlurMul * h };
     case "lag": return { tau: [140, 240, 380][i] * fx.lagMul * h };
     case "cmirror": return { both: c.lv >= 3 };
-    case "dizzy": return { r: [14, 22, 32][i] * fx.shakeMul * h };
+    case "dizzy": return { r: [14, 22, 32][i] * fx.ptrShakeMul * h };
     case "flaghue": return { deg: [70, 130, 200][i] * fx.colorMul };                    // Lupa del tasador: el neon apenas cambia los colores
     case "flagblur": return { px: [3, 6, 10][i] * fx.blurMul * h };
     case "flagdark": return { b: 1 - (1 - [0.55, 0.35, 0.18][i]) * (fx.darkR > 1 ? 0.35 : 1) };   // el Foco del vigilante alumbra la bandera
     case "flaggray": return { amt: [0.6, 0.85, 1][i] * fx.colorMul };                   // Lupa del tasador: casi todo el color vuelve
     case "crack": return { n: Math.max(1, Math.round([1, 2, 3][i] * h)) };
-    case "smudge": return { n: Math.max(1, Math.round([2, 3, 5][i] * h)), px: [3, 4.5, 6][i] * fx.blurMul * h };
+    case "smudge": return { n: Math.max(1, Math.round([2, 3, 5][i] * h)), px: [3, 4.5, 6][i] * fx.glassBlurMul * h };
     case "hang": return { n: Math.max(1, Math.round([1, 2, 3][i] * h)) };
-    case "battery": return { dim: Math.min(0.85, [0.55, 0.68, 0.8][i] * h) };
+    case "battery": return { dim: Math.min(0.85, [0.55, 0.68, 0.8][i] * h * fx.batteryMul) };   // el Foco la deja casi en nada
     default: return {};
   } };
   const cur = () => S.qlist || S.list;                                  // los retos de ESTA pregunta (la ronda, con el suplente de Babel si toca)
@@ -442,8 +460,8 @@ window.AIQ = window.AIQ || {};
     el.innerHTML = html + (word ? `<span class="wd">${word}</span>` : "");
     if (amp) el.classList.add("ch-shaky");
     if (damp) el.classList.add("ch-dance");
-    if (has("mirror") && !fx.unmirror) el.classList.add("ch-mirror");
-    if (has("upside") && !fx.unmirror) el.classList.add("ch-upside");
+    if (has("mirror") && !fx.unmirrorText) el.classList.add("ch-mirror");
+    if (has("upside") && !fx.unmirrorText) el.classList.add("ch-upside");
     if (riddle) { el.classList.add("ch-riddle"); if (text.length > 190) el.classList.add("ch-long"); fitRiddle(el); }
     if (has("scroll") && !fx.noMarquee) { el.innerHTML = `<span class="ch-marq">${el.innerHTML}</span>`; el.classList.add("ch-scroll"); }
     const restore = (b, g) => { b.classList.remove("gap", "dot", "faint", "rune"); b.classList.add("fix"); b.textContent = g; };
@@ -492,7 +510,7 @@ window.AIQ = window.AIQ || {};
   function mapSpec(map, o) {
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}`), fl0 = get("flip");
-    const ori = has("mirrorx") && !S.fx.unmirror ? { rot: 0, mx: 1 } : fl0 && !S.fx.unmirror ? { rot: Math.PI, mx: fl0.lv >= 3 ? 1 : 0 } : null;   // el mismo giro que se pone mas abajo
+    const ori = has("mirrorx") && !S.fx.unmirrorMap ? { rot: 0, mx: 1 } : fl0 && !S.fx.unmirrorMap ? { rot: Math.PI, mx: fl0.lv >= 3 ? 1 : 0 } : null;   // el mismo giro que se pone mas abajo
     const lay = ["pangea", "spread", "deal"].map(id => get(id)).find(Boolean);
     const tl = get("tilt"); if (tl) { const k = par(tl).k; for (let c = 0; c < 6; c++) spec.rot[c] = (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * k; any = true; }
     if (lay || tl) {                                                                                // motor de encaje con mascaras reales: los continentes nunca se pisan, tambien en Pangea
@@ -505,8 +523,8 @@ window.AIQ = window.AIQ || {};
     }
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
     if (has("noborders")) { spec.lineA = 0; any = true; }
-    const fl = get("flip"); if (fl && !S.fx.unmirror) { spec.orient = { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 }; any = true; }   // el Espejo del ilusionista tambien endereza el Sur arriba
-    if (has("mirrorx") && !S.fx.unmirror) { spec.orient = { rot: 0, mx: 1 }; any = true; }
+    const fl = get("flip"); if (fl && !S.fx.unmirrorMap) { spec.orient = { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 }; any = true; }   // el Espejo del ilusionista tambien endereza el Sur arriba
+    if (has("mirrorx") && !S.fx.unmirrorMap) { spec.orient = { rot: 0, mx: 1 }; any = true; }
     const sp = get("spin"); if (sp) { spec.spin = { amp: par(sp).amp, speed: 0.55 }; any = true; }
     const mo = get("mosaic"); if (mo) { spec.mosaic = par(mo).res; any = true; }
     const qk = get("quake"); if (qk) { spec.quake = par(qk).px; any = true; }
@@ -528,7 +546,7 @@ window.AIQ = window.AIQ || {};
   function decoyList(map, o, n) {
     if (!o || !map || !map.world || !map._clamp) return [];
     const rr = A.rng(`${S.seed}:d:${S.round}:${S.q}`), P = A.geo.project, TAU = Math.PI * 2;
-    const fl = get("flip"), ori = has("mirrorx") && !S.fx.unmirror ? { rot: 0, mx: 1 } : fl && !S.fx.unmirror ? { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 } : null;   // el mismo giro que mapSpec
+    const fl = get("flip"), ori = has("mirrorx") && !S.fx.unmirrorMap ? { rot: 0, mx: 1 } : fl && !S.fx.unmirrorMap ? { rot: Math.PI, mx: fl.lv >= 3 ? 1 : 0 } : null;   // el mismo giro que mapSpec
     const fy = !!(ori && ori.rot), fx = fy !== !!(ori && ori.mx), v = map._clamp({ ...map.home() }), W = map.W, H = map.H, HUD = hudPx(W, H);
     const toPx = (x, y) => { const sx = W / 2 + (x - v.cx) * v.s, sy = H / 2 - (y - v.cy) * v.s; return [fx ? W - sx : sx, fy ? H - sy : sy]; };
     const y0 = P(0, -60)[1], y1 = 2.1, out = [], pts = [];
@@ -577,13 +595,13 @@ window.AIQ = window.AIQ || {};
     const hit = S.list.filter(c => counterOf(c.id)); if (!hit.length || qi !== 0) return;
     /* tanda 2: la reliquia que ya es tuya se luce (su icono salta en la barra) con el sonido de contra; la ficha del reto no cambia */
     const ids = [...new Set(hit.map(c => counterOf(c.id)))];
-    later(() => ids.forEach((id, i) => (A.adv && A.adv.flash ? A.adv.flash(id, 0, "", () => say("counter", i)) : later(() => say("counter", i), i * 140))), 650);
+    later(() => ids.forEach((id, i) => (A.adv && A.adv.flash ? A.adv.flash(id, 0, A.adv.amuLabel ? A.adv.amuLabel(id) : "", () => say("counter", i)) : later(() => say("counter", i), i * 140))), 650);
   }
 
   /* ------------------------------------------------------------------ puntero: parametros para js/pointer.js */
   A.chal.ptrMods = () => {
     if (S.suspended || !S.on) return null;
-    const m = {}; for (const c of kindOn("ptr")) { const p = par(c); if (c.id === "cmirror" && S.fx.unmirror) continue; m[c.id] = p; }
+    const m = {}; for (const c of kindOn("ptr")) { const p = par(c); if (c.id === "cmirror" && S.fx.unmirrorPtr) continue; m[c.id] = p; }
     if (get("dark") && !S.fx.halo) m.tinyDark = true;                   // sin linterna, el puntero se ve mas pequeño en el apagon
     return Object.keys(m).length ? m : null;
   };

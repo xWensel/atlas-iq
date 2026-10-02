@@ -299,3 +299,8 @@ html.reduce-motion .go2::after { animation: none; opacity: .6; }
   .nr-head { flex-wrap: wrap; } .nr-list { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 700px) { .rd.plan { grid-template-columns: minmax(0, 1fr); } }
+
+/* tanda 3: amuletos en la mochila con sus cargas (marcas de oro, como las de las herramientas pero de su color) */
+.table.mesa .tr-relic .tr-face { position: relative; }
+.table.mesa .tr-relic .tr-pips { bottom: 4px; }
+.table.mesa .tr-relic .tr-pips i { background: #ffd95a; box-shadow: 0 0 0 1px #16241c, inset 0 -2px 0 #c46a1b; }

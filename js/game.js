@@ -688,7 +688,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
     dialog(`<div class="vd">
       <div class="v-main">
         <span class="tag">${tag || A.t("v.level", { n: pad2(level) })}</span>
-        <h2>${title}</h2><p>${text}</p>${lines && lines.length ? `<ul class="v-lines">${lines.map((l, i) => `<li${l[2] ? ' class="vl-perk"' : ""} style="animation-delay:${0.5 + i * 0.12}s"><span>${l[2] ? A.icon(l[2], "sm") : ""}${l[0]}</span><i></i><b>${l[1]}</b></li>`).join("")}</ul>` : ""}
+        <h2>${title}</h2><p>${text}</p>${lines && lines.length ? `<ul class="v-lines">${lines.map((l, i) => `<li${l[2] ? ' class="vl-perk' + (l[3] ? " vl-" + l[3] : "") + '"' : ""} style="animation-delay:${0.5 + i * 0.12}s"><span>${l[2] ? A.icon(l[2], "sm") : ""}${l[0]}</span><i></i><b>${l[1]}</b></li>`).join("")}</ul>` : ""}
         <div class="v-stats">${stats.map((s, i) => `<div><span>${s[0]}</span><span class="odo" id="vs${i}"></span></div>`).join("")}</div>
         <div class="v-actions">${buttons.map(b => `<button class="${b.cls}" id="${b.id}" ${b.primary ? "data-primary" : ""}><span>${b.label}</span>${b.arrow ? `<span class="ar">${A.icon("u_next", "sm")}</span>` : ""}</button>`).join("")}</div>
       </div>

@@ -255,7 +255,14 @@ window.AIQ = window.AIQ || {};
   const inflation = () => 1 + 0.25 * run.act;                            // todo cuesta mas en cada acto: el dinero pesa mas segun avanzas
   const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price * inflation()) + shopCtx().price);
   const lifePrice = () => price(6 + 2 * (run.lifeBuys || 0));            // cada provision comprada en la partida cuesta 2 mas
-  const sellValue = id => Math.floor(A.RELICS[id].cost * 0.5);
+  /* tanda 3 (S8): vender devuelve la mitad de lo que pagaste (run.paid); lo del cofre o de partidas viejas, la mitad de su precio de ahora.
+     Vendida en la misma visita en que la compraste: todo lo pagado (salvo el Ojo en el cielo, que ya ha mirado) */
+  const sellValue = id => { const p = A.RELICS[id], paid = run.paid && run.paid[id]; if (paid > 0 && run.paidAt && run.paidAt[id] === run.shopKey && id !== "spyhole") return paid; return Math.ceil((paid > 0 ? paid : price(p.cost)) / 2); };
+  /* amuletos (tanda 3): las contras de antes. Cargas en run.amu; 2 al comprarlo (las barajas que lo traen de serie, 6). Ver amuSpend */
+  const AMU_LV = 2, AMU_DECK = 6, isAmu = id => !!(A.RELICS[id] && A.RELICS[id].amulet);
+  const AMU_TAG = L6("Amuleto|Amulet|Amulette|Amuleto|Amulett|Amuleto||护身符|부적|お守り|Амулет|Amulet"), AMU_RE = L6("+2 cargas|+2 charges|+2 charges|+2 cargas|+2 Ladungen|+2 cariche||+2次充能|충전 +2회|+2回分|+2 заряда|+2 ładunki");
+  const AMU_BROKE = L6("se parte|breaks|se brise|se quebra|zerbricht|si spezza||碎了|부서졌어요|砕けた|раскололся|pęka");
+  const pips = (n, cls) => `<span class="${cls}">${Array.from({ length: Math.max(0, n) }, () => "<i></i>").join("")}</span>`;
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   const chestSkip = () => Math.round(2.5 * inflation());                // dejar el cofre del jefe sin abrir: 3 doblones al empezar el acto II, 4 al empezar el III (el Toque de Midas los duplica, como todo lo que ganas)
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades); pl: otra mano de perks (la tienda valora cada reliquia sin contarla a ella) */
@@ -342,6 +349,7 @@ window.AIQ = window.AIQ || {};
       perks: d.perks.concat(bonus ? [gift] : []), tools: {}, score: 0, cleared: 0, used: [], rerolls: 0, freeUsed: 0, shopN: 0, phase: "round", qi: 0, qn: 5, qTools: 0, rTools: 0, luckUsed: false, guardUsed: false,
       livesLostAct: 0, shieldAct: -1, leftSum: 0, roundScore: 0, rGood: 0, qTotal: 0, stats: { bulls: 0, best: 0, coinsEarned: 0 }, t0: Date.now(),
     };
+    run.amu = {}; run.perks.forEach(id => { if (isAmu(id)) run.amu[id] = d.perks.includes(id) ? AMU_DECK : AMU_LV; });
     d.tools.forEach(t => addTool(t)); if (bonus && bonus.buy) bonus.buy(run);
     persist(); A.ach.emit("adv", { kind: "start" }); A.profile.get().adv.runs++; A.profile.save();
     startRound();
@@ -358,6 +366,9 @@ window.AIQ = window.AIQ || {};
   A.adv.finalOf = finalOf;
   /* v0.13: partidas guardadas con reliquias o herramientas que ya no existen: se quitan y se devuelve su valor en doblones */
   function migrate(r) {
+    const TO = { spectacles: "dictionary", lens: "divingmask", umbrella: "divingmask", shockabsorber: "plates", gamer: "steadyhand", spareeye: "steadyhand", taskmgr: "protector", powerbank: "miner" }, seenP = new Set();
+    r.perks = r.perks.map(id => (!A.RELICS[id] && TO[id] && !r.perks.includes(TO[id]) && !seenP.has(TO[id]) ? (seenP.add(TO[id]), TO[id]) : id));
+    r.amu = r.amu || {}; r.perks.forEach(id => { if (A.RELICS[id] && A.RELICS[id].amulet && r.amu[id] == null) r.amu[id] = AMU_LV; });
     const gone = r.perks.filter(id => !A.RELICS[id]); if (gone.length) { r.perks = r.perks.filter(id => A.RELICS[id]); r.coins += gone.length * 4; }
     const dead = Object.keys(r.tools).filter(id => !TOOLS[id]); dead.forEach(id => { delete r.tools[id]; r.coins += 3; });
     if ((r.stock || []).some(s => (s.k === "perk" && !A.RELICS[s.id]) || (s.k === "tool" && !TOOLS[s.id]))) { r.stock = null; r.stockKey = null; }
@@ -468,6 +479,7 @@ window.AIQ = window.AIQ || {};
     const Lv = roundLevel(keep), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
+    amuSpend();
     A.dealer.enable(true); A.chal.begin(run.chal, A.chal.fx(perkList()), { seed: run.seed, round: roundNo(), halve: run.chalHalve });
     persist(); A.ach.emit("adv", { kind: "round", act: run.act }); C().startLevel(0);
     if (keep) { S.qi = run.qi; S.levelScore = run.roundScore; S.streak = run.streak || 0; S.hits = run.rGood; C().updateHud && C().updateHud(); }
@@ -812,6 +824,22 @@ window.AIQ = window.AIQ || {};
     if (!run.relicSeen[f.id] && run.relicSaidR !== rk && !run.inf && A.dealer.react("relic", { p: A.tx(A.RELICS[f.id].n) })) { run.relicSeen[f.id] = 1; run.relicSaidR = rk; }   // solo cuenta si de verdad habla (si estaba ocupado, lo intenta la siguiente)
     setTimeout(flashNext, f.lv ? 420 : 300);
   }
+  /* tanda 3: al empezar la ronda, cada amuleto cuya familia sale gasta una carga si sale a nivel 2 o mas (a nivel 1 actua gratis). Se paga una vez
+     por ronda, no por intento: la revancha no vuelve a cobrar. run.amuNow: lo que hizo en esta ronda (lo luce el aviso de contra con "-1") */
+  function amuSpend() {
+    const r = roundNo(); run.amu = run.amu || {}; run.amuPaid = run.amuPaid || {}; const paid = (run.amuPaid[r] = run.amuPaid[r] || []); run.amuNow = {};
+    perkList().filter(p => p.amulet).forEach(p => {
+      const hit = (run.chal || []).filter(c => A.CHAL[c.id] && A.CHAL[c.id].fam === p.amulet); if (!hit.length) return;
+      if (hit.some(c => (c.lv || 1) >= 2) && !paid.includes(p.id) && (run.amu[p.id] || 0) > 0) { run.amu[p.id]--; paid.push(p.id); run.amuNow[p.id] = "-1"; }
+    });
+  }
+  A.adv.amuLabel = id => (run && run.amuNow && run.amuNow[id] === "-1" ? "−1" : "");
+  /* al superar la ronda: el amuleto que gasto en ella su ultima carga se parte y deja libre el hueco */
+  function amuBreak() {
+    const paid = (run.amuPaid || {})[roundNo()] || [], out = perkList().filter(p => p.amulet && !((run.amu || {})[p.id] > 0) && paid.includes(p.id));
+    out.forEach(p => { run.perks.splice(run.perks.indexOf(p.id), 1); delete run.amu[p.id]; if (run.paid) delete run.paid[p.id]; });
+    return out;
+  }
   /* premio en el veredicto (la barra esta oculta): suena una moneda por linea de reliquia al aparecer y tiembla una vez (1); lv 2 = premio medio */
   function relicPay(ids, lv = 1) {
     ids = ids.filter(Boolean); if (!ids.length) return;
@@ -840,7 +868,7 @@ window.AIQ = window.AIQ || {};
     const info = actInfo(run.act), silenced = (run.boss || []).includes("silence");
     bar.classList.remove("hidden");
     bar.innerHTML = `<div class="ab-top"><span class="ab-act" data-tf="abact">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins" data-tf="abcoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts" data-tf="abhearts">${hearts()}</span></div>
-      <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" data-id="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}</span>`).join("")}</div>
+      <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" data-id="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}${isAmu(id) ? pips((run.amu || {})[id] || 0, "ab-pips") : ""}</span>`).join("")}</div>
       ${(run.chal || []).length ? `<div class="ab-chal">${run.chal.map(c => A.chal.chip(c, true)).join("")}</div>` : ""}
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</span></div>` : ""}`;
     flashKeep(bar);
@@ -876,6 +904,8 @@ window.AIQ = window.AIQ || {};
       run.coins += got; run.stats.coinsEarned += got;
       A.ach.emit("adv", { kind: "clear", tools: run.rTools, bulls: run.rBulls || 0 }); if (boss) { A.ach.emit("adv", { kind: "boss", lives: run.lives }); A.profile.get().adv.boss++; }
       A.sfx.stamp(); setTimeout(A.sfx.clear, 300);
+      const broke = amuBreak(); broke.forEach(p => lines.push([A.tx(p.n) + " · " + A.tx(AMU_BROKE), "", p.id, "broke"]));
+      if (broke.length) setTimeout(() => A.sfx.glass(), 900);
       const actDone = boss, winAct = actDone ? run.act + 1 : 0;
       if (actDone) { const flawless = run.livesLostAct === 0; A.ach.emit("adv", { kind: "act", act: winAct, flawless, asc: run.asc }); run.livesLostAct = 0; A.profile.get().adv.bestAct = Math.max(A.profile.get().adv.bestAct || 0, winAct); }
       A.profile.get().adv.bestRound = Math.max(A.profile.get().adv.bestRound, roundNo() + 1);
@@ -887,7 +917,7 @@ window.AIQ = window.AIQ || {};
         stamp: A.T("SUPERADA", "CLEARED"), stampSub: String(roundNo() + 1).padStart(2, "0"), art: boss ? "chest" : "win",
         buttons: [{ id: "nlBtn", cls: "btn-ink", label: boss ? A.T("Abrir el cofre del jefe", "Open the boss chest") : A.T("Al campamento", "To camp"), arrow: true, primary: true, onclick: () => { if (boss && run.act < 2 && !run.chestStuckDone && Math.random() < 0.6) { run.chestStuckDone = true; persist(); return stuckChest(); } afterVerdict(boss); } }, { id: "vdMenu", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().runMenu(), keep: true }],
       });
-      relicPay(lines.filter(l => l[2]).map(l => l[2]));
+      relicPay(lines.filter(l => l[2] && !l[3]).map(l => l[2]));
       const wb = { big: lt.margin >= 3, c: got, p: pctOf(S.levelScore - Lv.advance, Lv.advance), rn: roundNo() + 1, close: S.levelScore - Lv.advance < Lv.advance * 0.05 ? S.levelScore - Lv.advance : null };   // close: por los pelos   // aplastar la meta (+50 %) tiene sus propias frases
       setTimeout(() => A.dealer.react("roundWin", wb), 700);                // el crupier protesta (antes estas frases nunca se decian)
     } else {
@@ -950,10 +980,10 @@ window.AIQ = window.AIQ || {};
      y tras fallar, una carta frena los trucos de la ronda que repites (o el Interruptor, si ninguna reliquia puede) */
   function offers(chest) {
     const rr = A.rng(`${run.seed}:shop:${roundNo()}:${run.attempt || 0}:${run.shopN}:${chest ? 1 : 0}`), R = A.RELICS, out = [];
-    const bag = Object.keys(R).filter(id => !owned(id) && (chest ? true : R[id].r < 3) && useful(id));
+    const bag = Object.keys(R).filter(id => (!owned(id) || R[id].amulet) && (chest ? true : R[id].r < 3) && useful(id));   // un amuleto que ya llevas sale como recarga (+2 cargas)
     const cur = chalFor(roundNo()).list, up = new Set(); cur.forEach(c => (A.CHAL[c.id].counters || []).forEach(id => up.add(id)));
     const reach = {}; bag.forEach(id => { if (ctrOf(id)) reach[id] = helpRounds(id).length; });
-    const wt = id => { const r = R[id].r; return (chest ? [30, 35, 25, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1) * (reach[id] ? 0.7 + 0.3 * Math.min(4, reach[id]) : 1); };
+    const wt = id => { const r = R[id].r; return (chest ? [30, 35, 25, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1) * (reach[id] ? 0.7 + 0.3 * Math.min(4, reach[id]) : 1) * (R[id].amulet && run.act === 0 ? 0.5 : 1); };   // acto I: los amuletos pesan la mitad (que no llenen la mochila)
     const draw = (pool = bag) => { const tot = pool.reduce((n, id) => n + wt(id), 0); let x = rr() * tot, pick = pool[pool.length - 1]; for (const id of pool) { x -= wt(id); if (x <= 0) { pick = id; break; } } bag.splice(bag.indexOf(pick), 1); return pick; };
     const canTool = id => !!run.tools[id] || Object.keys(run.tools).length < 4;   // con 4 herramientas distintas solo sirven cargas de las tuyas
     const slots = chest ? 3 : shopCtx().slots;
@@ -1107,7 +1137,7 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
@@ -1124,7 +1154,7 @@ window.AIQ = window.AIQ || {};
   /* la reliquia en la mochila: carta pequena con el color de su rareza (la legendaria, con su marco de oro y su brillo).
      face: el dibujo como fondo y sin boton de vender (la que aparece al final de la secuencia: ninguna imagen nueva, que haria reajustar la pantalla) */
   const relicHtml = (id, face) => { const p = A.RELICS[id];
-    return `<div class="tr-card tr-relic r${p.r}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}</button>${face ? "" : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
+    return `<div class="tr-card tr-relic r${p.r}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${p.amulet ? pips((run.amu || {})[id] || 0, "tr-pips") : ""}</button>${face ? "" : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
   function renderShop(chest) {
     legOn = 0;                                                           // mesa nueva: si la legendaria se estaba luciendo en la anterior, esa secuencia ya no sigue
     const slots = 5, info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
@@ -1242,10 +1272,13 @@ window.AIQ = window.AIQ || {};
     if (s.k === "life") { const c = lifePrice(); if (run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } if (run.coins < c) return noFunds(el); run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
-      if (run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
+      const recharge = !!p.amulet && owned(s.id);
+      if (!recharge && run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
       if (run.coins < c) return noFunds(el);
       if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);
-      run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run); if (p.r === 3 && chest) run.legAch = 1;   // Botin legendario: solo la del cofre del jefe. Se concede en la tienda (openShop): su aviso no tapa la secuencia
+      run.coins -= c; run.amu = run.amu || {}; if (recharge) run.amu[s.id] += AMU_LV; else { run.perks.push(s.id); if (p.amulet) run.amu[s.id] = AMU_LV; }
+      run.paid = run.paid || {}; run.paidAt = run.paidAt || {}; run.paid[s.id] = (recharge ? run.paid[s.id] || 0 : 0) + c; run.paidAt[s.id] = run.shopKey;
+      if (p.buy) p.buy(run); if (p.r === 3 && chest) run.legAch = 1;   // Botin legendario: solo la del cofre del jefe. Se concede en la tienda (openShop): su aviso no tapa la secuencia
     } else {
       const c = cardCost(s);
       if (!run.tools[s.id] && Object.keys(run.tools).length >= 4) { A.sfx.deny(); shake(el); flash(A.T("Solo 4 herramientas distintas.", "Only 4 different tools.")); return; }
@@ -1352,7 +1385,7 @@ window.AIQ = window.AIQ || {};
     } catch (e) { console.error(e); end(); }
   }
   A.adv.busy = () => legOn !== 0;                                        // la legendaria del cofre se esta luciendo (js/game.js: Esc no abre el menu)
-  function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0) return; run.perks.splice(k, 1); run.coins += sellValue(id); if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
+  function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0) return; const v = sellValue(id); run.perks.splice(k, 1); run.coins += v; if (run.amu) delete run.amu[id]; if (run.paid) delete run.paid[id]; if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
   function flash(t) { const n = document.querySelector("#dlg .tb-shop"); if (!n) return; n.querySelectorAll(".shop-flash").forEach(x => x.remove()); const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.appendChild(m); setTimeout(() => m.remove(), 2200); }   // flotando sobre las cartas: no empuja nada
 
   /* ---------------- fin de la expedicion ---------------- */
