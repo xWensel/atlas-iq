@@ -177,21 +177,24 @@ window.AIQ = window.AIQ || {};
 
   /* ------------------------------------------------------------------ herramientas (activas, cargas por ronda) */
   const TOOLS = {
-    sonar: { ico: "sonar", uses: 2, cost: 5, r: 1, n: L("Sonar", "Sonar"), d: L("Toca un punto del mapa: te dice a cuántos km está el objetivo (±6 %) y dibuja el anillo. Con tres sondas, triangulas.", "Tap a point: tells you how far the target is (±6%) and draws the ring. Three probes triangulate."), kind: "probe" },
+    sonar: { ico: "sonar", uses: 2, cost: 5, r: 1, n: L("Sonar", "Sonar"), d: L6("Toca un punto del mapa: te dice a cuántos km está el objetivo (±6 %) y dibuja el anillo.|Tap a point: tells you how far the target is (±6%) and draws the ring.|Touche un point : il indique la distance à la cible (±6 %) et trace l'anneau.|Toque num ponto: diz a que distância está o alvo (±6%) e desenha o anel.|Tippe auf einen Punkt: zeigt die Entfernung zum Ziel (±6 %) und zeichnet den Ring.|Tocca un punto: indica la distanza dal bersaglio (±6%) e disegna l'anello.||点击一个点：显示目标的距离（±6%）并画出圆环。|지점을 탭하세요: 목표까지의 거리(±6%)를 알려주고 원을 그립니다.|地点をタップすると目標までの距離（±6%）が分かり、輪が描かれる。|Коснись точки: покажет расстояние до цели (±6%) и нарисует кольцо.|Stuknij punkt: pokaże odległość do celu (±6%) i narysuje okrąg."), kind: "probe" },
     compass: { ico: "compass", uses: 3, cost: 4, r: 0, n: L("Brújula", "Compass"), d: L("Toca un punto: una flecha señala el rumbo (8 direcciones) hacia el objetivo.", "Tap a point: an arrow shows the heading (8 directions) to the target."), kind: "probe" },
-    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pase VIP", "VIP pass"), d: L("Ilumina en el mapa el país del lugar (en un país, te dice el continente).", "Lights up the place's country on the map (for a country, tells you the continent)."), kind: "instant" },
-    journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Nota del crupier", "Dealer's note"), d: L("Lee la nota de campo del lugar antes de responder.", "Read the place's field note before answering."), kind: "instant" },
+    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pase VIP", "VIP pass"), d: L6("Ilumina el país del lugar; en banderas, países y pistas, el continente.|Lights up the place's country; for flags, countries and clues, the continent.|Illumine le pays du lieu ; drapeaux, pays et indices : le continent.|Ilumina o país do lugar; em bandeiras, países e pistas, o continente.|Lässt das Land aufleuchten; bei Flaggen, Ländern und Hinweisen nur den Kontinent.|Illumina il paese del luogo; bandiere, paesi e indizi: il continente.||点亮该地点所在的国家；国旗、国家、线索只给大洲。|장소가 속한 국가를 표시합니다. 국기·국가·단서는 대륙만.|その場所の国が光る。国旗・国・ヒントでは大陸だけ。|Подсвечивает страну места; во флагах, странах и подсказках — континент.|Podświetla kraj miejsca; flagi, kraje, wskazówki: kontynent."), kind: "instant" },   // como revealCountry: en banderas, paises y pistas solo el continente
+    journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Nota del crupier", "Dealer's note"), d: L6("Lee la nota de campo (en banderas, la región; en pistas, inicial y continente).|Read the field note (flags: the region; clues: initial and continent).|Lis la note de terrain (drapeaux : la région ; indices : initiale et continent).|Leia a nota de campo (bandeiras: a região; pistas: inicial e continente).|Lies die Feldnotiz (Flaggen: Region; Hinweise: Anfangsbuchstabe und Kontinent).|Leggi la nota di campo (bandiere: la regione; indizi: iniziale e continente).||阅读野外笔记（国旗给地区，线索给首字和大洲）。|야외 일지를 읽어 보세요(국기는 지역, 단서는 첫 글자와 대륙).|フィールドノートを読もう（国旗は地域、ヒントは頭文字と大陸）。|Прочитай полевую заметку (флаги — регион, подсказки — первая буква и континент).|Przeczytaj notatkę terenową (flagi: region; wskazówki: pierwsza litera i kontynent)."), kind: "instant" },
     hourglass: { ico: "hourglass", uses: 2, cost: 4, r: 0, n: L("Reloj de arena", "Hourglass"), d: L("+6 segundos en la pregunta actual.", "+6 seconds on the current question."), kind: "instant" },
     interruptor: { ico: "interruptor", uses: 1, cost: 8, r: 2, n: L("Interruptor", "Master switch"), d: L6("Apaga todos los retos durante esta pregunta, salvo el tiempo que ya quitó la Tormenta. Con Silencio no se puede usar.|Switches every challenge off for this question, except the time the Storm already took. It can't be used under Silence.|Désactive tous les défis pour cette question, sauf le temps déjà pris par la Tempête. Inutilisable sous Silence.|Desliga todos os desafios nesta pergunta, exceto o tempo que a Tempestade já tirou. Não pode ser usado com Silêncio.|Schaltet alle Herausforderungen für diese Frage aus, außer der Zeit, die das Gewitter schon genommen hat. Bei Stille nicht nutzbar.|Spegne tutte le sfide per questa domanda, tranne il tempo già tolto dalla Tempesta. Non si può usare con il Silenzio.||关闭本题的所有挑战，但“风暴”已扣掉的时间不会返还。“沉默”时无法使用。|이 문제의 모든 도전을 끕니다. 단, 폭풍이 이미 줄인 시간은 돌아오지 않습니다. 침묵 중에는 사용할 수 없습니다.|この問題のチャレンジをすべてオフにする。ただし嵐で減った時間は戻らない。静寂の間は使えない。|Отключает все испытания для этого вопроса, кроме времени, уже отнятого «Бурей». При «Тишине» не работает.|Wyłącza wszystkie wyzwania w tym pytaniu, poza czasem zabranym już przez Burzę. Nie działa podczas Ciszy."), kind: "instant" },
     swapcard: { ico: "swapcard", uses: 1, cost: 6, r: 1, n: L("Carta de cambio", "Swap card"), d: L("Cambia esta pregunta por otro lugar de la ronda.", "Swaps this question for another place from the round."), kind: "instant" },
   };
   const BOSSES = {};                                                 // los jefes ahora son combinaciones de retos (js/challenges.js)
+  /* barajas (usuario, 2026-10-02): se ganan superando Ascensiones. unlock = logro que la abre: Historiador ganando una expedicion, Navegante ganando
+     en Ascension 1 o mas y Aventurero ciego en Ascension 2 o mas (antes Acto I, un jefe y ganar). Las que ya tenias abiertas se quedan (A.adv.deckLocked).
+     asc = la Ascension que hay que superar (la carta cerrada lo dice) */
   const DECKS = {
     explorer: { ico: "deck_explorer", n: L("Explorador", "Explorer"), d: L("Un Sonar y 4 doblones. La baraja para aprender.", "A Sonar and 4 doubloons. The deck for learning."), tools: ["sonar"], perks: [], coins: 4, lives: 3, unlock: null },
     /* con los nombres de ahora de sus cartas (antes Cuaderno, Diccionario, Brujula de 16 rumbos y Linterna de minero, que ya no existen) */
-    historian: { ico: "deck_historian", n: L("Historiador", "Historian"), d: L6("Nota del crupier + Chuleta de crupier. Las letras borradas no te frenan.|Dealer's note + Dealer's cheat sheet. Faded letters won't stop you.|Note du croupier + Antisèche du croupier. Les lettres effacées ne t'arrêtent pas.|Nota do crupiê + Cola do crupiê. Letras apagadas não te param.|Notiz des Croupiers + Spickzettel des Croupiers. Verblasste Buchstaben halten dich nicht auf.|Nota del croupier + Bigliettino del croupier. Le lettere sbiadite non ti fermano.|Nota del crupier + Acordeón del crupier. Las letras borradas no te frenan.|荷官的便条 + 荷官的小抄。褪色的字母也难不倒你。|딜러의 메모 + 딜러의 커닝 페이퍼. 바랜 글자도 당신을 막지 못합니다.|ディーラーのメモ+ディーラーのカンニングペーパー。かすれた文字にも動じない。|Записка крупье + Шпаргалка крупье. Выцветшие буквы тебя не остановят.|Liścik od krupiera + Ściąga krupiera. Wyblakłe litery cię nie zatrzymają."), tools: ["journal"], perks: ["dictionary"], coins: 3, lives: 3, unlock: "adv_act1" },
-    navigator: { ico: "deck_navigator", n: L("Navegante", "Navigator"), d: L6("Dos brújulas y la Ruleta de 16 rumbos. Nunca te pierdes.|Two compasses and the 16-point roulette. You never get lost.|Deux boussoles et la Roulette à 16 directions. Tu ne te perds jamais.|Duas bússolas e a Roleta de 16 rumos. Você nunca se perde.|Zwei Kompasse und das 16-Feld-Roulette. Du verirrst dich nie.|Due bussole e la Roulette a 16 direzioni. Non ti perdi mai.||两个指南针加十六方位轮盘。你永远不会迷路。|나침반 두 개와 16방위 룰렛. 절대 길을 잃지 않습니다.|2つのコンパスと16方位ルーレット。決して迷わない。|Два компаса и 16-румбовая рулетка. Ты никогда не заблудишься.|Dwa kompasy i Ruletka na 16 pól. Nigdy się nie zgubisz."), tools: ["compass", "compass"], perks: ["compass16"], coins: 3, lives: 3, unlock: "adv_boss" },
-    blind: { ico: "deck_blind", n: L("Aventurero ciego", "Blind adventurer"), d: L6("Sin herramientas, con el Foco del vigilante y 4 provisiones.|No tools, with the Pit boss's spotlight and 4 provisions.|Sans outils, avec le Projecteur du chef de table et 4 provisions.|Sem ferramentas, com o Holofote do supervisor e 4 provisões.|Ohne Werkzeuge, mit dem Scheinwerfer des Pitbosses und 4 Proviant.|Senza strumenti, con il Faro del capotavolo e 4 provviste.||没有工具，携带场务经理的聚光灯与 4 份补给。|도구 없이 플로어 매니저의 스포트라이트와 식량 4개.|道具なし、ピットボスのスポットライトと4つのプロビジョン。|Без инструментов, с прожектором пит-босса и 4 запасами.|Bez narzędzi, z reflektorem szefa sali i 4 zapasami."), tools: [], perks: ["miner"], coins: 6, lives: 4, unlock: "adv_win" },
+    historian: { ico: "deck_historian", n: L("Historiador", "Historian"), d: L6("Nota del crupier + Chuleta de crupier. Las letras borradas no te frenan.|Dealer's note + Dealer's cheat sheet. Faded letters won't stop you.|Note du croupier + Antisèche du croupier. Les lettres effacées ne t'arrêtent pas.|Nota do crupiê + Cola do crupiê. Letras apagadas não te param.|Notiz des Croupiers + Spickzettel des Croupiers. Verblasste Buchstaben halten dich nicht auf.|Nota del croupier + Bigliettino del croupier. Le lettere sbiadite non ti fermano.|Nota del crupier + Acordeón del crupier. Las letras borradas no te frenan.|荷官的便条 + 荷官的小抄。褪色的字母也难不倒你。|딜러의 메모 + 딜러의 커닝 페이퍼. 바랜 글자도 당신을 막지 못합니다.|ディーラーのメモ+ディーラーのカンニングペーパー。かすれた文字にも動じない。|Записка крупье + Шпаргалка крупье. Выцветшие буквы тебя не остановят.|Liścik od krupiera + Ściąga krupiera. Wyblakłe litery cię nie zatrzymają."), tools: ["journal"], perks: ["dictionary"], coins: 3, lives: 3, unlock: "adv_win", asc: 0 },
+    navigator: { ico: "deck_navigator", n: L("Navegante", "Navigator"), d: L6("Dos brújulas y la Ruleta de 16 rumbos. Nunca te pierdes.|Two compasses and the 16-point roulette. You never get lost.|Deux boussoles et la Roulette à 16 directions. Tu ne te perds jamais.|Duas bússolas e a Roleta de 16 rumos. Você nunca se perde.|Zwei Kompasse und das 16-Feld-Roulette. Du verirrst dich nie.|Due bussole e la Roulette a 16 direzioni. Non ti perdi mai.||两个指南针加十六方位轮盘。你永远不会迷路。|나침반 두 개와 16방위 룰렛. 절대 길을 잃지 않습니다.|2つのコンパスと16方位ルーレット。決して迷わない。|Два компаса и 16-румбовая рулетка. Ты никогда не заблудишься.|Dwa kompasy i Ruletka na 16 pól. Nigdy się nie zgubisz."), tools: ["compass", "compass"], perks: ["compass16"], coins: 3, lives: 3, unlock: "adv_asc", asc: 1 },
+    blind: { ico: "deck_blind", n: L("Aventurero ciego", "Blind adventurer"), d: L6("Sin herramientas, con el Foco del vigilante y 4 provisiones.|No tools, with the Pit boss's spotlight and 4 provisions.|Sans outils, avec le Projecteur du chef de table et 4 provisions.|Sem ferramentas, com o Holofote do supervisor e 4 provisões.|Ohne Werkzeuge, mit dem Scheinwerfer des Pitbosses und 4 Proviant.|Senza strumenti, con il Faro del capotavolo e 4 provviste.||没有工具，携带场务经理的聚光灯与 4 份补给。|도구 없이 플로어 매니저의 스포트라이트와 식량 4개.|道具なし、ピットボスのスポットライトと4つのプロビジョン。|Без инструментов, с прожектором пит-босса и 4 запасами.|Bez narzędzi, z reflektorem szefa sali i 4 zapasami."), tools: [], perks: ["miner"], coins: 6, lives: 4, unlock: "adv_asc2", asc: 2 },
   };
   const TOPIC_ICON = { capital: "t_capital", landmark: "t_landmark", city: "t_city", country: "t_country", history: "t_battle", nature: "t_nature", clue: "t_curio", mixed: "slot", flag: "t_country" };
   const BOSS_IC = "boss_hat";                                        // v0.35: el jefe del acto es la chistera del crupier (los mismos pixeles de su retrato: tools/crupier/chistera.py)
@@ -219,6 +222,8 @@ window.AIQ = window.AIQ || {};
     const inf = `<div class="rd-act rd-inf">${size === "plan" ? "" : `<i class="rd-k"></i>`}<div class="rd-row"><span class="rd-n inf" ${A.ttAttr(A.T("Modo infinito", "Infinite mode"), A.tx(INF_D))}><span class="rd-ic"><b>∞</b></span>${size === "plan" ? `<em>${A.tx(INF_N)}</em>` : ""}</span></div></div>`;
     return `<div class="rd ${size}">${acts}${inf}</div>`;
   };
+  /* baraja cerrada: aun no tienes su logro y no la tenias abierta con la regla de antes (perfil: adv.deckKeep, ver js/profile.js) */
+  A.adv.deckLocked = id => { const d = DECKS[id], P = A.profile.get(); return !!(d && d.unlock && !P.ach[d.unlock] && !(P.adv.deckKeep || {})[id]); };
   A.adv.poolStats = () => Object.fromEntries(Object.entries(pools()).map(([k, v]) => [k, v.length]));
   A.adv.roundPlaces = r => poolFor(r);
   A.adv.countSeen = countSeen;
@@ -269,17 +274,31 @@ window.AIQ = window.AIQ || {};
   let CTR = null;                                                    // reliquia -> retos que frena (sale de A.CHAL[reto].counters)
   const ctrOf = id => { if (!CTR) { CTR = {}; for (const c in A.CHAL) (A.CHAL[c].counters || []).forEach(p => (CTR[p] = CTR[p] || []).push(c)); } return CTR[id] || null; };
   const pureCounter = p => !!ctrOf(p.id) && !(p.open || p.round || p.clear || p.post || p.shop || p.buy || p.actStart);   // solo frena retos (Batería externa y la Chuleta de bolsillo sirven tambien sin su reto)
-  /* rondas (de `from` a la ultima) con algun reto que esta reliquia frena: [{ r, id }] */
+  /* rondas (de `from` a la ultima) con algun reto que esta reliquia frena: [{ r, id }]. Sin herramientas, el Silencio no te quita nada (Tapones VIP) */
   const helpRounds = (id, from = roundNo()) => {
-    const cs = ctrOf(id), out = []; if (!cs || run.inf) return out;
+    let cs = ctrOf(id); const out = []; if (!cs || run.inf) return out;
+    if (!Object.keys(run.tools).length) cs = cs.filter(c => c !== "silence");
     const pl = perkList().filter(p => p.id !== id);
     for (let r = from; r <= LAST; r++) { const hit = chalFor(r, pl).list.find(c => cs.includes(c.id)); if (hit) out.push({ r, id: hit.id }); }
     return out;
+  };
+  /* pistas gratis: solo si aportan en alguna de las rondas que quedan. El Soplo (continente) solo donde el pais no esta escrito: banderas, paises,
+     pistas, el Jackpot (saca tambien de los carretes de paises y de pistas: 1 de cada 5) o una ronda con Sin pais. La Chuleta de bolsillo y el Oraculo iluminan el pais en las rondas de lugares (el Jackpot incluido, que es casi
+     todo lugares); en banderas, paises y pistas solo dan el continente (ver revealCountry). El Libro de la casa sirve en cualquier ronda */
+  const NOPAIS = ["flag", "country", "clue"];
+  const hintHelps = (hint, from) => {
+    if (hint === "note") return true;
+    for (let r = from; r <= LAST; r++) {
+      const t = defAt(r).topic;
+      if (hint === "continent" ? NOPAIS.includes(t) || t === "mixed" || chalFor(r).list.some(c => c.id === "nocountry") : !NOPAIS.includes(t)) return true;
+    }
+    return false;
   };
   const useful = (id, from = roundNo()) => {
     const p = A.RELICS[id]; if (!p || run.inf || from > LAST) return false;
     const left = LAST + 1 - from;                                    // rondas que quedan, contando la proxima
     if (pureCounter(p)) return helpRounds(id, from).length > 0;
+    if (p.hint) return hintHelps(p.hint, from);
     if (p.sonarErr) return !!run.tools.sonar;                        // Sonar trucado sin Sonar, o la ruleta de 16 rumbos sin Brujula, no hacen nada
     if (p.compass16) return !!run.tools.compass;
     if (p.toolBonus) return Object.keys(run.tools).length > 0;
@@ -532,13 +551,12 @@ window.AIQ = window.AIQ || {};
   A.adv.score = function (o, km, left, noSide) {
     const Lv = C().S.camp.levels[0], limit = C().S.limit || Lv.seconds, halve = 1, boss = run.boss || [], S = C().S;
     const r = roundNo(), c = {
-      o, km, left, limit, kind: o.kind || (o.clue ? "clue" : "place"), topic: o.topic || "mixed", cont: continentOf(o), coins: 0, lines: [], xmult: 1, mult: 1, streakStep: 0.2, luck: false,
+      o, km, left, limit, kind: o.kind || (o.clue ? "clue" : "place"), topic: o.topic || "mixed", cont: continentOf(o), coins: 0, lines: [], xmult: 1, mult: 1, streakStep: 0.2,
       scale: clamp(1500 * Math.pow(0.97, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1),   // v0.20: el margen se estrecha un 3 % por ronda (antes 6 %)
     };
     perkList().forEach(p => p.q && p.q(c, run));
     if (km != null) perkList().forEach(p => p.km && p.km(c, run));
     let dist = km == null ? 0 : Math.round(1000 * Math.exp(-c.km / c.scale));
-    if (c.luck && km != null && dist < 400) { dist = 700; c.lines.push(["luck", A.tx(A.RELICS.luck.n), "→ 700"]); if (!noSide) run.luckUsed = true; }
     const time = km == null ? 0 : Math.round(400 * Math.max(0, left / limit) * (0.3 + 0.7 * dist / 1000));
     c.dist = dist; c.time = time; c.chips = dist + time;
     const ratio = dist / 1000; let streak = km != null && ratio >= 0.6 ? S.streak + 1 : 0;
@@ -602,6 +620,22 @@ window.AIQ = window.AIQ || {};
     if (ne && C().world.byName[ne]) { C().map.setMarks({ highlight: ne }); noteH(A.tx(o.sub), "passport"); }
     else noteH(A.T("Continente: ", "Continent: ") + continentName(o), "passport");
   }
+  /* nota de campo sin chivatazos (Libro de la casa y Nota del crupier). En las banderas la nota del pais nombra su capital, gentilicios... y en las
+     pistas, la respuesta: alli solo dice la region del pais (las 31 familias de la Enciclopedia, js/codex.js) o, si no tiene, su continente.
+     Si el nombre de la familia dice el pais o la respuesta en algun idioma ("Italia y Malta", "United States, Canada & Greenland", "Iran y Asia
+     Central"...), la region es el continente ("Region: Europa": la carta promete la region y la cumple). Con la Adivinanza, la nota sale tapada
+     igual que la placa (antes la resolvia al instante) */
+  const REGION = "Región: {r}|Region: {r}|Région : {r}|Região: {r}|Region: {r}|Regione: {r}||地区：{r}|지역: {r}|地域：{r}|Регион: {r}|Region: {r}";
+  const foldTx = s => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").normalize("NFC").toLowerCase();   // NFC: sin recomponer, el hangul se quedaba en jamo
+  const CJK_RE = /[\u1100-\u11ff\u3040-\u30ff\u3130-\u318f\u3400-\u9fff\uac00-\ud7af]/;
+  const saysWord = (txt, w) => (CJK_RE.test(w) ? w.length >= 2 && txt.includes(w) : w.length >= 4 && new RegExp("(^|[^\\p{L}\\p{N}])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "($|[^\\p{L}\\p{N}])", "u").test(txt));
+  const famSays = (fam, N) => { const R = A.L6(fam); return Object.keys(N).some(l => R[l] && N[l].some(n => foldTx(n).split(/[\s,.()'’-]+/).some(w => saysWord(foldTx(R[l]), w)))); };
+  const regionNote = o => {
+    const ne = o.t === "c" ? o.key : (o.cEn || []).map(neOf).find(Boolean), fam = ne && A.codex && A.codex.regionNames ? A.codex.regionNames(ne) : "", N = {};
+    Object.entries((o.clue ? o.answer : o.name) || {}).concat((o.cEn || []).map(n => ["en", n])).forEach(([l, n]) => { if (n) (N[l] = N[l] || []).push(n); });   // la respuesta y el pais, en cada idioma
+    return A.pick6(REGION).replace("{r}", fam && !famSays(fam, N) ? A.pick6(fam) : continentName(o));
+  };
+  const fieldNote = o => (A.adv.isFlagRound() || o.clue ? regionNote(o) : A.chal.noteMask(o, A.tx(o.fact) || (A.factOf && A.factOf(o)) || ""));
   const hints = [];
   const noteH = (txt, icon) => { hints.push(txt); const el = $("factText"); el.textContent = hints.join("  ·  "); if (icon) el.insertAdjacentHTML("afterbegin", A.icon(icon, "sm")); };
   /* el reloj de la pregunta no vuelve a empezar si recargas o sales a mitad: al reanudar sigue con lo que ya habias gastado
@@ -623,7 +657,7 @@ window.AIQ = window.AIQ || {};
     if (kept) { C().map.avoid = hudRects(); C().map.setProbes(kept); renderBars(); }
     A.pointer.set({ tool: null, fx, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; return oo.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[oo.key]) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
     const api = {
-      fact: o2 => { const txt = A.tx(o2.fact) || (A.factOf && A.factOf(o2)) || ""; if (txt) noteH(txt, "journal"); },
+      fact: o2 => { const txt = fieldNote(o2); if (txt) noteH(txt, "journal"); },
       note: noteH, continent: o2 => continentName(o2), country: revealCountry, addTime: s => { S.limit += s; },
       laterHalf: fn => api.later(S.limit / 2, fn),
       /* cuando queden `sec` segundos del reloj de la pregunta: se recalcula en cada espera (la pausa y el Reloj de arena mueven el momento; antes una pausa lo perdia) */
@@ -672,7 +706,7 @@ window.AIQ = window.AIQ || {};
     if (id === "hourglass") { S.limit += 6; noteH(A.T("+6 segundos", "+6 seconds")); }
     else if (id === "interruptor") { A.chal.suspend(); run.windOff = true; A.sfx.restore(); noteH(A.T("Retos apagados en esta pregunta", "Challenges off for this question")); A.dealer.react("counter"); }
     else if (id === "swapcard") { if (!swapQuestion()) { t.left++; run.qTools--; run.rTools--; A.sfx.deny(); return; } }
-    else if (id === "journal") { const txt = o.clue ? A.tf("Empieza por «{l}» y está en {c}.", "Starts with “{l}” and lies in {c}.", { l: A.tx(o.answer).trim()[0], c: continentName(o) }) : (A.tx(o.fact) || (A.factOf && A.factOf(o)) || A.T("Sin notas para este lugar.", "No notes for this place.")); noteH(txt, "journal"); }
+    else if (id === "journal") { const txt = o.clue ? A.tf("Empieza por «{l}» y está en {c}.", "Starts with “{l}” and lies in {c}.", { l: A.tx(o.answer).trim()[0], c: continentName(o) }) : fieldNote(o) || A.T("Sin notas para este lugar.", "No notes for this place."); noteH(txt, "journal"); }
     else if (id === "passport") revealCountry(o);
     persist(); renderBars();
   };
@@ -803,6 +837,7 @@ window.AIQ = window.AIQ || {};
     } else {
       const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
       if (shielded && !insured) run.shieldAct = run.act; else if (!shielded) { run.lives--; run.livesLostAct++; }
+      if (insured) run.segN = (run.segN || 0) + 1;                       // el Seguro de ronda se ha gastado: el siguiente cuesta 2 mas (superar la ronda no lo encarece)
       run.attempt++; run.phase = "retry";
       /* consuelo: lo que puntuaste en la ronda fallida se cobra (1 por cada tercio del objetivo) para comprar ayuda antes de la revancha */
       const q = S.levelScore / Math.max(1, Lv.advance), conso = run.lives > 0 ? gain(consoOf(q)) : 0;
@@ -812,7 +847,7 @@ window.AIQ = window.AIQ || {};
       if (run.lives <= 0) return endRun(false);
       C().verdict({
         kind: "", level: roundNo() + 1, tag: `${A.tx(actInfo(run.act).n)} · ${boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + (run.round + 1)}`, title: A.T("No llegaste al objetivo", "Target missed"),
-        text: (shielded ? A.pick6("¡El seguro te salva: no pierdes provisión! |Insurance saves you: no provision lost! |L'assurance te sauve : aucune provision perdue ! |O seguro te salva: nenhuma provisão perdida! |Die Versicherung rettet dich: kein Proviant verloren! |L'assicurazione ti salva: nessuna provvista persa! ||保险救了你：没有损失补给！ |보험이 당신을 구했습니다: 식량 손실 없음! |保険が守ってくれた：プロビジョンは失われなかった！ |Страховка спасла тебя: ни один запас не потерян! |Ubezpieczenie cię ratuje: żaden zapas nie przepada! ") : "") + (run.lives === 1 ? A.tf("Te quedaste en {s} de {a}. Te queda {n} provisión.", "You scored {s} of {a}. You have {n} provision left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives }) : A.tf("Te quedaste en {s} de {a}. Te quedan {n} provisiones.", "You scored {s} of {a}. You have {n} provisions left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives })),   // el Seguro (reliquia) o el Seguro de ronda: el "Escudo" ya no existe
+        text: (insured ? A.pick6(SAVED_SUP) : shielded ? A.pick6(SAVED_PERK) : "") + (run.lives === 1 ? A.tf("Te quedaste en {s} de {a}. Te queda {n} provisión.", "You scored {s} of {a}. You have {n} provision left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives }) : A.tf("Te quedaste en {s} de {a}. Te quedan {n} provisiones.", "You scored {s} of {a}. You have {n} provisions left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives })),   // cada seguro con su frase: se sabe cual te ha salvado
         lines: conso ? [[et("conso", { p: pctOf(S.levelScore, Lv.advance) }), "+" + conso]] : [],
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), Lv.advance], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives), art: "lose",
         buttons: [{ id: "rtBtn", cls: "btn-ink", label: A.T("Reintentar con lugares nuevos", "Retry with new places"), arrow: true, primary: true, onclick: () => openShop(false) }, { id: "abBtn", cls: "btn-line", label: A.T("Abandonar", "Abandon"), onclick: () => endRun(false) }],
@@ -821,9 +856,10 @@ window.AIQ = window.AIQ || {};
       A.dealer.hover($("abBtn"), "hoverAbandon");                            // si el cursor va hacia Abandonar, el crupier lo ve
       { const ab = $("abBtn"); if (ab && !abSwapped) ab.addEventListener("pointerenter", () => { if (abSwapped || !ab.isConnected) return; abSwapped = true; const sp = ab.querySelector("span"); if (sp) sp.textContent = A.pick6("Abandonar (y dejarle ganar)|Abandon (and let him win)|Abandonner (et le laisser gagner)|Abandonar (e deixar ele ganhar)|Aufgeben (und ihn gewinnen lassen)|Abbandona (e lascialo vincere)||放弃（让他赢）|포기 (그가 이기게 두기)|やめる（彼を勝たせる）|Сдаться (и дать ему выиграть)|Poddaj się (i daj mu wygrać)"); if (A.sfx.buzz) A.sfx.buzz(1); }); }   // el boton dice la verdad (una vez por sesion)
     }
-    if (run.sup && run.sup.seguro) run.segN = (run.segN || 0) + 1;         // Seguro gastado: el siguiente cuesta 2 mas
     run.sup = {}; persist();                                                // los suministros solo valen para una ronda
   };
+  const SAVED_PERK = "¡Tu Seguro te salva (una vez por acto): no pierdes provisión! |Your Insurance saves you (once per act): no provision lost! |Ton Assurance te sauve (une fois par acte) : aucune provision perdue ! |Seu Seguro te salva (uma vez por ato): nenhuma provisão perdida! |Deine Versicherung rettet dich (einmal pro Akt): kein Proviant verloren! |La tua Assicurazione ti salva (una volta per atto): nessuna provvista persa! ||你的保险救了你（每幕一次）：没有损失补给！ |보험이 당신을 구했습니다(막마다 한 번): 식량 손실 없음! |保険が守ってくれた（1幕に1回）：プロビジョンは失われなかった！ |Страховка спасла тебя (раз за акт): ни один запас не потерян! |Ubezpieczenie cię ratuje (raz na akt): żaden zapas nie przepada! ";
+  const SAVED_SUP = "¡El Seguro de ronda te cubre: no pierdes provisión! |Round insurance covers you: no provision lost! |L'Assurance de manche te couvre : aucune provision perdue ! |O Seguro de rodada te cobre: nenhuma provisão perdida! |Die Rundenversicherung springt ein: kein Proviant verloren! |L'Assicurazione del round ti copre: nessuna provvista persa! ||回合保险为你兜底：没有损失补给！ |라운드 보험이 지켜 줬습니다: 식량 손실 없음! |ラウンド保険でカバー：プロビジョンは失われなかった！ |Страховка раунда покрыла провал: ни один запас не потерян! |Ubezpieczenie rundy cię kryje: żaden zapas nie przepada! ";
   /* el primer clic en "Abrir el cofre" no lo abre: el cofre (la medalla) tiembla y el crupier confiesa que lo esta sujetando; el segundo ya lo abre */
   function stuckChest() {
     const m = document.querySelector(".v-medal"), b = $("nlBtn"), S = C().S, reduced = (S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -938,13 +974,13 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-i="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${ixs(p.cost, p.suit)}<span class="of-r">${A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
-      return `<div class="offer pc otool r${t.r}${bought ? " sold" : ""}" data-i="${i}" data-suit="blk">${ixs("A", "s_palm")}<span class="of-r">${A.T("Herramienta", "Tool")}</span><div class="of-ico felt">${ic(t.ico)}</div><b class="of-n">${A.tx(t.n)}${have ? ` <em>+1 ${A.T("carga", "charge")}</em>` : ""}</b><p>${A.tx(t.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : costHtml(s)}</button></div>`;
+      return `<div class="offer pc otool r${t.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="blk">${ixs("A", "s_palm")}<span class="of-r">${A.T("Herramienta", "Tool")}</span><div class="of-ico felt">${ic(t.ico)}</div><b class="of-n">${A.tx(t.n)}${have ? ` <em>+1 ${A.T("carga", "charge")}</em>` : ""}</b><p>${A.tx(t.d)}</p><button class="buy" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : costHtml(s)}</button></div>`;
     }
-    return `<div class="offer pc life${bought ? " sold" : ""}" data-i="${i}" data-suit="red">${ixs("♥", "heart")}<span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico felt">${ic("heart")}</div><b class="of-n">+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${bought || run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${lifePrice()}</button></div>`;
+    return `<div class="offer pc life${bought ? " sold" : ""}" data-ix="${i}" data-suit="red">${ixs("♥", "heart")}<span class="of-r">${A.T("Provisión", "Provision")}</span><div class="of-ico felt">${ic("heart")}</div><b class="of-n">+1 ${A.T("provisión", "provision")}</b><p>${A.tf("Recupera una provisión (máx. {n}).", "Restore a provision (max {n}).", { n: run.maxLives })}</p><button class="buy" ${bought || run.lives >= run.maxLives ? "disabled" : ""}>${CN()}${lifePrice()}</button></div>`;
   }
   /* v0.35 (usuario): Campamento premium. La mochila son cartas pequenas con el color de su rareza: un clic levanta la reliquia y ensena
      "Vender" encima; el segundo clic, en ese boton, la vende (antes un solo clic la vendia sin preguntar). Tambien en el cofre del jefe.
@@ -1017,7 +1053,7 @@ window.AIQ = window.AIQ || {};
     { id: "kit", cost: 6, ico: "glass", n: A.L("Refuerzo", "Resupply"), d: A.L("+1 carga en todas tus herramientas la próxima ronda", "+1 charge on all your tools next round") },
     { id: "seguro", cost: 8, ico: "shield", n: A.L("Seguro de ronda", "Round insurance"), d: A.L("Si fallas la próxima ronda, no pierdes provisión", "If you fail next round, you keep your provision") },
   ];
-  const supCost = s => price(s.cost + (s.id === "seguro" ? 2 * (run.segN || 0) : 0));   // cada Seguro de ronda gastado encarece el siguiente (como las provisiones): no se puede fallar gratis para siempre
+  const supCost = s => price(s.cost + (s.id === "seguro" ? 2 * (run.segN || 0) : 0));   // cada Seguro de ronda gastado (el que te salva al fallar; ver roundEnd) encarece el siguiente: no se puede fallar gratis para siempre
   let supFresh = null;                                                 // el suministro recien comprado: solo a ese le cae el sello
   function supHtml() {
     const sup = run.sup || {}, items = SUPS.filter(s => s.id !== "kit" || Object.keys(run.tools).length).map(s => `<button class="sup sp-${s.id}${sup[s.id] ? " on" : ""}${supFresh === s.id ? " fresh" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span>${sup[s.id] ? `<em class="sp-on">${A.T("Activo", "On")}</em>` : `<em class="sp-p">${CN()}${supCost(s)}</em>`}</button>`).join("");
@@ -1062,14 +1098,14 @@ window.AIQ = window.AIQ || {};
     setTimeout(one, 380);
   }
   function buy(el, chest) {
-    const i = +el.dataset.i, s = run.stock[i]; if (!s || run.bought.includes(i)) return;
+    const i = +el.dataset.ix, s = run.stock[i]; if (!s || run.bought.includes(i)) return;   // data-ix (no data-i: cambiar de idioma reescribe todo [data-i] con A.t)
     if (s.k === "life") { const c = lifePrice(); if (run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } if (run.coins < c) return noFunds(el); run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
       if (run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
       if (run.coins < c) return noFunds(el);
       if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);
-      run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run); if (p.r === 3) A.ach.emit("adv", { kind: "legend" });
+      run.coins -= c; run.perks.push(s.id); if (p.buy) p.buy(run); if (p.r === 3 && chest) A.ach.emit("adv", { kind: "legend", chest: true });   // Botin legendario: solo la del cofre del jefe
     } else {
       const c = cardCost(s);
       if (!run.tools[s.id] && Object.keys(run.tools).length >= 4) { A.sfx.deny(); shake(el); flash(A.T("Solo 4 herramientas distintas.", "Only 4 different tools.")); return; }

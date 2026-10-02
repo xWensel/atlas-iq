@@ -311,6 +311,7 @@ window.AIQ = window.AIQ || {};
     RG("polares", "sea", "Océanos polares|Polar oceans|Océans polaires|Oceanos polares|Polarmeere|Oceani polari||极地海洋|극지 바다|極地の海|Полярные океаны|Oceany polarne", [], { seas: ["arctic-ocean", "southern-ocean", "drake-passage"] }),
   ];
   const regName = r => P(r.names);
+  const REG_OF = {}; REGIONS.forEach(r => r.countries.forEach(ne => (REG_OF[ne] = r)));   // pais del mapa (Natural Earth) -> su familia (la Aventura la usa en la nota de las banderas)
   const contName = c => A.t("cont." + c);
 
   /* indice geografico: se monta la primera vez que se abre la Enciclopedia (nada de esto hace falta para jugar) */
@@ -1181,6 +1182,7 @@ window.AIQ = window.AIQ || {};
     _load: (id, lang) => loadContent(E[id], lang || A.wlang()),
     _index: () => index(), _groupStats: key => gStats(index().gs[key]), _map: () => map, _ui: () => ui,
     ids: () => order.slice(),
+    regionNames: ne => (REG_OF[ne] ? REG_OF[ne].names : ""),         // nombre de la familia de un pais, "es|en|..." (sin montar el atlas)
     reset() { store = { unlocked: {}, seen: {} }; save(); dirty(); ui.cur = null; if (isOpen()) { ui.stack = []; ui.view = { k: "home" }; render(); } },
     byType,
     refresh() { if (isOpen()) { labels(); saveTop(); render(); } },

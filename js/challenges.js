@@ -95,10 +95,13 @@ window.AIQ = window.AIQ || {};
   const famOf = id => FAMILY[id] || (D[id].kind === "text" ? "t" : D[id].kind === "ptr" ? "c" : id);
   const NOLATIN = () => /^(zh|ja|ko)/.test(A.lang || "");                     // runas y sin vocales no tienen sentido con nombres en chino, japones o coreano
   const MILD_TEXT = ["shaky", "missing", "swap", "upside", "babel", "dance"], MILD_MAP = ["blur", "dark", "noborders", "clouds", "mirrorx", "negative", "rain"];
+  /* jefes por acto. Acto II: solo combinaciones sin retos de texto (su jefe es la ronda de banderas, donde el texto no hace nada: Mala vision, Noche
+     cerrada y Sin pasaporte no salian nunca en la Aventura; en el Reto diario, que baraja la ruta, si podian salir). Acto III: "Sin pasaporte"
+     (antes Torre de Babel, que se llamaba igual que su reto y traia runas, que no hacen nada en chino, japones y coreano) */
   const BOSS = [
     [["El Apagón|The Blackout|La panne|O Apagão|Der Stromausfall|Il Blackout||大停电|대정전|大停電|Великое затмение|Wielka ciemność", ["dark", "flicker"]], ["Ronda ciega|Blind round|Manche aveugle|Rodada cega|Blinde Runde|Round cieco||盲眼回合|블라인드 라운드|ブラインドラウンド|Слепой раунд|Runda na ślepo", ["blur", "missing"]], ["Un solo continente|One continent|Un seul continent|Um só continente|Ein Kontinent|Un solo continente||一块大陆|하나의 대륙|ひとつの大陸|Один континент|Jeden kontynent", ["pangea", "swap"]], ["Mareo de casino|Casino dizziness|Vertige de casino|Tontura de cassino|Casino-Schwindel|Capogiro da casinò||赌场眩晕|카지노 현기증|カジノのめまい|Казино-головокружение|Kasynowy zawrót głowy", ["dizzy", "shaky"]]],
-    [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme||虚惊一场|거짓 경보|誤報|Ложная тревога|Fałszywy alarm", ["spread", "wrongborders"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto||没有护照|여권 없음|パスポートなし|Без паспорта|Bez paszportu", ["nocountry", "blur"]], ["Mala visión|Bad eyesight|Mauvaise vue|Vista turva|Schlechte Sicht|Vista offuscata||视力不佳|나쁜 시력|視力低下|Плохое зрение|Słaby wzrok", ["flip", "anagram"]], ["Noche cerrada|Dead of night|Nuit noire|Noite fechada|Tiefste Nacht|Notte fonda||深夜|한밤중|真夜中|Глухая ночь|Głucha noc", ["dark", "shaky", "wind"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala||大厅地震|홀의 지진|ホールの地震|Землетрясение в зале|Trzęsienie na sali", ["quake", "decoys"]], ["Rompe la cuarta pared|Breaking the fourth wall|Briser le quatrième mur|Quebrando a quarta parede|Die vierte Wand durchbrechen|Rompere la quarta parete||打破第四面墙|제4의 벽 깨기|第四の壁を破れ|Ломая четвёртую стену|Przełamując czwartą ścianę", ["crack", "hang"]]],
-    [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio||巨镜|거대한 거울|大いなる鏡|Великое зеркало|Wielkie lustro", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato||洗乱的牌组|섞인 덱|シャッフルされたデッキ|Перетасованная колода|Potasowana talia", ["deal", "dark", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente||孤注一掷|모 아니면 도|オール・オア・ナッシング|Всё или ничего|Wszystko albo nic", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta||完美风暴|퍼펙트 스톰|パーフェクト・ストーム|Идеальный шторм|Sztorm doskonały", ["lightning", "rain", "tremble"]], ["Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele||巴别塔|바벨탑|バベルの塔|Вавилонская башня|Wieża Babel", ["babel", "runes", "mosaic"]], ["Pantallazo|System crash|Plantage total|Pane geral|Systemabsturz|Crash di sistema||系统崩溃|시스템 다운|システムクラッシュ|Системный сбой|Awaria systemu", ["battery", "hang", "flicker"]]],
+    [["Falsa alarma|False alarm|Fausse alerte|Falso alarme|Fehlalarm|Falso allarme||虚惊一场|거짓 경보|誤報|Ложная тревога|Fałszywy alarm", ["spread", "wrongborders"]], ["Terremoto en la sala|Quake in the hall|Séisme dans la salle|Terremoto no salão|Beben im Saal|Terremoto in sala||大厅地震|홀의 지진|ホールの地震|Землетрясение в зале|Trzęsienie na sali", ["quake", "decoys"]], ["Rompe la cuarta pared|Breaking the fourth wall|Briser le quatrième mur|Quebrando a quarta parede|Die vierte Wand durchbrechen|Rompere la quarta parete||打破第四面墙|제4의 벽 깨기|第四の壁を破れ|Ломая четвёртую стену|Przełamując czwartą ścianę", ["crack", "hang"]]],
+    [["El gran espejo|The great mirror|Le grand miroir|O grande espelho|Der große Spiegel|Il grande specchio||巨镜|거대한 거울|大いなる鏡|Великое зеркало|Wielkie lustro", ["flip", "cmirror", "blur"]], ["Baraja revuelta|Shuffled deck|Jeu mélangé|Baralho embaralhado|Gemischtes Deck|Mazzo mescolato||洗乱的牌组|섞인 덱|シャッフルされたデッキ|Перетасованная колода|Potasowana talia", ["deal", "dark", "missing"]], ["Todo o nada|All or nothing|Quitte ou double|Tudo ou nada|Alles oder nichts|Tutto o niente||孤注一掷|모 아니면 도|オール・オア・ナッシング|Всё или ничего|Wszystko albo nic", ["wrongborders", "flicker", "storm"]], ["Tormenta perfecta|Perfect storm|Tempête parfaite|Tempestade perfeita|Perfekter Sturm|Tempesta perfetta||完美风暴|퍼펙트 스톰|パーフェクト・ストーム|Идеальный шторм|Sztorm doskonały", ["lightning", "rain", "tremble"]], ["Sin pasaporte|No passport|Sans passeport|Sem passaporte|Ohne Pass|Senza passaporto||没有护照|여권 없음|パスポートなし|Без паспорта|Bez paszportu", ["babel", "nocountry", "mosaic"]], ["Pantallazo|System crash|Plantage total|Pane geral|Systemabsturz|Crash di sistema||系统崩溃|시스템 다운|システムクラッシュ|Системный сбой|Awaria systemu", ["battery", "hang", "flicker"]]],
   ].map(a => a.map(c => ({ n: L6(c[0]), ids: c[1] })));
   /* jefe de la ronda de banderas: la bandera trae su propio filtro y el mapa se lía por su cuenta */
   const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark", "clouds"]], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flaginvert", "flip"]], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue", "wrongborders"]], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur", "mosaic"]]].map(c => ({ n: L6(c[0]), ids: c[1] }));
@@ -268,9 +271,73 @@ window.AIQ = window.AIQ || {};
   function riddleText(o) {
     let t = ""; try { t = (A.tx(o.fact) || (A.factOf && A.factOf(o)) || "").trim(); } catch (e) { t = ""; }
     if (!t || t.length < 12) return null;
-    const words = new Set(); [...Object.values(o.name || {})].forEach(n => String(n).split(/[\s,()'’-]+/).forEach(w => { if (w.length >= 3) words.add(w); }));
-    for (const w of [...words].sort((a, b) => b.length - a.length)) t = t.replace(new RegExp("(?<![\\p{L}\\p{N}])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?![\\p{L}\\p{N}])", "giu"), m => "▮".repeat([...m].length));   // un hueco por letra, sin recortar el texto
-    return t;
+    return maskName(o, t);
+  }
+  /* tapa el nombre del lugar (en todos sus idiomas) dentro de un texto: la pista de la placa y la nota del pie. Un hueco por letra, sin recortar
+     el texto. Compara sin acentos ni marcas (el ruso de Wikipedia trae el acento de entonacion: "Дака́р") y recompone el hangul (partido en jamo,
+     el coreano no se tapaba). En chino, japones y coreano no espera espacios alrededor ("廷布", "브라질리아는"), salta los espacios de dentro
+     ("샌 재신토") y tapa tambien los trozos del nombre: partido por ・, ＝, ·, の, 之 y los numeros, sin su cola generica ("安卡拉之战" -> "安卡拉",
+     "西安市" -> "西安", "アポロ11号" -> "アポロ"), su principio ("华盛顿" en "华盛顿特区", salvo si es el del pais) y la lectura entre parentesis
+     que lo sigue ("東京都（とうきょうと、...）"). En coreano, un nombre de una sola silaba ("빈", "칸") cuando va suelto o con su particula.
+     En ruso, polaco, aleman, italiano y portugues, tambien el nombre declinado o derivado: su raiz y hasta 5 letras de cola ("Херонеи",
+     "Байленская", "Londynie", "Haifas"). Y el nombre entero con su apostrofo o guion ("Xi'an", que partido se queda en dos palabras de 2 letras) */
+  const CJK = /[\u1100-\u11ff\u3040-\u30ff\u3130-\u318f\u3400-\u9fff\uac00-\ud7af]/, MARK = /^\p{M}+$/u, isW = c => !!c && /[\p{L}\p{N}]/u.test(c);
+  const foldOf = s => String(s).normalize("NFD").replace(/\p{M}/gu, "").normalize("NFC").toLowerCase().replace(/[’ʼ]/g, "'");
+  const CJK_TAIL = new RegExp("(" + ["之战", "战役", "会战", "海战", "战争", "之围", "围城战", "包围战", "事件", "事变", "惨案", "大屠杀", "大地震", "地震", "大火", "火灾", "起义", "暴动", "革命", "维新", "运动", "进军", "攻势",
+    "会谈", "会议", "条约", "宣言", "危机", "兄弟", "特区", "特别行政区", "の戦い", "の戦", "戦い", "戦争", "会戦", "海戦", "の包囲戦", "包囲戦", "事変", "の虐殺", "虐殺", "大火", "の噴火", "噴火", "維新",
+    "運動", "行進", "攻勢", "略奪", "会談", "会議", "条約", "危機", "兄弟", "전투", "전쟁", "해전", "공방전", "사건", "학살", "대지진", "지진", "대화재", "혁명", "유신", "행진", "공세", "회담", "회의",
+    "조약", "위기", "형제", "市", "州", "省", "县", "縣", "区", "區", "都", "府", "岛", "島", "群岛", "群島", "半岛", "半島", "山", "山脉", "山脈", "火山", "湖", "河", "江", "川", "寺", "寺院", "宫", "宫殿",
+    "宮", "宮殿", "塔", "城", "城堡", "桥", "大桥", "橋", "大橋", "港", "湾", "灣", "运河", "運河", "瀑布", "滝", "沙漠", "砂漠", "广场", "広場", "公园", "公園", "国家公园", "国立公園", "大教堂",
+    "教堂", "大聖堂", "神社", "시", "주", "도", "섬", "산", "강", "호", "궁", "궁전", "탑", "성", "다리", "공원", "광장", "대성당", "성당", "폭포", "사막", "산맥", "화산", "신사"].join("|") + ")$");
+  const DECL = /^(ru|pl|de|it|pt)/, KANA = /^[\u3040-\u30ff]/, HANGUL1 = /^[\uac00-\ud7af]$/;
+  const SPLIT = /[\s,()'\-・＝·«»"“”„]+/, READING = /^[\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Latin}ー・\s'./／-]+$/u;
+  const PARTICLE = new Set(["", "은", "는", "이", "가", "을", "를", "의", "에", "에서", "에서는", "에는", "으로", "로", "과", "와", "도", "만", "까지", "부터", "이다", "이며", "이자", "이고"]);
+  const cutTail = s => s.replace(/^\d+年/, "").replace(CJK_TAIL, "").replace(/[の之]$/, "");
+  const pieces = w => {                                               // una palabra del nombre en chino, japones o coreano: entera, sin su cola y partida por の, 之 y los numeros
+    const out = new Set([w]), core = cutTail(w); if ([...core].length >= 2) out.add(core);
+    core.split(/[の之\d]+/).forEach(p => { const c = cutTail(p); if ([...p].length >= 2 && c) out.add(p); if ([...c].length >= 2) out.add(c); });
+    return [...out];
+  };
+  function maskName(o, t) {
+    const chars = [...t], F = [], at = [], hide = new Set(), words = new Set(), roots = [], one = new Set(), country = [];   // F: el texto plegado (sin marcas, en minusculas), letra a letra; at: de que caracter sale cada una
+    chars.forEach((ch, i) => { for (const c of foldOf(ch)) { F.push(c); at.push(i); } });
+    const add = (k, min) => { if ([...k].length >= min) words.add(k); };
+    Object.values(o.name || {}).forEach(n => {
+      const whole = foldOf(n).trim(); if (/['-]/.test(whole)) add(whole, 3);
+      whole.split(SPLIT).forEach(k => { if (!CJK.test(k)) add(k, 3); else if (HANGUL1.test(k)) one.add(k); else if (k.replace(CJK_TAIL, "")) pieces(k).forEach(p => add(p, 2)); });
+    });
+    if (DECL.test(A.lang || "") && o.name) foldOf(o.name[A.lang] || "").split(SPLIT).forEach(k => { const n = [...k].length; if (n >= 5 && !CJK.test(k)) roots.push(k.slice(0, Math.max(4, n - 2))); });
+    Object.values(o.sub || {}).forEach(s => String(s).split(" · ").forEach(c => { const k = foldOf(c).trim(); if (CJK.test(k)) country.push([...k]); }));
+    const ofCountry = (W, m) => country.some(c => c.length >= m && W.slice(0, m).every((x, j) => c[j] === x));   // ese principio del nombre es el del pais ("メキシコ" de "メキシコシティ")
+    for (const w of [...words].sort((a, b) => b.length - a.length)) {
+      const W = [...w], cjk = CJK.test(w), part = KANA.test(w) ? 4 : 3;   // el principio que se tapa: 3 caracteres (4 en kana: "ニュー" o "サンフ" no dicen nada)
+      for (let k = 0; k < F.length; k++) {
+        let m = 0, p = k, end = k; while (m < W.length && p < F.length) { if (F[p] === W[m]) { m++; end = ++p; } else if (cjk && m && F[p] === " ") p++; else break; }
+        if (m === W.length ? cjk || (!isW(F[k - 1]) && !isW(F[end])) : cjk && m >= part && !ofCountry(W, m)) for (let j = k; j < end; j++) hide.add(at[j]);
+      }
+    }
+    if (one.size) for (let k = 0; k < F.length; k++) {                // coreano de una silaba: suelto o con su particula
+      if (!one.has(F[k]) || isW(F[k - 1])) continue;
+      let e = k + 1; while (e < F.length && isW(F[e])) e++;
+      if (PARTICLE.has(F.slice(k + 1, e).join(""))) hide.add(at[k]);
+    }
+    if (roots.length) for (let k = 0; k < F.length;) {                // el nombre declinado: cada palabra del texto que empieza por su raiz
+      if (!isW(F[k])) { k++; continue; }
+      let e = k; while (e < F.length && isW(F[e])) e++;
+      const tw = F.slice(k, e).join("");
+      if (roots.some(r => tw.startsWith(r) && tw.length <= r.length + 5)) for (let j = k; j < e; j++) hide.add(at[j]);
+      k = e;
+    }
+    if (CJK.test(t)) chars.forEach((ch, i) => {                         // la lectura entre parentesis que sigue al nombre tapado (hasta la primera coma o los dos puntos)
+      if (!hide.has(i) || hide.has(i + 1)) return;
+      let j = i + 1; while (chars[j] === " ") j++;
+      if (chars[j] !== "（" && chars[j] !== "(") return;
+      let e = j + 1; while (e < chars.length && e - j < 60 && !"）)、，,；;：:".includes(chars[e])) e++;
+      const seg = chars.slice(j + 1, e).join(""), fs = foldOf(seg);
+      if (chars[e] && "）)、，,；;：:".includes(chars[e]) && seg.trim() && READING.test(seg) && !country.some(c => fs.includes(c.join("")))) for (let x = j + 1; x < e; x++) if (isW(chars[x])) hide.add(x);
+    });
+    let prev = false;                                                  // las marcas sueltas de una letra tapada se van con ella
+    return chars.map((ch, i) => { if (MARK.test(ch)) return prev ? "" : ch; prev = hide.has(i); return prev ? "▮" : ch; }).join("");
   }
   /* el nombre y el pais de debajo sufren los mismos retos de texto (el pais tambien tiembla, se borra, se cambia...) */
   function decorate(o) {
@@ -309,17 +376,20 @@ window.AIQ = window.AIQ || {};
       if (ms && letters.length >= 3) { const p = par(ms), n = clamp(Math.round(letters.length * p.frac), 2, Math.max(2, Math.floor(letters.length * 0.7))), pool = rnd.shuffle ? rnd.shuffle(letters.slice()) : letters.slice(); for (const k of pool) { if (hidden.size >= n) break; hidden.add(k); } }
     }
     const sh = get("shaky"), amp = sh ? par(sh).amp : 0, dn = get("dance"), damp = dn ? par(dn).amp : 0, memOn = !!get("memory");
-    const parts = chars.map((ch, i) => {
+    const parts = chars.map((ch, i) => {                              // data-n (no data-i: cambiar de idioma reescribe todo [data-i] con A.t)
       if (ch === " ") return chars[i - 1] === "▮" && chars[i + 1] === "▮" ? '<i class="wg"></i>' : " ";
       const c = ["lt"]; let glyph = ch; if (ch === "▮") c.push("blk");
       if (hidden.has(i)) c.push("gap", "sv" + Math.floor(rnd() * 3)); else if (dots.has(i)) { c.push("dot"); glyph = "·"; } else if (get("missing") && rnd() < 0.5) c.push("faint");
       if (runes.has(i)) c.push("rune");
       const dur = (0.07 + rnd() * 0.09).toFixed(3), del = (-rnd() * 0.3).toFixed(3), ax = ((rnd() - 0.5) * 2 * amp).toFixed(2), ay = ((rnd() - 0.5) * 2 * amp).toFixed(2), ar = ((rnd() - 0.5) * amp * 1.6).toFixed(2);
       const st = (amp ? `--dur:${dur}s;--del:${del}s;--ax:${ax}px;--ay:${ay}px;--ar:${ar}deg;` : "") + (damp ? `--dy:${(damp * (0.6 + rnd() * 0.8)).toFixed(2)}em;--di:${i};` : "") + (memOn ? `--fd:${(rnd() * 0.6).toFixed(2)}s;` : "");
-      return `<b class="${c.join(" ")}" data-i="${i}" data-g="${ch}" style="${st}"${amp ? ' data-sh="1"' : ""}${damp ? ' data-dn="1"' : ""}>${glyph}</b>`;
+      return `<b class="${c.join(" ")}" data-n="${i}" data-g="${ch}" style="${st}"${amp ? ' data-sh="1"' : ""}${damp ? ' data-dn="1"' : ""}>${glyph}</b>`;
     });
     let html = "", word = "";                                        // cada palabra en un bloque que no se parte (si no, las letras sueltas saltan de linea)
-    parts.forEach(pt => { if (pt === " " || pt.startsWith("<i")) { html += (word ? `<span class="wd">${word}</span>` : "") + pt; word = ""; } else word += pt; });
+    /* Adivinanza en chino o japones: sin espacios, el texto entero era un solo bloque y se salia de la placa (hasta 2.000 px). Ahi se puede cortar
+       entre dos caracteres, salvo antes de la puntuacion de cierre y de las kana pequenas (。、ーッェ...) y despues de la de apertura (（「...) */
+    const cut = i => riddle && (HZ.test(chars[i]) || HZ.test(chars[i - 1] || "")) && !HZ_CLOSE.test(chars[i]) && !HZ_OPEN.test(chars[i - 1] || "");
+    parts.forEach((pt, i) => { if (pt === " " || pt.startsWith("<i")) { html += (word ? `<span class="wd">${word}</span>` : "") + pt; word = ""; } else { if (word && cut(i)) { html += `<span class="wd">${word}</span>`; word = ""; } word += pt; } });
     el.innerHTML = html + (word ? `<span class="wd">${word}</span>` : "");
     if (amp) el.classList.add("ch-shaky");
     if (damp) el.classList.add("ch-dance");
@@ -329,15 +399,16 @@ window.AIQ = window.AIQ || {};
     if (has("scroll") && !fx.noMarquee) { el.innerHTML = `<span class="ch-marq">${el.innerHTML}</span>`; el.classList.add("ch-scroll"); }
     const restore = (b, g) => { b.classList.remove("gap", "dot", "faint", "rune"); b.classList.add("fix"); b.textContent = g; };
     const hid = [...hidden, ...dots];
-    if (hid.length && fx.missingRate > 0) hid.forEach((k, j) => later(() => { const b = el.querySelector(`.lt[data-i="${k}"]`); if (b) { restore(b, b.dataset.g); say("chip", 1 + j * 0.2); } }, 900 + (j * 1000) / fx.missingRate));
+    if (hid.length && fx.missingRate > 0) hid.forEach((k, j) => later(() => { const b = el.querySelector(`.lt[data-n="${k}"]`); if (b) { restore(b, b.dataset.g); say("chip", 1 + j * 0.2); } }, 900 + (j * 1000) / fx.missingRate));
     const unfix = new Set([...(fx.unswapMs ? fixed : []), ...(fx.decodeMs ? runes : [])]);   // la Chuleta devuelve las cambiadas o mezcladas, no las runas (eso no lo dice su carta)
-    if (unfix.size) later(() => { el.querySelectorAll(".lt").forEach(b => { const i = +b.dataset.i; if (unfix.has(i) && b.textContent !== orig[i] && !b.classList.contains("gap")) restore(b, orig[i]); }); say("chip", 2); }, Math.min(fx.unswapMs || 1e9, fx.decodeMs || 1e9));
+    if (unfix.size) later(() => { el.querySelectorAll(".lt").forEach(b => { const i = +b.dataset.n; if (unfix.has(i) && b.textContent !== orig[i] && !b.classList.contains("gap")) restore(b, orig[i]); }); say("chip", 2); }, Math.min(fx.unswapMs || 1e9, fx.decodeMs || 1e9));
     if (riddle && fx.riddleMs) later(() => { el.classList.remove("ch-riddle"); el.textContent = A.tx(obj); el.classList.add("fixed"); say("chip", 2); }, fx.riddleMs);
     const mem = get("memory");
     if (mem) later(() => { el.classList.add(fx.keepName ? "ch-dim" : "ch-fade"); }, par(mem).ms);
   }
-  /* adivinanza: la pista se encoge hasta caber en la placa (antes una nota larga se salia por debajo del crupier) */
-  const fitRiddle = el => requestAnimationFrame(() => { if (!el.classList.contains("ch-riddle")) return; let f = parseFloat(getComputedStyle(el).fontSize) || 16, n = 0; const max = Math.max(96, innerHeight * 0.22); while (el.scrollHeight > max && f > 11 && n++ < 18) { f -= 1; el.style.fontSize = f + "px"; } });
+  /* adivinanza: la pista se encoge hasta caber en la placa (antes una nota larga se salia por debajo del crupier), tambien a lo ancho */
+  const HZ = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/, HZ_CLOSE = /[、。，．！？：；）」』】〕〉》”’ー・…％ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/, HZ_OPEN = /[（「『【〔〈《“‘]/;
+  const fitRiddle = el => requestAnimationFrame(() => { if (!el.classList.contains("ch-riddle")) return; let f = parseFloat(getComputedStyle(el).fontSize) || 16, n = 0; const max = Math.max(96, innerHeight * 0.22); while ((el.scrollHeight > max || el.scrollWidth > el.clientWidth + 2) && f > 11 && n++ < 18) { f -= 1; el.style.fontSize = f + "px"; } });
   function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.style.fontSize = ""; if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
@@ -520,6 +591,8 @@ window.AIQ = window.AIQ || {};
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
       clearText(); if (A.pointer && A.pointer.mods) A.pointer.mods();
     },
-    decorate, par, get, fxNow: () => S.fx, suspended: () => S.suspended,
+    decorate, par, get, fxNow: () => S.fx, suspended: () => S.suspended, cjkTail: CJK_TAIL,
+    /* nota del pie (Libro de la casa, Nota del crupier): con la Adivinanza en la placa, la nota sale tapada igual (si no, la resolvia al instante) */
+    noteMask: (o, txt) => (txt && o && S.on && !S.suspended && has("riddle") && !o.clue && riddleText(o) ? maskName(o, txt) : txt),
   });
 })(window.AIQ);

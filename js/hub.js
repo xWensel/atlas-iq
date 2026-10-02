@@ -123,10 +123,11 @@ window.AIQ = window.AIQ || {};
     const c = C(), P = A.profile.get(), adv = P.adv, D = A.ADV.DECKS, saved = A.adv.hasSave(), TN = A.ADV.TOPIC_NAMES, R = A.RELICS;
     const sm = saved && A.adv.summary(), runInfo = sm ? `${where(sm)} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}` : "";
     const decks = Object.keys(D).map(id => {
-      const d = D[id], locked = d.unlock && !P.ach[d.unlock], lockTxt = locked ? (A.ACH.find(a => a.id === d.unlock) || { name: T("?", "?") }).name : "", [rk, su] = DECK_CARD[id];
+      const d = D[id], locked = A.adv.deckLocked(id), ach = locked && A.ACH.find(a => a.id === d.unlock), [rk, su] = DECK_CARD[id];
+      const lockTxt = T("Logro: ", "Achievement: ") + (ach ? A.tx(ach.name) + " · " : "") + A.pick6("Supera la Ascensión {n}.|Beat Ascension {n}.|Réussis l'Ascension {n}.|Vença a Ascensão {n}.|Schließe Aufstieg {n} ab.|Supera l'Ascensione {n}.||通过飞升 {n}。|어센션 {n} 클리어.|アセンション{n}をクリア。|Пройди Восхождение {n}.|Pokonaj Wniebowstąpienie {n}.").replace("{n}", d.asc || 0);   // el logro que la abre y la Ascension que pide (las barajas se ganan superando Ascensiones)
       const kit = [...d.tools.map(t => `<span class="kt" ${A.kitTip("tool", t)}>${A.icon(A.ADV.TOOLS[t].ico, "kit")}</span>`), ...d.perks.map(p => `<span class="kt" ${A.kitTip("perk", p)}>${A.icon(p, "kit")}</span>`)].join("");
       const stat = `<em><span class="dc-stat">${A.icon("coin", "dc-ic")}${d.coins}</span><span class="dc-stat">${A.icon("heart", "dc-ic")}${d.lives}</span></em>`;
-      return `<button class="dcard${advSel.deck === id ? " sel" : ""}${locked ? " lock" : ""}" data-deck="${id}" ${locked ? "disabled" : ""} data-suit="${su === "s_pin" || su === "s_compass" ? "red" : "blk"}"><span class="dc-art felt">${A.icon(d.ico)}${locked ? `<i class="dc-lock">${A.icon("lock")}</i>` : ""}</span><b class="dc-n">${A.tx(d.n)}</b><span class="dc-d">${locked ? T("Logro: ", "Achievement: ") + A.tx(lockTxt) : A.tx(d.d)}</span><span class="dc-kit">${locked ? "" : kit}${stat}</span></button>`;
+      return `<button class="dcard${advSel.deck === id ? " sel" : ""}${locked ? " lock" : ""}" data-deck="${id}" ${locked ? "disabled" : ""} data-suit="${su === "s_pin" || su === "s_compass" ? "red" : "blk"}"><span class="dc-art felt">${A.icon(d.ico)}${locked ? `<i class="dc-lock">${A.icon("lock")}</i>` : ""}</span><b class="dc-n">${A.tx(d.n)}</b><span class="dc-d">${locked ? lockTxt : A.tx(d.d)}</span><span class="dc-kit">${locked ? "" : kit}${stat}</span></button>`;
     }).join("");
     const ASC_TXT = ascTexts();
     let stakes = ""; for (let i = 0; i <= 5; i++) stakes += `<button class="stake${advSel.asc === i ? " sel" : ""}" data-asc="${i}" ${i > adv.asc ? "disabled" : ""} ${A.ttAttr(T("Ascensión", "Ascension") + " " + i, i > adv.asc ? A.tip6("Bloqueada: supera la ascensión anterior para desbloquearla.|Locked: beat the previous ascension to unlock it.|Verrouillée : réussis l'ascension précédente pour la débloquer.|Bloqueada: vença a ascensão anterior para desbloqueá-la.|Gesperrt: schließe die vorige Stufe ab, um sie freizuschalten.|Bloccata: supera l'ascensione precedente per sbloccarla.||已锁定：通过上一级飞升即可解锁。|잠김: 이전 어센션을 클리어하면 열립니다.|ロック中：前のアセンションをクリアすると解除。|Заблокировано: пройди предыдущее восхождение, чтобы открыть.|Zablokowane: pokonaj poprzednie wniebowstąpienie, żeby odblokować.") : ASC_TXT[i])}>${A.icon(STAKE_CHIP[i])}<b>${i}</b></button>`;
@@ -166,14 +167,14 @@ window.AIQ = window.AIQ || {};
   const hms = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(v => String(v).padStart(2, "0")).join(":"); };
   const actRound = where;
   function daily() {
-    const c = C(), P = A.profile.get(), DY = A.rank.daily, day = DY.board();
+    const c = C(), DY = A.rank.daily, day = DY.board();
     clearInterval(tickT);
     /* intentos a medias: el de otro dia se cierra con los puntos que llevaba; el de hoy sin partida guardada (se perdio) se cierra a cero */
     let sv = A.adv.summary(true);
     if (sv && sv.board !== day) { A.adv.abandon(true); sv = null; }
     let st = DY.get(day);
     if (st.live && !sv) { DY.finish(day, st.live, 0); st = DY.get(day); }
-    const h = DY.hand(day), deck = A.ADV.DECKS[h.deck], gift = h.gift && A.RELICS[h.gift], next = st.tries.length + 1, locked = deck.unlock && !P.ach[deck.unlock], hist = DY.stats();
+    const h = DY.hand(day), deck = A.ADV.DECKS[h.deck], gift = h.gift && A.RELICS[h.gift], next = st.tries.length + 1, locked = A.adv.deckLocked(h.deck), hist = DY.stats();
     const kit = (ico, lbl, val, tip) => `<div class="dr-k" ${tip}><span class="dr-ki">${ico}</span><span class="dr-kt"><i class="sq-fit">${lbl}</i><b class="sq-fit">${val}</b></span></div>`;
     const tries = [1, 2, 3].map(k => {
       const t = st.tries[k - 1], live = !!(t && t.live), cls = live ? "live" : t ? "done" : k === next && !st.live ? "next" : "free";

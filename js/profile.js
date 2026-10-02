@@ -20,6 +20,13 @@ window.AIQ = window.AIQ || {};
   { const D0 = defaults(), obj = v => !!v && typeof v === "object" && !Array.isArray(v); ["records", "ach", "boards", "daily", "medals", "stats", "adv"].forEach(k => { if (!obj(P[k])) P[k] = D0[k]; });
     if (!Array.isArray(P.nameLog)) P.nameLog = []; if (typeof P.name !== "string") P.name = ""; if (!P.id || typeof P.id !== "string") P.id = D0.id; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) { /* sin almacenamiento */ } };
+  /* barajas (2026-10-02): antes se abrian con el Acto I (Historiador), un jefe (Navegante) y ganar (Aventurero ciego); ahora con victorias y
+     Ascensiones (js/adventure.js, DECKS). Una sola vez: las que ya tenias abiertas con la regla vieja se quedan abiertas (adv.deckKeep) */
+  if (!P.adv.deckMig) {
+    const OLD = { historian: "adv_act1", navigator: "adv_boss", blind: "adv_win" }, keep = (P.adv.deckKeep = Object.assign({}, P.adv.deckKeep));
+    for (const id in OLD) if (P.ach[OLD[id]]) keep[id] = 1;
+    P.adv.deckMig = 1; save();
+  }
 
   /* nombre con el que rankeas (v0.37): letras de cualquier alfabeto, cifras, espacio y _ . - ' (lo mismo que acepta api/submit.js), hasta 20 */
   const NAME_MAX = 20;
@@ -142,7 +149,7 @@ window.AIQ = window.AIQ || {};
       /* tras ganar, el modo infinito no tiene actos: "Llega al Acto V" era imposible; se cuentan preguntas aguantadas (js/adventure.js, afterQuestion) */
       AD("adv_endless", "♾️", "Leyenda", "Legend", "Aguanta 25 preguntas en el modo infinito.", "Survive 25 questions in infinite mode.", "adv", c => c.kind === "hold" && c.inf >= 25),
       AD("adv_fullhouse", "🎰", "Pleno", "Clean sweep", "5 dianas en una misma ronda de la Aventura.", "5 bullseyes in a single Adventure round.", "adv", c => c.kind === "clear" && c.bulls >= 5),
-      AD("adv_legendary", "💎", "Botín legendario", "Legendary loot", "Consigue una reliquia legendaria en un cofre de jefe.", "Get a legendary relic from a boss chest.", "adv", c => c.kind === "legend"),
+      AD("adv_legendary", "💎", "Botín legendario", "Legendary loot", "Consigue una reliquia legendaria en un cofre de jefe.", "Get a legendary relic from a boss chest.", "adv", c => c.kind === "legend" && c.chest),   // solo la del cofre
       AD("codex_1000", "📚", "Bibliotecario", "Librarian", "1.000 tarjetas.", "1,000 cards.", "codex", c => c.u >= 1000),
       AD("adv_score100k", "🎇", "Premio gordo", "Jackpot", "100.000 puntos en una sola expedición.", "100,000 points in a single expedition.", "adv", c => c.kind === "end" && c.score >= 100000),
       AD("adv_rich2", "💎", "Altas apuestas", "High roller", "Ten 100 doblones a la vez.", "Hold 100 doubloons at once.", "adv", c => c.kind === "hold" && c.coins >= 100),
