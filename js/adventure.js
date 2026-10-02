@@ -179,11 +179,12 @@ window.AIQ = window.AIQ || {};
   const TOOLS = {
     sonar: { ico: "sonar", uses: 2, cost: 5, r: 1, n: L("Sonar", "Sonar"), d: L6("Toca un punto del mapa: te dice a cuántos km está el objetivo (±6 %) y dibuja el anillo.|Tap a point: tells you how far the target is (±6%) and draws the ring.|Touche un point : il indique la distance à la cible (±6 %) et trace l'anneau.|Toque num ponto: diz a que distância está o alvo (±6%) e desenha o anel.|Tippe auf einen Punkt: zeigt die Entfernung zum Ziel (±6 %) und zeichnet den Ring.|Tocca un punto: indica la distanza dal bersaglio (±6%) e disegna l'anello.||点击一个点：显示目标的距离（±6%）并画出圆环。|지점을 탭하세요: 목표까지의 거리(±6%)를 알려주고 원을 그립니다.|地点をタップすると目標までの距離（±6%）が分かり、輪が描かれる。|Коснись точки: покажет расстояние до цели (±6%) и нарисует кольцо.|Stuknij punkt: pokaże odległość do celu (±6%) i narysuje okrąg."), kind: "probe" },
     compass: { ico: "compass", uses: 3, cost: 4, r: 0, n: L("Brújula", "Compass"), d: L("Toca un punto: una flecha señala el rumbo (8 direcciones) hacia el objetivo.", "Tap a point: an arrow shows the heading (8 directions) to the target."), kind: "probe" },
-    passport: { ico: "passport", uses: 1, cost: 5, r: 1, n: L("Pase VIP", "VIP pass"), d: L6("Ilumina el país del lugar; en banderas, países y pistas, el continente.|Lights up the place's country; for flags, countries and clues, the continent.|Illumine le pays du lieu ; drapeaux, pays et indices : le continent.|Ilumina o país do lugar; em bandeiras, países e pistas, o continente.|Lässt das Land aufleuchten; bei Flaggen, Ländern und Hinweisen nur den Kontinent.|Illumina il paese del luogo; bandiere, paesi e indizi: il continente.||点亮该地点所在的国家；国旗、国家、线索只给大洲。|장소가 속한 국가를 표시합니다. 국기·국가·단서는 대륙만.|その場所の国が光る。国旗・国・ヒントでは大陸だけ。|Подсвечивает страну места; во флагах, странах и подсказках — континент.|Podświetla kraj miejsca; flagi, kraje, wskazówki: kontynent."), kind: "instant" },   // como revealCountry: en banderas, paises y pistas solo el continente
+    passport: { ico: "passport", uses: 1, cost: 7, r: 1, n: L("Pase VIP", "VIP pass"), d: L6("Ilumina el país del lugar; en banderas, países y pistas, el continente.|Lights up the place's country; for flags, countries and clues, the continent.|Illumine le pays du lieu ; drapeaux, pays et indices : le continent.|Ilumina o país do lugar; em bandeiras, países e pistas, o continente.|Lässt das Land aufleuchten; bei Flaggen, Ländern und Hinweisen nur den Kontinent.|Illumina il paese del luogo; bandiere, paesi e indizi: il continente.||点亮该地点所在的国家；国旗、国家、线索只给大洲。|장소가 속한 국가를 표시합니다. 국기·국가·단서는 대륙만.|その場所の国が光る。国旗・国・ヒントでは大陸だけ。|Подсвечивает страну места; во флагах, странах и подсказках — континент.|Podświetla kraj miejsca; flagi, kraje, wskazówki: kontynent."), kind: "instant" },   // como revealCountry: en banderas, paises y pistas solo el continente
     journal: { ico: "journal", uses: 1, cost: 4, r: 0, n: L("Nota del crupier", "Dealer's note"), d: L6("Lee la nota de campo (en banderas, la región; en pistas, inicial y continente).|Read the field note (flags: the region; clues: initial and continent).|Lis la note de terrain (drapeaux : la région ; indices : initiale et continent).|Leia a nota de campo (bandeiras: a região; pistas: inicial e continente).|Lies die Feldnotiz (Flaggen: Region; Hinweise: Anfangsbuchstabe und Kontinent).|Leggi la nota di campo (bandiere: la regione; indizi: iniziale e continente).||阅读野外笔记（国旗给地区，线索给首字和大洲）。|야외 일지를 읽어 보세요(국기는 지역, 단서는 첫 글자와 대륙).|フィールドノートを読もう（国旗は地域、ヒントは頭文字と大陸）。|Прочитай полевую заметку (флаги — регион, подсказки — первая буква и континент).|Przeczytaj notatkę terenową (flagi: region; wskazówki: pierwsza litera i kontynent)."), kind: "instant" },
     hourglass: { ico: "hourglass", uses: 2, cost: 4, r: 0, n: L("Reloj de arena", "Hourglass"), d: L("+6 segundos en la pregunta actual.", "+6 seconds on the current question."), kind: "instant" },
     interruptor: { ico: "interruptor", uses: 1, cost: 8, r: 2, n: L("Interruptor", "Master switch"), d: L6("Apaga todos los retos durante esta pregunta, salvo el tiempo que ya quitó la Tormenta. Con Silencio no se puede usar.|Switches every challenge off for this question, except the time the Storm already took. It can't be used under Silence.|Désactive tous les défis pour cette question, sauf le temps déjà pris par la Tempête. Inutilisable sous Silence.|Desliga todos os desafios nesta pergunta, exceto o tempo que a Tempestade já tirou. Não pode ser usado com Silêncio.|Schaltet alle Herausforderungen für diese Frage aus, außer der Zeit, die das Gewitter schon genommen hat. Bei Stille nicht nutzbar.|Spegne tutte le sfide per questa domanda, tranne il tempo già tolto dalla Tempesta. Non si può usare con il Silenzio.||关闭本题的所有挑战，但“风暴”已扣掉的时间不会返还。“沉默”时无法使用。|이 문제의 모든 도전을 끕니다. 단, 폭풍이 이미 줄인 시간은 돌아오지 않습니다. 침묵 중에는 사용할 수 없습니다.|この問題のチャレンジをすべてオフにする。ただし嵐で減った時間は戻らない。静寂の間は使えない。|Отключает все испытания для этого вопроса, кроме времени, уже отнятого «Бурей». При «Тишине» не работает.|Wyłącza wszystkie wyzwania w tym pytaniu, poza czasem zabranym już przez Burzę. Nie działa podczas Ciszy."), kind: "instant" },
-    swapcard: { ico: "swapcard", uses: 1, cost: 6, r: 1, n: L("Carta de cambio", "Swap card"), d: L("Cambia esta pregunta por otro lugar de la ronda.", "Swaps this question for another place from the round."), kind: "instant" },
+    swapcard: { ico: "swapcard", uses: 1, cost: 9, r: 1, n: L("Descarte", "Discard"),   // tanda 9: antes Carta de cambio (es lo que mas rinde por doblon)
+      d: L("Cambia esta pregunta por otro lugar de la ronda.", "Swaps this question for another place from the round."), kind: "instant" },
   };
   const BOSSES = {};                                                 // los jefes ahora son combinaciones de retos (js/challenges.js)
   /* barajas (usuario, 2026-10-02): se ganan superando Ascensiones. unlock = logro que la abre: Historiador ganando una expedicion, Navegante ganando
@@ -603,7 +604,7 @@ window.AIQ = window.AIQ || {};
     const ratio = dist / 1000, manga = has("sleeve") && !run.inf && run.qi === 5; let streak = km != null && ratio >= 0.6 ? S.streak + 1 : 0, guarded = false;
     if (manga) streak = S.streak;                                     // As en la manga: la 6.a ni alarga ni corta la racha
     const gN = sumFlag("guard");                                       // Guardarrachas: los 2 primeros fallos de la ronda no cortan la racha (tampoco el tiempo agotado)
-    if (ratio < 0.6 && S.streak > 0 && gN && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
+    if (ratio < 0.6 && S.streak > 0 && gN && !run.inf && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
     if (!noSide && !run.inf && streak === 2 && S.streak === 1 && has("calm") && run.qi < (run.qn || 5) - 1 && (run.chal || []).some(c2 => (perkList().find(p => p.calm) || {}).calm.includes((A.CHAL[c2.id] || {}).fam))) setTimeout(() => { A.adv.flash("coolhead", 1, "❄"); if (A.sfx.ice) A.sfx.ice(); }, 500);   // Sangre fria: la siguiente, en frio
     c.streak = streak; c.mult = guarded || manga ? 1 : 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);   // la respuesta salvada puntua x1
     c.qi = run.qi;
@@ -1054,7 +1055,10 @@ window.AIQ = window.AIQ || {};
     }
     while (out.length < slots) {
       const roll = rr();
-      if (!chest && roll < 0.16) { const tk = Object.keys(TOOLS).filter(id => canTool(id) && !out.some(o => o.id === id)); if (tk.length) { out.push({ k: "tool", id: rr.pick(tk) }); continue; } }
+      if (!chest && roll < 0.16) {                                     // tanda 9 (S9): primero la franja (55 / 35 / 10) y luego una herramienta de esa franja
+        const tk = Object.keys(TOOLS).filter(id => canTool(id) && !out.some(o => o.id === id)), tiers = [0, 1, 2].filter(t => tk.some(id => TOOLS[id].r === t)), TW = [55, 35, 10];
+        if (tiers.length) { let x = rr() * tiers.reduce((n, t) => n + TW[t], 0), tier = tiers[tiers.length - 1]; for (const t of tiers) { x -= TW[t]; if (x <= 0) { tier = t; break; } } out.push({ k: "tool", id: rr.pick(tk.filter(id => TOOLS[id].r === tier)) }); continue; }
+      }
       if (!chest && roll > 0.93 && run.lives < run.maxLives && !out.some(o => o.k === "life")) { out.push({ k: "life" }); continue; }
       if (!bag.length) break;
       out.push({ k: "perk", id: draw() });
@@ -1103,7 +1107,7 @@ window.AIQ = window.AIQ || {};
      los trucos son el juego, y la contra comprada a tiempo sale mucho mas a cuenta */
   const bribePrice = (c, boss) => { const d = A.CHAL[c.id]; return Math.max(2, Math.round((3 + 2 * (c.lv || 1) + (d.kind === "map" ? 1 : 0)) * (boss ? 2 : 1) * (1 + 0.5 * (run.bribeN || 0)) * ascFx(run.asc).price * inflation())); };
   const freeShuf = () => has("freeShuffle") && !chalFor(roundNo()).boss && run.freeShuf !== run.shopKey;   // tanda 9: una vez por visita con el Ojo en el cielo, salvo jefes
-  const chalRerollCost = () => (freeShuf() ? 0 : 4 + 2 * ((run.salt && run.salt[roundNo()]) || 0));
+  const chalRerollCost = () => (freeShuf() ? 0 : price(4 + 2 * ((run.salt && run.salt[roundNo()]) || 0)) * (chalFor(roundNo()).boss ? 2 : 1));   // tanda 9 (S9): como el soborno, el doble en el jefe
   function bribe(id) {
     const r = roundNo(), cf = chalFor(r), c = cf.list.find(x => x.id === id); if (!c) return; const cost = bribePrice(c, cf.boss);
     if (run.coins < cost) { A.sfx.deny(); flash(A.T("No te alcanzan los doblones.", "Not enough doubloons.")); return; }
@@ -1117,7 +1121,7 @@ window.AIQ = window.AIQ || {};
     A.dealer.enable(true); A.dealer.say(A.dealer.line("reroll"), { mood: "laugh", hold: 1800 }); renderShop(run.phase === "chest");
   }
   const routeHtml = () => A.adv.road({ size: "bar", route: run.route, cur: roundNo() });   // siempre las 12 rondas y el infinito (antes, una ventana de 12 que se corria)
-  const rerollCost = () => { const sx = shopCtx(); return run.freeUsed < sx.freeReroll ? 0 : 3 + run.rerolls; };
+  const rerollCost = () => { const sx = shopCtx(); return run.freeUsed < sx.freeReroll ? 0 : price(3 + run.rerolls); };
   /* precio de una carta de la tienda: la de la revancha (s.fix) va a mitad de precio */
   const cardCost = s => { const full = price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost); return s.fix ? Math.max(1, Math.ceil(full / 2)) : full; };
   const costHtml = s => (s.fix ? `${CN()}<s class="of-was">${price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost)}</s>${cardCost(s)}` : CN() + cardCost(s));
@@ -1200,7 +1204,7 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
+      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}${run.perks.length >= 5 && !bought && !(p.amulet && owned(s.id)) && !(p.ventaja && perkList().some(q => q.ventaja && q.id !== s.id)) ? " · " + A.tx(SWAP_FOR) : ""}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
@@ -1211,7 +1215,14 @@ window.AIQ = window.AIQ || {};
   /* v0.35 (usuario): Campamento premium. La mochila son cartas pequenas con el color de su rareza: un clic levanta la reliquia y ensena
      "Vender" encima; el segundo clic, en ese boton, la vende (antes un solo clic la vendia sin preguntar). Tambien en el cofre del jefe.
      El boton de "estoy listo" lleva la ficha de la ronda que viene (la misma de su presentacion) y su tema. */
-  let relicSel = null;                                                 // reliquia levantada en la mochila
+  let relicSel = null, swapIx = null;                                   // reliquia levantada en la mochila; carta que se va a cambiar por una de ella (tanda 9)
+  const SWAP_FOR = L6("cambiar por…|swap for…|échanger contre…|trocar por…|tauschen gegen…|scambia con…||换成…|교체하기…|入れ替える…|обменять на…|zamień na…"), SWAP_PICK = L6("Elige qué reliquia dejas.|Pick which relic to leave.|Choisis la relique que tu laisses.|Escolha qual relíquia deixar.|Wähl, welches Relikt du abgibst.|Scegli quale reliquia lasciare.||选一件要留下的遗物。|내려놓을 유물을 고르세요.|手放す遺物を選んで。|Выбери, какую реликвию оставить.|Wybierz, który relikt zostawić.");
+  /* vende la reliquia de la mochila y compra la carta elegida (si con lo que te dan te alcanza) */
+  function swapFor(ix, id, chest) {
+    const s = run.stock[ix]; swapIx = null; if (!s) return renderShop(chest); const c = chest ? 0 : cardCost(s);
+    if (run.coins + sellValue(id) < c) { A.sfx.deny(); return renderShop(chest); }
+    sell(id, chest); const el = document.querySelector(`#dlg .offer[data-ix="${ix}"]`); if (el) buy(el, chest);
+  }
   const SELL = "Vender|Sell|Vendre|Vender|Verkaufen|Vendi||出售|판매|売る|Продать|Sprzedaj";
   const TAKE = "Te llevas|You take|Tu prends|Você leva|Du bekommst|Prendi||你获得|획득|もらう|Получишь|Dostajesz";
   /* la reliquia en la mochila: carta pequena con el color de su rareza (la legendaria, con su marco de oro y su brillo).
@@ -1219,7 +1230,7 @@ window.AIQ = window.AIQ || {};
   const relicHtml = (id, face) => { const p = A.RELICS[id];
     return `<div class="tr-card tr-relic r${p.r}${p.ventaja ? " vtg" : ""}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${p.amulet ? pips((run.amu || {})[id] || 0, "tr-pips") : ""}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</button>${face ? "" : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
   function renderShop(chest) {
-    legOn = 0;                                                           // mesa nueva: si la legendaria se estaba luciendo en la anterior, esa secuencia ya no sigue
+    legOn = 0; swapIx = null;                                            // mesa nueva: si la legendaria se estaba luciendo en la anterior, esa secuencia ya no sigue
     const slots = 5, info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     if (relicSel && !run.perks.includes(relicSel)) relicSel = null;
@@ -1257,9 +1268,9 @@ window.AIQ = window.AIQ || {};
        con la mochila llena, vendes una y eliges la del cofre gratis */
     const lift = id => { relicSel = id; document.querySelectorAll("#dlg .tr-relic").forEach(x => x.classList.toggle("sel", x.dataset.relic === relicSel)); };
     document.querySelectorAll("#dlg .tr-relic").forEach(c => { const id = c.dataset.relic;
-      c.querySelector(".tr-face").onclick = e => { e.stopPropagation(); lift(relicSel === id ? null : id); A.sfx.card(); };
+      c.querySelector(".tr-face").onclick = e => { e.stopPropagation(); if (swapIx != null) return swapFor(swapIx, id, chest); lift(relicSel === id ? null : id); A.sfx.card(); };
       c.querySelector(".tr-sell").onclick = e => { e.stopPropagation(); relicSel = null; sell(id, chest); }; });
-    const tb = document.querySelector("#dlg .table.mesa"); if (tb) tb.addEventListener("click", () => { if (relicSel) lift(null); });
+    const tb = document.querySelector("#dlg .table.mesa"); if (tb) tb.addEventListener("click", e => { if (relicSel) lift(null); if (swapIx != null && !e.target.closest(".offer")) { swapIx = null; document.querySelectorAll("#dlg .swap-pick, #dlg .swap-src").forEach(x => x.classList.remove("swap-pick", "swap-src")); } });
     if ($("rerollBtn")) $("rerollBtn").onclick = () => {
       const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll();
       if (c > 0 && !run.shellDone && (run.paidRerolls = (run.paidRerolls || 0) + 1) >= 2) { run.shellDone = true; persist(); if (A.dealer.campShell) A.dealer.campShell(); return shellCards(() => openShop(false)); }   // el trile: una vez por expedicion
@@ -1336,7 +1347,10 @@ window.AIQ = window.AIQ || {};
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
       const recharge = !!p.amulet && owned(s.id), swapV = p.ventaja ? perkList().find(q => q.ventaja && q.id !== s.id) : null;
-      if (!recharge && !swapV && run.perks.length >= 5) { A.sfx.deny(); shake(el); flash(A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.")); return; }
+      if (!recharge && !swapV && run.perks.length >= 5) {                // tanda 9 (S10): mochila llena: eliges cual dejas y se cambia en un gesto
+        if (run.coins + Math.max(...run.perks.map(sellValue)) < c) return noFunds(el);
+        swapIx = i; document.querySelectorAll("#dlg .tr-relic").forEach(x => x.classList.add("swap-pick")); document.querySelectorAll("#dlg .offer").forEach(x => x.classList.toggle("swap-src", x === el)); A.sfx.card(); flash(A.tx(SWAP_PICK)); return;
+      }
       if (run.coins + (swapV ? sellValue(swapV.id) : 0) < c) return noFunds(el);
       if (swapV) { run.coins += sellValue(swapV.id); run.perks.splice(run.perks.indexOf(swapV.id), 1); if (run.paid) delete run.paid[swapV.id]; A.sfx.sell(); }   // la Ventaja vieja se vende
       if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);

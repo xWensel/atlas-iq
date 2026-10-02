@@ -418,6 +418,7 @@ window.AIQ = window.AIQ || {};
       "La última mano. Si la ganas, la mesa es tuya. Si la pierdes, te la reabro encantado.|The final hand. Win it and the table is yours. Lose it and I'll gladly reopen it for you.|La dernière main. Gagne-la et la table est à toi. Perds-la et je te la rouvre avec plaisir.|A última mão. Se ganhar, a mesa é sua. Se perder, eu reabro com prazer.|Die letzte Hand. Gewinnst du sie, gehört der Tisch dir. Verlierst du, öffne ich ihn dir gern wieder.|L'ultima mano. Se la vinci, il tavolo è tuo. Se la perdi, te lo riapro volentieri.||最后一手。赢了，牌桌归你。输了，我很乐意再为你开一桌。|마지막 판. 이기면 테이블은 네 거. 지면 기꺼이 다시 열어 주지.|最後の勝負だ。勝てばテーブルは君のもの。負けたら喜んでまた開けてあげよう。|Последняя раздача. Выиграешь — стол твой. Проиграешь — с радостью открою его снова.|Ostatnie rozdanie. Wygrasz – stół jest twój. Przegrasz – z przyjemnością otworzę go od nowa.",
       "El jefe final. Mi mejor baraja, mis peores trucos. Esto es lo que venías buscando.|The final boss. My best deck, my dirtiest tricks. This is what you came for.|Le boss final. Mon meilleur jeu, mes pires tours. C'est pour ça que tu es là.|O chefe final. Meu melhor baralho, meus piores truques. Foi para isso que você veio.|Der Endboss. Mein bestes Deck, meine fiesesten Tricks. Dafür bist du hier.|Il boss finale. Il mio mazzo migliore, i miei trucchi peggiori. È per questo che sei qui.||最终首领。我最好的牌，最狠的花招。你就是为此而来的。|최종 보스. 최고의 덱, 최악의 속임수. 네가 찾던 게 바로 이거지.|ラスボスだ。最高のデッキに最悪のトリック。君はこれを求めて来たんだろう。|Финальный босс. Моя лучшая колода, мои худшие трюки. Ради этого ты здесь.|Ostatni boss. Moja najlepsza talia, moje najgorsze sztuczki. Po to tu jesteś.",
     ],
+    infRules: ["Aquí no valen trucos: ni tiempo extra ni racha protegida. Solo lo que sabes.|No tricks here: no extra time, no protected streak. Just what you know.|Ici, pas de combines : ni temps en plus ni série protégée. Juste ce que tu sais.|Aqui não valem truques: nem tempo extra nem sequência protegida. Só o que você sabe.|Hier gelten keine Tricks: keine Extrazeit, keine geschützte Serie. Nur dein Wissen.|Qui non valgono trucchi: niente tempo extra né serie protetta. Solo quello che sai.||这里不讲花招：没有额外时间，也没有连击保护。只看你知道多少。|여기선 꼼수 없어. 추가 시간도, 연속 기록 보호도 없지. 네가 아는 것뿐이야.|ここでは小細工なし。延長時間もコンボの保護もない。君の知識だけだ。|Здесь без фокусов: ни лишнего времени, ни защиты серии. Только то, что ты знаешь.|Tu nie ma sztuczek: ani dodatkowego czasu, ani chronionej serii. Tylko twoja wiedza."],
     infinite: [
       "¿Modo infinito? Sabes que esto no acaba bien, ¿verdad? Me encanta.|Infinite mode? You know this doesn't end well, right? I love it.|Mode infini ? Tu sais que ça finit mal, hein ? J'adore.|Modo infinito? Você sabe que isso não acaba bem, né? Adoro.|Endlosmodus? Du weißt, dass das nicht gut ausgeht, oder? Ich liebe es.|Modalità infinita? Lo sai che non finisce bene, vero? Adoro.||无尽模式？你知道这不会有好结局吧？我太喜欢了。|무한 모드? 이게 좋게 안 끝난다는 거 알지? 아주 좋아.|エンドレスモード？これがいい終わり方をしないのは知ってるよね？最高だ。|Бесконечный режим? Ты ведь знаешь, что это плохо кончится? Обожаю.|Tryb nieskończony? Wiesz, że to się dobrze nie skończy, prawda? Uwielbiam.",
       "Sin rondas, sin campamento, sin final. Solo tú, el mapa y un reloj que encoge.|No rounds, no camp, no ending. Just you, the map, and a shrinking clock.|Pas de manches, pas de campement, pas de fin. Juste toi, la carte et une horloge qui rétrécit.|Sem rodadas, sem acampamento, sem fim. Só você, o mapa e um relógio que encolhe.|Keine Runden, kein Lager, kein Ende. Nur du, die Karte und eine schrumpfende Uhr.|Niente round, niente accampamento, niente fine. Solo tu, la mappa e un orologio che si restringe.||没有回合，没有营地，没有结局。只有你、地图，和一只越来越短的钟。|라운드도, 캠프도, 끝도 없어. 너와 지도, 그리고 줄어드는 시계뿐.|ラウンドもキャンプも終わりもない。君と地図と、縮んでいく時計だけ。|Ни раундов, ни лагеря, ни финала. Только ты, карта и часы, которые всё короче.|Bez rund, bez obozu, bez końca. Tylko ty, mapa i kurczący się zegar.",
@@ -2081,7 +2082,7 @@ window.AIQ = window.AIQ || {};
     if (fm) { seqFormula = true; return say1("trickAgain", { t: name }); }              // ya dijo su frase hoy: no la repite literal
     return null;                                                                      // y si ya hubo formula en esta intro, calla este truco
   }
-  const ownSaid = {}; let seqFormula = false, debutN = 0;
+  const ownSaid = {}; let seqFormula = false, debutN = 0, infRulesSaid = false;
   /* EL FANTASMA DE TU ULTIMA CAIDA: ghostR = la ronda donde caiste en tu ultima expedicion del mismo modo */
   let ghostR = 0, ghostSaid = false, virginSaid = false;
 
@@ -2611,7 +2612,7 @@ window.AIQ = window.AIQ || {};
     }
     if (special) add(special, "sly");
     else if (o.resumed) add(say1("runResume"));
-    else if (o.inf) add(say1("infinite"), "laugh");
+    else if (o.inf) { add(say1("infinite"), "laugh"); if (!infRulesSaid) { infRulesSaid = true; add(say1("infRules"), "sly"); } }   // tanda 9 (S15): una vez, que aqui no valen trucos
     else if (o.fresh) {
       if (runs <= 1) { add(nth("runFirst", 0)); add(nth("runFirst", 1), "laugh"); }
       else if (o.ranked) add(say1(o.dailyTry >= 3 ? "runDailyLast" : o.dailyTry === 2 ? "runDaily2" : "runDaily", { s: A.fmt(o.dailyTotal || 0) }));   // reto diario: el crupier sabe en que intento vas y lo que llevas hoy

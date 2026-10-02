@@ -3,6 +3,7 @@ window.AIQ = window.AIQ || {};
 (function (A) {
   Object.assign(A.TR = A.TR || {}, {
     "Master switch": ["Interrupteur général", "Interruptor geral", "Hauptschalter", "Interruttore generale", "Interruptor general", "总开关", "메인 스위치", "マスタースイッチ", "Главный выключатель", "Wyłącznik główny"],
+    "Discard": ["Défausse", "Descarte", "Abwurf", "Scarto", "Descarte", "弃牌", "버리기", "捨て札", "Сброс", "Odrzut"],
     "Swap card": ["Carte d'échange", "Carta de troca", "Tauschkarte", "Carta di scambio", "Carta de intercambio", "交换卡", "교환 카드", "交換カード", "Карта обмена", "Karta zamiany"],
     "Swaps this question for another place from the round.": ["Remplace cette question par un autre lieu de la manche.", "Troca esta pergunta por outro lugar da rodada.", "Tauscht diese Frage gegen einen anderen Ort der Runde.", "Sostituisce questa domanda con un altro luogo del round.", "Cambia esta pregunta por otro lugar de la ronda.", "将本题替换为本轮中的另一个地点。", "이 문제를 라운드의 다른 장소로 교체합니다.", "この問題をラウンド内の別の場所に交換する。", "Заменяет этот вопрос на другое место из раунда.", "Zamienia to pytanie na inne miejsce z rundy."],
     "The dealer touches the table": ["Le croupier touche à la table", "O crupiê mexe na mesa", "Der Croupier dreht am Tisch", "Il croupier tocca il tavolo", "El crupier toca la mesa", "荷官触碰了桌面", "딜러가 테이블을 건드립니다", "ディーラーがテーブルに手を加える", "Крупье касается стола", "Krupier majstruje przy stole"],
