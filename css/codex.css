@@ -270,7 +270,11 @@ body.cx-on .cx-toast { display: none !important; }                     /* su car
 .cx-rel .cx-pips i { width: 9px; height: 9px; } .cx-rel .cx-pips i:not(.on) { background: rgba(255, 255, 255, .08); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .2); }
 .cx-mini { width: 100%; max-width: 480px; height: 210px; display: block; border-radius: 12px; box-shadow: 0 0 0 2px #0a140f, inset 0 0 0 1.5px rgba(78, 227, 193, .3); }
 .cx-coord { margin: 6px 0 0; font-family: var(--mono); font-size: 13px; letter-spacing: .05em; color: rgba(242, 233, 214, .55); }
-.cx-light { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: rgba(4, 10, 13, .94); cursor: zoom-out; } .cx-light.hidden { display: none; } .cx-light img { max-width: 96%; max-height: 90%; object-fit: contain; animation: cx-fade .3s both; box-shadow: 0 20px 80px #000; }
+/* visor HD: toda la ventana (tambien los lados del lienzo en pantallas anchas) y la foto entera, encogida para caber sin scroll. La celda de la rejilla
+   tiene alto fijo (minmax(0, 1fr)): con una fila "auto" el max-height en % no limitaba nada y las fotos altas se salian por abajo */
+.cx-light { --lx: calc((min(1480px, 100 * var(--vw)) - 100 * var(--vw)) / 2); position: absolute; inset: 0 var(--lx); z-index: 3; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center;
+  padding: 58px 64px 50px; background: rgba(4, 10, 13, .94); cursor: zoom-out; } .cx-light.hidden { display: none; }
+.cx-light img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 8px; animation: cx-fade .3s both; box-shadow: 0 0 0 2px rgba(78, 227, 193, .22), 0 20px 80px #000; }
 .cx-light p { position: absolute; bottom: 14px; left: 0; right: 0; margin: 0; text-align: center; font-family: var(--mono); font-size: 14px; color: rgba(242, 233, 214, .6); } .cx-lx { position: absolute; top: 14px; right: 16px; font-size: 22px; color: var(--paper); background: none; border: 0; cursor: pointer; }
 
 /* ---------- aviso de tarjeta nueva ---------- */

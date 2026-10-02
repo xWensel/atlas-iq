@@ -990,19 +990,24 @@ window.AIQ = window.AIQ || {};
     map.setMarks(marks);
     map.fitPoints(pts, pad, ms);
   }
-  /* el pais bajo el raton (solo los de la Enciclopedia) */
+  /* el pais bajo el raton (solo los de la Enciclopedia). Primero el que contiene el punto; solo si cae en el mar, el mas cercano a unos
+     pocos pixeles (a este zoom). Antes valia el primero de la lista a menos de 25 km y Palestina salia siempre como Israel o Jordania */
   function pickAt(cx, cy) {
     if (!map.screenToLonLat) return null;
-    const r = map.cv.getBoundingClientRect(); let lon, lat;
-    try { [lon, lat] = map.screenToLonLat(cx - r.left, cy - r.top); } catch (x) { return null; }
+    const r = map.cv.getBoundingClientRect(); let lon, lat, tol;
+    try { [lon, lat] = map.screenToLonLat(cx - r.left, cy - r.top); const q = map.screenToLonLat(cx - r.left + 8, cy - r.top); tol = A.geo.haversine(lat, lon, q[1], q[0]); } catch (x) { return null; }
     if (!(lat >= -90 && lat <= 90) || !isFinite(lon)) return null; lon = ((lon + 540) % 360) - 180;
-    const by = index().byNE;
+    tol = Math.min(150, isFinite(tol) ? tol : 25);
+    const by = index().byNE, pad = tol / 80 + 0.3, cand = [];
     for (const f of world.features) {
-      if (!by[f.name]) continue;
-      let near = false; for (const p of f.polys) for (const L of [lon, lon + 360, lon - 360]) if (L >= p.bbox[0] - 0.3 && L <= p.bbox[2] + 0.3 && lat >= p.bbox[1] - 0.3 && lat <= p.bbox[3] + 0.3) { near = true; break; }
-      if (near && (A.geo.inFeature(lon, lat, f) || A.geo.distToFeature(lon, lat, f, 25) < 25)) return f.name;
+      let near = false; for (const p of f.polys) for (const L of [lon, lon + 360, lon - 360]) if (L >= p.bbox[0] - pad && L <= p.bbox[2] + pad && lat >= p.bbox[1] - pad && lat <= p.bbox[3] + pad) { near = true; break; }
+      if (!near) continue;
+      if (A.geo.inFeature(lon, lat, f)) return by[f.name] ? f.name : null;   // dentro de un pais: ese, nunca el vecino
+      if (by[f.name]) cand.push(f);
     }
-    return null;
+    let best = null, bd = tol;
+    for (const f of cand) { const d = A.geo.distToFeature(lon, lat, f, bd); if (d < bd) { bd = d; best = f.name; } }
+    return best;
   }
   function mapTip(ne, cx, cy) {
     const tip = $("cxTip"), stage = $("cxStage"); if (!tip || !stage) return;
