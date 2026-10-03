@@ -167,6 +167,7 @@ window.AIQ = window.AIQ || {};
       this.animateTo(v, 1400); setTimeout(() => { if (!this.anim) this.drift = { base: { ...this.view }, t0: performance.now() }; }, 1500);
     }
     zoomBy(f, px = this.W / 2, py = this.H / 2, animate = true) {
+      if (this.zzUntil && performance.now() < this.zzUntil) return;
       const v = this.anim ? this.anim.to : this.view;
       const [wx, wy] = this._toWorld(px, py, v);
       const s = clamp(v.s * f, this.minS, this.maxS);
@@ -183,6 +184,7 @@ window.AIQ = window.AIQ || {};
       const cv = this.cv; cv.style.touchAction = "none";
       cv.addEventListener("contextmenu", e => e.preventDefault());
       cv.addEventListener("pointerdown", e => {
+        if (this.zzUntil && performance.now() < this.zzUntil) return;
         if (e.pointerType === "mouse" && e.button !== 0) return;                   // solo el boton principal (el derecho marcaba respuesta al soltar)
         cv.setPointerCapture(e.pointerId); this.drift = null;
         this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false });
@@ -222,6 +224,7 @@ window.AIQ = window.AIQ || {};
     _pinchState() { const [a, b] = [...this.pointers.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; }
     _tap(px, py) {
       if (!this.pickEnabled) return;
+      if (this.zzUntil && performance.now() < this.zzUntil) return;
       const [x, y] = this._toWorld(px, py); const [lon, lat] = unproject(x, y);
       if (lon < -180 || lon > 180 || lat > 90 || lat < -90) return;
       this.onPick(lon, lat);

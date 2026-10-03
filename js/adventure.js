@@ -287,6 +287,7 @@ window.AIQ = window.AIQ || {};
     for (let k = sum("skipHardest"); k > 0 && list.length; k--) { const RK = { map: 5, wall: 4, ptr: 3, rule: 2 }, w = c => (c.lv || 1) * 10 + (RK[A.CHAL[c.id].kind] || 1); const top = list.reduce((a, c) => (w(c) > w(a) ? c : a)); nulled.push(top.id); list = list.filter(c => c !== top); }   // Comodin: fuera el reto mas fuerte
     if (boss) { let soft = sum("softenBoss"); list = list.map((c, i) => (i < soft ? { ...c, lv: 1 } : c)); }
     list = list.filter(c => !pl.some(p => (p.immune || []).includes(c.id)));
+    if (run.board) list = list.map(c => (c.id === "trap" && (c.lv || 1) > 2 ? { ...c, lv: 2 } : c));   // tanda 15: la Pregunta trampa, en el Reto diario, como mucho a nivel 2
     const bet = !run.inf && run.bets && run.bets[r];                   // tanda 11: los de la apuesta, sellados (si fallas, la revancha va sin ellos)
     if (bet && bet.retos && !(r === roundNo() && run.attempt > 0 && bet.id !== "offer")) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
     if (pl.some(p => p.pact) && !boss && !run.inf && r <= LAST && list.length < 4) { const add = pickSealed(r, 1, "pacto", list)[0]; if (add) list.push({ ...add, lv: clamp(list.length ? Math.max(...list.map(c => c.lv || 1)) : 1, 1, 3), sealed: true, sealBy: "pact" }); }   // tanda 13: el reto del Pacto
@@ -475,13 +476,28 @@ window.AIQ = window.AIQ || {};
     for (const b of B.bands) if (!taken.length) takeFrom(b.list, 1, rr, taken, ctx, null);
     return taken.slice(0, 1);
   }
-  function pickQuestions(n, keep) {
+  /* Pregunta trampa (tanda 15): de las 3 faciles de la ronda, 1 o 2 se cambian por otra de una franja mas dura del mismo tema (nv1 2/2/1, nv2 2/1/2, nv3 1/2/2).
+     Las 5 de siempre salen igual (drawRound no se toca): lo que cambia sale de su propia sub-semilla ":trap", y la que entra lleva q.trap = true (esquina roja y sello) */
+  function applyTrap(out, pos, attempt, used, lv) {
+    const t = A.chal.par({ id: "trap", lv }), B = bandsOf(slotOf(pos)), easy = new Set(B.bands[0].list.map(q => q.cid[0])), rr = A.rng(`${run.seed}:q:${pos}:${attempt}:trap`);
+    const idx = rr.shuffle(out.map((q, i) => (easy.has(q.cid[0]) ? i : -1)).filter(i => i >= 0)), want = [].concat(t.med ? [1] : [], t.hard ? [2] : []);
+    want.forEach((band, j) => {
+      if (j >= idx.length) return;
+      const got = takeFrom(B.bands[band].list, 1, rr, out.filter((q, i) => i !== idx[j]), ctxOf(pos, used.concat(out.map(q => q.cid[0])), B.topic), band === 2 ? B.tail : null);
+      if (got[0]) out[idx[j]] = { ...got[0], trap: true };
+    });
+    return out;
+  }
+  A.adv._bandIdx = cid => bandsOf(slotOf(roundNo())).bands.findIndex(b => b.list.some(q => q.cid[0] === cid));   // para las pruebas: 0 facil, 1 media, 2 dificil
+  function pickQuestions(n, keep, chal) {
     const all = allQ();
-    if (keep && run.qv === QV && run.curQ && run.curQ.length === n && run.curQ.every(id => all[id])) { run.used = run.used.concat(run.curQ.filter(id => !run.used.includes(id))); return run.curQ.map(id => withSub({ ...all[id] })); }
+    if (keep && run.qv === QV && run.curQ && run.curQ.length === n && run.curQ.every(id => all[id])) { run.used = run.used.concat(run.curQ.filter(id => !run.used.includes(id))); return run.curQ.map(id => { const q = withSub({ ...all[id] }); if (run.trap && run.trap.includes(id)) q.trap = true; return q; }); }
     const pos = roundNo();
     let used = run.used;
     if (run.board) { used = dailyUsed(pos); for (let a = 0; a < run.attempt; a++) used = used.concat(drawRound(pos, a, used, Math.min(n, 5)).map(q => q.cid[0])); }
-    const out = drawRound(pos, run.attempt, used, Math.min(n, 5));
+    const out = drawRound(pos, run.attempt, used, Math.min(n, 5)), tp = !run.inf && chal && chal.find(c => c.id === "trap");
+    if (tp) applyTrap(out, pos, run.attempt, used, tp.lv || 1);
+    run.trap = out.filter(q => q.trap).map(q => q.cid[0]);
     if (n > 5) out.push(...drawExtra(pos, run.attempt, used.concat(out.map(q => q.cid[0]))));   // la 6.a, la ultima
     run.qv = QV; run.curQ = out.map(q => q.cid[0]); run.used = run.used.concat(run.curQ);
     return out.map(q => withSub({ ...q }));
@@ -498,7 +514,7 @@ window.AIQ = window.AIQ || {};
     run.boss = rules; run.wind = null;
     if (rules.includes("wind")) { const wr = A.rng(`${run.seed}:wind:${r}:${run.attempt}`); run.wind = { brg: Math.round(wr() * 360), km: Math.round((160 + 40 * run.act) * halve) }; }
     run.qn = has("sleeve") && !run.inf ? 6 : 5;
-    const qs = pickQuestions(run.qn, keep), info = actInfo(run.act), tn = TOPIC_NAMES[def.topic][Math.min(def.tier, TOPIC_NAMES[def.topic].length - 1)];
+    const qs = pickQuestions(run.qn, keep, cf.list), info = actInfo(run.act), tn = TOPIC_NAMES[def.topic][Math.min(def.tier, TOPIC_NAMES[def.topic].length - 1)];
     run.topic = def.topic; run.tier = def.tier;
     if (!(keep && run.split && run.split.key === tgtKey())) {           // Dividir (tanda 12b): la alternativa de la pregunta dificil
       run.split = null;

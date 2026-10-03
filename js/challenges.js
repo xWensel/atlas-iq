@@ -39,6 +39,10 @@ window.AIQ = window.AIQ || {};
   def("nocountry", "text", "t_country", "Sin país|No country|Sans pays|Sem país|Ohne Land|Senza paese||没有国家|국가 없음|国なし|Без страны|Bez kraju", "El país del lugar desaparece: solo te queda el nombre.|The place's country disappears: only the name is left.|Le pays du lieu disparaît : il ne reste que le nom.|O país do lugar desaparece: só resta o nome.|Das Land des Ortes verschwindet: nur der Name bleibt.|Il paese del luogo sparisce: resta solo il nome.||地点所属的国家消失了：只剩下名字。|장소의 국가가 사라지고 이름만 남습니다.|場所の国が消え、名前だけが残る。|Страна места исчезает: остаётся только название.|Kraj miejsca znika: zostaje tylko nazwa.", ["atlasbook"]);
   def("fakepass", "text", "ch_fakepass", "Pasaporte falso|Fake passport|Faux passeport|Passaporte falso|Gefälschter Pass|Passaporto falso||假护照|가짜 여권|偽造パスポート|Поддельный паспорт|Fałszywy paszport", "El país de debajo a veces miente: es un vecino.|The country below sometimes lies: it's a neighbor.|Le pays en dessous ment parfois : c'est un voisin.|O país de baixo às vezes mente: é um vizinho.|Das Land darunter lügt manchmal: Es ist ein Nachbar.|Il paese sotto a volte mente: è un vicino.||下面的国家有时会撒谎：其实是邻国。|아래의 국가가 가끔 거짓말을 합니다. 이웃 나라예요.|下の国名はときどき嘘をつく。隣の国だ。|Страна под названием иногда врёт: это сосед.|Kraj pod nazwą czasem kłamie: to sąsiad.", []);   // tanda 14: el pais de debajo a veces es un vecino
   def("ticker", "text", "ch_ticker", "Panel de salidas|Departures board|Tableau des départs|Painel de partidas|Abflugtafel|Tabellone delle partenze||出发航班牌|출발 전광판|出発案内板|Табло вылетов|Tablica odlotów", "Las letras del nombre giran como en un aeropuerto hasta que se fijan.|The name's letters spin like an airport board until they lock in.|Les lettres du nom tournent comme dans un aéroport jusqu'à se figer.|As letras do nome giram como num aeroporto até se fixarem.|Die Buchstaben des Namens rattern wie auf einer Flughafentafel, bis sie einrasten.|Le lettere del nome girano come in un aeroporto finché non si fermano.||名字的字母像机场信息板一样翻动，直到定格。|이름의 글자가 공항 전광판처럼 돌아가다가 하나씩 멈춥니다.|名前の文字が空港の案内板のように回り、1つずつ止まる。|Буквы названия крутятся, как на табло в аэропорту, пока не встанут на место.|Litery nazwy obracają się jak na tablicy lotniska, aż się zatrzymają.", []);   // tanda 14: panel de salidas (sustituye a la Marquesina)
+  def("ctrlz", "wall", "ch_ctrlz", "Ctrl+Z|Ctrl+Z|Ctrl+Z|Ctrl+Z|Strg+Z|Ctrl+Z||Ctrl+Z|Ctrl+Z|Ctrl+Z|Ctrl+Z|Ctrl+Z", "El crupier deshace tu zoom: el mapa vuelve a la vista inicial.|The dealer undoes your zoom: the map snaps back to the starting view.|Le croupier annule ton zoom : la carte revient à la vue de départ.|O crupiê desfaz o seu zoom: o mapa volta à vista inicial.|Der Croupier macht deinen Zoom rückgängig: Die Karte springt zur Startansicht zurück.|Il croupier annulla il tuo zoom: la mappa torna alla vista iniziale.||荷官撤销了你的缩放：地图会跳回初始视角。|딜러가 확대를 취소해요. 지도가 처음 시점으로 돌아갑니다.|ディーラーがズームを取り消す：地図が最初の視点に戻る。|Крупье отменяет твой зум: карта возвращается к исходному виду.|Krupier cofa twój zoom: mapa wraca do widoku początkowego.");
+  def("stormnight", "map", "ch_stormnight", "Noche de tormenta|Stormy night|Nuit d'orage|Noite de tempestade|Gewitternacht|Notte di tempesta||暴风雨之夜|폭풍우 치는 밤|嵐の夜|Грозовая ночь|Burzowa noc", "El mapa está a oscuras: solo lo ves entero cuando cae un rayo.|The map is dark: you only see it whole when lightning strikes.|La carte est dans le noir : tu ne la vois en entier que lorsque la foudre tombe.|O mapa fica às escuras: você só o vê inteiro quando cai um raio.|Die Karte liegt im Dunkeln: Nur wenn ein Blitz einschlägt, siehst du sie ganz.|La mappa è al buio: la vedi intera solo quando cade un fulmine.||地图一片漆黑：只有闪电落下时才能看清全貌。|지도가 어둠 속에 잠겨 있어요. 번개가 칠 때만 전체가 보입니다.|地図は真っ暗：雷が落ちたときだけ全体が見える。|Карта в темноте: целиком её видно только при ударе молнии.|Mapa tonie w ciemności: całą widać tylko, gdy uderza piorun.");
+  def("trap", "rule", "ch_trap", "Pregunta trampa|Trick question|Question piège|Pergunta-armadilha|Fangfrage|Domanda trabocchetto||陷阱题|함정 문제|ひっかけ問題|Вопрос-ловушка|Podchwytliwe pytanie", "Una pregunta fácil se cambia por otra más dura, con el sello TRAMPA.|An easy question is swapped for a tougher one, stamped TRAP.|Une question facile est remplacée par une plus dure, tamponnée PIÈGE.|Uma pergunta fácil é trocada por outra mais difícil, com o selo ARMADILHA.|Eine leichte Frage wird gegen eine schwerere getauscht, mit dem Stempel FALLE.|Una domanda facile viene sostituita da una più dura, col timbro TRAPPOLA.||一道简单题会换成更难的题，并盖上「陷阱」印章。|쉬운 문제 하나가 더 어려운 문제로 바뀌고 '함정' 도장이 찍힙니다.|易しい問題が難しい問題にすり替わり、「ワナ」のスタンプが押される。|Лёгкий вопрос меняется на более трудный с печатью «ЛОВУШКА».|Łatwe pytanie zamienia się na trudniejsze z pieczęcią PUŁAPKA.");
+  def("giants", "map", "ch_giants", "Gigantes y enanos|Giants and dwarfs|Géants et nains|Gigantes e anões|Riesen und Zwerge|Giganti e nani||巨人与矮人|거인과 난쟁이|巨人と小人|Гиганты и карлики|Giganci i karły", "Unos continentes se agigantan y otros se encogen: hay que hacer zoom.|Some continents swell and others shrink: you'll have to zoom.|Certains continents grossissent, d'autres rétrécissent : il faudra zoomer.|Alguns continentes crescem e outros encolhem: será preciso dar zoom.|Manche Kontinente werden riesig, andere winzig: Du musst zoomen.|Alcuni continenti si ingigantiscono e altri si rimpiccioliscono: dovrai fare zoom.||有些大洲变得巨大，有些缩得很小：你得缩放地图。|어떤 대륙은 거대해지고 어떤 대륙은 작아져요. 확대·축소가 필요합니다.|巨大化する大陸と縮む大陸がある：ズームが必要だ。|Одни континенты разрастаются, другие сжимаются: придётся менять масштаб.|Jedne kontynenty rosną, inne maleją: trzeba będzie zoomować.");
   /* --- mapa --- */
   def("blur", "map", "ch_blur", "Mapa borroso|Blurry map|Carte floue|Mapa desfocado|Verschwommene Karte|Mappa sfocata||模糊的地图|흐릿한 지도|ぼやけた地図|Размытая карта|Rozmyta mapa", "El mapa está desenfocado.|The map is out of focus.|La carte est floue.|O mapa está fora de foco.|Die Karte ist unscharf.|La mappa è sfocata.||地图失焦了。|지도의 초점이 맞지 않습니다.|地図のピントが合っていない。|Карта не в фокусе.|Mapa jest nieostra.", ["lens", "divingmask"]);
   def("dark", "map", "ch_dark", "Apagón|Blackout|Panne de courant|Apagão|Stromausfall|Blackout||停电|정전|停電|Отключение света|Awaria prądu", "El casino se queda a oscuras: solo ves cerca del puntero.|The casino goes dark: you only see near your pointer.|Le casino s'éteint : tu ne vois qu'autour du pointeur.|O cassino fica às escuras: só se vê perto do ponteiro.|Das Casino wird dunkel: du siehst nur um den Zeiger.|Il casinò si spegne: vedi solo vicino al puntatore.||赌场一片漆黑：你只能看到指针附近。|카지노가 어두워집니다: 포인터 주변만 보입니다.|カジノが暗くなる：ポインターの周りしか見えない。|В казино гаснет свет: видно только возле курсора.|W kasynie gaśnie światło: widzisz tylko wokół kursora.", ["miner"]);
@@ -96,13 +100,13 @@ window.AIQ = window.AIQ || {};
     shaky: "letras", missing: "letras", anagram: "letras", runes: "letras", mirror: "letras", memory: "letras", flagpuzzle: "letras",
     riddle: "saber", nocountry: "saber", babel: "saber", ticker: "saber",
     dark: "luz", battery: "luz", flagdark: "luz",
-    flicker: "tormenta", lightning: "tormenta",
+    flicker: "tormenta", lightning: "tormenta", stormnight: "tormenta",
     blur: "vista", myopia: "vista", mosaic: "vista", clouds: "vista", rain: "vista", flagblur: "vista", flagwind: "vista",
-    spread: "sitio", tilt: "sitio", flip: "sitio", spin: "sitio", quake: "sitio", flagback: "sitio",
+    spread: "sitio", tilt: "sitio", flip: "sitio", spin: "sitio", quake: "sitio", flagback: "sitio", giants: "sitio",
     tremble: "puntero", ghost: "puntero", lag: "puntero", cmirror: "puntero",
-    crack: "pantalla", hang: "pantalla",
+    crack: "pantalla", hang: "pantalla", ctrlz: "pantalla",
     wrongborders: "mentiras", noborders: "mentiras", decoys: "mentiras", flaghue: "mentiras", flaggray: "mentiras", fakepass: "mentiras",
-    wind: "reglas", storm: "reglas", silence: "reglas",
+    wind: "reglas", storm: "reglas", silence: "reglas", trap: "reglas",
   };
   const AMULET = { letras: "dictionary", luz: "miner", vista: "divingmask", sitio: "plates", puntero: "steadyhand", pantalla: "protector" };
   /* tanda 6: FUSIONES. Los retos gemelos se funden en uno con tres niveles que se notan; los absorbidos (SUB) quedan como efectos internos: ya no
@@ -153,7 +157,7 @@ window.AIQ = window.AIQ || {};
   const CLASH = { memory: ["hang", "battery"], hang: ["memory"], battery: ["memory"] };
   const clashes = (id, ids) => (CLASH[id] || []).some(x => ids.includes(x));
   /* reglas: salen de una bolsa por expedicion (las tres barajadas; ninguna se repite hasta que han salido todas, ni en el cambio de bolsa) */
-  const ruleBag = (seed, i) => { let bag = null, prev = null; for (let j = 0; j <= Math.floor(i / 3); j++) { bag = A.rng(`${seed}:rules:${j}`).shuffle(RULE); if (bag[0] === prev) [bag[0], bag[1]] = [bag[1], bag[0]]; prev = bag[2]; } return bag[i % 3]; };
+  const ruleBag = (seed, i) => { let bag = null, prev = null; for (let j = 0; j <= Math.floor(i / RULE.length); j++) { bag = A.rng(`${seed}:rules:${j}`).shuffle(RULE); if (bag[0] === prev) [bag[0], bag[1]] = [bag[1], bag[0]]; prev = bag[RULE.length - 1]; } return bag[i % RULE.length]; };
   /* jefes por acto. Acto II: solo combinaciones sin retos de texto (su jefe es la ronda de banderas, donde el texto no hace nada: Mala vision, Noche
      cerrada y Sin pasaporte no salian nunca en la Aventura; en el Reto diario, que baraja la ruta, si podian salir). Acto III: "Sin pasaporte"
      (antes Torre de Babel, que se llamaba igual que su reto y traia runas, que no hacen nada en chino, japones y coreano).
@@ -319,6 +323,11 @@ window.AIQ = window.AIQ || {};
     case "flagpuzzle": return { cols: [2, 3, 4][i], rows: [2, 2, 3][i], pair: i === 0, gray: i === 2 ? 2 : 0 };
     case "flagwind": return { amp: [3, 5, 7][i], T: [1.9, 1.3, 1.1][i], sh: [0.2, 0.55, 0.62][i], gust: i === 2 };
     case "flagback": return {};
+    /* tanda 15 */
+    case "ctrlz": return { every: [6, 4, 0][i], after: [0, 0, 1.5][i], half: fx.glassMul < 0.9 };   // cada 6 s / cada 4 s / 1,5 s despues de cada zoom; el Protector la deja a la mitad
+    case "stormnight": return { iv: [1.5, 2.2, 3][i], glow: 900 };                      // un rayo cada 1,5 / 2,2 / 3 s, con un resplandor de 0,9 s
+    case "trap": return { med: [1, 0, 1][i], hard: [0, 1, 1][i] };                      // 2/2/1 (una facil pasa a media), 2/1/2 (una facil pasa a dificil), 1/2/2 (las dos)
+    case "giants": return { g: [1, 1, 1][i], d: [1, 2, 3][i], big: [1.5, 1.8, 2.1][i], small: [0.5, 0.35, 0.25][i], base: [0.9, 0.85, 0.85][i] };   // cuantos crecen, cuantos se encogen y cuanto; base: lo que se encogen los demas para dejar sitio (medido: gigante 1,3 / 1,6 / 1,8 reales)
     default: return {};
   } };
   const cur = () => S.qlist || S.list;                                  // los retos de ESTA pregunta (la ronda, con el suplente de Babel si toca)
@@ -330,7 +339,7 @@ window.AIQ = window.AIQ || {};
   function ensureOverlay(map) {
     if (S.ov && S.ov.isConnected) return S.ov;
     const ov = document.createElement("div"); ov.id = "chOv";
-    ov.innerHTML = `<div class="ch-blur"></div><div class="ch-myopia2"></div><div class="ch-myopia"></div><div class="ch-dark"></div><div class="ch-halo"></div><div class="ch-spot"></div><canvas class="ch-clouds" width="256" height="144"></canvas><div class="ch-flash"></div><div class="ch-flick"></div>`;
+    ov.innerHTML = `<div class="ch-blur"></div><div class="ch-myopia2"></div><div class="ch-myopia"></div><div class="ch-dark"></div><div class="ch-halo"></div><div class="ch-spot"></div><canvas class="ch-clouds" width="256" height="144"></canvas><div class="ch-night"></div><div class="ch-flash"></div><div class="ch-flick"></div>`;
     (map && map.fx ? map.fx : $("map")).after(ov); S.ov = ov; if (A.chfx) A.chfx.attach(ov); return ov;
   }
   const layer = c => (S.ov ? S.ov.querySelector(".ch-" + c) : null);
@@ -584,13 +593,15 @@ window.AIQ = window.AIQ || {};
     const rr = A.rng(`${S.seed}:m:${S.round}`), fl0 = get("flip");
     const ori = has("mirrorx") && !S.fx.unmirrorMap ? { rot: 0, mx: 1 } : fl0 && !S.fx.unmirrorMap ? { rot: Math.PI, mx: fl0.lv >= 3 ? 1 : 0 } : null;   // el mismo giro que se pone mas abajo
     const lay = ["pangea", "spread", "deal"].map(id => get(id)).find(Boolean);
+    const gi = get("giants"), scl = gi ? giantScales(gi.lv || 1, `${S.seed}:gd:${S.round}`) : null;
     const tl = get("tilt"); if (tl) { const k = par(tl).k; for (let c = 0; c < 6; c++) spec.rot[c] = (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * k; any = true; }
-    if (lay || tl) {                                                                                // motor de encaje con mascaras reales: los continentes nunca se pisan, tambien en Pangea
-      const kind = lay ? (lay.id === "deal" ? "mix" : lay.id) : "hold", k = lay ? par(lay).k : 1;
+    if (lay || tl || gi) {                                                                                // motor de encaje con mascaras reales: los continentes nunca se pisan, tambien en Pangea
+      const kind = lay ? (lay.id === "deal" ? "mix" : lay.id) : gi ? "giants" : "hold", k = lay ? par(lay).k : 1;
       const Z = hudZones(map, ori); if (kind === "mix") { Z.pts = roundPts(map); spec.rot = [0, 0, 0, 0, 0, 0, 0]; }
-      const L = layoutMemo(map, [S.seed, S.round, kind, k, spec.rot.join(), Z.key, Z.pts ? Z.pts.key : ""].join("|"), () => map.layout(kind, k, rr, spec.rot, Z)); spec.shift = L.shift; spec.scale = L.scale; any = true;
+      const L = layoutMemo(map, [S.seed, S.round, kind, k, spec.rot.join(), Z.key, Z.pts ? Z.pts.key : "", scl ? scl.join() : ""].join("|"), () => map.layout(kind, k, rr, spec.rot, Z, scl)); spec.shift = L.shift; spec.scale = L.scale; any = true;
       if (!L.ok) spec.rot = [0, 0, 0, 0, 0, 0, 0];                    // no hubo sitio: se quedan en su sitio y sin girar (girados a tamano completo se pisarian)
       if (lay && lay.id === "pangea") { spec.smooth = true; spec.ms = 2600; }
+      if (gi) { spec.smooth = true; spec.ms = 1500; }                                  // tanda 15: crecen y se encogen sin rebote
       if (kind === "mix") { spec.smooth = true; spec.ms = 1800; spec.deal = true; }   // como cartas: se encogen en su sitio y aparecen en el nuevo (sin cruzarse ni pasarse de largo)
     }
     const wb = get("wrongborders"); if (wb) { spec.wob = par(wb).amp; any = true; }
@@ -680,6 +691,88 @@ window.AIQ = window.AIQ || {};
       go(0);
     }, wait);
   }
+
+  /* ================================================================== tanda 15: retos nuevos II
+     Ctrl+Z (pantalla: el crupier deshace tu zoom), Noche de tormenta (tormenta: el mapa a oscuras, solo se ve entero cuando cae un rayo),
+     Pregunta trampa (reglas: aqui solo el sello; el cambio de reparto esta en adventure.js, applyTrap) y Gigantes y enanos (sitio: mapSpec) */
+  const TRAP_TXT = L6("TRAMPA|TRAP|PIÈGE|ARMADILHA|FALLE|TRAPPOLA||陷阱|함정|ワナ|ЛОВУШКА|PUŁAPKA");
+  /* el raton de verdad (el reticulo puede temblar o ir con retraso por otros retos: eso no cuenta como mover) */
+  addEventListener("pointermove", e => { if (e.pointerType !== "touch") S.mvAt = performance.now(); }, { passive: true });
+  /* --- Ctrl+Z: cada 6 s (nv1), cada 4 s (nv2) o 1,5 s despues de cada zoom (nv3), el mapa vuelve a la vista inicial en 300 ms.
+     Juego limpio: nunca con un boton pulsado ni en los 400 ms siguientes a mover el raton, durante los 300 ms no se aceptan clics (y se devuelven al reloj),
+     no actua durante el reparto de Continentes barajados ni con una sonda en curso, y solo mueve la camara */
+  const zzView = map => map.tv || (map.anim ? map.anim.to : map.view);
+  function zzClear() { const el = document.getElementById("zzFx"); if (el) el.remove(); S.zz = null; if (S.map) S.map.zzUntil = 0; }
+  function zzKey() {
+    const old = document.getElementById("zzFx"); if (old) old.remove();
+    const el = document.createElement("div"); el.id = "zzFx"; el.setAttribute("aria-hidden", "true");
+    el.style.setProperty("--zr", ((Math.random() - 0.5) * 14).toFixed(1) + "deg"); el.style.setProperty("--zx", Math.round((Math.random() - 0.5) * 260) + "px"); el.style.setProperty("--zy", Math.round((Math.random() - 0.5) * 90) + "px");
+    el.innerHTML = '<i class="zz-scan"></i><span class="zz-cap"><b class="zz-k">Ctrl</b><u>+</u><b class="zz-k zz-z">Z</b></span>';
+    document.body.appendChild(el); setTimeout(() => { if (el.isConnected) el.remove(); }, 1000);
+  }
+  const zzSafe = (map, now) => {
+    const d = map.dist;
+    return phaseOk() && !(map.pointers && map.pointers.size) && now - (S.mvAt || 0) > 400 && !(d && d.spec && d.spec.deal && d.k < 0.999) && !(map.probes || []).some(p => now - (p.t0 || 0) < 800) && now >= (map.zzUntil || 0);
+  };
+  function ctrlzFire(map, p, z, now) {
+    z.pend = false; z.nextAt = now + p.every * 1000 * (0.85 + Math.random() * 0.3); z.zoomAt = 0; z.n++;
+    if (p.half && z.n % 2 === 0) return;                                           // Protector: actua la mitad de las veces
+    const g = A.core && A.core.S, ms = calmMo() ? 0 : 300;
+    zzKey(); say("zUndo");
+    if (ms) { map.zzUntil = now + ms + 40; if (g) g.limit += ms / 1000; }           // durante los 300 ms no se aceptan clics: ese tiempo se devuelve
+    map.animateTo(map.home(), ms);
+  }
+  function ctrlzLoop() {
+    const c = get("ctrlz"), map = S.map; if (!c || S.suspended || !S.on || !map || !map.animateTo || !map.home) return;
+    const p = par(c), z = S.zz = { n: 0, s0: zzView(map).s, zoomAt: 0, pend: false, nextAt: performance.now() + (p.every || 0) * 1000 * (0.85 + Math.random() * 0.3) };
+    const zoomed = () => zzView(map).s > map.home().s * 1.2;
+    later(function tick() {
+      if (S.zz !== z || !S.on || S.suspended) return;
+      const now = performance.now(), s = zzView(map).s;
+      if (Math.abs(s - z.s0) > z.s0 * 0.003) { z.s0 = s; z.zoomAt = now; }
+      if (phaseOk()) {
+        let due = false;
+        if (p.after) due = zoomed() && z.zoomAt > 0 && now - z.zoomAt >= p.after * 1000;
+        else { if (now >= z.nextAt) z.pend = true; if (z.pend && !zoomed()) { z.pend = false; z.nextAt = now + p.every * 1000 * (0.85 + Math.random() * 0.3); } due = z.pend && now - z.zoomAt > 380; }
+        if (due && zzSafe(map, now)) ctrlzFire(map, p, z, now);
+      }
+      later(tick, 100);
+    }, 100);
+  }
+  /* --- Noche de tormenta: el mapa a oscuras (costas al 10 %) y solo se ve entero mientras dura el resplandor de un rayo. Cada rayo es de su manera
+     (normal, relampago lejano que solo medio alumbra, o doble); el primero cae enseguida. Con Destellos suaves, la luz entra y sale en un fundido */
+  function nightLoop() {
+    const sn = get("stormnight"); if (!sn || S.suspended || !S.on) return; const p = par(sn), CX = A.chfx, PX = !!(CX && CX.ok()), el = layer("night"), n = S.nt = { id: Math.random() };
+    if (!PX) { if (el) el.classList.add("on"); say("rain", 0.3); }
+    const up = kind => {
+      if (PX) return CX.night({ kind, ms: p.glow });
+      const sf = !!(A.softFlash && A.softFlash()), ms = kind === "sheet" ? p.glow * 0.7 : p.glow; if (!el) return;
+      el.classList.toggle("soft", sf); el.classList.remove("on"); say("nightBang", kind, sf); later(() => { if (S.nt === n && S.on) el.classList.add("on"); }, ms);
+    };
+    later(function beat() {
+      if (S.nt !== n || !S.on || S.suspended) return;
+      if (!phaseOk()) return later(beat, 400);
+      const r = Math.random(), kind = r < 0.68 ? "strike" : r < 0.88 ? "sheet" : "double";
+      up(kind); later(beat, p.iv * 1000 * (0.75 + Math.random() * 0.5) + (kind === "double" ? 260 : 0));
+    }, 380 + Math.random() * 260);
+  }
+  /* --- Pregunta trampa: la esquina roja y el sello (adventure.js marca o.trap en las preguntas cambiadas) */
+  function trapClear() { const pl = $("plate"); if (!pl) return; pl.classList.remove("trap"); const m = pl.querySelector(".trap-mark"); if (m) m.remove(); }
+  function trapMark(o) {
+    trapClear(); if (!S.on || S.suspended || !has("trap") || !o || !o.trap) return;
+    const pl = $("plate"); if (!pl) return; pl.classList.add("trap");
+    pl.insertAdjacentHTML("beforeend", `<span class="trap-mark" aria-hidden="true"><i class="trap-corner"></i><b class="trap-stamp">${A.tx(TRAP_TXT)}</b></span>`); say("trapStamp");
+  }
+  /* --- Gigantes y enanos: algunos continentes crecen y otros se encogen (cuantos y cuanto, segun el nivel). Los que caben menos crecen menos */
+  const GIANT_CAP = [1, 0.9, 1, 0.7, 1.15, 1.15];                                // af, na, sa, as, eu, oc: cuanto de su "grandeza" admite cada uno sin comerse el mapa
+  function giantScales(lv, seed) {
+    const p = par({ id: "giants", lv }), ord = A.rng(seed).shuffle([0, 1, 2, 3, 4, 5]), sc = [p.base, p.base, p.base, p.base, p.base, p.base, 1];   // los demas, algo encogidos para dejar sitio a los gigantes
+    ord.slice(0, p.g).forEach(c => { sc[c] = +(1 + (p.big - 1) * GIANT_CAP[c]).toFixed(3); });
+    ord.slice(p.g, p.g + p.d).forEach(c => { sc[c] = p.small; });
+    return sc.map((v, c) => (c < 6 ? +(1 + (v - 1) * S.fx.plateMul).toFixed(3) : v));   // el Ancla los deja casi en su sitio y a su tamano
+  }
+  A.chal.giantScales = giantScales;
+
 
   /* ------------------------------------------------------------------ perks que contrarrestan retos activos: al empezar la ronda suena la "contra"
      (v0.35: sin marcar que ficha ni con que perk; antes la ficha brillaba con el icono del perk y eso se lo daba mascado al jugador) */
@@ -909,7 +1002,7 @@ window.AIQ = window.AIQ || {};
       this.end(); S.pub = list.map(canon); S.list = expand(S.pub); S.qlist = null; S.qsub = null; S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0; S.fpSet = null;   // tanda 6: S.pub, los retos de la ronda; S.list, sus efectos
       S.map = A.core && A.core.map; if (S.map) ensureOverlay(S.map);
       /* retos que mueven continentes: su colocacion se deja calculada mientras se presenta la ronda (con el mapa ya quieto), no al empezar la pregunta */
-      if (S.map && S.map.layout && S.list.some(c => ["pangea", "spread", "tilt", "deal"].includes(c.id))) {
+      if (S.map && S.map.layout && S.list.some(c => ["pangea", "spread", "tilt", "deal", "giants"].includes(c.id))) {
         const idle = fn => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 0));
         /* Continentes barajados: primero los objetivos de la ronda y la preparacion de la mesa, cada cosa en su hueco libre (juntas pasaban de 60 ms) */
         const steps = (has("deal") ? [() => roundPts(S.map), () => S.map.warmMix && S.map.warmMix()] : []).concat(() => mapSpec(S.map, null));
@@ -922,7 +1015,7 @@ window.AIQ = window.AIQ || {};
     lensRadius: () => (S.suspended ? 0 : has("wrongborders") ? S.fx.trueR : has("noborders") ? S.fx.peekR : 0),
     question(o, qi = 0, opt = {}) {
       const map = S.map = (A.core && A.core.map) || S.map; if (!map || !S.on) return; S.q = qi; S.suspended = false; clearTimers(); ensureOverlay(map);
-      decorate(o);
+      decorate(o); trapMark(o);
       S.calm = opt.calm || null; if (S.calm) S.qlist = cur().filter(c => !S.calm.includes(D[c.id].fam));   // tanda 9: Sangre fria apaga en esta pregunta los retos de puntero y pantalla
       const spec = map.setDistort ? mapSpec(map, o) : null, app = $("app");
       if (spec) { map.setDistort(spec, spec.ms || 900); say("chal"); } else if (map.clearDistort) map.clearDistort(300);
@@ -941,26 +1034,26 @@ window.AIQ = window.AIQ || {};
       if (CX) { CX.clear(); CX.set(cur(), par, S.fx); }
       /* tanda 7: las Chinchetas trampa llueven durante la primera mitad larga de la pregunta, una tras otra, por todo el mapa */
       if (map.setDecoys) { if (dc) { const L = decoyList(map, o, par(dc).n), lim = ((A.core && A.core.S && A.core.S.limit) || 20) * 1000, t0 = performance.now() + 450, gap = (lim * 0.55) / Math.max(1, L.length), rr = A.rng(`${S.seed}:dr:${S.round}:${S.q}`); L.forEach((d, k) => { d.t0 = t0 + k * gap + rr() * gap * 0.6; later(() => say("pinFall", k), Math.max(0, d.t0 - performance.now())); }); map.setDecoys(L); } else map.setDecoys([]); }
-      layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; flickerLoop(); lightningLoop(); quakeLoop();
+      layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; layer("night").classList.remove("on"); flickerLoop(); lightningLoop(); quakeLoop(); ctrlzLoop(); nightLoop();
       if (A.pointer && A.pointer.mods) A.pointer.mods();
       counterFx(qi);
     },
     reveal(ms = 750) {
-      const map = S.map; clearTimers(); fxStop(); if (A.chfx) A.chfx.clear();
+      const map = S.map; clearTimers(); fxStop(); zzClear(); S.nt = null; if (A.chfx) A.chfx.clear();
       if (S.suspended) boardStop(); else { boardFinal(); passReveal(); fzSolve(); fwStill(); fbReveal(); }   // tanda 14
       if (map && map.clearDistort) { map.clearDistort(ms); if (map.setDecoys) map.setDecoys([]); }
       $("app").classList.remove("ch-negative");
-      if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
+      if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot", "night"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
       for (const id of ["askName", "askSub"]) { const el = $(id); if (el) { el.classList.remove("ch-fade", "ch-dim", "ch-riddle", "ch-nocountry"); el.querySelectorAll(".gap,.dot,.rune,.faint").forEach(b => { b.classList.remove("gap", "dot", "rune", "faint"); b.textContent = b.dataset.g || b.textContent; }); } }
       const o = A.core && A.core.S.qs[A.core.S.qi], sb = $("askSub"); if (o && sb && o.sub && !o.clue && sb.textContent.includes("▮")) A.renderBlanks(sb, A.tx(o.sub));       // al responder, el pais vuelve
     },
     suspend() { S.suspended = true; this.reveal(500); const o = A.core && A.core.S.qs[A.core.S.qi]; if (o) decorate(o); if (A.pointer && A.pointer.mods) A.pointer.mods(); },
     upright() { const map = S.map; if (map && map.setOrient) map.setOrient(false, 900); },
     end() {
-      clearTimers(); clearTimeout(S.preT); fxStop(); if (A.chfx) A.chfx.clear(); boardStop(); S.on = false; S.list = []; S.pub = []; S.qlist = null; S.qsub = null; const map = S.map || (A.core && A.core.map);
+      clearTimers(); clearTimeout(S.preT); fxStop(); zzClear(); trapClear(); S.nt = null; if (A.chfx) A.chfx.clear(); boardStop(); S.on = false; S.list = []; S.pub = []; S.qlist = null; S.qsub = null; const map = S.map || (A.core && A.core.map);
       if (map && map.clearDistort) { map.clearDistort(300); map.setLens && map.setLens(null); map.setDecoys && map.setDecoys([]); }
       const app = $("app"); if (app) app.classList.remove("ch-negative");
-      if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
+      if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; layer("night").classList.remove("on"); }
       clearText(); if (A.pointer && A.pointer.mods) A.pointer.mods();
     },
     /* Dividir (tanda 12b): el lugar alternativo bajo la placa, con los mismos retos de texto (ninguna de las dos se lee limpia) */

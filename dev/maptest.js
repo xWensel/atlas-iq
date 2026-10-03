@@ -1,4 +1,4 @@
-/* Solo para desarrollo: comprueba los retos que mueven continentes (Pangea, Big bang, Continentes torcidos y Continentes barajados) en sus tres niveles. Uso (consola, con el
+/* Solo para desarrollo: comprueba los retos que mueven continentes (Pangea, Big bang, Continentes torcidos, Continentes barajados y Gigantes y enanos) en sus tres niveles. Uso (consola, con el
  * mapa cargado): mapTest() -> { worstPx, rejected, tripPx, hiddenExtra, ringJumpPx, maxMs, rows }
  *  - worstPx: pixeles donde se pisan dos continentes, dibujando TODAS sus copias como la GPU (la propia y las de +-2pi, que la siguen a una vuelta)
  *  - rejected: clics de una rejilla que caen fuera del mundo (antes el juego los tiraba); tripPx: ida y vuelta pantalla -> lon/lat -> pantalla con el
@@ -33,11 +33,11 @@ window.mapTest = function (seeds = ["a", "b", "c", "d", "e", "f"]) {
   const save = { spec: m.dist.spec, k: m.dist.k, kk: m.dist.kk, kl: m.dist.kl, ko: m.dist.ko, ct: m.dist.ct };
   const rest = [0, 1, 2, 3, 4, 5].map(c => m._hidden(c, { x: 0, y: 0, s: 1, c: 1, n: 0 }, Z));   // celdas tapadas en su sitio
   const rows = []; let worst = 0, rej = 0, trip = 0, hidEx = 0, jump = 0, maxMs = 0;
-  const KS = { pangea: [0.6, 0.8, 1], spread: [0.5, 0.8, 1], hold: [1, 1, 1], mix: [0.6, 0.85, 1] }, TILT = [0.4, 0.65, 0.9];
+  const KS = { pangea: [0.6, 0.8, 1], spread: [0.5, 0.8, 1], hold: [1, 1, 1], mix: [0.6, 0.85, 1], giants: [1, 1, 1] }, TILT = [0.4, 0.65, 0.9];
   try {
-    for (const kind of ["pangea", "spread", "hold", "mix"]) for (let lv = 0; lv < 3; lv++) for (const seed of kind === "hold" || kind === "mix" ? seeds : seeds.slice(0, 1)) {
+    for (const kind of ["pangea", "spread", "hold", "mix", "giants"]) for (let lv = 0; lv < 3; lv++) for (const seed of kind === "hold" || kind === "mix" || kind === "giants" ? seeds : seeds.slice(0, 1)) {
       const rr = A.rng(seed + ":m:" + lv), rot = kind === "hold" ? [0, 1, 2, 3, 4, 5].map(() => (rr() < 0.5 ? -1 : 1) * (0.3 + rr() * 0.45) * TILT[lv]).concat([0]) : [0, 0, 0, 0, 0, 0, 0];
-      const t0 = performance.now(), L = m.layout(kind, KS[kind][lv], rr, rot, Z), ms = Math.round(performance.now() - t0), spec = { shift: L.shift, scale: L.scale, rot };
+      const t0 = performance.now(), scl = kind === "giants" ? A.chal.giantScales(lv + 1, seed + ":gd:" + lv) : undefined, L = m.layout(kind, KS[kind][lv], rr, rot, Z, scl), ms = Math.round(performance.now() - t0), spec = { shift: L.shift, scale: L.scale, rot };
       const px = overlap(spec); worst = Math.max(worst, px); maxMs = Math.max(maxMs, ms);
       const he = Math.max(...[0, 1, 2, 3, 4, 5].map(c => m._hidden(c, { x: L.shift[c][0], y: L.shift[c][1], s: L.scale[c], c: Math.cos(rot[c]), n: Math.sin(rot[c]) }, Z, rest[c]))); hidEx = Math.max(hidEx, he);   // parte que se tapa de nuevo
       let r0 = 0, t = 0, j = 0;
@@ -52,8 +52,9 @@ window.mapTest = function (seeds = ["a", "b", "c", "d", "e", "f"]) {
         }
       }
       rej += r0; trip = Math.max(trip, t); jump = Math.max(jump, j);
-      rows.push(`${kind}:${lv + 1}:${seed} ${ms}ms s=${L.scale.slice(0, 6).map(v => v.toFixed(2)).join("/")} solape=${px}px rechazados=${r0} idaVuelta=${t.toFixed(1)}px tapadoExtra=${he.toFixed(2)} saltoAnillo=${j.toFixed(0)}px`);
+      rows.push(`${kind}:${lv + 1}:${seed} ok=${L.ok} ${ms}ms s=${L.scale.slice(0, 6).map(v => v.toFixed(2)).join("/")} solape=${px}px rechazados=${r0} idaVuelta=${t.toFixed(1)}px tapadoExtra=${he.toFixed(2)} saltoAnillo=${j.toFixed(0)}px`);
     }
   } finally { Object.assign(m.dist, save); m.dirty = m.fxDirty = true; }
-  return { worstPx: worst, rejected: rej, tripPx: +trip.toFixed(1), hiddenExtra: +hidEx.toFixed(2), ringJumpPx: Math.round(jump), maxMs, rows };
+  const fails = rows.filter(r => /ok=false/.test(r)).length;
+  return { fails, worstPx: worst, rejected: rej, tripPx: +trip.toFixed(1), hiddenExtra: +hidEx.toFixed(2), ringJumpPx: Math.round(jump), maxMs, rows };
 };

@@ -819,6 +819,7 @@ void main(){
     }
     /* zoom suavizado hacia el cursor (objetivo + amortiguacion critica) */
     zoomBy(f, px = this.W / 2, py = this.H / 2, animate = true) {
+      if (this.zzUntil && performance.now() < this.zzUntil) return;                 // Ctrl+Z: mientras el mapa vuelve atras no se toca la camara
       const base = this.tv || (this.anim ? this.anim.to : this.view);
       const [wx, wy] = this._toWorld(px, py, base);
       const s = clamp(base.s * f, this.minS, this.maxS);
@@ -1006,10 +1007,10 @@ void main(){
        En Pangea se encogen un poco para encajar. Si algo no cabe, todo se encoge hasta que quepa. k: fuerza 0..1; rot: giro final de cada continente (tilt).
        Devuelve { shift: [[dx,dy] x7], scale: [x7], ok } en unidades del mapa. */
     warmMix() { mixPrep(this); }                                       // la preparacion de Continentes barajados, en un hueco libre aparte (una vez)
-    layout(kind, k, rr, rot, zones) {
+    layout(kind, k, rr, rot, zones, scl) {
       if (kind === "mix") return mixLayout(this, k, rr, zones || { view: [BX0, BY0, BX1, BY1], rects: [] });   // Continentes barajados
       const base = { pangea: 1 - 0.26 * k, spread: 1 - 0.16 * k, hold: 0.9 }[kind] || 1;   // los continentes no caben a tamano real sin pisarse: se encogen segun el reto
-      return this._layout(kind, k, rot, base, zones);
+      return this._layout(kind, k, rot, base, zones, scl);
     }
     /* tierra del continente c, colocado con t, que queda fuera de la vista de inicio o debajo del HUD (celdas gruesas). Z: { view:[x0,y0,x1,y1],
        rects:[[x0,y0,x1,y1]...] } en unidades del mapa. Sin rest devuelve que celdas quedan tapadas; con rest (las tapadas en su sitio), la parte (0..1)
@@ -1024,7 +1025,7 @@ void main(){
       }
       return out || (L.length ? n / (L.length / 2) : 0);
     }
-    _layout(kind, k, rot, base, Z) {
+    _layout(kind, k, rot, base, Z, scl) {
       const K = this.masks, home = K.mass, anchor = [0.05, 0.3], tg = [], R = rot || [0, 0, 0, 0, 0, 0, 0];
       for (let c = 0; c < 6; c++) {
         const h = home[c];
@@ -1033,25 +1034,26 @@ void main(){
         else tg[c] = h.slice();
       }
       if (!this._offs) { const o = [], st = 0.06, RMAX = 3.0, n = Math.round(RMAX / st); for (let a = -n; a <= n; a++) for (let b = -n; b <= n; b++) { const d = Math.hypot(a, b) * st; if (d <= RMAX) o.push([a * st, b * st, d]); } o.sort((p, q) => p[2] - q[2]); this._offs = o; }
-      const order = [0, 1, 2, 3, 4, 5].sort((a, b) => kind === "pangea" ? Math.hypot(tg[a][0] - anchor[0], tg[a][1] - anchor[1]) - Math.hypot(tg[b][0] - anchor[0], tg[b][1] - anchor[1]) : K.cells[b].length - K.cells[a].length);
-      const gap = 1, order2 = order.slice().reverse();
+      const sq = c => (scl ? scl[c] * scl[c] : 1), order = [0, 1, 2, 3, 4, 5].sort((a, b) => kind === "pangea" ? Math.hypot(tg[a][0] - anchor[0], tg[a][1] - anchor[1]) - Math.hypot(tg[b][0] - anchor[0], tg[b][1] - anchor[1]) : K.cells[b].length * sq(b) - K.cells[a].length * sq(a));   // Gigantes y enanos: primero los que mas ocupan ya crecidos
+      const gap = 1, order2 = order.slice().reverse(), SM = scl ? this._southMinY() : null, ANT = scl ? project(0, -62)[1] : 0;   // Gigantes y enanos: ningun trozo (islas lejanas incluidas) baja de los 62 S, donde empieza la Antartida
       /* juego limpio: la tierra que se ve con el continente en su sitio sigue viendose al moverlo (como mucho un 4 % se tapa por el HUD o sale de la
          vista). Antes podia acabar un continente entero debajo del marcador (Oceania con la pregunta de Papua Nueva Guinea) */
       const hid0 = Z ? [0, 1, 2, 3, 4, 5].map(c => this._hidden(c, { x: 0, y: 0, s: 1, c: 1, n: 0 }, Z)) : null;
       const attempt = (S0, ord) => {
         const T = [0, 1, 2, 3, 4, 5, 6].map(c => ({ x: 0, y: 0, s: c === 6 ? 1 : S0, c: Math.cos(R[c] || 0), n: Math.sin(R[c] || 0) })), placed = [6];
         for (const c of ord) {
-          const E = K.ext[c], big = R[c] ? Math.max(Math.abs(E[0]), E[1], Math.abs(E[2]), E[3]) * 0.75 : 0, ex0 = big ? -big : E[0], ex1 = big || E[1], ey0 = big ? -big : E[2], ey1 = big || E[3], t = T[c];
+          const sc0 = scl ? scl[c] : 1, cc0 = this.contCen[c], E = K.ext[c], big = R[c] ? Math.max(Math.abs(E[0]), E[1], Math.abs(E[2]), E[3]) * 0.75 : 0, ex0 = big ? -big : E[0], ex1 = big || E[1], ey0 = big ? -big : E[2], ey1 = big || E[3], t = T[c];
           const hx0 = home[c][0] - anchor[0], hy0 = home[c][1] - anchor[1], hl = Math.hypot(hx0, hy0) || 1;
           const place = (sc, maxD, sided, to = tg[c]) => {               // hueco libre mas cercano a su destino (a menos de maxD), con el continente a escala sc
-            t.s = sc; const lx = BX0 - 0.4 - ex0 * sc, hx = BX1 + 0.4 - ex1 * sc, ly = BY0 + 0.18 - ey0 * sc, hy = BY1 - 0.05 - ey1 * sc;   // el continente (sin islas sueltas) queda dentro del mundo y lejos de la Antartida
+            t.s = sc; const mg = scl ? 0 : 0.4, lx = BX0 - mg - ex0 * sc, hx = BX1 + mg - ex1 * sc, ly = BY0 + 0.18 - ey0 * sc, hy = BY1 - 0.05 - ey1 * sc;   // el continente (sin islas sueltas) queda dentro del mundo y lejos de la Antartida
             for (const [ox, oy, d] of this._offs) {
               if (d > maxD) return false;
-              t.x = to[0] - home[c][0] + ox; t.y = to[1] - home[c][1] + oy;
+              if (scl) { t.x = to[0] - cc0[0] - sc * (home[c][0] - cc0[0]) + ox; t.y = to[1] - cc0[1] - sc * (home[c][1] - cc0[1]) + oy; } else { t.x = to[0] - home[c][0] + ox; t.y = to[1] - home[c][1] + oy; }   // Gigantes y enanos: crece o se encoge alrededor de su centro de masa
               const m = this._massAt(c, T, K.mass); if (m[0] < lx || m[0] > hx || m[1] < ly || m[1] > hy) continue;
               if (sided) { const mx = m[0] - anchor[0], my = m[1] - anchor[1]; if (mx * hx0 + my * hy0 < 0.7 * hl * Math.hypot(mx, my)) continue; }   // Pangea: se arrima por su lado (a menos de 45 grados), no por el otro
-              if (hid0 && this._hidden(c, t, Z, hid0[c]) > 0.04) continue;
-              if (!this._clash(c, placed, T, gap, true) && !this._clash(c, placed, T, gap, false) && (kind !== "pangea" || this._roomy(c, placed, T, gap))) return true;
+              if (SM && cc0[1] + sc * (SM[c] - cc0[1]) + t.y < ANT) continue;
+              if (hid0 && this._hidden(c, t, Z, hid0[c]) > (scl ? (this.giantTol || 0.12) : 0.04)) continue;   // Gigantes y enanos: el gigante se pasa del marco (hay que mover el mapa)
+              if (!this._clash(c, placed, T, gap, true) && !this._clash(c, placed, T, gap, false) && ((kind !== "pangea" && !scl) || this._roomy(c, placed, T, gap))) return true;
             }
             return false;
           };
@@ -1062,7 +1064,7 @@ void main(){
           const path = f => [home[c][0] + (tg[c][0] - home[c][0]) * f, home[c][1] + (tg[c][1] - home[c][1]) * f];
           const back = () => [1, 0.8, 0.6, 0.4, 0.2, 0].some(f => place(S0, 0.35, true, path(f))) || place(S0, 1.3, true) ||
             [0.88, 0.77, 0.66].some(sc => [0.5, 0].some(f => place(S0 * sc, 0.6, true, path(f))));   // si ni asi, encogido antes que al otro lado del mapa (con fuerza 0,5 o 0,8 Asia bajaba al Indico y Oceania acababa junto a las Americas)
-          const found = kind === "pangea" ? back() || place(S0, Infinity, true) || place(S0, Infinity) : [[1, 0.55], [0.88, 0.55], [0.77, 0.55], [1, 0.9], [0.88, 0.9], [0.77, 0.9], [0.66, 0.9]].some(([f, d]) => place(S0 * f, d)) || place(S0, Infinity);
+          const found = kind === "pangea" ? back() || place(S0, Infinity, true) || place(S0, Infinity) : (sc0 > 1.05 ? [[1, 0.55], [1, 0.9], [0.94, 0.9], [0.88, 0.9], [0.82, 0.9]] : [[1, 0.55], [0.88, 0.55], [0.77, 0.55], [1, 0.9], [0.88, 0.9], [0.77, 0.9], [0.66, 0.9]]).some(([f, d]) => place(S0 * sc0 * f, d)) || place(S0 * sc0, Infinity);
           if (!found) { this._layFail = c; return null; }
           placed.push(c);
         }
@@ -1073,6 +1075,7 @@ void main(){
       if (!T) return { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), scale: [1, 1, 1, 1, 1, 1, 1], ok: false };
       return { shift: T.map(t => [t.x, t.y]), scale: T.map(t => t.s), ok: true };
     }
+    _southMinY() { if (this._smy) return this._smy; const r = [1e9, 1e9, 1e9, 1e9, 1e9, 1e9]; for (const f of this.world.features) for (const p of f.polys) { const c = p.ct; if (c == null || c > 5) continue; for (const ring of p.rings) for (const q of ring) { const y = project(q[0], Math.max(-89.99, q[1]))[1]; if (y < r[c]) r[c] = y; } } return (this._smy = r); }   // el punto mas al sur de cada continente, con sus islas
     _massAt(c, T, mass) { const t = T[c], cc = this.contCen[c], dx = mass[c][0] - cc[0], dy = mass[c][1] - cc[1]; return [cc[0] + t.s * (t.c * dx - t.n * dy) + t.x, cc[1] + t.s * (t.n * dx + t.c * dy) + t.y]; }
     /* spec: {shift:[[dx,dy]x7], rot:[x7], wob, lineA, orient:{rot,mx}, spin:{amp,speed}, mosaic, quake, pan:{vx,vy}, ct}. Se anima de "normal" a la deformacion. */
     setDistort(spec, ms = 900) {
@@ -1144,6 +1147,7 @@ void main(){
       const cv = this.cv; cv.style.touchAction = "none";
       cv.addEventListener("contextmenu", e => e.preventDefault());
       cv.addEventListener("pointerdown", e => {
+        if (this.zzUntil && performance.now() < this.zzUntil) return;               // Ctrl+Z: durante el rebobinado no se aceptan clics
         if (e.pointerType === "mouse" && e.button !== 0) return;                   // solo el boton principal: el derecho o la rueda ya no marcan respuesta al soltar
         cv.setPointerCapture(e.pointerId); this.drift = null; this.inertia = null; this.tv = null; this.samples = [];
         this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false });
@@ -1192,6 +1196,7 @@ void main(){
     _pinchState() { const [a, b] = [...this.pointers.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; }
     _tap(px, py) {
       if (!this.pickEnabled) return;
+      if (this.zzUntil && performance.now() < this.zzUntil) return;                 // Ctrl+Z: durante el rebobinado no se aceptan clics (el reloj devuelve ese tiempo)
       if (this.dist.spec && this.dist.spec.deal && this.dist.k < 0.999) return;   // Continentes barajados: mientras se reparten, el mapa esta casi vacio (el reloj devuelve ese tiempo)
       const rx = px, ry = py;
       const ef = A.pointer && A.pointer.effective && A.pointer.effective(); if (ef) { px = ef[0]; py = ef[1]; }     // el puntero puede tener retos (temblor, retraso, invertido...)

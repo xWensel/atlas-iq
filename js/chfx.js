@@ -27,7 +27,7 @@ window.AIQ = window.AIQ || {};
 
   let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [];
   const U = {}, t0 = performance.now(), timers = [];
-  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [], sparks: [], shades: [], wipes: [], teth: null, wind: null };
+  const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [], sparks: [], shades: [], wipes: [], teth: null, wind: null, night: null };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
   const ptr = () => (A.chal && A.chal.state && A.chal.state.px) || { x: W / 2, y: H / 2 };
 
@@ -36,7 +36,7 @@ window.AIQ = window.AIQ || {};
 void main(){ vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2)); gl_Position = vec4(p * 2. - 1., 0., 1.); }`;
   const FS = `#version 300 es
 precision highp float;
-uniform vec2 uR, uP; uniform float uK, uT, uFlash; uniform vec4 uDark, uSpot, uSmoke, uCut; uniform sampler2D uMask; uniform vec3 uPush;
+uniform vec2 uR, uP; uniform float uK, uT, uFlash; uniform vec4 uDark, uSpot, uSmoke, uCut, uNight; uniform sampler2D uMask; uniform vec3 uPush;
 out vec4 o;
 const float TAU = 6.2831853;
 float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
@@ -98,6 +98,13 @@ void main(){
     c.rgb += vec3(.85, .06, .04) * eg * .22 * uCut.y * uCut.x;
     if (uCut.z > 0.) { float ln = step(.72, h21(vec2(floor(px.y / 2.), floor(T * 40.)))) * uCut.z * .22; c = over(c, vec4(vec3(.55, .7, .62) * ln, ln)); }
   }
+  if (uNight.x > 0.) {                                   // tanda 15: noche de tormenta, el mapa casi negro (costas al 10 %); el rayo lo alumbra (uNight.y)
+    float g = clamp(uNight.y, 0., 1.), lit = g * g * (3. - 2. * g), a = uNight.x * (.04 + .86 * (1. - lit));
+    float cl = vn(px / 260. + vec2(T * .03, 0.)) * .6 + vn(px / 90. - vec2(0., T * .05)) * .4;
+    vec3 col = vec3(.012, .02, .05) + vec3(.02, .03, .06) * cl * (1. - lit);
+    c = over(c, vec4(col * a, a));
+    c.rgb += vec3(.4, .5, 1.) * lit * .06 * uNight.x;
+  }
   if (uFlash > 0.) c = over(c, vec4(vec3(.92, .95, 1.) * uFlash, uFlash));
   o = c;
 }`;
@@ -122,7 +129,7 @@ void main(){
     if (linked) return true; if (!gl || !prog) return false;
     if (psc && !gl.getProgramParameter(prog, psc.COMPLETION_STATUS_KHR)) return false;
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn("chfx: sin WebGL2", gl.getProgramInfoLog(prog), ...shs.map(s => gl.getShaderInfoLog(s))); gl = null; return false; }
-    for (const n of ["uR", "uP", "uK", "uT", "uFlash", "uDark", "uSpot", "uSmoke", "uCut", "uMask", "uPush"]) U[n] = gl.getUniformLocation(prog, n);
+    for (const n of ["uR", "uP", "uK", "uT", "uFlash", "uDark", "uSpot", "uSmoke", "uCut", "uNight", "uMask", "uPush"]) U[n] = gl.getUniformLocation(prog, n);
     return (linked = true);
   }
   /* se deja compilando en un rato libre nada mas arrancar: cuando llegue el primer reto ya esta listo */
@@ -156,7 +163,7 @@ void main(){
     cv.width = Math.max(2, Math.round(W * D2)); cv.height = Math.max(2, Math.round(H * D2));
     return true;
   }
-  const busy = () => !!(E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length || E.teth || E.wind);
+  const busy = () => !!(E.night || E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length || E.teth || E.wind);
   function kick() { if (!raf && ov) { last = performance.now(); raf = requestAnimationFrame(tick); } }
   function tick(now) {
     raf = 0; if (!ov || !ov.isConnected) return;
@@ -170,7 +177,8 @@ void main(){
   const keep = (o, props) => Object.assign(o || { k: 0 }, props, { on: 1 });
   const fadeK = (o, dt, tau = 0.18) => { o.k += (o.on - o.k) * (1 - Math.exp(-dt / tau)); return o.on || o.k > 0.01; };
   function step(dt, now) {
-    for (const n of ["dark", "spot", "smoke", "lens", "seal", "film"]) if (E[n] && !fadeK(E[n], dt)) E[n] = null;
+    for (const n of ["dark", "spot", "smoke", "lens", "seal", "film", "night"]) if (E[n] && !fadeK(E[n], dt)) E[n] = null;
+    if (E.night) nightStep(E.night, dt, now);
     if (E.rain) { if (fadeK(E.rain, dt, 0.25)) stepRain(E.rain, dt, now); else { E.rain = null; part("chx-drops").innerHTML = ""; } }
     if (E.crack && !E.crack.on) { E.crack.k -= dt / 0.35; if (E.crack.k <= 0) { E.crack = null; part("chx-shards").innerHTML = ""; } }
     if (E.prints && !E.prints.on) { E.prints.k -= dt / 0.45; if (E.prints.k <= 0) { E.prints = null; part("chx-prints").innerHTML = ""; } }
@@ -196,7 +204,7 @@ void main(){
 
   function drawGL(now) {
     if (!gl || !ready()) { if (glCv) glCv.classList.remove("on"); return; }
-    const need = !!(E.dark || E.spot || E.smoke || E.cut.v > 0.001 || E.flash > 0.001);
+    const need = !!(E.night || E.dark || E.spot || E.smoke || E.cut.v > 0.001 || E.flash > 0.001);
     glCv.classList.toggle("on", need); if (!need) return;
     gl.viewport(0, 0, glCv.width, glCv.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(prog); const p = ptr(), T = ((now - t0) / 1000) * (reduce() ? 0.35 : 1);
@@ -209,16 +217,17 @@ void main(){
     if (!SM.tex) { SM.tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, SM.tex); for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4)); }
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, SM.tex); if (m && SM.cv) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SM.cv);
     gl.uniform1i(U.uMask, 0); gl.uniform3f(U.uPush, clamp(SM.push[0], -170, 170), clamp(SM.push[1], -170, 170), 0);
-    gl.uniform4f(U.uCut, E.cut.v, E.cut.e, E.cut.b, 0); gl.uniform1f(U.uFlash, E.flash);
+    gl.uniform4f(U.uCut, E.cut.v, E.cut.e, E.cut.b, 0); gl.uniform1f(U.uFlash, E.flash); gl.uniform4f(U.uNight, E.night ? E.night.k : 0, E.night ? E.night.g : 0, 0, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function draw2D(now) {
-    const need = !!(E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length || E.teth || E.wind);
+    const need = !!(E.night || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length || E.teth || E.wind);
     cv.classList.toggle("on", need); if (!need) return;
     const g = g2; g.setTransform(D2, 0, 0, D2, 0, 0); g.clearRect(0, 0, W, H);
     if (E.film) drawFilm(g, E.film);
     if (E.prints) drawPrints(g, E.prints);
     if (E.rain) drawRain(g, E.rain, now);
+    if (E.night) drawNight(g, E.night);
     if (E.crack) drawCrack(g, E.crack, now);
     if (E.shades.length) drawShades(g, now);
     if (E.bolts.length) drawBolts(g, now);
@@ -665,6 +674,50 @@ void main(){
     g.restore();
   }
 
+  /* ------------------------------------------------------------------ tanda 15: Noche de tormenta
+     El mapa queda casi negro (lo pinta el shader: uNight.x = cuanta noche, uNight.y = cuanta luz del rayo) con una lluvia fina que se enciende con cada
+     relampago. Cada luz tiene su envolvente: dos pulsos (el rayo "tartamudea") y un resplandor que se apaga despacio; en Destellos suaves, un fundido */
+  const smooth01 = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  const nHard = (t, ms) => (t < 0 ? 0 : t < 40 ? t / 40 : t < 95 ? 1 - 0.5 * (t - 40) / 55 : t < 150 ? 0.5 + 0.5 * (t - 95) / 55 : t < ms * 0.5 ? 1 : t < ms ? 1 - Math.pow((t - ms * 0.5) / (ms * 0.5), 1.5) : 0);
+  const nSoft = (t, ms) => (t < 0 ? 0 : t < 220 ? smooth01(t / 220) : t < ms * 0.55 ? 1 : t < ms ? 1 - smooth01((t - ms * 0.55) / (ms * 0.45)) : 0);
+  function nightStep(n, dt, now) {
+    let g = 0; const L = n.lights;
+    for (const l of L) { const t = now - l.t0, v = l.peak * (l.soft ? nSoft(t, l.ms) : nHard(t, l.ms)); if (v > g) g = v; }
+    for (let i = L.length - 1; i >= 0; i--) if (now - L[i].t0 > L[i].ms + 60) L.splice(i, 1);
+    n.g = g;
+    for (const s of n.rs) { s.y += s.v * dt; s.x += s.v * dt * 0.2; if (s.y >= s.end) Object.assign(s, streak(false)); }
+  }
+  function drawNight(g, n) {
+    if (!n.rs.length) return; const a = (0.1 + 0.4 * n.g) * n.k;
+    g.save(); g.lineCap = "round";
+    for (const [z0, z1, w, m] of [[0, 0.55, 1, 0.7], [0.55, 1.01, 1.6, 1]]) {
+      g.strokeStyle = `rgba(190,215,255,${(a * m).toFixed(3)})`; g.lineWidth = w; g.beginPath();
+      for (const s of n.rs) if (s.z >= z0 && s.z < z1) { g.moveTo(s.x, s.y); g.lineTo(s.x - s.l * 0.2, s.y - s.l); }
+      g.stroke();
+    }
+    g.restore();
+  }
+  function mkBolt() {
+    const x1 = W * (0.12 + rnd() * 0.76), y1 = H * (0.35 + rnd() * 0.5), x0 = clamp(x1 + (rnd() - 0.5) * W * 0.4, 20, W - 20), y0 = -10, len = Math.hypot(x1 - x0, y1 - y0);
+    const main = boltPts(x0, y0, x1, y1, len * 0.17, 7), br = [], dir = Math.atan2(y1 - y0, x1 - x0);
+    for (let i = 0, nb = 2 + Math.floor(rnd() * 3); i < nb; i++) { const p = main[2 + Math.floor(rnd() * main.length * 0.6)], a = dir + (rnd() < 0.5 ? -1 : 1) * (0.35 + rnd() * 0.6), l = (0.16 + rnd() * 0.3) * len; br.push(boltPts(p[0], p[1], p[0] + Math.cos(a) * l, p[1] + Math.sin(a) * l, l * 0.2, 5)); }
+    return { main, br, x: x1, y: y1 };
+  }
+  /* kind: strike (rayo), sheet (relampago lejano: solo medio alumbra, sin trazo) o double (dos rayos seguidos); ms: lo que dura el resplandor */
+  X.night = (o = {}) => {
+    if (!ov || !E.night || !E.night.on) return; kick(); size();
+    const now = performance.now(), sf = soft(), kind = o.kind || "strike", ms = o.ms || 900, sheet = kind === "sheet";
+    E.night.lights.push({ t0: now, ms: sheet ? ms * 0.7 : ms, peak: sheet ? 0.5 : 1, soft: sf });
+    if (!sheet && !sf) { const b = mkBolt(); E.bolts.push({ t0: now, main: b.main, br: b.br, x: b.x, y: b.y, soft: false }); E.flash = Math.max(E.flash, 0.14); }
+    say("nightBang", kind, sf);
+    if (kind === "double") later(() => X.night({ kind: "strike", ms: ms * 0.8 }), 240 + rnd() * 160);
+  };
+  function nightOn() {
+    const n = E.night = keep(E.night && E.night.on ? E.night : null, { lights: [], rs: [], g: 0 });
+    if (!reduce()) for (let i = 0; i < 90; i++) n.rs.push(streak(true));
+    say("rain", 0.3);
+  }
+
   /* ------------------------------------------------------------------ API: configura la pregunta y la limpia al responder */
   X.set = (list, par, fx) => {
     if (!ov) return; size(); kick();
@@ -681,11 +734,13 @@ void main(){
     const hg = get("hang"); if (hg) winsOn(par(hg).n, fx.hangAuto || 0);
     if (get("wind")) { E.wind = E.wind || { k: 0, st: [], gt: 0 }; E.wind.off = false; } else if (E.wind) E.wind.off = true;   // tanda 8: rachas del Vendaval
     const bt = get("battery"); if (bt) battOn(par(bt).dim);
+    if (gl_ && get("stormnight")) nightOn(); else off("night");
   };
   X.clear = () => {
     timers.forEach(clearTimeout); timers.length = 0;
-    for (const n of ["dark", "spot", "smoke", "lens", "seal", "film"]) if (E[n]) E[n].on = 0;
+    for (const n of ["dark", "spot", "smoke", "lens", "seal", "film", "night"]) if (E[n]) E[n].on = 0;
     if (E.rain) { E.rain.on = 0; say("rain", 0); }
+    if (E.night) { E.night.on = 0; say("rain", 0); }
     if (ov) { part("chx-wet").classList.remove("on"); part("chx-drops").classList.remove("on"); part("chx-shards").classList.remove("on"); part("chx-prints").classList.remove("on"); const wb = part("chx-wins"); wb.querySelectorAll(".chx-win").forEach(w => w.classList.add("bye")); setTimeout(() => { if (!E.wins) wb.innerHTML = ""; }, 160); }
     E.wins = null;
     if (E.crack) E.crack.on = 0;

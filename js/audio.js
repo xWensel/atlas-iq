@@ -464,6 +464,16 @@ window.AIQ = window.AIQ || {};
     puzzleSnap: go((t, left = 1) => { const m = 84 + Math.floor(Math.random() * 4) * 2; thump(t, { vol: 0.09, f0: 330, f1: 120, dur: 0.06 }); noise(t, 0.015, { hp: 2800, vol: 0.04 }); bell(m, t + 0.02, { vol: 0.045, dur: 0.35, rev: 0.4 }); if (left <= 2) bell(m + 7, t + 0.09, { vol: 0.04, dur: 0.5, rev: 0.45 }); }),
     passStamp: go(t => { thump(t, { vol: 0.12, f0: 150, f1: 48, dur: 0.12 }); noise(t, 0.05, { lp: 1500 + Math.random() * 500, vol: 0.05 }); }),
     passFalse: go(t => { thump(t, { vol: 0.34, f0: 130, f1: 34, dur: 0.22 }); noise(t, 0.1, { lp: 1800, vol: 0.12 }); bell(52 + Math.floor(Math.random() * 3), t + 0.03, { vol: 0.05, dur: 0.6, rev: 0.4 }); }),
+    /* tanda 15: Ctrl+Z, Noche de tormenta, Pregunta trampa y Gigantes y enanos (flojitos y nunca iguales) */
+    zUndo: go(t => { const f = 180 + Math.random() * 50; thump(t, { vol: 0.07, f0: f, f1: f * 0.5, dur: 0.05 }); noise(t, 0.012, { hp: 3400, vol: 0.035 }); noise(t + 0.04, 0.26, { lp: 3000 + Math.random() * 600, sweepTo: 420, vol: 0.04, type: "bandpass", q: 1.1 }); thump(t + 0.3, { vol: 0.05, f0: f * 1.2, f1: f * 0.6, dur: 0.045 }); noise(t + 0.3, 0.01, { hp: 4200, vol: 0.03 }); }),
+    nightBang: go((t, kind = "strike", soft = false) => {
+      const d = 0.08 + Math.random() * 0.4;
+      if (kind === "sheet") { noise(t + d, 0.9 + Math.random() * 0.5, { lp: 300 + Math.random() * 120, sweepTo: 55, vol: 0.04 }); thump(t + d + 0.05, { vol: 0.07, f0: 56 + Math.random() * 10, f1: 30, dur: 0.5 }); return; }
+      if (!soft) noise(t, 0.05, { hp: 3500, vol: 0.05 });
+      noise(t + d, 0.8 + Math.random() * 0.5, { lp: 600 + Math.random() * 250, sweepTo: 70, vol: 0.07 }); thump(t + d + 0.02, { vol: 0.16, f0: 62 + Math.random() * 14, f1: 28, dur: 0.5 });
+    }),
+    trapStamp: go(t => { thump(t, { vol: 0.2, f0: 150, f1: 46, dur: 0.14 }); noise(t, 0.04, { lp: 1600, vol: 0.08 }); const b = 46 + Math.floor(Math.random() * 3); bell(b, t + 0.03, { vol: 0.06, dur: 0.7, rev: 0.4 }); bell(b + 6, t + 0.09, { vol: 0.045, dur: 0.6, rev: 0.4 }); }),
+    giantGrow: go((t, up = true) => { noise(t, 0.5, { lp: up ? 220 : 1500, sweepTo: up ? 1500 : 220, vol: 0.05, type: "bandpass", q: 0.9 }); thump(t + 0.05, { vol: 0.1, f0: up ? 70 : 110, f1: up ? 110 : 55, dur: 0.35 }); pluck((up ? 60 : 72) + Math.floor(Math.random() * 3) * 2, t + 0.1, { vol: 0.04, dur: 0.3, rev: 0.3 }); }),
     goal: go(t => {
       thump(t, { vol: 0.26, f0: 150, f1: 48, dur: 0.18 }); noise(t, 0.05, { hp: 2600, vol: 0.06 });
       MOTIF.forEach((m, i) => { pluck(m + 12, t + 0.02 + i * 0.075, { vol: 0.13, dur: 0.75, rev: 0.5 }); bell(m + 24, t + 0.02 + i * 0.075, { vol: 0.03, dur: 0.3, rev: 0.3 }); });

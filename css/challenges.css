@@ -427,3 +427,30 @@ html.reduce-motion .ch-pass .fp-stamp, html.reduce-motion .fp-sello { animation:
 #askSub.sf-pop { animation: sf-pop .4s steps(5, end); }
 @keyframes sf-pop { 0% { transform: scale(1.35); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 html.reduce-motion .sf-led { animation: none; }
+
+/* ====================================================================== tanda 15: retos nuevos II */
+/* Ctrl+Z: el teclado que pulsa el crupier (las teclas se hunden y se van) y una barrida de lineas al rebobinar el mapa */
+#zzFx { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+#zzFx .zz-scan { position: absolute; inset: -20% 0; background: repeating-linear-gradient(0deg, rgba(170, 225, 255, 0) 0 5px, rgba(170, 225, 255, .2) 5px 7px); mix-blend-mode: screen; animation: zz-scan .34s steps(7, end) both; }
+@keyframes zz-scan { 0% { opacity: 0; transform: translateY(28%); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-28%); } }
+#zzFx .zz-cap { position: absolute; left: 50%; top: 48%; display: flex; align-items: center; gap: 9px; transform: translate(calc(-50% + var(--zx, 0px)), calc(-50% + var(--zy, 0px))) rotate(var(--zr, 0deg)); animation: zz-cap .95s steps(12, end) both; }
+#zzFx .zz-cap u { text-decoration: none; font: 700 22px var(--mono); color: #fff1c2; text-shadow: 0 2px 0 #130a2e; }
+#zzFx .zz-k { display: block; min-width: 54px; padding: 13px 16px 11px; text-align: center; border-radius: 7px; font: 700 22px/1 var(--mono); letter-spacing: .02em; font-style: normal; color: #fff1c2; background: linear-gradient(#3d2f6f, #2b2150); box-shadow: 0 0 0 2px #130a2e, 0 6px 0 #130a2e, inset 0 2px 0 #6a58b3, inset 0 -3px 0 #1c1440; animation: zz-press .95s steps(12, end) both; }
+#zzFx .zz-z { color: #1d0a3d; background: linear-gradient(#fff7da, #f1dba3); box-shadow: 0 0 0 2px #130a2e, 0 6px 0 #130a2e, inset 0 2px 0 #fff, inset 0 -3px 0 #c9aa5e; animation-delay: .06s; }
+@keyframes zz-cap { 0% { opacity: 0; scale: 1.5; } 12% { opacity: 1; scale: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes zz-press { 0%, 14% { translate: 0 -6px; } 26%, 62% { translate: 0 5px; box-shadow: 0 0 0 2px #130a2e, 0 1px 0 #130a2e, inset 0 2px 0 #6a58b3, inset 0 -3px 0 #1c1440; } 100% { translate: 0 0; } }
+html.reduce-motion #zzFx .zz-scan, html.reduce-motion #zzFx .zz-cap, html.reduce-motion #zzFx .zz-k { animation: none !important; }
+html.reduce-motion #zzFx .zz-scan { display: none; }
+
+/* Noche de tormenta sin WebGL: una capa oscura que se apaga con cada rayo */
+#chOv > .ch-night { background: radial-gradient(ellipse at 50% 40%, rgba(5, 9, 24, .86), rgba(2, 4, 12, .94)); transition: opacity .12s ease-out; }
+#chOv > .ch-night.on { opacity: 1; transition: opacity .55s ease-in; } #chOv > .ch-night.soft { transition: opacity .3s ease; }
+
+/* Pregunta trampa: la esquina roja y el sello TRAMPA sobre la placa */
+#plate.trap { --edge: #9c1a3f; }
+.trap-mark { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.trap-corner { position: absolute; right: 0; top: 0; width: 46px; height: 46px; background: linear-gradient(225deg, #e23a52 0 52%, #9c1a3f 52% 58%, transparent 58%); animation: trap-fold .35s steps(5, end) both; }
+.trap-stamp { position: absolute; right: 14px; top: 6px; padding: .12em .5em .08em; font: 700 12px/1.2 var(--mono); font-style: normal; letter-spacing: .18em; text-transform: uppercase; color: #fff5ef; background: #d8283f; border: 2px solid #5e1238; border-radius: 3px; box-shadow: 0 2px 0 #5e1238; transform: rotate(5deg); animation: trap-slam .42s steps(6, end) both; }
+@keyframes trap-fold { from { scale: 0; transform-origin: 100% 0; } to { scale: 1; transform-origin: 100% 0; } }
+@keyframes trap-slam { 0% { transform: rotate(-16deg) scale(2.6); opacity: 0; } 55% { opacity: 1; } 100% { transform: rotate(5deg) scale(1); } }
+html.reduce-motion .trap-corner, html.reduce-motion .trap-stamp { animation: none !important; }
