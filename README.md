@@ -4,6 +4,8 @@
 
 > **Versiones:** desde la 0.2.3 la version del juego sigue la numeracion de las notas del parche (0.2.N): cada entrega sube el ultimo numero y lleva su entrada en las notas. Antes (hasta la 0.79.1) cada entrega subia la version menor y terminaba en 1. Se cambia en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.2.23** - El Pacto con la casa servia de nada: daba +1 hueco pero lo ocupaba el. Ahora no ocupa hueco: se ve como un lacre de cera junto al contador de Reliquias (se abre en grande al pasar el raton), entra aunque la mochila este llena y deja 6 huecos de verdad (4+1 en A5). Sigue sin poder venderse si la mochila no cabria sin el.
+
 **v0.2.22** - Mochila llena: al elegir carta, las reliquias ya no llevan la flecha de cambio (⇄) que parecia mandarlas a la tienda; cada una ensena en rojo, con su moneda, lo que cobras al venderla (+N).
 
 **v0.2.21** - Con la mochila llena, el cofre del jefe y el Campamento ya no hablan de "cambiar": la carta dice "vende una…", eliges que reliquia vendes y su carta grande lleva el boton Vender con lo que te dan; la carta elegida entra en su hueco. La Ventaja dice "vende la otra". Fuera los restos de CSS de las cargas de los amuletos.

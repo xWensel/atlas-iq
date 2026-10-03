@@ -197,7 +197,7 @@ window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6, bribe
         const buySup = id => { const s = supBtn(id); if (!s || s.c == null || s.c > run.coins || tried.has("sup:" + id)) return false; B.sups[id]++; B.supCoins += s.c; return go("sup:" + id, s.b, `suministro ${id} ${s.c}`); };
         const offers = [...document.querySelectorAll(".offer:not(.sold)")].map(el => { const s = run.stock && run.stock[+el.dataset.ix], btn = el.querySelector(".buy"); return { el, s, btn, c: chest ? 0 : num(btn) }; })
           .filter(x => x.s && x.btn && !x.btn.disabled && !tried.has("card:" + x.el.dataset.ix));
-        const canTake = x => x.s.k === "life" ? run.lives < run.maxLives : x.s.k === "perk" ? (run.perks.length < maxP(run) || (!!A.RELICS[x.s.id].amulet && run.perks.includes(x.s.id))) : O.tools && (!!run.tools[x.s.id] || Object.keys(run.tools).length < 4);
+        const canTake = x => x.s.k === "life" ? run.lives < run.maxLives : x.s.k === "perk" ? ((A.ADV.bagN ? A.ADV.bagN() : run.perks.length) < maxP(run) || !!A.RELICS[x.s.id].pact || (!!A.RELICS[x.s.id].amulet && run.perks.includes(x.s.id))) : O.tools && (!!run.tools[x.s.id] || Object.keys(run.tools).length < 4);
         const buyCard = x => { const k = x.s.k === "life" ? "life" : x.s.k + ":" + x.s.id; if (x.s.k === "life") B.lifeBuys++; else { buys++; B.cards++; } B.cardCoins += x.c || 0; return go("card:" + x.el.dataset.ix, x.btn, `compra ${k}${x.s.fix ? " (revancha)" : ""}${x.s.vit ? " (vitrina)" : ""} ${x.c || 0}`); };
         let done = false;
         /* 1) Seguro de ronda si va justo de provisiones; 2) sobornos; 3) provision; 4) cartas; 5) Cafe y Refuerzo con lo que sobre */

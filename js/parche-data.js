@@ -36,6 +36,23 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.23",
+      name: ["Un pacto que cumple", "A pact that delivers"],
+      date: "2026-10-04",
+      summary: ["El Pacto con la casa ya no ocupa el hueco que te da: ahora sí suma uno.",
+        "The Pact with the house no longer takes up the slot it gives you: now it really adds one."],
+      chapters: [
+        { id: "pacto", kicker: ["Reliquias", "Relics"], title: ["Pacto con la casa", "Pact with the house"],
+          entries: [
+            E(["No ocupa hueco", "Takes no slot"], "buff", "0.2.23", [
+              ["Antes daba +1 hueco pero lo ocupaba él mismo, así que no ganabas nada y cargabas con su reto. Ahora no ocupa sitio: la mochila tiene **6 huecos libres** (5 en Ascensión 5).",
+                "Before, it gave +1 slot but took it up itself, so you gained nothing and still carried its challenge. Now it takes no space: the pack has **6 free slots** (5 at Ascension 5)."],
+              ["Se ve como un **lacre de cera** junto al contador de Reliquias; al pasar el ratón se abre su carta. Entra aunque lleves la mochila llena.",
+                "It shows as a **wax seal** next to the Relics counter; hover it to open its card. It goes in even with a full pack."]
+            ]) ] },
+      ],
+    },
+    {
       id: "0.2.22",
       name: ["Lo que vale", "What it's worth"],
       date: "2026-10-04",

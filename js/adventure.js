@@ -228,7 +228,7 @@ window.AIQ = window.AIQ || {};
   };
   const TOPIC_ICON = { capital: "t_capital", landmark: "t_landmark", city: "t_city", country: "t_country", history: "t_battle", nature: "t_nature", clue: "t_curio", mixed: "slot", flag: "t_country" };
   const BOSS_IC = "boss_hat";                                        // v0.35: el jefe del acto es la chistera del crupier (los mismos pixeles de su retrato: tools/crupier/chistera.py)
-  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, TOPIC_ICON, BOSS_IC, roundDefOf, chalFor: r => chalFor(r), maxPerks: () => maxPerks() };
+  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, TOPIC_ICON, BOSS_IC, roundDefOf, chalFor: r => chalFor(r), maxPerks: () => maxPerks(), bagN: () => bagN() };
 
   /* ------------------------------------------------------------------ partida (run) */
   let run = null, slot = RUNKEY;                                     // slot: ranura de la partida activa (expedicion normal o intento del Reto diario)
@@ -281,6 +281,8 @@ window.AIQ = window.AIQ || {};
   const perkList = () => run.perks.map(id => A.RELICS[id]).filter(Boolean);
   const baseSlots = () => 5 + ascFx(run.asc).pack;                   // tanda 17 (A5): 4 huecos de base en Ascension 5
   const maxPerks = () => baseSlots() + perkList().reduce((n, p) => n + (p.slot || 0), 0);   // tanda 13 (S7): huecos de la mochila
+  /* 0.2.23: el Pacto no ocupa hueco (antes ocupaba el que daba y no servia de nada): la mochila cuenta todo lo demas; el Pacto se ve como un lacre junto al contador */
+  const isPact = id => !!(A.RELICS[id] && A.RELICS[id].pact), bag = () => run.perks.filter(id => !isPact(id)), bagN = () => bag().length;
   const has = flag => perkList().some(p => p[flag]);
   const sumFlag = flag => perkList().reduce((n, p) => n + (p[flag] || 0), 0);
   const owned = id => run.perks.includes(id);
@@ -1368,7 +1370,7 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${s.vit ? " vit" : ""}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${s.vit ? A.tx(VIT_TAG) + " · " : ""}${p.amulet ? A.tx(AMU_TAG) : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}${run.perks.length >= maxPerks() && !bought && !(p.ventaja && perkList().some(q => q.ventaja && q.id !== s.id)) ? " · " + A.tx(SWAP_FOR) : ""}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
+      return `<div class="offer pc r${p.r}${s.vit ? " vit" : ""}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${s.vit ? A.tx(VIT_TAG) + " · " : ""}${p.amulet ? A.tx(AMU_TAG) : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}${bagN() >= maxPerks() && !p.pact && !bought && !(p.ventaja && perkList().some(q => q.ventaja && q.id !== s.id)) ? " · " + A.tx(SWAP_FOR) : ""}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
@@ -1402,7 +1404,7 @@ window.AIQ = window.AIQ || {};
   function peekRelic(id, camp) {
     const p = A.RELICS[id]; if (!p || !run) return null;
     const tag = p.amulet ? A.tx(AMU_TAG) : p.ventaja ? A.tx(VTG_TAG) : A.tx(R_NAMES[p.r]), meta = id === "hoard" && run.hucha ? `${CN()}<b>${run.hucha}</b> ${A.tx(PK_IN)}` : "";
-    const pact = id === "pact" && run.perks.length > baseSlots(), mode = !camp ? "" : legOn ? "busy" : swapIx != null ? "swap" : pact ? "pact" : "sell";
+    const pact = isPact(id) && bagN() > baseSlots(), mode = !camp ? "" : legOn ? "busy" : pact ? "pact" : swapIx != null && !isPact(id) ? "swap" : "sell";
     const btn = mode === "sell" || mode === "swap" ? `<button class="pk-act sell" type="button"><span>${A.pick6(SELL)}</span><em>${CN()}+${sellValue(id)}</em></button>`   // con la mochila llena tambien se vende: la carta elegida entra en su hueco
       : mode === "pact" ? `<button class="pk-act off" type="button" disabled><span>${A.tx(PACT_FIRST)}</span></button>` : "";
     return { key: `r:${id}:${mode}:${sellValue(id)}`, cls: `r${p.r}${p.amulet ? " amu" : ""}${btn ? " act" : ""}`, html: pkCard({ ...p, id }, tag, meta, btn),
@@ -1420,11 +1422,12 @@ window.AIQ = window.AIQ || {};
     const slots = maxPerks(), info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     /* la mochila no avisa de que una reliquia ya no sirve: saber cuando venderla tambien es cosa del jugador */
-    const relics = Array.from({ length: slots }, (_, k) => (run.perks[k] ? relicHtml(run.perks[k]) : `<span class="tr-slot${k >= baseSlots() ? " pact" : ""}"></span>`)).join("");   // el hueco del Pacto, con su lacre
+    const B = bag(), relics = Array.from({ length: slots }, (_, k) => (B[k] ? relicHtml(B[k]) : `<span class="tr-slot${k >= baseSlots() ? " pact" : ""}"></span>`)).join("");   // el hueco del Pacto, con su lacre
+    const pactSeal = run.perks.some(isPact) ? `<span class="tr-relic tr-pact r1" data-relic="pact"><button class="tr-face" type="button">${ic("pact")}</button></span>` : "";   // 0.2.23: el Pacto, fuera de los huecos
     const tools = Object.keys(run.tools).map(id => `<span class="tr-card tr-tool" data-tool="${id}" tabindex="0"><span class="tr-face">${ic(TOOLS[id].ico)}<span class="tr-pips">${Array.from({ length: toolMax(id) }, () => "<i></i>").join("")}</span></span></span>`).join("") || `<i class="tr-none">${A.T("Ninguna", "None")}</i>`;
     /* fuera la frase de siempre ("Tres cartas sobre la mesa..."): solo los avisos que cambian algo (revancha, cofre, mochila llena) */
     const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));
-    const note = chest ? (run.perks.length >= slots ? A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.") : A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")) : retryNote ? A.tx(ETX.retry) : "";
+    const note = chest ? (bagN() >= slots ? A.T("Mochila llena: vende una reliquia.", "Pack full: sell a relic.") : A.T("Elige UNA reliquia gratis. Aquí pueden salir legendarias.", "Pick ONE relic for free. Legendaries can show up here.")) : retryNote ? A.tx(ETX.retry) : "";
     /* antes del jefe, el crupier te reescribe el boton (funciona igual) */
     const doom = !chest && !!cf.boss, DOOM = A.pick6("Ir al matadero|To the slaughter|À l'abattoir|Pro matadouro|Zur Schlachtbank|Al macello||去送死|도살장으로|処刑台へ|На убой|Na rzeź");
     const nd = defAt(r), TN = TOPIC_NAMES[nd.topic], topic = A.tx(TN[Math.min(nd.tier, TN.length - 1)]);
@@ -1443,7 +1446,7 @@ window.AIQ = window.AIQ || {};
       <section class="tb-shop">${note ? `<p class="tb-note">${note}</p>` : ""}<section class="offers">${cards}</section>
         ${chest ? "" : `<div class="tb-actions"><button class="chipbtn" id="rerollBtn" type="button">${ic("dice", "sm")}<span>${A.T("Cambiar cartas", "New cards")}</span><em>${rc ? CN() + rc : A.T("gratis", "free")}</em></button></div>`}</section>
       <footer class="tb-tray">
-        <div class="tray-col tr-relics"><h4>${A.T("Reliquias", "Relics")} <b>${run.perks.length}/${slots}</b></h4><div class="tray-row">${relics}</div></div>
+        <div class="tray-col tr-relics"><h4>${A.T("Reliquias", "Relics")} <b>${B.length}/${slots}</b>${pactSeal}</h4><div class="tray-row">${relics}</div></div>
         <div class="tray-col tr-tools"><h4>${A.T("Herramientas", "Tools")}</h4><div class="tray-row">${tools}</div></div>
         <div class="tray-col tr-prov"><h4>${A.T("Provisiones", "Provisions")} <b>${run.lives}/${run.maxLives}</b></h4><div class="tray-row hearts">${hearts()}</div></div>
         <button class="go2${doom ? " doom" : ""}${chest ? " skip" : ""}" id="goRound" type="button" data-primary><span class="go2-chip">${chip}</span><span class="go2-t"><b>${goB}</b><i>${goI}</i></span><span class="go2-ar">${A.icon("u_next", "sm")}</span></button></footer></div>`, "tablewrap");
@@ -1452,7 +1455,7 @@ window.AIQ = window.AIQ || {};
     /* la mochila: pasar el raton abre la carta grande (con su boton de vender); un clic la deja fija. Con una carta de la mesa esperando
        hueco, el clic en la reliquia la vende y entra esa. Tambien en el cofre del jefe: con la mochila llena, vendes una y eliges gratis */
     document.querySelectorAll("#dlg .tr-relic").forEach(c => { const id = c.dataset.relic;
-      c.querySelector(".tr-face").onclick = e => { e.stopPropagation(); if (swapIx != null) { A.peek.close(true); return swapFor(swapIx, id, chest); } A.peek.toggle(e.currentTarget); }; });
+      c.querySelector(".tr-face").onclick = e => { e.stopPropagation(); if (swapIx != null && !isPact(id)) { A.peek.close(true); return swapFor(swapIx, id, chest); } A.peek.toggle(e.currentTarget); }; });
     document.querySelectorAll("#dlg .tr-tool").forEach(c => (c.onclick = e => { e.stopPropagation(); A.peek.toggle(c); }));
     const tb = document.querySelector("#dlg .table.mesa"); if (tb) tb.addEventListener("click", e => { if (swapIx != null && !e.target.closest(".offer")) { swapIx = null; document.querySelectorAll("#dlg .swap-pick, #dlg .swap-src").forEach(x => x.classList.remove("swap-pick", "swap-src")); } });
     if ($("rerollBtn")) $("rerollBtn").onclick = () => {
@@ -1967,9 +1970,9 @@ window.AIQ = window.AIQ || {};
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
       if (owned(s.id)) return;                                            // 0.2.5: un amuleto no se compra dos veces (tiendas guardadas de antes, con su recarga)
       const swapV = p.ventaja ? perkList().find(q => q.ventaja && q.id !== s.id) : null;
-      if (!swapV && run.perks.length >= maxPerks()) {                // tanda 9 (S10): mochila llena: eliges cual vendes y la carta entra en su hueco, en un gesto
-        if (run.coins + Math.max(...run.perks.map(sellValue)) < c) return noFunds(el);
-        swapIx = i; document.querySelectorAll("#dlg .tr-relic").forEach(x => { x.classList.add("swap-pick"); x.dataset.sv = "+" + sellValue(x.dataset.relic); }); document.querySelectorAll("#dlg .offer").forEach(x => x.classList.toggle("swap-src", x === el)); A.sfx.card(); flash(A.tx(SWAP_PICK)); return;   // 0.2.21: cada reliquia ensena lo que te dan por venderla (antes una flecha de cambio)
+      if (!swapV && !p.pact && bagN() >= maxPerks()) {                // tanda 9 (S10): mochila llena: eliges cual vendes y la carta entra en su hueco, en un gesto
+        if (run.coins + Math.max(...bag().map(sellValue)) < c) return noFunds(el);
+        swapIx = i; document.querySelectorAll("#dlg .tr-relic:not(.tr-pact)").forEach(x => { x.classList.add("swap-pick"); x.dataset.sv = "+" + sellValue(x.dataset.relic); }); document.querySelectorAll("#dlg .offer").forEach(x => x.classList.toggle("swap-src", x === el)); A.sfx.card(); flash(A.tx(SWAP_PICK)); return;   // 0.2.21: cada reliquia ensena lo que te dan por venderla (antes una flecha de cambio)
       }
       if (run.coins + (swapV ? sellValue(swapV.id) : 0) < c) return noFunds(el);
       if (swapV) { run.coins += sellValue(swapV.id); run.perks.splice(run.perks.indexOf(swapV.id), 1); if (run.paid) delete run.paid[swapV.id]; A.sfx.sell(); }   // la Ventaja vieja se vende
@@ -2023,7 +2026,7 @@ window.AIQ = window.AIQ || {};
       const id = r0.perks[r0.perks.length - 1], S = C().S, rm = !!(S && S.reduce) || RMQ.matches;
       if (!tb || !A.RELICS[id]) return end();
       const offers = tb.querySelector(".offers"), others = [...offers.querySelectorAll(".offer")].filter(o => o !== el), g = Gold.of(el);
-      const slot = tb.querySelectorAll(".tr-relics .tray-row > *")[r0.perks.length - 1], icoSrc = (el.querySelector(".of-ico img") || {}).src || "";
+      const slot = tb.querySelectorAll(".tr-relics .tray-row > *")[bagN() - 1], icoSrc = (el.querySelector(".of-ico img") || {}).src || "";
       tb.classList.add("lg-seq"); el.classList.add("lg-hero"); tb.inert = true;
       /* medir (una sola vez, ya con la mesa quieta): en pixeles de pantalla; las animaciones van en px del lienzo (/k, la mesa lleva zoom) */
       const k = el.currentCSSZoom || A.uiK(), lr = el.getBoundingClientRect(), or = offers.getBoundingClientRect(), dr = tb.parentNode.getBoundingClientRect(), sr = slot ? slot.getBoundingClientRect() : null;
@@ -2078,7 +2081,7 @@ window.AIQ = window.AIQ || {};
         const face = icoSrc ? `<i class="ic lg-ico" style="background-image:url('${icoSrc}')"></i>` : "";
         slot.insertAdjacentHTML("afterend", relicHtml(id, face)); const mini = slot.nextElementSibling; slot.remove();
         if (mini) { mini.classList.add("lg-in"); Gold.mount(mini); }
-        const cnt = tb.querySelector(".tr-relics h4 b"); if (cnt) cnt.textContent = `${r0.perks.length}/${maxPerks()}`;
+        const cnt = tb.querySelector(".tr-relics h4 b"); if (cnt) cnt.textContent = `${bagN()}/${maxPerks()}`;
       }
       A.sfx.land(); A.haptic([30]);
       await Promise.all([Promise.race([talk, legWait(9000)]), legWait(800)]);   // red de seguridad: nunca se queda la mesa bloqueada
@@ -2086,7 +2089,7 @@ window.AIQ = window.AIQ || {};
     } catch (e) { console.error(e); end(); }
   }
   A.adv.busy = () => legOn !== 0;                                        // la legendaria del cofre se esta luciendo (js/game.js: Esc no abre el menu)
-  function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0 || (id === "pact" && run.perks.length > baseSlots())) return; const v = sellValue(id); if (id === "hoard" && run.hucha) { const t = run.hucha >= 20 ? 3 : run.hucha >= 10 ? 2 : 1; A.sfx.jackpot(t); if (A.core.jpShake) A.core.jpShake(t); run.hucha = 0; }   // se rompe: llueven monedas
+  function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0 || (isPact(id) && bagN() > baseSlots())) return; const v = sellValue(id); if (id === "hoard" && run.hucha) { const t = run.hucha >= 20 ? 3 : run.hucha >= 10 ? 2 : 1; A.sfx.jackpot(t); if (A.core.jpShake) A.core.jpShake(t); run.hucha = 0; }   // se rompe: llueven monedas
     run.perks.splice(k, 1); run.coins += v; if (run.paid) delete run.paid[id]; if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
   function flash(t) { const n = document.querySelector("#dlg .tb-shop"); if (!n) return; n.querySelectorAll(".shop-flash").forEach(x => x.remove()); const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.appendChild(m); setTimeout(() => m.remove(), 2200); }   // flotando sobre las cartas: no empuja nada
 
