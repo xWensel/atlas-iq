@@ -684,10 +684,13 @@ window.AIQ = window.AIQ || {};
     let dist = km == null ? 0 : Math.round(1000 * Math.exp(-c.km / c.scale));
     const time = km == null ? 0 : Math.round(400 * Math.max(0, left / limit) * (0.3 + 0.7 * dist / 1000));
     c.dist = dist; c.time = time; c.chips = dist + time;
-    const ratio = dist / 1000, manga = has("sleeve") && !run.inf && run.qi === 5; let streak = km != null && ratio >= 0.6 ? S.streak + 1 : 0, guarded = false;
+    /* acierto (racha, bandera): dentro de los 300 km de la Enciclopedia (x2 en mares y naturaleza), el anillo exterior; no un porcentaje de los puntos */
+    const lim0 = (A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid }) : [300, 150, 75])[0];
+    c.hit = km != null && c.km <= lim0;
+    const manga = has("sleeve") && !run.inf && run.qi === 5; let streak = c.hit ? S.streak + 1 : 0, guarded = false;
     if (manga) streak = S.streak;                                     // As en la manga: la 6.a ni alarga ni corta la racha
     const gN = sumFlag("guard");                                       // Guardarrachas: los 2 primeros fallos de la ronda no cortan la racha (tampoco el tiempo agotado)
-    if (ratio < 0.6 && S.streak > 0 && gN && !run.inf && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
+    if (!c.hit && S.streak > 0 && gN && !run.inf && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
     if (!noSide && !run.inf && streak === 2 && S.streak === 1 && has("calm") && run.qi < (run.qn || 5) - 1 && (run.chal || []).some(c2 => (perkList().find(p => p.calm) || {}).calm.includes((A.CHAL[c2.id] || {}).fam))) setTimeout(() => { A.adv.flash("coolhead", 1, "❄"); if (A.sfx.ice) A.sfx.ice(); }, 500);   // Sangre fria: la siguiente, en frio
     c.streak = streak; c.mult = guarded || manga ? 1 : 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);   // la respuesta salvada puntua x1
     c.qi = run.qi;
@@ -699,7 +702,7 @@ window.AIQ = window.AIQ || {};
       c.lines.push(["sleeve", A.tx(A.RELICS.sleeve.n), raw > worst ? "−" + A.fmt(worst) : "="]);
       if (!noSide) setTimeout(() => { if (raw > worst) { A.adv.flash("sleeve", 2, "+" + A.fmt(raw - worst)); A.sfx.jackpot(2); } else A.adv.flash("sleeve", 0, "="); }, 450);
     }
-    if (!noSide && km != null && ratio >= 0.6 && run.ballSaved && run.ballSaved[qKey()]) { run.ballSaved[qKey()] = 0; setTimeout(() => { A.adv.flash("reball", 2, "✓"); A.sfx.jackpot(2); }, 450); }   // la segunda bola acerto
+    if (!noSide && c.hit && run.ballSaved && run.ballSaved[qKey()]) { run.ballSaved[qKey()] = 0; setTimeout(() => { A.adv.flash("reball", 2, "✓"); A.sfx.jackpot(2); }, 450); }   // la segunda bola acerto
     c.coinsBase = km == null ? 0 : dist >= 960 ? 1 : 0;                         // solo las dianas dan doblon
     c.coins += c.coinsBase; c.coins = gain(c.coins);
     c.sc = { dist, time, distMax: 1000, timeMax: 400 };

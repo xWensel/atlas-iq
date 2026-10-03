@@ -4,6 +4,8 @@
 
 > **Versiones:** desde la 0.2.3 la version del juego sigue la numeracion de las notas del parche (0.2.N): cada entrega sube el ultimo numero y lleva su entrada en las notas. Antes (hasta la 0.79.1) cada entrega subia la version menor y terminaba en 1. Se cambia en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.2.20** - Acierto y veredicto atados a las dianas de la Enciclopedia: acertar (racha, bandera, Guardarrachas) es caer a 300 km o menos (x2 en mares y naturaleza), no el 60 % de los puntos; el veredicto del ticket es 75 / 150 / 300 km, como los anillos y los jackpots. La puntuacion no cambia. Ademas, el zoom del revelado acierta con Gigantes y enanos: el mapa se encuadra tal como queda al deshacerse el reto.
+
 **v0.2.19** - Con Reducir movimiento activado, las ruletas del casino ya no dan el resultado al instante: sin giro, pero con 2 s de espera para mantener la tension.
 
 **v0.2.18** - Las ruletas del casino (Rojo o negro, Moneda al aire y Ruleta de premios) ya giran aunque Windows tenga desactivadas las animaciones: antes, con ese ajuste del sistema, saltaban directas al resultado sin animacion. Solo las apaga el ajuste Reducir movimiento del propio juego.

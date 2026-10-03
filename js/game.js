@@ -697,6 +697,7 @@
       if (guess) km = A.geo.haversine(guess.lat, guess.lon, o.lat, o.lon);
     }
     let sc, chips, mult, total, adv = null;
+    const lim = A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid }) : [300, 150, 75];   // 300/150/75 km (x2 en mares y naturaleza): anillos, jackpots, acierto y veredicto
     if (S.run) {                                                   // Aventura: reliquias, jefes y fichas x mult
       adv = A.adv.score(o, guess ? km : null, left, false); sc = adv.sc; S.streak = adv.streak; chips = adv.chips; mult = adv.mult * adv.xmult; total = adv.total;
       const lt = map.lastTap; map.lastTap = null;                                  // el crupier compara tu mano de verdad con el pin (solo lo comenta)
@@ -705,7 +706,7 @@
       A.adv.afterQuestion(adv); if (adv.bank && adv.bank.pt) span = span.concat([adv.bank.pt]);
     } else {
       sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
-      S.streak = guess && sc.dist / sc.distMax >= 0.6 ? S.streak + 1 : 0;
+      S.streak = guess && km <= lim[0] ? S.streak + 1 : 0;
       /* el Clasico tiene su propia puntuacion (data/campaigns.js) */
       chips = sc.dist + sc.time;
       mult = 1;
@@ -716,17 +717,16 @@
     S.levelScore += total; S.runMax += L.maxPerQ;
     A.profile.question({ km: guess ? km : null, inside: !!(guess && isC && !af && km === 0), area: !!(guess && af && km === 0), ratio, streak: S.streak, left, limit: S.limit, timeout: !guess });
 
-    const tier = !guess ? 5 : isC && km === 0 ? 4 : ratio >= 0.96 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.4 ? 2 : ratio >= 0.05 ? 1 : 0;
+    const tier = !guess ? 5 : isC && km === 0 ? 4 : km <= lim[2] ? 4 : km <= lim[1] ? 3 : km <= lim[0] ? 2 : km <= 2 * lim[0] ? 1 : 0;   // veredicto = los anillos: <=75 oro, <=150 plata, <=300 bronce
     const title = !guess ? A.t("res.timeout") : isC && km === 0 ? A.t("res.inside") : A.t(["res.t5", "res.t4", "res.t3", "res.t2", "res.t1"][tier]);
     const cxr = guess ? A.codexUnlock(o, km) : { added: [], level: 0 };
     /* Enciclopedia: 1, 2 o 3 jackpots segun el nivel, en cuanto el total termina de rodar. Con cada uno tiembla la pantalla (mas cuanto
        mas cerca) y vibra el movil, y las casillas del ticket se encienden al mismo ritmo. Si ya has pasado a la siguiente pregunta, no empiezan */
     const JP_AT = 1850, JP_MS = Math.round(A.audio.jpGap * 1000), jpTok = S.jpTok = (S.jpTok || 0) + 1, jpAt = i => JP_AT + i * JP_MS + "ms";
     const still = () => S.jpTok === jpTok && S.phase === "reveal";          // sigue en pantalla este ticket (si ya has pasado, sus sonidos no pisan la pregunta siguiente)
-    /* v0.2.15: acierto = la misma regla que la racha (el 60 % de los puntos de distancia). Te llevas la bandera: en el mapa se iza en el sitio
+    /* v0.2.15: acierto = la misma regla que la racha (<= 300 km, el anillo exterior). Te llevas la bandera: en el mapa se iza en el sitio
        (FLAG_AT, con su corneta) y en el ticket va junto al nombre; si fallas, el mastil se queda vacio. T_SLAM: golpe de la caja de la racha */
-    const hit = !!guess && ratio >= 0.6, fl = flagsOf(o), up = hit && fl.length > 0, FLAG_AT = 650, T_SLAM = 1300;
-    const lim = A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid }) : [300, 150, 75];
+    const hit = !!guess && (adv ? adv.hit : km <= lim[0]), fl = flagsOf(o), up = hit && fl.length > 0, FLAG_AT = 650, T_SLAM = 1300;
     const label = o.clue ? A.tx(o.answer) : A.tx(o.name);
     /* tu chincheta, por el camino corto: si cruza el antimeridiano (Fiyi y Samoa) se dibuja en la copia del mundo junto al objetivo */
     const refLon = ans ? ans[0] : labelAt ? labelAt[0] : null, gLon = guess ? (refLon == null ? guess.lon : guess.lon + 360 * Math.round((refLon - guess.lon) / 360)) : null;

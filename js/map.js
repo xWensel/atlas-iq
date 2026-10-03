@@ -820,11 +820,13 @@ void main(){
        pts: [[lon, lat, ct], ...] tal como se ven (con los continentes movidos, sceneOf); obs: lo que tapa el HUD en px [x0, y0, x1, y1];
        mg: aire alrededor de los puntos (cabeza de la chincheta, mastil y etiqueta). Con el mapa girado (del reves, espejo) se encuadra ya girado */
     frameReveal(pts, obs = [], mg = { l: 70, r: 70, t: 90, b: 36 }, ms = 1100) {
-      const W = this.W, H = this.H, o = this._orient();
+      /* al responder, los retos del mapa se deshacen (clearDistort): se encuadra el mapa tal como QUEDARA (sin continentes movidos, escalados ni girados),
+         no a mitad de la animacion; si no, con Gigantes y enanos el zoom iba a donde estaba el pais crecido/encogido y no a donde acaba */
+      const W = this.W, H = this.H, clr = !!(this.dist.spec && this.dist.to === 0), o = clr ? { on: false } : this._orient();
       obs = obs.map(r => [Math.floor(r[0]), Math.floor(r[1]), Math.ceil(r[2]), Math.ceil(r[3]), r[4] || 0]);   // en pixeles enteros, como los bordes candidatos (con decimales un borde de 456,8 invalidaba el hueco que empieza en 457)
       const R = (x, y) => (o.on ? [(o.c * x) / o.sx - o.s * y, (-o.s * x) / o.sx - o.c * y] : [x, -y]);   // escena -> pantalla (sin camara)
       const Ri = (u, v) => (o.on ? [o.sx * (o.c * u - o.s * v), -(o.s * u + o.c * v)] : [u, -v]);
-      const U = pts.map(p => { const q = this.sceneOf(p[0], p[1], p[2]); return R(q[0], q[1]); });
+      const U = pts.map(p => { const q = clr ? project(p[0], p[1]) : this.sceneOf(p[0], p[1], p[2]); return R(q[0], q[1]); });
       let x0 = Math.min(...U.map(p => p[0])), x1 = Math.max(...U.map(p => p[0])), y0 = Math.min(...U.map(p => p[1])), y1 = Math.max(...U.map(p => p[1]));
       const MIN = 0.3;                                                   // con un pleno no se acerca tanto que pierdas el pais de vista
       if (x1 - x0 < MIN) { const m = (x0 + x1) / 2; x0 = m - MIN / 2; x1 = m + MIN / 2; }

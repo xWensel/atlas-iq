@@ -36,6 +36,27 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.20",
+      name: ["Las dianas mandan", "Rings rule"],
+      date: "2026-10-03",
+      summary: ["Acertar y el veredicto de cada respuesta siguen ya los anillos de la Enciclopedia: 300, 150 y 75 km. Además, el zoom de Gigantes y enanos ya no se descuadra.",
+        "Landing a hit and each answer's verdict now follow the Encyclopedia rings: 300, 150 and 75 km. Also, the Giants and dwarfs zoom no longer drifts."],
+      chapters: [
+        { id: "dianas", kicker: ["Puntuación", "Scoring"], title: ["Anillos como regla", "Rings as the rule"],
+          entries: [
+            E(["Acierto y veredicto", "Hit and verdict"], "change", "0.2.20", [
+              ["Acertar (racha, bandera y Guardarrachas) es caer a **300 km** o menos de la respuesta (el doble en mares y naturaleza), igual para todas las rondas. Antes era el 60 % de los puntos, que en las rondas avanzadas pedía menos de 150 km.",
+                "A hit (streak, flag and Streak guard) means landing within **300 km** of the answer (double for seas and nature), the same in every round. Before it was 60% of the points, which late on asked for under 150 km."],
+              ["El veredicto del ticket sale de los anillos: 75 km, 150 km y 300 km. Los puntos no cambian.",
+                "The ticket's verdict comes from the rings: 75 km, 150 km and 300 km. Points are unchanged."]
+            ]),
+            E(["Encuadre del revelado", "Reveal framing"], "fix", "0.2.20", [
+              ["Al responder, el zoom encuadra el mapa tal como queda al deshacerse el reto, así que con Gigantes y enanos ya no enfoca un punto equivocado.",
+                "On answering, the zoom frames the map as it ends up once the challenge is undone, so with Giants and dwarfs it no longer aims at the wrong spot."]
+            ]) ] },
+      ],
+    },
+    {
       id: "0.2.19",
       name: ["La espera de la ruleta", "The wheel's wait"],
       date: "2026-10-03",
