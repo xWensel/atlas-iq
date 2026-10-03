@@ -148,7 +148,9 @@ html.reduce-motion .tr-relic.swap-pick .tr-face { animation: none; }
 .nr-chips { flex: 1; display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
 
 /* suministros: placas de casino (tapete con costura dorada). Comprado: placa de oro con el sello de la casa */
-.table.mesa .tb-sup { display: flex; gap: 12px; margin: 2px 0 4px; }
+.table.mesa .tb-sup { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px; margin: 2px 0 4px; }
+.table.mesa .tb-sup.no-red { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .table.mesa .tb-sup.no-red .sup-void { display: none; }   /* sin apuestas abiertas, solo los dos suministros */
+.table.mesa .sup-void { display: block; }
 .table.mesa .sup { --c1: #2c7353; --c2: #1b5640; --c3: #0f3727; --sc: #4fb6a0;
   position: relative; display: flex; flex: 1 1 0; align-items: center; gap: 10px; min-width: 0; max-width: none; min-height: 48px; padding: 6px 12px 8px 8px;
   border: 0; border-radius: 12px; cursor: pointer; text-align: left; color: #f6efdc; background: var(--c2);
@@ -318,7 +320,7 @@ html.reduce-motion .go2::after { animation: none; opacity: .6; }
   .table.mesa .tb-head { grid-template-columns: minmax(0, 1fr) auto; }
   .table.mesa .tb-head > .rd { grid-column: 1 / -1; grid-row: 2; justify-self: start; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
   .table.mesa .tb-head > .tb-right { grid-column: 2; }
-  .table.mesa .tb-sup { flex-direction: column; }
+  .table.mesa .tb-sup, .table.mesa .tb-sup.no-red { grid-template-columns: minmax(0, 1fr); } .table.mesa .sup-void { display: none; }
   .table.mesa .tb-shop { flex: none; min-height: 0; }
   .table.mesa .offers { flex: none; flex-wrap: wrap; gap: 22px 12px; }   /* entre filas, sitio para la placa de la legendaria (sobresale por arriba) */
   .table.mesa .offer.pc, .table.mesa.chest .offer.pc { flex: 0 0 min(44vw, 230px); height: auto; aspect-ratio: auto; }

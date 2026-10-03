@@ -320,8 +320,8 @@ window.AIQ = window.AIQ || {};
     if (boss) { let soft = sum("softenBoss"); list = list.map((c, i) => (i < soft ? { ...c, lv: 1 } : c)); }
     list = list.filter(c => !pl.some(p => (p.immune || []).includes(c.id)));
     if (run.board) list = list.map(c => (c.id === "trap" && (c.lv || 1) > 2 ? { ...c, lv: 2 } : c));   // tanda 15: la Pregunta trampa, en el Reto diario, como mucho a nivel 2
-    const bet = !run.inf && run.bets && run.bets[r];                   // tanda 11: los de la apuesta, sellados (si fallas, la revancha va sin ellos)
-    if (bet && bet.retos && !(r === roundNo() && run.attempt > 0 && bet.id !== "offer")) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
+    for (const bet of run.inf ? [] : [run.bets && run.bets[r], redOf(r)])      // tanda 11: los de las apuestas (la lateral y Rojo o negro), sellados (si fallas, la revancha va sin ellos)
+      if (bet && bet.retos && !(r === roundNo() && run.attempt > 0 && bet.id !== "offer")) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
     if (pl.some(p => p.pact) && !boss && !run.inf && r <= LAST && list.length < 4) { const add = pickSealed(r, 1, "pacto", list)[0]; if (add) list.push({ ...add, lv: clamp(list.length ? Math.max(...list.map(c => c.lv || 1)) : 1, 1, 3), sealed: true, sealBy: "pact" }); }   // tanda 13: el reto del Pacto
     if (boss) while (list.length > 5) { const k = list.findIndex(c => c.x4); if (k < 0) break; list.splice(k, 1); }   // tanda 17 (A4): el reto extra del jefe cede ante los sellados: nunca mas de 5
     if (run.chSeen0 && !run.board && run.asc < 3 && !A.adv._force) list = list.map(c => (run.chSeen0.includes(c.id) || c.sealed ? c : { ...c, lv: 1, isNew: true }));   // S12: lo que nunca has visto se estrena a nivel 1
@@ -825,7 +825,7 @@ window.AIQ = window.AIQ || {};
     const S = C().S, o = S.qs[S.qi], kept = o && run.probes && run.probes.length && run.probesK === qKey() + ":" + o.cid[0] ? run.probes : null;   // al reanudar la misma pregunta, las sondas siguen ahi (las cargas ya estaban gastadas)
     clearTimers(); hints.length = 0; run.qTools = 0; run.probes = kept || []; run.tool = null; run.windOff = false; S.tool = null; renderBars();
     if (!o) return;
-    { const b = !run.inf && run.qi === 0 && (run.bets || {})[roundNo()]; if (b && b.id === "red" && b.win && b.att === (run.attempt || 0)) { S.streak = Math.max(S.streak || 0, 1); run.streak = Math.max(run.streak || 0, 1); } }   // tanda 11: Rojo o negro acertado: empiezas en racha
+    { const b = !run.inf && run.qi === 0 && redOf(roundNo()); if (b && b.win && b.att === (run.attempt || 0)) { S.streak = Math.max(S.streak || 0, 1); run.streak = Math.max(run.streak || 0, 1); } }   // tanda 11: Rojo o negro acertado: empiezas en racha
     const calmF = (perkList().find(p => p.calm) || {}).calm, calm = calmF && !run.inf && (run.streak || 0) >= 2 && (run.chal || []).some(c => calmF.includes((A.CHAL[c.id] || {}).fam)) ? calmF : null;   // Sangre fria (tanda 9)
     if (!!calm !== !!run.calmOn) { if (calm) A.adv.flash("coolhead", 0, "❄"); else A.adv.flash("coolhead", 0, "✕", () => A.sfx.chip(0.3)); }   // entra en frio / se le quiebra el halo
     const calmWas = !!run.calmOn; run.calmOn = !!calm; if (calmWas !== run.calmOn) renderBars();   // las fichas que apaga, heladas
@@ -1112,8 +1112,8 @@ window.AIQ = window.AIQ || {};
       perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins, p.id]); } } });
       if (has("bank")) { const b = gain(sumFlag("bank")); run.hucha = (run.hucha || 0) + b; lines.push([A.tx(A.RELICS.hoard.n) + " · " + A.tx(H_IN).replace("{n}", run.hucha), "+" + b, "hoard"]); }   // tanda 9: la Hucha guarda, no paga
       if (boss && run.act === 1 && has("bossHeal") && run.lives < run.maxLives) { run.lives++; lines.push([A.tx(A.RELICS.heartperk.n), A.tx(H_HEART), "heartperk"]); setTimeout(() => A.sfx.jackpot(1), 1100); }   // Corazon: el jefe del acto II te devuelve una provision
-      const bet = (run.bets || {})[roundNo()], first = !run.attempt;   // tanda 11: las apuestas se cobran aqui
-      if (bet && bet.id === "red" && bet.win && bet.att === (run.attempt || 0) && !bet.paid) { const extra = Math.ceil(x.coins * 0.5); x.coins += extra; bet.paid = 1; lines.push([A.tx(BETS.red.n) + " · +50 %", "+" + extra, null, "bet"]); }
+      const bet = (run.bets || {})[roundNo()], rb = redOf(roundNo()), first = !run.attempt;   // tanda 11: las apuestas se cobran aqui
+      if (rb && rb.win && rb.att === (run.attempt || 0) && !rb.paid) { const extra = Math.ceil(x.coins * 0.5); x.coins += extra; rb.paid = 1; lines.push([A.tx(BETS.red.n) + " · +50 %", "+" + extra, null, "bet"]); }
       const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins), (perkList().find(p => p.coinX) || {}).id]);
       run.coins += got; run.stats.coinsEarned += got;
       if (bet && bet.id === "double" && !bet.done) { bet.done = 1; if (first) { const win = Math.min(bet.stake, 40); run.coins += bet.stake + win; run.stats.coinsEarned += win; lines.push([A.tx(BETS.double.n) + " ×2", "+" + (bet.stake + win), null, "bet"]); setTimeout(() => { A.sfx.jackpot(3); if (A.core.jpShake) A.core.jpShake(3); A.dealer.say(A.dealer.line("betWin"), { mood: "angry", hold: 2400 }); }, 1100); } }   // doblas lo apostado (+40 como mucho)
@@ -1493,7 +1493,30 @@ window.AIQ = window.AIQ || {};
     house: L6("Gana la casa|The house wins|La maison gagne|A casa ganha|Das Haus gewinnt|Vince il banco||庄家赢|하우스 승리|ハウスの勝ち|Заведение выигрывает|Kasyno wygrywa"),
     tip: L6("1 entre 37: si sale, te saltas el acto entero (en el último, vas directo al jefe final). Si sale y no lo elegiste, gana la casa.|1 in 37: if it hits, you skip the whole act (in the last one, straight to the final boss). If it hits and you didn't pick it, the house wins.|1 sur 37 : s'il sort, tu sautes l'acte entier (au dernier, direct au boss final). S'il sort sans que tu l'aies choisi, la maison gagne.|1 em 37: se sair, você pula o ato inteiro (no último, vai direto ao chefe final). Se sair e você não escolheu, a casa ganha.|1 aus 37: Fällt es, überspringst du den ganzen Akt (im letzten geht's direkt zum Endboss). Fällt es und du hast es nicht gewählt, gewinnt das Haus.|1 su 37: se esce, salti l'intero atto (nell'ultimo, dritto al boss finale). Se esce e non l'hai scelto, vince il banco.||37 选 1：开出就跳过整幕（最后一幕则直达最终首领）。开出但你没选，庄家赢。|37분의 1: 나오면 막 전체를 건너뜁니다 (마지막 막에서는 곧장 최종 보스). 나왔는데 고르지 않았다면 하우스가 이깁니다.|37分の1：出れば幕を丸ごと飛ばす（最後の幕では最終ボスへ直行）。出たのに選んでいなければ、ハウスの勝ち。|1 из 37: выпадет — пропускаешь весь акт (в последнем — сразу к финальному боссу). Выпадет, а ты не выбрал — выигрывает заведение.|1 do 37: jeśli wypadnie, przeskakujesz cały akt (w ostatnim — prosto do ostatecznego bossa). Jeśli wypadnie, a go nie wybrałeś, wygrywa kasyno.") };
   const offerRound = act => act * 4 + A.rng(`${run.seed}:oferta:${act}`).pick([0, 1, 2]);   // tanda 13: la Oferta de la casa, en un Campamento sorteado del acto II y otro del III
-  const betKind = r => (r > LAST ? null : r % 4 === 3 ? (r === LAST ? "final" : "double") : Math.floor(r / 4) >= 1 && r === offerRound(Math.floor(r / 4)) ? "offer" : "red");
+  /* v0.2.8: la Barra es una fila de TRES casillas de juego. En el centro, SIEMPRE Rojo o negro. A los lados, dos sorteados por ronda entre los demas:
+     los suministros (Seguro, Cafe doble) y las apuestas que tocan en esa ronda (Oferta de la casa en su Campamento sorteado; Doble o nada / La apuesta
+     final antes de cada jefe: salian siempre y no se pierden). Lo que ya tienes puesto (apuesta o suministro activo) no se esconde. Un juego nuevo de
+     casino entra en SIDE_GAMES y en barOf. */
+  const redOf = r => { const R = run.reds && run.reds[r]; if (R) return R; const b = (run.bets || {})[r]; if (b && b.id === "red") { run.reds = run.reds || {}; run.reds[r] = b; delete run.bets[r]; return b; } return null; };   // las partidas guardadas con Rojo o negro en run.bets se mudan solas
+  const SIDE_GAMES = ["offer", "double", "final"];
+  const sideRound = r => (r > LAST ? null : r % 4 === 3 ? (r === LAST ? "final" : "double") : Math.floor(r / 4) >= 1 && r === offerRound(Math.floor(r / 4)) ? "offer" : null);   // la apuesta lateral que toca en la ronda r
+  function sideOk(k, r) {
+    const b = (run.bets || {})[r]; if (b && b.id === k) return true;                      // la que ya pusiste se queda
+    if (run.attempt > 0) return false;
+    if (k === "offer") return 4 - chalFor(r).list.length >= 1 && pickSealed(r, 1, "oferta").length === 1;
+    return run.lives > 1 && chalFor(r).list.filter(c => !c.x4).length + (k === "final" ? 2 : 1) <= 5 && (k !== "double" || run.coins >= 1);
+  }
+  function barOf(r) {                                                     // [izquierda, derecha]; se fija por ronda e intento (la tienda se redibuja a cada compra)
+    const key = r + ":" + (run.attempt || 0); if (run.bar && run.bar.key === key) return run.bar.s;
+    const rr = A.rng(`${run.seed}:barra:${r}`), b = (run.bets || {})[r], sup = ["seguro", "cafe"], own = [];
+    const open = betsOpen() && !run.inf;                                  // aun sin apuestas abiertas (antes de tu primer jefe): solo los suministros
+    if (open && b && b.id !== "red") own.push(b.id);                      // lo ya puesto, primero
+    sup.forEach(id => run.sup && run.sup[id] && own.push(id));
+    const sd = open && sideRound(r); if (sd && !own.includes(sd) && sideOk(sd, r)) own.push(sd);
+    const rest = rr.shuffle(sup.filter(id => !own.includes(id)));
+    const s = rr.shuffle(own.concat(rest).slice(0, 2));
+    run.bar = { key, s }; return s;
+  }
   const offerPay = c => { const d = A.CHAL[c.id]; return Math.max(1, Math.round(0.6 * (3 + 2 * (c.lv || 3) + (d.kind === "map" ? 1 : 0)) * ascFx(run.asc).price * inflation())); };   // el 60 % del soborno base, sin la escalada
   const betsOpen = () => !!run.board || (A.profile.get().adv.boss || 0) > 0;
   const redCost = () => price(2);
@@ -1508,9 +1531,9 @@ window.AIQ = window.AIQ || {};
     return got;
   }
   /* la carta de la apuesta en la Barra (tapete rojo) */
-  function betHtml() {
-    const r = roundNo(), k = betKind(r); if (run.inf || !k || !betsOpen()) return "";
-    const b = (run.bets || {})[r], B = BETS[k], cf = chalFor(r), head = `<span class="sp-ic">${ic(B.ico)}</span><span class="sp-t" data-tt="${A.tx(B.d).replace(/"/g, "&quot;")}"><b>${A.tx(B.n)}</b><i>${A.tx(B.s)}</i></span>`;   // en la carta, el texto corto; el entero, en el globo
+  function betHtml(k) {
+    const r = roundNo(); if (run.inf || r > LAST || !betsOpen()) return "";
+    const b = k === "red" ? redOf(r) : (run.bets || {})[r], B = BETS[k], cf = chalFor(r), head = `<span class="sp-ic">${ic(B.ico)}</span><span class="sp-t" data-tt="${A.tx(B.d).replace(/"/g, "&quot;")}"><b>${A.tx(B.n)}</b><i>${A.tx(B.s)}</i></span>`;   // en la carta, el texto corto; el entero, en el globo
     if (k === "offer") {
       if (b && b.id === "offer") return `<div class="sup bet on bt-offer" data-bet="offer" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.sold)} · ${b.retos.length} · +${CN()}${b.pay}</em></div>`;
       const room = 4 - cf.list.length; if (room < 1 || run.attempt > 0) return "";
@@ -1519,16 +1542,16 @@ window.AIQ = window.AIQ || {};
     }
     if (k === "red") {
       const att = run.attempt || 0;
-      if (b && b.id === "red" && b.att === att) { const gn = b.out === "green"; return `<div class="sup bet bt-red done ${b.win ? "win" : "lose"}${gn ? " zero" : ""}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(gn ? BT2.zero : b.out === "red" ? BT.red : BT.black)}${b.n != null ? " · " + b.n : ""}</b>${A.tx(gn ? BT2.house : b.win ? BT.won : BT.lost)}${b.retos && b.retos.length ? " · " + A.tx(BT2.extra) : ""}</em></div>`; }
+      if (b && b.att === att) { const gn = b.out === "green"; return `<div class="sup bet bt-red done ${b.win ? "win" : "lose"}${gn ? " zero" : ""}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(gn ? BT2.zero : b.out === "red" ? BT.red : BT.black)}${b.n != null ? " · " + b.n : ""}</b>${A.tx(gn ? BT2.house : b.win ? BT.won : BT.lost)}${b.retos && b.retos.length ? " · " + A.tx(BT2.extra) : ""}</em></div>`; }
       return `<div class="sup bet bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><button class="bt-c bt-cg" type="button" data-pick="green" ${A.ttAttr(A.tx(BT2.green), A.tx(BT2.tip))}>${A.tx(BT2.green)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
     }
     if (b && b.id === k) return `<div class="sup bet on bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.on)}${k === "double" ? " · " + CN() + b.stake : ""}</em></div>`;
-    const cap = cf.list.filter(c => !c.x4).length + (k === "final" ? 2 : 1) <= 5;
-    if (run.attempt > 0 || run.lives <= 1 || !cap || (k === "double" && run.coins < 1)) return "";
+    if (!sideOk(k, r)) return "";
     return `<div class="sup bet bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-p bt-go">${A.tx(BT.go)}${k === "double" ? " · " + CN() + run.coins : ""}</em></div>`;
   }
-  function wireBet() {
-    const el = document.querySelector("#dlg .sup.bet"); if (!el) return; const r = roundNo(), k = el.dataset.bet;
+  function wireBet() { document.querySelectorAll("#dlg .sup.bet").forEach(wireOneBet); }
+  function wireOneBet(el) {
+    const r = roundNo(), k = el.dataset.bet;
     if (k === "offer") {
       el.querySelectorAll("[data-n]").forEach(btn => (btn.onclick = e => {
         e.stopPropagation(); const retos = pickSealed(r, +btn.dataset.n, "oferta"), pay = retos.reduce((m, c) => m + offerPay(c), 0);
@@ -1542,9 +1565,9 @@ window.AIQ = window.AIQ || {};
       el.querySelectorAll("[data-pick]").forEach(btn => (btn.onclick = e => {
         e.stopPropagation(); if (rouOpen) return; const c = redCost(); if (run.coins < c) { A.sfx.deny(); shake(el); return; }
         const att = run.attempt || 0, n = Math.floor(A.rng(`${run.seed}:rojo:${r}:${att}`)() * 37), out = colorOf(n), pick = btn.dataset.pick;   // la rueda europea: 18 rojos, 18 negros y el cero
-        run.coins -= c; run.bets = run.bets || {}; const win = pick === out;
+        run.coins -= c; run.reds = run.reds || {}; const win = pick === out;
         const extra = !win && chalFor(r).list.length < 5 ? pickSealed(r, 1, "rojoextra") : [];   // fallar: la cuota ya esta perdida y la ronda trae un reto mas (sellado, nivel 3; con 5 retos ya no cabe)
-        run.bets[r] = { id: "red", pick, out, n, win, att }; if (extra.length) run.bets[r].retos = extra;
+        run.reds[r] = { id: "red", pick, out, n, win, att }; if (extra.length) run.reds[r].retos = extra;
         const skip = win && out === "green" ? greenSkip() : null;   // el salto ya esta hecho y guardado antes de girar: recargar a medias no lo deshace (la ruleta solo lo ensena)
         persist();
         A.sfx.rouBet(pick === "green" ? 2 : pick === "red" ? 0 : 1); if (A.haptic) A.haptic([10]);   // la ficha cae al instante: el clic nunca se queda mudo
@@ -1665,9 +1688,11 @@ window.AIQ = window.AIQ || {};
   const supCost = s => price(s.cost + (s.id === "seguro" ? 2 * (run.segN || 0) : 0));   // cada Seguro de ronda gastado (el que te salva al fallar; ver roundEnd) encarece el siguiente: no se puede fallar gratis para siempre
   let supFresh = null;                                                 // el suministro recien comprado: solo a ese le cae el sello
   function supHtml() {
-    const sup = run.sup || {}, items = SUPS.map(s => `<button class="sup sp-${s.id}${sup[s.id] ? " on" : ""}${supFresh === s.id ? " fresh" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span>${sup[s.id] ? `<em class="sp-on">${A.T("Activo", "On")}</em>` : `<em class="sp-p">${CN()}${supCost(s)}</em>`}</button>`).join("");
+    const sup = run.sup || {}, r = roundNo(), card = s => `<button class="sup sp-${s.id}${sup[s.id] ? " on" : ""}${supFresh === s.id ? " fresh" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span>${sup[s.id] ? `<em class="sp-on">${A.T("Activo", "On")}</em>` : `<em class="sp-p">${CN()}${supCost(s)}</em>`}</button>`;
+    const void_ = '<i class="sup-void"></i>', red = betHtml("red"), slot = id => (SIDE_GAMES.includes(id) ? betHtml(id) : card(SUPS.find(x => x.id === id))) || void_;
+    const [L, R] = barOf(r);
     supFresh = null;
-    return `<div class="tb-sup">${items}${betHtml()}</div>`;
+    return `<div class="tb-sup${red ? "" : " no-red"}">${slot(L)}${red || ""}${slot(R)}</div>`;   // izquierda y derecha sorteadas; el centro, Rojo o negro (si la casa ya abre las apuestas)
   }
   function wireSup() {
     document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {
