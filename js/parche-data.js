@@ -36,6 +36,21 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.7",
+      name: ["Cartas a la vista", "Cards in plain view"],
+      date: "2026-10-03",
+      summary: ["Las cartas que llevas se leen en grande: pasa el ratón por la mochila o por la barra de la ronda y se abre la carta entera, con el botón de vender dentro.",
+        "The cards you carry can be read in full: hover your pack or the round bar and the whole card opens, with the sell button inside."],
+      chapters: [
+        { id: "cartas", kicker: ["Interfaz", "Interface"], title: ["La carta grande", "The big card"],
+          entries: [
+            E(["Tus reliquias, amuletos y herramientas, en grande", "Your relics, charms and tools, up close"], "new", "0.2.7", [
+            ["Al pasar el ratón por una carta de la mochila (Campamento y cofre del jefe) o de la barra de reliquias durante la ronda, se abre encima su carta grande, como las de la tienda: rareza, dibujo y el texto entero. Un clic la deja fija; Esc la cierra.", "Hover a card in your pack (Camp and boss chest) or in the relic bar during a round and its big card opens above it, like the shop ones: rarity, art and the full text. Click to pin it; Esc closes it."],
+            ["Vender va dentro de la carta, con la ficha de lo que te dan; también «Dejar esta» cuando cambias una carta de la mesa. Fuera el antiguo «clic para levantar y vender».", "Selling lives inside the card, with a chip showing what you get; so does \"Leave this one\" when you swap a table card. The old \"click to lift, then sell\" is gone."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.6",
       name: ["El agua tiene frontera", "Water has borders"],
       date: "2026-10-03",

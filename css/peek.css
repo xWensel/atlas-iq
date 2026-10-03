@@ -1,0 +1,64 @@
+/* ==== Carta grande de lo que llevas (js/peek.js) ====
+   Al pasar el raton por una reliquia, amuleto o herramienta de la mochila (o por la barra de la ronda) se abre su carta en grande:
+   la misma carta crema de la tienda, con su rareza en el marco, el dibujo en el tapete, el texto entero y, en el Campamento, el boton
+   de vender dentro. Medidas en px del lienzo de 1280x720: js/peek.js le pone el zoom (--k) de la carta pequena. */
+.pk { position: fixed; left: 0; top: 0; z-index: 100020; will-change: transform; }
+.pk[hidden] { display: none; }
+.pk-card { --rc: #b7bfc4; --tg: #4a6b5a; position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 7px; width: 238px; padding: 22px 15px 15px;
+  font-family: var(--serif); text-align: center; color: #16241c; background: #f6efdc; border-radius: 16px;
+  box-shadow: 0 0 0 3px #16241c, inset 0 0 0 5px var(--rc), inset 0 0 0 7px #16241c, inset 0 -8px 0 rgba(22, 36, 28, .08), 0 14px 0 3px rgba(0, 0, 0, .42), 0 26px 46px rgba(0, 0, 0, .5); }
+.pk-card.r1 { --rc: #4fb6a0; --tg: #2f7f6e; } .pk-card.r2 { --rc: #c78bf0; --tg: #8a3fc0; } .pk-card.pk-tool { --rc: #6c8cff; --tg: #3d5bd1; }
+.pk-card.r3 { --rc: #ffd95a; --tg: #c46a1b;
+  box-shadow: 0 0 0 3px #16241c, inset 3px 3px 0 0 #fff6c8, inset -3px -3px 0 0 #c46a1b, inset 0 0 0 6px #ffd95a, inset 0 0 0 8px #16241c, 0 14px 0 3px rgba(0, 0, 0, .42), 0 0 0 7px rgba(255, 217, 90, .28), 0 26px 46px rgba(0, 0, 0, .5); }
+.pk.pinned .pk-card { box-shadow: 0 0 0 3px #16241c, inset 0 0 0 5px var(--rc), inset 0 0 0 7px #16241c, 0 0 0 6px #ffd98a, 0 0 30px 6px rgba(255, 208, 107, .45), 0 14px 0 3px rgba(0, 0, 0, .42), 0 26px 46px rgba(0, 0, 0, .5); }
+/* la punta hacia la carta pequena */
+.pk-card::before { content: ""; position: absolute; width: 0; height: 0; border: 11px solid transparent; pointer-events: none; }
+.pk[data-side="up"] .pk-card::before { left: var(--nx); top: calc(100% + 2px); translate: -50% 0; border-top-color: #16241c; border-bottom-width: 0; }
+.pk[data-side="down"] .pk-card::before { left: var(--nx); bottom: calc(100% + 2px); translate: -50% 0; border-bottom-color: #16241c; border-top-width: 0; }
+.pk[data-side="right"] .pk-card::before { top: var(--ny); right: calc(100% + 2px); translate: 0 -50%; border-right-color: #16241c; border-left-width: 0; }
+/* la rareza: placa colgada del borde de arriba */
+.pk-tag { position: absolute; top: -12px; left: 50%; translate: -50% 0; z-index: 3; padding: 5px 12px 4px; border-radius: 4px; white-space: nowrap;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; line-height: 1; color: var(--rc); background: #16241c;
+  box-shadow: inset 0 0 0 2px var(--rc), 0 3px 0 rgba(0, 0, 0, .35); }
+.pk-card.r0 .pk-tag { color: #e9ece4; }
+.pk-card.amu .pk-tag { color: #ffd98a; box-shadow: inset 0 0 0 2px #ffd98a, 0 3px 0 rgba(0, 0, 0, .35); }
+/* el tapete con el dibujo */
+.pk-felt { position: relative; display: grid; place-items: center; height: 128px; overflow: hidden; border: 3px solid #16241c; border-radius: 10px; background-color: #17553a;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .12), inset 0 -12px 20px rgba(0, 0, 0, .32); }
+.pk-felt .ic { position: relative; z-index: 2; width: 100px; height: 100px; image-rendering: pixelated; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, .4)); animation: pkBob 2.6s ease-in-out infinite; }
+@keyframes pkBob { 50% { transform: translateY(-4px); } }
+.pk-card.r3 .pk-felt { border-color: #16241c; box-shadow: inset 0 0 0 3px #c46a1b, inset 0 0 0 5px rgba(0, 0, 0, .4), inset 0 -12px 18px rgba(0, 0, 0, .45); }
+/* la legendaria: un reflejo de oro que cruza el tapete; la rara, el holo de las cartas de la tienda */
+.pk-gold { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(115deg, transparent 32%, rgba(255, 230, 140, .5) 46%, rgba(255, 246, 200, .75) 50%, transparent 64%) 0 0 / 260% 100%; animation: holo 3.2s linear infinite; mix-blend-mode: screen; }
+.pk-card.r2::after { content: ""; position: absolute; inset: 0; border-radius: 16px; pointer-events: none; mix-blend-mode: color-dodge; opacity: .3;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .8) 46%, rgba(160, 220, 255, .7) 52%, transparent 66%) 0 0 / 250% 100%; animation: holo 3.4s linear infinite; }
+.pk-n { display: block; margin-top: 2px; font-size: 29px; font-weight: 400; line-height: .95; color: #16241c; text-wrap: balance; }
+.pk-d { margin: 0; font-size: 19px; line-height: 1.12; color: #3a4a3e; text-wrap: pretty; }
+.pk-meta { display: inline-flex; align-items: center; justify-content: center; gap: 6px; align-self: center; margin: 1px 0 0; padding: 3px 11px 2px; border-radius: 999px;
+  font-size: 16px; line-height: 1; color: #ffe08a; background: #16241c; }
+.pk-meta b { font-weight: 400; } .pk-meta .cn { width: 16px; height: 16px; }
+.pk-pips { display: inline-flex; gap: 3px; } .pk-pips i { width: 7px; height: 7px; border-radius: 1px; background: #6c8cff; box-shadow: 0 0 0 1px #0a140f; }
+/* lo que se hace con la carta: vender (lacre rojo con la ficha de lo que te dan), dejarla a cambio (ambar) o el aviso del Pacto */
+.pk-act { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 5px; padding: 8px 8px 8px 16px; border: 0; border-radius: 999px; cursor: pointer;
+  font-family: var(--serif); font-size: 22px; line-height: 1; color: #fff3df; background: #b3322a;
+  box-shadow: inset 0 0 0 2px #16241c, inset 0 3px 0 rgba(255, 255, 255, .22), inset 0 -4px 0 rgba(0, 0, 0, .25), 0 5px 0 rgba(0, 0, 0, .35);
+  transition: transform .18s var(--spring, ease), background .15s, box-shadow .15s; }
+.pk-act em { display: inline-flex; align-items: center; gap: 3px; padding: 3px 10px 2px 6px; border-radius: 999px; font-style: normal; font-size: 19px; color: #ffd98a; background: #16241c; box-shadow: inset 0 0 0 2px rgba(255, 217, 138, .45); }
+.pk-act em .cn { width: 17px; height: 17px; }
+.pk-act:hover { background: #d4463b; transform: translateY(-2px) scale(1.03); box-shadow: inset 0 0 0 2px #16241c, inset 0 3px 0 rgba(255, 255, 255, .28), inset 0 -4px 0 rgba(0, 0, 0, .25), 0 0 0 3px #ffd98a, 0 7px 0 rgba(0, 0, 0, .35); }
+.pk-act:active { transform: translateY(2px); box-shadow: inset 0 0 0 2px #16241c, inset 0 2px 0 rgba(0, 0, 0, .2), 0 2px 0 rgba(0, 0, 0, .35); }
+.pk-act:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.pk-act.swap { color: #16241c; background: #f8b449; } .pk-act.swap:hover { background: #ffc86a; } .pk-act.swap em { color: #f8b449; font-size: 20px; }
+.pk-act.off { justify-content: center; padding: 9px 12px; font-size: 17px; cursor: not-allowed; color: #5f6e64; background: #cfd6c9; box-shadow: inset 0 0 0 2px rgba(22, 36, 28, .35); }
+/* vendida: la carta cae y la ficha salta */
+.pk-card.pk-sold { animation: pkSold .23s ease-in forwards; pointer-events: none; }
+.pk-card.pk-sold .pk-act em { animation: pkCoin .23s var(--spring, ease) both; }
+@keyframes pkSold { 0% { transform: none; } 30% { transform: translateY(-6px) scale(1.02); opacity: 1; } 100% { transform: translateY(30px) scale(.82) rotate(4deg); opacity: 0; } }
+@keyframes pkCoin { 50% { transform: scale(1.35); background: #ffd98a; color: #16241c; } }
+/* la carta pequena mientras se lee la grande: levantada, con el aro dorado */
+.table.mesa .tr-relic .tr-face.pk-on, .table.mesa .tr-tool.pk-on .tr-face { transform: translateY(-14px); box-shadow: 0 0 0 2px #16241c, inset 0 0 0 3px var(--rc, #6c8cff), 0 0 0 5px #ffd98a, 0 0 24px 5px rgba(255, 208, 107, .55), 0 10px 0 rgba(0, 0, 0, .35); }
+.table.mesa .tr-tool { cursor: pointer; } .table.mesa .tr-tool .tr-face { cursor: pointer; } .table.mesa .tr-tool:focus-visible { outline: 3px solid #fff; outline-offset: 3px; border-radius: 10px; }
+.table.mesa .tr-tool:hover .tr-face { transform: translateY(-6px) rotate(-2deg); }
+.ab-perk { cursor: pointer; } .ab-perk.pk-on { box-shadow: 0 0 0 2px #ffd95a, 0 0 0 4px rgba(255, 217, 90, .3); }
+html.reduce-motion .pk-felt .ic, html.reduce-motion .pk-gold, html.reduce-motion .pk-card.r2::after { animation: none; }
+@media (prefers-reduced-motion: reduce) { .pk-felt .ic, .pk-gold, .pk-card.r2::after { animation: none; } }
