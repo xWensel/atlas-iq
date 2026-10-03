@@ -1692,7 +1692,7 @@ window.AIQ = window.AIQ || {};
       setTimeout(close, zero ? 2900 : 2300);                                                      // el cero se queda mas: hay que verlo
     };
     try {
-      if (reduced) { reveal(); return; }
+      if (reduced) { A.sfx.rouNoMore(); setTimeout(() => { if (!closed) reveal(); }, 2000); return; }   // sin movimiento, pero con su espera: la tension es del juego
       A.sfx.rouNoMore(); setTimeout(() => { if (!closed && !revealed) A.sfx.rouStart(); }, T_IN * 1000);
       const frame = now => {
         try {
@@ -1827,7 +1827,7 @@ window.AIQ = window.AIQ || {};
       sh.hold(edge ? 3000 : 2300);
     };
     try {
-      if (sh.reduced) { reveal(); return; }
+      if (sh.reduced) { setTimeout(() => { if (!sh.closed) reveal(); }, 2000); return; }   // sin movimiento, pero con su espera
       A.sfx.rouNoMore();
       setTimeout(() => {
         if (sh.closed || sh.revealed) return;
@@ -1883,7 +1883,7 @@ window.AIQ = window.AIQ || {};
       sh.hold(info.jp === 3 ? 3200 : 2800);
     };
     try {
-      if (sh.reduced) { reveal(); return; }
+      if (sh.reduced) { setTimeout(() => { if (!sh.closed) reveal(); }, 2000); return; }   // sin movimiento, pero con su espera
       A.sfx.rouNoMore(); setTimeout(() => { if (!sh.closed && !sh.revealed) A.sfx.rouStart(); }, T_IN * 1000);
       let t0 = 0, last = 0, lastT = 0, lastTick = 0, cur = 0;
       const frame = now => {

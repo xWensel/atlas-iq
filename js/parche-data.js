@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.19",
+      name: ["La espera de la ruleta", "The wheel's wait"],
+      date: "2026-10-03",
+      summary: ["Con Reducir movimiento, las ruletas ya no sueltan el resultado al instante: esperan 2 segundos, sin giro pero con tensión.",
+        "With Reduce motion on, the wheels no longer drop the result instantly: they wait 2 seconds, no spin but with tension."],
+      chapters: [
+        { id: "espera", kicker: ["Campamento", "Camp"], title: ["La Barra", "The Bar"],
+          entries: [
+            E(["Resultado sin prisas", "No instant results"], "fix", "0.2.19", [
+            ["Antes, con **Reducir movimiento** el resultado salía en el acto. Ahora hay 2 segundos de espera tras el «No va más», sin giro pero con el suspense de siempre.", "Before, with **Reduce motion** the result appeared at once. Now there's a 2-second wait after \"No more bets\", no spin but with the usual suspense."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.18",
       name: ["La ruleta gira siempre", "The wheel always spins"],
       date: "2026-10-03",
