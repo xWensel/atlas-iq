@@ -142,10 +142,10 @@ window.AIQ = window.AIQ || {};
        expo(x, k) = (e^(k x) - 1) / (e^k - 1)                exponencial que sale de 0 y llega a 1 (k = 0 seria recta)
      En cada ronda siguen las 3 faciles / 1 media / 1 dificil, pero como ventana alrededor de D: centros D-de, D+dm y D+dh (acotados a 0-1), con un peso de campana de ancho sg
      sobre la posicion de cada pregunta en el carrete y un suelo fl: NADA de techo duro, todo el carrete sigue en el pool (el suelo hace que lo lejano salga muy de vez en cuando) */
-  const DK0 = { lo0: 0.02, lo5: 0.75, hi0: 0.36, hi5: 0.99, ka: 0.9, kr: 2.2, de: 0.15, dm: 0.10, dh: 0.30, sg: 0.12, fl: 0.008, tw: 1 };
+  const DK0 = { lo0: 0.02, lo5: 0.75, hi0: 0.36, hi5: 0.99, ka: 0.9, kr: 2.2, de: 0.15, dm: 0.10, dh: 0.30, sg: 0.12, fl: 0.008, tw: 1, up: [0, 0, 0.02, 0.10, 0.10, 0] };   // up: empuje extra de la ventana en A3 y A4 (el experto las ganaba casi siempre); A0-A2 y A5 no cambian
   const DKN = () => (A.KN && A.KN.dk ? Object.assign({}, DK0, A.KN.dk) : DK0);   // perillas de medicion (dev/bot.js: CFG.knobs = { dk: {...} })
   const expo = (x, k) => (Math.abs(k) < 1e-6 ? x : (Math.exp(k * x) - 1) / (Math.exp(k) - 1));
-  const diffAt = (asc, pos) => { const K = DKN(), g = expo(clamp((asc | 0) / 5, 0, 1), K.ka), lo = K.lo0 + (K.lo5 - K.lo0) * g, hi = K.hi0 + (K.hi5 - K.hi0) * g; return lo + (hi - lo) * expo(clamp(pos / 11, 0, 1), K.kr); };
+  const diffAt = (asc, pos) => { const K = DKN(), g = expo(clamp((asc | 0) / 5, 0, 1), K.ka), lo = K.lo0 + (K.lo5 - K.lo0) * g, hi = K.hi0 + (K.hi5 - K.hi0) * g; return clamp(lo + (hi - lo) * expo(clamp(pos / 11, 0, 1), K.kr) + ((K.up && K.up[clamp(asc | 0, 0, 5)]) || 0), 0, 1); };
   let BASE = {}, BANDS = {};
   function baseOf(slot) {                                            // el carrete de la ronda de facil a dificil y la posicion 0-1 de cada pregunta; la 12 saca de todo el banco (sin banderas)
     const tw = (DKN().tw | 0) ? 1 : 0, bk = slot + ":" + tw; if (BASE[bk]) return BASE[bk];
