@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.8",
+      name: ["La mesa de tres juegos", "The three-game table"],
+      date: "2026-10-03",
+      summary: ["La Barra del Campamento pone Rojo o negro siempre en el centro y sortea los dos juegos de los lados en cada ronda.",
+        "The Camp bar always puts Red or black in the middle and draws the two side games each round."],
+      chapters: [
+        { id: "barra", kicker: ["Campamento", "Camp"], title: ["La Barra", "The bar"],
+          entries: [
+            E(["Rojo o negro, siempre en el centro", "Red or black, always in the middle"], "change", "0.2.8", [
+            ["Tres casillas de juego por ronda: Rojo o negro fijo en el centro (también en los jefes) y dos a los lados, sorteadas entre Seguro, Café doble y la apuesta que toque (Oferta de la casa, Doble o nada, La apuesta final).", "Three game slots each round: Red or black fixed in the middle (boss rounds too) and two on the sides, drawn from Insurance, Double espresso and the bet of the moment (House offer, Double or nothing, The final bet)."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.7",
       name: ["Cartas a la vista", "Cards in plain view"],
       date: "2026-10-03",
