@@ -5,6 +5,8 @@
  * Cada parche junta varias versiones del juego (campo `games`). El jugador los ve desde el icono del cuaderno,
  * en la esquina inferior izquierda de la portada, y navega por los anteriores en la lista de la izquierda.
  *
+ * REGLA: un parche PUBLICADO queda CERRADO. Todo cambio posterior (aunque sea pequeno) va a un parche NUEVO (v0.2.2, v0.2.3...), nunca como edicion de uno anterior.
+ *
  * COMO ANADIR UN PARCHE NUEVO
  *   1. Pon sus imagenes (capturas del juego real, webp, ~1100 px de ancho) en assets/parche/ y anade su tamano real a `SZ`
  *      (ancho, alto: asi la pagina reserva el hueco y no salta al cargar; sin dato se reserva un 16:9).
@@ -33,6 +35,31 @@ window.AIQ = window.AIQ || {};
   const E = (name, tag, ver, items, imgs) => ({ name, tag, ver, items, imgs: imgs || [] });
 
   A.PATCHES = [
+    {
+      id: "0.2.2",
+      name: ["Ajuste de la curva", "Curve tuning"],
+      date: "2026-10-03",
+      games: ["0.77.1", "0.78.1"],
+      summary: ["La curva de dificultad de las preguntas se endurece en A3 y A4, se mide cuántas expediciones hacen falta para ver todas las preguntas y Rojo o negro gana una ruleta de verdad.",
+        "The question difficulty curve gets tougher on A3 and A4, we measure how many runs it takes to see every question, and Red or black gets a real roulette."],
+      chapters: [
+        { id: "ascensiones", kicker: ["Ascensiones", "Ascensions"], title: ["A3 y A4, más duras", "A3 and A4, tougher"],
+          intro: ["Las preguntas suben con la Ascensión; ahora el experto encuentra más resistencia a mitad de camino.", "Questions climb with the Ascension; now the expert meets more resistance halfway up."],
+          entries: [
+            E(["A3 y A4, más duras", "A3 and A4, tougher"], "change", "0.77.1", [
+            ["A3 y A4 reciben un empuje extra en la dificultad de las preguntas, porque el experto las ganaba casi siempre. La dificultad media de las cinco preguntas pasa a 17, 20, 26, 39, 49 y 53 de A0 a A5 (antes 17, 20, 25, 33, 43 y 53). A0, A1 y A5 no cambian.", "A3 and A4 get an extra push in question difficulty, because the expert won them almost every time. The average difficulty of the five questions goes to 17, 20, 26, 39, 49 and 53 from A0 to A5 (before: 17, 20, 25, 33, 43 and 53). A0, A1 and A5 do not change."],
+            ["Ronda 1 en A3: La Habana, Damasco, Ciudad de Panamá, Freetown y Tiflis. Ronda 12 en A3: la batalla de Azincourt, el cráter del Ngorongoro, Armenia, el Museo de Arte Contemporáneo de Niterói y el monte Whitney.", "Round 1 on A3: Havana, Damascus, Panama City, Freetown and Tbilisi. Round 12 on A3: the Battle of Agincourt, the Ngorongoro Crater, Armenia, the Niterói Contemporary Art Museum and Mount Whitney."],
+            ["¿Cuántas expediciones hacen falta para ver todas las preguntas? La Aventura tiene 1.909 y una expedición completa enseña 60. Repartidas en las seis Ascensiones, con unas 20 expediciones en cada una se ve el 97 %. Jugando una sola Ascensión hacen falta entre 100 y 300. Lo más difícil solo sale pronto si llegas a A4 o A5.", "How many runs does it take to see every question? The Adventure has 1,909 and a full run shows 60. Spread over the six Ascensions, about 20 runs in each shows 97%. On a single Ascension it takes between 100 and 300. The hardest ones only come up early if you reach A4 or A5."],
+            ["Pendiente: comprobar con una persona si el experto deja de ganar A3 casi siempre y si quien solo sabe continentes puede ganar A0. Los objetivos de A0 no se han tocado.", "Pending: check with a real player whether the expert stops winning A3 almost every time and whether someone who only knows continents can win A0. A0 targets have not been touched."]])] },
+        { id: "apuestas", kicker: ["Apuestas", "Bets"], title: ["La ruleta de verdad", "The real roulette"],
+          intro: ["Antes giraba un icono dentro de la carta y no se veía nada; ahora es un momento de casino.", "It used to spin an icon inside the card and you could not see anything; now it is a casino moment."],
+          entries: [
+            E(["Rojo o negro, con ruleta de verdad", "Red or black, with a real roulette"], "change", "0.78.1", [
+            ["Al apostar se abre una ruleta lineal a pantalla completa con la rueda europea: 37 casillas en su orden real (18 rojas, 18 negras y el 0 verde, 1 de cada 37), puntero dorado y bombillas de marquesina. Dura unos 3 segundos: «No va más», arranque con aceleración, tic de matraca que se frena, latido en el casi-fallo y golpe seco al parar con un sello grande.", "When you bet, a full-screen linear roulette opens with the European wheel: 37 pockets in their real order (18 red, 18 black and the green 0, 1 in 37), a golden pointer and marquee bulbs. It lasts about 3 seconds: «No more bets», an accelerating start, a ratchet tick that slows down, a heartbeat on a near miss and a dry thud at the stop with a big stamp."],
+            ["Nuevo botón Verde: si lo apuestas y sale, te saltas el acto entero (en el acto III vas directo al jefe final) y el crupier lo lleva fatal. Si sale verde y no lo apostaste, gana la casa y se ríe. Rojo y negro pagan igual que antes.", "New Green button: if you bet it and it lands, you skip the whole act (in act III you go straight to the final boss) and the dealer takes it very badly. If green lands and you did not bet it, the house wins and laughs. Red and black pay the same as before."]])] },
+      ],
+      timeline: [["0.77.1", ["La curva de A3 y A4", "The A3 and A4 curve"]], ["0.78.1", ["Ruleta de verdad", "A real roulette"]]],
+    },
     {
       id: "0.2.1",
       name: ["La mesa nueva", "The new table"],
@@ -244,10 +271,10 @@ window.AIQ = window.AIQ || {};
         { id: "ascensiones", kicker: ["Ascensiones", "Ascensions"], title: ["Cada Ascensión, con su identidad", "Every Ascension, with its own identity"],
           intro: ["El escalón de dificultad que cobra el experto, con una regla clara en cada nivel. Cada Ascensión suma lo de las anteriores.", "The difficulty ladder the expert climbs, with a clear rule at every level. Each Ascension adds everything before it."],
           entries: [
-            E(["Las preguntas suben con la Ascensión", "Questions get harder with every Ascension"], "change", "0.75.1 · 0.77.1", [
+            E(["Las preguntas suben con la Ascensión", "Questions get harder with every Ascension"], "change", "0.75.1", [
               ["La dificultad de las preguntas ya no depende solo de la ronda: sube de forma exponencial entre rondas y entre Ascensiones. En A0 salen los lugares, banderas y pistas más fáciles de cada tema; en A5, los realmente difíciles.", "Question difficulty no longer depends only on the round: it climbs exponentially between rounds and between Ascensions. A0 serves the easiest places, flags and clues of each theme; A5 serves the really hard ones."],
               ["Ronda 1 en A0: París, Caracas, Berlín, La Habana y El Cairo. Ronda 1 en A5: Abu Dabi, Varsovia, Bratislava, Camberra y Brazzaville. Ronda 12 en A5: Iwo Jima, Lincoln Center, la selva de Daintree, la Larga Marcha y Lesoto.", "Round 1 on A0: Paris, Caracas, Berlin, Havana and Cairo. Round 1 on A5: Abu Dhabi, Warsaw, Bratislava, Canberra and Brazzaville. Round 12 on A5: Iwo Jima, Lincoln Center, the Daintree rainforest, the Long March and Lesotho."],
-              ["La dificultad media de las cinco preguntas sube de 17 en A0 a 53 en A5 (en una escala de 0 a 100): 17, 20, 26, 39, 49 y 53. A3 y A4 llevan un empuje extra, porque el experto las ganaba casi siempre (antes 33 y 43). Las primeras rondas de las Ascensiones altas no son ya lo más difícil: la ronda 1 de A5 es de dificultad media-alta (38) y la 12, la más dura (58).", "The average difficulty of the five questions rises from 17 on A0 to 53 on A5 (on a 0 to 100 scale): 17, 20, 26, 39, 49 and 53. A3 and A4 get an extra push, because the expert won them almost every time (33 and 43 before). The first rounds of the high Ascensions are not the hardest yet: round 1 of A5 is medium-high (38) and round 12 the toughest (58)."],
+              ["La dificultad media de las cinco preguntas sube de 17 en A0 a 53 en A5 (en una escala de 0 a 100) Las primeras rondas de las Ascensiones altas no son ya lo más difícil: la ronda 1 de A5 es de dificultad media-alta (38) y la 12, la más dura (58).", "The average difficulty of the five questions rises from 17 on A0 to 53 on A5 (on a 0 to 100 scale) The first rounds of the high Ascensions are not the hardest yet: round 1 of A5 is medium-high (38) and round 12 the toughest (58)."],
               ["Siguen saliendo todas las preguntas: no hay techo duro y un lugar difícil puede aparecer de vez en cuando incluso en A0. Se mantiene el reparto de 3 fáciles, 1 media y 1 difícil, pero relativo a la Ascensión. Los temas de dos rondas (banderas, ciudades y monumentos) sortean ahora del tema entero.", "Every question can still appear: there is no hard ceiling and a hard place can show up now and then even on A0. The split of 3 easy, 1 medium and 1 hard stays, but relative to the Ascension. Themes that span two rounds (flags, cities and landmarks) now draw from the whole theme."],
               ["El Reto diario usa su Ascensión en la misma curva y sigue siendo idéntico para todos. Una partida guardada a medias reanuda con sus mismas preguntas. El modo infinito y el Clásico no cambian.", "The Daily Challenge uses its Ascension on the same curve and is still identical for everyone. A half-played saved run resumes with the same questions. Infinite mode and Classic do not change."],
               ["A0 queda deliberadamente suave: quien sabe lo básico gana con facilidad. La curva se seguirá afinando en el parche v0.2.2, porque el experto en A3 todavía gana casi siempre y al novato de continentes aún le cuesta ganar A0.", "A0 is deliberately gentle: anyone who knows the basics wins easily. The curve will keep being tuned in patch v0.2.2, because the expert on A3 still wins almost every time and the continents-only newcomer still struggles to win A0."]]),
