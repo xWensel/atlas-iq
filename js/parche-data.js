@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.11",
+      name: ["La caja vacía", "The empty box"],
+      date: "2026-10-03",
+      summary: ["La casilla Nada de la Ruleta de premios estrena dibujo: una caja de regalo abierta y vacía.",
+        "The Nothing slot of the Prize wheel gets a new picture: an open, empty gift box."],
+      chapters: [
+        { id: "nada", kicker: ["Arte", "Art"], title: ["Nada", "Nothing"],
+          entries: [
+            E(["Una caja de regalo vacía", "An empty gift box"], "change", "0.2.11", [
+            ["Sustituye a la cartera con telaraña: la caja está abierta, sin nada dentro, con su tapa y su lazo en el suelo.", "It replaces the cobwebbed wallet: the box is open with nothing inside, its lid and bow on the floor."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.10",
       name: ["Iconos de la mesa", "Table icons"],
       date: "2026-10-03",

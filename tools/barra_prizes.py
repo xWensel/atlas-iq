@@ -265,39 +265,39 @@ def clock():
 
 # ---------- pz_nada: bolsa vacia, vuelta del reves, con telarana ----------
 def empty():
+    """Nada: una caja de regalo abierta y vacia, con la tapa tirada al lado y una nubecilla de polvo"""
     im = canvas(); d = ImageDraw.Draw(im)
-    LEA = [(196, 134, 84, 255), (160, 102, 58, 255), (118, 72, 42, 255), (80, 48, 32, 255)]
-    LIN = [(236, 196, 150, 255), (200, 150, 110, 255), (150, 98, 76, 255)]
-    # dos mitades de una cartera abierta
-    for x0, x1 in ((4, 31), (33, 60)):
-        d.rounded_rectangle([x0, 10, x1, 54], radius=4, fill=LEA[2])
-        d.rounded_rectangle([x0, 10, x1, 51], radius=4, fill=LEA[1])
-        d.rounded_rectangle([x0 + 2, 12, x1 - 2, 48], radius=2, fill=LIN[1])
-        d.line([(x0 + 3, 12), (x1 - 3, 12)], fill=LIN[0])
-        # puntadas
-        for x in range(x0 + 3, x1 - 2, 4):
-            d.point((x, 50), fill=LEA[0]); d.point((x, 13), fill=LIN[2])
-    # lomo
-    d.rectangle([31, 10, 32, 54], fill=LEA[3])
-    # ranuras de tarjetas vacias a la izquierda
-    for y in (20, 28, 36):
-        d.line([(8, y), (27, y)], fill=LIN[2]); d.line([(8, y + 1), (27, y + 1)], fill=LIN[0])
-    # bolsillo de billetes vacio a la derecha
-    d.rounded_rectangle([37, 18, 56, 44], radius=2, fill=LIN[2]); d.rectangle([37, 18, 56, 21], fill=(120, 76, 60, 255))
-    d.rectangle([39, 22, 54, 24], fill=(98, 62, 52, 255))
-    # telarana en la esquina
-    cw = (226, 230, 248, 255)
-    ox, oy = 59, 10
-    for ang in (100, 125, 150, 175):
-        a = math.radians(ang)
-        d.line([(ox, oy), (ox + math.cos(a) * 20, oy + math.sin(a) * 20)], fill=cw)
-    for rr in (6, 11, 16):
-        pts = [(ox + math.cos(math.radians(a)) * rr, oy + math.sin(math.radians(a)) * rr) for a in (100, 125, 150, 175)]
-        d.line(pts, fill=cw)
-    # la arana colgando
-    d.line([(46, 21), (46, 28)], fill=cw); d.ellipse([44, 28, 48, 32], fill=BLK[2])
-    for dx in (-3, -2, 2, 3):
-        d.point((46 + dx, 29 + (1 if abs(dx) == 3 else 0)), fill=BLK[2])
+    DUST = [(250, 250, 255, 255), (214, 218, 238, 255), (168, 174, 206, 255)]
+    # --- caja (vista en oblicuo): frente, lateral derecho y borde de arriba
+    fx0, fx1, fy0, fy1, dx, dy = 3, 30, 28, 58, 9, -8
+    # lateral derecho
+    d.polygon([(fx1, fy0), (fx1 + dx, fy0 + dy), (fx1 + dx, fy1 + dy), (fx1, fy1)], fill=RED[3])
+    d.line([(fx1 + 1, fy0 + 3), (fx1 + 1, fy1 - 1)], fill=RED[2])
+    # interior vacio (se ve el fondo y las paredes)
+    top = [(fx0, fy0), (fx1, fy0), (fx1 + dx, fy0 + dy), (fx0 + dx, fy0 + dy)]
+    d.polygon(top, fill=RED[0])
+    d.polygon([(fx0 + 3, fy0 - 1), (fx1 - 3, fy0 - 1), (fx1 + dx - 3, fy0 + dy + 2), (fx0 + dx + 3, fy0 + dy + 2)], fill=(58, 20, 34, 255))
+    d.polygon([(fx0 + dx + 3, fy0 + dy + 2), (fx1 + dx - 3, fy0 + dy + 2), (fx1 + dx - 3, fy0 + dy + 6), (fx0 + dx + 3, fy0 + dy + 6)], fill=(96, 34, 46, 255))   # pared del fondo
+    d.polygon([(fx0 + 3, fy0 - 1), (fx0 + dx + 3, fy0 + dy + 2), (fx0 + dx + 3, fy0 + dy + 6), (fx0 + 3, fy0 + 3)], fill=(78, 26, 40, 255))              # pared izquierda
+    # frente
+    d.rectangle([fx0, fy0, fx1, fy1], fill=RED[1])
+    d.rectangle([fx0, fy0, fx1, fy0 + 3], fill=RED[0])                 # labio claro
+    d.rectangle([fx0, fy1 - 4, fx1, fy1], fill=RED[2])                 # sombra de abajo
+    d.line([(fx0 + 1, fy0 + 4), (fx0 + 1, fy1 - 5)], fill=RED[0])      # brillo del canto izquierdo
+    # cinta dorada vertical
+    d.rectangle([14, fy0, 19, fy1], fill=GOLD[2]); d.rectangle([14, fy0, 15, fy1], fill=GOLD[1]); d.rectangle([19, fy0, 19, fy1], fill=GOLD[3])
+    d.rectangle([14, fy0, 19, fy0 + 3], fill=GOLD[1])
+    # cinta sobre el lateral
+    d.polygon([(fx1, fy0 + 2), (fx1 + dx, fy0 + dy + 2), (fx1 + dx, fy0 + dy + 8), (fx1, fy0 + 8)], fill=GOLD[3])
+    # --- tapa tirada abajo a la derecha, con su lazo
+    d.polygon([(42, 55), (61, 55), (61, 60), (42, 60)], fill=RED[2])
+    d.polygon([(41, 50), (62, 50), (62, 56), (41, 56)], fill=RED[1]); d.rectangle([41, 50, 62, 51], fill=RED[0])
+    d.rectangle([49, 50, 53, 56], fill=GOLD[2]); d.rectangle([49, 50, 50, 56], fill=GOLD[1])
+    d.ellipse([43, 42, 50, 50], fill=GOLD[2]); d.ellipse([45, 44, 48, 48], fill=RED[1]); d.ellipse([52, 42, 59, 50], fill=GOLD[3]); d.ellipse([54, 44, 57, 48], fill=RED[1])
+    d.ellipse([48, 45, 54, 51], fill=GOLD[1]); d.point((49, 46), fill=WHITE)
+    # --- nubecilla de polvo: la caja esta vacia
+    for (x, y, r) in ((18, 16, 4), (24, 12, 5), (30, 16, 4), (24, 17, 3)):
+        d.ellipse([x - r, y - r + 1, x + r, y + r + 1], fill=DUST[2]); d.ellipse([x - r, y - r, x + r, y + r], fill=DUST[1]); d.ellipse([x - r + 1, y - r, x + r - 2, y + r - 3], fill=DUST[0])
     return outline(im)
 
 
