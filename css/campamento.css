@@ -463,8 +463,8 @@ html.reduce-motion .rou-no { display: none; }
 .rou.done .wh-b { animation: rou-flash .26s steps(1) 8; }
 .wh-disc { position: absolute; inset: 9%; border-radius: 50%; overflow: hidden; will-change: transform; box-shadow: 0 0 0 3px #0a140f; }
 .wh-s { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(var(--a)); }
-.wh-s img { position: absolute; width: calc(var(--ws) * .115); height: calc(var(--ws) * .115); left: calc(var(--ws) * -.0575); top: calc(var(--ws) * -.355); image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .4)); }
-.wh-s b { position: absolute; width: calc(var(--ws) * .2); left: calc(var(--ws) * -.1); top: calc(var(--ws) * -.232); text-align: center; font: 900 calc(var(--ws) * .042)/1 var(--serif); color: #fff; text-shadow: 0 2px 0 #000, 0 0 4px #000; }
+.wh-s img { position: absolute; width: calc(var(--ws) * .15); height: calc(var(--ws) * .15); left: calc(var(--ws) * -.075); top: calc(var(--ws) * -.385); image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .4)); }
+.wh-s b { position: absolute; width: calc(var(--ws) * .2); left: calc(var(--ws) * -.1); top: calc(var(--ws) * -.222); text-align: center; font: 900 calc(var(--ws) * .04)/1 var(--serif); color: #fff; text-shadow: 0 2px 0 #000, 0 0 4px #000; }
 .wh-sep { position: absolute; inset: 0; background: repeating-conic-gradient(from -15deg, #0a140f 0 1deg, transparent 1deg 30deg); }
 .wh-dim { position: absolute; inset: 0; opacity: 0; background: conic-gradient(from calc(var(--a) - 15deg), transparent 0 30deg, rgba(0, 0, 0, .66) 30deg 360deg); }
 .rou.done .wh-dim { opacity: 1; transition: opacity .3s; }

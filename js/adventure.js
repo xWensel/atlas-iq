@@ -1753,9 +1753,9 @@ window.AIQ = window.AIQ || {};
   };
   /* las 12 casillas, en el orden de la rueda: buenas, malas y una vacia, intercaladas. t decide el color de la cuna; mul son doblones base (escalan con la expedicion) */
   const PRIZES = [
-    { k: "coin", mul: 6, ico: "coin", t: "good" }, { k: "reto", ico: "skull", t: "bad" }, { k: "jack", mul: 14, ico: "chips", t: "good" }, { k: "clock", ico: "hourglass", t: "bad" },
-    { k: "cafe", ico: "sup_cafe", t: "good" }, { k: "steal", ico: "bet_offer", t: "bad" }, { k: "seguro", ico: "sup_seguro", t: "good" }, { k: "none", ico: "chip_k", t: "none" },
-    { k: "streak", ico: "a_flame", t: "good" }, { k: "reto", ico: "skull", t: "bad" }, { k: "life", ico: "heart", t: "good" }, { k: "coin", mul: 6, ico: "coin", t: "good" },
+    { k: "coin", mul: 6, ico: "pz_monedas", t: "good" }, { k: "reto", ico: "pz_reto", t: "bad" }, { k: "jack", mul: 14, ico: "pz_gordo", t: "good" }, { k: "clock", ico: "pz_reloj", t: "bad" },
+    { k: "cafe", ico: "sup_cafe", t: "good" }, { k: "steal", ico: "pz_atraco", t: "bad" }, { k: "seguro", ico: "sup_seguro", t: "good" }, { k: "none", ico: "pz_nada", t: "none" },
+    { k: "streak", ico: "a_flame", t: "good" }, { k: "reto", ico: "pz_reto", t: "bad" }, { k: "life", ico: "heart", t: "good" }, { k: "coin", mul: 6, ico: "pz_monedas", t: "good" },
   ];
   const prizeVal = n => Math.max(1, Math.round(n * ascFx(run.asc).price * inflation()));
   const wheelCost = () => price(4), COIN_STAKES = [2, 5, 10], coinCost = i => price(COIN_STAKES[i % COIN_STAKES.length]);

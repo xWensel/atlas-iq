@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.10",
+      name: ["Iconos de la mesa", "Table icons"],
+      date: "2026-10-03",
+      summary: ["Rojo o negro estrena icono con la Tierra de Geolite y la Ruleta de premios, un dibujo claro en cada casilla.",
+        "Red or black gets a new icon with the Geolite Earth, and the Prize wheel gets a clear picture on every slot."],
+      chapters: [
+        { id: "iconos", kicker: ["Arte", "Art"], title: ["Dibujos nuevos", "New drawings"],
+          entries: [
+            E(["Rojo o negro y las casillas de la rueda", "Red or black and the wheel slots"], "change", "0.2.10", [
+            ["La ruleta de Rojo o negro lleva ahora la Tierra de Geolite en el centro. Cada casilla de la Ruleta de premios tiene su propio dibujo: monedas, lingotes, pergamino sellado, antifaz de ladrón, cronómetro agrietado y cartera vacía.", "The Red or black wheel now carries the Geolite Earth at its center. Every Prize wheel slot has its own picture: coins, gold bars, a sealed scroll, a bandit mask, a cracked stopwatch and an empty wallet."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.9",
       name: ["Juegos de casino", "Casino games"],
       date: "2026-10-03",
