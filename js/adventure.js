@@ -320,7 +320,7 @@ window.AIQ = window.AIQ || {};
     if (boss) { let soft = sum("softenBoss"); list = list.map((c, i) => (i < soft ? { ...c, lv: 1 } : c)); }
     list = list.filter(c => !pl.some(p => (p.immune || []).includes(c.id)));
     if (run.board) list = list.map(c => (c.id === "trap" && (c.lv || 1) > 2 ? { ...c, lv: 2 } : c));   // tanda 15: la Pregunta trampa, en el Reto diario, como mucho a nivel 2
-    for (const bet of run.inf ? [] : [run.bets && run.bets[r], redOf(r)])      // tanda 11: los de las apuestas (la lateral y Rojo o negro), sellados (si fallas, la revancha va sin ellos)
+    for (const bet of run.inf ? [] : [run.bets && run.bets[r], casOf(r)])      // tanda 11: los de las apuestas (la lateral y Rojo o negro), sellados (si fallas, la revancha va sin ellos)
       if (bet && bet.retos && !(r === roundNo() && run.attempt > 0 && bet.id !== "offer")) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
     if (pl.some(p => p.pact) && !boss && !run.inf && r <= LAST && list.length < 4) { const add = pickSealed(r, 1, "pacto", list)[0]; if (add) list.push({ ...add, lv: clamp(list.length ? Math.max(...list.map(c => c.lv || 1)) : 1, 1, 3), sealed: true, sealBy: "pact" }); }   // tanda 13: el reto del Pacto
     if (boss) while (list.length > 5) { const k = list.findIndex(c => c.x4); if (k < 0) break; list.splice(k, 1); }   // tanda 17 (A4): el reto extra del jefe cede ante los sellados: nunca mas de 5
@@ -543,6 +543,7 @@ window.AIQ = window.AIQ || {};
     const ctx = { seconds: clamp(Math.round(26 - 1.0 * r + ascFx(run.asc).secs), 10, 28), target: 1 };
     perkList().forEach(p => p.round && p.round(ctx, run)); ctx.target = Math.max(0.85, ctx.target);
     if (run.sup && run.sup.cafe) ctx.seconds += 4;                                       // suministro: Cafe doble
+    { const cr = casOf(r); if (cr && cr.secs && cr.att === (run.attempt || 0)) ctx.seconds += cr.secs; }   // Ruleta de premios: Reloj corto
     ctx.seconds = Math.max(6, ctx.seconds);
     run.chal = cf.list; run.chalName = cf.combo ? cf.combo.n : null; run.chalHalve = halve; run.chalKey = cf.boss && cf.combo ? cf.combo.k : null; run.chalDesc = cf.boss && cf.combo ? cf.combo.d : null;
     run.duel = !run.inf && run.chalKey === "duel" ? mkDuel(roundTarget()) : null;   // tanda 16: Duelo con la banca
@@ -825,7 +826,7 @@ window.AIQ = window.AIQ || {};
     const S = C().S, o = S.qs[S.qi], kept = o && run.probes && run.probes.length && run.probesK === qKey() + ":" + o.cid[0] ? run.probes : null;   // al reanudar la misma pregunta, las sondas siguen ahi (las cargas ya estaban gastadas)
     clearTimers(); hints.length = 0; run.qTools = 0; run.probes = kept || []; run.tool = null; run.windOff = false; S.tool = null; renderBars();
     if (!o) return;
-    { const b = !run.inf && run.qi === 0 && redOf(roundNo()); if (b && b.win && b.att === (run.attempt || 0)) { S.streak = Math.max(S.streak || 0, 1); run.streak = Math.max(run.streak || 0, 1); } }   // tanda 11: Rojo o negro acertado: empiezas en racha
+    { const b = !run.inf && run.qi === 0 && casOf(roundNo()); if (b && (b.id === "red" ? b.win : b.streak) && b.att === (run.attempt || 0)) { S.streak = Math.max(S.streak || 0, 1); run.streak = Math.max(run.streak || 0, 1); } }   // tanda 11: Rojo o negro acertado: empiezas en racha
     const calmF = (perkList().find(p => p.calm) || {}).calm, calm = calmF && !run.inf && (run.streak || 0) >= 2 && (run.chal || []).some(c => calmF.includes((A.CHAL[c.id] || {}).fam)) ? calmF : null;   // Sangre fria (tanda 9)
     if (!!calm !== !!run.calmOn) { if (calm) A.adv.flash("coolhead", 0, "❄"); else A.adv.flash("coolhead", 0, "✕", () => A.sfx.chip(0.3)); }   // entra en frio / se le quiebra el halo
     const calmWas = !!run.calmOn; run.calmOn = !!calm; if (calmWas !== run.calmOn) renderBars();   // las fichas que apaga, heladas
@@ -1112,8 +1113,8 @@ window.AIQ = window.AIQ || {};
       perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins, p.id]); } } });
       if (has("bank")) { const b = gain(sumFlag("bank")); run.hucha = (run.hucha || 0) + b; lines.push([A.tx(A.RELICS.hoard.n) + " · " + A.tx(H_IN).replace("{n}", run.hucha), "+" + b, "hoard"]); }   // tanda 9: la Hucha guarda, no paga
       if (boss && run.act === 1 && has("bossHeal") && run.lives < run.maxLives) { run.lives++; lines.push([A.tx(A.RELICS.heartperk.n), A.tx(H_HEART), "heartperk"]); setTimeout(() => A.sfx.jackpot(1), 1100); }   // Corazon: el jefe del acto II te devuelve una provision
-      const bet = (run.bets || {})[roundNo()], rb = redOf(roundNo()), first = !run.attempt;   // tanda 11: las apuestas se cobran aqui
-      if (rb && rb.win && rb.att === (run.attempt || 0) && !rb.paid) { const extra = Math.ceil(x.coins * 0.5); x.coins += extra; rb.paid = 1; lines.push([A.tx(BETS.red.n) + " · +50 %", "+" + extra, null, "bet"]); }
+      const bet = (run.bets || {})[roundNo()], rb = casOf(roundNo()), first = !run.attempt;   // tanda 11: las apuestas se cobran aqui
+      if (rb && rb.id === "red" && rb.win && rb.att === (run.attempt || 0) && !rb.paid) { const extra = Math.ceil(x.coins * 0.5); x.coins += extra; rb.paid = 1; lines.push([A.tx(BETS.red.n) + " · +50 %", "+" + extra, null, "bet"]); }
       const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins), (perkList().find(p => p.coinX) || {}).id]);
       run.coins += got; run.stats.coinsEarned += got;
       if (bet && bet.id === "double" && !bet.done) { bet.done = 1; if (first) { const win = Math.min(bet.stake, 40); run.coins += bet.stake + win; run.stats.coinsEarned += win; lines.push([A.tx(BETS.double.n) + " ×2", "+" + (bet.stake + win), null, "bet"]); setTimeout(() => { A.sfx.jackpot(3); if (A.core.jpShake) A.core.jpShake(3); A.dealer.say(A.dealer.line("betWin"), { mood: "angry", hold: 2400 }); }, 1100); } }   // doblas lo apostado (+40 como mucho)
@@ -1497,7 +1498,9 @@ window.AIQ = window.AIQ || {};
      los suministros (Seguro, Cafe doble) y las apuestas que tocan en esa ronda (Oferta de la casa en su Campamento sorteado; Doble o nada / La apuesta
      final antes de cada jefe: salian siempre y no se pierden). Lo que ya tienes puesto (apuesta o suministro activo) no se esconde. Un juego nuevo de
      casino entra en SIDE_GAMES y en barOf. */
-  const redOf = r => { const R = run.reds && run.reds[r]; if (R) return R; const b = (run.bets || {})[r]; if (b && b.id === "red") { run.reds = run.reds || {}; run.reds[r] = b; delete run.bets[r]; return b; } return null; };   // las partidas guardadas con Rojo o negro en run.bets se mudan solas
+  const casOf = r => { const R = run.reds && run.reds[r]; if (R) return R; const b = (run.bets || {})[r]; if (b && b.id === "red") { run.reds = run.reds || {}; run.reds[r] = b; delete run.bets[r]; return b; } return null; };   // las partidas guardadas con Rojo o negro en run.bets se mudan solas
+  const CASINO = ["red", "coin", "wheel"];                              // los juegos del centro; cada ronda sortea uno (la semilla) y se queda con el
+  const casinoKind = r => { const R = casOf(r); return R && CASINO.includes(R.id) ? R.id : A.rng(`${run.seed}:casino:${r}`).pick(CASINO); };
   const SIDE_GAMES = ["offer", "double", "final"];
   const sideRound = r => (r > LAST ? null : r % 4 === 3 ? (r === LAST ? "final" : "double") : Math.floor(r / 4) >= 1 && r === offerRound(Math.floor(r / 4)) ? "offer" : null);   // la apuesta lateral que toca en la ronda r
   function sideOk(k, r) {
@@ -1508,13 +1511,11 @@ window.AIQ = window.AIQ || {};
   }
   function barOf(r) {                                                     // [izquierda, derecha]; se fija por ronda e intento (la tienda se redibuja a cada compra)
     const key = r + ":" + (run.attempt || 0); if (run.bar && run.bar.key === key) return run.bar.s;
-    const rr = A.rng(`${run.seed}:barra:${r}`), b = (run.bets || {})[r], sup = ["seguro", "cafe"], own = [];
-    const open = betsOpen() && !run.inf;                                  // aun sin apuestas abiertas (antes de tu primer jefe): solo los suministros
-    if (open && b && b.id !== "red") own.push(b.id);                      // lo ya puesto, primero
-    sup.forEach(id => run.sup && run.sup[id] && own.push(id));
-    const sd = open && sideRound(r); if (sd && !own.includes(sd) && sideOk(sd, r)) own.push(sd);
-    const rest = rr.shuffle(sup.filter(id => !own.includes(id)));
-    const s = rr.shuffle(own.concat(rest).slice(0, 2));
+    casOf(r);                                                             // mueve a su sitio un Rojo o negro de una partida vieja
+    const rr = A.rng(`${run.seed}:barra:${r}`), b = (run.bets || {})[r], open = betsOpen() && !run.inf;   // aun sin apuestas abiertas (antes de tu primer jefe): solo los suministros
+    const sd = open ? (b ? b.id : sideRound(r)) : null, bet = sd && sideOk(sd, r) ? sd : null;
+    const sup = rr.shuffle(["seguro", "cafe"]).sort((x, y) => (run.sup && run.sup[y] ? 1 : 0) - (run.sup && run.sup[x] ? 1 : 0));   // a la izquierda, un suministro (el que ya tengas activo, primero)
+    const s = [sup[0], bet || sup[1]];
     run.bar = { key, s }; return s;
   }
   const offerPay = c => { const d = A.CHAL[c.id]; return Math.max(1, Math.round(0.6 * (3 + 2 * (c.lv || 3) + (d.kind === "map" ? 1 : 0)) * ascFx(run.asc).price * inflation())); };   // el 60 % del soborno base, sin la escalada
@@ -1533,17 +1534,27 @@ window.AIQ = window.AIQ || {};
   /* la carta de la apuesta en la Barra (tapete rojo) */
   function betHtml(k) {
     const r = roundNo(); if (run.inf || r > LAST || !betsOpen()) return "";
-    const b = k === "red" ? redOf(r) : (run.bets || {})[r], B = BETS[k], cf = chalFor(r), head = `<span class="sp-ic">${ic(B.ico)}</span><span class="sp-t" data-tt="${A.tx(B.d).replace(/"/g, "&quot;")}"><b>${A.tx(B.n)}</b><i>${A.tx(B.s)}</i></span>`;   // en la carta, el texto corto; el entero, en el globo
+    const b = CASINO.includes(k) ? casOf(r) : (run.bets || {})[r], B = BETS[k], cf = chalFor(r), head = `<span class="sp-ic">${ic(B.ico)}</span><span class="sp-t" data-tt="${A.tx(B.d).replace(/"/g, "&quot;")}"><b>${A.tx(B.n)}</b><i>${A.tx(B.s)}</i></span>`;   // en la carta, el texto corto; el entero, en el globo
     if (k === "offer") {
       if (b && b.id === "offer") return `<div class="sup bet on bt-offer" data-bet="offer" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.sold)} · ${b.retos.length} · +${CN()}${b.pay}</em></div>`;
       const room = 4 - cf.list.length; if (room < 1 || run.attempt > 0) return "";
       const opts = [1, 2, 3].filter(n => n <= room).map(n => { const rs = pickSealed(r, n, "oferta"); return rs.length === n ? `<button class="bt-c bt-n" type="button" data-n="${n}">${n}<span>+${CN()}${rs.reduce((m, c) => m + offerPay(c), 0)}</span></button>` : ""; }).join("");
       return opts ? `<div class="sup bet bt-offer" data-bet="offer">${head}<span class="bt-pick">${opts}</span></div>` : "";
     }
+    if (k === "coin") {
+      const att = run.attempt || 0, edge = b && b.out === "edge";
+      if (b && b.att === att) return `<div class="sup bet cas bt-coin done ${b.win ? "win" : "lose"}" data-bet="coin">${head}<em class="bt-res"><b>${A.tx(CT[b.out])}</b>${A.tx(edge ? CT.edgeMsg : b.win ? BT.won : BT.lost)}${b.pay ? " · +" + b.pay : ""}</em></div>`;
+      return `<div class="sup bet cas bt-coin" data-bet="coin">${head}<span class="bt-pick"><button class="bt-c bt-ch" type="button" data-side="heads">${A.tx(CT.heads)}</button><button class="bt-c bt-ct" type="button" data-side="tails">${A.tx(CT.tails)}</button><em class="sp-p bt-stake" role="button" tabindex="0">${CN()}${coinCost(coinStake)}</em></span></div>`;
+    }
+    if (k === "wheel") {
+      const att = run.attempt || 0, P = b && PRIZES[b.w];
+      if (b && b.att === att && P) return `<div class="sup bet cas bt-wheel done ${P.t === "good" ? "win" : "lose"}" data-bet="wheel">${head}<em class="bt-res"><b>${A.tx(WT[P.k])}</b>${b.val ? (b.val > 0 ? "+" : "") + b.val : ""}</em></div>`;
+      return `<div class="sup bet cas bt-wheel" data-bet="wheel">${head}<span class="bt-pick"><button class="bt-c bt-cs" type="button" data-spin="1">${A.tx(CT.spin)}</button><em class="sp-p">${CN()}${wheelCost()}</em></span></div>`;
+    }
     if (k === "red") {
       const att = run.attempt || 0;
-      if (b && b.att === att) { const gn = b.out === "green"; return `<div class="sup bet bt-red done ${b.win ? "win" : "lose"}${gn ? " zero" : ""}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(gn ? BT2.zero : b.out === "red" ? BT.red : BT.black)}${b.n != null ? " · " + b.n : ""}</b>${A.tx(gn ? BT2.house : b.win ? BT.won : BT.lost)}${b.retos && b.retos.length ? " · " + A.tx(BT2.extra) : ""}</em></div>`; }
-      return `<div class="sup bet bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><button class="bt-c bt-cg" type="button" data-pick="green" ${A.ttAttr(A.tx(BT2.green), A.tx(BT2.tip))}>${A.tx(BT2.green)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
+      if (b && b.att === att) { const gn = b.out === "green"; return `<div class="sup bet cas bt-red done ${b.win ? "win" : "lose"}${gn ? " zero" : ""}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(gn ? BT2.zero : b.out === "red" ? BT.red : BT.black)}${b.n != null ? " · " + b.n : ""}</b>${A.tx(gn ? BT2.house : b.win ? BT.won : BT.lost)}${b.retos && b.retos.length ? " · " + A.tx(BT2.extra) : ""}</em></div>`; }
+      return `<div class="sup bet cas bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><button class="bt-c bt-cg" type="button" data-pick="green" ${A.ttAttr(A.tx(BT2.green), A.tx(BT2.tip))}>${A.tx(BT2.green)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
     }
     if (b && b.id === k) return `<div class="sup bet on bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.on)}${k === "double" ? " · " + CN() + b.stake : ""}</em></div>`;
     if (!sideOk(k, r)) return "";
@@ -1559,6 +1570,34 @@ window.AIQ = window.AIQ || {};
         A.sfx.jackpot(1); if (A.core.jpShake) A.core.jpShake(1); A.dealer.enable(true); A.dealer.say(A.dealer.line("betDeal"), { mood: "laugh", hold: 2400 });   // lluvia de monedas
       }));
       el.onclick = () => { const b = (run.bets || {})[r]; if (!b || b.id !== "offer") return; if (run.coins < b.pay) { A.sfx.deny(); shake(el); return; } run.coins -= b.pay; delete run.bets[r]; A.sfx.sell(); persist(); renderShop(false); };   // en la misma visita, te echas atras devolviendo lo cobrado
+      return;
+    }
+    if (k === "coin") {
+      const pill = el.querySelector(".bt-stake");
+      if (pill) pill.onclick = e => { e.stopPropagation(); coinStake = (coinStake + 1) % COIN_STAKES.length; pill.innerHTML = CN() + coinCost(coinStake); A.sfx.tick(1); };   // el precio se cambia con un clic en la ficha
+      el.querySelectorAll("[data-side]").forEach(btn => (btn.onclick = e => {
+        e.stopPropagation(); if (rouOpen) return; const stake = coinCost(coinStake); if (run.coins < stake) { A.sfx.deny(); shake(el); return; }
+        const att = run.attempt || 0, u = A.rng(`${run.seed}:moneda:${r}:${att}`)(), pick = btn.dataset.side;
+        const out = u < 1 / 64 ? "edge" : (u - 1 / 64) / (63 / 64) < 0.5 ? "heads" : "tails", win = out === pick, pay = out === "edge" ? stake * 6 : win ? stake * 2 : 0;   // 1 de cada 64 cae de canto
+        run.coins += pay - stake; if (pay > stake) run.stats.coinsEarned += pay - stake;
+        run.reds = run.reds || {}; run.reds[r] = { id: "coin", pick, out, win: win || out === "edge", att, stake, pay };
+        persist(); A.sfx.rouBet(pick === "heads" ? 0 : 1); if (A.haptic) A.haptic([10]);
+        { const cb = document.querySelector("#shopCoins b"); if (cb) cb.textContent = run.coins - pay; }
+        spinCoin({ pick, out, win, pay, stake }, () => { if (!run || C().S.phase !== "shop") return; renderShop(false); });
+      }));
+      return;
+    }
+    if (k === "wheel") {
+      const spinBtn = el.querySelector("[data-spin]"); if (!spinBtn) return;                // ya tirada en este intento: solo el resultado
+      spinBtn.onclick = e => {
+        e.stopPropagation(); if (rouOpen) return; const c = wheelCost(); if (run.coins < c) { A.sfx.deny(); shake(el); return; }
+        const att = run.attempt || 0, w = Math.floor(A.rng(`${run.seed}:premios:${r}:${att}`)() * PRIZES.length), rec = { id: "wheel", w, att };
+        run.coins -= c; run.reds = run.reds || {}; run.reds[r] = rec; const afterFee = run.coins;
+        const info = applyPrize(PRIZES[w], rec, r); run.bar = null;       // el premio puede ser un suministro: la Barra se vuelve a montar
+        persist(); A.sfx.rouBet(2); if (A.haptic) A.haptic([10]);
+        { const cb = document.querySelector("#shopCoins b"); if (cb) cb.textContent = afterFee; }
+        spinWheel({ w, info }, () => { if (!run || C().S.phase !== "shop") return; renderShop(false); });
+      };
       return;
     }
     if (k === "red") {
@@ -1681,6 +1720,195 @@ window.AIQ = window.AIQ || {};
       requestAnimationFrame(frame);
     } catch (e) { bail(e); }
   }
+  /* ---------------- v0.2.9: mas juegos de casino para el centro de la Barra: Moneda al aire y Ruleta de premios ----------------
+     El centro lo sortea la semilla por ronda entre CASINO (Rojo o negro, Moneda al aire, Ruleta de premios); cada juego tiene su cenefa y su pantalla.
+     Todo se decide y se guarda ANTES de animar (como la ruleta): recargar a medias no lo deshace. El registro de la ronda vive en run.reds[r]
+     ({ id, att, ... }) y sus efectos (racha, segundos, retos sellados) solo valen para el intento en que se tiro (att). */
+  Object.assign(BETS, {
+    coin: { n: L6("Moneda al aire|Coin flip|Pile ou face|Cara ou coroa|Münzwurf|Testa o croce||抛硬币|동전 던지기|コイントス|Орёл или решка|Rzut monetą"),
+      d: L6("Elige cara o cruz. Si aciertas, cobras el doble de lo apostado; si fallas, lo pierdes. A veces la moneda cae de canto: paga ×6.|Pick heads or tails. Guess right and you win double your stake; guess wrong and you lose it. Sometimes the coin lands on its edge: pays ×6.|Choisis pile ou face. Si tu as raison, tu gagnes le double de ta mise ; sinon, tu la perds. Parfois la pièce retombe sur la tranche : paie ×6.|Escolha cara ou coroa. Se acertar, recebe o dobro da aposta; se errar, perde. Às vezes a moeda cai de lado: paga ×6.|Wähl Kopf oder Zahl. Liegst du richtig, bekommst du den doppelten Einsatz, sonst ist er weg. Manchmal bleibt die Münze auf der Kante stehen: zahlt ×6.|Scegli testa o croce. Se indovini, vinci il doppio della puntata; se sbagli, la perdi. A volte la moneta cade di taglio: paga ×6.||选正面或反面。猜对赢双倍赌注，猜错输掉赌注。偶尔硬币会立起来：赔 ×6。|앞면이나 뒷면을 고르세요. 맞히면 건 돈의 두 배, 틀리면 잃습니다. 가끔 동전이 모서리로 섭니다: ×6 지급.|表か裏を選ぶ。当たれば賭け金の2倍、はずれれば失う。まれにコインが縁で立つ：×6の配当。|Выбери орла или решку. Угадал — получаешь удвоенную ставку, не угадал — теряешь её. Иногда монета встаёт на ребро: выплата ×6.|Wybierz orła lub reszkę. Trafisz — dostajesz podwójną stawkę, pudło — tracisz ją. Czasem moneta staje na krawędzi: wypłata ×6."),
+      s: L6("Acierta y cobras el doble de lo apostado.|Call it right and win double your stake.|Devine juste et gagne le double de ta mise.|Acerte e receba o dobro da aposta.|Rate richtig: doppelter Einsatz.|Indovina e vinci il doppio.||猜对赢双倍赌注。|맞히면 건 돈의 두 배.|当てれば賭け金の2倍。|Угадай — получишь двойную ставку.|Zgadnij i wygraj podwójnie."), ico: "bet_coin" },
+    wheel: { n: L6("Ruleta de premios|Prize wheel|Roue des prix|Roda de prêmios|Glücksrad|Ruota dei premi||奖品转盘|상품 룰렛|景品ルーレット|Колесо призов|Koło nagród"),
+      d: L6("Pagas la cuota y giras la rueda: 12 casillas con premios (doblones, racha, café, seguro, provisión) y castigos (un reto más, atraco, reloj corto). Todas tienen la misma probabilidad.|You pay the fee and spin: 12 slots with prizes (doubloons, streak, espresso, insurance, provision) and penalties (one more challenge, a heist, a short clock). Every slot is equally likely.|Tu paies la mise et tu lances la roue : 12 cases avec des lots (doublons, série, café, assurance, provision) et des pénalités (un défi de plus, un braquage, une horloge courte). Chaque case a la même probabilité.|Você paga a taxa e gira a roda: 12 casas com prêmios (dobrões, sequência, café, seguro, provisão) e castigos (mais um desafio, um assalto, relógio curto). Todas têm a mesma chance.|Du zahlst den Einsatz und drehst: 12 Felder mit Preisen (Dublonen, Serie, Espresso, Versicherung, Proviant) und Strafen (eine Herausforderung mehr, ein Überfall, kurze Uhr). Jedes Feld ist gleich wahrscheinlich.|Paghi la quota e giri la ruota: 12 caselle con premi (dobloni, serie, caffè, assicurazione, provvista) e penalità (una sfida in più, una rapina, orologio corto). Ogni casella ha la stessa probabilità.||你付费并转动转盘：12 格，有奖励（金币、连击、咖啡、保险、补给）也有惩罚（多一个挑战、被抢劫、时间变短）。每格概率相同。|참가비를 내고 룰렛을 돌립니다: 12칸에 상(도블론, 연속 기록, 커피, 보험, 식량)과 벌(도전 +1, 강탈, 짧은 시계)이 있습니다. 모든 칸의 확률은 같습니다.|参加費を払ってルーレットを回す：12マスに、賞（ダブロン、連続記録、コーヒー、保険、プロビジョン）と罰（チャレンジ+1、強奪、短い時計）。どのマスも同じ確率。|Платишь взнос и крутишь колесо: 12 секторов с призами (дублоны, серия, кофе, страховка, запас) и штрафами (ещё одно испытание, ограбление, короткие часы). Шансы у всех секторов одинаковые.|Płacisz opłatę i kręcisz kołem: 12 pól z nagrodami (dublony, seria, kawa, ubezpieczenie, zapas) i karami (jedno wyzwanie więcej, napad, krótki zegar). Każde pole ma te same szanse."),
+      s: L6("Premios buenos y malos. Gira y arriésgate.|Good prizes and bad ones. Spin and risk it.|Bons lots et mauvais. Tourne, tente ta chance.|Prêmios bons e ruins. Gire e arrisque.|Gute Preise und schlechte. Dreh und riskier es.|Premi buoni e cattivi. Gira e rischia.||有好奖也有坏奖，转一转赌一把。|좋은 상도 나쁜 상도. 돌려서 도전하세요.|良い賞も悪い賞も。回して賭けよう。|Призы хорошие и плохие. Крути и рискуй.|Dobre nagrody i złe. Zakręć i zaryzykuj."), ico: "bet_wheel" },
+  });
+  const CT = {
+    heads: L6("Cara|Heads|Face|Cara|Kopf|Testa||正面|앞면|表|Орёл|Orzeł"), tails: L6("Cruz|Tails|Pile|Coroa|Zahl|Croce||反面|뒷면|裏|Решка|Reszka"),
+    edge: L6("De canto|On its edge|Sur la tranche|De lado|Auf der Kante|Di taglio||立起来了|모서리에 섬|縁で立った|На ребре|Na krawędzi"),
+    edgeMsg: L6("¡Se ha quedado de canto!|It stands on its edge!|Elle reste sur la tranche !|Ficou de lado!|Sie bleibt auf der Kante stehen!|È rimasta di taglio!||硬币立住了！|동전이 모서리로 섰다!|コインが縁で立った！|Монета встала на ребро!|Moneta stanęła na krawędzi!"),
+    spin: L6("Girar|Spin|Tourner|Girar|Drehen|Gira||转动|돌리기|回す|Крутить|Kręć"),
+  };
+  const WT = {
+    coin: L6("Doblones|Doubloons|Doublons|Dobrões|Dublonen|Dobloni||金币|도블론|ダブロン|Дублоны|Dublony"), jack: L6("¡Premio gordo!|Jackpot!|Jackpot !|Prêmio gordo!|Jackpot!|Jackpot!||大奖！|잭팟!|ジャックポット！|Джекпот!|Jackpot!"),
+    streak: L6("Racha|Streak|Série|Sequência|Serie|Serie||连击|연속 기록|連続記録|Серия|Seria"), streakD: L6("Empiezas la próxima ronda en racha|You start next round on a streak|Tu commences la prochaine manche en série|Você começa a próxima rodada em sequência|Du startest die nächste Runde mit Serie|Parti in serie nel prossimo round||下一轮开局就有连击|다음 라운드를 연속 기록으로 시작합니다|次のラウンドを連続記録つきで始める|Следующий раунд начнёшь с серией|Następną rundę zaczniesz z serią"),
+    cafe: L6("Café gratis|Free espresso|Café offert|Café grátis|Gratis-Espresso|Caffè gratis||免费咖啡|공짜 커피|無料コーヒー|Бесплатный кофе|Darmowa kawa"), cafeD: L6("Café doble activo en la próxima ronda|Double espresso active next round|Café doublé actif à la prochaine manche|Café duplo ativo na próxima rodada|Doppelter Espresso nächste Runde aktiv|Caffè doppio attivo nel prossimo round||下一轮双倍咖啡生效|다음 라운드에 더블 커피 적용|次のラウンドでダブルコーヒー有効|Двойной кофе действует в следующем раунде|Podwójna kawa aktywna w następnej rundzie"),
+    seguro: L6("Seguro gratis|Free insurance|Assurance offerte|Seguro grátis|Gratis-Versicherung|Assicurazione gratis||免费保险|공짜 보험|無料保険|Бесплатная страховка|Darmowe ubezpieczenie"), seguroD: L6("Seguro de ronda activo|Round insurance active|Assurance de manche active|Seguro de rodada ativo|Rundenversicherung aktiv|Assicurazione del round attiva||回合保险生效|라운드 보험 적용|ラウンド保険有効|Страховка раунда действует|Ubezpieczenie rundy aktywne"),
+    already: L6("Ya lo tenías: lo cobras en doblones|You already had it: paid in doubloons|Tu l'avais déjà : payé en doublons|Você já tinha: pago em dobrões|Hattest du schon: in Dublonen ausgezahlt|Ce l'avevi già: pagato in dobloni||你已拥有：折算成金币|이미 있어서 도블론으로 받습니다|すでに持っている：ダブロンで支払い|Уже есть: выплата дублонами|Już to masz: wypłata w dublonach"),
+    life: L6("Provisión|Provision|Provision|Provisão|Proviant|Provvista||补给|식량|プロビジョン|Запас|Zapas"), lifeD: L6("+1 provisión|+1 provision|+1 provision|+1 provisão|+1 Proviant|+1 provvista||+1 补给|식량 +1|+1 プロビジョン|+1 запас|+1 zapas"),
+    none: L6("Nada|Nothing|Rien|Nada|Nichts|Niente||什么都没有|꽝|なし|Ничего|Nic"), noneD: L6("La rueda no paga nada|The wheel pays nothing|La roue ne paie rien|A roda não paga nada|Das Rad zahlt nichts|La ruota non paga nulla||转盘没有奖励|룰렛이 아무것도 주지 않습니다|ルーレットは何も出さない|Колесо ничего не платит|Koło nic nie płaci"),
+    reto: L6("Reto extra|Extra challenge|Défi en plus|Desafio extra|Extra-Herausforderung|Sfida extra||额外挑战|추가 도전|追加チャレンジ|Лишнее испытание|Dodatkowe wyzwanie"), retoD: L6("La ronda trae un reto más (sellado, nivel 3)|The round brings one more challenge (sealed, level 3)|La manche apporte un défi de plus (scellé, niveau 3)|A rodada traz mais um desafio (selado, nível 3)|Die Runde bringt eine Herausforderung mehr (versiegelt, Stufe 3)|Il round porta una sfida in più (sigillata, livello 3)||这一轮多一个挑战（3 级封印）|라운드에 도전이 하나 더 붙습니다 (봉인, 3단계)|ラウンドにチャレンジが1つ増える（封印、レベル3）|В раунде станет на одно испытание больше (запечатанное, 3-й уровень)|Runda dostaje jedno wyzwanie więcej (zapieczętowane, poziom 3)"),
+    noRoom: L6("Ya no cabe otro reto: te libras|There's no room for another challenge: you're spared|Plus de place pour un défi : tu t'en tires|Não cabe mais um desafio: você se livra|Kein Platz für eine weitere Herausforderung: Glück gehabt|Non c'è posto per un'altra sfida: te la cavi||挑战已满：你逃过一劫|더 이상 도전이 들어갈 자리가 없어 무사합니다|これ以上チャレンジは入らない：助かった|Места для ещё одного испытания нет: повезло|Nie ma miejsca na kolejne wyzwanie: uchodzi ci to płazem"),
+    steal: L6("Atraco|Heist|Braquage|Assalto|Überfall|Rapina||被抢劫|강탈|強奪|Ограбление|Napad"), stealD: L6("El crupier se queda la mitad de tus doblones (máx. {n})|The dealer keeps half your doubloons (max {n})|Le croupier garde la moitié de tes doublons (max {n})|O crupiê fica com metade dos seus dobrões (máx. {n})|Der Croupier behält die Hälfte deiner Dublonen (max. {n})|Il croupier si tiene metà dei tuoi dobloni (max {n})||荷官拿走你一半金币（最多 {n}）|딜러가 도블론의 절반을 가져갑니다 (최대 {n})|ディーラーがダブロンの半分を取る（最大{n}）|Крупье забирает половину твоих дублонов (макс. {n})|Krupier zabiera połowę twoich dublonów (maks. {n})"),
+    clock: L6("Reloj corto|Short clock|Horloge courte|Relógio curto|Kurze Uhr|Orologio corto||时间变短|짧은 시계|短い時計|Короткие часы|Krótki zegar"), clockD: L6("−{n} s por pregunta en la próxima ronda|−{n} s per question next round|−{n} s par question à la prochaine manche|−{n} s por pergunta na próxima rodada|−{n} s pro Frage in der nächsten Runde|−{n} s per domanda nel prossimo round||下一轮每题 −{n} 秒|다음 라운드 문제당 −{n}초|次のラウンドは1問につき−{n}秒|−{n} с на вопрос в следующем раунде|−{n} s na pytanie w następnej rundzie"),
+  };
+  /* las 12 casillas, en el orden de la rueda: buenas, malas y una vacia, intercaladas. t decide el color de la cuna; mul son doblones base (escalan con la expedicion) */
+  const PRIZES = [
+    { k: "coin", mul: 6, ico: "coin", t: "good" }, { k: "reto", ico: "skull", t: "bad" }, { k: "jack", mul: 14, ico: "chips", t: "good" }, { k: "clock", ico: "hourglass", t: "bad" },
+    { k: "cafe", ico: "sup_cafe", t: "good" }, { k: "steal", ico: "bet_offer", t: "bad" }, { k: "seguro", ico: "sup_seguro", t: "good" }, { k: "none", ico: "chip_k", t: "none" },
+    { k: "streak", ico: "a_flame", t: "good" }, { k: "reto", ico: "skull", t: "bad" }, { k: "life", ico: "heart", t: "good" }, { k: "coin", mul: 6, ico: "coin", t: "good" },
+  ];
+  const prizeVal = n => Math.max(1, Math.round(n * ascFx(run.asc).price * inflation()));
+  const wheelCost = () => price(4), COIN_STAKES = [2, 5, 10], coinCost = i => price(COIN_STAKES[i % COIN_STAKES.length]);
+  let coinStake = 0;
+  const tx = (o, n) => A.tx(o).replace("{n}", n);
+  /* aplica el premio (dinero, provision, suministro, reto sellado...) y devuelve lo que ensena la pantalla */
+  function applyPrize(P, rec, r) {
+    const T = WT, v = P.mul ? prizeVal(P.mul) : 0, earn = n => { run.coins += n; run.stats.coinsEarned += n; };
+    if (P.k === "coin" || P.k === "jack") { earn(v); rec.val = v; return { name: A.tx(P.k === "jack" ? T.jack : T.coin), detail: "+" + v, tone: "good", jp: P.k === "jack" ? 3 : 1 }; }
+    if (P.k === "streak") { rec.streak = true; return { name: A.tx(T.streak), detail: A.tx(T.streakD), tone: "good", jp: 1 }; }
+    if (P.k === "cafe" || P.k === "seguro") {
+      const s = SUPS.find(x => x.id === P.k), shown = barOf(r).includes(P.k) && !(run.sup && run.sup[P.k]);
+      if (shown) { run.sup = run.sup || {}; run.sup[P.k] = "gift"; return { name: A.tx(T[P.k]), detail: A.tx(T[P.k + "D"]), tone: "good", jp: 1 }; }
+      const pay = prizeVal(s.cost); earn(pay); return { name: A.tx(T[P.k]), detail: A.tx(T.already) + " · +" + pay, tone: "good", jp: 1 };
+    }
+    if (P.k === "life") {
+      if (run.lives < run.maxLives) { run.lives++; return { name: A.tx(T.life), detail: A.tx(T.lifeD), tone: "good", jp: 2 }; }
+      const pay = prizeVal(8); earn(pay); return { name: A.tx(T.life), detail: A.tx(T.already) + " · +" + pay, tone: "good", jp: 1 };
+    }
+    if (P.k === "reto") {
+      const rs = chalFor(r).list.length < 5 ? pickSealed(r, 1, "premioreto") : [];
+      if (rs.length) { rec.retos = rs; return { name: A.tx(T.reto), detail: A.tx(T.retoD), tone: "bad", jp: 0 }; }
+      return { name: A.tx(T.reto), detail: A.tx(T.noRoom), tone: "none", jp: 0 };
+    }
+    if (P.k === "clock") { rec.secs = -3; return { name: A.tx(T.clock), detail: tx(T.clockD, 3), tone: "bad", jp: 0 }; }
+    if (P.k === "steal") { const cap = prizeVal(15), amt = Math.min(Math.ceil(run.coins / 2), cap); run.coins -= amt; rec.val = -amt; return { name: A.tx(T.steal), detail: tx(T.stealD, cap) + (amt ? " · −" + amt : ""), tone: "bad", jp: 0 }; }
+    return { name: A.tx(T.none), detail: A.tx(T.noneD), tone: "none", jp: 0 };
+  }
+  const wedgeLabel = P => (P.mul ? "+" + prizeVal(P.mul) : P.k === "steal" ? "−½" : P.k === "clock" ? "−3s" : "");
+
+  /* la capa a pantalla completa que comparten Moneda y Ruleta de premios (la de Rojo o negro es la suya): teclado bloqueado, cierre con fundido, nunca deja el Campamento bloqueado */
+  function rouShell(cls, html, vars, done) {
+    const app = $("app"), S = C().S, reduced = !!(S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!app) { done(); return null; }
+    rouOpen = true;
+    const ov = document.createElement("div"); ov.id = "rouOv"; ov.className = "rou spin " + cls;
+    Object.keys(vars).forEach(k => ov.style.setProperty(k, vars[k])); ov.innerHTML = html + '<u class="rou-wash"></u>'; app.appendChild(ov);
+    const block = e => { e.preventDefault(); e.stopPropagation(); }; addEventListener("keydown", block, true);
+    const sh = { ov, reduced, closed: false, revealed: false };
+    sh.close = () => { if (sh.closed) return; sh.closed = true; removeEventListener("keydown", block, true); ov.classList.add("out"); setTimeout(() => { ov.remove(); rouOpen = false; done(); }, reduced ? 0 : 280); };
+    sh.bail = e => { try { console.error("casino", e); } catch (x) { /* nada */ } if (sh.closed) return; sh.closed = true; removeEventListener("keydown", block, true); ov.remove(); rouOpen = false; done(); };
+    sh.hold = ms => { setTimeout(() => { ov.addEventListener("click", sh.close); ov.classList.add("skippable"); }, 600); setTimeout(sh.close, ms); };
+    return sh;
+  }
+
+  /* ---------------- Moneda al aire: la moneda (la de los logros, en 24 fotogramas de giro) sube, gira y cae; si cae de canto, se queda de pie ---------------- */
+  function spinCoin(o, done) {
+    const { pick, out, win, pay } = o, edge = out === "edge", cw = Math.max(60, Math.min(116, Math.round(innerHeight * 0.125), Math.round(innerWidth / 7))), k = Math.max(2, Math.min(3, Math.round(cw * 1.5 / 64))), fw = 64 * k, NF = 24;   // fotograma de 64 px logicos, ampliado en entero
+    const msg = edge ? A.tx(CT.edgeMsg) + " +" + pay : win ? A.tx(BT.won) + " +" + pay : A.tx(BT.lost);
+    const sh = rouShell(`coin ${edge ? "win edge" : win ? "win" : "lose"}`,
+      `<div class="rou-stage"><div class="rou-top"><b class="rou-no">${A.tx(BT2.noMore)}</b><div class="rou-res"><span class="rr-plate rc-coin"><b>${A.tx(CT[out])}</b>${win || edge ? `<i>${edge ? "×6" : "×2"}</i>` : ""}</span><span class="rr-msg">${msg}</span></div>
+        <div class="rou-pick"><span class="rp-dot rp-coin"></span><span class="rp-k">${A.tx(BT.seal)}</span><b>${A.tx(CT[pick])} · ${o.stake}</b></div></div>
+      <div class="rou-band cn-band"><i class="rou-lights top"></i><div class="cn-air"><i class="cn-shadow"></i><div class="cn-arc"><i class="cn-spr"></i><img class="cn-stand" src="assets/icons/coin_stand.webp" alt="" draggable="false"></div></div><i class="rou-lights bot"></i></div></div>`,
+      { "--cw": cw + "px", "--fw": fw + "px", "--k": k }, done);
+    if (!sh) return;
+    const ov = sh.ov, arc = ov.querySelector(".cn-arc"), spr = ov.querySelector(".cn-spr"), shadow = ov.querySelector(".cn-shadow");
+    const END = out === "tails" ? 180 : edge ? 75 : 0, TH = 360 * 4 + END, H = Math.round(fw * 0.62), DUR = 1900, DS = DUR * 0.76, T_IN = 340;
+    const frameAt = deg => Math.round(deg / (360 / NF)) % NF, put = i => { spr.style.backgroundPositionX = -i * fw + "px"; };
+    put(0);
+    const reveal = () => {
+      if (sh.revealed) return; sh.revealed = true; put(frameAt(END)); ov.classList.remove("spin"); ov.classList.add("done", "is-coin", edge ? "is-edge" : win ? "is-win" : "is-lose");
+      if (A.haptic) A.haptic([edge ? 60 : 30]);
+      setTimeout(() => {
+        A.dealer.enable(true);
+        if (edge) { A.sfx.jackpot(3); if (A.core.jpShake) A.core.jpShake(3); if (A.haptic) A.haptic([40, 40, 80]); A.dealer.say(A.dealer.line("betWin"), { mood: "angry", face: "furious", gesture: "stamp", fx: "shake", hold: 3000 }); }
+        else if (win) { A.sfx.jackpot(1); if (A.core.jpShake) A.core.jpShake(1); A.dealer.say(A.dealer.line("betWin"), { mood: "angry", hold: 2200 }); }
+        else { A.sfx.lose(); A.dealer.say(A.dealer.line("betLose"), { mood: "laugh", hold: 2200 }); }
+      }, 150);
+      sh.hold(edge ? 3000 : 2300);
+    };
+    try {
+      if (sh.reduced) { reveal(); return; }
+      A.sfx.rouNoMore();
+      setTimeout(() => {
+        if (sh.closed || sh.revealed) return;
+        A.sfx.coinToss();
+        arc.animate([{ transform: "translateY(0)", offset: 0, easing: "cubic-bezier(.2,.7,.35,1)" }, { transform: `translateY(${-H}px)`, offset: 0.44, easing: "cubic-bezier(.6,0,.85,.4)" },
+          { transform: "translateY(0)", offset: 0.76, easing: "cubic-bezier(.2,.6,.4,1)" }, { transform: `translateY(${-Math.round(H * 0.14)}px)`, offset: 0.87, easing: "cubic-bezier(.6,0,.85,.4)" }, { transform: "translateY(0)", offset: 1 }], { duration: DUR, fill: "forwards" });
+        shadow.animate([{ transform: "scaleX(1)", opacity: 0.55, offset: 0 }, { transform: "scaleX(.55)", opacity: 0.22, offset: 0.44 }, { transform: "scaleX(1)", opacity: 0.55, offset: 0.76 }, { transform: "scaleX(.88)", opacity: 0.42, offset: 0.87 }, { transform: "scaleX(1)", opacity: 0.55, offset: 1 }], { duration: DUR, fill: "forwards" });
+        const t0 = performance.now(); let cur = 0;
+        const frame = now => {
+          if (sh.closed || sh.revealed) return;
+          const x = Math.min(1, (now - t0) / DS), deg = TH * (1 - Math.pow(1 - x, 2.3)), i = frameAt(deg);
+          if (i !== cur) { cur = i; put(i); }
+          if (x < 1) requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+        setTimeout(() => { if (!sh.closed) { put(frameAt(END)); A.sfx.coinLand(0); } }, DS);
+        setTimeout(() => { if (!sh.closed) A.sfx.coinLand(1); }, DUR * 0.87);
+        setTimeout(() => { if (!sh.closed) reveal(); }, DUR + 60);
+      }, T_IN);
+    } catch (e) { sh.bail(e); }
+  }
+
+  /* ---------------- Ruleta de premios: rueda circular de 12 cunas, aro de bombillas y puntero fijo arriba ---------------- */
+  function spinWheel(o, done) {
+    const { w, info } = o, N = PRIZES.length, STEP = 360 / N, ws = Math.max(240, Math.min(620, Math.round(Math.min(innerHeight * 0.5, innerWidth * 0.78) / 4) * 4));
+    const TONE = { good: ["#f2b63d", "#1f9a58"], bad: ["#c9362c", "#23252e"], none: ["#5d6470", "#4a505b"] };
+    const cnt = { good: 0, bad: 0, none: 0 }, cols = PRIZES.map(P => TONE[P.t][cnt[P.t]++ % 2]);
+    const disc = `conic-gradient(from ${-STEP / 2}deg, ${cols.map((c, i) => `${c} ${i * STEP}deg ${(i + 1) * STEP}deg`).join(", ")})`;
+    const slots = PRIZES.map((P, i) => `<span class="wh-s" style="--a:${i * STEP}deg"><img src="assets/icons/${P.ico}.webp" alt="" draggable="false"><b>${wedgeLabel(P)}</b></span>`).join("");
+    const bulbs = Array.from({ length: 24 }, (_, i) => `<i class="wh-b ${i % 2 ? "o" : "e"}" style="--a:${i * 15}deg"></i>`).join("");
+    const sh = rouShell(`wheel ${info.tone === "good" ? "win" : "lose"} tone-${info.tone}`,
+      `<div class="rou-stage"><div class="rou-top"><b class="rou-no">${A.tx(BT2.noMore)}</b><div class="rou-res"><span class="rr-plate rc-${info.tone}"><b>${info.name}</b></span><span class="rr-msg">${info.detail}</span></div>
+        <div class="rou-pick"><span class="rp-dot rp-wheel"></span><span class="rp-k">${A.tx(BT.seal)}</span><b>${A.tx(BETS.wheel.n)}</b></div></div>
+      <div class="wh" ><div class="wh-ring">${bulbs}</div><div class="wh-disc" style="background:${disc}">${slots}<u class="wh-sep"></u><u class="wh-dim" style="--a:${w * STEP}deg"></u></div>
+        <i class="wh-hub"><img src="assets/icons/coin.webp" alt="" draggable="false"></i><i class="wh-ptr"></i></div></div>`,
+      { "--ws": ws + "px", "--cw": Math.round(ws * 0.2) + "px" }, done);
+    if (!sh) return;
+    const ov = sh.ov, discEl = ov.querySelector(".wh-disc"), ptr = ov.querySelector(".wh-ptr");
+    const jit = (A.rng(`${run.seed}:premios:j:${roundNo()}:${run.attempt || 0}`)() - 0.5) * 0.7 * STEP;           // donde se para dentro de la cuna: a veces rozando el borde
+    const TH = 360 * 5 - w * STEP + jit, D = 3.2, T_IN = 0.34, ease = x => 1 - Math.pow(1 - x, 3.5);
+    const warp = t => (t < 0.16 ? (t * t) / 0.32 : t - 0.08), angAt = t => (t <= 0 ? 0 : TH * ease(Math.min(1, warp(t) / D))), END = D + 0.08;
+    const put = a => { discEl.style.transform = `rotate(${a.toFixed(2)}deg)`; };
+    put(0);
+    const reveal = () => {
+      if (sh.revealed) return; sh.revealed = true; put(TH); ov.classList.remove("spin"); ov.classList.add("done", "is-" + info.tone);
+      A.sfx.rouStop(); if (A.haptic) A.haptic([info.tone === "good" ? 40 : 25]);
+      setTimeout(() => {
+        A.dealer.enable(true);
+        if (info.tone === "good") { A.sfx.jackpot(info.jp || 1); if (A.core.jpShake) A.core.jpShake(info.jp || 1); A.dealer.say(A.dealer.line("betWin"), { mood: "angry", hold: 2400 }); }
+        else if (info.tone === "bad") { A.sfx.lose(); if (A.core.jpShake) A.core.jpShake(1); A.dealer.say(A.dealer.line("betLose"), { mood: "laugh", hold: 2400 }); }
+        else { A.sfx.deny(); A.dealer.say(A.dealer.line("betLose"), { mood: "sly", hold: 2200 }); }
+      }, 150);
+      sh.hold(info.jp === 3 ? 3200 : 2800);
+    };
+    try {
+      if (sh.reduced) { reveal(); return; }
+      A.sfx.rouNoMore(); setTimeout(() => { if (!sh.closed && !sh.revealed) A.sfx.rouStart(); }, T_IN * 1000);
+      let t0 = 0, last = 0, lastT = 0, lastTick = 0, cur = 0;
+      const frame = now => {
+        try {
+          if (!ov.isConnected) { rouOpen = false; return; }
+          if (sh.revealed) return;
+          if (!t0) t0 = now + T_IN * 1000;
+          const t = (now - t0) / 1000, a = angAt(t), dt = Math.max(1, now - lastT) / 1000, v = lastT ? Math.abs(a - last) / dt : 0;      // v: grados por segundo
+          put(a);
+          const idx = Math.floor((a + STEP / 2) / STEP);
+          if (idx !== cur) {
+            cur = idx;
+            if (t > 0 && now - lastTick > 34) {
+              lastTick = now; const slow = Math.max(0, Math.min(1, 1 - v / 1500)); A.sfx.rouTick(slow); if (A.haptic && v < 300) A.haptic([6]);
+              if (v < 1100) { const dy = 3 + slow * 7; ptr.animate([{ transform: "rotate(0deg)" }, { transform: `rotate(${-18 - slow * 14}deg)` }, { transform: "rotate(0deg)" }], { duration: 80 + slow * 90, easing: "ease-out" }); }   // el puntero cede a cada cuna
+            }
+          }
+          last = a; lastT = now;
+          if (t >= END) return reveal();
+          requestAnimationFrame(frame);
+        } catch (e) { sh.bail(e); }
+      };
+      requestAnimationFrame(frame);
+    } catch (e) { sh.bail(e); }
+  }
   const SUPS = [
     { id: "cafe", cost: 4, ico: "sup_cafe", n: A.L("Café doble", "Double espresso"), d: A.L("+4 s por pregunta en la próxima ronda", "+4 s per question next round") },
     { id: "seguro", cost: 8, ico: "sup_seguro", n: A.L("Seguro de ronda", "Round insurance"), d: A.L("Si fallas la próxima ronda, no pierdes provisión", "If you fail next round, you keep your provision") },
@@ -1689,15 +1917,15 @@ window.AIQ = window.AIQ || {};
   let supFresh = null;                                                 // el suministro recien comprado: solo a ese le cae el sello
   function supHtml() {
     const sup = run.sup || {}, r = roundNo(), card = s => `<button class="sup sp-${s.id}${sup[s.id] ? " on" : ""}${supFresh === s.id ? " fresh" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span>${sup[s.id] ? `<em class="sp-on">${A.T("Activo", "On")}</em>` : `<em class="sp-p">${CN()}${supCost(s)}</em>`}</button>`;
-    const void_ = '<i class="sup-void"></i>', red = betHtml("red"), slot = id => (SIDE_GAMES.includes(id) ? betHtml(id) : card(SUPS.find(x => x.id === id))) || void_;
+    const void_ = '<i class="sup-void"></i>', red = betHtml(casinoKind(r)), slot = id => (SIDE_GAMES.includes(id) ? betHtml(id) : card(SUPS.find(x => x.id === id))) || void_;
     const [L, R] = barOf(r);
     supFresh = null;
-    return `<div class="tb-sup${red ? "" : " no-red"}">${slot(L)}${red || ""}${slot(R)}</div>`;   // izquierda y derecha sorteadas; el centro, Rojo o negro (si la casa ya abre las apuestas)
+    return `<div class="tb-sup${red ? "" : " no-cas"}">${slot(L)}${red || ""}${slot(R)}</div>`;   // izquierda, un suministro; derecha, la apuesta que toque (o el otro suministro); centro, el juego de casino (si la casa ya abre las apuestas)
   }
   function wireSup() {
     document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {
       const s = SUPS.find(x => x.id === b.dataset.sup), c = supCost(s); run.sup = run.sup || {};
-      if (run.sup[s.id]) { run.coins += typeof run.sup[s.id] === "number" ? run.sup[s.id] : c; run.sup[s.id] = false; A.sfx.sell(); }   // devuelve lo que pagaste (vender el Vale entre medias ya no regala 1)
+      if (run.sup[s.id]) { run.coins += typeof run.sup[s.id] === "number" ? run.sup[s.id] : run.sup[s.id] === "gift" ? 0 : c; run.sup[s.id] = false; A.sfx.sell(); }   // devuelve lo que pagaste (vender el Vale entre medias ya no regala 1)
       else { if (run.coins < c) { A.sfx.deny(); shake(b); return; } run.coins -= c; run.sup[s.id] = c; supFresh = s.id; run.visitBuys = (run.visitBuys || 0) + 1; A.sfx.buy(); if (SUPS.every(x => run.sup[x.id])) A.ach.emit("adv", { kind: "supplies" }); }
       persist(); renderShop(false);
     }));

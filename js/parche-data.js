@@ -36,6 +36,24 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.9",
+      name: ["Juegos de casino", "Casino games"],
+      date: "2026-10-03",
+      summary: ["El centro de la Barra sortea cada ronda entre tres juegos de casino, cada uno con su propia mesa: Rojo o negro, Moneda al aire y Ruleta de premios.",
+        "The middle of the bar draws one of three casino games each round, each with its own table: Red or black, Coin flip and Prize wheel."],
+      chapters: [
+        { id: "casino", kicker: ["Campamento", "Camp"], title: ["Mesa de casino", "Casino table"],
+          entries: [
+            E(["Moneda al aire", "Coin flip"], "new", "0.2.9", [
+            ["Elige cara o cruz y paga la ficha (2, 5 o 10: se cambia con un clic en el precio). Si aciertas cobras el doble; 1 de cada 64 veces la moneda cae de canto y paga ×6. Se tira en dos segundos, con la moneda de los logros girando.", "Pick heads or tails and pay the chip (2, 5 or 10: click the price to change it). Guess right and you get double; 1 time in 64 the coin lands on its edge and pays ×6. It takes two seconds, with the achievements coin spinning."]]),
+            E(["Ruleta de premios", "Prize wheel"], "new", "0.2.9", [
+            ["Una rueda circular de 12 casillas, todas con la misma probabilidad. Siete buenas (doblones, premio gordo, racha, Café o Seguro gratis, +1 provisión), una vacía y cuatro malas (un reto más sellado, Atraco y Reloj corto).", "A circular wheel with 12 equally likely slots. Seven good ones (doubloons, jackpot, streak, free espresso or insurance, +1 provision), one empty and four bad ones (one more sealed challenge, a heist and a short clock)."]]),
+            E(["Cada juego, su mesa", "Each game, its own table"], "change", "0.2.9", [
+            ["A la izquierda, un suministro (el Café doble ahora es color café); en el centro, el juego de casino con luces y su propia cenefa; a la derecha, la apuesta que toque.", "On the left, a supply (the Double espresso is now coffee-colored); in the middle, the casino game with lights and its own border; on the right, the bet of the moment."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.8",
       name: ["La mesa de tres juegos", "The three-game table"],
       date: "2026-10-03",

@@ -149,7 +149,6 @@ html.reduce-motion .tr-relic.swap-pick .tr-face { animation: none; }
 
 /* suministros: placas de casino (tapete con costura dorada). Comprado: placa de oro con el sello de la casa */
 .table.mesa .tb-sup { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px; margin: 2px 0 4px; }
-.table.mesa .tb-sup.no-red { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .table.mesa .tb-sup.no-red .sup-void { display: none; }   /* sin apuestas abiertas, solo los dos suministros */
 .table.mesa .sup-void { display: block; }
 .table.mesa .sup { --c1: #2c7353; --c2: #1b5640; --c3: #0f3727; --sc: #4fb6a0;
   position: relative; display: flex; flex: 1 1 0; align-items: center; gap: 10px; min-width: 0; max-width: none; min-height: 48px; padding: 6px 12px 8px 8px;
@@ -320,7 +319,7 @@ html.reduce-motion .go2::after { animation: none; opacity: .6; }
   .table.mesa .tb-head { grid-template-columns: minmax(0, 1fr) auto; }
   .table.mesa .tb-head > .rd { grid-column: 1 / -1; grid-row: 2; justify-self: start; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
   .table.mesa .tb-head > .tb-right { grid-column: 2; }
-  .table.mesa .tb-sup, .table.mesa .tb-sup.no-red { grid-template-columns: minmax(0, 1fr); } .table.mesa .sup-void { display: none; }
+  .table.mesa .tb-sup { grid-template-columns: minmax(0, 1fr); } .table.mesa .sup-void { display: none; }
   .table.mesa .tb-shop { flex: none; min-height: 0; }
   .table.mesa .offers { flex: none; flex-wrap: wrap; gap: 22px 12px; }   /* entre filas, sitio para la placa de la legendaria (sobresale por arriba) */
   .table.mesa .offer.pc, .table.mesa.chest .offer.pc { flex: 0 0 min(44vw, 230px); height: auto; aspect-ratio: auto; }
@@ -410,3 +409,69 @@ html.reduce-motion .rou, html.reduce-motion .rou * { animation: none !important;
 .rou.win .rou-wash { --wc: rgba(255, 217, 90, .55); } .rou.zero .rou-wash { --wc: rgba(80, 230, 140, .6); } .rou.lose:not(.zero) .rou-wash { --wc: rgba(0, 0, 0, .35); }
 .rou.flash .rou-wash { animation: rou-wash .55s ease-out; } @keyframes rou-wash { 0% { opacity: 1; } 100% { opacity: 0; } }
 html.reduce-motion .rou-no { display: none; }
+
+/* ---------------------------------------------------------------- v0.2.9: el centro de la Barra, mesa de juegos de casino. Cada juego, su fieltro y su cenefa; los suministros y las apuestas, sin luces */
+.table.mesa .tb-sup { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.table.mesa .tb-sup.no-cas { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .table.mesa .tb-sup.no-cas .sup-void { display: none; }
+.table.mesa .sup.sp-cafe:not(.on) { --c1: #b27544; --c2: #7d4a24; --c3: #4a2810; --sc: #e2a463; }   /* el Cafe doble, color cafe: el verde es del tapete de la ruleta */
+.table.mesa .sup.bet.cas { --gc: #f6c453; --gd: #0a140f; min-height: 74px; padding: 22px 16px 22px 12px; overflow: hidden; color: #fff;
+  box-shadow: 0 0 0 2px var(--gd), inset 0 0 0 3px var(--gc), inset 0 0 0 5px var(--gd), 0 0 24px rgba(255, 200, 70, .45), 0 5px 0 2px var(--gd); }
+.table.mesa .sup.bet.cas::before { inset: 0; border: 0; border-radius: 12px; background: var(--sb) top / 100% 10px no-repeat, var(--sb2, var(--sb)) bottom / 100% 10px no-repeat; opacity: .96; }
+.table.mesa .sup.bet.cas .sp-t b { color: #ffd24a; text-shadow: 0 2px 0 #000; letter-spacing: .05em; text-transform: uppercase; font-size: 19px; }
+.table.mesa .sup.bet.cas .sp-t > i { color: rgba(255, 255, 255, .86); }
+.table.mesa .sup.bet.cas .sp-ic { box-shadow: 0 0 0 2px var(--gd), inset 0 0 0 3px var(--gc), 0 0 12px rgba(255, 200, 70, .55); }
+.table.mesa .sup.bet.cas:hover { box-shadow: 0 0 0 2px var(--gd), inset 0 0 0 3px var(--gc), inset 0 0 0 5px var(--gd), 0 0 34px rgba(255, 215, 90, .75), 0 8px 0 2px var(--gd); }
+.table.mesa .sup.bet.cas.done { cursor: default; }
+/* Rojo o negro: fieltro verde, cenefa de casillas rojas y negras y el cero verde en el centro */
+.table.mesa .sup.bet.bt-red { background: radial-gradient(ellipse at 50% 40%, #1d7a45 0%, #0b3a21 78%);
+  --sb: repeating-linear-gradient(90deg, #c8322a 0 12px, #14161d 12px 24px); --sb2: repeating-linear-gradient(90deg, #14161d 0 12px, #c8322a 12px 24px); }
+.table.mesa .sup.bet.bt-red::after { content: ""; position: absolute; left: 50%; top: 0; width: 12px; height: 10px; margin-left: -6px; background: #1fa65a; box-shadow: 0 0 6px #6dffa0; z-index: 2; }
+/* Moneda al aire: fieltro azul de noche y canto de moneda estriado (el cordoncillo) */
+.table.mesa .sup.bet.bt-coin { background: radial-gradient(ellipse at 50% 40%, #28508a 0%, #0e2147 80%);
+  --sb: repeating-linear-gradient(90deg, #f6c453 0 3px, #8a5a12 3px 6px); }
+.table.mesa .sup.bet.bt-coin .bt-ch { background: #e8a91e; color: #3a2606; text-shadow: none; } .table.mesa .sup.bet.bt-coin .bt-ct { background: #3f7fd4; }
+.table.mesa .sup.bet.bt-coin .bt-stake { cursor: pointer; } .table.mesa .sup.bet.bt-coin .bt-stake:hover { filter: brightness(1.25); }
+/* Ruleta de premios: fieltro ciruela y cenefa con los colores de la rueda */
+.table.mesa .sup.bet.bt-wheel { background: radial-gradient(ellipse at 50% 40%, #6a2878 0%, #2a0f33 80%);
+  --sb: repeating-linear-gradient(90deg, #f2b63d 0 12px, #1f9a58 12px 24px, #c9362c 24px 36px, #23252e 36px 48px); --sb2: repeating-linear-gradient(90deg, #23252e 0 12px, #c9362c 12px 24px, #1f9a58 24px 36px, #f2b63d 36px 48px); }
+.table.mesa .sup.bet.bt-wheel .bt-cs { background: #e8a91e; color: #3a2606; text-shadow: none; }
+.table.mesa .sup.bet.bt-coin.done.win, .table.mesa .sup.bet.bt-wheel.done.win { --c1: #ffe9a6; --c2: #f8b449; --c3: #b8741a; }
+.table.mesa .sup.bet.cas.done.win .bt-res, .table.mesa .sup.bet.cas.done.win .sp-t b, .table.mesa .sup.bet.cas.done.win .sp-t > i { color: #fff; }
+@media (max-width: 899px), (max-height: 519px) { .table.mesa .tb-sup, .table.mesa .tb-sup.no-cas { grid-template-columns: minmax(0, 1fr); } .table.mesa .sup-void { display: none; } }
+
+/* las pantallas de Moneda al aire y de Ruleta de premios (comparten la capa .rou de Rojo o negro) */
+.rc-coin { --cc: #d9a21f; --ch: #ffe08a; --cs: #8a5a12; } .rc-good { --cc: #1f9a58; --ch: #6fe6a0; --cs: #0f5f33; } .rc-bad { --cc: #c9362c; --ch: #ee6a52; --cs: #8c2320; } .rc-none { --cc: #5d6470; --ch: #8a93a2; --cs: #3a4049; }
+.rp-coin { background: #e8a91e; } .rp-wheel { background: #8a3a9c; }
+.rou.coin .rou-band { height: calc(var(--fw) * 1.75); background: radial-gradient(ellipse at 50% 55%, #1a3a68 0%, #0a1830 75%); }
+.rou.coin .rou-band::before, .rou.coin .rou-band::after { display: none; }
+.cn-air { position: absolute; left: 50%; top: 50%; width: var(--fw); height: var(--fw); margin: calc(var(--fw) / -2) 0 0 calc(var(--fw) / -2); z-index: 3; }
+.cn-arc { position: absolute; inset: 0; }
+.cn-spr { position: absolute; inset: 0; background: url(../assets/icons/coin_spin.webp) 0 0 / calc(var(--fw) * 24) var(--fw) no-repeat; image-rendering: pixelated; }
+.cn-shadow { position: absolute; left: 18%; right: 18%; bottom: -1%; height: 7%; border-radius: 50%; background: rgba(0, 0, 0, .55); opacity: .55; }
+.cn-stand { position: absolute; left: 50%; top: 0; width: calc(var(--fw) / 4); height: var(--fw); margin-left: calc(var(--fw) / -8); image-rendering: pixelated; display: none; transform-origin: 50% 94%; }
+.rou.coin.is-edge .cn-spr { display: none; } .rou.coin.is-edge .cn-stand { display: block; animation: cn-wobble .9s ease-out both; }
+@keyframes cn-wobble { 0% { transform: rotate(9deg); } 20% { transform: rotate(-6deg); } 40% { transform: rotate(4deg); } 60% { transform: rotate(-2deg); } 100% { transform: rotate(0); } }
+.rou.coin.done.is-coin .rou-lights { --lc: #ffd95a; --ld: #ffd95a; }
+.rou.wheel .rou-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--ws) * .05); }
+.rou.wheel .rou-top { position: relative; left: auto; right: auto; bottom: auto; }
+.wh { position: relative; width: var(--ws); height: var(--ws); flex: none; animation: rou-open .46s var(--spring) both; }
+.wh-ring { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle closest-side, transparent 0 80.5%, #0a140f 80.5% 82.5%, #9a6a1c 82.5% 85%, #f0b94f 85% 95%, #9a6a1c 95% 97.5%, #0a140f 97.5% 100%); filter: drop-shadow(0 22px 28px rgba(0, 0, 0, .6)); }
+.wh-b { position: absolute; left: 50%; top: 50%; width: calc(var(--ws) * .034); height: calc(var(--ws) * .034); margin: calc(var(--ws) * -.017) 0 0 calc(var(--ws) * -.017); border-radius: 50%; background: #fff4b0;
+  box-shadow: 0 0 0 2px #0a140f, 0 0 10px 2px rgba(255, 224, 138, .8); transform: rotate(var(--a)) translateY(calc(var(--ws) * -.445)); animation: wh-blink .5s steps(1) infinite; }
+.wh-b.o { animation-delay: .25s; } @keyframes wh-blink { 0% { background: #fff4b0; } 50% { background: #8a6a2a; box-shadow: 0 0 0 2px #0a140f; } }
+.rou.spin .wh-b { animation-duration: .16s; } .rou.spin .wh-b.o { animation-delay: .08s; }
+.rou.done .wh-b { animation: rou-flash .26s steps(1) 8; }
+.wh-disc { position: absolute; inset: 9%; border-radius: 50%; overflow: hidden; will-change: transform; box-shadow: 0 0 0 3px #0a140f; }
+.wh-s { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(var(--a)); }
+.wh-s img { position: absolute; width: calc(var(--ws) * .115); height: calc(var(--ws) * .115); left: calc(var(--ws) * -.0575); top: calc(var(--ws) * -.355); image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .4)); }
+.wh-s b { position: absolute; width: calc(var(--ws) * .2); left: calc(var(--ws) * -.1); top: calc(var(--ws) * -.232); text-align: center; font: 900 calc(var(--ws) * .042)/1 var(--serif); color: #fff; text-shadow: 0 2px 0 #000, 0 0 4px #000; }
+.wh-sep { position: absolute; inset: 0; background: repeating-conic-gradient(from -15deg, #0a140f 0 1deg, transparent 1deg 30deg); }
+.wh-dim { position: absolute; inset: 0; opacity: 0; background: conic-gradient(from calc(var(--a) - 15deg), transparent 0 30deg, rgba(0, 0, 0, .66) 30deg 360deg); }
+.rou.done .wh-dim { opacity: 1; transition: opacity .3s; }
+.wh-hub { position: absolute; left: 50%; top: 50%; width: calc(var(--ws) * .17); height: calc(var(--ws) * .17); margin: calc(var(--ws) * -.085) 0 0 calc(var(--ws) * -.085); border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 35%, #fff0a8, #f0b94f 55%, #9a6a1c); box-shadow: 0 0 0 3px #0a140f, 0 4px 0 3px #0a140f; z-index: 2; }
+.wh-hub img { width: 70%; height: 70%; image-rendering: pixelated; }
+.wh-ptr { position: absolute; left: 50%; top: calc(var(--ws) * -.035); width: calc(var(--ws) * .1); height: calc(var(--ws) * .13); margin-left: calc(var(--ws) * -.05); background: #0a140f; clip-path: polygon(0 0, 100% 0, 50% 100%); z-index: 3; transform-origin: 50% 15%; }
+.wh-ptr::after { content: ""; position: absolute; inset: 4px 6px 9px; background: #ffd95a; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.rou.wheel .rou-wash { --wc: rgba(255, 217, 90, .5); } .rou.wheel.lose .rou-wash { --wc: rgba(0, 0, 0, .4); }
+.rou.wheel, .rou.coin { background: radial-gradient(ellipse at 50% 50%, rgba(14, 6, 18, .96), rgba(3, 2, 6, .99) 85%); }
