@@ -179,6 +179,8 @@ window.AIQ = window.AIQ || {};
   ].map(a => a.map(c => ({ n: L6(c[0]), ids: c[1], k: c[2], d: L6(T16["d_" + c[2]] || "") })));
   /* jefe de la ronda de banderas: la bandera trae su propio filtro y el mapa se lia por su cuenta (tanda 16: Bandera al reves del mundo ya no invierte colores; El coleccionista) */
   const FLAG_BOSS = [["Bandera en la niebla|Flag in the fog|Drapeau dans le brouillard|Bandeira na neblina|Flagge im Nebel|Bandiera nella nebbia||雾中的国旗|안개 속의 국기|霧の中の国旗|Флаг в тумане|Flaga we mgle", ["flagdark","clouds"], "flagfog"], ["Bandera al revés del mundo|Upside-down world flag|Drapeau à l'envers du monde|Bandeira do mundo ao contrário|Flagge der verkehrten Welt|Bandiera del mondo capovolto||颠倒世界的国旗|뒤집힌 세계의 국기|逆さま世界の国旗|Флаг перевёрнутого мира|Flaga świata do góry nogami", ["flagback","flip"], "flagworld"], ["Neón de fronteras falsas|Neon false borders|Néons aux fausses frontières|Neon de fronteiras falsas|Neon an falschen Grenzen|Neon a confini falsi||霓虹假边界|네온 가짜 국경|ネオンの偽国境|Неоновые ложные границы|Neonowe fałszywe granice", ["flaghue","wrongborders"], "flagneon"], ["Bandera pixelada|Pixelated flag|Drapeau pixelisé|Bandeira pixelada|Verpixelte Flagge|Bandiera pixelata||像素化的国旗|픽셀화된 국기|ピクセル化した国旗|Пиксельный флаг|Spikselowana flaga", ["flagblur","mosaic"], "flagpix"], ["Cine mudo|Silent movie|Cinéma muet|Cinema mudo|Stummfilm|Cinema muto||默片|무성 영화|サイレント映画|Немое кино|Kino nieme", ["flaggray","noborders"], "flagmute"], [T16.n_coll, ["wrongborders"], "collector"]].map(c => ({ n: L6(c[0]), ids: c[1], k: c[2], d: L6(T16["d_" + c[2]] || "") }));
+  /* tanda 17: PERILLAS de medicion (dev/bot.js las cambia con CFG.knobs). Fijadas con el bot: ruleSwap = la regla de A2 ocupa el sitio de un reto (no se suma), provAt = la Ascension desde la que se pierde una provision (la 4, no la 3). Probadas y no aplicadas: Acto III +5 %, Guardarrachas a 1 fallo, Segunda bola a 1 tiro, +1 provision y R5-R6 suaves en la primera expedicion */
+  A.KN = Object.assign({ ruleSwap: 1, provAt: 4 }, A.KN || {});
   const A2R = [4, 6, 8, 10];                                          // tanda 3: la regla de Ascension 2 sale en R5, R7, R9 y R11 (sin Tapones, ya no tiene contra)
   /* tanda 6b: sorteo con peso. Familia: 1/(1 + veces que ya ha salido en la expedicion), LUZ a la mitad (el Apagon obligatorio cuenta como suya);
      reto: 1/(1 + veces que ha salido ese reto). Las veces salen del plan BASE (la semilla de la expedicion, sin barajar ni nada comprado) */
@@ -243,7 +245,7 @@ window.AIQ = window.AIQ || {};
         if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]).filter(id => !noop(id)); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
       if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia (ni el Apagon ni una pareja que choque)
         const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids);
-        if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv }); }
+        if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv, x4: 1 }); }   // x4: el reto extra de Ascension 4 (cede ante los sellados: nunca mas de 5, ver chalFor)
       }
       return { list, boss, combo };
     }
@@ -252,7 +254,8 @@ window.AIQ = window.AIQ || {};
       const put = id => { list.push({ id, lv: soft ? clamp(1 + (asc >= 3 ? 1 : 0), 1, 3) : lv }); ids.push(id); fams.add(famOf(id)); if (D[id].kind === "text") placa = true; if (D[id].kind === "flag") flagN++; };
       /* el Apagon, una vez por expedicion (asi el Foco siempre tiene su momento); si barajas esa ronda, el crupier saca otra cosa (pagaste por ello) */
       if (seed === ctx.base && r === darkRound(ctx.base)) put("dark");
-      const n = ctx.first && r === 0 ? 0 : COUNT[r] != null ? COUNT[r] : 3;
+      const KN = A.KN || {};   // PERILLAS de medicion (tanda 17): A.KN la rellena dev/bot.js (CFG.knobs); sin ella, el juego normal
+      const n = Math.max(0, (ctx.first && r === 0 ? 0 : COUNT[r] != null ? COUNT[r] : 3) - (a2 && KN.ruleSwap ? 1 : 0));   // A2: la regla ocupa el sitio de un reto
       const rr = A.rng(`${seed}:fam:${r}`);
       while (list.length < n) {
         const needFlag = flagRound && !flagN;                          // ronda de banderas: su primer reto va sobre la bandera
@@ -261,7 +264,7 @@ window.AIQ = window.AIQ || {};
         if (!pool.length) break;
         put(draw(rr, pool, H));
       }
-      if (a2) { let ruleN = 0; for (let x = 0; x < r; x++) if (A2R.includes(x)) ruleN++; put(ruleBag(seed, ruleN)); }   // Ascension 2: la regla de la bolsa
+      if (a2) { let ruleN = 0; for (let x = 0; x < r; x++) if (A2R.includes(x)) ruleN++; put(ruleBag(ctx.base || seed, ruleN)); }   // Ascension 2: la regla de la bolsa (de la semilla de la expedicion: barajar no la cambia ni repite una)
       return { list, boss, combo };
     }
   A.chal = {

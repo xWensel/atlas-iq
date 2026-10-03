@@ -199,7 +199,7 @@ window.AIQ = window.AIQ || {};
   };
   const TOPIC_ICON = { capital: "t_capital", landmark: "t_landmark", city: "t_city", country: "t_country", history: "t_battle", nature: "t_nature", clue: "t_curio", mixed: "slot", flag: "t_country" };
   const BOSS_IC = "boss_hat";                                        // v0.35: el jefe del acto es la chistera del crupier (los mismos pixeles de su retrato: tools/crupier/chistera.py)
-  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, TOPIC_ICON, BOSS_IC, roundDefOf, chalFor: r => chalFor(r) };
+  A.ADV = { TOOLS, PERKS: A.RELICS, BOSSES, DECKS, ROUNDS, TOPIC_NAMES, TOPIC_ICON, BOSS_IC, roundDefOf, chalFor: r => chalFor(r), maxPerks: () => maxPerks() };
 
   /* ------------------------------------------------------------------ partida (run) */
   let run = null, slot = RUNKEY;                                     // slot: ranura de la partida activa (expedicion normal o intento del Reto diario)
@@ -237,7 +237,11 @@ window.AIQ = window.AIQ || {};
   A.adv.roundPool = r => poolFor(r).length;
   const persist = () => { try { if (run) localStorage.setItem(slot, JSON.stringify(run)); else localStorage.removeItem(slot); } catch (e) { /* sin almacenamiento */ } };
 
-  const ascFx = a => ({ target: 1 + 0.05 * a, secs: -a, lives: a >= 3 ? -1 : 0, price: 1 + 0.1 * a, boss2: a >= 4 });
+  /* tanda 17: Ascensiones con identidad. A1 La casa cobra (+5 % objetivo, -1 s, +10 % precios: sube un escalon por Ascension), A2 Reglas de la casa (una regla en R5, R7, R9 y R11),
+     A3 Retos afilados (+1 nivel en los actos I y II), A4 Jefes con poder (+1 reto en cada jefe, tope 5, y -1 provision: medido, ver perks-revision-2026-10) y A5 Equipaje de mano (mochila de 4, 5 con el Pacto) */
+  const ascFx = a => ({ target: 1 + 0.05 * a, secs: -a, lives: a >= ((A.KN || {}).provAt || 3) ? -1 : 0, price: 1 + 0.1 * a, boss2: a >= 4, pack: a >= 5 ? -1 : 0 });
+  const ASC_N = [null, L6("La casa cobra|The house takes its cut|La maison encaisse|A casa cobra|Das Haus kassiert|La casa incassa||赌场收账|하우스의 수수료|ハウスの取り分|Заведение берёт своё|Kasyno bierze swoje"), L6("Reglas de la casa|House rules|Règles de la maison|Regras da casa|Hausregeln|Regole della casa||赌场规矩|하우스 룰|ハウスルール|Правила заведения|Zasady kasyna"), L6("Retos afilados|Sharpened challenges|Défis aiguisés|Desafios afiados|Geschärfte Herausforderungen|Sfide affilate||锋利的挑战|날카로워진 도전|研ぎ澄まされた試練|Заострённые испытания|Zaostrzone wyzwania"), L6("Jefes con poder|Bosses with power|Boss puissants|Chefes com poder|Bosse mit Macht|Boss con potere||强力首领|강력한 보스|力を持つボス|Боссы с силой|Bossowie z mocą"), L6("Equipaje de mano|Carry-on|Bagage à main|Bagagem de mão|Handgepäck|Bagaglio a mano||随身行李|기내 수하물|機内持ち込み|Ручная кладь|Bagaż podręczny")], ASC_D = [null, L6("Objetivos +5 %, −1 s y todo cuesta +10 %.|Targets +5%, −1 s and everything costs +10%.|Objectifs +5 %, −1 s et tout coûte +10 %.|Metas +5%, −1 s e tudo custa +10%.|Ziele +5 %, −1 s und alles kostet +10 %.|Obiettivi +5%, −1 s e tutto costa +10%.||目标 +5%，−1 秒，一切涨价 10%。|목표 +5%, −1초, 모든 가격 +10%.|目標+5%、−1秒、すべて+10%値上げ。|Цели +5%, −1 с, всё дороже на 10%.|Cele +5%, −1 s, wszystko droższe o 10%."), L6("Una regla de la casa en las rondas 5, 7, 9 y 11.|A house rule in rounds 5, 7, 9 and 11.|Une règle de la maison aux manches 5, 7, 9 et 11.|Uma regra da casa nas rodadas 5, 7, 9 e 11.|Eine Hausregel in Runde 5, 7, 9 und 11.|Una regola della casa nei round 5, 7, 9 e 11.||第 5、7、9、11 回合有一条赌场规矩。|5·7·9·11라운드에 하우스 룰이 하나 붙습니다.|ラウンド5・7・9・11にハウスルールが1つ。|Правило заведения в раундах 5, 7, 9 и 11.|Zasada kasyna w rundach 5, 7, 9 i 11."), L6("Retos un nivel más fuertes en los actos I y II.|Challenges one level stronger in acts I and II.|Défis d'un niveau de plus aux actes I et II.|Desafios um nível mais fortes nos atos I e II.|Herausforderungen eine Stufe stärker in Akt I und II.|Sfide di un livello più forti negli atti I e II.||第一、二幕的挑战强一级。|1·2막 도전이 한 단계 강해집니다.|第1・2幕の試練が1段階強化。|Испытания в актах I и II на уровень сильнее.|Wyzwania o poziom mocniejsze w aktach I i II."), L6("Cada jefe trae un reto más (con tope de 5) y una provisión menos.|Every boss brings one more challenge (capped at 5) and you have one fewer provision.|Chaque boss apporte un défi de plus (5 au maximum) et tu as une provision de moins.|Cada chefe traz um desafio a mais (no máximo 5) e você tem uma provisão a menos.|Jeder Boss bringt eine Herausforderung mehr (höchstens 5) und du hast ein Proviant weniger.|Ogni boss porta una sfida in più (massimo 5) e hai una provvista in meno.||每个首领多一个挑战（最多 5 个），补给 −1。|보스마다 도전이 하나 더 나오고 (최대 5개) 식량이 1개 줄어듭니다.|各ボスにチャレンジが1つ増え（最大5つ）、プロビジョンが1つ減る。|Каждый босс приносит ещё одно испытание (не больше 5), и на один запас меньше.|Każdy boss przynosi jedno wyzwanie więcej (maksymalnie 5) i masz jeden zapas mniej."), L6("Mochila de 4 huecos (5 con el Pacto).|A 4-slot backpack (5 with the Pact).|Un sac de 4 emplacements (5 avec le Pacte).|Mochila de 4 espaços (5 com o Pacto).|Ein Rucksack mit 4 Plätzen (5 mit dem Pakt).|Uno zaino da 4 posti (5 con il Patto).||背包只有 4 格（有契约时 5 格）。|배낭 4칸 (계약이 있으면 5칸).|バッグは4枠（契約があれば5枠）。|Рюкзак на 4 ячейки (5 с договором).|Plecak na 4 miejsca (5 z paktem).")], ASC_K = L6("La casa cobra más: objetivos +{a} %, −{s} s, precios +{p} %.|The house takes more: targets +{a}%, −{s} s, prices +{p}%.|La maison prend plus : objectifs +{a} %, −{s} s, prix +{p} %.|A casa cobra mais: metas +{a}%, −{s} s, preços +{p}%.|Das Haus verlangt mehr: Ziele +{a} %, −{s} s, Preise +{p} %.|La casa incassa di più: obiettivi +{a}%, −{s} s, prezzi +{p}%.||赌场收得更多：目标 +{a}%，−{s} 秒，价格 +{p}%。|하우스가 더 챙깁니다: 목표 +{a}%, −{s}초, 가격 +{p}%.|ハウスの取り分が増える：目標+{a}%、−{s}秒、価格+{p}%。|Заведение берёт больше: цели +{a}%, −{s} с, цены +{p}%.|Kasyno bierze więcej: cele +{a}%, −{s} s, ceny +{p}%."), ASC_ALL = L6("Suma todo lo anterior.|Adds everything above.|Cumule tout ce qui précède.|Soma tudo o que veio antes.|Zählt alles Vorherige dazu.|Somma tutto il precedente.||叠加之前的全部效果。|이전 효과가 모두 더해집니다.|これまでの効果がすべて加わる。|Включает всё предыдущее.|Obejmuje wszystko, co wcześniej."), ASC_UNLOCK = L6("Ascensión {n} desbloqueada: «{name}».|Ascension {n} unlocked: “{name}”.|Ascension {n} débloquée : « {name} ».|Ascensão {n} desbloqueada: “{name}”.|Aufstieg {n} freigeschaltet: „{name}“.|Ascensione {n} sbloccata: «{name}».||已解锁飞升 {n}：「{name}」。|어센션 {n} 해금: 「{name}」.|アセンション{n}解放：「{name}」。|Восхождение {n} открыто: «{name}».|Odblokowano Wniebowstąpienie {n}: „{name}”.");
+  A.adv.ascInfo = i => ({ n: A.tx(ASC_N[i]), d: A.tx(ASC_D[i]), k: i >= 2 ? A.tx(ASC_K).replace("{a}", 5 * i).replace("{s}", i).replace("{p}", 10 * i) + " " + A.tx(ASC_ALL) : "" });
   const roundNo = () => run.act * 4 + run.round;
   /* Reto diario: la ruta del dia baraja las rondas de cada acto (run.route[hueco] = ronda original); el jefe sigue siendo el 4.o hueco de cada acto */
   const slotOf = r => (run && run.route && r < 12 ? run.route[r] : r);
@@ -246,7 +250,8 @@ window.AIQ = window.AIQ || {};
   const rdef = () => defAt(roundNo());
   const isBoss = () => run.round === 3;
   const perkList = () => run.perks.map(id => A.RELICS[id]).filter(Boolean);
-  const maxPerks = () => 5 + perkList().reduce((n, p) => n + (p.slot || 0), 0);   // tanda 13 (S7): huecos de la mochila
+  const baseSlots = () => 5 + ascFx(run.asc).pack;                   // tanda 17 (A5): 4 huecos de base en Ascension 5
+  const maxPerks = () => baseSlots() + perkList().reduce((n, p) => n + (p.slot || 0), 0);   // tanda 13 (S7): huecos de la mochila
   const has = flag => perkList().some(p => p[flag]);
   const sumFlag = flag => perkList().reduce((n, p) => n + (p[flag] || 0), 0);
   const owned = id => run.perks.includes(id);
@@ -291,6 +296,7 @@ window.AIQ = window.AIQ || {};
     const bet = !run.inf && run.bets && run.bets[r];                   // tanda 11: los de la apuesta, sellados (si fallas, la revancha va sin ellos)
     if (bet && bet.retos && !(r === roundNo() && run.attempt > 0 && bet.id !== "offer")) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
     if (pl.some(p => p.pact) && !boss && !run.inf && r <= LAST && list.length < 4) { const add = pickSealed(r, 1, "pacto", list)[0]; if (add) list.push({ ...add, lv: clamp(list.length ? Math.max(...list.map(c => c.lv || 1)) : 1, 1, 3), sealed: true, sealBy: "pact" }); }   // tanda 13: el reto del Pacto
+    if (boss) while (list.length > 5) { const k = list.findIndex(c => c.x4); if (k < 0) break; list.splice(k, 1); }   // tanda 17 (A4): el reto extra del jefe cede ante los sellados: nunca mas de 5
     if (run.chSeen0 && !run.board && run.asc < 3 && !A.adv._force) list = list.map(c => (run.chSeen0.includes(c.id) || c.sealed ? c : { ...c, lv: 1, isNew: true }));   // S12: lo que nunca has visto se estrena a nivel 1
     if (pl.some(p => p.spy)) list = list.map(c => (c.hid ? { ...c, up: true } : c));   // tanda 16: con el Ojo en el cielo, las fichas boca abajo del jefe se ven
     return { list, combo: plan.combo, boss, paid, nulled };
@@ -441,7 +447,7 @@ window.AIQ = window.AIQ || {};
   };
   A.adv.save = () => persist();
   A.adv.leave = () => { if (run) { snapSpent(); persist(); A.dealer.noteLeave(); } clearTimers(); A.chal.end(); A.dealer.enable(false); run = null; A.adv.hideBars(); };
-  A.adv.summary = (daily = false) => { const r = (run && !!run.board === daily && run) || loadSlot(daily); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives, board: r.board || null, dailyTry: r.dailyTry || 0, inf: !!r.inf } : null; };
+  A.adv.summary = (daily = false) => { const r = (run && !!run.board === daily && run) || loadSlot(daily); return r ? { act: r.act + 1, round: r.round + 1, coins: r.coins, score: r.score, lives: r.lives, board: r.board || null, dailyTry: r.dailyTry || 0, inf: !!r.inf, asc: r.asc || 0 } : null; };
   A.adv.active = () => !!run;
   A.adv.isDaily = () => !!(run && run.board);
 
@@ -1354,14 +1360,14 @@ window.AIQ = window.AIQ || {};
   /* la reliquia en la mochila: carta pequena con el color de su rareza (la legendaria, con su marco de oro y su brillo).
      face: el dibujo como fondo y sin boton de vender (la que aparece al final de la secuencia: ninguna imagen nueva, que haria reajustar la pantalla) */
   const relicHtml = (id, face) => { const p = A.RELICS[id];
-    return `<div class="tr-card tr-relic r${p.r}${p.ventaja ? " vtg" : ""}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${p.amulet ? pips((run.amu || {})[id] || 0, "tr-pips") : ""}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</button>${face ? "" : id === "pact" && run.perks.length > 5 ? `<button class="tr-sell off" type="button" disabled>${A.tx(PACT_FIRST)}</button>` : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
+    return `<div class="tr-card tr-relic r${p.r}${p.ventaja ? " vtg" : ""}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${p.amulet ? pips((run.amu || {})[id] || 0, "tr-pips") : ""}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</button>${face ? "" : id === "pact" && run.perks.length > baseSlots() ? `<button class="tr-sell off" type="button" disabled>${A.tx(PACT_FIRST)}</button>` : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
   function renderShop(chest) {
     legOn = 0; swapIx = null;                                            // mesa nueva: si la legendaria se estaba luciendo en la anterior, esa secuencia ya no sigue
     const slots = maxPerks(), info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
     const cards = run.stock.map((s, i) => cardHtml(s, i, chest)).join("") || `<p class="tb-empty">${A.T("No quedan cartas: ¡sigue adelante!", "No cards left: move on!")}</p>`;
     if (relicSel && !run.perks.includes(relicSel)) relicSel = null;
     /* la mochila no avisa de que una reliquia ya no sirve: saber cuando venderla tambien es cosa del jugador */
-    const relics = Array.from({ length: slots }, (_, k) => (run.perks[k] ? relicHtml(run.perks[k]) : `<span class="tr-slot${k >= 5 ? " pact" : ""}"></span>`)).join("");   // el hueco del Pacto, con su lacre
+    const relics = Array.from({ length: slots }, (_, k) => (run.perks[k] ? relicHtml(run.perks[k]) : `<span class="tr-slot${k >= baseSlots() ? " pact" : ""}"></span>`)).join("");   // el hueco del Pacto, con su lacre
     const tools = Object.keys(run.tools).map(id => `<span class="tr-card tr-tool" ${A.kitTip("tool", id)}><span class="tr-face">${ic(TOOLS[id].ico)}<span class="tr-pips">${Array.from({ length: toolMax(id) }, () => "<i></i>").join("")}</span></span></span>`).join("") || `<i class="tr-none">${A.T("Ninguna", "None")}</i>`;
     /* fuera la frase de siempre ("Tres cartas sobre la mesa..."): solo los avisos que cambian algo (revancha, cofre, mochila llena) */
     const retryNote = !chest && run.stock.some((s, i) => s.fix && !run.bought.includes(i));
@@ -1377,7 +1383,7 @@ window.AIQ = window.AIQ || {};
     const goB = chest ? A.T("Continuar sin elegir", "Continue without picking") : doom ? DOOM : A.T("Siguiente ronda", "Next round");
     const goI = chest ? `${A.pick6(TAKE)} ${CN()}+${gain(chestSkip())}` : cf.boss ? A.T("Jefe del acto", "Act boss") + (cf.combo ? " · " + A.tx(cf.combo.n) : "") : A.T("Ronda", "Round") + " " + (run.round + 1) + " · " + topic;
     C().dialog(`<div class="table mesa d${dense}${chest ? " chest" : ""}${run.stock.length > 3 ? " many" : ""}">
-      <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2></div>
+      <header class="tb-head"><div class="tb-title"><span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${chest ? A.T("Cofre del jefe", "Boss chest") : A.T("Campamento", "Camp")}</h2>${run.asc ? `<p class="tb-ascd" ${A.ttAttr("A" + run.asc + " · " + A.adv.ascInfo(run.asc).n, A.adv.ascInfo(run.asc).d + (A.adv.ascInfo(run.asc).k ? " " + A.adv.ascInfo(run.asc).k : ""))}><b>A${run.asc} · ${A.adv.ascInfo(run.asc).n}</b> ${A.adv.ascInfo(run.asc).d}</p>` : ""}</div>
         ${routeHtml()}<div class="tb-right"><button class="chipbtn tb-menu" id="shopMenu" type="button">${A.icon("u_pause", "sm")}<span>${A.T("Menú", "Menu")}</span></button><div class="tb-coins" id="shopCoins">${CN()}<b>${run.coins}</b></div></div></header>
       ${nextHtml()}
       ${chest ? "" : supHtml()}
@@ -1458,7 +1464,7 @@ window.AIQ = window.AIQ || {};
       return `<div class="sup bet bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
     }
     if (b && b.id === k) return `<div class="sup bet on bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.on)}${k === "double" ? " · " + CN() + b.stake : ""}</em></div>`;
-    const cap = cf.list.length + (k === "final" ? 2 : 1) <= 5;
+    const cap = cf.list.filter(c => !c.x4).length + (k === "final" ? 2 : 1) <= 5;
     if (run.attempt > 0 || run.lives <= 1 || !cap || (k === "double" && run.coins < 1)) return "";
     return `<div class="sup bet bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-p bt-go">${A.tx(BT.go)}${k === "double" ? " · " + CN() + run.coins : ""}</em></div>`;
   }
@@ -1671,7 +1677,7 @@ window.AIQ = window.AIQ || {};
     } catch (e) { console.error(e); end(); }
   }
   A.adv.busy = () => legOn !== 0;                                        // la legendaria del cofre se esta luciendo (js/game.js: Esc no abre el menu)
-  function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0 || (id === "pact" && run.perks.length > 5)) return; const v = sellValue(id); if (id === "hoard" && run.hucha) { const t = run.hucha >= 20 ? 3 : run.hucha >= 10 ? 2 : 1; A.sfx.jackpot(t); if (A.core.jpShake) A.core.jpShake(t); run.hucha = 0; }   // se rompe: llueven monedas
+  function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0 || (id === "pact" && run.perks.length > baseSlots())) return; const v = sellValue(id); if (id === "hoard" && run.hucha) { const t = run.hucha >= 20 ? 3 : run.hucha >= 10 ? 2 : 1; A.sfx.jackpot(t); if (A.core.jpShake) A.core.jpShake(t); run.hucha = 0; }   // se rompe: llueven monedas
     run.perks.splice(k, 1); run.coins += v; if (run.amu) delete run.amu[id]; if (run.paid) delete run.paid[id]; if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
   function flash(t) { const n = document.querySelector("#dlg .tb-shop"); if (!n) return; n.querySelectorAll(".shop-flash").forEach(x => x.remove()); const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.appendChild(m); setTimeout(() => m.remove(), 2200); }   // flotando sobre las cartas: no empuja nada
 
@@ -1681,6 +1687,7 @@ window.AIQ = window.AIQ || {};
     /* el Reto diario tiene sus propias tablas (Hoy y Ayer): no cuenta para el record ni para la tabla "Aventura" (solo expediciones del modo Aventura) */
     if (!daily) P.adv.bestScore = Math.max(P.adv.bestScore, final);
     P.adv.coins += run.stats.coinsEarned;
+    const newAsc = win && run.won && !daily && P.adv.asc < Math.min(5, run.asc + 1) ? Math.min(5, run.asc + 1) : 0;
     if (win && run.won && !daily) P.adv.asc = Math.max(P.adv.asc, Math.min(5, run.asc + 1));   // el Reto diario no desbloquea ascensiones de la Aventura
     A.profile.save();
     const hadBest = (P.records["adv-all"] || 0) > 0, rec = !daily && A.profile.record("adv-all", final);   // la primera expedicion siempre es "record": el crupier solo lo celebra si habia uno que batir
@@ -1722,8 +1729,8 @@ window.AIQ = window.AIQ || {};
       if (sent) sent.then(res => { const el = $("vdRank"), g = res && res.global; if (el && g && g.rank) el.textContent = sp + A.pick6("Puesto {r} de {n} en el mundo.|Rank {r} of {n} worldwide.|Rang {r} sur {n} dans le monde.|Posição {r} de {n} no mundo.|Platz {r} von {n} weltweit.|Posizione {r} su {n} nel mondo.||全球第 {r} 名（共 {n} 人）。|전 세계 {n}명 중 {r}위.|世界{n}人中{r}位。|Место {r} из {n} в мире.|Miejsce {r} na {n} na świecie.").replace("{r}", A.fmt(g.rank)).replace("{n}", A.fmt(g.total)); }).catch(() => {});
     } else {
       C().verdict({
-        kind: win ? "win" : "", level: r.cleared, tag: A.T("Expedición", "Expedition"), title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
-        text: summary,
+        kind: win ? "win" : "", level: r.cleared, tag: A.T("Expedición", "Expedition") + (r.asc ? " · A" + r.asc + " " + A.tx(ASC_N[r.asc]) : ""), title: win ? A.T("Expedición cobrada", "Expedition cashed out") : A.T("Fin de la expedición", "Expedition over"),
+        text: summary + (newAsc ? " " + A.tx(ASC_UNLOCK).replace("{n}", newAsc).replace("{name}", A.tx(ASC_N[newAsc])) : ""),
         stats: [[A.T("Puntuación final", "Final score"), final], [A.T("Rondas superadas", "Rounds cleared"), r.cleared], [A.T("Doblones ganados", "Doubloons earned"), r.stats.coinsEarned]],
         stamp: win ? A.T("GLORIA", "GLORY") : A.T("FIN", "END"), stampSub: win ? A.icon("u_star", "st") : A.icon("u_close", "st"), art: win ? "win" : "lose",
         buttons: [{ id: "nrBtn", cls: "btn-ink", label: A.T("Otra expedición", "Another expedition"), arrow: true, primary: true, onclick: () => C().showHub("adventure") }, { id: "hubBtn", cls: "btn-line", label: A.T("Menú", "Menu"), onclick: () => C().showHub() }],

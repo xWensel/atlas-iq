@@ -13,7 +13,7 @@ window.AIQ = window.AIQ || {};
   const top = (back) => `<div class="menu-top">${back ? `<button class="hub-back" id="hubBack">${A.icon("u_back", "sm")}${T("Menú", "Menu")}</button>` : `<img class="menu-rose" src="assets/icons/logo_mark.png" alt="" draggable="false">`}${tools()}</div>`;
   const shell = (inner, back) => `<div class="menu-in hub">${top(back)}${inner}<p class="menu-foot">Geolite · v${A.VERSION}</p></div>`;
   /* donde va una partida guardada (A.adv.summary): tras el Acto III ya no hay rondas numeradas (antes decia "Acto 4 · Ronda 1") */
-  const where = sv => (sv.inf ? T("Modo infinito", "Infinite mode") : sv.act > 3 ? T("Tres actos completados", "Three acts completed") : `${T("Acto", "Act")} ${sv.act} · ${T("Ronda", "Round")} ${sv.round}`);
+  const where = sv => (sv.inf ? T("Modo infinito", "Infinite mode") : sv.act > 3 ? T("Tres actos completados", "Three acts completed") : `${T("Acto", "Act")} ${sv.act} · ${T("Ronda", "Round")} ${sv.round}${sv.asc ? " · A" + sv.asc : ""}`);
 
   /* ------------------------------------------------------------------ pantalla principal */
   /* placa de casino del pie de la portada (Enciclopedia, Clasificacion, Perfil): icono, nombre y una etiqueta como la de las cartas;
@@ -118,20 +118,22 @@ window.AIQ = window.AIQ || {};
   let advSel = { deck: "explorer", asc: 0 };
   const DECK_CARD = { explorer: ["A", "s_compass"], historian: ["K", "s_peak"], navigator: ["Q", "s_palm"], blind: ["J", "s_pin"] };
   const STAKE_CHIP = ["blank_small", "blank_teal", "blank_gold", "blank_big", "blank_boss", "blank_boss"];
-  const ascTexts = () => [T("Estándar", "Standard"), T("Objetivos +5 %, −1 s, tienda +10 %", "Targets +5%, −1 s, shop +10%"), T("+10 %, −2 s. Desde el acto 2, un reto de regla (viento, tormenta o silencio) en cada ronda", "+10%, −2 s. From act 2, a rule challenge (wind, storm or silence) every round"), T("+15 %, −3 s, retos un nivel más fuertes y una provisión menos", "+15%, −3 s, challenges one level stronger and one fewer provision"), T("+20 %, −4 s. Los jefes traen un poder extra", "+20%, −4 s. Bosses bring one extra power"), T("+25 %, −5 s. Solo para leyendas", "+25%, −5 s. Legends only")];
+  /* tanda 17: cada Ascension tiene nombre y una linea (A.adv.ascInfo, js/adventure.js); ascTexts: texto plano de los globos, ascHtml: el parrafo de la seleccion */
+  const ascTexts = () => [T("Estándar", "Standard")].concat([1, 2, 3, 4, 5].map(i => { const x = A.adv.ascInfo(i); return `«${x.n}»: ${x.d}${x.k ? " " + x.k : ""}`; }));
+  const ascHtml = i => { if (!i) return T("Estándar", "Standard"); const x = A.adv.ascInfo(i); return `<b>«${x.n}»</b> ${x.d}${x.k ? `<span class="as-k">${x.k}</span>` : ""}`; };
   function adventure() {
     const c = C(), P = A.profile.get(), adv = P.adv, D = A.ADV.DECKS, saved = A.adv.hasSave(), TN = A.ADV.TOPIC_NAMES, R = A.RELICS;
     const sm = saved && A.adv.summary(), runInfo = sm ? `${where(sm)} · ${sm.coins} ${T("doblones", "doubloons")} · ${A.fmt(sm.score)} ${T("pts", "pts")}` : "";
     const decks = Object.keys(D).map(id => {
       const d = D[id], locked = A.adv.deckLocked(id), ach = locked && A.ACH.find(a => a.id === d.unlock), [rk, su] = DECK_CARD[id];
-      const lockTxt = T("Logro: ", "Achievement: ") + (ach ? A.tx(ach.name) + " · " : "") + A.pick6("Supera la Ascensión {n}.|Beat Ascension {n}.|Réussis l'Ascension {n}.|Vença a Ascensão {n}.|Schließe Aufstieg {n} ab.|Supera l'Ascensione {n}.||通过飞升 {n}。|어센션 {n} 클리어.|アセンション{n}をクリア。|Пройди Восхождение {n}.|Pokonaj Wniebowstąpienie {n}.").replace("{n}", d.asc || 0);   // el logro que la abre y la Ascension que pide (las barajas se ganan superando Ascensiones)
+      const lockTxt = T("Logro: ", "Achievement: ") + (ach ? A.tx(ach.name) + " · " : "") + A.pick6("Supera la Ascensión {n}.|Beat Ascension {n}.|Réussis l'Ascension {n}.|Vença a Ascensão {n}.|Schließe Aufstieg {n} ab.|Supera l'Ascensione {n}.||通过飞升 {n}。|어센션 {n} 클리어.|アセンション{n}をクリア。|Пройди Восхождение {n}.|Pokonaj Wniebowstąpienie {n}.").replace("{n}", (d.asc || 0) + (d.asc ? " «" + A.adv.ascInfo(d.asc).n + "»" : ""));   // el logro que la abre y la Ascension que pide (las barajas se ganan superando Ascensiones)
       const kit = [...d.tools.map(t => `<span class="kt" ${A.kitTip("tool", t)}>${A.icon(A.ADV.TOOLS[t].ico, "kit")}</span>`), ...d.perks.map(p => `<span class="kt" ${A.kitTip("perk", p)}>${A.icon(p, "kit")}</span>`)].join("");
       const stat = `<em><span class="dc-stat">${A.icon("coin", "dc-ic")}${d.coins}</span><span class="dc-stat">${A.icon("heart", "dc-ic")}${d.lives}</span></em>`;
       return `<button class="dcard${advSel.deck === id ? " sel" : ""}${locked ? " lock" : ""}" data-deck="${id}" ${locked ? "disabled" : ""} data-suit="${su === "s_pin" || su === "s_compass" ? "red" : "blk"}"><span class="dc-art felt">${A.icon(d.ico)}${locked ? `<i class="dc-lock">${A.icon("lock")}</i>` : ""}</span><b class="dc-n">${A.tx(d.n)}</b><span class="dc-d">${locked ? lockTxt : A.tx(d.d)}</span><span class="dc-kit">${locked ? "" : kit}${stat}</span></button>`;
     }).join("");
     const ASC_TXT = ascTexts();
     let stakes = ""; for (let i = 0; i <= 5; i++) stakes += `<button class="stake${advSel.asc === i ? " sel" : ""}" data-asc="${i}" ${i > adv.asc ? "disabled" : ""} ${A.ttAttr(T("Ascensión", "Ascension") + " " + i, i > adv.asc ? A.tip6("Bloqueada: supera la ascensión anterior para desbloquearla.|Locked: beat the previous ascension to unlock it.|Verrouillée : réussis l'ascension précédente pour la débloquer.|Bloqueada: vença a ascensão anterior para desbloqueá-la.|Gesperrt: schließe die vorige Stufe ab, um sie freizuschalten.|Bloccata: supera l'ascensione precedente per sbloccarla.||已锁定：通过上一级飞升即可解锁。|잠김: 이전 어센션을 클리어하면 열립니다.|ロック中：前のアセンションをクリアすると解除。|Заблокировано: пройди предыдущее восхождение, чтобы открыть.|Zablokowane: pokonaj poprzednie wniebowstąpienie, żeby odblokować.") : ASC_TXT[i])}>${A.icon(STAKE_CHIP[i])}<b>${i}</b></button>`;
-    const ascTxt = ASC_TXT[advSel.asc];
+    const ascTxt = ascHtml(advSel.asc);
     c.dialog(scr(T("Aventura", "Adventure"), `<div class="adv-setup">
       <section class="as-main">
         ${saved ? `<div class="resume"><span class="tag">${T("Partida guardada", "Saved run")}</span><b>${runInfo}</b><div><button class="btn-ink" id="contBtn" data-primary><span>${T("Continuar", "Continue")}</span><span class="ar">${A.icon("u_next", "sm")}</span></button><button class="btn-line danger" id="abandonBtn">${T("Descartar partida", "Discard run")}</button></div></div>` : ""}
