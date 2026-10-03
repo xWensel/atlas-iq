@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.12",
+      name: ["Arte al nivel de los logros", "Art at achievement level"],
+      date: "2026-10-03",
+      summary: ["Todos los iconos de la mesa de casino se rehacen con el mismo proceso que los logros.",
+        "All the casino table icons are redone with the same process as the achievements."],
+      chapters: [
+        { id: "arte", kicker: ["Arte", "Art"], title: ["Los dibujos de la mesa", "The table drawings"],
+          entries: [
+            E(["Ruleta, rueda y casillas", "Roulette, wheel and slots"], "change", "0.2.12", [
+            ["Rojo o negro, la Ruleta de premios y sus casillas (doblones, premio gordo, reto extra, atraco, reloj corto y nada) estrenan dibujo, hechos con el mismo estilo y acabado que los logros. «Nada» es ahora un cofre abierto y vacío.", "Red or black, the Prize wheel and its slots (doubloons, jackpot, extra challenge, heist, short clock and nothing) get new drawings, made with the same style and finish as the achievements. «Nothing» is now an open, empty chest."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.11",
       name: ["La caja vacía", "The empty box"],
       date: "2026-10-03",
