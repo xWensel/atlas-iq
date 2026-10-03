@@ -334,7 +334,7 @@ window.AIQ = window.AIQ || {};
     case "quake": return { px: V([3, 6, 8], i) * fx.quakeMul * h };
     case "drift": return { px: V([22, 36, 54], i) * fx.quakeMul * h };
     case "spin": return { amp: V([0.28, 0.45, 0.7], i) * fx.quakeMul * h };
-    case "decoys": return { n: V([8, 14, 22], i) };   // tanda 7: llueven del cielo
+    case "decoys": return { n: V([30, 52, 80], i) };   // tanda 7: llueven del cielo (v0.2.16: muchas mas, antes 8 / 14 / 22)
     case "tremble": return { px: V([7, 10, 12], i) * fx.ptrShakeMul * h };
     case "blink": return { period: V([0.55, 0.42, 0.3], i), duty: 0.45 };
     case "ghost": return { every: V([5, 4.2, 4], i), off: V([1, 1.4, 1.5], i) * fx.ghostMul };
@@ -651,16 +651,10 @@ window.AIQ = window.AIQ || {};
     return any ? spec : null;
   }
   /* Chinchetas trampa (v0.52): estorban y no senalan nada. Antes rodeaban el objetivo a 250-2.050 km con rumbo al azar y su centro caia a 340-566 km
-     del sitio (clicar ahi daba 750-800 puntos sin saber nada). Ahora se reparten por la tierra visible de todo el mapa sin mirar el objetivo:
-     candidatos al azar con la semilla de la pregunta, uniformes en la vista de inicio (de -180 a 180 y hasta 60 S), solo en tierra y separados
+     del sitio (clicar ahi daba 750-800 puntos sin saber nada). Ahora se reparten por todo el mapa visible (tierra y mar) sin mirar el objetivo:
+     candidatos al azar con la semilla de la pregunta, uniformes en la vista de inicio (de -180 a 180 y hasta 60 S), en tierra o en mar y separados
      entre si. La lista de candidatos no depende de la ventana; de ella se saltan los que caerian debajo del HUD o fuera de la pantalla (en otra
      ventana solo cambian esos). Del objetivo no se mira nada, ni para apartarse de el: un hueco alrededor del sitio tambien seria una pista */
-  let LANDP = null;
-  const onLand = (world, lon, lat) => {
-    if (!LANDP || LANDP.w !== world) { LANDP = []; LANDP.w = world; for (const f of world.features) for (const p of f.polys) LANDP.push(p); }
-    for (const p of LANDP) { const b = p.bbox; if (lat < b[1] || lat > b[3]) continue; if (((lon >= b[0] && lon <= b[2]) || (lon + 360 >= b[0] && lon + 360 <= b[2]) || (lon - 360 >= b[0] && lon - 360 <= b[2])) && A.geo.inFeature(lon, lat, { polys: [p] })) return true; }
-    return false;
-  };
   function decoyList(map, o, n) {
     if (!o || !map || !map.world || !map._clamp) return [];
     const rr = A.rng(`${S.seed}:d:${S.round}:${S.q}`), P = A.geo.project, TAU = Math.PI * 2;
@@ -668,12 +662,14 @@ window.AIQ = window.AIQ || {};
     const fy = !!(ori && ori.rot), fx = fy !== !!(ori && ori.mx), v = map._clamp({ ...map.home() }), W = map.W, H = map.H, HUD = hudPx(W, H);
     const toPx = (x, y) => { const sx = W / 2 + (x - v.cx) * v.s, sy = H / 2 - (y - v.cy) * v.s; return [fx ? W - sx : sx, fy ? H - sy : sy]; };
     const y0 = P(0, -60)[1], y1 = 2.1, out = [], pts = [];
-    for (let k = 0; k < 900 && out.length < n; k++) {
+    /* v0.2.16: tambien caen en el mar (si todas cayeran en tierra, "chincheta = pais" seria una pista y el mar quedaria siempre limpio) y son muchas mas:
+       primero bien repartidas y luego apretadas, hasta que el mapa se llene */
+    for (let k = 0; k < 3000 && out.length < n; k++) {
       const x = -Math.PI + rr() * TAU, y = y0 + rr() * (y1 - y0), [px, py] = toPx(x, y);   // siempre dos numeros por candidato: la lista no cambia con la ventana
       if (px < 16 || px > W - 16 || py < 44 || py > H - 6) continue;                  // la chincheta entera a la vista (cabeza 39 px por encima de la punta)
       if (HUD.some(([a, b, c, d]) => px + 14 > a && px - 14 < c && py + 4 > b && py - 40 < d)) continue;
-      if (pts.some(q => Math.hypot(q[0] - x, q[1] - y) < (k < 450 ? 0.36 : 0.2))) continue;
-      const [lon, lat] = A.geo.unproject(x, y); if (!onLand(map.world, lon, lat)) continue;
+      if (pts.some(q => Math.hypot(q[0] - x, q[1] - y) < (k < 1000 ? 0.22 : 0.13))) continue;
+      const [lon, lat] = A.geo.unproject(x, y);
       pts.push([x, y]); out.push({ lat, lon, a: S.fx.trapGhost ? 0.28 : 0.95 });
     }
     return out;
@@ -1161,7 +1157,7 @@ window.AIQ = window.AIQ || {};
       if (cl && !PX) fxStart("smoke", par(cl).cover); else if (rn && !CX) fxStart("rain", par(rn).dens); else fxStop();
       if (CX) { CX.clear(); CX.set(cur(), par, S.fx); }
       /* tanda 7: las Chinchetas trampa llueven durante la primera mitad larga de la pregunta, una tras otra, por todo el mapa */
-      if (map.setDecoys) { if (dc) { const L = decoyList(map, o, par(dc).n), lim = ((A.core && A.core.S && A.core.S.limit) || 20) * 1000, t0 = performance.now() + 450, gap = (lim * 0.55) / Math.max(1, L.length), rr = A.rng(`${S.seed}:dr:${S.round}:${S.q}`); L.forEach((d, k) => { d.t0 = t0 + k * gap + rr() * gap * 0.6; later(() => say("pinFall", k), Math.max(0, d.t0 - performance.now())); }); map.setDecoys(L); } else map.setDecoys([]); }
+      if (map.setDecoys) { if (dc) { const L = decoyList(map, o, par(dc).n), lim = ((A.core && A.core.S && A.core.S.limit) || 20) * 1000, t0 = performance.now() + 450, gap = (lim * 0.55) / Math.max(1, L.length), rr = A.rng(`${S.seed}:dr:${S.round}:${S.q}`); L.forEach((d, k) => { d.t0 = t0 + k * gap + rr() * gap * 0.6; later(() => say("pinFall", k, L.length), Math.max(0, d.t0 + 620 - performance.now())); /* suena al clavarse: la caida dura 620 ms */ }); map.setDecoys(L); } else map.setDecoys([]); }
       layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; layer("night").classList.remove("on"); flickerLoop(); lightningLoop(); quakeLoop(); ctrlzLoop(); nightLoop();
       if (A.pointer && A.pointer.mods) A.pointer.mods();
       counterFx(qi);

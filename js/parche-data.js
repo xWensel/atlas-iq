@@ -36,6 +36,22 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.16",
+      name: ["Lluvia de chinchetas", "Pin rain"],
+      date: "2026-10-03",
+      summary: ["El reto Chinchetas trampa por fin engaña: caen muchas más y también en el mar, así que una chincheta ya no te dice dónde hay tierra.",
+        "The Decoy pins challenge finally fools you: far more of them fall, and into the sea too, so a pin no longer tells you where land is."],
+      chapters: [
+        { id: "chinchetas", kicker: ["Retos", "Challenges"], title: ["Chinchetas trampa", "Decoy pins"],
+          entries: [
+            E(["Muchas más, también en el mar", "Many more, at sea too"], "buff", "0.2.16", [
+            ["Caen **30, 52 u 80** chinchetas según el nivel del reto (antes 8, 14 o 22), primero bien repartidas y luego cada vez más juntas, hasta llenar el mapa.", "**30, 52 or 80** pins fall depending on the challenge level (before 8, 14 or 22), well spread at first and then ever closer, until the map is full."],
+            ["Ya no caen solo en tierra: antes, «donde hay chincheta hay un país» era una pista y el mar quedaba siempre limpio.", "They no longer land only on land: before, \"where there's a pin there's a country\" was a hint and the sea always stayed clear."],
+            ["Cada chincheta suena al clavarse con un tic de kalimba corto y siempre distinto, más bajito cuantas más caen.", "Each pin sounds as it sticks, with a short kalimba tick that is never the same, quieter the more of them fall."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.15",
       name: ["El ticket nuevo", "The new ticket"],
       date: "2026-10-03",
