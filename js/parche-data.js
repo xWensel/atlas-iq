@@ -30,11 +30,31 @@
 window.AIQ = window.AIQ || {};
 (function (A) {
   /* ancho y alto reales de cada imagen de assets/parche/ */
-  const SZ = {"apuestas-barra":[1100,825],"bandera-destenida":[1100,618],"bandera-viento":[1100,618],"bigbang-1":[1100,618],"bigbang-2":[1100,618],"bigbang-3":[1100,618],"cambiar-por":[1100,618],"dividir":[940,500],"duelo-banca":[1100,618],"escalada-acto3":[1100,928],"escalada-apagon":[1100,618],"etiqueta-nuevo":[1100,618],"galeria-reliquias":[1060,1170],"iconos-herramientas":[840,240],"iconos-t14":[1000,460],"iconos-t15":[1040,440],"iconos-t16":[820,622],"miopia":[1100,618],"mochila-amuletos":[884,260],"nombre-girado":[1100,618],"pacto-oferta":[1100,825],"pared-cinco":[1100,928],"pase-vip":[1100,309],"retos-t14":[1100,618],"retos-t15":[1100,618],"rojo-negro":[1100,412],"rueda-coleccionista":[1100,928],"sangre-fria":[1100,837],"segunda-bola":[1100,618],"siesta":[1100,618],"tanda7":[1100,1237],"tanda8":[1100,548],"tienda-ventajas":[1100,618],"vitrina":[1100,618]};
+  const SZ = {"amuleto-sello":[1100,619],"apuestas-barra":[1100,825],"bandera-destenida":[1100,618],"bandera-viento":[1100,618],"bigbang-1":[1100,618],"bigbang-2":[1100,618],"bigbang-3":[1100,618],"cambiar-por":[1100,618],"dividir":[940,500],"duelo-banca":[1100,618],"escalada-acto3":[1100,928],"escalada-apagon":[1100,618],"etiqueta-nuevo":[1100,618],"galeria-reliquias":[1060,1170],"iconos-herramientas":[840,240],"iconos-t14":[1000,460],"iconos-t15":[1040,440],"iconos-t16":[820,622],"miopia":[1100,618],"mochila-amuletos":[884,260],"nombre-girado":[1100,618],"pacto-oferta":[1100,825],"pared-cinco":[1100,928],"pase-vip":[1100,309],"retos-t14":[1100,618],"retos-t15":[1100,618],"rojo-negro":[1100,412],"rueda-coleccionista":[1100,928],"sangre-fria":[1100,837],"segunda-bola":[1100,618],"siesta":[1100,618],"tanda7":[1100,1237],"tanda8":[1100,548],"tienda-ventajas":[1100,618],"vitrina":[1100,618]};
   const I = (src, cap, size) => ({ src, cap, size: size || "wide", w: (SZ[src] || [1100, 618])[0], h: (SZ[src] || [1100, 618])[1] });
   const E = (name, tag, ver, items, imgs) => ({ name, tag, ver, items, imgs: imgs || [] });
 
   A.PATCHES = [
+    {
+      id: "0.2.5",
+      name: ["Amuletos para siempre", "Charms for good"],
+      date: "2026-10-03",
+      summary: ["Los amuletos dejan de gastarse: actúan siempre que sale su familia de retos y ahora se ve cuándo te protegen.",
+        "Charms no longer wear out: they work whenever their family of challenges shows up, and now you can see when they protect you."],
+      chapters: [
+        { id: "amuletos", kicker: ["Amuletos", "Charms"], title: ["Sin cargas", "No charges"],
+          entries: [
+            E(["Amuletos fijos", "Permanent charms"], "change", "0.2.5", [
+            ["Fuera las cargas: un amuleto ya no se gasta ni se parte. Actúa mientras lo lleves, cada vez que sale un reto de su familia. Sigue ocupando un hueco de la mochila.", "No more charges: a charm no longer wears out or breaks. It works as long as you carry it, every time a challenge from its family shows up. It still takes a backpack slot."],
+            ["Contra un reto a **nivel 3** solo lo suaviza: el reto se sigue notando a medias.", "Against a **level 3** challenge it only softens it: you still feel half of it."],
+            ["Ya no salen recargas en el Campamento: si llevas un amuleto, su carta no vuelve a aparecer.", "No more refills at the Camp: if you carry a charm, its card won't show up again."]]),
+            E(["Se nota cuando te protege", "You can tell when it protects you"], "new", "0.2.5", [
+            ["Al empezar la ronda, el amuleto salta en la mochila y su **sello** cae con un golpe sobre la ficha del reto que frena. Se queda ahí toda la ronda.", "When the round starts, the charm jumps in the backpack and its **seal** slams onto the chip of the challenge it holds back. It stays there the whole round."],
+            ["La primera vez que cada amuleto le estropea un truco, el crupier se queja nombrando los dos.", "The first time each charm spoils one of his tricks, the dealer complains, naming both."]],
+            [I("amuleto-sello", ["El Foco sella el Apagón (nivel 3: a medias) y el crupier protesta.", "The Spotlight seals the Blackout (level 3: halfway) and the dealer protests."])]),
+          ] },
+      ],
+    },
     {
       id: "0.2.4",
       name: ["Perder cuesta", "Losing costs"],

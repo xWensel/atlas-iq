@@ -280,7 +280,7 @@ window.AIQ = window.AIQ || {};
     /* v0.35: la ficha ya no dice que perk frena el reto (ni brilla por ello): el jugador tiene que leer y atar cabos */
     /* v0.52: durante una pregunta en la que la Torre de Babel no puede cambiar el nombre, su ficha ensena el reto que sale en su lugar (y por que) */
     NEW_TAG: L6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||初登场|첫 등장|初登場|Новинка|Nowość"),
-    chip(c, small) { if (c.hid && !c.up && !S.on) return `<span class="ch-chip k-rule ch-hid${small ? " sm" : ""}" data-tt="${A.tx(L6(T16.ui_faceDown))}">${A.icon("boss_hat", "sm")}<b>?</b></span>`; const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}${c.calm ? " ch-calm" : ""}${c.sealed ? " ch-sealed" + (c.sealBy ? " seal-" + c.sealBy : "") : ""}${c.tw ? " tw" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b>${c.isNew ? `<span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""}<i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
+    chip(c, small) { if (c.hid && !c.up && !S.on) return `<span class="ch-chip k-rule ch-hid${small ? " sm" : ""}" data-tt="${A.tx(L6(T16.ui_faceDown))}">${A.icon("boss_hat", "sm")}<b>?</b></span>`; const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}${c.calm ? " ch-calm" : ""}${c.sealed ? " ch-sealed" + (c.sealBy ? " seal-" + c.sealBy : "") : ""}${c.tw ? " tw" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b>${c.isNew ? `<span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""}<i class="ch-lv">${"●".repeat(s.lv || 1)}</i>${c.amu ? `<i class="ch-amu${c.amuWait ? " wait" : ""}" data-amu="${c.amu}">${A.icon(c.amuIco, "sm")}</i>` : ""}</span>`; },
   };
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */
@@ -902,13 +902,13 @@ window.AIQ = window.AIQ || {};
   }
 
   /* ------------------------------------------------------------------ perks que contrarrestan retos activos: al empezar la ronda suena la "contra"
-     (v0.35: sin marcar que ficha ni con que perk; antes la ficha brillaba con el icono del perk y eso se lo daba mascado al jugador) */
+     (v0.35: sin marcar que ficha ni con que perk antes de comprarlo. 0.2.5: el amuleto YA comprado si se luce: su sello en la ficha que frena) */
   const counterOf = id => { const ids = (S.on && S.fx && S.fx.ids) || []; return (D[id].counters || []).find(p => ids.includes(p)); };
   function counterFx(qi) {
     const all = S.bk && BX[S.bk] ? [0, 1, 2, 3, 4].flatMap(bossQ) : S.list, hit = all.filter(c => counterOf(c.id)); if (!hit.length || qi !== 0) return;
     /* tanda 2: la reliquia que ya es tuya se luce (su icono salta en la barra) con el sonido de contra; la ficha del reto no cambia */
     const ids = [...new Set(hit.map(c => counterOf(c.id)))];
-    later(() => ids.forEach((id, i) => (A.adv && A.adv.flash ? A.adv.flash(id, 0, A.adv.amuLabel ? A.adv.amuLabel(id) : "", () => say("counter", i)) : later(() => say("counter", i), i * 140))), 650);
+    later(() => ids.forEach((id, i) => (A.adv && A.adv.flash ? A.adv.flash(id, 0, "", () => { say("counter", i); if (A.adv.amuSlam) A.adv.amuSlam(id); }) : later(() => say("counter", i), i * 140))), 650);   // 0.2.5: el amuleto salta y su sello cae sobre la ficha del reto
   }
 
   /* ------------------------------------------------------------------ puntero: parametros para js/pointer.js */

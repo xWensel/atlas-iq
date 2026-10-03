@@ -114,7 +114,7 @@ window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6, bribe
     const own = run.perks.includes(x.s.id);
     if (p.r === 3) return own ? 0 : 60;
     if (p.ventaja) return run.perks.some(id => (A.RELICS[id] || {}).ventaja) ? 0 : 100;
-    if (p.amulet) { const need = up[p.amulet] || 0; return own ? (need && (run.amu || {})[x.s.id] <= 1 ? 30 + need : 0) : need ? 50 + 10 * need : 0; }
+    if (p.amulet) { const need = up[p.amulet] || 0; return own ? 0 : need ? 50 + 10 * need : 0; }
     if (own) return 0;
     if (p.calm) return up.puntero || up.pantalla ? 40 : 0;
     if (p.pact) return 0;

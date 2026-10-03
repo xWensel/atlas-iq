@@ -297,13 +297,11 @@ window.AIQ = window.AIQ || {};
      Vendida en la misma visita en que la compraste: todo lo pagado (salvo el Ojo en el cielo, que ya ha mirado) */
   const sellValue = id => (id === "hoard" ? run.hucha || 0 : 0) + sellBase(id);   // tanda 9: la Hucha vale ademas lo que lleva dentro
   const sellBase = id => { const p = A.RELICS[id], paid = run.paid && run.paid[id]; if (paid > 0 && run.paidAt && run.paidAt[id] === run.shopKey && id !== "spyhole") return paid; return Math.ceil((paid > 0 ? paid : price(p.cost)) / 2); };
-  /* amuletos (tanda 3): las contras de antes. Cargas en run.amu; 2 al comprarlo (las barajas que lo traen de serie, 6). Ver amuSpend */
-  const AMU_LV = 2, AMU_DECK = 6, isAmu = id => !!(A.RELICS[id] && A.RELICS[id].amulet);
-  const AMU_TAG = L6("Amuleto|Amulet|Amulette|Amuleto|Amulett|Amuleto||护身符|부적|お守り|Амулет|Amulet"), AMU_RE = L6("+2 cargas|+2 charges|+2 charges|+2 cargas|+2 Ladungen|+2 cariche||+2次充能|충전 +2회|+2回分|+2 заряда|+2 ładunki");
+  /* amuletos (tanda 3): las contras de antes. Desde la 0.2.5 son fijos (sin cargas): ver amuPerks */
+  const AMU_TAG = L6("Amuleto|Amulet|Amulette|Amuleto|Amulett|Amuleto||护身符|부적|お守り|Амулет|Amulet");
   const VTG_TAG = L6("Ventaja|Edge|Atout|Vantagem|Vorteil|Vantaggio||优势|어드밴티지|アドバンテージ|Преимущество|Atut"), VTG_SWAP = L6("cambiar por esta|swap for this one|échanger contre celle-ci|trocar por esta|dagegen tauschen|scambiala con questa||换成这张|이걸로 교체|これと交換|заменить на эту|zamień na tę");
   const OTRA = L6("¡Otra!|Again!|Encore !|De novo!|Noch mal!|Ancora!||再来！|한 번 더!|もう一回！|Ещё!|Jeszcze!"), BEST5 = L6("5 mejores|best 5|5 meilleures|5 melhores|beste 5|5 migliori||取前5|상위 5개|上位5つ|5 лучших|5 najlepszych");
   const NULLED = L6("Anulado|Voided|Annulé|Anulado|Annulliert|Annullato||已作废|무효|無効|Отменён|Anulowany"), SAVED_BY = L6("te ha salvado|saved you|t'a sauvé|te salvou|hat dich gerettet|ti ha salvato||救了你|덕분에 살았어요|に救われた|спас тебя|cię uratował");
-  const AMU_BROKE = L6("se parte|breaks|se brise|se quebra|zerbricht|si spezza||碎了|부서졌어요|砕けた|раскололся|pęka");
   const pips = (n, cls) => `<span class="${cls}">${Array.from({ length: Math.max(0, n) }, () => "<i></i>").join("")}</span>`;
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   const chestSkip = () => Math.round(2.5 * inflation());                // dejar el cofre del jefe sin abrir: 3 doblones al empezar el acto II, 4 al empezar el III (el Toque de Midas los duplica, como todo lo que ganas)
@@ -407,7 +405,6 @@ window.AIQ = window.AIQ || {};
       perks: d.perks.concat(bonus ? [gift] : []), tools: {}, score: 0, cleared: 0, used: [], rerolls: 0, freeUsed: 0, shopN: 0, phase: "round", qi: 0, qn: 5, qTools: 0, rTools: 0, luckUsed: false, guardUsed: false,
       livesLostAct: 0, shieldAct: -1, leftSum: 0, roundScore: 0, rGood: 0, qTotal: 0, stats: { bulls: 0, best: 0, coinsEarned: 0 }, t0: Date.now(),
     };
-    run.amu = {}; run.perks.forEach(id => { if (isAmu(id)) run.amu[id] = d.perks.includes(id) ? AMU_DECK : AMU_LV; });
     d.tools.forEach(t => addTool(t)); if (bonus && bonus.buy) bonus.buy(run);
     persist(); A.ach.emit("adv", { kind: "start" }); A.profile.get().adv.runs++; A.profile.save();
     startRound();
@@ -426,7 +423,6 @@ window.AIQ = window.AIQ || {};
   function migrate(r) {
     const TO = { spectacles: "dictionary", lens: "divingmask", umbrella: "divingmask", shockabsorber: "plates", gamer: "steadyhand", spareeye: "steadyhand", taskmgr: "protector", powerbank: "miner", sonarplus: "glass", compass16: "glass", coupon: "spyhole", banker: "hoard" }, seenP = new Set();
     r.perks = r.perks.map(id => (!A.RELICS[id] && TO[id] && !r.perks.includes(TO[id]) && !seenP.has(TO[id]) ? (seenP.add(TO[id]), TO[id]) : id));
-    r.amu = r.amu || {}; r.perks.forEach(id => { if (A.RELICS[id] && A.RELICS[id].amulet && r.amu[id] == null) r.amu[id] = AMU_LV; });
     const gone = r.perks.filter(id => !A.RELICS[id]); if (gone.length) { r.perks = r.perks.filter(id => A.RELICS[id]); r.coins += gone.length * 4; }
     const dead = Object.keys(r.tools).filter(id => !TOOLS[id]); dead.forEach(id => { delete r.tools[id]; r.coins += 3; });
     if ((r.stock || []).some(s => (s.k === "perk" && !A.RELICS[s.id]) || (s.k === "tool" && !TOOLS[s.id]))) { r.stock = null; r.stockKey = null; }
@@ -573,9 +569,8 @@ window.AIQ = window.AIQ || {};
     const Lv = roundLevel(keep), S = C().S;
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
-    amuSpend();
     A.dealer.enable(true); if (run.duel) run.duel.n = keep ? run.qi : 0;
-    A.chal.begin(run.chal, A.chal.fx(perkList()), { seed: run.seed, round: roundNo(), halve: run.chalHalve, boss: run.chalKey, asc: run.asc, topic: run.topic, cjk: run.cjk });
+    A.chal.begin(run.chal, A.chal.fx(amuPerks()), { seed: run.seed, round: roundNo(), halve: run.chalHalve, boss: run.chalKey, asc: run.asc, topic: run.topic, cjk: run.cjk });
     persist(); A.ach.emit("adv", { kind: "round", act: run.act }); C().startLevel(0);
     if (keep) { S.qi = run.qi; S.levelScore = run.roundScore; S.streak = run.streak || 0; S.hits = run.rGood; C().updateHud && C().updateHud(); }
     if (Lv.boss) setTimeout(() => A.sfx.boss(), 200);
@@ -831,7 +826,7 @@ window.AIQ = window.AIQ || {};
     const calmF = (perkList().find(p => p.calm) || {}).calm, calm = calmF && !run.inf && (run.streak || 0) >= 2 && (run.chal || []).some(c => calmF.includes((A.CHAL[c.id] || {}).fam)) ? calmF : null;   // Sangre fria (tanda 9)
     if (!!calm !== !!run.calmOn) { if (calm) A.adv.flash("coolhead", 0, "❄"); else A.adv.flash("coolhead", 0, "✕", () => A.sfx.chip(0.3)); }   // entra en frio / se le quiebra el halo
     const calmWas = !!run.calmOn; run.calmOn = !!calm; if (calmWas !== run.calmOn) renderBars();   // las fichas que apaga, heladas
-    const fx = A.chal.fx(perkList()); A.chal.question(o, run.qi, { calm });
+    const fx = A.chal.fx(amuPerks()); A.chal.question(o, run.qi, { calm });
     showSplit();
     if (kept) { C().map.avoid = hudRects(); C().map.setProbes(kept); renderBars(); }
     A.pointer.set({ tool: null, fx, calm: !!calm, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; return oo.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[oo.key]) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
@@ -1004,6 +999,13 @@ window.AIQ = window.AIQ || {};
     el.classList.remove("fl0", "fl1", "fl2"); A.restyle(el); el.classList.add("fl" + f.lv);
     if (f.label) { const old = el.querySelector(".ab-lbl"); if (old) old.remove(); el.insertAdjacentHTML("beforeend", `<i class="ab-lbl">${f.label}</i>`); }
   }
+  /* la queja del amuleto (una por amuleto y expedicion): si el crupier esta hablando, espera su turno durante la pregunta en vez de perderse */
+  function amuGripe(id, n) {
+    const am = run && amuHit(A.RELICS[id])[0]; run.relicSeen = run.relicSeen || {};
+    if (!am || run.inf || run.relicSeen[id] || n > 8 || C().S.phase !== "asking") return;
+    if (A.dealer.react("amulet", { p: A.tx(A.RELICS[id].n), c: A.tx(A.CHAL[am.id].n) })) { run.relicSeen[id] = 1; return; }
+    setTimeout(() => amuGripe(id, n + 1), 1500);
+  }
   function flashNext() {
     const f = flashQ.shift(); if (!f || !run) { flashBusy = false; return; } flashBusy = true;
     const el = document.querySelector(`#advBar .ab-perk[data-id="${f.id}"]`), k = flashK++ % 4, asking = C().S.phase === "asking";
@@ -1011,25 +1013,21 @@ window.AIQ = window.AIQ || {};
     if (f.snd) f.snd(); else if (f.lv === 0) A.sfx.chip(0.15 + Math.random() * 0.7); else { A.sfx.coin(k); if (f.lv === 2) setTimeout(() => A.sfx.chip(0.4 + Math.random() * 0.5), 120); }
     if (f.lv === 2 && !asking && C().jpShake) C().jpShake(1);                           // nada tiembla mientras respondes
     run.relicSeen = run.relicSeen || {}; const rk = run.act + ":" + run.round;
-    if (!run.relicSeen[f.id] && run.relicSaidR !== rk && !run.inf && A.dealer.react("relic", { p: A.tx(A.RELICS[f.id].n) })) { run.relicSeen[f.id] = 1; run.relicSaidR = rk; }   // solo cuenta si de verdad habla (si estaba ocupado, lo intenta la siguiente)
+    if (A.RELICS[f.id].amulet) amuGripe(f.id, 0);                                         // 0.2.5: un amuleto le estropea un reto: se queja nombrando los dos
+    else if (!run.relicSeen[f.id] && run.relicSaidR !== rk && !run.inf && A.dealer.react("relic", { p: A.tx(A.RELICS[f.id].n) })) { run.relicSeen[f.id] = 1; run.relicSaidR = rk; }   // solo cuenta si de verdad habla (si estaba ocupado, lo intenta la siguiente)
     setTimeout(flashNext, f.lv ? 420 : 300);
   }
-  /* tanda 3: al empezar la ronda, cada amuleto cuya familia sale gasta una carga si sale a nivel 2 o mas (a nivel 1 actua gratis). Se paga una vez
-     por ronda, no por intento: la revancha no vuelve a cobrar. run.amuNow: lo que hizo en esta ronda (lo luce el aviso de contra con "-1") */
-  function amuSpend() {
-    const r = roundNo(); run.amu = run.amu || {}; run.amuPaid = run.amuPaid || {}; const paid = (run.amuPaid[r] = run.amuPaid[r] || []); run.amuNow = {};
-    perkList().filter(p => p.amulet).forEach(p => {
-      const hit = (run.chal || []).filter(c => A.CHAL[c.id] && A.CHAL[c.id].fam === p.amulet); if (!hit.length) return;
-      if (hit.some(c => (c.lv || 1) >= 2) && !paid.includes(p.id) && (run.amu[p.id] || 0) > 0) { run.amu[p.id]--; paid.push(p.id); run.amuNow[p.id] = "-1"; }
-    });
-  }
-  A.adv.amuLabel = id => (run && run.amuNow && run.amuNow[id] === "-1" ? "−1" : "");
-  /* al superar la ronda: el amuleto que gasto en ella su ultima carga se parte y deja libre el hueco */
-  function amuBreak() {
-    const paid = (run.amuPaid || {})[roundNo()] || [], out = perkList().filter(p => p.amulet && !((run.amu || {})[p.id] > 0) && paid.includes(p.id));
-    out.forEach(p => { run.perks.splice(run.perks.indexOf(p.id), 1); delete run.amu[p.id]; if (run.paid) delete run.paid[p.id]; });
-    return out;
-  }
+  /* amuletos fijos (0.2.5): sin cargas, actuan siempre que sale su familia. Contra un reto a nivel 3 solo lo suavizan: sus efectos a medias
+     (los multiplicadores a mitad de camino de 1, los tiempos de arreglo el doble, el resto a la mitad; los si/no se quedan). Es la lista que ven los retos */
+  const amuHit = p => (run.chal || []).filter(c => A.CHAL[c.id] && A.CHAL[c.id].fam === p.amulet);
+  const amuSoft = fx => { const o = {}; for (const k in fx) { const v = fx[k]; o[k] = typeof v !== "number" ? v : /Mul$|^darkR$/.test(k) ? (1 + v) / 2 : /Ms$|^hangAuto$/.test(k) ? v * 2 : v / 2; } return o; };
+  const amuPerks = () => perkList().map(p => (p.amulet && amuHit(p).some(c => (c.lv || 1) >= 3) ? { ...p, fx: amuSoft(p.fx) } : p));
+  /* el sello del amuleto en la ficha del reto que frena (en la barra, toda la ronda). Aparece con un golpe al empezar la ronda (A.adv.amuSlam) */
+  const amuOf = c => { const f = (A.CHAL[c.id] || {}).fam; return f ? perkList().find(p => p.amulet === f) : null; };
+  A.adv.amuSlam = id => {
+    run.amuSlam = roundNo() + ":" + (run.attempt || 0);
+    document.querySelectorAll(`#advBar .ch-amu[data-amu="${id}"]`).forEach((el, i) => { el.classList.remove("wait", "slam"); A.restyle(el); el.classList.add("slam"); setTimeout(() => A.sfx.sealPop(), 60 + i * 120); const ch = el.closest(".ch-chip"); if (ch && !matchMedia("(prefers-reduced-motion: reduce)").matches) ch.animate([{ transform: "none" }, { transform: "translateX(-4px) rotate(-2deg)" }, { transform: "translateX(3px) rotate(1deg)" }, { transform: "none" }], { duration: 300, delay: 220, easing: "steps(6, end)" }); });   // la ficha encaja el golpe
+  };
   /* premio en el veredicto (la barra esta oculta): suena una moneda por linea de reliquia al aparecer y tiembla una vez (1); lv 2 = premio medio */
   function relicPay(ids, lv = 1) {
     ids = ids.filter(Boolean); if (!ids.length) return;
@@ -1074,8 +1072,8 @@ window.AIQ = window.AIQ || {};
     const info = actInfo(run.act), silenced = (run.boss || []).includes("silence");
     bar.classList.remove("hidden");
     bar.innerHTML = `<div class="ab-top"><span class="ab-act" data-tf="abact">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins" data-tf="abcoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts" data-tf="abhearts">${hearts()}</span></div>
-      <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" data-id="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}${isAmu(id) ? pips((run.amu || {})[id] || 0, "ab-pips") : ""}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</span>`).join("")}</div>
-      ${(run.chal || []).length ? `<div class="ab-chal">${(A.chal.barList ? A.chal.barList(run.chal) : run.chal).map(c => A.chal.chip(run.calmOn && ((perkList().find(p => p.calm) || {}).calm || []).includes((A.CHAL[c.id] || {}).fam) ? { ...c, calm: true } : c, true)).join("")}</div>` : ""}
+      <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" data-id="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</span>`).join("")}</div>
+      ${(run.chal || []).length ? `<div class="ab-chal">${(A.chal.barList ? A.chal.barList(run.chal) : run.chal).map(c => { const am = amuOf(c), cc = am ? { ...c, amu: am.id, amuIco: am.ico, amuWait: run.qi === 0 && run.amuSlam !== roundNo() + ":" + (run.attempt || 0) } : c; return A.chal.chip(run.calmOn && ((perkList().find(p => p.calm) || {}).calm || []).includes((A.CHAL[c.id] || {}).fam) ? { ...cc, calm: true } : cc, true); }).join("")}</div>` : ""}
       ${A.jefes ? A.jefes.riseHtml() : ""}
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</span></div>` : ""}`;
     flashKeep(bar);
@@ -1119,8 +1117,6 @@ window.AIQ = window.AIQ || {};
       if (bet && bet.id === "final" && !bet.done) { bet.done = 1; if (first) { run.maxLives += 2; run.lives += 2; lines.push([A.tx(BETS.final.n), A.tx(BT.lives2), null, "bet"]); setTimeout(() => { A.sfx.jackpot(3); if (A.core.jpShake) A.core.jpShake(3); }, 1100); } }   // +2 provisiones para el modo infinito
       A.ach.emit("adv", { kind: "clear", tools: run.rTools, bulls: run.rBulls || 0 }); if (boss) { A.ach.emit("adv", { kind: "boss", lives: run.lives }); A.profile.get().adv.boss++; }
       A.sfx.stamp(); setTimeout(A.sfx.clear, 300);
-      const broke = amuBreak(); broke.forEach(p => lines.push([A.tx(p.n) + " · " + A.tx(AMU_BROKE), "", p.id, "broke"]));
-      if (broke.length) setTimeout(() => A.sfx.glass(), 900);
       const actDone = boss, winAct = actDone ? run.act + 1 : 0;
       if (actDone) { const flawless = run.livesLostAct === 0; A.ach.emit("adv", { kind: "act", act: winAct, flawless, asc: run.asc }); run.livesLostAct = 0; A.profile.get().adv.bestAct = Math.max(A.profile.get().adv.bestAct || 0, winAct); }
       A.profile.get().adv.bestRound = Math.max(A.profile.get().adv.bestRound, roundNo() + 1);
@@ -1199,7 +1195,7 @@ window.AIQ = window.AIQ || {};
   function offers(chest) {
     const rr = A.rng(`${run.seed}:shop:${roundNo()}:${run.attempt || 0}:${run.shopN}:${chest ? 1 : 0}`), R = A.RELICS, out = [];
     const legDone = !!(run.legAct && run.legAct[run.act]);                // tanda 12 (S11): una legendaria por acto, venga de donde venga
-    const bag = Object.keys(R).filter(id => (!owned(id) || R[id].amulet) && (chest ? !(R[id].r === 3 && legDone) : R[id].r < 3) && useful(id));   // un amuleto que ya llevas sale como recarga (+2 cargas)
+    const bag = Object.keys(R).filter(id => !owned(id) && (chest ? !(R[id].r === 3 && legDone) : R[id].r < 3) && useful(id));   // 0.2.5: los amuletos ya no tienen recarga: el tuyo no vuelve a salir
     const cur = chalFor(roundNo()).list, up = new Set(); cur.forEach(c => (A.CHAL[c.id].counters || []).forEach(id => up.add(id)));
     const reach = {}; bag.forEach(id => { if (ctrOf(id)) reach[id] = helpRounds(id).length; });
     const wt = id => { const r = R[id].r; return (chest ? [0, 50, 40, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1) * (reach[id] ? 0.7 + 0.3 * Math.min(4, reach[id]) : 1) * (R[id].amulet && run.act === 0 ? 0.5 : 1) * (R[id].ventaja && !perkList().some(p => p.ventaja) ? 2 : 1); };   // sin Ventaja, pesan el doble   // acto I: los amuletos pesan la mitad (que no llenen la mochila)
@@ -1366,7 +1362,7 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${s.vit ? " vit" : ""}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${s.vit ? A.tx(VIT_TAG) + " · " : ""}${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}${run.perks.length >= maxPerks() && !bought && !(p.amulet && owned(s.id)) && !(p.ventaja && perkList().some(q => q.ventaja && q.id !== s.id)) ? " · " + A.tx(SWAP_FOR) : ""}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
+      return `<div class="offer pc r${p.r}${s.vit ? " vit" : ""}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${s.vit ? A.tx(VIT_TAG) + " · " : ""}${p.amulet ? A.tx(AMU_TAG) : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}${run.perks.length >= maxPerks() && !bought && !(p.ventaja && perkList().some(q => q.ventaja && q.id !== s.id)) ? " · " + A.tx(SWAP_FOR) : ""}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
@@ -1390,7 +1386,7 @@ window.AIQ = window.AIQ || {};
   /* la reliquia en la mochila: carta pequena con el color de su rareza (la legendaria, con su marco de oro y su brillo).
      face: el dibujo como fondo y sin boton de vender (la que aparece al final de la secuencia: ninguna imagen nueva, que haria reajustar la pantalla) */
   const relicHtml = (id, face) => { const p = A.RELICS[id];
-    return `<div class="tr-card tr-relic r${p.r}${p.ventaja ? " vtg" : ""}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${p.amulet ? pips((run.amu || {})[id] || 0, "tr-pips") : ""}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</button>${face ? "" : id === "pact" && run.perks.length > baseSlots() ? `<button class="tr-sell off" type="button" disabled>${A.tx(PACT_FIRST)}</button>` : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
+    return `<div class="tr-card tr-relic r${p.r}${p.ventaja ? " vtg" : ""}${relicSel === id ? " sel" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button" ${A.kitTip("perk", id)}>${p.r === 3 ? GLINT : ""}${face || ic(id)}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</button>${face ? "" : id === "pact" && run.perks.length > baseSlots() ? `<button class="tr-sell off" type="button" disabled>${A.tx(PACT_FIRST)}</button>` : `<button class="tr-sell" type="button">${A.pick6(SELL)}<span>${CN()}${sellValue(id)}</span></button>`}</div>`; };
   function renderShop(chest) {
     legOn = 0; swapIx = null;                                            // mesa nueva: si la legendaria se estaba luciendo en la anterior, esa secuencia ya no sigue
     const slots = maxPerks(), info = actInfo(run.act), rc = rerollCost(), r = roundNo(), cf = chalFor(r);
@@ -1691,16 +1687,17 @@ window.AIQ = window.AIQ || {};
     if (s.k === "life") { const c = lifePrice(); if (run.lives >= run.maxLives) { A.sfx.deny(); shake(el); return; } if (run.coins < c) return noFunds(el); run.coins -= c; run.lives++; run.lifeBuys = (run.lifeBuys || 0) + 1; run.bought.push(i); A.sfx.buy(); persist(); return renderShop(chest); }
     if (s.k === "perk") {
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
-      const recharge = !!p.amulet && owned(s.id), swapV = p.ventaja ? perkList().find(q => q.ventaja && q.id !== s.id) : null;
-      if (!recharge && !swapV && run.perks.length >= maxPerks()) {                // tanda 9 (S10): mochila llena: eliges cual dejas y se cambia en un gesto
+      if (owned(s.id)) return;                                            // 0.2.5: un amuleto no se compra dos veces (tiendas guardadas de antes, con su recarga)
+      const swapV = p.ventaja ? perkList().find(q => q.ventaja && q.id !== s.id) : null;
+      if (!swapV && run.perks.length >= maxPerks()) {                // tanda 9 (S10): mochila llena: eliges cual dejas y se cambia en un gesto
         if (run.coins + Math.max(...run.perks.map(sellValue)) < c) return noFunds(el);
         swapIx = i; document.querySelectorAll("#dlg .tr-relic").forEach(x => x.classList.add("swap-pick")); document.querySelectorAll("#dlg .offer").forEach(x => x.classList.toggle("swap-src", x === el)); A.sfx.card(); flash(A.tx(SWAP_PICK)); return;
       }
       if (run.coins + (swapV ? sellValue(swapV.id) : 0) < c) return noFunds(el);
       if (swapV) { run.coins += sellValue(swapV.id); run.perks.splice(run.perks.indexOf(swapV.id), 1); if (run.paid) delete run.paid[swapV.id]; A.sfx.sell(); }   // la Ventaja vieja se vende
       if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);
-      run.coins -= c; run.amu = run.amu || {}; if (recharge) run.amu[s.id] += AMU_LV; else { run.perks.push(s.id); if (p.amulet) run.amu[s.id] = AMU_LV; }
-      run.paid = run.paid || {}; run.paidAt = run.paidAt || {}; run.paid[s.id] = (recharge ? run.paid[s.id] || 0 : 0) + c; run.paidAt[s.id] = run.shopKey;
+      run.coins -= c; run.perks.push(s.id);
+      run.paid = run.paid || {}; run.paidAt = run.paidAt || {}; run.paid[s.id] = c; run.paidAt[s.id] = run.shopKey;
       if (p.buy) p.buy(run); if (p.r === 3 && chest) run.legAch = 1;
       if (p.r === 3) (run.legAct = run.legAct || {})[run.act] = s.id;
       if (p.pact) setTimeout(() => { A.sfx.stamp(); if (A.core.jpShake) A.core.jpShake(2); A.dealer.enable(true); A.dealer.say(A.dealer.line("betDeal"), { mood: "sly", hold: 2400 }); }, 200);   // trato hecho: un hueco lacrado mas   // tanda 12: la legendaria de este acto   // Botin legendario: solo la del cofre del jefe. Se concede en la tienda (openShop): su aviso no tapa la secuencia
@@ -1812,7 +1809,7 @@ window.AIQ = window.AIQ || {};
   }
   A.adv.busy = () => legOn !== 0;                                        // la legendaria del cofre se esta luciendo (js/game.js: Esc no abre el menu)
   function sell(id, chest) { const k = run.perks.indexOf(id); if (k < 0 || (id === "pact" && run.perks.length > baseSlots())) return; const v = sellValue(id); if (id === "hoard" && run.hucha) { const t = run.hucha >= 20 ? 3 : run.hucha >= 10 ? 2 : 1; A.sfx.jackpot(t); if (A.core.jpShake) A.core.jpShake(t); run.hucha = 0; }   // se rompe: llueven monedas
-    run.perks.splice(k, 1); run.coins += v; if (run.amu) delete run.amu[id]; if (run.paid) delete run.paid[id]; if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
+    run.perks.splice(k, 1); run.coins += v; if (run.paid) delete run.paid[id]; if (A.RELICS[id].sell) A.RELICS[id].sell(run); A.sfx.sell(); persist(); renderShop(!!chest); }   // sell: lo que la reliquia dio al comprarla se va con ella (Corazon de explorador)
   function flash(t) { const n = document.querySelector("#dlg .tb-shop"); if (!n) return; n.querySelectorAll(".shop-flash").forEach(x => x.remove()); const m = document.createElement("p"); m.className = "shop-flash"; m.textContent = t; n.appendChild(m); setTimeout(() => m.remove(), 2200); }   // flotando sobre las cartas: no empuja nada
 
   /* ---------------- fin de la expedicion ---------------- */

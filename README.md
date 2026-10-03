@@ -4,6 +4,8 @@
 
 > **Versiones:** desde la 0.2.3 la version del juego sigue la numeracion de las notas del parche (0.2.N): cada entrega sube el ultimo numero y lleva su entrada en las notas. Antes (hasta la 0.79.1) cada entrega subia la version menor y terminaba en 1. Se cambia en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.2.5** - Amuletos fijos: fuera las cargas (ya no se gastan, no se parten ni hay recargas en el Campamento). Un amuleto actua mientras lo lleves cada vez que sale su familia de retos; contra un reto a nivel 3 solo lo suaviza (sus efectos a medias: multiplicadores a mitad de camino de 1, tiempos de arreglo el doble). Se luce en la partida: al empezar la ronda salta en la mochila y su sello cae con un golpe sobre la ficha del reto que frena, y la primera vez que cada amuleto le estropea un truco el crupier se queja nombrando los dos (frases `amuletOn`, esperan su turno). Nota en el parche v0.2.5.
+
 **v0.2.4** - Fallar en Rojo o negro tiene precio. Si pierdes la apuesta (un color equivocado o un cero que no apostaste), pierdes la cuota y la ronda trae un reto mas, sellado y a nivel 3 (con 5 retos ya no cabe; en la revancha va sin el). La banda lo dice ("Fallas · +1 reto"), la carta tambien, y la descripcion cambia en los 12 idiomas. Parche v0.2.4 en las notas del juego.
 
 **v0.2.3** - La version del juego pasa a numerarse como los parches (0.2.N) y cada entrega lleva su propia entrada en las notas del parche. Las compilaciones antiguas (0.50.1 a 0.79.1) quedan etiquetadas como "Compilaciones" en las notas, para que no choquen con los numeros de parche. Nace el parche v0.2.3 "Una version, una nota".
