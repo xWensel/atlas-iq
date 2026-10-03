@@ -330,10 +330,7 @@ html.reduce-motion .go2::after { animation: none; opacity: .6; }
 }
 @media (max-width: 700px) { .rd.plan { grid-template-columns: minmax(0, 1fr); } }
 
-/* tanda 3: amuletos en la mochila con sus cargas (marcas de oro, como las de las herramientas pero de su color) */
-.table.mesa .tr-relic .tr-face { position: relative; }
-.table.mesa .tr-relic .tr-pips { bottom: 4px; }
-.table.mesa .tr-relic .tr-pips i { background: #ffd95a; box-shadow: 0 0 0 1px #16241c, inset 0 -2px 0 #c46a1b; }
+.table.mesa .tr-relic .tr-face { position: relative; }   /* 0.2.21: fuera las marcas de cargas de los amuletos (no se gastan desde la 0.2.5) */
 /* tanda 4: la Ventaja de la mochila lleva un sello dorado (solo cabe una) */
 .table.mesa .tr-relic.vtg .tr-face::after { content: ""; position: absolute; top: 3px; right: 3px; width: 9px; height: 9px; border-radius: 50%; background: #ffd95a; box-shadow: 0 0 0 1px #16241c, inset -2px -2px 0 #c46a1b, inset 1px 1px 0 #fff6c8; pointer-events: none; }
 .nr-k .of-was { opacity: .6; margin-right: 3px; text-decoration-thickness: 2px; }

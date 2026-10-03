@@ -36,6 +36,22 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.21",
+      name: ["Vender, no cambiar", "Sell, don't swap"],
+      date: "2026-10-04",
+      summary: ["Con la mochila llena, para hacer sitio a una carta nueva se vende una reliquia: nada de cambiar.",
+        "With a full pack, you make room for a new card by selling a relic: no more swapping."],
+      chapters: [
+        { id: "vender", kicker: ["Campamento", "Camp"], title: ["Mochila llena", "Full pack"],
+          entries: [
+            E(["Vender para hacer sitio", "Sell to make room"], "change", "0.2.21", [
+              ["En el cofre del jefe y en el Campamento, con la mochila llena, la carta dice **vende una…**: eliges qué reliquia vendes, cobras lo que vale y la carta elegida entra en su hueco (gratis en el cofre).",
+                "In the boss chest and at the Camp, with a full pack, the card says **sell one…**: you pick which relic to sell, get what it's worth and the chosen card takes its slot (free in the chest)."],
+              ["Una Ventaja nueva dice **vende la otra**: la que llevabas se vende.", "A new Edge says **sells your other one**: the one you had gets sold."]
+            ]) ] },
+      ],
+    },
+    {
       id: "0.2.20",
       name: ["Las dianas mandan", "Rings rule"],
       date: "2026-10-03",

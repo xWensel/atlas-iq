@@ -302,10 +302,9 @@ window.AIQ = window.AIQ || {};
   const sellBase = id => { const p = A.RELICS[id], paid = run.paid && run.paid[id]; if (paid > 0 && run.paidAt && run.paidAt[id] === run.shopKey && id !== "spyhole") return paid; return Math.ceil((paid > 0 ? paid : price(p.cost)) / 2); };
   /* amuletos (tanda 3): las contras de antes. Desde la 0.2.5 son fijos (sin cargas): ver amuPerks */
   const AMU_TAG = L6("Amuleto|Amulet|Amulette|Amuleto|Amulett|Amuleto||护身符|부적|お守り|Амулет|Amulet");
-  const VTG_TAG = L6("Ventaja|Edge|Atout|Vantagem|Vorteil|Vantaggio||优势|어드밴티지|アドバンテージ|Преимущество|Atut"), VTG_SWAP = L6("cambiar por esta|swap for this one|échanger contre celle-ci|trocar por esta|dagegen tauschen|scambiala con questa||换成这张|이걸로 교체|これと交換|заменить на эту|zamień na tę");
+  const VTG_TAG = L6("Ventaja|Edge|Atout|Vantagem|Vorteil|Vantaggio||优势|어드밴티지|アドバンテージ|Преимущество|Atut"), VTG_SWAP = L6("vende la otra|sells your other one|vend l'autre|vende a outra|verkauft den anderen|vende l'altro||卖掉另一张|다른 하나는 판매|もう一枚は売る|продаёт другое|sprzedaje drugi");   // 0.2.21: nada de "cambiar": la vieja se vende
   const OTRA = L6("¡Otra!|Again!|Encore !|De novo!|Noch mal!|Ancora!||再来！|한 번 더!|もう一回！|Ещё!|Jeszcze!"), BEST5 = L6("5 mejores|best 5|5 meilleures|5 melhores|beste 5|5 migliori||取前5|상위 5개|上位5つ|5 лучших|5 najlepszych");
   const NULLED = L6("Anulado|Voided|Annulé|Anulado|Annulliert|Annullato||已作废|무효|無効|Отменён|Anulowany"), SAVED_BY = L6("te ha salvado|saved you|t'a sauvé|te salvou|hat dich gerettet|ti ha salvato||救了你|덕분에 살았어요|に救われた|спас тебя|cię uratował");
-  const pips = (n, cls) => `<span class="${cls}">${Array.from({ length: Math.max(0, n) }, () => "<i></i>").join("")}</span>`;
   const gain = n => Math.round(n * (sumFlag("coinX") || 1));
   const chestSkip = () => Math.round(2.5 * inflation());                // dejar el cofre del jefe sin abrir: 3 doblones al empezar el acto II, 4 al empezar el III (el Toque de Midas los duplica, como todo lo que ganas)
   /* retos de la ronda r tras aplicar perks (Llave maestra, Talisman, inmunidades); pl: otra mano de perks (la tienda valora cada reliquia sin contarla a ella) */
@@ -1380,8 +1379,8 @@ window.AIQ = window.AIQ || {};
   /* v0.35 (usuario): Campamento premium. La mochila son cartas pequenas con el color de su rareza: un clic levanta la reliquia y ensena
      "Vender" encima; el segundo clic, en ese boton, la vende (antes un solo clic la vendia sin preguntar). Tambien en el cofre del jefe.
      El boton de "estoy listo" lleva la ficha de la ronda que viene (la misma de su presentacion) y su tema. */
-  let swapIx = null;                                                    // carta que se va a cambiar por una de la mochila (tanda 9)
-  const SWAP_FOR = L6("cambiar por…|swap for…|échanger contre…|trocar por…|tauschen gegen…|scambia con…||换成…|교체하기…|入れ替える…|обменять на…|zamień na…"), SWAP_PICK = L6("Elige qué reliquia dejas.|Pick which relic to leave.|Choisis la relique que tu laisses.|Escolha qual relíquia deixar.|Wähl, welches Relikt du abgibst.|Scegli quale reliquia lasciare.||选一件要留下的遗物。|내려놓을 유물을 고르세요.|手放す遺物を選んで。|Выбери, какую реликвию оставить.|Wybierz, który relikt zostawić.");
+  let swapIx = null;                                                    // carta elegida con la mochila llena: falta decir que reliquia vendes (tanda 9; desde 0.2.21 se dice "vender", no "cambiar")
+  const SWAP_FOR = L6("vende una…|sell one…|vends-en une…|venda uma…|verkauf eins…|vendine una…||先卖一件…|하나 팔기…|ひとつ売って…|продай одну…|sprzedaj jeden…"), SWAP_PICK = L6("Elige qué reliquia vendes.|Pick which relic to sell.|Choisis la relique que tu vends.|Escolha qual relíquia vender.|Wähl, welches Relikt du verkaufst.|Scegli quale reliquia vendere.||选一件要卖掉的遗物。|팔 유물을 고르세요.|売る遺物を選んで。|Выбери, какую реликвию продать.|Wybierz, który relikt sprzedać.");
   /* vende la reliquia de la mochila y compra la carta elegida (si con lo que te dan te alcanza) */
   function swapFor(ix, id, chest) {
     const s = run.stock[ix]; swapIx = null; if (!s) return renderShop(chest); const c = chest ? 0 : cardCost(s);
@@ -1395,23 +1394,21 @@ window.AIQ = window.AIQ || {};
   const relicHtml = (id, face) => { const p = A.RELICS[id];
     return `<div class="tr-card tr-relic r${p.r}${p.ventaja ? " vtg" : ""}" data-relic="${id}"><button class="tr-face inv-perk" type="button">${p.r === 3 ? GLINT : ""}${face || ic(id)}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</button></div>`; };
   /* ---- la carta grande de lo que llevas (js/peek.js): al pasar el raton por la mochila o por la barra de la ronda se abre encima, para leerla
-     entera. En el Campamento lleva dentro lo que se puede hacer con ella: venderla, dejarla a cambio de la carta elegida, o el aviso del Pacto */
+     entera. En el Campamento lleva dentro lo que se puede hacer con ella: venderla (tambien para hacer sitio a la carta elegida) o el aviso del Pacto */
   const PK_IN = L6("dentro|inside|dedans|dentro|drin|dentro||在里面|들어 있음|入っている|внутри|w środku"), PK_USES = L6("{n} usos por ronda|{n} uses per round|{n} utilisations par manche|{n} usos por rodada|{n} Einsätze pro Runde|{n} usi per round||每回合 {n} 次|라운드당 {n}회|1ラウンド{n}回|{n} исп. за раунд|{n} użycia na rundę"),
-    PK_LEAVE = L6("Dejar esta|Leave this one|Laisser celle-ci|Deixar esta|Diese abgeben|Lascia questa||留下这件|이걸 내려놓기|これを手放す|Оставить эту|Zostaw ten"), PK_TOOL = L6("Herramienta|Tool|Outil|Ferramenta|Werkzeug|Strumento||工具|도구|道具|Инструмент|Narzędzie");
+    PK_TOOL = L6("Herramienta|Tool|Outil|Ferramenta|Werkzeug|Strumento||工具|도구|道具|Инструмент|Narzędzie");
   let shopChest = false;                                                // si la mochila que se ve es la del cofre del jefe (para vender desde la carta grande)
   const pkCard = (o, tag, meta, btn) => `<span class="pk-tag">${tag}</span><div class="pk-felt felt">${o.r === 3 ? `<span class="pk-gold"></span>` : ""}${ic(o.ico || o.id)}</div><b class="pk-n">${A.tx(o.n)}</b><p class="pk-d">${A.tx(o.d)}</p>${meta ? `<p class="pk-meta">${meta}</p>` : ""}${btn || ""}`;
   function peekRelic(id, camp) {
     const p = A.RELICS[id]; if (!p || !run) return null;
     const tag = p.amulet ? A.tx(AMU_TAG) : p.ventaja ? A.tx(VTG_TAG) : A.tx(R_NAMES[p.r]), meta = id === "hoard" && run.hucha ? `${CN()}<b>${run.hucha}</b> ${A.tx(PK_IN)}` : "";
     const pact = id === "pact" && run.perks.length > baseSlots(), mode = !camp ? "" : legOn ? "busy" : swapIx != null ? "swap" : pact ? "pact" : "sell";
-    const btn = mode === "sell" ? `<button class="pk-act sell" type="button"><span>${A.pick6(SELL)}</span><em>${CN()}+${sellValue(id)}</em></button>`
-      : mode === "swap" ? `<button class="pk-act swap" type="button"><span>${A.tx(PK_LEAVE)}</span><em>⇄</em></button>`
+    const btn = mode === "sell" || mode === "swap" ? `<button class="pk-act sell" type="button"><span>${A.pick6(SELL)}</span><em>${CN()}+${sellValue(id)}</em></button>`   // con la mochila llena tambien se vende: la carta elegida entra en su hueco
       : mode === "pact" ? `<button class="pk-act off" type="button" disabled><span>${A.tx(PACT_FIRST)}</span></button>` : "";
     return { key: `r:${id}:${mode}:${sellValue(id)}`, cls: `r${p.r}${p.amulet ? " amu" : ""}${btn ? " act" : ""}`, html: pkCard({ ...p, id }, tag, meta, btn),
       wire: (card, close) => { const b = card.querySelector(".pk-act:not(.off)"); if (!b) return;
         b.onclick = e => { e.stopPropagation(); if (card.classList.contains("pk-go")) return; card.classList.add("pk-go");
-          if (mode === "swap") { close(true); return swapFor(swapIx, id, shopChest); }
-          const go = () => { close(true); if (run.perks.includes(id)) sell(id, shopChest); };
+          const go = mode === "swap" ? () => { close(true); swapFor(swapIx, id, shopChest); } : () => { close(true); if (run.perks.includes(id)) sell(id, shopChest); };
           if (matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("reduce-motion")) go(); else { card.classList.add("pk-sold"); setTimeout(go, 230); } }; } };
   }
   A.peek.on(".table.mesa .tr-relic .tr-face", el => peekRelic(el.parentNode.dataset.relic, true));
@@ -1453,7 +1450,7 @@ window.AIQ = window.AIQ || {};
     Gold.mount($("dlg"));                                                // el brillo de oro de las legendarias (mesa y mochila)
     document.querySelectorAll(".offer").forEach((el, i) => { const btn = el.querySelector(".buy"); if (btn) btn.onclick = () => buy(el, chest); if (!chest) el.addEventListener("pointerenter", e => { if (e.pointerType === "mouse" && A.dealer.campHover) A.dealer.campHover(i); }); });
     /* la mochila: pasar el raton abre la carta grande (con su boton de vender); un clic la deja fija. Con una carta de la mesa esperando
-       cambio, el clic en la reliquia la deja a cambio de esa. Tambien en el cofre del jefe: con la mochila llena, vendes una y eliges gratis */
+       hueco, el clic en la reliquia la vende y entra esa. Tambien en el cofre del jefe: con la mochila llena, vendes una y eliges gratis */
     document.querySelectorAll("#dlg .tr-relic").forEach(c => { const id = c.dataset.relic;
       c.querySelector(".tr-face").onclick = e => { e.stopPropagation(); if (swapIx != null) { A.peek.close(true); return swapFor(swapIx, id, chest); } A.peek.toggle(e.currentTarget); }; });
     document.querySelectorAll("#dlg .tr-tool").forEach(c => (c.onclick = e => { e.stopPropagation(); A.peek.toggle(c); }));
@@ -1970,7 +1967,7 @@ window.AIQ = window.AIQ || {};
       const p = A.RELICS[s.id], c = chest ? 0 : cardCost(s);
       if (owned(s.id)) return;                                            // 0.2.5: un amuleto no se compra dos veces (tiendas guardadas de antes, con su recarga)
       const swapV = p.ventaja ? perkList().find(q => q.ventaja && q.id !== s.id) : null;
-      if (!swapV && run.perks.length >= maxPerks()) {                // tanda 9 (S10): mochila llena: eliges cual dejas y se cambia en un gesto
+      if (!swapV && run.perks.length >= maxPerks()) {                // tanda 9 (S10): mochila llena: eliges cual vendes y la carta entra en su hueco, en un gesto
         if (run.coins + Math.max(...run.perks.map(sellValue)) < c) return noFunds(el);
         swapIx = i; document.querySelectorAll("#dlg .tr-relic").forEach(x => x.classList.add("swap-pick")); document.querySelectorAll("#dlg .offer").forEach(x => x.classList.toggle("swap-src", x === el)); A.sfx.card(); flash(A.tx(SWAP_PICK)); return;
       }
