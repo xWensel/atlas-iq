@@ -36,6 +36,21 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.17",
+      name: ["Casino para todos", "Casino for everyone"],
+      date: "2026-10-03",
+      summary: ["El juego de casino del centro de la Barra sale en todos los Campamentos, también en tu primera partida.",
+        "The casino game in the middle of the Bar shows up at every Camp, your very first run included."],
+      chapters: [
+        { id: "casino", kicker: ["Campamento", "Camp"], title: ["La Barra", "The Bar"],
+          entries: [
+            E(["El casino, desde el primer Campamento", "Casino from the very first Camp"], "fix", "0.2.17", [
+            ["Rojo o negro, Moneda al aire y Ruleta de premios aparecían solo después de derrotar a tu primer jefe: quien empezaba de cero veía únicamente los suministros. Ahora el juego del centro sale en **todos** los Campamentos.", "Red or black, Coin flip and the Prize wheel only appeared after you beat your first boss: anyone starting from scratch saw only the supplies. Now the middle game shows up at **every** Camp."],
+            ["Las apuestas de los lados (Oferta de la casa, Doble o nada y Apuesta final) siguen esperando a tu primer jefe.", "The side bets (House offer, Double or nothing and Final bet) still wait for your first boss."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.16",
       name: ["Lluvia de chinchetas", "Pin rain"],
       date: "2026-10-03",
