@@ -354,3 +354,76 @@ html.soft-flash.no-shake #app.ch-glitch #map, html.soft-flash.no-shake #app.ch-g
 .ch-chip.ch-sub { animation: ch-sub-in .42s steps(4, end) both; box-shadow: inset 0 0 0 2px var(--cc), 0 3px 0 rgba(0, 0, 0, .35); }
 @keyframes ch-sub-in { 0% { transform: scaleY(.15); } 50% { transform: scaleY(1.12); } 100% { transform: none; } }
 html.reduce-motion .ch-chip.ch-sub { animation: none; }
+
+/* ====================================================================== tanda 14: retos nuevos de bandera y de placa */
+/* envoltorio de la bandera (los trozos, las tiras y el giro cuelgan de el) */
+.fl-wrap { position: relative; display: inline-block; line-height: 0; }
+.fl-stage { display: inline-block; transform-origin: 50% 50%; }
+.fl-stage .ask-flag { display: block; }
+
+/* Bandera de espaldas: el sello del giro, siempre a la vista (espejo, boca abajo o 90 grados) */
+.fb-seal { position: absolute; right: -17px; bottom: -17px; z-index: 4; width: 38px; height: 38px; display: grid; place-items: center; line-height: 1; border-radius: 50%; color: #2a1860; background: #f6e8c4; transform: rotate(-12deg); box-shadow: 0 0 0 2px #2a1860, inset 0 0 0 3px #f6e8c4, inset 0 0 0 4px #7d4fe0, 0 3px 0 rgba(0, 0, 0, .35); animation: fb-pop .42s steps(5, end) both; }
+.fb-seal svg { display: block; } .fb-seal b { font: 700 11px/1 var(--mono); letter-spacing: -.02em; }
+@keyframes fb-pop { 0% { transform: rotate(-32deg) scale(2.4); opacity: 0; } 55% { opacity: 1; } 100% { transform: rotate(-12deg) scale(1); } }
+.sa-flag { transition: transform .2s; }
+
+/* Bandera a trozos */
+.fz-board { position: relative; display: block; box-sizing: content-box; border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); background: #1b1030; }
+.fz-p { position: absolute; left: 0; top: 0; background-repeat: no-repeat; transition: transform .34s cubic-bezier(.3, 1.45, .5, 1); box-shadow: inset 0 0 0 1px rgba(20, 8, 40, .6); will-change: transform; }
+.fz-p.gr { filter: grayscale(1) brightness(.78) contrast(.92); }
+.fz-board.deal .fz-p { animation: fz-in .38s steps(6, end) var(--d, 0ms) both; }
+@keyframes fz-in { from { opacity: 0; scale: .35; } to { opacity: 1; scale: 1; } }
+.fz-board.gold .fz-p { box-shadow: inset 0 0 0 1px #ffd95a, 0 0 0 1px rgba(255, 217, 90, .3); }
+.fz-board.whole .fz-p, .fz-board.end .fz-p { box-shadow: none; }
+
+/* Bandera al viento: 8 tiras con su desfase (transform en pasos enteros, solo compositor) y pliegues que oscurecen */
+.fw-wrap::before { content: ""; position: absolute; left: -10px; top: -9px; bottom: -12px; width: 5px; border-radius: 2px; background: linear-gradient(90deg, #f2c46a, #c98f4a 60%, #8a5a3a); box-shadow: 0 0 0 1.5px var(--ink); }
+.fw-wrap::after { content: ""; position: absolute; left: -12px; top: -17px; width: 9px; height: 9px; border-radius: 50%; background: #ffd95a; box-shadow: 0 0 0 1.5px var(--ink), inset -2px -2px 0 #e0a21f; }
+.fw-board { position: relative; display: block; }
+.fw-s { position: absolute; top: 0; will-change: transform; animation: fw-wave var(--T, 1.8s) steps(var(--sn, 3)) calc(var(--i) * var(--ph, .25s) * -1) infinite; }
+.fw-s b { position: absolute; inset: 0; background-repeat: no-repeat; transform-origin: 0 50%; }
+.fw-s b { box-shadow: inset 0 2px 0 #1d0a3d, inset 0 -2px 0 #1d0a3d; } .fw-s:nth-child(1) b { box-shadow: inset 0 2px 0 #1d0a3d, inset 0 -2px 0 #1d0a3d, inset 2px 0 0 #1d0a3d; } .fw-s:nth-child(8) b { box-shadow: inset 0 2px 0 #1d0a3d, inset 0 -2px 0 #1d0a3d, inset -2px 0 0 #1d0a3d; }
+.fw-s::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(25, 8, 50, var(--sh, .2)), rgba(25, 8, 50, 0) 90%); animation: fw-shade var(--T, 1.8s) steps(4) calc(var(--i) * var(--ph, .25s) * -1) infinite; }
+@keyframes fw-wave { 0% { transform: translateY(0); } 25% { transform: translateY(calc(var(--a) * -1)); } 50% { transform: translateY(0); } 75% { transform: translateY(var(--a)); } 100% { transform: translateY(0); } }
+@keyframes fw-shade { 0%, 50%, 100% { opacity: .2; } 25% { opacity: 0; } 75% { opacity: 1; } }
+.fw-board.gust .fw-s:nth-child(n+5) b { animation: fw-furl 1.3s steps(7) calc((var(--i) - 4) * .07s) both; }
+@keyframes fw-furl { 0% { transform: scaleX(1); } 28%, 72% { transform: scaleX(.04); } 100% { transform: scaleX(1); } }
+.fw-clip { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
+.fw-ln { position: absolute; left: -90px; top: var(--y, 30%); width: var(--w, 90px); height: 2px; background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .75)); animation: fw-streak var(--t, 1.6s) steps(16) infinite; }
+@keyframes fw-streak { from { transform: translateX(0); } to { transform: translateX(380px); } }
+.fw-board.still .fw-s, .fw-board.still .fw-s::after, .fw-board.still .fw-s b, .fw-board.still .fw-ln { animation: none !important; }
+html.reduce-motion .fw-s, html.reduce-motion .fw-s::after, html.reduce-motion .fw-s b, html.reduce-motion .fw-ln, html.reduce-motion .fz-p, html.reduce-motion .fb-seal { animation: none !important; transition: none !important; }
+
+/* Pasaporte falso: el pais de debajo se estampa como en un pasaporte; al responder, el FALSO en rojo y el de verdad */
+#askSub.ch-pass { margin-top: 9px; }
+.ch-pass .fp-stamp, .fp-fake { display: inline-block; font-family: var(--mono); font-style: normal; font-weight: 700; font-size: .86em; letter-spacing: .1em; text-transform: uppercase; color: #2d3fa8; padding: .2em .8em .16em; border: 2px solid currentColor; border-radius: 4px; box-shadow: inset 0 0 0 2px #f7efd8, inset 0 0 0 3px currentColor; transform: rotate(-2.2deg); text-shadow: .5px 0 0 currentColor; }
+.ch-pass .fp-stamp { opacity: .94; animation: fp-slam .4s steps(5, end) both; }
+@keyframes fp-slam { 0% { transform: rotate(-10deg) scale(2.1); opacity: 0; } 55% { opacity: .95; } 100% { transform: rotate(-2.2deg) scale(1); } }
+.fp-fake { position: relative; opacity: .8; font-size: .74em; } .fp-fake s { text-decoration: none; }
+.fp-sello { position: absolute; left: -9%; right: -9%; top: 50%; margin-top: -.72em; padding: .08em .2em; text-align: center; font-size: 1.12em; letter-spacing: .16em; color: #d8283f; border: 2.5px solid #d8283f; border-radius: 4px; background: rgba(247, 239, 216, .72); transform: rotate(-7deg); box-shadow: 0 0 0 1.5px rgba(247, 239, 216, .8); animation: fp-slam2 .46s steps(6, end) both; text-shadow: none; }
+@keyframes fp-slam2 { 0% { transform: rotate(-24deg) scale(2.6); opacity: 0; } 50% { opacity: 1; } 100% { transform: rotate(-7deg) scale(1); } }
+.fp-arr { display: inline-block; width: .5em; height: .5em; margin: 0 .85em 0 .4em; border-top: 2.5px solid var(--ink-2); border-right: 2.5px solid var(--ink-2); transform: rotate(45deg); vertical-align: .08em; }
+.fp-real, .fp-ok { font-style: normal; font-weight: 700; color: #16793f; }
+html.reduce-motion .ch-pass .fp-stamp, html.reduce-motion .fp-sello { animation: none !important; }
+
+/* Panel de salidas: fichas de aeropuerto (mitad de arriba, mitad de abajo y las dos hojas que caen) */
+#askName.ch-board { display: flex; justify-content: center; }
+.sf-board { display: inline-flex; align-items: center; gap: calc(var(--sf) * .3); max-width: 100%; padding: calc(var(--sf) * .22) calc(var(--sf) * .34); border-radius: 7px; background: #120c22; box-shadow: inset 0 0 0 2px #3a2b66, inset 0 0 0 4px #0c0718, 0 3px 0 rgba(0, 0, 0, .4); }
+.sf-led { flex: none; width: calc(var(--sf) * .22); height: calc(var(--sf) * .22); border-radius: 50%; background: #ffb347; box-shadow: 0 0 0 1.5px #0c0718, 0 0 7px 1px rgba(255, 179, 71, .75); animation: sf-blink .5s steps(2, end) infinite; }
+.sf-led.ok { background: #5cf08c; box-shadow: 0 0 0 1.5px #0c0718, 0 0 8px 2px rgba(92, 240, 140, .8); animation: none; }
+@keyframes sf-blink { 50% { opacity: .25; } }
+.sf-in { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(var(--sf) * .18) calc(var(--sf) * .55); }
+.sf-w { display: inline-flex; white-space: nowrap; }
+.sf-t { position: relative; display: block; flex: none; width: calc(var(--sf) * .64); height: calc(var(--sf) * .98); margin: 0 1px; perspective: calc(var(--sf) * 6); font-family: var(--mono); font-weight: 700; font-style: normal; font-size: var(--sf); line-height: 1; }
+.sf-t > i { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; font-style: normal; backface-visibility: hidden; }
+.sf-t u { position: absolute; left: 0; right: 0; height: calc(var(--sf) * .98); line-height: calc(var(--sf) * .98); text-align: center; text-decoration: none; color: #fff1c2; font-size: calc(var(--sf) * .86); text-shadow: 0 0 .25em rgba(255, 241, 194, .25); }
+.sf-u, .sf-fu { top: 0; border-radius: 4px 4px 0 0; background: linear-gradient(#3b2d68, #2a1f4e); transform-origin: 50% 100%; }
+.sf-l, .sf-fl { bottom: 0; border-radius: 0 0 4px 4px; background: linear-gradient(#1f1640, #281d4a); transform-origin: 50% 0; }
+.sf-u u, .sf-fu u { top: 0; } .sf-l u, .sf-fl u { bottom: 0; }
+.sf-fl { transform: rotateX(90deg); } .sf-fu { z-index: 2; } .sf-fl { z-index: 3; }
+.sf-t::after { content: ""; position: absolute; left: -1px; right: -1px; top: calc(50% - 1px); height: 2px; background: #0c0718; z-index: 5; box-shadow: 0 1px 0 rgba(255, 255, 255, .06); }
+.sf-x { flex: none; align-self: center; margin: 0 2px; font: 700 calc(var(--sf) * .8)/1 var(--mono); color: #fff1c2; }
+.ch-covered .ch-redact { opacity: .9; }
+#askSub.sf-pop { animation: sf-pop .4s steps(5, end); }
+@keyframes sf-pop { 0% { transform: scale(1.35); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+html.reduce-motion .sf-led { animation: none; }

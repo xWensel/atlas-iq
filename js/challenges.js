@@ -37,6 +37,8 @@ window.AIQ = window.AIQ || {};
   def("riddle", "text", "ch_riddle", "Adivinanza|Riddle|Devinette|Adivinha|Rätsel|Indovinello||谜语|수수께끼|なぞなぞ|Загадка|Zagadka", "En vez del nombre, una pista con el nombre tapado.|A clue with the name blanked out replaces the name.|Un indice au nom masqué remplace le nom.|Uma pista com o nome tapado substitui o nome.|Statt des Namens ein Hinweis mit verdecktem Namen.|Al posto del nome, un indizio con il nome coperto.||名字被替换成一条遮住名字的线索。|이름 대신 이름이 가려진 단서가 나옵니다.|名前の代わりに、名前を伏せたヒントが表示される。|Вместо названия — подсказка, где название скрыто.|Zamiast nazwy pojawia się wskazówka z zakrytą nazwą.", ["almanac"]);
   def("babel", "text", "ch_babel", "Torre de Babel|Tower of Babel|Tour de Babel|Torre de Babel|Turmbau zu Babel|Torre di Babele||巴别塔|바벨탑|バベルの塔|Вавилонская башня|Wieża Babel", "El nombre aparece en otro idioma.|The name appears in another language.|Le nom apparaît dans une autre langue.|O nome aparece em outro idioma.|Der Name erscheint in einer anderen Sprache.|Il nome appare in un'altra lingua.||名字以另一种语言显示。|이름이 다른 언어로 나타납니다.|名前が別の言語で表示される。|Название появляется на другом языке.|Nazwa pojawia się w innym języku.", ["dictionary"]);
   def("nocountry", "text", "t_country", "Sin país|No country|Sans pays|Sem país|Ohne Land|Senza paese||没有国家|국가 없음|国なし|Без страны|Bez kraju", "El país del lugar desaparece: solo te queda el nombre.|The place's country disappears: only the name is left.|Le pays du lieu disparaît : il ne reste que le nom.|O país do lugar desaparece: só resta o nome.|Das Land des Ortes verschwindet: nur der Name bleibt.|Il paese del luogo sparisce: resta solo il nome.||地点所属的国家消失了：只剩下名字。|장소의 국가가 사라지고 이름만 남습니다.|場所の国が消え、名前だけが残る。|Страна места исчезает: остаётся только название.|Kraj miejsca znika: zostaje tylko nazwa.", ["atlasbook"]);
+  def("fakepass", "text", "ch_fakepass", "Pasaporte falso|Fake passport|Faux passeport|Passaporte falso|Gefälschter Pass|Passaporto falso||假护照|가짜 여권|偽造パスポート|Поддельный паспорт|Fałszywy paszport", "El país de debajo a veces miente: es un vecino.|The country below sometimes lies: it's a neighbor.|Le pays en dessous ment parfois : c'est un voisin.|O país de baixo às vezes mente: é um vizinho.|Das Land darunter lügt manchmal: Es ist ein Nachbar.|Il paese sotto a volte mente: è un vicino.||下面的国家有时会撒谎：其实是邻国。|아래의 국가가 가끔 거짓말을 합니다. 이웃 나라예요.|下の国名はときどき嘘をつく。隣の国だ。|Страна под названием иногда врёт: это сосед.|Kraj pod nazwą czasem kłamie: to sąsiad.", []);   // tanda 14: el pais de debajo a veces es un vecino
+  def("ticker", "text", "ch_ticker", "Panel de salidas|Departures board|Tableau des départs|Painel de partidas|Abflugtafel|Tabellone delle partenze||出发航班牌|출발 전광판|出発案内板|Табло вылетов|Tablica odlotów", "Las letras del nombre giran como en un aeropuerto hasta que se fijan.|The name's letters spin like an airport board until they lock in.|Les lettres du nom tournent comme dans un aéroport jusqu'à se figer.|As letras do nome giram como num aeroporto até se fixarem.|Die Buchstaben des Namens rattern wie auf einer Flughafentafel, bis sie einrasten.|Le lettere del nome girano come in un aeroporto finché non si fermano.||名字的字母像机场信息板一样翻动，直到定格。|이름의 글자가 공항 전광판처럼 돌아가다가 하나씩 멈춥니다.|名前の文字が空港の案内板のように回り、1つずつ止まる。|Буквы названия крутятся, как на табло в аэропорту, пока не встанут на место.|Litery nazwy obracają się jak na tablicy lotniska, aż się zatrzymają.", []);   // tanda 14: panel de salidas (sustituye a la Marquesina)
   /* --- mapa --- */
   def("blur", "map", "ch_blur", "Mapa borroso|Blurry map|Carte floue|Mapa desfocado|Verschwommene Karte|Mappa sfocata||模糊的地图|흐릿한 지도|ぼやけた地図|Размытая карта|Rozmyta mapa", "El mapa está desenfocado.|The map is out of focus.|La carte est floue.|O mapa está fora de foco.|Die Karte ist unscharf.|La mappa è sfocata.||地图失焦了。|지도의 초점이 맞지 않습니다.|地図のピントが合っていない。|Карта не в фокусе.|Mapa jest nieostra.", ["lens", "divingmask"]);
   def("dark", "map", "ch_dark", "Apagón|Blackout|Panne de courant|Apagão|Stromausfall|Blackout||停电|정전|停電|Отключение света|Awaria prądu", "El casino se queda a oscuras: solo ves cerca del puntero.|The casino goes dark: you only see near your pointer.|Le casino s'éteint : tu ne vois qu'autour du pointeur.|O cassino fica às escuras: só se vê perto do ponteiro.|Das Casino wird dunkel: du siehst nur um den Zeiger.|Il casinò si spegne: vedi solo vicino al puntatore.||赌场一片漆黑：你只能看到指针附近。|카지노가 어두워집니다: 포인터 주변만 보입니다.|カジノが暗くなる：ポインターの周りしか見えない。|В казино гаснет свет: видно только возле курсора.|W kasynie gaśnie światło: widzisz tylko wokół kursora.", ["miner"]);
@@ -83,20 +85,23 @@ window.AIQ = window.AIQ || {};
   def("flagblur", "flag", "ch_blur", "Bandera borrosa|Blurry flag|Drapeau flou|Bandeira desfocada|Unscharfe Flagge|Bandiera sfocata||模糊的国旗|흐릿한 국기|ぼやけた国旗|Размытый флаг|Rozmyta flaga", "La bandera está desenfocada.|The flag is out of focus.|Le drapeau est flou.|A bandeira está desfocada.|Die Flagge ist unscharf.|La bandiera è sfocata.||国旗失焦了。|국기의 초점이 맞지 않습니다.|国旗のピントが合っていない。|Флаг не в фокусе.|Flaga jest nieostra.", ["divingmask"]);
   def("flagdark", "flag", "ch_dark", "Bandera a oscuras|Flag in the dark|Drapeau dans le noir|Bandeira no escuro|Flagge im Dunkeln|Bandiera al buio||黑暗中的国旗|어둠 속의 국기|暗闇の国旗|Флаг в темноте|Flaga w ciemności", "La bandera casi no se distingue en la penumbra.|The flag is barely visible in the dim light.|Le drapeau se distingue à peine dans la pénombre.|A bandeira quase não se distingue na penumbra.|Die Flagge ist im Dämmerlicht kaum zu erkennen.|La bandiera si distingue a malapena nella penombra.||昏暗中几乎看不清国旗。|어두운 조명 속에서 국기가 거의 보이지 않습니다.|薄明かりの中で国旗がほとんど見えない。|В тусклом свете флаг едва виден.|W półmroku flagę ledwo widać.", ["miner"]);
   def("flaggray", "flag", "ch_flaggray", "Bandera desteñida|Faded flag|Drapeau délavé|Bandeira desbotada|Verblasste Flagge|Bandiera sbiadita||褪色的国旗|바랜 국기|色あせた国旗|Выцветший флаг|Wyblakła flaga", "La bandera pierde sus colores; a tope, en negativo.|The flag loses its colors; at full power, in negative.|Le drapeau perd ses couleurs ; à fond, en négatif.|A bandeira perde as cores; no máximo, em negativo.|Die Flagge verliert ihre Farben; voll aufgedreht als Negativ.|La bandiera perde i colori; al massimo, in negativo.||国旗失去了颜色；最高等级时变成负片。|국기가 색을 잃고, 최고 단계에선 네거티브가 됩니다.|国旗の色が抜ける。最高レベルではネガになる。|Флаг теряет цвета; на максимуме — негатив.|Flaga traci kolory; na maksa w negatywie.", ["lens"]);
+  def("flagback", "flag", "ch_flagback", "Bandera de espaldas|Flag from behind|Drapeau vu de dos|Bandeira de costas|Flagge von hinten|Bandiera di spalle||背面的旗帜|뒷면의 국기|裏返しの国旗|Флаг с изнанки|Flaga od tyłu", "La bandera se ve por detrás; un sello dice cómo está girada.|You see the flag from behind; a stamp tells how it's turned.|On voit le drapeau de dos ; un tampon dit comment il est tourné.|A bandeira aparece de trás; um selo diz como está girada.|Die Flagge ist von hinten zu sehen; ein Stempel zeigt, wie sie gedreht ist.|La bandiera si vede da dietro; un timbro dice come è girata.||旗帜是从背面看的；印章会告诉你它是怎么转的。|국기를 뒤에서 본 모습이에요. 도장이 어떻게 돌았는지 알려줍니다.|国旗を裏から見ている。スタンプが向きを教えてくれる。|Флаг виден с обратной стороны; печать показывает, как он повёрнут.|Flaga widoczna od tyłu; pieczątka mówi, jak jest obrócona.", []);   // tanda 14
+  def("flagpuzzle", "flag", "ch_flagpuzzle", "Bandera a trozos|Flag puzzle|Drapeau en puzzle|Bandeira em pedaços|Flaggen-Puzzle|Bandiera a pezzi||拼图国旗|조각난 국기|バラバラの国旗|Флаг-пазл|Flaga w kawałkach", "La bandera está troceada y desordenada. Cada 3 s, un trozo vuelve a su sitio.|The flag is cut up and shuffled. Every 3 s, a piece goes back.|Le drapeau est découpé et mélangé. Toutes les 3 s, un morceau revient.|A bandeira está cortada e embaralhada. A cada 3 s, um pedaço volta ao lugar.|Die Flagge ist zerschnitten und vertauscht. Alle 3 s kehrt ein Teil zurück.|La bandiera è tagliata e mescolata. Ogni 3 s un pezzo torna al suo posto.||旗帜被切开并打乱。每 3 秒，一块会回到原位。|국기가 조각나 섞여 있어요. 3초마다 한 조각이 제자리로 돌아옵니다.|国旗がバラバラに切られて混ざっている。3秒ごとに1枚が元の位置に戻る。|Флаг разрезан и перемешан. Каждые 3 с один кусочек встаёт на место.|Flaga jest pocięta i pomieszana. Co 3 s jeden kawałek wraca na miejsce.", []);
+  def("flagwind", "flag", "ch_flagwind", "Bandera al viento|Flag in the wind|Drapeau au vent|Bandeira ao vento|Flagge im Wind|Bandiera al vento||迎风的旗帜|바람에 날리는 국기|風になびく国旗|Флаг на ветру|Flaga na wietrze", "La bandera ondea con el viento y los pliegues la esconden a ratos.|The flag flaps in the wind, and its folds hide parts of it.|Le drapeau flotte au vent et ses plis en cachent des parties.|A bandeira ondula ao vento e as dobras escondem partes dela.|Die Flagge flattert im Wind, und Falten verdecken Teile.|La bandiera sventola al vento e le pieghe ne nascondono delle parti.||旗帜在风中飘动，褶皱会遮住一部分。|국기가 바람에 펄럭이며 주름이 일부를 가립니다.|国旗が風にはためき、しわが一部を隠す。|Флаг развевается на ветру, а складки скрывают его части.|Flaga powiewa na wietrze, a fałdy zasłaniają jej części.", []);
   A.CHAL = D;
   /* tanda 3: FAMILIAS de sensacion (lo que contesta un amuleto). Lo que estorba se conjura: LETRAS, LUZ, VISTA, SITIO, PUNTERO y PANTALLA tienen
      un amuleto cada una. Lo que miente o calla se vence sabiendo (SABER, MENTIRAS), la tormenta se sufre (TORMENTA) y las reglas de la casa se
      sobornan o se aguantan (REGLAS). counters (tienda, intro y aviso de contra) sale de aqui, y desde la tanda 6b tambien el sorteo (famOf) */
   const FAMC = {
-    shaky: "letras", missing: "letras", anagram: "letras", runes: "letras", mirror: "letras", memory: "letras",
-    riddle: "saber", nocountry: "saber", babel: "saber",
+    shaky: "letras", missing: "letras", anagram: "letras", runes: "letras", mirror: "letras", memory: "letras", flagpuzzle: "letras",
+    riddle: "saber", nocountry: "saber", babel: "saber", ticker: "saber",
     dark: "luz", battery: "luz", flagdark: "luz",
     flicker: "tormenta", lightning: "tormenta",
-    blur: "vista", myopia: "vista", mosaic: "vista", clouds: "vista", rain: "vista", flagblur: "vista",
-    spread: "sitio", tilt: "sitio", flip: "sitio", spin: "sitio", quake: "sitio",
+    blur: "vista", myopia: "vista", mosaic: "vista", clouds: "vista", rain: "vista", flagblur: "vista", flagwind: "vista",
+    spread: "sitio", tilt: "sitio", flip: "sitio", spin: "sitio", quake: "sitio", flagback: "sitio",
     tremble: "puntero", ghost: "puntero", lag: "puntero", cmirror: "puntero",
     crack: "pantalla", hang: "pantalla",
-    wrongborders: "mentiras", noborders: "mentiras", decoys: "mentiras", flaghue: "mentiras", flaggray: "mentiras",
+    wrongborders: "mentiras", noborders: "mentiras", decoys: "mentiras", flaghue: "mentiras", flaggray: "mentiras", fakepass: "mentiras",
     wind: "reglas", storm: "reglas", silence: "reglas",
   };
   const AMULET = { letras: "dictionary", luz: "miner", vista: "divingmask", sitio: "plates", puntero: "steadyhand", pantalla: "protector" };
@@ -141,7 +146,7 @@ window.AIQ = window.AIQ || {};
   const NOLATIN = () => /^(zh|ja|ko)/.test(A.lang || "");                     // runas y sin vocales no tienen sentido con nombres en chino, japones o coreano
   /* tanda 6b: la LISTA SUAVE de R1-R3 (a nivel 1): estorban sin desorientar. Fuera: Controles invertidos, Mundo del reves, las reglas, lo que
      calla la placa y el Apagon (que solo sale una vez, en R5, R6, R9, R10 u R11). En la ronda de banderas, un reto de bandera */
-  const SOFT = ["shaky", "missing", "noborders", "flicker", "decoys", "blur", "clouds", "rain", "spread", "lag", "crack", "flaghue", "flagblur", "flagdark", "flaggray"];
+  const SOFT = ["shaky", "missing", "noborders", "flicker", "decoys", "blur", "clouds", "rain", "spread", "lag", "crack", "flaghue", "flagblur", "flagdark", "flaggray", "flagback", "flagpuzzle", "flagwind", "ticker"];
   /* retos por ronda fuera de los jefes en A0 (27 por expedicion con los de los jefes: R4 2, R8 3, R12 3). R1 sin reto en tu primera expedicion */
   const COUNT = [1, 1, 1, 0, 2, 2, 3, 0, 3, 3, 3, 0];
   /* parejas que no se juntan en una ronda: las ventanas de No responde y la Bateria baja te hacen perder el nombre de Memoria de pez sin culpa tuya */
@@ -189,7 +194,7 @@ window.AIQ = window.AIQ || {};
        si el sorteo cae en uno, se sortea otro. Lo que ya salia bien no cambia (partidas guardadas y sobornos intactos). v0.52: tambien en los jefes
        y en el poder extra de la Ascension 4. Babel donde el nombre no cambia se resuelve pregunta a pregunta (ver babelAlt) */
     const useless = id => (flagRound && !!D[id] && D[id].kind === "text") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle");
-    const noop = id => useless(id) || (cjk && (id === "runes" || id === "novowels"));
+    const noop = id => useless(id) || (cjk && (id === "runes" || id === "novowels" || id === "ticker")) || ((topic === "country" || topic === "clue") && id === "fakepass") || (topic === "clue" && id === "ticker") || (id === "fakepass" && asc >= 5 && act >= 2);
     if (boss) {
       /* v0.7.1: el jefe de una ronda de banderas (la 8 de la Aventura) ya no es siempre de banderas: la semilla sortea entre los de banderas y los
          del acto que sirven en esa ronda (sin trucos de texto: la bandera manda), cada combinacion con la misma probabilidad. Los jefes que no
@@ -203,7 +208,7 @@ window.AIQ = window.AIQ || {};
           const pool = [...TEXT, ...MAPD, ...PTR, ...FLAG].filter(id => id !== "dark" && !noop(id) && !fs.has(famOf(id)) && !clashes(id, ids) && (D[id].kind === "flag" ? flagRound && !flagIn : true) && !(D[id].kind === "text" && (flagRound || txt)));
           if (pool.length) list.push({ id: draw(A.rng(`${seed}:boss3:${act}`), pool, ctx.H), lv });
         }
-        if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
+        if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]).filter(id => !noop(id)); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
       if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia (ni el Apagon ni una pareja que choque)
         const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids);
         if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv }); }
@@ -308,6 +313,12 @@ window.AIQ = window.AIQ || {};
     case "smudge": return { n: Math.max(1, Math.round([2, 3, 5][i] * h)), px: [3, 4.5, 6][i] * fx.glassBlurMul * h };
     case "hang": return { n: Math.max(1, Math.round([1, 2, 3][i] * h)) };
     case "battery": return { dim: Math.min(0.85, [0.55, 0.68, 0.8][i] * h * fx.batteryMul) };   // el Foco la deja casi en nada
+    /* tanda 14 */
+    case "ticker": return { gap: [100, 150, 215][i], cap: [2300, 3300, 5200][i], lead: [450, 650, 900][i], cover: i >= 1, rnd: i >= 2, churn: i >= 2 };   // ms entre una letra y la siguiente; el pais tapado hasta que acaba; a tope: en desorden y se sueltan
+    case "fakepass": return { n: i + 1 };
+    case "flagpuzzle": return { cols: [2, 3, 4][i], rows: [2, 2, 3][i], pair: i === 0, gray: i === 2 ? 2 : 0 };
+    case "flagwind": return { amp: [3, 5, 7][i], T: [1.9, 1.3, 1.1][i], sh: [0.2, 0.55, 0.62][i], gust: i === 2 };
+    case "flagback": return {};
     default: return {};
   } };
   const cur = () => S.qlist || S.list;                                  // los retos de ESTA pregunta (la ronda, con el suplente de Babel si toca)
@@ -460,7 +471,7 @@ window.AIQ = window.AIQ || {};
   function decorate(o) {
     const el = $("askName"), sub = $("askSub"); if (!el || !o) return; clearText();
     const hadSub = !!S.qsub; S.qsub = null; S.qlist = null;
-    if (o.t === "c" && A.adv && A.adv.isFlagRound && A.adv.isFlagRound()) { if (sub) sub.textContent = ""; if (A.adv.renderFlag) A.adv.renderFlag(o); flagClass(el); if (hadSub) syncChips(); return; }   // ronda de banderas: la bandera manda, nunca el texto
+    if (o.t === "c" && A.adv && A.adv.isFlagRound && A.adv.isFlagRound()) { if (sub) sub.textContent = ""; if (A.adv.renderFlag) A.adv.renderFlag(o); flagClass(el, o); if (hadSub) syncChips(); return; }   // ronda de banderas: la bandera manda, nunca el texto
     const nameTxt = A.tx(o.name), subTxt = A.tx(o.sub);
     let alt = null;                                                   // Torre de Babel: los dos textos salen en el mismo otro idioma
     if (!S.suspended && S.list.some(c => c.id === "babel") && !S.fx.noBabel) { alt = babelAlt(o, `${S.seed}:t:${S.q}:${nameTxt}`); if (!alt) babelSwap(o); }
@@ -472,6 +483,8 @@ window.AIQ = window.AIQ || {};
       if (has("nocountry") && subTxt && !o.clue) { sub.innerHTML = '<span class="ch-redact">▮▮▮▮▮▮</span>'; sub.classList.add("ch-nocountry"); }
       else if (subTxt) deco(sub, o, o.sub, alt, true); else sub.textContent = "";
     }
+    if (has("ticker") && !has("riddle")) boardStart(el, sub, o, alt && o.name[alt] ? o.name[alt] : nameTxt, get("ticker"));   // tanda 14
+    if (has("fakepass")) passStart(sub, o);
   }
   function deco(el, o, obj, alt, isSub) {
     const fx = S.fx;
@@ -535,7 +548,7 @@ window.AIQ = window.AIQ || {};
   /* adivinanza: la pista se encoge hasta caber en la placa (antes una nota larga se salia por debajo del crupier), tambien a lo ancho */
   const HZ = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/, HZ_CLOSE = /[、。，．！？：；）」』】〕〉》”’ー・…％ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/, HZ_OPEN = /[（「『【〔〈《“‘]/;
   const fitRiddle = el => requestAnimationFrame(() => { if (!el.classList.contains("ch-riddle")) return; let f = parseFloat(getComputedStyle(el).fontSize) || 16, n = 0; const max = Math.max(96, innerHeight * 0.22); while ((el.scrollHeight > max || el.scrollWidth > el.clientWidth + 2) && f > 11 && n++ < 18) { f -= 1; el.style.fontSize = f + "px"; } });
-  function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.style.fontSize = ""; if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-crazy", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed"); } }
+  function clearText() { for (const id of ["askName", "askSub"]) { const el = $(id); if (el) el.style.fontSize = ""; if (el) el.classList.remove("ch-shaky", "ch-mirror", "ch-upside", "ch-fade", "ch-dim", "ch-dance", "ch-crazy", "ch-riddle", "ch-long", "ch-scroll", "ch-nocountry", "fixed", "ch-board", "ch-pass", "ch-covered", "sf-pop"); } S.fb = S.fz = S.fw = S.fp = null; boardStop(); }
 
   /* ------------------------------------------------------------------ mapa: deformaciones */
   /* la colocacion de continentes (19-76 ms de calculo) sale igual en todas las preguntas de la ronda (misma semilla, mismo reto): se calcula una vez
@@ -686,6 +699,183 @@ window.AIQ = window.AIQ || {};
     return Object.keys(m).length ? m : null;
   };
 
+  /* ================================================================== tanda 14: retos nuevos de bandera y de placa
+     Bandera de espaldas (flagback: espejo, boca abajo o girada, con su sello), Bandera a trozos (flagpuzzle: un puzle que se va recomponiendo),
+     Bandera al viento (flagwind: tiras que ondean, solo transform) | Pasaporte falso (fakepass: a veces el pais de debajo es un vecino) y
+     Panel de salidas (ticker: fichas de aeropuerto que giran y se van fijando en las letras del nombre). Todo cuelga de decorate() / flagClass()
+     y se apaga en reveal() (el sello FALSO, la bandera que se endereza, el puzle que se cierra, el panel que acaba de repente) */
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  const calmMo = () => document.documentElement.classList.contains("reduce-motion") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const FP_FALSE = L6("FALSO|FAKE|FAUX|FALSO|FALSCH|FALSO||假|가짜|偽|ЛОЖЬ|FAŁSZ");
+  /* --- banderas simetricas (medido sobre las 199 del juego: menos del 5 % de pixeles distintos al girarlas): si lo son, el giro no se ve y se usa el siguiente */
+  const FB_SYM = { m: new Set(["Albania","Antigua and Barbuda","Argentina","Armenia","Austria","Azerbaijan","Barbados","Belize","Bolivia","Botswana","Brazil","Bulgaria","Burkina Faso","Burundi","Cape Verde","Cambodia","Canada","Central African Republic","Colombia","Costa Rica","Croatia","Ecuador","Estonia","Egypt","El Salvador","Ethiopia","Gabon","The Gambia","Georgia","Ghana","Germany","Grenada","Guatemala","Haiti","Honduras","Hungary","India","Indonesia","Iran","Iraq","Israel","Jamaica","Japan","Kenya","Kiribati","Kosovo","Kyrgyzstan","Laos","Latvia","Lesotho","Libya","Lithuania","Luxembourg","North Macedonia","Malawi","Maldives","Mauritania","Mauritius","Federated States of Micronesia","Monaco","Montenegro","Morocco","Myanmar","Netherlands","Nicaragua","Niger","Nigeria","Paraguay","Peru","Poland","Russia","Saint Lucia","San Marino","Sierra Leone","Somalia","South Korea","Suriname","Switzerland","Syria","Tajikistan","Thailand","Uganda","Ukraine","Uzbekistan","Venezuela","Vietnam","Yemen","Curaçao","Aruba"]), f: new Set(["Algeria","Argentina","Austria","The Bahamas","Bahrain","Bangladesh","Belgium","Botswana","Brazil","Burundi","Cameroon","Chad","Costa Rica","Cuba","Ivory Coast","Denmark","El Salvador","Finland","France","Georgia","Grenada","Guatemala","Guinea","Guyana","Honduras","Iceland","Republic of Ireland","Israel","Italy","Jamaica","Japan","Kyrgyzstan","Laos","Latvia","North Macedonia","Maldives","Mali","Malta","Federated States of Micronesia","Nicaragua","Nigeria","North Korea","Norway","Palau","Peru","Portugal","Qatar","Romania","Senegal","Somalia","Suriname","Sweden","Switzerland","São Tomé and Príncipe","Thailand","Timor-Leste","Tunisia","Turkey","Zimbabwe"]), r: new Set(["Switzerland"]) };
+  const FB_ORDER = [["m", "f", "r"], ["f", "r", "m"], ["r", "m", "f"]];             // nivel 1: espejo (↔) / nivel 2: boca abajo (↕) / nivel 3: girada 90 grados
+  const fbKind = (name, lv) => { const o = FB_ORDER[clamp(lv || 1, 1, 3) - 1]; return o.find(k => !FB_SYM[k].has(name)) || o[0]; };
+  const FB_BITS = { m: ["...#.....#...", "..##.....##..", ".###.....###.", "#############", ".###.....###.", "..##.....##..", "...#.....#..."] };
+  FB_BITS.f = FB_BITS.m[0].split("").map((_, x) => FB_BITS.m.map(r => r[x]).join(""));
+  const bitsSvg = rows => { let d = ""; rows.forEach((r, y) => { let x = 0; while (x < r.length) { if (r[x] !== "#") { x++; continue; } let e = x; while (e < r.length && r[e] === "#") e++; d += `M${x} ${y}h${e - x}v1h-${e - x}z`; x = e; } }); return `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" width="${rows[0].length * 2}" height="${rows.length * 2}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg>`; };
+  const sealHtml = k => `<span class="fb-seal fb-seal-${k}">${k === "r" ? "<b>90°</b>" : bitsSvg(FB_BITS[k])}</span>`;
+  /* la bandera tal como la pinta .ask-flag (max 220 x 140 px y 60 vw, con su proporcion): los trozos y las tiras se montan sobre esa caja */
+  function flagBox(o) {
+    const rec = A.FLAGS && o.name && A.FLAGS[o.name.en], r0 = rec ? rec[1] / rec[2] : 1.5, W0 = Math.min(Math.min(220, 0.6 * innerWidth), 140 * r0);
+    return { r: r0, W: W0, H: W0 / r0, src: `assets/flags/${A.mediaKey(o.name.en)}.svg` };
+  }
+  function flagWrap(el, o) {
+    const img = el.querySelector(".ask-flag"); if (!img) return null; const bx = flagBox(o); img.style.width = Math.round(bx.W) + "px"; img.style.height = Math.round(bx.H) + "px";   // el SVG no trae tamano propio: sin esto se encoge a 4 px dentro del envoltorio
+    const wrap = document.createElement("span"), stage = document.createElement("span"); wrap.className = "fl-wrap"; stage.className = "fl-stage";
+    img.replaceWith(wrap); wrap.appendChild(stage); stage.appendChild(img);
+    if (img.style.filter) stage.style.filter = img.style.filter;                    // por si la bandera trae ademas un filtro de color
+    return { wrap, stage, img };
+  }
+  /* ------------------------------------------------------------------ Bandera de espaldas */
+  function flagBack(F, c, o) {
+    if (S.fx.unmirrorMap) return;                                                  // el Ancla: la bandera sale derecha
+    const k = fbKind(o.name.en, c.lv), b = flagBox(o), kr = Math.min(1, 138 / b.W).toFixed(3);
+    const T = { m: "perspective(700px) rotateY(180deg)", f: "perspective(700px) rotateX(180deg)", r: `rotate(90deg) scale(${kr})` };
+    F.stage.style.transform = T[k]; F.stage.dataset.fb = k; S.fb = { stage: F.stage, wrap: F.wrap, k };
+    if (calmMo() || !F.stage.animate) { F.wrap.insertAdjacentHTML("beforeend", sealHtml(k)); return; }
+    /* se entra girando desde de canto (nunca se ve la bandera de frente) y se posa con un rebote */
+    const from = { m: "perspective(700px) rotateY(90deg)", f: "perspective(700px) rotateX(90deg)", r: "rotate(450deg) scale(0)" }[k], over = { m: "perspective(700px) rotateY(194deg)", f: "perspective(700px) rotateX(194deg)", r: `rotate(80deg) scale(${(kr * 1.04).toFixed(3)})` }[k];
+    F.stage.animate([{ transform: from, opacity: 0.2 }, { transform: over, opacity: 1, offset: 0.72 }, { transform: T[k], opacity: 1 }], { duration: 780, easing: "cubic-bezier(.25,.8,.3,1)" });
+    say("flagFlip", k); later(() => { if (!S.fb || S.fb.stage !== F.stage) return; F.wrap.insertAdjacentHTML("beforeend", sealHtml(k)); say("sealPop"); }, 600);
+  }
+  /* al responder la bandera se endereza (y el sello se va) */
+  function fbReveal() {
+    const f = S.fb; S.fb = null; if (!f || !f.stage.isConnected) return;
+    const s = f.wrap.querySelector(".fb-seal"); if (s) s.remove();
+    if (calmMo() || !f.stage.animate) { f.stage.style.transform = ""; return; }
+    const id = { m: "perspective(700px) rotateY(0deg)", f: "perspective(700px) rotateX(0deg)", r: "rotate(0deg) scale(1)" }[f.k], from = f.stage.style.transform;
+    f.stage.style.transform = id; f.stage.animate([{ transform: from }, { transform: id }], { duration: 480, easing: "cubic-bezier(.3,1.35,.5,1)" }); say("flagFlip", f.k);
+  }
+  /* Dividir: la bandera pequena de la otra carta, con el mismo giro (sin animacion) */
+  A.chal.flagAlt = (img, q) => { if (!img || !S.on || S.suspended || S.fx.unmirrorMap) return; const c = get("flagback"); if (!c || !q || !q.name) return; const k = fbKind(q.name.en, c.lv); img.style.transform = { m: "scaleX(-1)", f: "scaleY(-1)", r: "rotate(90deg) scale(.62)" }[k]; };
+  /* ------------------------------------------------------------------ Bandera a trozos */
+  function flagPuzzle(F, c, o) {
+    const p = par(c), b = flagBox(o), cols = p.cols, rows = p.rows, N = cols * rows, pw = Math.max(8, Math.floor(b.W / cols)), ph = Math.max(8, Math.floor(b.H / rows)), W = pw * cols, H = ph * rows;
+    const rr = A.rng(`${S.seed}:fz:${S.round}:${S.q}:${o.name.en}`);
+    let pos = Array.from({ length: N }, (_, i) => i);                                // pos[pieza] = casilla en la que esta (la suya es la i)
+    if (p.pair) { const a = Math.floor(rr() * N); let d = Math.floor(rr() * (N - 1)); if (d >= a) d++; [pos[a], pos[d]] = [pos[d], pos[a]]; }
+    else { for (let t = 0; t < 60; t++) { pos = rr.shuffle(pos); if (pos.every((s, i) => s !== i)) break; } if (pos.some((s, i) => s === i)) pos = pos.map((s, i) => (i + 1) % N); }
+    const gray = new Set(p.gray ? rr.shuffle(pos.map((_, i) => i)).slice(0, p.gray) : []), at = i => `translate(${(pos[i] % cols) * pw}px,${Math.floor(pos[i] / cols) * ph}px)`;
+    const bg = `background-image:url(${b.src});background-size:${W}px ${H}px;`;
+    F.stage.innerHTML = `<span class="fz-board${S.fx.unswapMs ? " gold" : ""}" style="width:${W}px;height:${H}px">${pos.map((_, i) => `<i class="fz-p${gray.has(i) ? " gr" : ""}" style="width:${pw}px;height:${ph}px;${bg}background-position:${-(i % cols) * pw}px ${-Math.floor(i / cols) * ph}px;transform:${at(i)};--d:${Math.floor(rr() * 260)}ms"></i>`).join("")}</span>`;
+    const board = F.stage.firstChild, els = [...board.children];
+    S.fz = { board, els, pos, cols, pw, ph, N, at, rr, gray, done: false, every: S.fx.unswapMs ? 1000 : 3000 };
+    say("puzzleDeal"); if (!calmMo()) board.classList.add("deal");
+    const z = S.fz; later(function tick() { if (S.fz !== z || z.done) return; if (!phaseOk()) return later(tick, 300); fzReturn(); if (!z.done) later(tick, z.every); }, z.every);
+  }
+  function fzPlace(z, i) { z.els[i].style.transform = z.at(i); }
+  function fzReturn() {
+    const z = S.fz; if (!z || z.done) return; const dis = z.pos.map((s, i) => (s !== i ? i : -1)).filter(i => i >= 0);
+    if (!dis.length) { z.done = true; return; }
+    const i = dis[Math.floor(z.rr() * dis.length)], occ = z.pos.indexOf(i), old = z.pos[i]; z.pos[i] = i; z.pos[occ] = old;
+    z.els[i].classList.remove("gr"); fzPlace(z, i); fzPlace(z, occ);
+    for (const j of [i, occ]) if (z.els[j].animate && !calmMo()) z.els[j].animate([{ filter: "brightness(1.9)" }, { filter: "brightness(1)" }], { duration: 380, easing: "ease-out" });
+    say("puzzleSnap", dis.length); if (z.pos.every((s, k) => s === k)) { z.done = true; z.board.classList.add("whole"); }
+  }
+  function fzSolve() {
+    const z = S.fz; if (!z || !z.board.isConnected) return; z.done = true; z.board.classList.add("whole", "end");
+    for (let i = 0; i < z.pos.length; i++) z.pos[i] = i; z.els.forEach((e, i) => { e.classList.remove("gr"); fzPlace(z, i); });
+  }
+  /* ------------------------------------------------------------------ Bandera al viento: 8 tiras, cada una con su desfase; solo transform y opacity (compositor) */
+  function flagWind(F, c, o) {
+    const p = par(c), calm = S.fx.blurMul < 0.5, b = flagBox(o), n = 8, sw = Math.max(6, Math.floor(b.W / n)), W = sw * n, H = Math.round(b.H), a = calm ? 2 : p.amp, T = calm ? 1.7 : p.T;
+    const bg = `background-image:url(${b.src});background-size:${W}px ${H}px;`;
+    F.stage.innerHTML = `<span class="fw-board" style="width:${W}px;height:${H}px;--a:${a}px;--sn:${a};--T:${T}s;--ph:${(T / 7).toFixed(3)}s;--sh:${calm ? 0.14 : p.sh}">${Array.from({ length: n }, (_, k) => `<i class="fw-s" style="--i:${k};left:${k * sw}px;width:${sw + 1}px;height:${H}px"><b style="${bg}background-position:${-k * sw}px 0"></b></i>`).join("")}<em class="fw-clip"><s class="fw-ln" style="--y:22%;--t:1.5s"></s><s class="fw-ln" style="--y:58%;--t:1.9s;--w:60px"></s><s class="fw-ln" style="--y:84%;--t:1.3s"></s></em></span>`;
+    F.wrap.classList.add("fw-wrap"); const w = S.fw = { board: F.stage.firstChild, gust: !calm && p.gust }; say("gust");
+    if (w.gust) later(function g() { if (S.fw !== w) return; if (!phaseOk()) return later(g, 400); w.board.classList.add("gust"); say("gust"); later(() => w.board.classList.remove("gust"), 1300); later(g, 2700 + Math.random() * 2200); }, 1700 + Math.random() * 1400);
+  }
+  const fwStill = () => { const w = S.fw; S.fw = null; if (w && w.board.isConnected) w.board.classList.add("still"); };
+  /* un solo punto de entrada desde flagClass(): la bandera se mete en su envoltorio y cada reto la transforma */
+  function flagNew(el, o) {
+    S.fb = S.fz = S.fw = null; const ids = kindOn("flag").map(c => c.id).filter(id => id === "flagback" || id === "flagpuzzle" || id === "flagwind"); if (!ids.length || !o || !o.name) return;
+    const F = flagWrap(el, o); if (!F) return;
+    if (has("flagpuzzle")) flagPuzzle(F, get("flagpuzzle"), o); else if (has("flagwind")) flagWind(F, get("flagwind"), o);
+    if (has("flagback")) flagBack(F, get("flagback"), o);
+  }
+  /* ------------------------------------------------------------------ Pasaporte falso */
+  const FP_NEIGH = {zimbabwe:"zambia southafrica mozambique botswana",zambia:"zimbabwe tanzania namibia mozambique malawi democraticrepublicofthecongo angola",yemen:"saudiarabia oman",vietnam:"laos china cambodia",venezuela:"guyana colombia brazil",vaticancity:"italy",vanuatu:"solomonislands",uzbekistan:"turkmenistan tajikistan kyrgyzstan kazakhstan afghanistan",uruguay:"brazil argentina",federatedstatesofmicronesia:"palau",marshallislands:"kiribati",unitedstates:"mexico canada",unitedkingdom:"ireland",unitedarabemirates:"saudiarabia oman",ukraine:"slovakia russia romania poland moldova hungary belarus",uganda:"tanzania southsudan rwanda kenya democraticrepublicofthecongo",turkmenistan:"uzbekistan kazakhstan iran afghanistan",turkey:"syria iraq iran greece georgia bulgaria azerbaijan armenia",tunisia:"libya algeria",trinidadandtobago:"venezuela",tonga:"fiji",togo:"ghana burkinafaso benin",timorleste:"indonesia",thailand:"malaysia laos cambodia myanmar",tanzania:"zambia uganda rwanda mozambique malawi kenya democraticrepublicofthecongo burundi",tajikistan:"uzbekistan kyrgyzstan china afghanistan",syria:"turkey lebanon jordan israel iraq",switzerland:"liechtenstein italy germany france austria",sweden:"norway finland",eswatini:"southafrica mozambique",suriname:"guyana france brazil",southsudan:"uganda sudan kenya ethiopia democraticrepublicofthecongo centralafricanrepublic",sudan:"southsudan libya ethiopia eritrea egypt chad centralafricanrepublic",srilanka:"india",spain:"portugal france andorra",southkorea:"northkorea",southafrica:"zimbabwe eswatini namibia mozambique lesotho botswana",somalia:"kenya ethiopia",solomonislands:"papuanewguinea",slovakia:"ukraine poland hungary czechrepublic austria",slovenia:"italy hungary croatia austria",singapore:"malaysia",sierraleone:"liberia guinea",seychelles:"madagascar",serbia:"romania montenegro northmacedonia hungary croatia bulgaria bosniaandherzegovina",senegal:"mauritania mali guineabissau guinea thegambia",saudiarabia:"yemen unitedarabemirates qatar oman kuwait jordan iraq",saotomeandprincipe:"equatorialguinea",sanmarino:"italy",samoa:"tonga",saintvincentandthegrenadines:"saintlucia",saintlucia:"saintvincentandthegrenadines",saintkittsandnevis:"antiguaandbarbuda",rwanda:"uganda tanzania democraticrepublicofthecongo burundi",russia:"ukraine poland norway northkorea mongolia lithuania latvia kazakhstan georgia finland estonia china belarus azerbaijan",romania:"ukraine serbia moldova hungary bulgaria",qatar:"saudiarabia",portugal:"spain",poland:"ukraine slovakia russia lithuania germany czechrepublic belarus",philippines:"malaysia",peru:"ecuador colombia chile brazil bolivia",paraguay:"brazil bolivia argentina",papuanewguinea:"indonesia",panama:"costarica colombia",palau:"philippines",pakistan:"iran india china afghanistan",oman:"yemen unitedarabemirates saudiarabia",norway:"sweden russia finland",northkorea:"southkorea russia china",nigeria:"niger chad cameroon benin",niger:"nigeria mali libya chad burkinafaso benin algeria",nicaragua:"honduras costarica",newzealand:"australia",cookislands:"kiribati",netherlands:"germany belgium",aruba:"venezuela",curacao:"netherlands",nepal:"india china",nauru:"kiribati",namibia:"zambia southafrica botswana angola",mozambique:"zimbabwe zambia tanzania eswatini southafrica malawi",morocco:"algeria",montenegro:"serbia croatia bosniaandherzegovina albania",mongolia:"russia china",moldova:"ukraine romania",monaco:"france",mexico:"unitedstates guatemala belize",mauritius:"madagascar",mauritania:"senegal mali algeria",malta:"italy",mali:"senegal niger mauritania guinea ivorycoast burkinafaso algeria",maldives:"india",malaysia:"thailand indonesia brunei",malawi:"zambia tanzania mozambique",madagascar:"mozambique",northmacedonia:"serbia greece bulgaria albania",luxembourg:"germany france belgium",lithuania:"russia poland latvia belarus",liechtenstein:"switzerland austria",libya:"tunisia sudan niger egypt chad algeria",liberia:"sierraleone guinea ivorycoast",lesotho:"southafrica",lebanon:"syria israel",latvia:"russia lithuania estonia belarus",laos:"vietnam thailand china cambodia myanmar",kyrgyzstan:"uzbekistan tajikistan kazakhstan china",kuwait:"saudiarabia iraq",kiribati:"nauru",kenya:"uganda tanzania southsudan somalia ethiopia",kazakhstan:"uzbekistan turkmenistan russia kyrgyzstan china",jordan:"syria saudiarabia israel iraq",japan:"russia",jamaica:"cuba",italy:"vaticancity switzerland slovenia sanmarino france austria",israel:"syria lebanon jordan egypt",ireland:"unitedkingdom",iraq:"turkey syria saudiarabia kuwait jordan iran",iran:"turkmenistan turkey pakistan iraq azerbaijan armenia afghanistan",indonesia:"timorleste papuanewguinea malaysia",india:"pakistan nepal china myanmar bhutan bangladesh",iceland:"greenland",hungary:"ukraine slovakia slovenia serbia romania croatia austria",honduras:"nicaragua guatemala elsalvador",haiti:"dominicanrepublic",guyana:"venezuela suriname brazil",guineabissau:"senegal guinea",guinea:"sierraleone senegal mali liberia guineabissau ivorycoast",guatemala:"mexico honduras elsalvador belize",grenada:"saintvincentandthegrenadines",greece:"turkey northmacedonia bulgaria albania",ghana:"togo ivorycoast burkinafaso",germany:"switzerland poland netherlands luxembourg france denmark czechrepublic belgium austria",georgia:"turkey russia azerbaijan armenia",thegambia:"senegal",gabon:"equatorialguinea republicofthecongo cameroon",france:"switzerland spain monaco luxembourg italy germany belgium andorra",finland:"sweden russia norway",fiji:"tonga",ethiopia:"southsudan sudan somalia kenya eritrea djibouti",estonia:"russia latvia",eritrea:"sudan ethiopia djibouti",equatorialguinea:"gabon cameroon",elsalvador:"honduras guatemala",egypt:"sudan libya israel",ecuador:"peru colombia",dominicanrepublic:"haiti",dominica:"antiguaandbarbuda",djibouti:"ethiopia eritrea",greenland:"canada",denmark:"germany",czechrepublic:"slovakia poland germany austria",cyprus:"turkey",cuba:"haiti",croatia:"slovenia serbia montenegro hungary bosniaandherzegovina",ivorycoast:"mali liberia guinea ghana burkinafaso",costarica:"panama nicaragua",democraticrepublicofthecongo:"zambia uganda tanzania southsudan rwanda republicofthecongo centralafricanrepublic burundi angola",republicofthecongo:"gabon democraticrepublicofthecongo centralafricanrepublic cameroon angola",comoros:"madagascar",colombia:"venezuela peru panama ecuador brazil",china:"vietnam tajikistan russia pakistan northkorea nepal mongolia laos kyrgyzstan kazakhstan india myanmar bhutan afghanistan",chile:"peru bolivia argentina",chad:"sudan nigeria niger libya centralafricanrepublic cameroon",centralafricanrepublic:"southsudan sudan democraticrepublicofthecongo republicofthecongo chad cameroon",capeverde:"senegal",canada:"unitedstates",cameroon:"nigeria gabon equatorialguinea republicofthecongo chad centralafricanrepublic",cambodia:"vietnam thailand laos",myanmar:"thailand laos india china bangladesh",burundi:"tanzania rwanda democraticrepublicofthecongo",burkinafaso:"togo niger mali ghana ivorycoast benin",bulgaria:"turkey serbia romania northmacedonia greece",brunei:"malaysia",brazil:"venezuela uruguay suriname peru paraguay guyana colombia bolivia argentina",botswana:"zimbabwe southafrica namibia",bosniaandherzegovina:"serbia montenegro croatia",bolivia:"peru paraguay chile brazil argentina",bhutan:"india china",benin:"togo nigeria niger burkinafaso",belize:"mexico guatemala",belgium:"netherlands luxembourg germany france",belarus:"ukraine russia poland lithuania latvia",barbados:"saintlucia",bangladesh:"india myanmar",bahrain:"saudiarabia",thebahamas:"cuba",azerbaijan:"turkey russia iran georgia armenia",austria:"switzerland slovakia slovenia liechtenstein italy hungary germany czechrepublic",australia:"indonesia",armenia:"turkey iran georgia azerbaijan",argentina:"uruguay paraguay chile brazil bolivia",antiguaandbarbuda:"saintkittsandnevis",angola:"zambia namibia democraticrepublicofthecongo republicofthecongo",andorra:"spain france",algeria:"tunisia niger morocco mauritania mali libya",albania:"montenegro northmacedonia greece",afghanistan:"uzbekistan turkmenistan tajikistan pakistan iran china"};
+  const FP_CEN = {zimbabwe:[29.1,-19],zambia:[27.8,-13.1],yemen:[47.9,15.8],vietnam:[105.8,16],venezuela:[-66.6,6.4],vaticancity:[12.4,41.9],vanuatu:[166.9,-15.1],uzbekistan:[64.6,41.4],uruguay:[-55.8,-32.5],federatedstatesofmicronesia:[158.2,6.9],marshallislands:[171.2,7.1],unitedstates:[-95.8,37.3],unitedkingdom:[-2.2,54.3],unitedarabemirates:[54,24.3],ukraine:[31.1,48.4],uganda:[32.3,1.4],turkmenistan:[59.6,39],turkey:[35.5,38.9],tunisia:[9.5,33.8],trinidadandtobago:[-61.4,10.5],tonga:[-175.2,-21.2],togo:[0.8,8.6],timorleste:[126.1,-8.9],thailand:[101.5,13],tanzania:[34.9,-6.4],tajikistan:[71.2,38.9],syria:[39.1,34.8],switzerland:[8.2,46.8],sweden:[17.7,62.2],eswatini:[31.4,-26.5],suriname:[-56,3.9],southsudan:[29.7,7.9],sudan:[30.2,15.4],srilanka:[80.8,7.9],spain:[-3,39.9],southkorea:[127.9,36.5],southafrica:[24.7,-28.5],somalia:[46.2,5.1],solomonislands:[159.2,-8.1],slovakia:[19.7,48.7],slovenia:[14.9,46.1],singapore:[103.8,1.4],sierraleone:[-11.8,8.5],seychelles:[55.5,-4.7],serbia:[20.9,44.2],senegal:[-14.5,14.5],saudiarabia:[45.1,24.2],saotomeandprincipe:[6.6,0.2],sanmarino:[12.5,43.9],samoa:[-172.5,-13.6],saintvincentandthegrenadines:[-61.2,13.3],saintlucia:[-61,13.9],saintkittsandnevis:[-62.7,17.3],rwanda:[29.9,-1.9],russia:[-0.1,59.5],romania:[25,46],qatar:[51.2,25.4],portugal:[-7.8,39.6],poland:[19.1,51.9],philippines:[122,15.6],peru:[-75,-9.2],paraguay:[-58.4,-23.4],papuanewguinea:[145.9,-6.6],panama:[-80.1,8.4],palau:[134.6,7.5],pakistan:[68.9,30.4],oman:[55.9,20.8],norway:[17.9,64.6],northkorea:[127.5,40.4],nigeria:[8.7,9.1],niger:[8.1,17.6],nicaragua:[-85.4,12.9],newzealand:[170.4,-43.6],cookislands:[-159.8,-21.2],netherlands:[5.3,52.1],aruba:[-70,12.5],curacao:[-69,12.2],nepal:[84.1,28.4],nauru:[166.9,-0.5],namibia:[18.5,-23],mozambique:[35.5,-18.7],morocco:[-9,28.7],montenegro:[19.4,42.7],mongolia:[103.8,46.9],moldova:[28.4,47],monaco:[7.4,43.8],mexico:[-102,23.6],mauritius:[57.6,-20.3],mauritania:[-10.9,21],malta:[14.5,35.9],mali:[-4,17.6],maldives:[73.5,4.2],malaysia:[114.4,3.9],malawi:[34.3,-13.3],madagascar:[46.9,-18.8],northmacedonia:[21.7,41.6],luxembourg:[6.1,49.8],lithuania:[23.9,55.2],liechtenstein:[9.5,47.2],libya:[17.2,26.3],liberia:[-9.5,6.4],lesotho:[28.2,-29.6],lebanon:[35.8,33.9],latvia:[24.6,56.9],laos:[103.9,18.2],kyrgyzstan:[74.7,41.2],kuwait:[47.5,29.3],kiribati:[-157.4,1.9],kenya:[37.9,0.4],kazakhstan:[67,48],jordan:[37.1,31.3],japan:[136.4,37.5],jamaica:[-77.3,18.1],italy:[12.6,42.5],israel:[35.1,31.5],ireland:[-8.2,53.4],iraq:[43.7,33.2],iran:[53.7,32.4],indonesia:[100.6,-0.1],india:[82.8,21.8],iceland:[-19,65],hungary:[19.5,47.2],honduras:[-86.3,14.5],haiti:[-73.1,19],guyana:[-58.9,4.9],guineabissau:[-15.2,11.8],guinea:[-11.4,9.9],guatemala:[-90.2,15.8],grenada:[-61.7,12.1],greece:[23.3,39.1],ghana:[-1,8],germany:[10.4,51.1],georgia:[43.3,42.3],thegambia:[-15.3,13.4],gabon:[11.6,-0.8],france:[1.7,46.7],finland:[26.1,64.9],fiji:[0,-16.5],ethiopia:[40.5,9.2],estonia:[25.8,58.6],eritrea:[39.8,15.2],equatorialguinea:[10.4,1.6],elsalvador:[-88.9,13.8],egypt:[30.8,26.8],ecuador:[-78.1,-1.8],dominicanrepublic:[-70.2,18.8],dominica:[-61.4,15.4],djibouti:[42.6,11.8],greenland:[-42.1,71.7],denmark:[9.5,56.3],czechrepublic:[15.5,49.8],cyprus:[33.2,34.9],cuba:[-79.5,21.5],croatia:[16.5,44.7],ivorycoast:[-5.6,7.5],costarica:[-84.2,9.6],democraticrepublicofthecongo:[21.7,-4.1],republicofthecongo:[14.9,-0.7],comoros:[43.4,-11.6],colombia:[-73,4.1],china:[104.2,36.9],chile:[-71.4,-35.7],chad:[18.7,15.5],centralafricanrepublic:[20.9,6.6],capeverde:[-23.6,15.1],canada:[-98.3,56.8],cameroon:[12.4,7.4],cambodia:[105,12.6],myanmar:[96.7,19.3],burundi:[29.9,-3.4],burkinafaso:[-1.6,12.3],bulgaria:[25.5,42.7],brunei:[114.6,4.5],brazil:[-54.4,-14.2],botswana:[24.7,-22.3],bosniaandherzegovina:[17.7,43.9],bolivia:[-63.6,-16.3],bhutan:[90.4,27.5],benin:[2.3,9.3],belize:[-88.7,17.2],belgium:[4.4,50.5],belarus:[27.9,53.7],barbados:[-59.5,13.2],bangladesh:[90.3,23.7],bahrain:[50.5,26],thebahamas:[-77.5,26.4],azerbaijan:[47.7,40.1],austria:[13.3,47.7],australia:[133.4,-24.9],armenia:[45,40.1],argentina:[-63.6,-37.1],antiguaandbarbuda:[-61.8,17.1],angola:[17.9,-11.9],andorra:[1.6,42.5],algeria:[1.6,28],albania:[20.2,41.1],afghanistan:[67.7,33.9]};   // el centro de cada pais [lon, lat]: de los vecinos, miente uno de los 3 mas cercanos al lugar (Hong Kong no dice Kazajistan)
+  let FP_BY = null;
+  const ckey = e => { const k = String(e || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z]/g, ""); return k === "republicofireland" ? "ireland" : k; };
+  const fpBy = () => { if (!FP_BY) { FP_BY = {}; const PC = A.PCOUNTRY || {}; for (const q in PC) FP_BY[ckey(PC[q].en)] = PC[q]; } return FP_BY; };
+  const fpOk = q => !!q && q.t === "p" && !q.clue && !!q.sub && Array.isArray(q.cEn) && q.cEn.length === 1 && !!FP_NEIGH[ckey(q.cEn[0])] && !!fpBy()[ckey(q.cEn[0])];
+  /* que preguntas de la ronda mienten: n (1, 2 o 3 segun el nivel) de las 5, a la suerte con la semilla; las que no tienen vecino (mares, pistas, paises) no cuentan */
+  function fpSet() {
+    if (S.fpSet) return S.fpSet; const qs = (A.core && A.core.S && A.core.S.qs) || [], fp = get("fakepass"), n = fp ? par(fp).n : 1;
+    return (S.fpSet = new Set(A.rng(`${S.seed}:fp:${S.round}`).shuffle(qs.map((q, i) => (fpOk(q) ? i : -1)).filter(i => i >= 0)).slice(0, n)));
+  }
+  function fpLie(o, qi) {
+    if (!fpOk(o) || !fpSet().has(qi)) return null; const ks = FP_NEIGH[ckey(o.cEn[0])].split(" ").filter(k => fpBy()[k]);
+    if (o.lat != null && o.lon != null) ks.sort((a, b) => (FP_CEN[a] ? A.geo.haversine(o.lat, o.lon, FP_CEN[a][1], FP_CEN[a][0]) : 1e9) - (FP_CEN[b] ? A.geo.haversine(o.lat, o.lon, FP_CEN[b][1], FP_CEN[b][0]) : 1e9));
+    return ks.length ? fpBy()[A.rng(`${S.seed}:fpn:${S.round}:${qi}:${o.name.en}`).pick(ks.slice(0, 3))] : null;
+  }
+  /* el pais de debajo se estampa como en un pasaporte (en TODAS las preguntas de la ronda, mientan o no) */
+  function passStart(sub, o) {
+    S.fp = null; if (!sub || !o.sub || o.clue || has("nocountry")) return;
+    const lie = fpLie(o, S.q), real = A.tx(o.sub), shown = lie ? A.tx(lie) : real; S.fp = { lie: lie ? shown : null, real };
+    sub.innerHTML = `<span class="fp-stamp">${esc(shown)}</span>`; sub.classList.add("ch-pass"); say("passStamp");
+  }
+  function passReveal() {
+    const sub = $("askSub"), fp = S.fp; if (!sub || !fp) return; sub.classList.remove("ch-pass");
+    if (fp.lie) { sub.innerHTML = `<span class="fp-fake"><s>${esc(fp.lie)}</s><b class="fp-sello">${esc(A.tx(FP_FALSE))}</b></span><i class="fp-arr"></i><span class="fp-real">${esc(fp.real)}</span>`; say("passFalse"); }
+    else sub.innerHTML = `<span class="fp-ok">${esc(fp.real)}</span>`;
+  }
+  /* ------------------------------------------------------------------ Panel de salidas (split-flap) */
+  const SF_LAT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ", SF_CYR = "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ", SF = { t: 0, tiles: [], el: 0, on: false, led: null, sub: null, done: false, idle: 0 };
+  const sfPut = (t, ch) => { t.cur = ch; t.u.textContent = t.l.textContent = t.fu.textContent = t.fl.textContent = ch; };
+  function sfFlip(t, ch, fast) {
+    if (t.cur === ch) return; const old = t.cur;
+    if (calmMo() || !t.fuE.animate) { sfPut(t, ch); return; }
+    if (t.a2) { t.a1.cancel(); t.a2.cancel(); t.l.textContent = old; }               // el giro anterior no acabo: se da por aterrizado
+    t.u.textContent = ch; t.fu.textContent = old; t.fl.textContent = ch; t.cur = ch; const d = fast ? 28 : 36;
+    t.a1 = t.fuE.animate([{ transform: "rotateX(0deg)" }, { transform: "rotateX(-90deg)" }], { duration: d, easing: "ease-in", fill: "forwards" });
+    t.a2 = t.flE.animate([{ transform: "rotateX(90deg)" }, { transform: "rotateX(0deg)" }], { duration: d, delay: d, easing: "ease-out", fill: "both" });
+    t.a2.onfinish = () => { t.l.textContent = ch; t.fu.textContent = ch; if (t.a1) t.a1.cancel(); if (t.a2) t.a2.cancel(); t.a1 = t.a2 = null; };
+  }
+  function boardStop() { clearTimeout(SF.t); SF.on = false; SF.tiles.forEach(t => { if (t.a1) { t.a1.cancel(); t.a2.cancel(); t.a1 = t.a2 = null; } }); }
+  function boardEnd(quiet) {                                                         // todas fijas: el piloto en verde, el pais a la vista y el timbre
+    SF.done = true; SF.on = false; clearTimeout(SF.t); if (SF.led) SF.led.classList.add("ok");
+    if (SF.sub && SF.sub.isConnected) { const o = A.core && A.core.S.qs[A.core.S.qi]; if (o && o.sub) { A.renderBlanks(SF.sub, A.tx(o.sub)); SF.sub.classList.remove("ch-covered"); if (!quiet && !calmMo()) SF.sub.classList.add("sf-pop"); } }
+    if (!quiet) say("boardDone");
+  }
+  function boardFinal() { if (!SF.tiles.length) return; boardStop(); SF.tiles.forEach(t => sfPut(t, t.fin)); boardEnd(true); SF.tiles = []; }
+  function boardStart(el, sub, o, text, c) {
+    boardStop(); SF.tiles = []; SF.done = false;
+    const chars = [...text], letters = chars.filter(ch => /\p{L}/u.test(ch)).length; if (letters < 2 || letters > 28 || o.clue || CJK.test(text)) return false;
+    const p = par(c), cyr = /[Ѐ-ӿ]/.test(text), POOL = [...(cyr ? SF_CYR : SF_LAT)], words = text.split(/\s+/).filter(Boolean);
+    const up = ch => { const u = ch.toLocaleUpperCase(); return [...u].length === 1 ? u : ch; };
+    const fs0 = parseFloat(getComputedStyle(el).fontSize) || 40, Wp = Math.max(240, (el.clientWidth || 520) - 70), nT = chars.length - words.length + 1;
+    const f1 = (Wp - 2 * nT) / (0.64 * nT + 0.55 * (words.length - 1) + 0.9), f = Math.round(Math.max(14, Math.min(fs0, f1 >= 22 ? f1 : Math.min(f1 * 1.8, 30))));
+    const rr = A.rng(`${S.seed}:sf:${S.round}:${S.q}:${text}`), tileHtml = ch => `<b class="sf-t"><i class="sf-u"><u>${esc(ch)}</u></i><i class="sf-l"><u>${esc(ch)}</u></i><i class="sf-fu"><u>${esc(ch)}</u></i><i class="sf-fl"><u>${esc(ch)}</u></i></b>`;
+    const rnd = () => POOL[Math.floor(rr() * POOL.length)];
+    let html = "", idx = 0; const meta = [];
+    words.forEach(w => { html += '<span class="sf-w">'; for (const ch of w) { if (/\p{L}/u.test(ch)) { const st = rnd(); html += tileHtml(st); meta.push({ fin: up(ch), st }); idx++; } else html += `<b class="sf-x">${esc(ch)}</b>`; } html += "</span>"; });
+    el.innerHTML = `<span class="sf-board" style="--sf:${f}px"><i class="sf-led"></i><span class="sf-in">${html}</span></span>`; el.classList.add("ch-board");
+    const tl = [...el.querySelectorAll(".sf-t")], n = tl.length, order = p.rnd ? rr.shuffle(tl.map((_, i) => i)) : tl.map((_, i) => i), gap = Math.min(p.gap, p.cap / Math.max(1, n - 1));
+    tl.forEach((b, i) => { const h = b.children, m = meta[i], t = { b, fuE: h[2], flE: h[3], u: h[0].firstChild, l: h[1].firstChild, fu: h[2].firstChild, fl: h[3].firstChild, cur: m.st, fin: m.fin, at: 0, nt: 0, set: false, slip: 0 }; t.at = p.lead + order.indexOf(i) * gap * (0.85 + rr() * 0.3); t.nt = Math.floor(rr() * 90); SF.tiles.push(t); });
+    SF.led = el.querySelector(".sf-led"); SF.sub = null; SF.el = 0; SF.on = true; const last = Math.max(...SF.tiles.map(t => t.at));
+    if (p.cover && sub && o.sub) { sub.innerHTML = '<span class="ch-redact">▮▮▮▮▮▮</span>'; sub.classList.add("ch-covered"); SF.sub = sub; }
+    let prev = performance.now(), lastRoll = 0, nextSlip = 1500 + rr() * 900;
+    SF.t = setTimeout(function tick() {
+      if (!SF.on) return; const now = performance.now(), dt = Math.min(120, now - prev); prev = now; SF.t = setTimeout(tick, 34);
+      if (!phaseOk()) { const g = A.core && A.core.S; if (g && g.phase !== "asking" && ++SF.idle > 240) boardStop(); return; }   // pausa: espera; fuera de la pregunta (se abandono la partida): se apaga
+      SF.idle = 0; SF.el += dt; const e = SF.el; let flips = 0, sets = 0, open = 0;
+      if (p.churn && e > nextSlip && e < last + 200) {                              // a nivel 3, de vez en cuando una ya fija se suelta y vuelve a girar
+        const fixed = SF.tiles.filter(t => t.set); if (fixed.length) { const t = fixed[Math.floor(Math.random() * fixed.length)]; t.set = false; t.at = e + 350 + Math.random() * 350; t.nt = e; } nextSlip = e + 700 + Math.random() * 700;
+      }
+      for (const t of SF.tiles) {
+        if (t.set) continue; open++;
+        if (e >= t.at) { sfFlip(t, t.fin); t.set = true; sets++; open--; continue; }
+        if (e >= t.nt) { let ch = rnd(); if (ch === t.cur) ch = rnd(); sfFlip(t, ch, true); flips++; t.nt = e + (p.churn ? 42 + Math.random() * 38 : 62 + Math.random() * 50); }
+      }
+      if (flips && e - lastRoll > 70) { lastRoll = e; say("flapRoll", flips); }
+      if (sets) say("flapSet", sets);
+      if (!open && e >= last) boardEnd(false);
+    }, 34);
+    return true;
+  }
+
   /* ------------------------------------------------------------------ bandera: filtro CSS para js/adventure.js (renderFlag) */
   A.chal.flagFx = () => {
     if (S.suspended || !S.on) return null;
@@ -703,19 +893,20 @@ window.AIQ = window.AIQ || {};
     return f.length ? f.join(" ") : null;
   };
 
-  function flagClass(el) {
+  function flagClass(el, o) {
     const img = el && el.querySelector(".ask-flag"); if (!img || S.suspended || !S.on) return;
     kindOn("flag").forEach(c => {
       const p = par(c); img.classList.add("fx-" + c.id);
       if (c.id === "flaghue") { img.style.setProperty("--fh0", (p.deg * 0.6) + "deg"); img.style.setProperty("--fh1", (p.deg * 1.4) + "deg"); }
       if (c.id === "flagdark") img.style.setProperty("--fb", p.b);
     });
+    flagNew(el, o);   // tanda 14: la bandera de espaldas, a trozos o al viento
   }
 
   /* ------------------------------------------------------------------ API */
   Object.assign(A.chal, {
     begin(list, fx, ctx = {}) {
-      this.end(); S.pub = list.map(canon); S.list = expand(S.pub); S.qlist = null; S.qsub = null; S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0;   // tanda 6: S.pub, los retos de la ronda; S.list, sus efectos
+      this.end(); S.pub = list.map(canon); S.list = expand(S.pub); S.qlist = null; S.qsub = null; S.fx = fx || A.chal.fx([]); S.halve = ctx.halve || 1; S.seed = ctx.seed || "s"; S.round = ctx.round || 0; S.on = true; S.suspended = false; S.q = 0; S.fpSet = null;   // tanda 6: S.pub, los retos de la ronda; S.list, sus efectos
       S.map = A.core && A.core.map; if (S.map) ensureOverlay(S.map);
       /* retos que mueven continentes: su colocacion se deja calculada mientras se presenta la ronda (con el mapa ya quieto), no al empezar la pregunta */
       if (S.map && S.map.layout && S.list.some(c => ["pangea", "spread", "tilt", "deal"].includes(c.id))) {
@@ -756,6 +947,7 @@ window.AIQ = window.AIQ || {};
     },
     reveal(ms = 750) {
       const map = S.map; clearTimers(); fxStop(); if (A.chfx) A.chfx.clear();
+      if (S.suspended) boardStop(); else { boardFinal(); passReveal(); fzSolve(); fwStill(); fbReveal(); }   // tanda 14
       if (map && map.clearDistort) { map.clearDistort(ms); if (map.setDecoys) map.setDecoys([]); }
       $("app").classList.remove("ch-negative");
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
@@ -765,7 +957,7 @@ window.AIQ = window.AIQ || {};
     suspend() { S.suspended = true; this.reveal(500); const o = A.core && A.core.S.qs[A.core.S.qi]; if (o) decorate(o); if (A.pointer && A.pointer.mods) A.pointer.mods(); },
     upright() { const map = S.map; if (map && map.setOrient) map.setOrient(false, 900); },
     end() {
-      clearTimers(); clearTimeout(S.preT); fxStop(); if (A.chfx) A.chfx.clear(); S.on = false; S.list = []; S.pub = []; S.qlist = null; S.qsub = null; const map = S.map || (A.core && A.core.map);
+      clearTimers(); clearTimeout(S.preT); fxStop(); if (A.chfx) A.chfx.clear(); boardStop(); S.on = false; S.list = []; S.pub = []; S.qlist = null; S.qsub = null; const map = S.map || (A.core && A.core.map);
       if (map && map.clearDistort) { map.clearDistort(300); map.setLens && map.setLens(null); map.setDecoys && map.setDecoys([]); }
       const app = $("app"); if (app) app.classList.remove("ch-negative");
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }

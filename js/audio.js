@@ -454,6 +454,16 @@ window.AIQ = window.AIQ || {};
     gust: go(t => { noise(t, 0.9 + Math.random() * 0.4, { lp: 260 + Math.random() * 120, sweepTo: 900 + Math.random() * 300, vol: 0.03, type: "bandpass", q: 0.6 }); }),
     spark: go(t => { for (let i = 0; i < 5; i++) noise(t + i * 0.022 + Math.random() * 0.02, 0.012, { hp: 3800 + Math.random() * 2000, vol: 0.035 + Math.random() * 0.02 }); }),
     tear: go(t => { noise(t, 0.13, { lp: 1100, sweepTo: 5600, vol: 0.075, type: "bandpass", q: 1.3 }); for (let i = 0; i < 6; i++) noise(t + 0.008 + i * 0.016 + Math.random() * 0.006, 0.009, { hp: 3800, vol: 0.045 }); thump(t, { vol: 0.06, f0: 240, f1: 120, dur: 0.05 }); }),
+    /* tanda 14: panel de salidas, bandera de espaldas, puzle y pasaporte falso (flojitos y nunca iguales) */
+    flapRoll: go((t, n = 1) => { const k = Math.min(4, 1 + (n > 6 ? 2 : n > 2 ? 1 : 0)); for (let i = 0; i < k; i++) noise(t + i * (0.008 + Math.random() * 0.016), 0.006, { hp: 2400 + Math.random() * 2600, vol: 0.011 + Math.random() * 0.008 }); }),
+    flapSet: go((t, n = 1) => { const f = 300 + Math.random() * 90; thump(t, { vol: 0.045, f0: f, f1: f * 0.38, dur: 0.045 }); noise(t, 0.012, { hp: 3200 + Math.random() * 1500, vol: 0.03 }); if (n > 1) noise(t + 0.02, 0.01, { hp: 3800, vol: 0.02 }); }),
+    boardDone: go(t => { const b = 84 + Math.floor(Math.random() * 3) * 2; bell(b, t, { vol: 0.05, dur: 0.7, rev: 0.5 }); bell(b - 4, t + 0.2, { vol: 0.045, dur: 0.9, rev: 0.55 }); }),
+    flagFlip: go(t => { noise(t, 0.18 + Math.random() * 0.06, { lp: 700 + Math.random() * 300, sweepTo: 3600, vol: 0.05, type: "bandpass", q: 1 }); thump(t + 0.17, { vol: 0.07, f0: 220 + Math.random() * 40, f1: 90, dur: 0.07 }); }),
+    sealPop: go(t => { thump(t, { vol: 0.12, f0: 150, f1: 60, dur: 0.09 }); noise(t, 0.02, { hp: 3000, vol: 0.04 }); pluck(88 + Math.floor(Math.random() * 3), t + 0.02, { vol: 0.04, dur: 0.14, bright: 3, rev: 0.2 }); }),
+    puzzleDeal: go(t => { for (let i = 0; i < 6; i++) { noise(t + i * 0.045 + Math.random() * 0.02, 0.012, { hp: 1800 + Math.random() * 1200, vol: 0.03 }); thump(t + i * 0.045, { vol: 0.03, f0: 360, f1: 200, dur: 0.03 }); } }),
+    puzzleSnap: go((t, left = 1) => { const m = 84 + Math.floor(Math.random() * 4) * 2; thump(t, { vol: 0.09, f0: 330, f1: 120, dur: 0.06 }); noise(t, 0.015, { hp: 2800, vol: 0.04 }); bell(m, t + 0.02, { vol: 0.045, dur: 0.35, rev: 0.4 }); if (left <= 2) bell(m + 7, t + 0.09, { vol: 0.04, dur: 0.5, rev: 0.45 }); }),
+    passStamp: go(t => { thump(t, { vol: 0.12, f0: 150, f1: 48, dur: 0.12 }); noise(t, 0.05, { lp: 1500 + Math.random() * 500, vol: 0.05 }); }),
+    passFalse: go(t => { thump(t, { vol: 0.34, f0: 130, f1: 34, dur: 0.22 }); noise(t, 0.1, { lp: 1800, vol: 0.12 }); bell(52 + Math.floor(Math.random() * 3), t + 0.03, { vol: 0.05, dur: 0.6, rev: 0.4 }); }),
     goal: go(t => {
       thump(t, { vol: 0.26, f0: 150, f1: 48, dur: 0.18 }); noise(t, 0.05, { hp: 2600, vol: 0.06 });
       MOTIF.forEach((m, i) => { pluck(m + 12, t + 0.02 + i * 0.075, { vol: 0.13, dur: 0.75, rev: 0.5 }); bell(m + 24, t + 0.02 + i * 0.075, { vol: 0.03, dur: 0.3, rev: 0.3 }); });

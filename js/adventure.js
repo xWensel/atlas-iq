@@ -837,7 +837,7 @@ window.AIQ = window.AIQ || {};
     const b = document.createElement("button"); b.id = "splitAlt"; b.type = "button"; b.className = "split-alt";
     b.innerHTML = `<span class="sa-k">${ic("oracle", "sm")}${A.tx(SPLIT_OR)}</span><span class="sa-n"></span><kbd class="sa-key">Tab</kbd>`;
     const n = b.querySelector(".sa-n");
-    if (A.adv.isFlagRound() && q.t === "c" && A.FLAGS && q.name && A.FLAGS[q.name.en]) { const fx = A.chal.flagFx && A.chal.flagFx(); n.innerHTML = `<img class="sa-flag" alt="" src="assets/flags/${A.mediaKey(q.name.en)}.svg"${fx ? ` style="filter:${fx}"` : ""}>`; }
+    if (A.adv.isFlagRound() && q.t === "c" && A.FLAGS && q.name && A.FLAGS[q.name.en]) { const fx = A.chal.flagFx && A.chal.flagFx(); n.innerHTML = `<img class="sa-flag" alt="" src="assets/flags/${A.mediaKey(q.name.en)}.svg"${fx ? ` style="filter:${fx}"` : ""}>`; A.chal.flagAlt && A.chal.flagAlt(n.querySelector("img"), q); }
     else if (A.chal.decoAlt) A.chal.decoAlt(n, q); else n.textContent = A.tx(q.name);
     b.onclick = e => { e.stopPropagation(); splitSwap(); };
     sub.after(b);
@@ -1398,7 +1398,7 @@ window.AIQ = window.AIQ || {};
   /* n retos sellados para la ronda r: de familias que no estan, sin chocar con la ronda (texto en banderas, la placa, Memoria de pez...) */
   function pickSealed(r, n, tag, baseList) {
     const D = A.CHAL, base = baseList || chalFor(r).list, fs = new Set(base.map(c => D[c.id].fam)), flag = defAt(r).topic === "flag", topic = defAt(r).topic, txt = base.some(c => D[c.id].kind === "text");
-    const bad = id => (flag ? D[id].kind === "text" : D[id].kind === "flag") || (txt && D[id].kind === "text") || (run.cjk && id === "runes") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle") || (id === "memory" && base.some(c => c.id === "hang" || c.id === "battery")) || ((id === "hang" || id === "battery") && base.some(c => c.id === "memory"));
+    const bad = id => (flag ? D[id].kind === "text" : D[id].kind === "flag") || (txt && D[id].kind === "text") || (run.cjk && id === "runes") || ((topic === "country" || topic === "clue") && (id === "nocountry" || id === "fakepass")) || (topic === "clue" && id === "ticker") || (run.cjk && id === "ticker") || (topic === "clue" && id === "riddle") || (id === "memory" && base.some(c => c.id === "hang" || c.id === "battery")) || ((id === "hang" || id === "battery") && base.some(c => c.id === "memory"));
     let pool = Object.keys(D).filter(id => !D[id].sub && D[id].kind !== "rule" && id !== "dark" && !fs.has(D[id].fam) && !bad(id));
     if (!run.board && run.chSeen0) { const seen = pool.filter(id => run.chSeen0.includes(id)); if (seen.length >= n) pool = seen; }   // de los que ya has visto
     const rr = A.rng(`${run.seed}:${tag}:${r}`), got = [];
