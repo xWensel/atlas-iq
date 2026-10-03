@@ -240,7 +240,7 @@ window.AIQ = window.AIQ || {};
     /* v0.35: la ficha ya no dice que perk frena el reto (ni brilla por ello): el jugador tiene que leer y atar cabos */
     /* v0.52: durante una pregunta en la que la Torre de Babel no puede cambiar el nombre, su ficha ensena el reto que sale en su lugar (y por que) */
     NEW_TAG: L6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||初登场|첫 등장|初登場|Новинка|Nowość"),
-    chip(c, small) { const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}${c.calm ? " ch-calm" : ""}${c.sealed ? " ch-sealed" : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b>${c.isNew ? `<span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""}<i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
+    chip(c, small) { const sub = S.on && S.qsub && S.qsub.of === c.id ? S.qsub : null, s = sub || c, d = D[s.id]; if (!d) return ""; return `<span class="ch-chip k-${d.kind}${small ? " sm" : ""}${sub ? " ch-sub" : ""}${c.calm ? " ch-calm" : ""}${c.sealed ? " ch-sealed" + (c.sealBy ? " seal-" + c.sealBy : "") : ""}" data-ch="${s.id}" data-of="${c.id}" data-tt="${(A.tx(d.n) + " — " + A.tx(d.d) + (sub ? "\n" + A.tx(BABEL_NOTE) : "")).replace(/"/g, "&quot;")}">${A.icon(d.ico, "sm")}<b>${A.tx(d.n)}</b>${c.isNew ? `<span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""}<i class="ch-lv">${"●".repeat(s.lv || 1)}</i></span>`; },
   };
 
   /* ------------------------------------------------------------------ mitigaciones (suma de los `fx` de las reliquias) */

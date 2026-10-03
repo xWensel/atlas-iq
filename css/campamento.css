@@ -132,6 +132,10 @@
 .nr.far { padding: 4px 10px 4px; opacity: .82; }
 .nr.far .nr-badge { width: 28px; height: 28px; border-radius: 7px; } .nr.far .nr-badge .ic { width: 22px; height: 22px; }
 /* tanda 9 (S10): mochila llena: la carta elegida brilla y las reliquias de la mochila esperan a que elijas cual dejas */
+/* tanda 13: el hueco del Pacto (lacrado), el Pacto que no se puede vender y los botones de la Oferta */
+.table.mesa .tr-slot.pact { position: relative; } .table.mesa .tr-slot.pact::after { content: ""; position: absolute; right: 4px; bottom: 4px; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff7b6b, #a8231b 70%); box-shadow: 0 0 0 1.5px #16241c; }
+.table.mesa .tr-sell.off { opacity: .55; cursor: not-allowed; font-size: 11px; }
+.table.mesa .sup.bet .bt-n { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; background: #8e2a26; min-width: 38px; } .table.mesa .sup.bet .bt-n span { font: 700 11px/1 var(--mono, monospace); color: #ffd98a; display: inline-flex; align-items: center; gap: 2px; } .table.mesa .sup.bet .bt-n span .ic { width: 12px; height: 12px; }
 /* tanda 12 (S11): la vitrina, una cuarta carta con la legendaria del acto */
 .offer.pc.vit .of-r { color: #b8741a; }
 .offer.swap-src { box-shadow: 0 0 0 3px #f8b449, 0 0 26px rgba(248, 180, 73, .55); }
