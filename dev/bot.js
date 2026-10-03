@@ -25,16 +25,20 @@
                     sobre, Sangre fria, Cortesia, Corazon, Red, Ficha, Hucha; legendarias (vitrina y cofre) siempre; nunca cambia de mochila (maxPerks, A5 incluida)
        ball: true   usa la Segunda bola (A.adv.reBall: repite si el clic no hace racha, con el error x0,85) y Dividir (#splitAlt: cambia la pregunta dificil si no la sabe y la otra si)
        bet: ["red","double","final","offer"]   las apuestas que acepta en la Barra (por defecto ninguna)
-       Siempre: la Sangre fria apaga los retos de puntero y pantalla con racha >= 2.
+       tanda 18: la p de saber de cada pregunta sale de su dificultad absoluta (A.adv._diff = A.QDIFF) con una logistica por perfil (BOT_PROFS, mu y s); old: true = las franjas fijas de la tanda 17.
+     Siempre: la Sangre fria apaga los retos de puntero y pantalla con racha >= 2.
        Perillas de la curva (A.KN, js/challenges.js): ruleSwap = la regla de A2 ocupa el sitio de un reto (por defecto 1), provAt = la Ascension desde la que se pierde una provision (por defecto 4).
          Para medir otra cosa, ponlas antes de empezar: AIQ.KN.provAt = 3. Modelo: Dividir y la Segunda bola, si; pistas gratis (Soplo, Libro), herramientas y la Hucha, no (el bot las compra pero no las usa).
        Medicion publicada: ver la memoria perks-revision-2026-10 (tabla de victorias por perfil y Ascension, 40-60 expediciones por celda).
      Ejemplos: bot2(300, "explorer", 1, "s1", 1, false, { w: 0.25 })   bot2(300, "explorer", 0, "s2", 2, true, { sup: { cafe: 10 } })   bot2(0, "explorer", 3, "s3", 3, false, { prof: "sabe", build: true, ball: true }) */
+/* tanda 18: p de SABER una pregunta = logistica de su dificultad absoluta d (A.QDIFF 0-100): 1 / (1 + e^((d - mu) / s)). mu = la dificultad a la que acierta la mitad, s = lo brusco que es el corte.
+   Ajustada para que sobre las franjas fijas de antes (60/20/20 %) diera lo mismo que pk (sabe .95/.8/.5, duda .78/.5/.22, experto .99/.92/.75 con su decay): asi la tabla de la tanda 17 sigue siendo comparable.
+   El novato solo sabe lo muy famoso (mu 14): lo facil lo acierta (~150 km, dentro del pais el 60 %) y el resto lo adivina por el continente (~800 km). old: true usa las franjas de antes (pk + decay). */
 const BOT_PROFS = {
-  sabe: { pk: [0.95, 0.8, 0.5], known: 220, unk: 1000, t: 6, decay: 0.01 },
-  duda: { pk: [0.78, 0.5, 0.22], known: 330, unk: 1500, t: 8, decay: 0.012 },
-  experto: { pk: [0.99, 0.92, 0.75], known: 140, unk: 800, t: 5, decay: 0.006 },
-  novato: { pk: [1, 1, 1], known: 800, unk: 800, t: 7, decay: 0, ctryIn: 0.12, ctryOut: 800 },
+  sabe: { mu: 60, s: 12, known: 220, unk: 1000, t: 6, pk: [0.95, 0.8, 0.5], decay: 0.01 },
+  duda: { mu: 40, s: 12, known: 330, unk: 1500, t: 8, pk: [0.78, 0.5, 0.22], decay: 0.012 },
+  experto: { mu: 78, s: 14, known: 140, unk: 800, t: 5, pk: [0.99, 0.92, 0.75], decay: 0.006 },
+  novato: { mu: 14, s: 7, known: 150, unk: 800, t: 7, ctryIn: 0.6, ctryOut: 800, pk: [1, 1, 1], decay: 0 },
 };
 window.BOT_PROFS = BOT_PROFS;
 window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6, bribe = false, opt = {}) {
@@ -48,7 +52,7 @@ window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6, bribe
   A.core.prepareRun(); A.adv.begin({ deck, asc, seed });
   const B = window.botStats = { seed, errKm, deck, asc, buyN, bribe, w: O.w, legacy: O.legacy, prof: O.prof, rounds: [], q: 0, timeouts: 0, rushed: 0, cTot: 0, cIn: 0,
     bribes: 0, bribeCoins: 0, sups: { cafe: 0, kit: 0, seguro: 0 }, supCoins: 0, cards: 0, cardCoins: 0, lifeBuys: 0, cleared: 0, coinsEarned: 0, score: 0, won: false, end: null,
-    balls: 0, splits: 0, bets: [], perks: [] };
+    balls: 0, splits: 0, bets: [], perks: [], dSum: 0, dN: 0, pkSum: 0 };
   const dest = (lat, lon, brg, km) => { const R = Math.PI / 180, d = km / 6371, la = lat * R, lo = lon * R, b = brg * R; const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b)); const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(la2)); return { lat: la2 / R, lon: ((lo2 / R + 540) % 360) - 180 }; };
   const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
   const lognorm = (m, s) => m * Math.exp(s * gauss()), clampN = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -127,11 +131,12 @@ window.bot2 = function (errKm, deck = "explorer", asc = 0, seed, buyN = 6, bribe
         let q = null, swapped = false;
         if (PR) {
           q = { known: false, ctry: o.t === "c" };
-          const band = Math.max(0, A.adv._bandIdx ? A.adv._bandIdx(o.cid[0]) : 0), r = run.act * 4 + run.round, pk = clampN(PR.pk[band] * (1 - PR.decay * r), 0.02, 0.99);
+          const band = Math.max(0, A.adv._bandIdx ? A.adv._bandIdx(o.cid[0]) : 0), r = run.act * 4 + run.round, pkOf = cid => (O.old || !A.adv._diff ? clampN(PR.pk[band] * (1 - PR.decay * r), 0.02, 0.99) : clampN(1 / (1 + Math.exp((A.adv._diff(cid) - PR.mu) / PR.s)), 0.02, 0.99)), pk = pkOf(o.cid[0]);
+          B.dSum = (B.dSum || 0) + (A.adv._diff ? A.adv._diff(o.cid[0]) : 0); B.dN = (B.dN || 0) + 1; B.pkSum = (B.pkSum || 0) + pk;
           q.known = forceKnown || Math.random() < pk; forceKnown = false;
           /* Dividir: en la pregunta dificil, si no la sabe y la otra si, la cambia (un solo uso) */
           const alt = O.ball && A.adv.splitAlt && A.adv.splitAlt(), btn = alt && document.getElementById("splitAlt");
-          if (btn && !q.known && Math.random() < clampN(PR.pk[2] * (1 - PR.decay * r), 0.02, 0.99)) { forceKnown = true; swapT = 0.8; B.splits++; btn.click(); swapped = true; }
+          if (btn && !q.known && Math.random() < (O.old ? clampN(PR.pk[2] * (1 - PR.decay * r), 0.02, 0.99) : pkOf(alt.cid[0]))) { forceKnown = true; swapT = 0.8; B.splits++; btn.click(); swapped = true; }
         }
         if (!swapped) {
           /* cuanto tarda: lognormal alrededor de tMed, mas lento con retos; la Tormenta, el Cafe y los perks de tiempo mueven S.limit */

@@ -133,27 +133,53 @@ window.AIQ = window.AIQ || {};
     return out;
   }
   const poolFor = r => assign()[r < 12 ? r : 4 + ((r - 4) % 8)];   // la Leyenda (12+) repite las rondas 5-12
-  let BANDS = {};
-  function bandsOf(slot) {                                           // franjas de una ronda: [facil 60 %, media 20 %, dificil 20 %]; la 12 saca de todo el banco (sin banderas)
-    if (BANDS[slot]) return BANDS[slot];
+  /* v0.74 (usuario, 2026-10-03): "la dificultad tiene que venir ENTRE ASCENSIONES: en la A0, los lugares, las banderas y las pistas de los mas faciles, y asi hasta que las
+     ultimas sean lugares realmente complicados; las primeras rondas de las ultimas Ascensiones no tienen por que ser ultra dificiles: una subida EXPONENCIAL entre rondas y entre Ascensiones".
+     D(a, r) = posicion 0-1 en el carrete de la ronda (0 = lo mas facil, 1 = lo mas dificil) donde se centra el sorteo:
+       D = lo(a) + (hi(a) - lo(a)) * expo(r / 11, kr)        r = ronda 0-11 de la expedicion; sube dentro de la Ascension
+       lo(a) = lo0 + (lo5 - lo0) * expo(a / 5, ka)           el suelo de la Ascension (su ronda 1): A0 .02, A1 .12, A2 .24, A3 .38, A4 .55, A5 .75
+       hi(a) = hi0 + (hi5 - hi0) * expo(a / 5, ka)           el techo de la Ascension (su ronda 12): A0 .36, A1 .45, A2 .55, A3 .67, A4 .82, A5 .99
+       expo(x, k) = (e^(k x) - 1) / (e^k - 1)                exponencial que sale de 0 y llega a 1 (k = 0 seria recta)
+     En cada ronda siguen las 3 faciles / 1 media / 1 dificil, pero como ventana alrededor de D: centros D-de, D+dm y D+dh (acotados a 0-1), con un peso de campana de ancho sg
+     sobre la posicion de cada pregunta en el carrete y un suelo fl: NADA de techo duro, todo el carrete sigue en el pool (el suelo hace que lo lejano salga muy de vez en cuando) */
+  const DK0 = { lo0: 0.02, lo5: 0.75, hi0: 0.36, hi5: 0.99, ka: 0.9, kr: 2.2, de: 0.15, dm: 0.10, dh: 0.30, sg: 0.12, fl: 0.008, tw: 1 };
+  const DKN = () => (A.KN && A.KN.dk ? Object.assign({}, DK0, A.KN.dk) : DK0);   // perillas de medicion (dev/bot.js: CFG.knobs = { dk: {...} })
+  const expo = (x, k) => (Math.abs(k) < 1e-6 ? x : (Math.exp(k * x) - 1) / (Math.exp(k) - 1));
+  const diffAt = (asc, pos) => { const K = DKN(), g = expo(clamp((asc | 0) / 5, 0, 1), K.ka), lo = K.lo0 + (K.lo5 - K.lo0) * g, hi = K.hi0 + (K.hi5 - K.hi0) * g; return lo + (hi - lo) * expo(clamp(pos / 11, 0, 1), K.kr); };
+  let BASE = {}, BANDS = {};
+  function baseOf(slot) {                                            // el carrete de la ronda de facil a dificil y la posicion 0-1 de cada pregunta; la 12 saca de todo el banco (sin banderas)
+    const tw = (DKN().tw | 0) ? 1 : 0, bk = slot + ":" + tw; if (BASE[bk]) return BASE[bk];
     let list = poolFor(slot), topic = ROUND_THEME[slot < 12 ? slot : 4 + ((slot - 4) % 8)], tail = null;
     if (topic === "mixed") {
       const seen = new Set(); tail = new Set(assign()[11].map(q => q.cid[0])); list = [];
       assign().forEach((l, i) => { if (ROUND_THEME[i] !== "flag") l.forEach(q => { if (!seen.has(q.cid[0])) { seen.add(q.cid[0]); list.push(q); } }); });
-      list.sort(byLevel(null));                                        // cada pregunta con el nivel de su categoria: la 12 tiene faciles y dificiles de todas
+      list.sort((a, b) => diffOf(a, a.topic) - diffOf(b, b.topic));  // la 12 ordena por la dificultad absoluta: facil es facil de verdad en cualquier categoria
+    } else if (tw) {                                                 // el tema entero (rondas I y II juntas) como un solo carrete: asi la R8 de la A0 tambien lleva banderas faciles (perilla dk.tw = 0 vuelve a un carrete por ronda)
+      const seen = new Set(); list = [];
+      assign().forEach((l, i) => { if (ROUND_THEME[i] === topic) l.forEach(q => { if (!seen.has(q.cid[0])) { seen.add(q.cid[0]); list.push(q); } }); });
+      list.sort(byLevel(topic));
     }
-    const own = topic === "mixed" ? list : list.filter(q => q.topic === (topic === "flag" ? "country" : topic)), guests = topic === "mixed" ? [] : list.filter(q => !own.includes(q));   // invitadas: p. ej. capitales 9-10 en la R5
-    const n = own.length, a = Math.ceil(n * 0.6), b = Math.ceil(n * 0.8);
-    return (BANDS[slot] = { topic, tail, bands: [{ k: "e", n: 3, list: own.slice(0, a) }, { k: "m", n: 1, list: own.slice(a, b) }, { k: "h", n: 1, list: own.slice(b).concat(guests) }] });
+    const own = topic === "mixed" ? list : list.filter(q => q.topic === (topic === "flag" ? "country" : topic)), guests = topic === "mixed" ? [] : list.filter(q => !own.includes(q));   // invitadas: p. ej. capitales 9-10 en la R5 (las mas dificiles)
+    const n = own.length, pct = new Map(); own.forEach((q, i) => pct.set(q.cid[0], n > 1 ? i / (n - 1) : 0.5)); guests.forEach(q => pct.set(q.cid[0], 1));
+    return (BASE[bk] = { topic, tail, list: own.concat(guests), pct });
+  }
+  function bandsOf(slot, pos) {                                      // franjas de una ronda para su Ascension: [facil, media, dificil] desplazadas segun D(a, r); cls(q) dice a cual de las tres se parece mas
+    const K = DKN(), D = diffAt(run ? run.asc : 0, pos), key = [slot, (K.tw | 0) ? 1 : 0, D.toFixed(4), K.de, K.dm, K.dh, K.sg, K.fl].join(":");
+    if (BANDS[key]) return BANDS[key];
+    const base = baseOf(slot), mu = [clamp(D - K.de, 0, 1), clamp(D + K.dm, 0, 1), clamp(D + K.dh, 0, 1)], cut = [(mu[0] + mu[1]) / 2, (mu[1] + mu[2]) / 2];
+    const bell = m => { const w = new Map(); base.list.forEach(q => { const z = (base.pct.get(q.cid[0]) - m) / K.sg; w.set(q, K.fl + (1 - K.fl) * Math.exp(-0.5 * z * z)); }); return w; };
+    return (BANDS[key] = { topic: base.topic, tail: base.tail, D, pct: q => base.pct.get(q.cid[0]), cls: q => { const p = base.pct.get(q.cid[0]); return p == null || p < cut[0] ? 0 : p < cut[1] ? 1 : 2; },
+      bands: [{ k: "e", n: 3, list: base.list, w: bell(mu[0]) }, { k: "m", n: 1, list: base.list, w: bell(mu[1]) }, { k: "h", n: 1, list: base.list, w: bell(mu[2]) }] });
   }
   /* saca n preguntas de una franja por sorteo con peso: todas siguen en el pool y pueden repetirse, pero las que menos te han salido pesan mas
      (peso 1 / (1 + veces - minimo de la franja): nunca vista = 1, una vez mas que la que menos = 1/2...). En el Reto diario todas pesan igual y manda la semilla.
      Reglas que se relajan si no hay otra: 2) continente y pais; 1) nada ya preguntado en la expedicion; 0) lo que sea. first: preguntas con prioridad (x4). */
   const seenStore = () => { if (run._scratch) return run._scratch; const P = A.profile.get(); if (P.adv.decks) delete P.adv.decks; return (P.adv.seen = P.adv.seen || {}); };
   const seenKey = (q, topic) => qidOf(q, topic || q.topic);
-  function takeFrom(band, n, rr, taken, ctx, first) {
-    const got = [], seen = run.board ? null : seenStore(), cnt = q => (seen && seen[seenKey(q, ctx.topic)]) || 0;
-    const min = band.reduce((m, q) => Math.min(m, cnt(q)), Infinity), w = q => (first && first.has(q.cid[0]) ? 4 : 1) / (1 + cnt(q) - (min === Infinity ? 0 : min));
+  function takeFrom(band, n, rr, taken, ctx, first) {                // band = una franja de bandsOf: { list: todo el carrete, w: peso de campana de cada pregunta }
+    const list = band.list, bw = band.w, got = [], seen = run.board ? null : seenStore(), cnt = q => (seen && seen[seenKey(q, ctx.topic)]) || 0;
+    const core = list.filter(q => bw.get(q) > 0.3), ref = core.length ? core : list;   // "lo que menos ha salido" se mide en el centro de la ventana: lo lejano casi no sale y no cuenta
+    const min = ref.reduce((m, q) => Math.min(m, cnt(q)), Infinity), w = q => bw.get(q) * (first && first.has(q.cid[0]) ? 4 : 1) / (1 + Math.max(0, cnt(q) - (min === Infinity ? 0 : min)));
     const fits = (q, lvl) => {
       if (taken.includes(q)) return false;
       if (lvl >= 1 && (ctx.used.has(q.cid[0]) || nameKeys(q).some(k => ctx.names.has(k)))) return false;
@@ -161,7 +187,7 @@ window.AIQ = window.AIQ || {};
       return true;
     };
     for (const lvl of [2, 1, 0]) while (got.length < n) {
-      const cand = band.filter(q => fits(q, lvl)); if (!cand.length) break;
+      const cand = list.filter(q => fits(q, lvl)); if (!cand.length) break;
       let r = rr() * cand.reduce((t, q) => t + w(q), 0), q = cand[cand.length - 1];
       for (const c of cand) { r -= w(c); if (r <= 0) { q = c; break; } }
       got.push(q); taken.push(q); nameKeys(q).forEach(k => ctx.names.add(k));
@@ -458,13 +484,14 @@ window.AIQ = window.AIQ || {};
   /* ---------------- ronda ---------------- */
   /* el pais siempre a la vista: si el lugar no tiene pais (mares, desiertos, cordilleras...), se muestra su continente */
   const withSub = q => { if (q.t === "p" && !q.clue && !(q.sub && (q.sub.en || q.sub.es))) { const c = CONT[continentOf(q)]; if (c) q.sub = { es: c.es, en: c.en }; } return q; };
-  /* v0.20: 3 faciles, 1 media y 1 dificil de las franjas de la ronda (ver bandsOf/takeFrom), en orden barajado; al reanudar, las mismas de antes */
-  const QV = 2;                                                      // version del sorteo: una partida guardada con el de antes (v0.19) no reutiliza sus preguntas al reanudar
+  /* v0.20: 3 faciles, 1 media y 1 dificil de las franjas de la ronda (ver bandsOf/takeFrom), en orden barajado; al reanudar, las mismas de antes.
+     v0.74: las franjas son relativas a la ventana de dificultad de la Ascension y la ronda (ver diffAt) */
+  const QV = 3;                                                      // version del sorteo: una partida guardada con el criterio de antes (v0.19-v0.73: franjas fijas) no reutiliza sus preguntas al reanudar
   const ctxOf = (pos, usedIds, topic) => { const all = allQ(), ctx = { used: new Set(usedIds), names: new Set(), topic: topic === "mixed" ? null : topic }; usedIds.forEach(id => all[id] && nameKeys(all[id]).forEach(k => ctx.names.add(k))); return ctx; };
   function drawRound(pos, attempt, usedIds, n = 5) {                 // n preguntas de la ronda de la posicion pos (0-11, y la Leyenda): 3 faciles, 1 media y 1 dificil, en orden barajado
-    const slot = slotOf(pos), B = bandsOf(slot), rr = A.rng(`${run.seed}:q:${pos}:${attempt}`), ctx = ctxOf(pos, usedIds, B.topic), taken = [];
-    for (const b of [B.bands[2], B.bands[1], B.bands[0]]) takeFrom(b.list, Math.round(b.n * n / 5), rr, taken, ctx, b.k === "h" ? B.tail : null);   // primero la dificil y la media: las faciles tienen mas donde elegir
-    for (const b of B.bands) if (taken.length < n) takeFrom(b.list, n - taken.length, rr, taken, ctx, null);   // franja corta: se completa con las otras
+    const slot = slotOf(pos), B = bandsOf(slot, pos), rr = A.rng(`${run.seed}:q:${pos}:${attempt}`), ctx = ctxOf(pos, usedIds, B.topic), taken = [];
+    for (const b of [B.bands[2], B.bands[1], B.bands[0]]) takeFrom(b, Math.round(b.n * n / 5), rr, taken, ctx, b.k === "h" ? B.tail : null);   // primero la dificil y la media: las faciles tienen mas donde elegir
+    for (const b of B.bands) if (taken.length < n) takeFrom(b, n - taken.length, rr, taken, ctx, null);   // franja corta: se completa con las otras
     return rr.shuffle(taken).slice(0, n);
   }
   /* Reto diario: "ya preguntado" sale solo de la semilla (los primeros intentos de las rondas anteriores y los intentos previos de esta), nunca de lo que haya hecho
@@ -478,24 +505,27 @@ window.AIQ = window.AIQ || {};
   }
   /* As en la manga (tanda 5): el 6.o lugar, de la franja DIFICIL del tema, con su propia sub-semilla (":manga"): las 5 de siempre no cambian */
   function drawExtra(pos, attempt, usedIds) {
-    const slot = slotOf(pos), B = bandsOf(slot), rr = A.rng(`${run.seed}:q:${pos}:${attempt}:manga`), ctx = ctxOf(pos, usedIds, B.topic), taken = [];
-    takeFrom(B.bands[2].list, 1, rr, taken, ctx, B.tail);
-    for (const b of B.bands) if (!taken.length) takeFrom(b.list, 1, rr, taken, ctx, null);
+    const slot = slotOf(pos), B = bandsOf(slot, pos), rr = A.rng(`${run.seed}:q:${pos}:${attempt}:manga`), ctx = ctxOf(pos, usedIds, B.topic), taken = [];
+    takeFrom(B.bands[2], 1, rr, taken, ctx, B.tail);
+    for (const b of B.bands) if (!taken.length) takeFrom(b, 1, rr, taken, ctx, null);
     return taken.slice(0, 1);
   }
   /* Pregunta trampa (tanda 15): de las 3 faciles de la ronda, 1 o 2 se cambian por otra de una franja mas dura del mismo tema (nv1 2/2/1, nv2 2/1/2, nv3 1/2/2).
      Las 5 de siempre salen igual (drawRound no se toca): lo que cambia sale de su propia sub-semilla ":trap", y la que entra lleva q.trap = true (esquina roja y sello) */
   function applyTrap(out, pos, attempt, used, lv) {
-    const t = A.chal.par({ id: "trap", lv }), B = bandsOf(slotOf(pos)), easy = new Set(B.bands[0].list.map(q => q.cid[0])), rr = A.rng(`${run.seed}:q:${pos}:${attempt}:trap`);
-    const idx = rr.shuffle(out.map((q, i) => (easy.has(q.cid[0]) ? i : -1)).filter(i => i >= 0)), want = [].concat(t.med ? [1] : [], t.hard ? [2] : []);
+    const t = A.chal.par({ id: "trap", lv }), B = bandsOf(slotOf(pos), pos), rr = A.rng(`${run.seed}:q:${pos}:${attempt}:trap`);
+    const idx = rr.shuffle(out.map((q, i) => ({ i, p: B.pct(q) == null ? 1 : B.pct(q) })).sort((x, y) => x.p - y.p).slice(0, 3).map(x => x.i)), want = [].concat(t.med ? [1] : [], t.hard ? [2] : []);
     want.forEach((band, j) => {
       if (j >= idx.length) return;
-      const got = takeFrom(B.bands[band].list, 1, rr, out.filter((q, i) => i !== idx[j]), ctxOf(pos, used.concat(out.map(q => q.cid[0])), B.topic), band === 2 ? B.tail : null);
+      const got = takeFrom(B.bands[band], 1, rr, out.filter((q, i) => i !== idx[j]), ctxOf(pos, used.concat(out.map(q => q.cid[0])), B.topic), band === 2 ? B.tail : null);
       if (got[0]) out[idx[j]] = { ...got[0], trap: true };
     });
     return out;
   }
-  A.adv._bandIdx = cid => bandsOf(slotOf(roundNo())).bands.findIndex(b => b.list.some(q => q.cid[0] === cid));   // para las pruebas: 0 facil, 1 media, 2 dificil
+  A.adv._bandIdx = cid => { const pos = roundNo(), B = bandsOf(slotOf(pos), pos), q = allQ()[cid]; return q && B.pct(q) != null ? B.cls(q) : 0; };   // para las pruebas: 0 facil, 1 media, 2 dificil (relativas a la ventana de esta Ascension y ronda)
+  A.adv._diff = cid => { const q = allQ()[cid]; return q ? diffOf(q, ROUND_THEME[slotOf(roundNo())]) : 50; };   // la dificultad 0-100 de una pregunta (A.QDIFF), para el bot
+  A.adv._allQ = allQ;                                                // para las pruebas: cid -> pregunta
+  A.adv.diffAt = diffAt;                                             // D(Ascension, ronda) de 0 a 1
   function pickQuestions(n, keep, chal) {
     const all = allQ();
     if (keep && run.qv === QV && run.curQ && run.curQ.length === n && run.curQ.every(id => all[id])) { run.used = run.used.concat(run.curQ.filter(id => !run.used.includes(id))); return run.curQ.map(id => { const q = withSub({ ...all[id] }); if (run.trap && run.trap.includes(id)) q.trap = true; return q; }); }
@@ -527,8 +557,8 @@ window.AIQ = window.AIQ || {};
     if (!(keep && run.split && run.split.key === tgtKey())) {           // Dividir (tanda 12b): la alternativa de la pregunta dificil
       run.split = null;
       if (has("split") && !run.inf) {
-        const pos = roundNo(), B = bandsOf(slotOf(pos)), hard = new Set(B.bands[2].list.map(q => q.cid[0])), hi = qs.findIndex((q, i) => i < 5 && hard.has(q.cid[0]));
-        if (hi >= 0) { const t = []; takeFrom(B.bands[2].list, 1, A.rng(`${run.seed}:alt:${pos}:${run.attempt || 0}`), t, ctxOf(pos, run.used, B.topic), B.tail); if (t[0]) run.split = { key: tgtKey(), qi: hi, alt: t[0].cid[0], used: false }; }
+        const pos = roundNo(), B = bandsOf(slotOf(pos), pos), hi = qs.reduce((m, q, i) => (i < 5 && B.pct(q) != null && (m < 0 || B.pct(q) > B.pct(qs[m])) ? i : m), -1);
+        if (hi >= 0) { const t = []; takeFrom(B.bands[2], 1, A.rng(`${run.seed}:alt:${pos}:${run.attempt || 0}`), t, ctxOf(pos, run.used, B.topic), B.tail); if (t[0]) run.split = { key: tgtKey(), qi: hi, alt: t[0].cid[0], used: false }; }
       }
     }
     return {
@@ -898,9 +928,9 @@ window.AIQ = window.AIQ || {};
     if (!cur) return false;
     if (run.inf) { const used = new Set(run.used), cand = infPool().filter(q => !used.has(q.cid[0])); pick = cand.length ? rr.pick(cand) : null; }   // modo infinito: del banco entero
     else {                                                           // v0.20: otra de la misma franja (facil por facil, dificil por dificil), con las reglas de la ronda y del mazo
-      const pos = roundNo(), slot = slotOf(pos), B = bandsOf(slot), bi = Math.max(0, B.bands.findIndex(b => b.list.some(q => q.cid[0] === cur.cid[0]))), b = B.bands[bi];
+      const pos = roundNo(), slot = slotOf(pos), B = bandsOf(slot, pos), b = B.bands[B.cls(cur)];
       const others = S.qs.filter((q, i) => q && i !== S.qi);
-      pick = takeFrom(b.list, 1, rr, others.slice(), ctxOf(pos, run.used, B.topic), null)[0] || null;
+      pick = takeFrom(b, 1, rr, others.slice(), ctxOf(pos, run.used, B.topic), null)[0] || null;
     }
     if (!pick) { noteH(A.T("No quedan lugares para cambiar.", "No places left to swap.")); return false; }
     const q = withSub({ ...pick });
