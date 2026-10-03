@@ -27,3 +27,5 @@ steam-flavor.json
 steam/*.local.*
 steam-output/
 tools/cache-ne/
+tools/barra_px/g/
+tools/barra_px/z/

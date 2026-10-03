@@ -2,7 +2,7 @@
 La moneda de la Barra, con el arte de la moneda de los logros (assets/icons/coin.webp, pixel logico de 8 px):
  - coin_spin.webp : 24 fotogramas de 64x64 (pixel logico) de la moneda girando sobre su eje horizontal (cara = estrella, cruz = rosa de los vientos)
  - coin_stand.webp: la moneda de canto, de pie
- - bet_coin.webp  : el icono de la casilla (moneda inclinada con destellos)
+ - bet_coin.webp  : el icono de la casilla (la moneda inclinada del giro, sin destellos)
 Se renderiza la moneda como un cilindro: dos caras elipticas con la textura del arte original y el canto con su cordoncillo."""
 import math, sys
 import numpy as np
@@ -196,17 +196,12 @@ def stand():
     return Image.fromarray(out)
 
 
-def icon():
-    """icono de la casilla: la moneda inclinada, con destellos"""
-    f = frame(ALPHA + 8)
-    big = Image.new("RGBA", (F, F), (0, 0, 0, 0))
-    big.alpha_composite(f, (-1, 3))
-    px = big.load()
-    for (x, y) in ((54, 9), (54, 7), (54, 11), (52, 9), (56, 9), (8, 52), (8, 50), (8, 54), (6, 52), (10, 52)):
-        px[x, y] = CREAM
-    for (x, y) in ((58, 20), (5, 18)):
-        px[x, y] = LIGHT
-    return big
+def icon(sp):
+    """icono de la casilla: la moneda inclinada del propio giro (fotograma 1: se ve la cara y el canto), centrada; sin destellos"""
+    f = sp.crop((F, 0, 2 * F, F)); bb = f.getbbox()
+    c = Image.new("RGBA", (F, F), (0, 0, 0, 0)); h = bb[3] - bb[1]
+    c.alpha_composite(f.crop((0, bb[1], F, bb[3])), (0, (F - h) // 2))
+    return c
 
 
 if __name__ == "__main__":
@@ -214,7 +209,7 @@ if __name__ == "__main__":
     sp.save(ICONS + "coin_spin.webp", lossless=True)
     st = stand()
     st.save(ICONS + "coin_stand.webp", lossless=True)
-    ic = icon().resize((384, 384), Image.NEAREST)
+    ic = icon(sp).resize((384, 384), Image.NEAREST)
     ic.save(ICONS + "bet_coin.webp", lossless=True)
     # hoja de contacto para revisar
     prev = Image.new("RGBA", (F * 12 * 4, F * 2 * 4 + 40 * 4), (30, 60, 90, 255))

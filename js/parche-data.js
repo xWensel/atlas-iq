@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.13",
+      name: ["Iconos de la mesa, pulidos", "Table icons, polished"],
+      date: "2026-10-03",
+      summary: ["Los iconos de Rojo o negro, la Moneda al aire, la Ruleta de premios y sus casillas se redibujan a mano, pixel a pixel, con el acabado de los iconos de la Barra.",
+        "The icons for Red or black, the Coin flip, the Prize wheel and its slots are redrawn by hand, pixel by pixel, with the finish of the bar icons."],
+      chapters: [
+        { id: "pulido", kicker: ["Arte", "Art"], title: ["Pixel a pixel", "Pixel by pixel"],
+          entries: [
+            E(["La mesa de casino, a limpio", "The casino table, clean"], "change", "0.2.13", [
+            ["Ruleta con la Tierra de Geolite en el centro, rueda de la fortuna con bombillas y su pie, y en las casillas: pilas de doblones, lingotes, carta de reto con lacre, la bolsa con antifaz, el cronómetro casi agotado y el cofre vacío con su polilla. La moneda del icono es la misma que gira.", "A roulette with the Geolite Earth in the center, a wheel of fortune with bulbs and a stand, and on the slots: stacks of doubloons, gold bars, a sealed challenge card, the masked money bag, the nearly empty stopwatch and the empty chest with its moth. The icon's coin is the same one that spins."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.12",
       name: ["Arte al nivel de los logros", "Art at achievement level"],
       date: "2026-10-03",
