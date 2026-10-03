@@ -286,7 +286,9 @@ window.AIQ = window.AIQ || {};
     for (let k = sum("skipHardest"); k > 0 && list.length; k--) { const RK = { map: 5, wall: 4, ptr: 3, rule: 2 }, w = c => (c.lv || 1) * 10 + (RK[A.CHAL[c.id].kind] || 1); const top = list.reduce((a, c) => (w(c) > w(a) ? c : a)); nulled.push(top.id); list = list.filter(c => c !== top); }   // Comodin: fuera el reto mas fuerte
     if (boss) { let soft = sum("softenBoss"); list = list.map((c, i) => (i < soft ? { ...c, lv: 1 } : c)); }
     list = list.filter(c => !pl.some(p => (p.immune || []).includes(c.id)));
-    if (run.chSeen0 && !run.board && run.asc < 3 && !A.adv._force) list = list.map(c => (run.chSeen0.includes(c.id) ? c : { ...c, lv: 1, isNew: true }));   // S12: lo que nunca has visto se estrena a nivel 1
+    const bet = !run.inf && run.bets && run.bets[r];                   // tanda 11: los de la apuesta, sellados (si fallas, la revancha va sin ellos)
+    if (bet && bet.retos && !(r === roundNo() && run.attempt > 0)) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true })));
+    if (run.chSeen0 && !run.board && run.asc < 3 && !A.adv._force) list = list.map(c => (run.chSeen0.includes(c.id) || c.sealed ? c : { ...c, lv: 1, isNew: true }));   // S12: lo que nunca has visto se estrena a nivel 1
     return { list, combo: plan.combo, boss, paid, nulled };
   };
 
@@ -743,6 +745,7 @@ window.AIQ = window.AIQ || {};
     const S = C().S, o = S.qs[S.qi], kept = o && run.probes && run.probes.length && run.probesK === qKey() + ":" + o.cid[0] ? run.probes : null;   // al reanudar la misma pregunta, las sondas siguen ahi (las cargas ya estaban gastadas)
     clearTimers(); hints.length = 0; run.qTools = 0; run.probes = kept || []; run.tool = null; run.windOff = false; S.tool = null; renderBars();
     if (!o) return;
+    { const b = !run.inf && run.qi === 0 && (run.bets || {})[roundNo()]; if (b && b.id === "red" && b.win && b.att === (run.attempt || 0)) { S.streak = Math.max(S.streak || 0, 1); run.streak = Math.max(run.streak || 0, 1); } }   // tanda 11: Rojo o negro acertado: empiezas en racha
     const calmF = (perkList().find(p => p.calm) || {}).calm, calm = calmF && !run.inf && (run.streak || 0) >= 2 && (run.chal || []).some(c => calmF.includes((A.CHAL[c.id] || {}).fam)) ? calmF : null;   // Sangre fria (tanda 9)
     if (!!calm !== !!run.calmOn) { if (calm) A.adv.flash("coolhead", 0, "❄"); else A.adv.flash("coolhead", 0, "✕", () => A.sfx.chip(0.3)); }   // entra en frio / se le quiebra el halo
     const calmWas = !!run.calmOn; run.calmOn = !!calm; if (calmWas !== run.calmOn) renderBars();   // las fichas que apaga, heladas
@@ -870,7 +873,7 @@ window.AIQ = window.AIQ || {};
     el = document.createElement("div"); el.id = "advBar"; el.className = "adv-bar hidden"; ($("leftCol") || $("app")).appendChild(el);
     const tb = document.createElement("div"); tb.id = "toolBar"; tb.className = "tool-bar hidden"; $("app").appendChild(tb);
   }
-  function hearts() { let h = ""; for (let i = 0; i < run.maxLives; i++) h += `<i class="hp ${i < run.lives ? "on" : ""}">${ic("heart")}</i>`; return h; }
+  function hearts() { let h = ""; for (let i = 0; i < run.maxLives; i++) h += `<i class="hp ${i < run.lives ? "on" : ""}">${ic(i < run.lives ? "heart" : "heart_empty")}</i>`; return h; }
   /* botin en vivo en el marcador: en cuanto superas el objetivo, cuanto cobrarias ya y a cuantos puntos esta el siguiente doblon */
   function renderLoot() {
     const led = $("ledger"); if (!led) return;
@@ -999,8 +1002,12 @@ window.AIQ = window.AIQ || {};
       perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins, p.id]); } } });
       if (has("bank")) { const b = gain(sumFlag("bank")); run.hucha = (run.hucha || 0) + b; lines.push([A.tx(A.RELICS.hoard.n) + " · " + A.tx(H_IN).replace("{n}", run.hucha), "+" + b, "hoard"]); }   // tanda 9: la Hucha guarda, no paga
       if (boss && run.act === 1 && has("bossHeal") && run.lives < run.maxLives) { run.lives++; lines.push([A.tx(A.RELICS.heartperk.n), A.tx(H_HEART), "heartperk"]); setTimeout(() => A.sfx.jackpot(1), 1100); }   // Corazon: el jefe del acto II te devuelve una provision
+      const bet = (run.bets || {})[roundNo()], first = !run.attempt;   // tanda 11: las apuestas se cobran aqui
+      if (bet && bet.id === "red" && bet.win && bet.att === (run.attempt || 0) && !bet.paid) { const extra = Math.ceil(x.coins * 0.5); x.coins += extra; bet.paid = 1; lines.push([A.tx(BETS.red.n) + " · +50 %", "+" + extra, null, "bet"]); }
       const got = gain(x.coins); if (got !== x.coins) lines.push([A.T("Doblones ×2", "Doubloons ×2"), "+" + (got - x.coins), (perkList().find(p => p.coinX) || {}).id]);
       run.coins += got; run.stats.coinsEarned += got;
+      if (bet && bet.id === "double" && !bet.done) { bet.done = 1; if (first) { const win = Math.min(bet.stake, 40); run.coins += bet.stake + win; run.stats.coinsEarned += win; lines.push([A.tx(BETS.double.n) + " ×2", "+" + (bet.stake + win), null, "bet"]); setTimeout(() => { A.sfx.jackpot(3); if (A.core.jpShake) A.core.jpShake(3); A.dealer.say(A.dealer.line("betWin"), { mood: "angry", hold: 2400 }); }, 1100); } }   // doblas lo apostado (+40 como mucho)
+      if (bet && bet.id === "final" && !bet.done) { bet.done = 1; if (first) { run.maxLives += 2; run.lives += 2; lines.push([A.tx(BETS.final.n), A.tx(BT.lives2), null, "bet"]); setTimeout(() => { A.sfx.jackpot(3); if (A.core.jpShake) A.core.jpShake(3); }, 1100); } }   // +2 provisiones para el modo infinito
       A.ach.emit("adv", { kind: "clear", tools: run.rTools, bulls: run.rBulls || 0 }); if (boss) { A.ach.emit("adv", { kind: "boss", lives: run.lives }); A.profile.get().adv.boss++; }
       A.sfx.stamp(); setTimeout(A.sfx.clear, 300);
       const broke = amuBreak(); broke.forEach(p => lines.push([A.tx(p.n) + " · " + A.tx(AMU_BROKE), "", p.id, "broke"]));
@@ -1022,6 +1029,8 @@ window.AIQ = window.AIQ || {};
     } else {
       const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
       if (shielded && !insured) run.shieldAct = run.act; else if (!shielded) { run.lives--; run.livesLostAct++; }
+      const lb = (run.bets || {})[roundNo()], betLost = [];   // tanda 11: la apuesta del jefe se pierde al fallarlo (Doble o nada: lo apostado)
+      if (lb && (lb.id === "double" || lb.id === "final") && !lb.done) { lb.done = 1; betLost.push([A.tx(BETS[lb.id].n), lb.id === "double" ? "−" + lb.stake : "—", null, "bet lost"]); setTimeout(() => A.dealer.say(A.dealer.line("betLose"), { mood: "laugh", hold: 2400 }), 1200); }
       if (insured) run.segN = (run.segN || 0) + 1;                       // el Seguro de ronda se ha gastado: el siguiente cuesta 2 mas (superar la ronda no lo encarece)
       run.attempt++; run.phase = "retry";
       /* consuelo: lo que puntuaste en la ronda fallida se cobra (1 por cada tercio del objetivo) para comprar ayuda antes de la revancha */
@@ -1033,7 +1042,7 @@ window.AIQ = window.AIQ || {};
       C().verdict({
         kind: "", level: roundNo() + 1, tag: `${A.tx(actInfo(run.act).n)} · ${boss ? A.T("Jefe", "Boss") : A.T("Ronda", "Round") + " " + (run.round + 1)}`, title: A.T("No llegaste al objetivo", "Target missed"),
         text: (insured ? A.pick6(SAVED_SUP) : shielded ? ic("shield", "sm") + " " + A.pick6(SAVED_PERK) : "") + (run.lives === 1 ? A.tf("Te quedaste en {s} de {a}. Te queda {n} provisión.", "You scored {s} of {a}. You have {n} provision left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives }) : A.tf("Te quedaste en {s} de {a}. Te quedan {n} provisiones.", "You scored {s} of {a}. You have {n} provisions left.", { s: A.fmt(S.levelScore), a: A.fmt(Lv.advance), n: run.lives })),   // cada seguro con su frase: se sabe cual te ha salvado
-        lines: conso ? [[et("conso", { p: pctOf(S.levelScore, Lv.advance) }), "+" + conso]] : [],
+        lines: (conso ? [[et("conso", { p: pctOf(S.levelScore, Lv.advance) }), "+" + conso]] : []).concat(betLost),
         stats: [[A.T("Puntos de la ronda", "Round points"), S.levelScore], [A.T("Objetivo", "Target"), Lv.advance], [A.T("Doblones", "Doubloons"), run.coins]], stamp: A.T("FALLIDA", "FAILED"), stampSub: String(run.lives), art: "lose",
         buttons: [{ id: "rtBtn", cls: "btn-ink", label: A.T("Reintentar con lugares nuevos", "Retry with new places"), arrow: true, primary: true, onclick: () => openShop(false) }, { id: "abBtn", cls: "btn-line", label: A.T("Abandonar", "Abandon"), onclick: () => endRun(false) }],
       });
@@ -1133,7 +1142,7 @@ window.AIQ = window.AIQ || {};
       if (!main) return `<div class="nr far${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}</span><b class="nr-name">${name}</b></div><div class="nr-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div>${count}</div></div>`;
       const shuffle = n ? `<button class="chipbtn nr-shuffle" id="chalReroll" type="button" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span>${freeShuf() ? `<em class="nr-free">${ic("spyhole", "sm")}${A.tx(H_FREE)}</em>` : `<em>${CN()}${chalRerollCost()}</em>`}</button>` : "";
       const lis = cf.list.map(c => { const dd = A.CHAL[c.id];
-        return `<li class="nr-row k-${dd.kind}"><span class="nr-ic">${ic(dd.ico)}</span><b class="nr-rn">${A.tx(dd.n)}${c.isNew ? ` <span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><button class="nr-buy" type="button" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")}<span class="nr-p">${CN()}${bribePrice(c, cf.boss)}</span></button><p>${A.tx(dd.d)}</p></li>`; }).join("")
+        return `<li class="nr-row k-${dd.kind}"><span class="nr-ic">${ic(dd.ico)}</span><b class="nr-rn">${A.tx(dd.n)}${c.isNew ? ` <span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b>${c.sealed ? `<em class="nr-have nr-seal">${A.tx(BT.seal)}</em>` : ""}<button class="nr-buy${c.sealed ? " hidden" : ""}" type="button" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")}<span class="nr-p">${CN()}${bribePrice(c, cf.boss)}</span></button><p>${A.tx(dd.d)}</p></li>`; }).join("")
         + done.map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.T("Sobornado", "Bribed")}</em></li>`).join("")
         + (cf.nulled || []).map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.tx(NULLED)}</em></li>`).join("");   // los que quita tu Comodin
       return `<div class="nr${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}${dot}${A.T("Objetivo", "Target")} ${baseTarget() > target() && rr === roundNo() ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(target())}</b></span><b class="nr-name">${name}</b></div>${count}${shuffle}</div>${lis ? `<ul class="nr-list n${Math.min(6, n + done.length)}">${lis}</ul>` : `<p class="nr-clean">${A.T("Ronda limpia: solo tú y el mapa.", "A clean round: just you and the map.")}</p>`}</div>`;
@@ -1318,7 +1327,7 @@ window.AIQ = window.AIQ || {};
     $("shopMenu").onclick = () => C().runMenu();
     document.querySelectorAll("#dlg .nr-buy").forEach(b => (b.onclick = () => bribe(b.dataset.id)));
     if ($("chalReroll")) $("chalReroll").onclick = rerollChal;
-    if (!chest) wireSup();
+    if (!chest) { wireSup(); wireBet(); }
     $("goRound").onclick = () => {
       if (legOn) return;                                                 // la legendaria del cofre aun se esta luciendo (Intro pulsa este boton)
       if (!chest && !run.visitBuys && !run.skipSaid && run.coins >= 8 && Math.random() < 0.5 && A.dealer.campSkip) { run.skipSaid = true; A.dealer.campSkip(run.coins); }   // te vas sin comprar nada (una vez por expedicion)
@@ -1330,17 +1339,77 @@ window.AIQ = window.AIQ || {};
     if (A.tour) A.tour.maybe("camp");
   }
   /* Suministros de la proxima ronda (se gastan cada ronda: el dinero siempre tiene en que invertirse) */
+  /* ---------------- tanda 11: APUESTAS de la Barra (una por visita; aparecen tras vencer a tu primer jefe; en el Reto diario, para todos) ----------------
+     Antes de R4 y R8, Doble o nada: te juegas TODOS tus doblones, el jefe trae un reto mas; vencerlo a la primera los dobla (+40 como mucho) y si no,
+     los pierdes. Antes de R12, La apuesta final: el jefe trae 2 retos mas; vencerlo a la primera da +2 provisiones para el modo infinito y perder no
+     cuesta nada. En las demas visitas, Rojo o negro: tirar cuesta poco y, si aciertas, la proxima ronda paga un 50 % mas y empiezas en racha.
+     Los retos de las apuestas van SELLADOS (ni el Comodin ni el soborno los quitan): de los que ya has visto, de una familia que no esta, a nivel 3 */
+  const BETS = { double: { n: L6("Doble o nada|Double or nothing|Quitte ou double|Dobro ou nada|Doppelt oder nichts|Lascia o raddoppia||加倍或归零|더블 오어 낫싱|ダブル・オア・ナッシング|Удвоить или потерять|Podwójnie albo nic"), d: L6("Te juegas todos tus doblones. El jefe trae un reto más: si lo vences a la primera, los doblas (+40 como mucho); si no, los pierdes.|You stake all your doubloons. The boss brings one more challenge: beat it on the first try and you double them (+40 at most); otherwise you lose them.|Tu mises tous tes doublons. Le boss apporte un défi de plus : bats-le du premier coup et tu les doubles (+40 maximum) ; sinon, tu les perds.|Você aposta todos os seus dobrões. O chefe traz mais um desafio: vença de primeira e você os dobra (+40 no máximo); senão, perde tudo.|Du setzt alle deine Dublonen. Der Boss bringt eine Herausforderung mehr: Besiegst du ihn im ersten Versuch, verdoppelst du sie (höchstens +40), sonst verlierst du sie.|Punti tutti i tuoi dobloni. Il boss porta una sfida in più: battilo al primo colpo e li raddoppi (+40 al massimo); altrimenti li perdi.||押上你所有的金币。首领多带一个挑战：一次击败它，金币翻倍（最多 +40）；否则全输光。|도블론을 전부 겁니다. 보스가 도전을 하나 더 가져옵니다: 한 번에 이기면 두 배 (최대 +40), 아니면 모두 잃습니다.|ダブロンを全部賭ける。ボスはチャレンジを1つ追加してくる。一発で倒せば倍（最大+40）、だめなら全部失う。|Ставишь все дублоны. Босс приносит ещё одно испытание: победишь с первого раза — удвоишь (максимум +40), иначе всё потеряешь.|Stawiasz wszystkie dublony. Boss przynosi jedno wyzwanie więcej: pokonaj go za pierwszym razem, a je podwoisz (maks. +40); inaczej je tracisz."), s: L6("Todos tus doblones contra el jefe: a la primera, ×2 (+40 máx.); si no, nada.|All your doubloons on the boss: first try, ×2 (+40 max); otherwise, nothing.|Tous tes doublons sur le boss : du premier coup, ×2 (+40 max) ; sinon, rien.|Todos os seus dobrões no chefe: de primeira, ×2 (+40 máx.); senão, nada.|Alle Dublonen auf den Boss: im ersten Versuch ×2 (max. +40), sonst nichts.|Tutti i dobloni sul boss: al primo colpo ×2 (+40 max); altrimenti, niente.||全部金币押在首领身上：一次过关 ×2（最多 +40），否则全没。|도블론 전부를 보스에: 한 번에 이기면 ×2 (최대 +40), 아니면 전부 잃음.|全ダブロンをボスに：一発なら×2（最大+40）、だめなら全部失う。|Все дублоны на босса: с первого раза ×2 (макс. +40), иначе ничего.|Wszystkie dublony na bossa: za pierwszym razem ×2 (maks. +40), inaczej nic."), ico: "bet_double" }, final: { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), d: L6("El jefe final trae 2 retos más. Si lo vences a la primera, +2 provisiones para el modo infinito. Perder no cuesta nada.|The final boss brings 2 more challenges. Beat it on the first try for +2 provisions in infinite mode. Losing costs nothing.|Le boss final apporte 2 défis de plus. Bats-le du premier coup : +2 provisions pour le mode infini. Perdre ne coûte rien.|O chefe final traz mais 2 desafios. Vença de primeira e ganhe +2 provisões para o modo infinito. Perder não custa nada.|Der Endboss bringt 2 Herausforderungen mehr. Besiegst du ihn im ersten Versuch: +2 Proviant für den Endlosmodus. Verlieren kostet nichts.|Il boss finale porta 2 sfide in più. Battilo al primo colpo: +2 provviste per la modalità infinita. Perdere non costa nulla.||最终首领多带 2 个挑战。一次击败它，无限模式补给 +2。输了也不亏。|최종 보스가 도전을 2개 더 가져옵니다. 한 번에 이기면 무한 모드 식량 +2. 져도 잃는 건 없습니다.|最終ボスはチャレンジを2つ追加してくる。一発で倒せばエンドレスモード用にプロビジョン+2。負けても失うものはない。|Финальный босс приносит ещё 2 испытания. Победишь с первого раза — +2 запаса для бесконечного режима. Проигрыш ничего не стоит.|Ostatni boss przynosi 2 wyzwania więcej. Pokonaj go za pierwszym razem: +2 zapasy na tryb nieskończony. Przegrana nic nie kosztuje."), s: L6("El jefe final trae 2 retos más. A la primera: +2 provisiones.|The final boss brings 2 more challenges. First try: +2 provisions.|Le boss final apporte 2 défis de plus. Du premier coup : +2 provisions.|O chefe final traz mais 2 desafios. De primeira: +2 provisões.|Der Endboss bringt 2 Herausforderungen mehr. Im ersten Versuch: +2 Proviant.|Il boss finale porta 2 sfide in più. Al primo colpo: +2 provviste.||最终首领多带 2 个挑战。一次过关：补给 +2。|최종 보스가 도전 2개 추가. 한 번에 이기면 식량 +2.|最終ボスにチャレンジ2つ追加。一発ならプロビジョン+2。|Финальный босс приносит ещё 2 испытания. С первого раза: +2 запаса.|Ostatni boss przynosi 2 wyzwania więcej. Za pierwszym razem: +2 zapasy."), ico: "bet_final" }, red: { n: L6("Rojo o negro|Red or black|Rouge ou noir|Vermelho ou preto|Rot oder Schwarz|Rosso o nero||红或黑|빨강 또는 검정|赤か黒|Красное или чёрное|Czerwone czy czarne"), d: L6("Elige color y gira. Si aciertas, la próxima ronda paga un 50 % más y empiezas en racha.|Pick a color and spin. If you're right, the next round pays 50% more and you start on a streak.|Choisis une couleur et lance. Si tu as raison, la prochaine manche paie 50 % de plus et tu commences en série.|Escolha uma cor e gire. Se acertar, a próxima rodada paga 50% a mais e você começa em sequência.|Wähl eine Farbe und dreh. Liegst du richtig, zahlt die nächste Runde 50 % mehr und du startest mit Serie.|Scegli un colore e gira. Se indovini, il prossimo round paga il 50% in più e parti in serie.||选一种颜色然后转动。猜中的话，下一轮奖励多 50%，并且开局就有连击。|색을 고르고 돌리세요. 맞히면 다음 라운드 보상이 50% 늘고 연속 기록을 안고 시작합니다.|色を選んで回す。当たれば次のラウンドの報酬が50%増え、連続記録つきで始まる。|Выбери цвет и крути. Угадаешь — следующий раунд платит на 50% больше, и ты начинаешь с серией.|Wybierz kolor i zakręć. Jeśli trafisz, następna runda płaci 50% więcej i zaczynasz z serią."), s: L6("Si aciertas: la ronda paga un 50 % más y empiezas en racha.|If you're right: the round pays 50% more and you start on a streak.|Si tu as raison : la manche paie 50 % de plus et tu commences en série.|Se acertar: a rodada paga 50% a mais e você começa em sequência.|Liegst du richtig: Die Runde zahlt 50 % mehr und du startest mit Serie.|Se indovini: il round paga il 50% in più e parti in serie.||猜中：这一轮奖励多 50%，开局就有连击。|맞히면: 라운드 보상 50% 증가, 연속 기록을 안고 시작.|当たれば：ラウンド報酬50%増し、連続記録つきで開始。|Угадаешь: раунд платит на 50% больше, и ты начинаешь с серией.|Trafisz: runda płaci 50% więcej i zaczynasz z serią."), ico: "bet_red" } };
+  const BT = { red: L6("Rojo|Red|Rouge|Vermelho|Rot|Rosso||红|빨강|赤|Красное|Czerwone"), black: L6("Negro|Black|Noir|Preto|Schwarz|Nero||黑|검정|黒|Чёрное|Czarne"), go: L6("Apostar|Bet|Miser|Apostar|Setzen|Punta||下注|베팅|賭ける|Ставлю|Stawiam"), on: L6("Apostado|Bet placed|Misé|Apostado|Gesetzt|Puntato||已下注|베팅함|賭けた|Ставка сделана|Postawione"), won: L6("¡Aciertas!|You win!|Gagné !|Acertou!|Gewonnen!|Hai vinto!||猜中了！|맞혔다!|当たり！|Угадал!|Trafione!"), lost: L6("Fallas|You lose|Perdu|Errou|Verloren|Hai perso||没猜中|빗나감|はずれ|Мимо|Pudło"), seal: L6("Apuesta|Bet|Pari|Aposta|Wette|Scommessa||赌注|베팅|賭け|Ставка|Zakład"), lives2: L6("+2 provisiones|+2 provisions|+2 provisions|+2 provisões|+2 Proviant|+2 provviste||+2 补给|식량 +2|+2 プロビジョン|+2 запаса|+2 zapasy") };
+  A.adv.BET_SEAL = BT.seal;
+  const betKind = r => (r > LAST ? null : r % 4 === 3 ? (r === LAST ? "final" : "double") : "red");
+  const betsOpen = () => !!run.board || (A.profile.get().adv.boss || 0) > 0;
+  const redCost = () => price(2);
+  /* n retos sellados para la ronda r: de familias que no estan, sin chocar con la ronda (texto en banderas, la placa, Memoria de pez...) */
+  function pickSealed(r, n, tag) {
+    const D = A.CHAL, base = chalFor(r).list, fs = new Set(base.map(c => D[c.id].fam)), flag = defAt(r).topic === "flag", topic = defAt(r).topic, txt = base.some(c => D[c.id].kind === "text");
+    const bad = id => (flag ? D[id].kind === "text" : D[id].kind === "flag") || (txt && D[id].kind === "text") || (run.cjk && id === "runes") || ((topic === "country" || topic === "clue") && id === "nocountry") || (topic === "clue" && id === "riddle") || (id === "memory" && base.some(c => c.id === "hang" || c.id === "battery")) || ((id === "hang" || id === "battery") && base.some(c => c.id === "memory"));
+    let pool = Object.keys(D).filter(id => !D[id].sub && D[id].kind !== "rule" && id !== "dark" && !fs.has(D[id].fam) && !bad(id));
+    if (!run.board && run.chSeen0) { const seen = pool.filter(id => run.chSeen0.includes(id)); if (seen.length >= n) pool = seen; }   // de los que ya has visto
+    const rr = A.rng(`${run.seed}:${tag}:${r}`), got = [];
+    for (const id of rr.shuffle(pool)) { if (fs.has(D[id].fam)) continue; got.push({ id, lv: 3 }); fs.add(D[id].fam); if (got.length === n) break; }
+    return got;
+  }
+  /* la carta de la apuesta en la Barra (tapete rojo) */
+  function betHtml() {
+    const r = roundNo(), k = betKind(r); if (run.inf || !k || !betsOpen()) return "";
+    const b = (run.bets || {})[r], B = BETS[k], cf = chalFor(r), head = `<span class="sp-ic">${ic(B.ico)}</span><span class="sp-t" data-tt="${A.tx(B.d).replace(/"/g, "&quot;")}"><b>${A.tx(B.n)}</b><i>${A.tx(B.s)}</i></span>`;   // en la carta, el texto corto; el entero, en el globo
+    if (k === "red") {
+      const att = run.attempt || 0;
+      if (b && b.id === "red" && b.att === att) return `<div class="sup bet bt-red done ${b.win ? "win" : "lose"}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(b.out === "red" ? BT.red : BT.black)}</b>${A.tx(b.win ? BT.won : BT.lost)}</em></div>`;
+      return `<div class="sup bet bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
+    }
+    if (b && b.id === k) return `<div class="sup bet on bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.on)}${k === "double" ? " · " + CN() + b.stake : ""}</em></div>`;
+    const cap = cf.list.length + (k === "final" ? 2 : 1) <= 5;
+    if (run.attempt > 0 || run.lives <= 1 || !cap || (k === "double" && run.coins < 1)) return "";
+    return `<div class="sup bet bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-p bt-go">${A.tx(BT.go)}${k === "double" ? " · " + CN() + run.coins : ""}</em></div>`;
+  }
+  function wireBet() {
+    const el = document.querySelector("#dlg .sup.bet"); if (!el) return; const r = roundNo(), k = el.dataset.bet;
+    if (k === "red") {
+      el.querySelectorAll("[data-pick]").forEach(btn => (btn.onclick = e => {
+        e.stopPropagation(); const c = redCost(); if (run.coins < c) { A.sfx.deny(); shake(el); return; }
+        const att = run.attempt || 0, out = A.rng(`${run.seed}:rojo:${r}:${att}`)() < 0.5 ? "red" : "black", pick = btn.dataset.pick;
+        run.coins -= c; run.bets = run.bets || {}; run.bets[r] = { id: "red", pick, out, win: pick === out, att }; persist();   // guardada antes de girar: recargar no la cambia
+        spinRed(el, () => { renderShop(false); const b = run.bets[r]; if (b.win) { A.sfx.jackpot(1); if (A.core.jpShake) A.core.jpShake(1); } else A.sfx.lose(); A.dealer.enable(true); A.dealer.say(A.dealer.line(b.win ? "betWin" : "betLose"), { mood: b.win ? "angry" : "laugh", hold: 2200 }); });
+      }));
+      return;
+    }
+    el.onclick = () => {
+      run.bets = run.bets || {}; const b = run.bets[r];
+      if (b && b.id === k) { if (k === "double") run.coins += b.stake; delete run.bets[r]; A.sfx.sell(); persist(); return renderShop(false); }   // en la misma visita, te echas atras
+      const retos = pickSealed(r, k === "final" ? 2 : 1, k === "final" ? "final" : "doble"); if (!retos.length) { A.sfx.deny(); shake(el); return; }
+      run.bets[r] = { id: k, retos, stake: k === "double" ? run.coins : 0 }; if (k === "double") run.coins = 0;
+      A.sfx.chip(0.2); setTimeout(() => A.sfx.chip(0.6), 120); setTimeout(() => A.sfx.stamp(), 260); persist(); renderShop(false);
+      A.dealer.enable(true); A.dealer.say(A.dealer.line("betDeal"), { mood: "sly", hold: 2400 });   // cierra el trato
+    };
+  }
+  /* la ruleta gira 2 s en la carta, con el tic-tic de la bola cada vez mas lento */
+  function spinRed(el, done) {
+    el.classList.add("spinning"); const reduced = C().S.reduce || matchMedia("(prefers-reduced-motion: reduce)").matches; let t = 0, k = 0;
+    if (reduced) return setTimeout(done, 400);
+    const tick = () => { if (t > 1900) return done(); A.sfx.tick(); const gap = 60 + k * k * 4; k++; t += gap; setTimeout(tick, gap); }; tick();
+  }
   const SUPS = [
-    { id: "cafe", cost: 4, ico: "hourglass", n: A.L("Café doble", "Double espresso"), d: A.L("+4 s por pregunta en la próxima ronda", "+4 s per question next round") },
-    { id: "kit", cost: 6, ico: "glass", n: A.L("Refuerzo", "Resupply"), d: A.L("+1 carga en todas tus herramientas la próxima ronda", "+1 charge on all your tools next round") },
-    { id: "seguro", cost: 8, ico: "shield", n: A.L("Seguro de ronda", "Round insurance"), d: A.L("Si fallas la próxima ronda, no pierdes provisión", "If you fail next round, you keep your provision") },
+    { id: "cafe", cost: 4, ico: "sup_cafe", n: A.L("Café doble", "Double espresso"), d: A.L("+4 s por pregunta en la próxima ronda", "+4 s per question next round") },
+    { id: "seguro", cost: 8, ico: "sup_seguro", n: A.L("Seguro de ronda", "Round insurance"), d: A.L("Si fallas la próxima ronda, no pierdes provisión", "If you fail next round, you keep your provision") },
   ];
   const supCost = s => price(s.cost + (s.id === "seguro" ? 2 * (run.segN || 0) : 0));   // cada Seguro de ronda gastado (el que te salva al fallar; ver roundEnd) encarece el siguiente: no se puede fallar gratis para siempre
   let supFresh = null;                                                 // el suministro recien comprado: solo a ese le cae el sello
   function supHtml() {
-    const sup = run.sup || {}, items = SUPS.filter(s => s.id !== "kit" || Object.keys(run.tools).length).map(s => `<button class="sup sp-${s.id}${sup[s.id] ? " on" : ""}${supFresh === s.id ? " fresh" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span>${sup[s.id] ? `<em class="sp-on">${A.T("Activo", "On")}</em>` : `<em class="sp-p">${CN()}${supCost(s)}</em>`}</button>`).join("");
+    const sup = run.sup || {}, items = SUPS.map(s => `<button class="sup sp-${s.id}${sup[s.id] ? " on" : ""}${supFresh === s.id ? " fresh" : ""}" data-sup="${s.id}" type="button"><span class="sp-ic">${ic(s.ico)}</span><span class="sp-t"><b>${A.tx(s.n)}</b><i>${A.tx(s.d)}</i></span>${sup[s.id] ? `<em class="sp-on">${A.T("Activo", "On")}</em>` : `<em class="sp-p">${CN()}${supCost(s)}</em>`}</button>`).join("");
     supFresh = null;
-    return `<div class="tb-sup">${items}</div>`;
+    return `<div class="tb-sup">${items}${betHtml()}</div>`;
   }
   function wireSup() {
     document.querySelectorAll("[data-sup]").forEach(b => (b.onclick = () => {

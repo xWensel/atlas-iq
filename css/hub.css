@@ -111,7 +111,7 @@ i.uic { display: contents; } .uic .ic, .menu-gear .ic { width: 28px; height: 28p
 .ic.cn { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -.26em; margin-right: .28em; }
 .ic.sm { display: inline-block; width: 20px; height: 20px; vertical-align: middle; margin-right: 7px; } .hub-back .ic.sm { margin: 0; } .hub-back { display: inline-flex; align-items: center; gap: 6px; }
 .ic.big { width: 160px; height: 160px; }
-.hp { display: inline-block; margin-right: 2px; } .hp .ic { width: 22px; height: 22px; } .hp:not(.on) .ic { filter: grayscale(1) brightness(.32) drop-shadow(0 2px 0 rgba(0, 0, 0, .3)); } .hearts .hp .ic { width: 30px; height: 30px; } .ab-hearts { display: flex; }
+.hp { display: inline-block; margin-right: 2px; } .hp .ic { width: 22px; height: 22px; } .hp:not(.on) .ic { filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .3)); }   /* la provision perdida tiene su propio corazon vacio (heart_empty) */ .hearts .hp .ic { width: 30px; height: 30px; } .ab-hearts { display: flex; }
 .ab-coins { display: inline-flex; align-items: center; } .ab-coins b { font-weight: 700; }
 .ab-perk .ic { width: 26px; height: 26px; }
 .of-ico { display: grid; place-items: center; height: 92px; background: radial-gradient(circle at 50% 55%, rgba(255, 255, 255, .16), transparent 62%); } .of-ico .ic { width: 72px; height: 72px; transition: transform .3s var(--spring); } .offer:hover .of-ico .ic { transform: scale(1.12) rotate(-5deg); }

@@ -150,6 +150,23 @@ html.reduce-motion .tr-relic.swap-pick .tr-face { animation: none; }
 .table.mesa .sup::before { content: ""; position: absolute; inset: 5px 5px 8px; border-radius: 8px; border: 2px dashed rgba(255, 255, 255, .18); pointer-events: none; }
 .table.mesa .sup:hover { transform: translateY(-3px); box-shadow: 0 0 0 2px #0a140f, inset 0 3px 0 var(--c1), inset 0 -5px 0 var(--c3), 0 8px 0 2px #0a140f, 0 0 22px rgba(255, 208, 107, .35); }
 .table.mesa .sup:active { transform: translateY(2px); }
+/* tanda 11: la apuesta de la Barra, en tapete rojo; Rojo o negro gira su ruleta y deja el resultado */
+.table.mesa .sup.bet { --c1: #b8433b; --c2: #8e2a26; --c3: #5c1714; --sc: #ff8a70; }
+.table.mesa .sup.bet::before { border-color: rgba(255, 220, 190, .22); }
+.table.mesa .sup.bet .sp-t > i { color: rgba(255, 236, 220, .86); }
+.table.mesa .sup.bet.on { --c1: #ffe9a6; --c2: #f8b449; --c3: #b8741a; }
+.table.mesa .sup.bet .bt-pick { position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; flex: none; }
+.table.mesa .sup.bet .bt-c { padding: 5px 10px 4px; border: 0; border-radius: 8px; font: 900 13px/1 var(--serif); letter-spacing: .03em; text-transform: uppercase; color: #fff; cursor: pointer; box-shadow: 0 0 0 2px #0a140f, inset 0 2px 0 rgba(255, 255, 255, .25), 0 3px 0 2px #0a140f; transition: transform .15s var(--spring); }
+.table.mesa .sup.bet .bt-cr { background: #d63a2f; } .table.mesa .sup.bet .bt-cb { background: #1d1f26; }
+.table.mesa .sup.bet .bt-c:hover { transform: translateY(-2px); } .table.mesa .sup.bet .bt-c:active { transform: translateY(1px); }
+.table.mesa .sup.bet.spinning .sp-ic .ic { animation: bt-spin .28s linear infinite; }
+@keyframes bt-spin { to { transform: rotate(360deg); } }
+.table.mesa .sup.bet .bt-res { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; font-style: normal; font-family: var(--serif); font-size: 13px; color: #ffe2cf; }
+.table.mesa .sup.bet .bt-res b { font-weight: 900; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; }
+.table.mesa .sup.bet.win { --c1: #ffe9a6; --c2: #f8b449; --c3: #b8741a; } .table.mesa .sup.bet.win .bt-res, .table.mesa .sup.bet.win .sp-t b, .table.mesa .sup.bet.win .sp-t > i { color: #16241c; text-shadow: none; }
+.table.mesa .sup.bet.done { cursor: default; } .table.mesa .sup.bet.done:hover { transform: none; }
+html.reduce-motion .table.mesa .sup.bet.spinning .sp-ic .ic { animation: none; }
+.nr-seal { color: #ff8a70 !important; }
 .table.mesa .sup.sp-cafe { --sc: #3fb59a; } .table.mesa .sup.sp-kit { --sc: #6c8cff; } .table.mesa .sup.sp-seguro { --sc: #fe5f55; }
 .table.mesa .sp-ic { position: relative; z-index: 1; flex: none; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 50% 36%, var(--sc), #0f2a1e 82%);
   box-shadow: 0 0 0 2px #0a140f, inset 0 0 0 2px rgba(255, 217, 138, .55); }
