@@ -1519,7 +1519,7 @@ window.AIQ = window.AIQ || {};
     run.bar = { key, s }; return s;
   }
   const offerPay = c => { const d = A.CHAL[c.id]; return Math.max(1, Math.round(0.6 * (3 + 2 * (c.lv || 3) + (d.kind === "map" ? 1 : 0)) * ascFx(run.asc).price * inflation())); };   // el 60 % del soborno base, sin la escalada
-  const betsOpen = () => !!run.board || (A.profile.get().adv.boss || 0) > 0;
+  const betsOpen = () => true;   // la Barra de tres casillas (suministro, casino, apuesta) sale en TODOS los Campamentos, desde el primero
   const redCost = () => price(2);
   /* n retos sellados para la ronda r: de familias que no estan, sin chocar con la ronda (texto en banderas, la placa, Memoria de pez...) */
   function pickSealed(r, n, tag, baseList) {
@@ -1533,7 +1533,7 @@ window.AIQ = window.AIQ || {};
   }
   /* la carta de la apuesta en la Barra (tapete rojo) */
   function betHtml(k) {
-    const r = roundNo(); if (run.inf || r > LAST || (!betsOpen() && !CASINO.includes(k))) return "";   // el juego de casino del centro sale en TODOS los Campamentos; solo las apuestas laterales esperan a tu primer jefe
+    const r = roundNo(); if (run.inf || r > LAST || !betsOpen()) return "";   // el juego de casino del centro sale en TODOS los Campamentos; solo las apuestas laterales esperan a tu primer jefe
     const b = CASINO.includes(k) ? casOf(r) : (run.bets || {})[r], B = BETS[k], cf = chalFor(r), head = `<span class="sp-ic">${ic(B.ico)}</span><span class="sp-t" data-tt="${A.tx(B.d).replace(/"/g, "&quot;")}"><b>${A.tx(B.n)}</b><i>${A.tx(B.s)}</i></span>`;   // en la carta, el texto corto; el entero, en el globo
     if (k === "offer") {
       if (b && b.id === "offer") return `<div class="sup bet on bt-offer" data-bet="offer" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.sold)} · ${b.retos.length} · +${CN()}${b.pay}</em></div>`;

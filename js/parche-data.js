@@ -46,7 +46,7 @@ window.AIQ = window.AIQ || {};
           entries: [
             E(["El casino, desde el primer Campamento", "Casino from the very first Camp"], "fix", "0.2.17", [
             ["Rojo o negro, Moneda al aire y Ruleta de premios aparecían solo después de derrotar a tu primer jefe: quien empezaba de cero veía únicamente los suministros. Ahora el juego del centro sale en **todos** los Campamentos.", "Red or black, Coin flip and the Prize wheel only appeared after you beat your first boss: anyone starting from scratch saw only the supplies. Now the middle game shows up at **every** Camp."],
-            ["Las apuestas de los lados (Oferta de la casa, Doble o nada y Apuesta final) siguen esperando a tu primer jefe.", "The side bets (House offer, Double or nothing and Final bet) still wait for your first boss."]]),
+            ["Lo mismo con las apuestas de la derecha (Oferta de la casa, Doble o nada y Apuesta final): salen desde el primer Campamento, en las rondas que les tocan.", "Same for the side bets on the right (House offer, Double or nothing and Final bet): they show up from the first Camp, in the rounds they belong to."]]),
           ] },
       ],
     },
