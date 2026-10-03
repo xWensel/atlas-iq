@@ -18,3 +18,9 @@
   siga a la vista y que el explorador no le tape la cara. Las piezas de la escena estan en `tools/art/card_adv/`.
 - El icono del jefe del acto (`assets/icons/boss_hat.webp`: ruta de la expedicion, proxima ronda, ficha roja del jefe) es la chistera del crupier,
   sacada de su capa `hat`. Si el crupier cambia, en la misma entrega: `python tools/crupier/chistera.py`.
+
+## Notas del parche (lo que lee el jugador dentro del juego)
+- Los parches tienen numeracion PROPIA, distinta de la del juego (v0.2.1, v0.2.2...), y se leen desde el icono del cuaderno de la esquina inferior izquierda de la portada.
+  Los datos estan en `js/parche-data.js` (`A.PATCHES`, el mas nuevo primero; la cabecera del archivo explica el formato) y sus capturas en `assets/parche/`. La interfaz es `js/parche.js` + `css/parche.css`.
+- Cuando una entrega (o varias seguidas) reuna cambios que el jugador note, anade un parche nuevo (o amplia el ultimo si aun no se ha publicado): textos en es y en (los otros 10 idiomas caen al ingles),
+  cifras medidas contra el README y cada entrada con la version del juego en la que llego. El punto rojo de "nuevo" sale solo.

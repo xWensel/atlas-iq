@@ -23,7 +23,7 @@ window.smoke = async function (lang = "fr") {
     if (els.length && !clashSeen.has(where + what)) { clashSeen.add(where + what); errors.push(`cambiar de idioma en ${where} pisa ${els.length} elementos [data-i] que no son textos (${what})`); } };
   const step = async (name, fn, ms = 350) => { try { await fn(); } catch (e) { errors.push(name + ": " + e.message); } await wait(ms); };
   // menus
-  for (const s of ["home", "classic", "adventure", "daily", "profile"]) await step("hub " + s, () => A.hub.screen(s));
+  for (const s of ["home", "classic", "adventure", "daily", "profile", "patch"]) await step("hub " + s, () => A.hub.screen(s));
   await step("codex", () => { A.codex.open(); }, 600); await step("codex close", () => A.codex.close());
   for (const t of ["general", "sound", "video", "data"]) await step("settings " + t, () => { C.openSettings(true); document.querySelector(`[data-seg=settab] [data-v=${t}]`).click(); });
   await step("settings close", () => C.openSettings(false));

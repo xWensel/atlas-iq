@@ -393,8 +393,8 @@
   /* los tooltips (data-tt / data-tip / title) los pinta js/uikit.js */
   /* sonido suave al pasar por controles. Los 7 botones del menu principal (3 modos, Enciclopedia, Clasificacion, Perfil, Ajustes) tienen el suyo,
      solo con raton: en movil el toque ya suena al pulsar y no se montan dos sonidos */
-  const MENU6 = ".hh .mcard, .hh .plq, .hh .menu-gear";                                   // .plq: las placas del pie (Enciclopedia, Clasificacion, Perfil)
-  const menuK = el => (el.classList.contains("mcard") ? ["classic", "adventure", "daily"].indexOf(el.dataset.mode) : ({ codexBtn: 3, profBtn: 4, rankBtn: 6 })[el.id] ?? 5);
+  const MENU6 = ".hh .mcard, .hh .plq, .hh .menu-gear, #dlg > .menu-patch";                                   // .plq: las placas del pie (Enciclopedia, Clasificacion, Perfil)
+  const menuK = el => (el.classList.contains("mcard") ? ["classic", "adventure", "daily"].indexOf(el.dataset.mode) : ({ codexBtn: 3, profBtn: 4, rankBtn: 6, patchBtn: 3 })[el.id] ?? 5);
   let lastHover = null, ptr = "mouse";
   document.addEventListener("pointerover", e => (ptr = e.pointerType), true);
   document.addEventListener("mouseover", e => {

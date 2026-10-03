@@ -58,8 +58,8 @@ window.AIQ = window.AIQ || {};
           ${plaque("plq-prof", "profBtn", "m_prof", T("Perfil", "Profile"), `${A.icon("u_star")}${A.fmt(A.ach.count())} / ${A.fmt(A.ach.total())}`, (100 * A.ach.count()) / Math.max(1, A.ach.total()), A.ttAttr(T("Perfil", "Profile"), A.tip6("Tus estadísticas y tus logros.|Your stats and achievements.|Tes statistiques et tes succès.|Suas estatísticas e conquistas.|Deine Statistiken und Erfolge.|Le tue statistiche e i tuoi obiettivi.||你的统计数据和成就。|내 통계와 업적.|あなたの記録と実績。|Твоя статистика и достижения.|Twoje statystyki i osiągnięcia.")))}
         </div>
       </div></div>
-      <span class="hh-ver">Geolite · v${A.VERSION}</span>`, "home");               // fuera de .hh: no cuenta para la composicion ni para A.fitK
-    wireTools(); A.podio.wire();                                      // Clasificacion: js/podio.js
+      <span class="hh-ver">Geolite · v${A.VERSION}</span>${A.parche ? A.parche.button() : ""}`, "home");               // fuera de .hh: no cuenta para la composicion ni para A.fitK
+    wireTools(); A.podio.wire(); if (A.parche) A.parche.wire();                                      // Clasificacion: js/podio.js
     fitNames(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNames);
     if (A.salir) A.salir.wire();                                      // salir del juego: js/salir.js
     $("codexBtn").onclick = () => A.codex.open();                     // la Enciclopedia ya suena al abrirse
@@ -299,8 +299,8 @@ window.AIQ = window.AIQ || {};
   function screen(id) {
     A.podio.reset();                                                  // el podio de la portada no se queda encima de otra pantalla
     C().S.hub = id;
-    ({ home, classic: () => campaigns("classic"), adventure, daily, profile }[id] || home)();
+    ({ home, classic: () => campaigns("classic"), adventure, daily, profile, patch: () => A.parche.open() }[id] || home)();
     C().refreshSkinBits && C().refreshSkinBits();
   }
-  A.hub = { render: id => screen(id || "home"), screen, plaque };
+  A.hub = { render: id => screen(id || "home"), screen, plaque, frame: scr, wireTools };
 })(window.AIQ);
