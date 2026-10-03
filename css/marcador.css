@@ -89,3 +89,157 @@ html[data-skin="casino"] #ledgerSh.mc-live .ledger::before { border-radius: 11px
 html.reduce-motion #ledgerSh, html.reduce-motion #ledgerSh .mc-slot, html.reduce-motion #scLoot { transition: none; }
 html.reduce-motion #ledgerSh .mc-in > .ticket, html.reduce-motion .mc-stamp { animation: none; }
 @media (prefers-reduced-motion: reduce) { .mc-chip, .mc-plus, .mc-drop { display: none; } }
+
+/* ==========================================================================
+   v0.2.15 - el ticket nuevo (reveal en js/game.js). Se lee de arriba abajo como una mano de Balatro:
+   quien era (bandera, veredicto y lugar) -> cuanto fallaste (km, rumbo, tu chincheta) -> la cuenta (PUNTOS x RACHA) -> el total.
+   ========================================================================== */
+/* cabecera: la bandera del acierto (o el mastil vacio) junto al veredicto y el lugar, con la tipografia de la placa de la pregunta */
+.tk-head { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; text-align: left; }
+.tk-head.nf { text-align: center; }
+.tk-head .tk-title { margin-top: 0; }
+.tk-id { min-width: 0; display: grid; gap: 3px; }
+.tk-place { display: grid; line-height: 1.05; animation: rise .5s var(--spring) .2s both; }
+.tk-place > span { font-family: var(--mono); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 1px; }
+.tk-place b { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 800; font-size: 24px; color: var(--ink); text-wrap: balance; }
+.tk-place em { font-family: var(--serif); font-style: normal; font-weight: 800; font-size: 17px; color: #1d6b42; margin-top: 2px; text-wrap: balance; }
+.tk-place em::before { content: "◈"; font-size: .6em; margin-right: .45em; vertical-align: .18em; opacity: .7; }
+.tk-head.nf .tk-place { justify-items: center; }
+/* la bandera: el pixel de 64 x 64 de la Enciclopedia (1 px por celda). El mastil es la columna 0-9 de la imagen; la tela, el resto: al acertar
+   sube por el mastil y se despliega a saltos de un pixel, a la vez que la del mapa (--fh). Al fallar queda el mastil solo, apagado */
+.tk-flag { position: relative; flex: none; width: 64px; height: 64px; margin-left: -6px; }
+.tk-flag.two { width: 118px; }
+.tk-flag > i { position: absolute; top: 0; left: calc(var(--fi, 0) * 54px); width: 64px; height: 64px; }
+.tk-flag img { position: absolute; inset: 0; width: 64px; height: 64px; image-rendering: pixelated; -webkit-user-drag: none; }
+.tk-flag img.p { clip-path: inset(0 84.375% 0 0); }
+.tk-flag:not(.up) img.p { opacity: .5; }
+.tk-flag img.h { opacity: .5; }   /* fallo: el hueco punteado de la tela (tools/flag_slot.py): habia una bandera que ganar, sin desvelar cual */
+.tk-flag img.c { clip-path: inset(0 0 0 15.625%); animation: tf-up .44s steps(11, jump-none) calc(var(--fh, 650ms) + var(--fi, 0) * 140ms) both; }
+@keyframes tf-up { from { transform: translateY(10px); clip-path: inset(0 78% 0 15.625%); } }
+/* km, rumbo del fallo y tu chincheta (en verde si cayo en el pais bueno, en rojo si no) */
+html body .tk2 .tk-km { margin-top: 6px; }
+.tk2 .tk-from { margin-top: 3px; }
+.tk-pin { font-size: 15px; line-height: 1.2; color: var(--ink-2); margin-top: 1px; animation: rise .45s var(--spring) .62s both; }
+.tk-pin b { font-weight: inherit; color: var(--ink); }
+.tk-pin.ok b { color: #1d6b42; } .tk-pin.bad b { color: var(--red); } .tk-pin.sea b { color: #2d6f8a; }
+/* Clasico: la racha solo cuenta (no multiplica) */
+.tk-rows .tk-srow dt, .tk-rows .tk-srow dd { color: var(--red); }
+.tk-rows .tk-srow.off dd s { opacity: .55; margin-right: 6px; }
+
+/* la ecuacion: PUNTOS x RACHA, siempre a la vista en la Aventura y el Reto. La caja roja cuenta la racha: apagada (x1), encendida con llamas
+   (la llama de los logros, a_flame, en 32 celdas: 1, 2 o 3 segun la racha) o agrietada al perderla. Todo pasa en el golpe --sl */
+.tk-eq { display: flex; align-items: stretch; margin: 22px 0 4px; }
+.tk-eq .c, .tk-eq .m { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 60px; padding: 6px 8px 7px; border-radius: 10px; color: #fff;
+  box-shadow: inset 0 0 0 2px #16241c, 0 4px 0 rgba(0, 0, 0, .35); text-shadow: 2px 2px 0 rgba(22, 36, 28, .45); }
+.tk-eq .c { flex: 1 1 0; min-width: 0; background: #2f7bf5; }
+.tk-eq .mw { position: relative; flex: 1 1 0; min-width: 0; display: grid; }
+.tk-eq .m { z-index: 1; background: #fe5f55; --off: #6e6264; }
+.tk-eq .x { flex: none; align-self: center; width: 28px; text-align: center; font-family: var(--serif); font-style: normal; font-weight: 900; font-size: 28px; line-height: 1; color: var(--ink); }
+.tk-eq :is(.c, .m) > span { font-family: var(--mono); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+.tk-eq b { font-family: var(--serif); font-variation-settings: var(--disp); font-weight: 900; font-size: 30px; line-height: 1; }
+.tk-eq .c b.odo { height: 1em; }
+.tk-eq .m > span, .tk-eq .m > b { display: grid; justify-items: center; }
+.tk-eq .m em { grid-area: 1 / 1; font-style: normal; }
+.tk-eq .m > span em.lg { font-size: 11px; line-height: 1.1; white-space: normal; text-wrap: balance; text-align: center; letter-spacing: .03em; }   /* "Serie gerissen", "Sequência quebrada": a dos lineas, sin ensanchar la caja */
+.tk-eq .m em.a { animation: eq-a 1ms step-start var(--sl) both; }
+.tk-eq .m em.b, .tk-eq .m small, .tk-eq .m .crk { animation: eq-b 1ms step-start var(--sl) both; }
+@keyframes eq-a { from { opacity: 1; } to { opacity: 0; } }      /* step-start: al acabar, Chromium deja el progreso en 0,99999 y con step-end volvia al principio */
+@keyframes eq-b { from { opacity: 0; } to { opacity: 1; } }
+.tk-eq.e-off .m { background: var(--off); color: #efe4df; }
+.tk-eq.e-off .m b { opacity: .78; }
+.tk-eq.e-on:not(.f-lit) .m { animation: eq-ignite .46s cubic-bezier(.3, 1.6, .5, 1) var(--sl) both; }
+.tk-eq.e-on.f-lit .m { animation: eq-bump .46s cubic-bezier(.3, 1.6, .5, 1) var(--sl) both; }
+.tk-eq.e-broken .m { animation: eq-break .55s ease-out var(--sl) both; }
+@keyframes eq-ignite { from { background: var(--off); color: #efe4df; } 30% { background: #ff9a7a; color: #fff; transform: scale(1.16) rotate(-3deg); } to { background: #fe5f55; color: #fff; transform: none; } }
+@keyframes eq-bump { 30% { transform: scale(1.13) rotate(-3deg); filter: brightness(1.3); } }
+@keyframes eq-break { from { background: #fe5f55; } 10% { transform: translateX(-5px) rotate(-2deg); background: #fff1e8; } 22% { transform: translateX(5px) rotate(2deg); } 34% { transform: translateX(-3px) rotate(-1deg); }
+  52%, to { transform: none; background: var(--off); color: #efe4df; } }
+.tk-eq .m > span, .tk-eq .m > b, .tk-eq .m small { position: relative; z-index: 1; }   /* el texto, por encima de la grieta */
+.tk-eq .m small { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; line-height: 1; opacity: .85; text-shadow: none; }
+/* la grieta: una raya quebrada de pixel que cruza la caja */
+.tk-eq .m .crk { position: absolute; inset: 3px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60' preserveAspectRatio='none' shape-rendering='crispEdges'%3E%3Cg fill='none' stroke-linejoin='miter'%3E%3Cpath d='M0 16L14 21L22 14L34 27L44 22L52 33L64 29L74 40L86 35L96 46L108 41L120 49M52 33L57 45L52 58' stroke='%2316241c' stroke-opacity='.8' stroke-width='4'/%3E%3Cpath d='M0 16L14 21L22 14L34 27L44 22L52 33L64 29L74 40L86 35L96 46L108 41L120 49M52 33L57 45L52 58' stroke='%23fff6ea' stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+/* las llamas asoman por encima de la caja roja (por detras de ella) y titilan dandose la vuelta, cada una a su ritmo */
+.tk-eq .fire { position: absolute; left: 0; right: 0; bottom: calc(100% - 9px); height: 32px; display: flex; justify-content: center; z-index: 0; pointer-events: none; transform-origin: 50% 100%; }
+.tk-eq .fire b { flex: none; width: 32px; height: 32px; background: url("../assets/icons/a_flame_s.webp") 0 0 / 32px 32px no-repeat; image-rendering: pixelated; animation: fl-flick .36s steps(1) infinite; }
+.tk-eq .fire b:nth-child(2) { margin: -6px -2px 0; animation-duration: .44s; animation-delay: -.2s; }
+.tk-eq .fire b:nth-child(3) { animation-duration: .4s; animation-delay: -.1s; }
+@keyframes fl-flick { 0% { transform: none; } 50% { transform: scaleX(-1) translateY(-1px); } }
+.tk-eq .fire[data-lv="1"] b:not(:nth-child(2)) { display: none; }
+.tk-eq .fire[data-lv="1"] b:nth-child(2) { margin: 0; }
+.tk-eq .fire[data-lv="2"] b:nth-child(2) { display: none; }
+.tk-eq .fire.f1 { animation: fl-in .4s cubic-bezier(.3, 1.7, .5, 1) var(--sl) both; }
+@keyframes fl-in { from { transform: scale(.1, .1); opacity: 0; } 1% { opacity: 1; } to { transform: none; opacity: 1; } }
+.tk-eq.e-on .fire.f0 { animation: eq-a 1ms step-start var(--sl) both; }
+.tk-eq.e-broken .fire.f0 { animation: fl-out .26s ease-in var(--sl) both; }
+@keyframes fl-out { to { transform: scale(.5, 0); opacity: 0; } }
+/* esquirlas de la grieta (js/game.js shards) */
+.tk-shard { position: absolute; z-index: 30; left: 0; top: 0; width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #fe5f55; box-shadow: 0 0 0 2px #16241c; pointer-events: none; will-change: transform; }
+.tk-shard.d { width: 4px; height: 4px; background: #fff1e8; }
+
+/* el ticket pegado al marcador, cuando falta alto: tambien se aprietan las piezas nuevas */
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-head { margin-top: 8px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-place b { font-size: 21px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-eq { margin-top: 18px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-eq :is(.c, .m) { min-height: 52px; padding-top: 4px; padding-bottom: 5px; gap: 2px; }
+:is(#ledgerSh, .mc-ghost).mc-c1 .tk-eq b { font-size: 26px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-head { margin-top: 6px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-pin { display: none; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-eq { margin-top: 16px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-eq :is(.c, .m) { min-height: 46px; }
+:is(#ledgerSh, .mc-ghost).mc-c2 .tk-eq b { font-size: 23px; }
+
+html.reduce-motion .tk-flag img.c, html.reduce-motion .tk-eq .m, html.reduce-motion .tk-eq .fire { animation-duration: 1ms; }
+html.reduce-motion .tk-eq .fire b { animation: none; }
+@media (prefers-reduced-motion: reduce) { .tk-eq .fire b { animation: none; } .tk-shard { display: none; } }
+
+/* la hoja del ticket (ventana estrecha o baja, #dlg.side): la ecuacion un poco mas baja; la bandera y la linea de tu chincheta se quitan si falta sitio
+   (sc1, sc2: js/marcador.js) o en movil (<= 600 px), y entonces la cabecera se centra */
+#dlg.side .tk-head { margin-top: 8px; }
+#dlg.side .tk-place b { font-size: 21px; }
+#dlg.side .tk-eq { margin: 16px 0 2px; }
+#dlg.side .tk-eq :is(.c, .m) { min-height: 46px; padding: 4px 6px 5px; gap: 2px; }
+#dlg.side .tk-eq b { font-size: 24px; }
+#dlg.side.sc1 .tk-pin, #dlg.side.sc2 .tk-flag { display: none; }
+#dlg.side.sc2 .tk-head .tk-id, #dlg.side.sc2 .tk-place { justify-items: center; text-align: center; }
+@media (max-width: 600px) {
+  #dlg.side .tk-flag, #dlg.side .tk-pin { display: none; }
+  #dlg.side .tk-head .tk-id, #dlg.side .tk-place { justify-items: center; text-align: center; }
+}
+
+/* v0.2.15, ventana estrecha (<= 900 px: sin marcador al lado; en Electron no pasa, su ventana minima es de 960 x 600). La hoja del ticket ni se desplaza
+   ni la tapan la nota o los avisos: va entre la placa (--plate-bottom) y la nota (--note-top) y, si no cabe, js/marcador.js la aprieta (sc1, sc2) y la
+   encoge. De 601 a 900 px va a la derecha, como el ticket de escritorio, y deja la columna izquierda al crupier y al mapa */
+@media (max-width: 900px) and (min-height: 521px), (max-width: 900px) and (orientation: portrait) {
+  #dlg.side { max-height: calc(calc(100 * var(--vh)) - var(--plate-bottom, 220px) - var(--note-top, 90px) - 18px); overflow: hidden; }
+  body.tk-on #lvlText { display: none; }
+  /* los avisos (logro, tarjeta nueva) se posan sobre la placa mientras se ve el ticket, no debajo de ella (donde empieza la hoja) */
+  body.tk-on #leftCol { display: grid; }
+  body.tk-on #leftCol > * { grid-area: 1 / 1; }
+  body.tk-on #leftCol .ach-toast { align-self: start; }
+  body.tk-on #leftCol .cx-toast { align-self: end; }
+}
+@media (min-width: 601px) and (max-width: 900px) and (min-height: 521px) {
+  #dlg.side { place-self: end end; width: min(352px, calc(calc(100 * var(--vw)) - 260px)); margin: 0 14px calc(var(--note-top, 90px) + 8px) 0; }
+  #dlg.side .tk-rows { grid-template-columns: 1fr; gap: 4px; }   /* a 352 px, dos columnas cortaban "Velocidad +311" */
+}
+/* el marcador de la ventana estrecha solo lleva la cifra: la cinta de la racha ("Racha 2 · ×1,2") cuelga debajo en vez de meterse bajo la placa */
+/* y la columna de la placa deja sitio al marcador de verdad (antes 92 px fijos: con cuatro cifras la placa tapaba la primera) */
+@media (max-width: 900px) and (min-height: 521px), (max-width: 900px) and (orientation: portrait) { #leftCol { width: calc(calc(100 * var(--vw)) - var(--ledger-w, 84px) - 26px); } }
+@media (max-width: 900px) { #streakChip { top: calc(100% + 24px); right: 2px; padding: 4px 7px 3px; font-size: 12px; text-align: center; line-height: 1.2; } #streakChip i { display: none; } #streakChip span { display: block; white-space: nowrap; } }   /* debajo del sello de meta */
+#dlg.side.sc1 .tk-perf, #dlg.side.sc1 .tk-cx { display: none; }
+#dlg.side.sc1 .tk-head { margin-top: 4px; }
+#dlg.side.sc1 .tk-km { font-size: 34px; margin-top: 2px; }
+#dlg.side.sc1 .tk-eq { margin-top: 12px; }
+#dlg.side.sc1 .tk-total { margin: 4px 0 6px; } #dlg.side.sc1 .tk-total .odo { font-size: 30px; }
+#dlg.side.sc2 .tk-band { display: none; }
+#dlg.side.sc2 .tk-title { font-size: 20px; }
+#dlg.side.sc2 .tk-from { font-size: 16px; }
+#dlg.side.sc2 .tk-eq :is(.c, .m) { min-height: 40px; }
+#dlg.side.sc2 .btn-ink { padding-top: 8px; padding-bottom: 8px; }
+
+/* movil en horizontal (<= 520 px de alto): la hoja va abajo a la derecha; mientras se ve, la nota de campo se aparta a su izquierda, encima del dock */
+@media (max-height: 520px) and (orientation: landscape) {
+  body.tk-on #noteSh, html[data-skin="casino"] body.tk-on #noteSh { left: 8px; transform: none; bottom: 58px; width: calc(calc(100 * var(--vw)) - min(calc(46 * var(--vw)), 340px) - 86px); }
+  #dlg.side .tk-rows { grid-template-columns: 1fr; gap: 4px; }
+}

@@ -106,10 +106,11 @@
     document.body.classList.toggle("vd-on", cls === "verdict" || cls === "tablewrap"); document.body.classList.toggle("tk-on", cls === "side");
     if (A.dealer && A.dealer.homeTease) A.dealer.homeTease(cls === "home");   // el crupier asoma de vez en cuando SOLO en la pantalla de inicio
     $("layer").classList.remove("hidden");
+    if (cls === "side") A.marcador.fitSheet();                               // v0.2.15: la hoja del ticket (ventana estrecha) cabe entera, sin desplazarse
     requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add("in")));
     const b = d.querySelector("[data-primary]"); if (b) setTimeout(() => b.focus({ preventScroll: true }), 60);
   }
-  function closeDialog() { A.marcador.close(); $("layer").classList.add("hidden"); $("dlg").classList.remove("in"); document.body.classList.remove("vd-on", "tk-on"); }   // el ticket del marcador se arranca y cae
+  function closeDialog() { A.marcador.close(); $("layer").classList.add("hidden"); $("dlg").classList.remove("in"); document.body.classList.remove("vd-on", "tk-on"); if (A.dealer && A.dealer.refit) A.dealer.refit(); }   // el ticket del marcador se arranca y cae
   /* control segmentado con indicador deslizante */
   function segSet(seg, value) {
     const btns = [...seg.querySelectorAll("button")], idx = Math.max(0, btns.findIndex(b => b.dataset.v === value));
@@ -150,6 +151,7 @@
   }
   function setPrompt() {
     const o = q(); if (!o) return;
+    preFlags();                                                            // v0.2.15: la bandera del acierto, ya cargada para el mapa
     $("askKind").textContent = A.t("kind." + (o.clue ? "clue" : o.kind || lv().kind));
     if (o.clue && o.answer && !(o.sub && (o.sub.en || o.sub.es))) o.sub = A.blankObj(o.answer);        // descripcion: debajo, la casilla de cada letra
     const flagRound = (o.kind || lv().kind) === "flag" || !!(S.run && o.t === "c" && A.adv.isFlagRound && A.adv.isFlagRound());
@@ -176,9 +178,11 @@
     const str = Math.max(0, left).toFixed(1);
     if (str !== S.lastTimeStr) { S.lastTimeStr = str; $("timeTxt").textContent = A.fmt1(+str); $("plate").classList.toggle("hurry", f < 0.3 && left > 0); }
   }
+  /* cinta de racha del marcador: aciertos seguidos y, en la Aventura y el Reto, su multiplicador de verdad ("Racha 3 · ×1,4"; hasta la 0.2.14
+     decia "Racha ×3" y parecia un x3). En el Clasico la racha no multiplica: solo el numero */
   function setStreak() {
     const c = $("streakChip");
-    if (S.streak >= 2) { c.textContent = A.t("streak", { n: S.streak }); c.classList.remove("hidden", "pop"); A.restyle(c); c.classList.add("pop"); }
+    if (S.streak >= 2) { c.innerHTML = `<span>${A.t("res.streak")} ${S.streak}</span>` + (S.run ? `<i> · </i><span>×${A.fmt1(1 + Math.min(1.5, 0.2 * (S.streak - 1)))}</span>` : ""); c.classList.remove("hidden", "pop"); A.restyle(c); c.classList.add("pop"); }   // en ventana estrecha, en dos lineas (css/marcador.css)
     else c.classList.add("hidden");
   }
 
@@ -484,8 +488,25 @@
   /* las cartas (retratos, iconos) pueden tardar en cargar en la primera visita: si llegan tarde, el ajuste ya hecho se queda corto y el panel desborda.
      Un solo reajuste cuando termina la tanda (antes, uno por imagen: el Perfil trae 200 y el mapa de fondo iba a tirones) */
   let imgT = 0; if ($("dlg")) $("dlg").addEventListener("load", e => { if (e.target.tagName === "IMG") { clearTimeout(imgT); imgT = setTimeout(fitSoon, 240); } }, true);
-  { const upd = () => { const r = $("note").getBoundingClientRect(); document.documentElement.style.setProperty("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px"); };
-    if (window.ResizeObserver) new ResizeObserver(upd).observe($("note")); addEventListener("resize", upd); }
+  /* --note-top: lo que ocupa la nota de campo desde abajo; --plate-bottom (v0.2.15): donde acaba la placa. Entre las dos va la hoja del ticket en ventana estrecha */
+  { let updQ = 0; const de = document.documentElement, last = {};
+    /* una variable en la raiz recalcula los estilos de TODA la pagina: solo se escribe si cambia de verdad, y las de la ventana estrecha solo en ella
+       (el marcador cambia de tamano en cada fotograma mientras se despliega el ticket: escribirlas siempre costaba fotogramas) */
+    const set = (k, v) => { if (last[k] !== v) { last[k] = v; de.style.setProperty(k, v); } };
+    const upd = () => {
+      const r = $("note").getBoundingClientRect(); set("--note-top", (r.height ? Math.round(innerHeight - r.top) : 16) + "px");
+      if (A.marcador.docked()) return;
+      const p = $("plate").getBoundingClientRect(), lw = $("ledgerSh").getBoundingClientRect().width;
+      set("--plate-bottom", (p.height ? Math.round(p.bottom) : 16) + "px"); if (lw) set("--ledger-w", Math.round(lw) + "px");   // la placa deja sitio al marcador
+      A.marcador.fitSheet();
+    };
+    const soon = () => { if (!updQ) updQ = requestAnimationFrame(() => { updQ = 0; upd(); }); };   // fuera del aviso de cambio de tamano: lo que mueve (la placa, la hoja) no reentra en el mismo fotograma
+    /* la nota siempre; la placa y el marcador solo en ventana estrecha (en escritorio el marcador cambia de tamano en cada fotograma al desplegar el ticket
+       y se ajusta dentro de su propio aviso: vigilarlo ahi costaba fotogramas y el navegador avisaba de un bucle) */
+    let ro = null, wide = null;
+    const watch = () => { const d = A.marcador.docked(); if (!ro || d === wide) return; wide = d; for (const id of ["plate", "ledgerSh"]) d ? ro.unobserve($(id)) : ro.observe($(id)); };
+    if (window.ResizeObserver) { ro = new ResizeObserver(soon); ro.observe($("note")); watch(); }
+    addEventListener("resize", () => { watch(); upd(); }); }
 
   /* ------------------------------------------------------------ partida */
   function prepareRun(resume) { S.run = null; S.tool = null; openSettings(false); A.audio.unlock(); A.music.mode(1); if (!resume) { A.profile.get().stats.plays++; A.profile.save(); } }   // resume: seguir una partida guardada no suma partida (logro de 50 partidas)
@@ -586,11 +607,82 @@
     return A.T("Enciclopedia: a menos de 300 km desbloqueas el lugar, a menos de 150 km su historia y a menos de 75 km su dato clave.", "Encyclopedia: within 300 km you unlock the place, within 150 km its history and within 75 km its key fact.")
       .replace(/(?<!\d)(300|150|75)(\s*)(km|公里|км)/g, (m, n, sp, u) => { const v = lim[[300, 150, 75].indexOf(+n)]; return mi ? fmtKm(v) : A.fmt(v) + sp + u; });
   };
-  const padForDialog = () => { return window.innerWidth > 900 ? { l: 60, r: 410, t: 170, b: 130 } : { l: 30, r: 30, t: 240, b: 410 }; };
+  const padForDialog = () => { return window.innerWidth > 900 ? { l: 60, r: 410, t: 170, b: 130 } : { l: 30, r: 30, t: 240, b: 410 }; };   // (mapa 2D de respaldo)
+
+  /* ------------------------------------------------------------ revelado (v0.2.15): bandera del acierto, rumbo del fallo, tu chincheta y encuadre */
+  /* banderas pixel de la respuesta (las 199 de la Enciclopedia, assets/flags/p): un pais, la suya; un lugar, la de su pais o sus dos paises
+     (data/paises-lugares.js); en el Clasico, cuyos lugares no traen pais, la del pais donde cae el punto (no en mares, naturaleza ni estrechos).
+     Mares y oceanos no llevan */
+  const FLAG_ALIAS = { Ireland: "Republic of Ireland" };
+  let NE_EN = null, EN_LOC = null;
+  const neEn = ne => { if (!NE_EN) { NE_EN = {}; (A.PLACES || []).forEach(r => { if (r[1] === "country") NE_EN[r[0].slice(2)] = r[6].en; }); } return NE_EN[ne]; };
+  const flagKey = en => (!en || !A.FLAGS ? null : A.FLAGS[en] ? en : A.FLAGS[FLAG_ALIAS[en]] ? FLAG_ALIAS[en] : null);
+  const locCountry = en => { if (!EN_LOC) { EN_LOC = {}; Object.values(A.PCOUNTRY || {}).forEach(n => { if (n && n.en) EN_LOC[n.en] = n; }); } return EN_LOC[en] ? A.tx(EN_LOC[en]) : en; };
+  function flagsOf(o) {
+    if (!o) return [];
+    if (!o._fl) {
+      let list = o.cEn || [];
+      if (!o.cEn && o.t === "c") list = [neEn(o.key)];
+      else if (!o.cEn && o.lat != null && (o.kf || 1) === 1 && A.pointer.featureAt) { const f = A.pointer.featureAt(o.lon, o.lat); if (f) list = [neEn(f.name)]; }
+      o._fl = [...new Set(list.map(flagKey).filter(Boolean))].slice(0, 2);
+    }
+    return o._fl;
+  }
+  const flagSrc = en => `assets/flags/p/${A.mediaKey(en)}.webp`;
+  const FLAG_IMG = new Map();
+  const flagImg = en => {
+    let im = FLAG_IMG.get(en);
+    if (!im) { im = new Image(); im.decoding = "async"; im.onload = () => { if (im.decode) im.decode().catch(() => {}); const go = () => { if (map.prepFlag) map.prepFlag(im); }; window.requestIdleCallback ? requestIdleCallback(go, { timeout: 400 }) : setTimeout(go, 50); }; im.src = flagSrc(en); FLAG_IMG.set(en, im); }   // la onda de la tela se prepara en un rato libre (js/map.js)
+    return im;
+  };
+  let preUi = false;
+  const preFlags = () => {
+    try { flagsOf(q()).forEach(flagImg); } catch (e) { /* sin bandera */ }
+    if (!preUi) { preUi = true; ["assets/icons/a_flame_s.webp", "assets/flags/p/_hueco.webp"].forEach(u => { const im = new Image(); im.src = u; if (im.decode) im.decode().catch(() => {}); }); }   // la llama y el hueco del ticket, decodificados antes del primer revelado
+  };   // al empezar la pregunta: al revelar ya esta lista para el mapa
+  /* rumbo de tu chincheta visto desde el objetivo (en un pais o una masa de agua f, desde su punto de borde mas cercano), en 8 sectores: 0 norte, 1 noreste, 2 este... */
+  function dirOf(o, g, f) {
+    let la0 = o.lat, lo0 = o.lon;
+    if (f) {
+      const cl = Math.cos((g.lat * Math.PI) / 180); let best = Infinity;
+      for (const p of f.polys) for (const ring of p.rings) for (const [lo, la] of ring) { const dx = ((((lo - g.lon) % 360) + 540) % 360 - 180) * cl, dy = la - g.lat, d = dx * dx + dy * dy; if (d < best) { best = d; lo0 = lo; la0 = la; } }
+    }
+    const R = Math.PI / 180, dl = (g.lon - lo0) * R, y = Math.sin(dl) * Math.cos(g.lat * R), x = Math.cos(la0 * R) * Math.sin(g.lat * R) - Math.sin(la0 * R) * Math.cos(g.lat * R) * Math.cos(dl);
+    return Math.round((((Math.atan2(y, x) / R) + 360) % 360) / 45) % 8;
+  }
+  /* lo que tapa el HUD en el lienzo del mapa al revelar (px): placa, mochila, herramientas, nota de campo, dock, el marcador con el ticket ya
+     desplegado (aunque aun este bajando) y el crupier; si no ha salido, el hueco de su retrato, porque suele asomar a comentar la respuesta */
+  function revealObs() {
+    const cv = map.cv.getBoundingClientRect(), out = [];
+    const add = (r, p = 12) => { if (r && r.width > 1 && r.height > 1) out.push([r.left - cv.left - p, r.top - cv.top - p, r.right - cv.left + p, r.bottom - cv.top + p]); };
+    for (const id of ["plate", "advBar", "toolBar", "note", "dock"]) { const e = $(id); if (e && e.getClientRects().length) add(e.getBoundingClientRect()); }
+    if (A.marcador.docked()) add(A.marcador.finalRect());
+    else { const sr = A.marcador.sheetRect(); if (sr) add(sr); else out.push([0, cv.height - Math.min(cv.height * 0.62, 440), cv.width, cv.height]); }   // ventana estrecha: la hoja del ticket, donde de verdad esta
+    const d = $("dealer"), sz = innerWidth > 720 ? 320 : 170;
+    const n0 = out.length;                                                 // el crupier es un obstaculo blando (su globo se va solo): si no deja hueco, se ignora
+    if (d && d.classList.contains("in") && d.getClientRects().length) add(d.getBoundingClientRect(), 6);
+    else if (S.run && A.dealer && A.dealer.on) add({ left: cv.left + 16, top: cv.bottom - 112 - sz, right: cv.left + 16 + sz, bottom: cv.bottom - 112, width: sz, height: sz }, 0);
+    if (out.length > n0) out[n0].push(1);
+    return out;
+  }
+  /* racha rota: la caja roja suelta unas esquirlas de pixel al agrietarse */
+  function shards() {
+    if (S.reduce || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const m = document.querySelector(".tk-eq .m"), app = $("app"); if (!m || !app) return;
+    const r = m.getBoundingClientRect(), ar = app.getBoundingClientRect(); if (!r.width) return;
+    for (let i = 0; i < 7; i++) {
+      const s = document.createElement("i"); s.className = "tk-shard" + (i % 3 ? "" : " d");
+      s.style.left = Math.round(r.left - ar.left + r.width * (0.18 + Math.random() * 0.64)) + "px"; s.style.top = Math.round(r.top - ar.top + r.height * (0.25 + Math.random() * 0.5)) + "px"; app.appendChild(s);
+      const dx = (Math.random() - 0.5) * 110, up = 10 + Math.random() * 18, dy = 40 + Math.random() * 60, rot = (Math.random() - 0.5) * 340;
+      s.animate([{ transform: "translate(0, 0) rotate(0deg)", opacity: 1 }, { transform: `translate(${dx * 0.45}px, ${-up}px) rotate(${rot * 0.35}deg)`, opacity: 1, offset: 0.28 },
+        { transform: `translate(${dx}px, ${dy}px) rotate(${rot}deg)`, opacity: 0 }], { duration: 640 + Math.random() * 220, easing: "cubic-bezier(.3, .6, .6, 1)", fill: "forwards" }).onfinish = () => s.remove();
+      setTimeout(() => s.remove(), 1200);
+    }
+  }
 
   function reveal(guess, left) {
     S.phase = "reveal"; map.setPick(false); S.tense = false; A.music.mode(1); if (S.run) A.chal.reveal();
-    const o = q(), L = lv(), af = A.waters && A.waters.of(o), isC = o.t === "c" || !!af;      // af: masa de agua (mar, oceano, lago): se acierta dentro, como un pais, y se dibuja su territorio
+    const o = q(), L = lv(), af = A.waters && A.waters.of(o), isC = o.t === "c" || !!af, prevStreak = S.streak || 0;      // af: masa de agua (mar, oceano, lago): se acierta dentro, como un pais, y se dibuja su territorio
     let km = null, ans = null, span = [], labelAt = null;
     if (af) {
       span = [[af.bbox[0], af.bbox[1]], [af.bbox[2], af.bbox[3]]]; labelAt = [o.lon, o.lat];
@@ -624,14 +716,6 @@
     S.levelScore += total; S.runMax += L.maxPerQ;
     A.profile.question({ km: guess ? km : null, inside: !!(guess && isC && !af && km === 0), area: !!(guess && af && km === 0), ratio, streak: S.streak, left, limit: S.limit, timeout: !guess });
 
-    const label = o.clue ? A.tx(o.answer) : A.tx(o.name);
-    map.setMarks({
-      guess: guess ? [guess.lon, guess.lat] : null, answer: ans, highlight: isC && !af ? o.key : null, area: af || null, label, labelAt,
-      dist: guess && km > 0 ? fmtKm(km) : "", pop: total ? "+" + A.fmt(total) : null,
-    });
-    if (adv && adv.bank && adv.bank.pt) { const bq = S.qi; map.setDecoys([{ lon: adv.bank.pt[0], lat: adv.bank.pt[1], bank: adv.bank.s, bankLabel: A.tx(A.chal.tl("ui_bank")).toUpperCase() + " +" + A.fmt(adv.bank.s), t0: performance.now() + 900, a: 1 }]); setTimeout(() => { if (S.phase === "reveal" && S.qi === bq && A.sfx.bankPin) A.sfx.bankPin(); }, 1500); }   // la chincheta de la banca cae despues de la tuya
-    map.fitPoints(guess ? [...span, [guess.lon, guess.lat]] : span, padForDialog(), 1100);
-
     const tier = !guess ? 5 : isC && km === 0 ? 4 : ratio >= 0.96 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.4 ? 2 : ratio >= 0.05 ? 1 : 0;
     const title = !guess ? A.t("res.timeout") : isC && km === 0 ? A.t("res.inside") : A.t(["res.t5", "res.t4", "res.t3", "res.t2", "res.t1"][tier]);
     const cxr = guess ? A.codexUnlock(o, km) : { added: [], level: 0 };
@@ -639,50 +723,117 @@
        mas cerca) y vibra el movil, y las casillas del ticket se encienden al mismo ritmo. Si ya has pasado a la siguiente pregunta, no empiezan */
     const JP_AT = 1850, JP_MS = Math.round(A.audio.jpGap * 1000), jpTok = S.jpTok = (S.jpTok || 0) + 1, jpAt = i => JP_AT + i * JP_MS + "ms";
     const still = () => S.jpTok === jpTok && S.phase === "reveal";          // sigue en pantalla este ticket (si ya has pasado, sus sonidos no pisan la pregunta siguiente)
+    /* v0.2.15: acierto = la misma regla que la racha (el 60 % de los puntos de distancia). Te llevas la bandera: en el mapa se iza en el sitio
+       (FLAG_AT, con su corneta) y en el ticket va junto al nombre; si fallas, el mastil se queda vacio. T_SLAM: golpe de la caja de la racha */
+    const hit = !!guess && ratio >= 0.6, fl = flagsOf(o), up = hit && fl.length > 0, FLAG_AT = 650, T_SLAM = 1300;
+    const lim = A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid }) : [300, 150, 75];
+    const label = o.clue ? A.tx(o.answer) : A.tx(o.name);
+    /* tu chincheta, por el camino corto: si cruza el antimeridiano (Fiyi y Samoa) se dibuja en la copia del mundo junto al objetivo */
+    const refLon = ans ? ans[0] : labelAt ? labelAt[0] : null, gLon = guess ? (refLon == null ? guess.lon : guess.lon + 360 * Math.round((refLon - guess.lon) / 360)) : null;
+    map.setMarks({
+      guess: guess ? [gLon, guess.lat] : null, answer: ans, highlight: isC && !af ? o.key : null, area: af || null, label, labelAt,
+      dist: guess && km > 0 ? fmtKm(km) : "", pop: total ? "+" + A.fmt(total) : null,
+      flags: up ? fl.map(flagImg) : null,
+      rings: guess && !isC ? { r: lim, n: cxr.level, at: [0, 1, 2].map(i => JP_AT + i * JP_MS) } : null,   // anillos 300/150/75 km: se encienden con los jackpots
+    });
+    if (adv && adv.bank && adv.bank.pt) { const bq = S.qi; map.setDecoys([{ lon: adv.bank.pt[0], lat: adv.bank.pt[1], bank: adv.bank.s, bankLabel: A.tx(A.chal.tl("ui_bank")).toUpperCase() + " +" + A.fmt(adv.bank.s), t0: performance.now() + 900, a: 1 }]); setTimeout(() => { if (S.phase === "reveal" && S.qi === bq && A.sfx.bankPin) A.sfx.bankPin(); }, 1500); }   // la chincheta de la banca cae despues de la tuya
+    const fC = isC ? world.byName[o.key] : null;
+    const fpts = (isC ? span.slice(0, 2).map(p => [p[0], p[1], fC && fC.ct]) : [[ans[0], ans[1]]]).concat(span.slice(isC ? 2 : 1).map(p => [p[0], p[1]]), guess ? [[gLon, guess.lat, map.pickCt]] : []);
+
     setTimeout(() => { if (still()) A.sfx.reveal(tier); }, 480);
+    if (up) setTimeout(() => { if (still() && A.sfx.flag) A.sfx.flag(fl.length); }, FLAG_AT);
     if (cxr.level) setTimeout(() => {
       if (!still()) return;
       A.sfx.jackpot(cxr.level); A.haptic.jackpot(cxr.level);
       for (let k = 1; k <= cxr.level; k++) setTimeout(() => jpShake(k), (k - 1) * JP_MS);
     }, JP_AT);
     if (adv && adv.coins) coinFx(adv.coins);
-    if (S.streak >= 2) setTimeout(() => { if (!still()) { if (S.phase === "asking") setStreak(); return; } A.sfx.streak(S.streak); setStreak(); if (mult > 1 && !S.reduce && S.shake) { const ap = $("app"); ap.classList.remove("shake"); A.restyle(ap); ap.classList.add("shake"); } }, 1500); else setStreak();
+    /* la caja de la racha (Aventura y Reto diario): "on" se enciende o sube de nivel, "broken" se agrieta (perdiste una racha de 2 o mas), "off" se queda
+       apagada a x1. En el Clasico la racha no multiplica: solo cuenta (fila RACHA) */
+    const eq = S.run ? (mult > 1 ? "on" : prevStreak >= 2 && !S.streak ? "broken" : "off") : null;
+    const broke = eq === "broken" || (!S.run && prevStreak >= 2 && !S.streak);
+    setTimeout(() => {
+      if (!still()) { if (S.phase === "asking") setStreak(); return; }
+      if (eq === "on" || (!S.run && S.streak >= 2)) { A.sfx.streak(S.streak); if (mult > 1 && !S.reduce && S.shake) { const ap = $("app"); ap.classList.remove("shake"); A.restyle(ap); ap.classList.add("shake"); } }
+      else if (broke) { if (A.sfx.streakBreak) A.sfx.streakBreak(); if (eq) shards(); }
+      setStreak();
+    }, T_SLAM);
 
     const last = S.qi === S.qs.length - 1 || (S.run && A.adv.infDone && A.adv.infDone());
-    const place = o.answer ? A.tx(o.answer) : A.tx(o.name) + (A.tx(o.sub) ? ", " + A.tx(o.sub) : "");
-    const from = !guess ? "" : isC ? A.t("res.border", { name: A.tx(o.clue ? o.answer : o.name) }) : o.clue ? "" : A.t("res.from", { name: place });
     const showKm = guess && !(isC && km === 0);
-    dialog(`<div class="sheet ticket">
+    /* cabecera: la bandera (o el mastil vacio), el veredicto y el lugar como en la placa de la pregunta (nombre y, en verde, su pais) */
+    const cn = (o.cEn || []).map(locCountry).join(" · "), pName = o.clue ? A.tx(o.answer) : A.tx(o.name), pSub = isC ? "" : o.clue ? cn : A.tx(o.sub) || cn;   // en las pistas, o.sub son las casillas de la respuesta
+    const flagSlot = fl.length ? `<div class="tk-flag${up ? " up" : ""}${fl.length > 1 ? " two" : ""}" style="--fh:${FLAG_AT}ms">${fl.map((en, i) => `<i style="--fi:${i}"><img class="p" src="${flagSrc(en)}" alt="" draggable="false">${up ? `<img class="c" src="${flagSrc(en)}" alt="" draggable="false">` : `<img class="h" src="assets/flags/p/_hueco.webp" alt="" draggable="false">`}</i>`).join("")}</div>` : "";
+    /* rumbo del fallo ("Demasiado al oeste") y el pais donde cayo tu chincheta: en verde si es el bueno, en rojo si no */
+    const dirTxt = showKm && km >= 10 ? A.t("res.dir").split("|")[dirOf(o, guess, af || (o.t === "c" && world.byName[o.key]))] || "" : "";
+    const pinF = showKm && A.pointer.featureAt ? A.pointer.featureAt(guess.lon, guess.lat) : null;
+    const pinCls = !pinF ? "sea" : fl.includes(flagKey(neEn(pinF.name))) ? "ok" : "bad";
+    const pinTxt = showKm ? A.t("res.pin", { p: `<b>${pinF ? A.pointer.nameOf(pinF) : A.t("res.sea")}</b>` }) : "";
+    /* la ecuacion: PUNTOS x RACHA. La caja roja muestra antes del golpe como venia la racha y despues como queda */
+    let eqHtml = "";
+    if (eq) {
+      const step = adv && adv.streakStep != null ? adv.streakStep : 0.2, sm = n => 1 + (n >= 2 ? Math.min(1.5, step * (n - 1)) : 0), lvOf = n => (n >= 6 ? 3 : n >= 4 ? 2 : 1);
+      const lb = n => (n >= 1 ? A.t("res.streak") + " " + n : A.t("res.nostreak")), fire = (k, lv) => `<i class="fire ${k}" data-lv="${lv}"><b></b><b></b><b></b></i>`;
+      const from = prevStreak >= 2 && eq !== "off" ? { lit: 1, lb: lb(prevStreak), v: "×" + A.fmt1(sm(prevStreak)), lv: lvOf(prevStreak) } : { lit: 0, lb: lb(eq === "on" ? prevStreak : S.streak), v: "×1" };
+      const to = eq === "on" ? { lit: 1, lb: lb(S.streak), v: "×" + A.fmt1(mult), lv: lvOf(S.streak) } : eq === "broken" ? { lit: 0, lb: A.t("res.broken"), v: "×1" } : from;
+      const two = to !== from, lg = t => (String(t).length > 12 ? " lg" : ""), sw = (a, b) => (two ? `<em class="a${lg(a)}">${a}</em><em class="b${lg(b)}">${b}</em>` : `<em class="${lg(b)}">${b}</em>`);   // lg: etiqueta larga ("Sequência quebrada"): a dos lineas
+      eqHtml = `<div class="tk-eq e-${eq}${from.lit ? " f-lit" : ""}${to.lit ? " t-lit" : ""}" style="--sl:${T_SLAM}ms">
+        <div class="c"><span>${A.t("res.chips")}</span><b class="odo" id="eqChips"></b></div><i class="x">×</i>
+        <div class="mw">${from.lit ? fire("f0", from.lv) : ""}${to.lit ? fire("f1", to.lv) : ""}<div class="m"><span>${sw(from.lb, to.lb)}</span><b>${sw(from.v, to.v)}</b>${eq === "broken" ? `<small>${A.t("res.was2", { m: A.fmt1(sm(prevStreak)) })}</small><i class="crk"></i>` : ""}</div></div>
+      </div>`;
+    }
+    const srow = !S.run && (S.streak >= 2 || broke) ? `<div class="tk-srow${broke ? " off" : ""}" style="--i:2"><dt>${A.t("res.streak")}</dt><i></i><dd>${broke ? `<s>${prevStreak}</s> 0` : S.streak}</dd></div>` : "";
+    const tkHtml = `<div class="sheet ticket tk2${up ? " tk-up" : ""}${eq ? " tk-eqon" : ""}">
       <div class="tk-band"><span>${S.run && A.adv.isInfinite && A.adv.isInfinite() ? A.t("ask.inf", { n: pad2(S.qi + 1) }) : A.t("ask.no", { n: pad2(S.qi + 1), m: pad2(S.qs.length) })}</span><span class="tag">${A.t("kind." + (o.clue ? "clue" : o.kind || L.kind))}</span></div>
-      <div class="tk-title">${title}</div>
+      <div class="tk-head${fl.length ? "" : " nf"}">${flagSlot}<div class="tk-id"><div class="tk-title">${title}</div><div class="tk-place">${o.clue ? `<span>${A.t("res.was")}</span>` : ""}<b>${pName}</b>${pSub ? `<em>${pSub}</em>` : ""}</div></div></div>
       ${showKm ? `<div class="tk-km"><span class="odo" id="kmNum"></span><span>${S.units === "mi" ? "mi" : "km"}</span></div>` : ""}
-      <div class="tk-from">${[from, guess ? A.t("res.clicked", { t: A.fmt1(S.limit - left) }) : ""].filter(Boolean).join(" · ")}</div>
-      ${o.clue ? `<div class="tk-answer"><span>${A.t("res.was")}</span>${A.tx(o.answer)}</div>` : ""}
+      <div class="tk-from">${[dirTxt, guess ? A.t("res.clicked", { t: A.fmt1(S.limit - left) }) : ""].filter(Boolean).join(" · ")}</div>
+      ${pinTxt ? `<div class="tk-pin ${pinCls}">${pinTxt}</div>` : ""}
       <div class="tk-perf"></div>
       <dl class="tk-rows">
         <div style="--i:0"><dt>${A.t("res.dist")}</dt><i></i><dd>+${A.fmt(sc.dist)}</dd></div>
         <div style="--i:1"><dt>${A.t("res.speed")}</dt><i></i><dd>+${A.fmt(sc.time)}</dd></div>
+        ${srow}
       </dl>
       ${adv && adv.lines.length ? `<div class="tk-perks">${adv.lines.map(l => `<div><span>${A.icon(l[0])}</span><i>${l[1]}</i><b>${l[2]}</b></div>`).join("")}</div>` : ""}
-      ${mult > 1 ? `<div class="tk-mult"><div class="c"><span>${A.t("res.chips")}</span><b>${A.fmt(chips)}</b></div><div class="m"><span>${A.t("res.streak")} ${S.streak}</span><b>×${mult.toFixed(1)}</b></div></div>` : ""}
+      ${eqHtml}
       <div class="tk-total"><span>${A.t("res.total")}</span><span class="odo" id="totNum"></span></div>
       ${adv && adv.coins ? `<div class="tk-coins">${A.icon("coin", "cn")}+${adv.coins} ${adv.coins === 1 ? A.pick6("doblón|doubloon|doublon|dobrão|Dublone|doblone||枚金币|도블론|ダブロン|дублон|dublon") : A.T("doblones", "doubloons")}</div>` : ""}
       ${guess ? `<div class="tk-cx l${cxr.level}" data-tt="${A.t("codex.title")}
 ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style="--jd:${jpAt(i)}"></u>`).join("")}</i><b style="--jd:${jpAt(Math.max(0, cxr.level - 1))}">${cxr.added.length ? "+" + cxr.added.length : cxr.level ? "" : "&gt;" + fmtKm(A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid })[0] : 300)}</b></div>` : ""}
       <button class="btn-ink" id="nextBtn" data-primary><span>${!last ? A.t("btn.next") : S.run ? A.pick6("Terminar ronda|Finish round|Terminer la manche|Concluir rodada|Runde beenden|Termina il round||结束本回合|라운드 종료|ラウンドを終了|Завершить раунд|Zakończ rundę") : A.t("btn.finish")}</span><span class="ar">${A.icon("u_next", "sm")}</span> <kbd>${A.icon("u_enter", "sm")}</kbd></button>
-    </div>`, "side");
-    requestAnimationFrame(() => { const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px"); });
-    if (showKm) { const kmEl = $("kmNum"); odoNow(kmEl, 0); requestAnimationFrame(() => odoSet(kmEl, Math.round(S.units === "mi" ? km / 1.609344 : km), { ms: 1100, delay: 560 })); }
-    const totEl = $("totNum"); odoNow(totEl, 0); requestAnimationFrame(() => odoSet(totEl, total, { ms: 1100, delay: 700, tick: total > 0 }));
-    $("nextBtn").onclick = () => { last ? finishLevel() : (S.qi++, nextQuestion()); };
-
+    </div>`;
     $("factText").textContent = factLine(o);
     $("plate").classList.remove("hurry");
     /* el cobro: los puntos del ticket suben al marcador al compas de su TOTAL (700 + 1100 ms); la barra llega en 450 ms y, si cruza la meta
        o un escalon de botin, lo celebra (js/marcador.js) */
     const cash = { from: S.levelScore - total, to: S.levelScore, total, delay: 700, ms: 1100, gauge: 450 };
-    updateHud(cash);
-    A.marcador.cashIn({ ...cash, advance: L.advance, runTotal: S.runTotal, lootOn: !!(S.run && S.camp.mode === "adventure" && !(A.adv.isInfinite && A.adv.isInfinite())) });
+    /* v0.2.15: el ticket se monta en el fotograma siguiente. La puntuacion, las marcas y los sonidos van en esta tarea y el ticket (maquetarlo es lo mas
+       caro) en la otra: asi ninguna se come un fotograma entero (con la CPU a x4 el revelado era una sola tarea de ~50 ms) */
+    requestAnimationFrame(() => {
+      if (!still()) return;
+      dialog(tkHtml, "side");
+      if (showKm) { const kmEl = $("kmNum"); odoNow(kmEl, 0); requestAnimationFrame(() => odoSet(kmEl, Math.round(S.units === "mi" ? km / 1.609344 : km), { ms: 1100, delay: 560 })); }
+      /* el total: con racha, primero cuenta los PUNTOS y, con el golpe de la caja roja, sube por el multiplicador (como en Balatro); sin ella, de una vez.
+         Las cifras del marcador van aparte, al mismo compas de siempre (700 + 1100 ms) */
+      const totEl = $("totNum"), eqC = $("eqChips"); odoNow(totEl, 0);
+      if (eqC) { odoNow(eqC, 0); requestAnimationFrame(() => odoSet(eqC, chips, { ms: 560, delay: 700 })); }
+      if (eq === "on") {
+        requestAnimationFrame(() => odoSet(totEl, chips, { ms: 560, delay: 700, tick: chips > 0 }));
+        setTimeout(() => { if (still() && totEl.isConnected) odoSet(totEl, total, { ms: 470, delay: 30, tick: true }); }, T_SLAM);
+      } else requestAnimationFrame(() => odoSet(totEl, total, { ms: 1100, delay: 700, tick: total > 0 }));
+      $("nextBtn").onclick = () => { last ? finishLevel() : (S.qi++, nextQuestion()); };
+      updateHud(cash);
+      A.marcador.cashIn({ ...cash, advance: L.advance, runTotal: S.runTotal, lootOn: !!(S.run && S.camp.mode === "adventure" && !(A.adv.isInfinite && A.adv.isInfinite())) });
+      /* un fotograma despues: las muescas del ticket y el encuadre (tu chincheta y el objetivo en el hueco libre de verdad, con el ticket ya montado,
+         la nota escrita y el crupier en su sitio) */
+      requestAnimationFrame(() => {
+        if (!still()) return;
+        const sh = document.querySelector("#dlg .sheet"), pf = sh && sh.querySelector(".tk-perf"); if (pf) sh.style.setProperty("--n", pf.offsetTop + 1 + "px");
+        if (map.frameReveal) map.frameReveal(fpts, revealObs(), { l: 70, r: 70, t: up ? 122 : 86, b: 34 }, 1100);
+        else map.fitPoints(fpts.map(p => [p[0], p[1]]), padForDialog(), 1100);
+      });
+    });
   }
 
   /* ------------------------------------------------------------ veredictos */
@@ -923,5 +1074,5 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
 
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
 
-  A._debug = Object.assign(A._debug || {}, { S, map, world, reveal, startLevel_, showTitle, odoSet, setLang, finishBoot, playStudio, gateWarn });
+  A._debug = Object.assign(A._debug || {}, { S, map, world, reveal, revealObs, startLevel_, showTitle, odoSet, setLang, finishBoot, playStudio, gateWarn });
 })(window.AIQ);

@@ -49,7 +49,7 @@ window.AIQ = window.AIQ || {};
       widthTo(true);
       if (!still() && A.sfx.feed) setTimeout(A.sfx.feed, 70);
     }
-    fit(); requestAnimationFrame(fit);                            // la nota de campo cambia justo despues: se vuelve a medir antes de pintar
+    fit(); requestAnimationFrame(() => { fit(); if (innerWidth < 1240 && A.dealer && A.dealer.refit) A.dealer.refit(); });   // la nota de campo cambia justo despues: se vuelve a medir antes de pintar. Si el crupier ya hablaba, se aparta del ticket (solo en ventanas en las que su globo llega hasta el)
     later(() => { const b = M.primary(); if (b) b.focus({ preventScroll: true }); }, 60);
   };
 
@@ -105,6 +105,33 @@ window.AIQ = window.AIQ || {};
     p.style.setProperty("--mc-z", k.toFixed(3));
   }
   M.fit = fit;
+  /* v0.2.15: la hoja del ticket (ventana estrecha o baja: #dlg.side, sin marcador al lado). Cabe entera sin desplazarse (antes se recortaba por
+     dentro y dejaba fuera el total y el boton): primero se aprieta (sc1, sc2) y, si aun no cabe, se encoge. sheetRect: su sitio sin la animacion de
+     entrada, para que el encuadre del mapa y el crupier no la pisen */
+  M.sheetRect = () => {
+    const d = $("dlg"); if (M.docked() || !d || !d.classList.contains("side") || !document.body.classList.contains("tk-on") || !d.offsetWidth) return null;
+    const pr = (d.offsetParent || document.body).getBoundingClientRect(), left = pr.left + d.offsetLeft, top = pr.top + d.offsetTop;
+    return { left, top, right: left + d.offsetWidth, bottom: top + d.offsetHeight, width: d.offsetWidth, height: d.offsetHeight };
+  };
+  /* lo que el crupier no debe pisar: el ticket pegado al marcador (escritorio) o la hoja (ventana estrecha) */
+  M.avoidRect = () => (M.docked() ? (isOpen ? M.finalRect() : null) : M.sheetRect());
+  M.fitSheet = () => {
+    const d = $("dlg"), t = d && d.firstElementChild; if (M.docked() || !t || !d.classList.contains("side") || !t.classList.contains("ticket")) return;
+    d.classList.remove("sc1", "sc2"); t.style.removeProperty("zoom");
+    const fits = () => d.scrollHeight <= d.clientHeight + 1;
+    if (!fits()) d.classList.add("sc1");
+    if (!fits()) d.classList.add("sc2");
+    if (!fits()) { let k = Math.max(0.55, d.clientHeight / d.scrollHeight); for (let i = 0; i < 4; i++) { t.style.zoom = k.toFixed(3); if (fits() || k <= 0.55) break; k = Math.max(0.55, k * 0.97); } }
+    if (A.dealer && A.dealer.refit) A.dealer.refit();                        // el crupier se recoloca a su lado (js/dealer.js)
+  };
+  addEventListener("resize", () => { if (!M.docked()) M.fitSheet(); });
+  /* v0.2.15: rectangulo FINAL del marcador con el ticket desplegado (el encuadre del mapa lo esquiva aunque el ticket aun este saliendo de la ranura) */
+  M.finalRect = () => {
+    const sh = shell(); if (!sh) return null; const r = sh.getBoundingClientRect();
+    if (!isOpen || !M.docked()) return r;
+    const h = $("ledger").offsetHeight + paper().scrollHeight + 3, w = mcW();
+    return { left: r.right - w, right: r.right, top: r.top, bottom: r.top + h, width: w, height: h };
+  };
   /* la ventana pasa de escritorio a movil con el ticket abierto: se lleva a la hoja inferior de siempre (y al reves solo se reajusta) */
   addEventListener("resize", () => {
     if (!isOpen) return;
@@ -113,6 +140,7 @@ window.AIQ = window.AIQ || {};
     isOpen = false; gen++; document.body.classList.remove("mc-on");
     d.className = "side in"; d.replaceChildren(sheet); $("layer").classList.remove("hidden"); document.body.classList.add("tk-on");
     sh.classList.remove("mc-live", "mc-c1", "mc-c2", "mc-open"); sh.style.width = ""; paper().style.removeProperty("--mc-z");
+    sheet.style.removeProperty("zoom"); M.fitSheet();                         // ya en la hoja: que quepa entera
   });
   { const n = $("note"); if (n && window.ResizeObserver) new ResizeObserver(() => { if (isOpen) fit(); }).observe(n); }
 

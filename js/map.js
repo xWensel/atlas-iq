@@ -18,6 +18,7 @@ window.AIQ = window.AIQ || {};
      con la misma cuenta que los vertices de la GPU: ct + 8 * (vuelta + 2). Sin vuelta (t null), el punto se envuelve al lado visible del mundo */
   const frameOf = ct => (ct == null ? [null, null] : ct < 8 ? [ct, null] : [ct % 8, Math.floor(ct / 8) - 2]);
   const TWO_PI = Math.PI * 2;
+  const FLAG_EXT = 18;                                     // v0.2.15: celdas que se alarga el mastil de la bandera del acierto (lo que sube la tela)
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const easeIO = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const easeOutBounce = t => {
@@ -742,7 +743,7 @@ void main(){
     /* ---------- tamano / camara ---------- */
     _emptyMarks() { return { guess: null, answer: null, highlight: null, area: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
     setMarks(m) { const hl = m.highlight && this.world.byName[m.highlight]; this.marks = { ...this._emptyMarks(), gct: m.guess ? this.pickCt : null, act: hl ? hl.ct : null, ...m, t0: performance.now() }; this.fxDirty = this.dirty = true; }
-    clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.dirty = true; }
+    clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.panSlack = 0; this.fxDirty = this.dirty = true; }
     /* paises tenidos por encima de la tierra ({ "Spain": [r, g, b, a] }, 0-1): la Enciclopedia pinta asi lo que llevas descubierto. null = nada */
     setPaint(p) { this.paint = p || null; this.dirty = this.fxDirty = true; }
     /* resalta un pais sin reiniciar las marcas (la chincheta no vuelve a caer): el pais bajo el raton en la Enciclopedia */
@@ -783,7 +784,8 @@ void main(){
     }
     _clamp(v) {
       const hw = this.W / (2 * v.s), hh = this.H / (2 * v.s);
-      v.cx = hw * 2 >= BX1 - BX0 ? 0 : clamp(v.cx, BX0 + hw, BX1 - hw);
+      const sl = this.panSlack || 0;                                   // v0.2.15: el encuadre del revelado puede asomar mas alla de los 180 grados (Pacifico)
+      v.cx = hw * 2 >= BX1 - BX0 ? 0 : clamp(v.cx, BX0 + hw - sl, BX1 - hw + sl);
       v.cy = hh * 2 >= BY1 - BY0 ? (BY0 + BY1) / 2 : clamp(v.cy, BY0 + hh, BY1 - hh);
       return v;
     }
@@ -812,6 +814,46 @@ void main(){
       const aw = this.W - pad.l - pad.r, ah = this.H - pad.t - pad.b;
       const s = clamp(Math.min(aw / (x1 - x0), ah / (y1 - y0)), this.minS, this.maxS);
       this.animateTo({ cx: (x0 + x1) / 2 - (pad.l - pad.r) / (2 * s), cy: (y0 + y1) / 2 + (pad.t - pad.b) / (2 * s), s }, ms);
+    }
+    /* encuadre del revelado (v0.2.15): tu chincheta y el objetivo, centrados y lo mas grandes posible en el mayor hueco LIBRE de la pantalla.
+       Antes (fitPoints con un margen fijo) la placa, la nota de campo o el crupier tapaban la chincheta o la etiqueta del lugar.
+       pts: [[lon, lat, ct], ...] tal como se ven (con los continentes movidos, sceneOf); obs: lo que tapa el HUD en px [x0, y0, x1, y1];
+       mg: aire alrededor de los puntos (cabeza de la chincheta, mastil y etiqueta). Con el mapa girado (del reves, espejo) se encuadra ya girado */
+    frameReveal(pts, obs = [], mg = { l: 70, r: 70, t: 90, b: 36 }, ms = 1100) {
+      const W = this.W, H = this.H, o = this._orient();
+      obs = obs.map(r => [Math.floor(r[0]), Math.floor(r[1]), Math.ceil(r[2]), Math.ceil(r[3]), r[4] || 0]);   // en pixeles enteros, como los bordes candidatos (con decimales un borde de 456,8 invalidaba el hueco que empieza en 457)
+      const R = (x, y) => (o.on ? [(o.c * x) / o.sx - o.s * y, (-o.s * x) / o.sx - o.c * y] : [x, -y]);   // escena -> pantalla (sin camara)
+      const Ri = (u, v) => (o.on ? [o.sx * (o.c * u - o.s * v), -(o.s * u + o.c * v)] : [u, -v]);
+      const U = pts.map(p => { const q = this.sceneOf(p[0], p[1], p[2]); return R(q[0], q[1]); });
+      let x0 = Math.min(...U.map(p => p[0])), x1 = Math.max(...U.map(p => p[0])), y0 = Math.min(...U.map(p => p[1])), y1 = Math.max(...U.map(p => p[1]));
+      const MIN = 0.3;                                                   // con un pleno no se acerca tanto que pierdas el pais de vista
+      if (x1 - x0 < MIN) { const m = (x0 + x1) / 2; x0 = m - MIN / 2; x1 = m + MIN / 2; }
+      if (y1 - y0 < MIN) { const m = (y0 + y1) / 2; y0 = m - MIN / 2; y1 = m + MIN / 2; }
+      const sw = x1 - x0, sh = y1 - y0, minW = mg.l + mg.r + 80, minH = mg.t + mg.b + 60;
+      /* el mayor hueco: rectangulos con los bordes de la pantalla y de cada panel; gana el que deja los puntos mas grandes (y, a igualdad, el mayor) */
+      const pick = (mw, mh, obs) => {
+        const cut = (lim, i, j) => [...new Set([0, lim, ...obs.flatMap(r => [r[i], r[j]])].map(v => clamp(v, 0, lim)))].sort((a, b) => a - b), xs = cut(W, 0, 2), ys = cut(H, 1, 3);                                         // mw, mh: hueco minimo; sin ninguno valido (ventana muy llena), el mayor libre
+        let best = null;
+        for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++) {
+          const a = xs[i], b = xs[j]; if (b - a < mw) continue;
+          for (let k = 0; k < ys.length; k++) for (let l = k + 1; l < ys.length; l++) {
+            const c = ys[k], d = ys[l]; if (d - c < mh || obs.some(r => r[0] < b && r[2] > a && r[1] < d && r[3] > c)) continue;
+            const s = mw ? Math.min((b - a - mg.l - mg.r) / sw, (d - c - mg.t - mg.b) / sh) : 0, area = (b - a) * (d - c);
+            if (!best || (mw ? s > best.s * 1.0001 || (s >= best.s * 0.9999 && area > best.area) : area > best.area)) best = { s, area, a, b, c, d };
+          }
+        }
+        return best;
+      };
+      const hard = obs.filter(r => !r[4]);                              // r[4]: obstaculo blando (el hueco del crupier, que aun no ha salido): si no queda sitio, se ignora
+      let bx = pick(minW, minH, obs) || pick(minW, minH, hard);
+      if (!bx) { bx = pick(0, 0, hard) || { a: 0, b: W, c: 0, d: H }; const m = Math.min(1, (bx.b - bx.a) / (mg.l + mg.r + 80), (bx.d - bx.c) / (mg.t + mg.b + 60)); mg = { l: mg.l * m, r: mg.r * m, t: mg.t * m, b: mg.b * m }; bx.s = Math.max(1, Math.min((bx.b - bx.a - mg.l - mg.r) / sw, (bx.d - bx.c - mg.t - mg.b) / sh)); }
+      const s = clamp(bx.s, this.minS, this.maxS), scx = (bx.a + mg.l + bx.b - mg.r) / 2, scy = (bx.c + mg.t + bx.d - mg.b) / 2;
+      const [cx, cy] = Ri((x0 + x1) / 2 - (scx - W / 2) / s, (y0 + y1) / 2 - (scy - H / 2) / s);
+      this.frameBox = [bx.a, bx.c, bx.b, bx.d];      // (para las pruebas)
+      /* junto al antimeridiano (Nueva Zelanda, Fiyi, Samoa...) el mapa no deja pasar de los 180 grados y el objetivo quedaba pegado al borde, bajo el
+         ticket: mientras dure este revelado se deja asomar hasta 0,8 rad mas alla (alli las islas tienen su copia dibujada). clearMarks lo devuelve a 0 */
+      const hw = W / (2 * s); this.panSlack = hw * 2 >= BX1 - BX0 ? 0 : clamp(Math.abs(cx) - (Math.PI - hw), 0, 0.8);
+      this.animateTo({ cx, cy, s }, ms);
     }
     startDrift() {
       const v = this._clamp({ cx: 0.3, cy: 0.9, s: this.minS * 1.7 });
@@ -1475,6 +1517,8 @@ void main(){
       const age = now - m.t0;
       if (m.guess || m.answer || m.labelAt) {
         const G = m.guess && this.lonLatToScreen(m.guess[0], m.guess[1], m.gct), Aa = m.answer && this.lonLatToScreen(m.answer[0], m.answer[1]);
+        const fl = m.flags && m.flags.length ? m.flags : null;           // v0.2.15: acierto con bandera (la chincheta del objetivo pasa a mastil)
+        if (Aa && m.rings) this._rings(c, m, Aa, age);                    // anillos de la Enciclopedia, debajo de todo
         const ds = G && Aa ? this._line(c, m, G, Aa, age) : null;
         if (Aa) {
           const k = clamp((age - 480) / 600, 0, 1);
@@ -1483,12 +1527,16 @@ void main(){
             c.strokeStyle = `rgba(242,233,214,${0.85 * (1 - t)})`; c.lineWidth = 2.5; c.beginPath(); c.arc(Aa[0], Aa[1], 10 + t * 48, 0, Math.PI * 2); c.stroke();
             c.strokeStyle = this._rgba(sk.red, 0.6 * (1 - t)); c.lineWidth = 2; c.beginPath(); c.arc(Aa[0], Aa[1], 8 + t * 30, 0, Math.PI * 2); c.stroke();
           }
-          this._pin(c, Aa[0], Aa[1], sk.red, sk.paper, age - 480, k);
+          if (!fl) this._pin(c, Aa[0], Aa[1], sk.red, sk.paper, age - 480, k);
         }
         if (G) this._pin(c, G[0], G[1], sk.ink, sk.paper, age, 1);
-        if (ds) this._distChip(c, m, ds, age);                            // encima de las chinchetas (antes quedaba debajo y la tapaba el pin de la respuesta)
         const at = Aa || (m.labelAt && this.lonLatToScreen(m.labelAt[0], m.labelAt[1], m.act));
-        if (at && m.label && age > 520) this._chip(c, m.label, at[0], at[1] - (Aa ? 66 : 10), { center: true, font: `italic 700 17px ${this._fd()}`, alpha: Math.min(1, (age - 520) / 300) });
+        if (fl && at) this._flagPole(c, fl, at[0], at[1], age, now);      // encima de tu chincheta: la bandera es el premio
+        if (ds) this._distChip(c, m, ds, age);                            // encima de las chinchetas (antes quedaba debajo y la tapaba el pin de la respuesta)
+        if (at && m.label && age > 520) {
+          const g = fl && this._flagGeom(fl.length), lx = g ? at[0] + g.cx : at[0], ly = g ? at[1] - g.h - 17 : at[1] - (Aa ? 66 : 10);
+          this._chip(c, m.label, lx, ly, { center: true, font: `italic 700 17px ${this._fd()}`, alpha: Math.min(1, (age - 520) / 300) });
+        }
         if (G && m.pop && age > 700) {
           const t = Math.min(1, (age - 700) / 1700), y = G[1] - 52 - easeIO(t) * 46;
           c.save(); c.globalAlpha = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
@@ -1541,6 +1589,75 @@ void main(){
       c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 10; c.shadowOffsetY = 3; path(); c.fillStyle = sk.paper; c.fill();
       c.shadowColor = "transparent"; c.strokeStyle = sk.ink; c.lineWidth = 1.3; c.stroke();
       c.fillStyle = sk.ink; c.textBaseline = "middle"; c.fillText(text, rx + 11, ry + h / 2 + 1); c.restore();
+    }
+    /* v0.2.15, bandera del acierto: el mastil es el de las banderas pixel de la Enciclopedia (assets/flags/p, 64x64 celdas: pomo y mastil en las
+       columnas 4-9, tela en la 10-58), alargado FLAG_EXT celdas para que la bandera suba por el. Cada celda ocupa k pixeles FISICOS enteros
+       (nitido a cualquier escala de Windows); u = celda en px CSS. Medidas desde la base del mastil (el punto exacto del objetivo) */
+    _flagGeom(n = 1) {
+      const k = Math.max(1, Math.round(this.dpr)), u = k / this.dpr;
+      return { k, u, h: (58 + FLAG_EXT) * u, cx: (n > 1 ? -4 : 24) * u };    // h: alto hasta el pomo; cx: centro de la(s) bandera(s) respecto a la base
+    }
+    /* el mastil sale del suelo (200 ms), la tela sube hasta arriba con un pequeno rebote y ondea por columnas, a saltos de una celda.
+       Dos paises (K2, el lago Titicaca...): dos mastiles, el segundo a la izquierda y un poco despues */
+    /* la tela ondeando, ya dibujada: 12 fases de la onda en una hoja (por imagen y escala), para pintar 1 imagen por fotograma en vez de 49 columnas.
+       Cada columna sube o baja una celda, mas cuanto mas lejos del mastil (junto a el no se mueve). game.js la prepara al cargar la bandera, en un rato libre */
+    prepFlag(img, k = Math.max(1, Math.round(this.dpr))) {
+      if (!img || !img.complete || !img.naturalWidth) return null;
+      const key = "_fs" + k; if (img[key]) return img[key];
+      const S = img.naturalWidth / 64, N = 12, fw = 49 * k, fh = 51 * k, cv = document.createElement("canvas"); cv.width = fw * N; cv.height = fh;
+      const g = cv.getContext("2d"); g.imageSmoothingEnabled = false;
+      for (let p = 0; p < N; p++) for (let cc = 10; cc <= 58; cc++) {
+        const wv = Math.round(Math.sin((p / N) * TWO_PI - cc * 0.34) * 1.3 * ((cc - 10) / 48));
+        g.drawImage(img, cc * S, 8 * S, S, 49 * S, p * fw + (cc - 10) * k, (1 + wv) * k, k, 49 * k);
+      }
+      return (img[key] = { cv, fw, fh, N });
+    }
+    /* el mastil sale del suelo (200 ms), la tela sube hasta arriba con un pequeno rebote y ondea a saltos de una celda (12 fases por vuelta).
+       Dos paises (K2, el lago Titicaca...): dos mastiles, el segundo a la izquierda y un poco despues */
+    _flagPole(c, imgs, x, y, age, now) {
+      const a0 = age - 480; if (a0 < 0) return;
+      const { k } = this._flagGeom(), dpr = this.dpr, E = FLAG_EXT;
+      c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = false;
+      imgs.forEach((img, i) => {
+        const a = a0 - i * 140; if (a < 0 || !img || !img.complete || !img.naturalWidth) return;
+        const S = img.naturalWidth / 64, ox = Math.round(x * dpr - (7.5 + i * 56) * k), base = Math.round(y * dpr), oy = base - (61 + E) * k;
+        const g = 1 - Math.pow(1 - clamp(a / 200, 0, 1), 3), sink = Math.round((58 + E) * (1 - g)) * k;   // filas que faltan por salir del suelo
+        const bx = ox + 7.5 * k;
+        c.fillStyle = "rgba(0,0,0,.32)"; c.beginPath(); c.ellipse(bx, base + dpr, (5 + 4 * g) * dpr, (2 + 1.6 * g) * dpr, 0, 0, Math.PI * 2); c.fill();
+        c.save(); c.beginPath(); c.rect(ox - 8 * k, 0, 72 * k, base + k); c.clip();          // el mastil asoma del suelo: nada por debajo de la base
+        const col = (sr, n, dr, dn) => c.drawImage(img, 4 * S, sr * S, 6 * S, n * S, ox + 4 * k, oy + dr * k + sink, 6 * k, (dn || n) * k);
+        col(3, 57, 3); col(30, 1, 60, E); col(60, 1, 60 + E);                // pomo y mastil (filas 3-59), tramo alargado (la fila 30 repetida) y pie
+        /* la tela: sube desde el pie (3 + E celdas) en 440 ms con un rebote de una celda */
+        const h = clamp((a - 170) / 440, 0, 1), sh = h > 0 && this.prepFlag(img, k);
+        if (sh) {
+          const e = h < 1 ? 1 + 2.2 * Math.pow(h - 1, 3) + 1.2 * Math.pow(h - 1, 2) : 1, dy = Math.round((1 - e) * (3 + E));
+          const p = ((Math.floor(((now / 150 + i) / TWO_PI) * sh.N) % sh.N) + sh.N) % sh.N;
+          c.drawImage(sh.cv, p * sh.fw, 0, sh.fw, sh.fh, ox + 10 * k, oy + (7 + dy) * k + sink, sh.fw, sh.fh);
+        }
+        c.restore();
+      });
+      c.restore();
+    }
+    /* anillos de la Enciclopedia: 300/150/75 km (lo de esta pregunta: m.rings.r) alrededor del objetivo. Crecen al revelar, se encienden de fuera a
+       dentro con el color de su medalla (bronce, plata y oro) al compas de los jackpots (m.rings.at, ms desde el revelado; m.rings.n = los que
+       alcanzaste) y se apagan solos a los pocos segundos. Los puntos del circulo se calculan una vez y, con la camara quieta, tambien su sitio en pantalla */
+    _rings(c, m, A0, age) {
+      const R = m.rings, ans = m.answer, T0 = 520, END = 5600; if (age < T0 || age > END + 900) return;
+      if (R.ct === undefined) R.ct = this.dist.spec && this._moved() ? this._ctOf(ans[0], ans[1]) : null;   // una vez: en el mar, _ctOf recorre el mundo entero
+      if (!R.ll) R.ll = R.r.map(km => { const out = []; for (let j = 0; j <= 80; j++) { let [lo, la] = destLL(ans[1], ans[0], (j / 80) * 360, km); lo += 360 * Math.round((ans[0] - lo) / 360); out.push(lo, la); } return out; });   // junto al antimeridiano no se parte
+      const v = this.viewJ || this.view, key = this.dist.spec ? null : v.cx + "|" + v.cy + "|" + v.s + "|" + this.W + "|" + this.H;
+      if (!key || R.key !== key) { R.key = key; R.xy = R.ll.map(L => { const o = new Float32Array(L.length); for (let j = 0; j < L.length; j += 2) { const q = this.lonLatToScreen(L[j], L[j + 1], R.ct); o[j] = q[0]; o[j + 1] = q[1]; } return o; }); }
+      const grow = easeIO(clamp((age - T0) / 560, 0, 1)), sc = 0.55 + 0.45 * grow, fade = 1 - clamp((age - END) / 900, 0, 1), sk = this.sk, MED = ["#c98a4b", "#dfe6ec", "#f8c64a"];
+      c.save(); c.lineJoin = "round";
+      for (let i = 0; i < 3; i++) {
+        const on = R.n > i && age >= R.at[i], f = on ? clamp((age - R.at[i]) / 260, 0, 1) : 0, P = R.xy[i];
+        c.beginPath();
+        for (let j = 0; j < P.length; j += 2) { const px = A0[0] + (P[j] - A0[0]) * sc, py = A0[1] + (P[j + 1] - A0[1]) * sc; j ? c.lineTo(px, py) : c.moveTo(px, py); }   // al crecer, a escala desde el objetivo
+        c.closePath();
+        if (on) { const p = 1 + 1.5 * (1 - f) * (1 - f); c.globalAlpha = fade; c.lineWidth = 6 * p; c.strokeStyle = this._rgba(sk.ink, 0.8); c.stroke(); c.lineWidth = 3 * p; c.strokeStyle = MED[i]; c.stroke(); }
+        else { c.setLineDash([2, 7]); c.lineCap = "round"; c.globalAlpha = 0.85 * grow * fade; c.lineWidth = 3.4; c.strokeStyle = this._rgba(sk.ink, 0.7); c.stroke(); c.lineWidth = 1.3; c.strokeStyle = this._rgba(sk.paper, 0.95); c.stroke(); c.setLineDash([]); c.lineCap = "butt"; }   // dos tonos, como la linea de distancia: se ve en tierra clara y en el mar
+      }
+      c.restore();
     }
     _pin(c, x, y, fill, ring, age, alpha, noShadow) {
       if (age < 0 || alpha <= 0) return;

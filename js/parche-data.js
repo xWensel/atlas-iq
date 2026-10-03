@@ -30,11 +30,46 @@
 window.AIQ = window.AIQ || {};
 (function (A) {
   /* ancho y alto reales de cada imagen de assets/parche/ */
-  const SZ = {"amuleto-sello":[1100,619],"apuestas-barra":[1100,825],"bandera-destenida":[1100,618],"bandera-viento":[1100,618],"bigbang-1":[1100,618],"bigbang-2":[1100,618],"bigbang-3":[1100,618],"cambiar-por":[1100,618],"dividir":[940,500],"duelo-banca":[1100,618],"escalada-acto3":[1100,928],"escalada-apagon":[1100,618],"etiqueta-nuevo":[1100,618],"galeria-reliquias":[1060,1170],"iconos-herramientas":[840,240],"iconos-t14":[1000,460],"iconos-t15":[1040,440],"iconos-t16":[820,622],"miopia":[1100,618],"mochila-amuletos":[884,260],"nombre-girado":[1100,618],"pacto-oferta":[1100,825],"pared-cinco":[1100,928],"pase-vip":[1100,309],"retos-t14":[1100,618],"retos-t15":[1100,618],"rojo-negro":[1100,412],"rueda-coleccionista":[1100,928],"sangre-fria":[1100,837],"segunda-bola":[1100,618],"siesta":[1100,618],"tanda7":[1100,1237],"tanda8":[1100,548],"tienda-ventajas":[1100,618],"vitrina":[1100,618]};
+  const SZ = {"ticket-bandera":[1100,619],"ticket-dos-banderas":[1100,619],"ticket-encuadre":[1100,619],"ticket-racha":[1100,161],"amuleto-sello":[1100,619],"apuestas-barra":[1100,825],"bandera-destenida":[1100,618],"bandera-viento":[1100,618],"bigbang-1":[1100,618],"bigbang-2":[1100,618],"bigbang-3":[1100,618],"cambiar-por":[1100,618],"dividir":[940,500],"duelo-banca":[1100,618],"escalada-acto3":[1100,928],"escalada-apagon":[1100,618],"etiqueta-nuevo":[1100,618],"galeria-reliquias":[1060,1170],"iconos-herramientas":[840,240],"iconos-t14":[1000,460],"iconos-t15":[1040,440],"iconos-t16":[820,622],"miopia":[1100,618],"mochila-amuletos":[884,260],"nombre-girado":[1100,618],"pacto-oferta":[1100,825],"pared-cinco":[1100,928],"pase-vip":[1100,309],"retos-t14":[1100,618],"retos-t15":[1100,618],"rojo-negro":[1100,412],"rueda-coleccionista":[1100,928],"sangre-fria":[1100,837],"segunda-bola":[1100,618],"siesta":[1100,618],"tanda7":[1100,1237],"tanda8":[1100,548],"tienda-ventajas":[1100,618],"vitrina":[1100,618]};
   const I = (src, cap, size) => ({ src, cap, size: size || "wide", w: (SZ[src] || [1100, 618])[0], h: (SZ[src] || [1100, 618])[1] });
   const E = (name, tag, ver, items, imgs) => ({ name, tag, ver, items, imgs: imgs || [] });
 
   A.PATCHES = [
+    {
+      id: "0.2.15",
+      name: ["El ticket nuevo", "The new ticket"],
+      date: "2026-10-03",
+      summary: ["Cada respuesta se lee como una mano de Balatro: la bandera del sitio si aciertas, cuánto y hacia dónde fallaste, la cuenta PUNTOS × RACHA siempre a la vista y un mapa que encuadra tu chincheta y el objetivo en el hueco libre.",
+        "Every answer reads like a Balatro hand: the place's flag when you get it right, how far and which way you missed, the POINTS × STREAK sum always in view, and a map that frames your pin and the target in the free space."],
+      chapters: [
+        { id: "ticket", kicker: ["Partida", "Gameplay"], title: ["El ticket de cada respuesta", "The ticket for every answer"],
+          entries: [
+            E(["La bandera del acierto", "The flag for a hit"], "new", "0.2.15", [
+            ["Si aciertas (lo mismo que alarga la racha), la chincheta del objetivo se convierte en un mástil y la **bandera pixel** del país sube y ondea en el sitio, con su corneta. En el ticket va junto al nombre del lugar: aprendes banderas en todas las rondas, no solo en las de banderas.", "If you get it right (the same rule that extends your streak), the target pin becomes a flagpole and the country's **pixel flag** rises and waves on the spot, with its own bugle. On the ticket it sits next to the place's name: you learn flags in every round, not just the flag rounds."],
+            ["Los lugares de dos países (el K2, el lago Titicaca) izan las dos. Si fallas, el ticket deja el mástil vacío con el hueco punteado de la bandera que había en juego.", "Places shared by two countries (K2, Lake Titicaca) raise both. If you miss, the ticket shows the empty pole with the dotted outline of the flag that was at stake."]],
+            [I("ticket-bandera", ["Tokio a 60 km: la bandera de Japón se iza en el mapa y en el ticket, y la racha se enciende.", "Tokyo at 60 km: Japan's flag rises on the map and on the ticket, and the streak lights up."]),
+             I("ticket-dos-banderas", ["El K2 iza las banderas de Pakistán y China.", "K2 raises the flags of Pakistan and China."], "half"),
+             I("ticket-encuadre", ["Jerusalén a 2.500 km: las dos chinchetas a la vista, el mástil vacío y la racha rota.", "Jerusalem at 2,500 km: both pins in view, the empty pole and the broken streak."], "half")]),
+            E(["La cuenta, como en Balatro", "The sum, Balatro-style"], "change", "0.2.15", [
+            ["En la Aventura y el Reto diario la cuenta **PUNTOS × RACHA** sale siempre. Sin racha, la caja roja está apagada (×1); con racha se enciende con llamas que crecen con ella; y si pierdes una racha de 2 o más, se agrieta («Racha rota, era ×1,6»).", "In the Adventure and the Daily challenge the **POINTS × STREAK** sum is always shown. With no streak the red box is off (×1); with a streak it lights up with flames that grow with it; and if you lose a streak of 2 or more, it cracks (\"Streak broken, was ×1.6\")."],
+            ["El total cuenta en dos tiempos: primero los puntos y, con el golpe de la racha, sube por el multiplicador.", "The total counts in two beats: first the points and then, with the streak's slam, it climbs by the multiplier."],
+            ["En el Clásico la racha no multiplica: se cuenta en su propia fila.", "In Classic the streak does not multiply: it is counted in its own row."]],
+            [I("ticket-racha", ["Apagada, encendida y rota.", "Off, lit and broken."])]),
+            E(["Lo que aprendes al clicar", "What you learn from a click"], "new", "0.2.15", [
+            ["Debajo de los km, hacia dónde fallaste («Demasiado al oeste») y en qué país cayó tu chincheta: en verde si es el bueno, en rojo si no.", "Under the km, which way you missed (\"Too far west\") and which country your pin landed in: green if it is the right one, red if not."],
+            ["Alrededor del objetivo se dibujan los anillos de la Enciclopedia (300, 150 y 75 km, o los de esa pregunta) y se encienden en bronce, plata y oro al ritmo de sus jackpots.", "Around the target the Encyclopedia rings are drawn (300, 150 and 75 km, or that question's own) and light up in bronze, silver and gold in time with their jackpots."],
+            ["Los territorios que no son país de ninguna pregunta (Groenlandia, el Sáhara Occidental, las Malvinas...) ya se nombran en tu idioma.", "Territories that are not a country in any question (Greenland, Western Sahara, the Falklands...) are now named in your language."]]),
+            E(["El mapa encuadra tu respuesta", "The map frames your answer"], "fix", "0.2.15", [
+            ["Al responder, el mapa centra tu chincheta y el objetivo en el hueco que de verdad queda libre (antes la placa, la nota o el crupier podían taparlos) y se aleja si fallaste por mucho.", "When you answer, the map centres your pin and the target in the space that is actually free (before, the plate, the note or the dealer could cover them) and zooms out if you missed by a lot."],
+            ["Junto al antimeridiano (Nueva Zelanda, Fiyi, Samoa) ya no se quedan bajo el ticket, y tu chincheta va por el camino corto.", "Near the antimeridian (New Zealand, Fiji, Samoa) they no longer end up under the ticket, and your pin takes the short way."]]),
+            E(["La cinta de la racha", "The streak ribbon"], "fix", "0.2.15", [
+            ["Decía «Racha ×3» con el número de aciertos, y parecía un ×3. Ahora dice «Racha 3 · ×1,4»: el multiplicador de verdad.", "It read \"Streak ×3\" with the number of hits, which looked like a ×3. Now it reads \"Streak 3 · ×1.4\": the real multiplier."]]),
+            E(["El ticket en ventanas pequeñas", "The ticket in small windows"], "fix", "0.2.15", [
+            ["En ventanas de 900 px de ancho o menos (la web y el móvil; la ventana de Steam empieza en 960 × 600), el ticket va a la derecha, entre la placa y la nota, y cabe entero sin desplazarse: ni la nota, ni los avisos de logro o tarjeta, ni el crupier lo tapan.", "In windows 900 px wide or less (the web and mobile; the Steam window starts at 960 × 600), the ticket sits on the right, between the plate and the note, and fits whole without scrolling: neither the note, nor the achievement or card notices, nor the dealer cover it."],
+            ["Con la ventana mínima de Steam, el globo del crupier ya no se mete en el ticket.", "At the smallest Steam window, the dealer's speech bubble no longer runs into the ticket."]]),
+          ] },
+      ],
+    },
     {
       id: "0.2.14",
       name: ["Atraco sin trampas", "A fair heist"],

@@ -115,6 +115,17 @@ window.AIQ = window.AIQ || {};
   function ring(a, b, t, n, vol = 0.05) {
     for (let i = 0; i < n; i++) bell(i % 2 ? b : a, t + i * 0.042, { vol: vol * (1 - 0.75 * i / n), dur: 0.13, rev: 0.4 });
   }
+  /* corneta de 8 bits (v0.2.15, bandera del acierto): onda cuadrada filtrada con un pellizco de tono al atacar, como un metal, y vibrato opcional */
+  function horn(m, t, o = {}) {
+    const { vol = 0.03, dur = 0.14, vib = 0, bus = sfxBus } = o;
+    const f = mtof(m), os = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+    os.type = "square"; os.frequency.setValueAtTime(f * 0.94, t); os.frequency.exponentialRampToValueAtTime(f, t + 0.028);
+    lp.type = "lowpass"; lp.Q.value = 1.1; lp.frequency.setValueAtTime(f * 2, t); lp.frequency.exponentialRampToValueAtTime(Math.min(9000, f * 4.5), t + 0.05);
+    if (vib) { const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = vib; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * 0.011, t + dur * 0.55); lfo.connect(lg).connect(os.frequency); lfo.start(t); lfo.stop(t + dur + 0.1); }
+    os.connect(lp).connect(g).connect(bus); send(g, 0.22);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.014); g.gain.setValueAtTime(vol * 0.85, t + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    os.start(t); os.stop(t + dur + 0.05);
+  }
   /* pitido arcade de onda cuadrada: el brillo de maquinita que se suma a las campanas */
   function chirp(m, t, vol = 0.025, dur = 0.09) {
     const os = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
@@ -242,7 +253,7 @@ window.AIQ = window.AIQ || {};
      Enciclopedia, Perfil y Clasificacion (abajo, mas graves y tambien subiendo: Enciclopedia, Clasificacion, Perfil) y Ajustes (arriba, el mas agudo).
      Todo entre do5 y re6 */
   const HOV_DEG = [7, 8, 9, 6, 8, 10, 7];
-  let hovT = -1, hovLast = 0, landLast = 0;
+  let hovT = -1, hovLast = 0, landLast = 0, flagLast = -1;
   const JP_GAP = 0.46;                    // segundos entre jackpots de la Enciclopedia: el ticket enciende sus casillas y el movil vibra a este mismo ritmo
   const JP_LEAD = 0.12;                   // con cuanta antelacion se crean los nodos de cada golpe del jackpot
   A.audio.jpGap = JP_GAP;
@@ -295,6 +306,26 @@ window.AIQ = window.AIQ || {};
     countEnd: go(t => { bell(84, t, { vol: 0.07, dur: 0.8 }); bell(91, t + 0.06, { vol: 0.04, dur: 0.8 }); }),
     /* racha: cada nivel de racha sube un peldano */
     streak: go((t, n) => { const b = scaleNote(4 + Math.min(n, 7) * 2, 60); pluck(b, t, { vol: 0.12, dur: 0.4 }); pluck(b + 7, t + 0.07, { vol: 0.1, dur: 0.5 }); noise(t, 0.25, { hp: 2500, vol: 0.03, sweepTo: 9000, type: "highpass" }); }),
+    /* v0.2.15, la bandera del acierto: corneta pixel de tres notas que suben mientras la bandera sube por el mastil. Flojita (muy por debajo de los
+       jackpots) y nunca igual: se sortean el motivo (nunca el de la vez anterior), el tono, el volumen y la afinacion; la ultima nota lleva vibrato.
+       Delante, el golpe de tela al desplegarse. n = 2 (dos paises): un eco una octava arriba */
+    flag: go((t, n = 1) => {
+      const r = Math.random, M = [[0, 2, 3], [0, 3, 5], [2, 3, 5], [0, 2, 5], [1, 3, 5]];
+      let mi = Math.floor(r() * M.length); if (mi === flagLast) mi = (mi + 1 + Math.floor(r() * (M.length - 1))) % M.length; flagLast = mi;
+      const base = [60, 62, 65][Math.floor(r() * 3)] + 12, v = 0.03 * (0.85 + 0.3 * r()), step = 0.1 + 0.025 * r();
+      noise(t, 0.08, { type: "bandpass", lp: 1300 + 700 * r(), q: 0.9, vol: 0.022 });
+      noise(t + 0.03, 0.05, { type: "bandpass", lp: 2200 + 900 * r(), q: 1.2, vol: 0.012 });
+      M[mi].forEach((d, i) => { const last = i === 2; horn(scaleNote(d, base) + (r() - 0.5) * 0.08, t + 0.05 + i * step, { vol: v * (last ? 1.08 : 0.9), dur: last ? 0.44 : 0.11, vib: last ? 5.5 + r() : 0 }); });
+      if (n > 1) M[mi].forEach((d, i) => horn(scaleNote(d, base) + 12, t + 0.2 + i * step, { vol: v * 0.32, dur: i === 2 ? 0.3 : 0.08 }));
+    }),
+    /* v0.2.15, racha rota: la ficha que se agrieta. Chasquido seco, unas esquirlas, un golpe sordo y dos notas que caen. Flojo: perder no se celebra, pero se nota */
+    streakBreak: go(t => {
+      const r = Math.random;
+      noise(t, 0.05, { type: "bandpass", lp: 3600 + 900 * r(), q: 2.2, vol: 0.07 });
+      for (let i = 0; i < 4; i++) noise(t + 0.012 + i * 0.019 + r() * 0.008, 0.012, { hp: 4500 + r() * 2500, vol: 0.028 });
+      thump(t, { vol: 0.15, f0: 140, f1: 48, dur: 0.14 });
+      pluck(64, t + 0.05, { vol: 0.065, dur: 0.22, bright: 2.5, wave: "square" }); pluck(59, t + 0.17, { vol: 0.06, dur: 0.38, bright: 2 });
+    }),
     tick: go((t, n) => pluck(88 - n * 2, t, { vol: 0.08, dur: 0.08, bright: 4, rev: 0.05 })),
     /* ruleta lineal del Campamento (v0.73): la ficha al apostar, el "no va mas" (campanilla), el arranque (barrido + golpe; la musica baja), el tic de matraca de
        cada casilla (v: 0 rapido .. 1 casi parada: mas grave, mas fuerte y mas largo), el latido del casi-fallo, el tope final y el cero */

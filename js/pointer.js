@@ -28,7 +28,27 @@ window.AIQ = window.AIQ || {};
 
   /* nombres de pais traducidos (clave: nombre Natural Earth en ingles) */
   let CN = null;
-  const countryName = f => { if (!CN) { CN = {}; (A.PLACES || []).forEach(r => { if (r[1] === "country") CN[r[0].slice(2)] = r[6]; }); } const n = CN[f.name]; return n ? A.tx(n) : f.name; };
+  /* v0.2.15: territorios del mapa que no son pais de ninguna pregunta (antes salian en ingles: "Tu chincheta: Somaliland", "Greenland") */
+  const TERR = {
+    "W. Sahara": "Sáhara Occidental|Western Sahara|Sahara occidental|Saara Ocidental|Westsahara|Sahara Occidentale||西撒哈拉|서사하라|西サハラ|Западная Сахара|Sahara Zachodnia",
+    "Somaliland": "Somalilandia|Somaliland|Somaliland|Somalilândia|Somaliland|Somaliland||索马里兰|소말릴란드|ソマリランド|Сомалиленд|Somaliland",
+    "Antarctica": "Antártida|Antarctica|Antarctique|Antártida|Antarktis|Antartide||南极洲|남극|南極大陸|Антарктида|Antarktyda",
+    "N. Cyprus": "Chipre del Norte|Northern Cyprus|Chypre du Nord|Chipre do Norte|Nordzypern|Cipro del Nord||北塞浦路斯|북키프로스|北キプロス|Северный Кипр|Cypr Północny",
+    "Puerto Rico": "Puerto Rico|Puerto Rico|Porto Rico|Porto Rico|Puerto Rico|Porto Rico||波多黎各|푸에르토리코|プエルトリコ|Пуэрто-Рико|Portoryko",
+    "Falkland Is.": "Islas Malvinas|Falkland Islands|Îles Malouines|Ilhas Malvinas|Falklandinseln|Isole Falkland||福克兰群岛|포클랜드 제도|フォークランド諸島|Фолклендские острова|Falklandy",
+    "New Caledonia": "Nueva Caledonia|New Caledonia|Nouvelle-Calédonie|Nova Caledônia|Neukaledonien|Nuova Caledonia||新喀里多尼亚|누벨칼레도니|ニューカレドニア|Новая Каледония|Nowa Kaledonia",
+    "Fr. Polynesia": "Polinesia Francesa|French Polynesia|Polynésie française|Polinésia Francesa|Französisch-Polynesien|Polinesia francese||法属波利尼西亚|프랑스령 폴리네시아|フランス領ポリネシア|Французская Полинезия|Polinezja Francuska",
+    "Hong Kong": "Hong Kong|Hong Kong|Hong Kong|Hong Kong|Hongkong|Hong Kong||香港|홍콩|香港|Гонконг|Hongkong",
+    "Macao": "Macao|Macau|Macao|Macau|Macau|Macao||澳门|마카오|マカオ|Макао|Makau",
+    "Faeroe Is.": "Islas Feroe|Faroe Islands|Îles Féroé|Ilhas Faroé|Färöer|Isole Fær Øer||法罗群岛|페로 제도|フェロー諸島|Фарерские острова|Wyspy Owcze",
+    "Fr. S. Antarctic Lands": "Tierras Australes Francesas|French Southern Lands|Terres australes françaises|Terras Austrais Francesas|Französische Süd-Gebiete|Terre australi francesi||法属南部领地|프랑스령 남방 지역|フランス領南方地域|Французские Южные территории|Francuskie Terytoria Południowe",
+    "S. Geo. and the Is.": "Georgia del Sur|South Georgia|Géorgie du Sud|Geórgia do Sul|Südgeorgien|Georgia del Sud||南乔治亚|사우스조지아|サウスジョージア|Южная Георгия|Georgia Południowa",
+  };
+  const PC_EN = { Greenland: "Greenland", "Curaçao": "Curaçao", Aruba: "Aruba", "Cook Is.": "Cook Islands" };   // estos si vienen en A.PCOUNTRY (por su nombre ingles)
+  const countryName = f => {
+    if (!CN) { CN = {}; (A.PLACES || []).forEach(r => { if (r[1] === "country") CN[r[0].slice(2)] = r[6]; }); for (const ne in PC_EN) { const n = Object.values(A.PCOUNTRY || {}).find(x => x && x.en === PC_EN[ne]); if (n) CN[ne] = n; } }
+    const n = CN[f.name]; return n ? A.tx(n) : TERR[f.name] ? A.pick6(TERR[f.name]) : f.name;
+  };
   const countryAt = (lon, lat) => { for (const f of map.world.features) { const b = f.polys; let near = false; for (const p of b) if (lon >= p.bbox[0] - 1 && lon <= p.bbox[2] + 1 && lat >= p.bbox[1] - 1 && lat <= p.bbox[3] + 1) { near = true; break; } if (near && A.geo.inFeature(lon, lat, f)) return f; } return null; };
 
   /* ---------------------------------------------------------------- dibujo del reticulo (64x64, pixel a pixel) */
@@ -182,11 +202,13 @@ window.AIQ = window.AIQ || {};
   P.effective = () => (P.on ? [P.x, P.y] : null);
   /* para el crupier (js/dealer.js): lon/lat bajo el reticulo (lo que ya se calcula a ~30 Hz) y el pais de un punto */
   P.ll = () => (P.on ? lastLL : null);
-  P.countryAt = (lon, lat) => {                                                     // en la costa el mapa simplificado deja fuera muchas ciudades: el pais mas cercano a menos de 40 km
-    if (!map || !map.world) return ""; let f = countryAt(lon, lat);
+  P.featureAt = (lon, lat) => {                                                     // en la costa el mapa simplificado deja fuera muchas ciudades: el pais mas cercano a menos de 40 km
+    if (!map || !map.world) return null; let f = countryAt(lon, lat);
     if (!f) { let best = 40; for (const g of map.world.features) { if (!g.polys.some(p => lon >= p.bbox[0] - 1 && lon <= p.bbox[2] + 1 && lat >= p.bbox[1] - 1 && lat <= p.bbox[3] + 1)) continue; const d = A.geo.distToFeature(lon, lat, g); if (d < best) { best = d; f = g; } } }
-    return f ? countryName(f) : "";
+    return f;
   };
+  P.nameOf = f => (f ? countryName(f) : "");
+  P.countryAt = (lon, lat) => P.nameOf(P.featureAt(lon, lat));
   /* termometro: azul (lejos) -> rojo (cerca), por franjas */
   const HOT = [[6000, "#3b6bff"], [3000, "#35a7ff"], [1500, "#3fe0c8"], [700, "#7be04a"], [350, "#f2e03a"], [150, "#ffa53a"], [0, "#ff3b3b"]];
   const hotColor = km => { for (const [k, c] of HOT) if (km >= k) return c; return HOT[HOT.length - 1][1]; };
