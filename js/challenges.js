@@ -557,7 +557,7 @@ window.AIQ = window.AIQ || {};
      cambio trae otra, la mesa se reparte de nuevo para ella (cada pregunta empieza con el reparto, asi que no se nota) */
   let RPTS = { key: null, pts: null };
   const roundPts = map => {
-    const list = ((A.core && A.core.S && A.core.S.qs) || []).filter(Boolean), key = S.seed + "|" + S.round + "|" + list.map(q => (q.cid ? q.cid[0] : q.key)).join(","); if (RPTS.key === key) return RPTS.pts;
+    const alt = A.adv && A.adv.splitAlt ? A.adv.splitAlt() : null, list = ((A.core && A.core.S && A.core.S.qs) || []).concat(alt ? [alt] : []).filter(Boolean), key = S.seed + "|" + S.round + "|" + list.map(q => (q.cid ? q.cid[0] : q.key)).join(","); if (RPTS.key === key) return RPTS.pts;
     const pts = [];
     for (const q of list) {
       if (q.t === "c") { const f = map.world.byName[q.key]; if (!f) continue; const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a)); pts.push([(big.bbox[0] + big.bbox[2]) / 2, (big.bbox[1] + big.bbox[3]) / 2, big.ct]); }
@@ -771,6 +771,8 @@ window.AIQ = window.AIQ || {};
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; }
       clearText(); if (A.pointer && A.pointer.mods) A.pointer.mods();
     },
+    /* Dividir (tanda 12b): el lugar alternativo bajo la placa, con los mismos retos de texto (ninguna de las dos se lee limpia) */
+    decoAlt: (el, o) => { if (!S.on || S.suspended || !cur().some(c => D[c.id].kind === "text")) { el.textContent = A.tx(o.name); return; } deco(el, o, o.name, null, true); },
     decorate, par, get, fxNow: () => S.fx, suspended: () => S.suspended, cjkTail: CJK_TAIL, babelAlt,   // babelAlt y decoys: tambien para las pruebas
     decoys: (o, n) => decoyList(S.map || (A.core && A.core.map), o, n),
     /* nota del pie (Libro de la casa, Nota del crupier): con la Adivinanza en la placa, la nota sale tapada igual (si no, la resolvia al instante) */

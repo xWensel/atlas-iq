@@ -497,6 +497,13 @@ window.AIQ = window.AIQ || {};
     run.qn = has("sleeve") && !run.inf ? 6 : 5;
     const qs = pickQuestions(run.qn, keep), info = actInfo(run.act), tn = TOPIC_NAMES[def.topic][Math.min(def.tier, TOPIC_NAMES[def.topic].length - 1)];
     run.topic = def.topic; run.tier = def.tier;
+    if (!(keep && run.split && run.split.key === tgtKey())) {           // Dividir (tanda 12b): la alternativa de la pregunta dificil
+      run.split = null;
+      if (has("split") && !run.inf) {
+        const pos = roundNo(), B = bandsOf(slotOf(pos)), hard = new Set(B.bands[2].list.map(q => q.cid[0])), hi = qs.findIndex((q, i) => i < 5 && hard.has(q.cid[0]));
+        if (hi >= 0) { const t = []; takeFrom(B.bands[2].list, 1, A.rng(`${run.seed}:alt:${pos}:${run.attempt || 0}`), t, ctxOf(pos, run.used, B.topic), B.tail); if (t[0]) run.split = { key: tgtKey(), qi: hi, alt: t[0].cid[0], used: false }; }
+      }
+    }
     return {
       name: `${A.tx(info.n)} · ${boss ? A.T("Jefe", "Boss") : A.tf("Ronda {n}/3", "Round {n}/3", { n: run.round + 1 })}`, topicName: tn, topic: def.topic, kind: "adventure", boss: !!boss,
       seconds: ctx.seconds, advance: roundTarget(), maxPerQ: 1400, bonus: false, plainName: true, questions: () => qs,
@@ -750,6 +757,7 @@ window.AIQ = window.AIQ || {};
     if (!!calm !== !!run.calmOn) { if (calm) A.adv.flash("coolhead", 0, "❄"); else A.adv.flash("coolhead", 0, "✕", () => A.sfx.chip(0.3)); }   // entra en frio / se le quiebra el halo
     const calmWas = !!run.calmOn; run.calmOn = !!calm; if (calmWas !== run.calmOn) renderBars();   // las fichas que apaga, heladas
     const fx = A.chal.fx(perkList()); A.chal.question(o, run.qi, { calm });
+    showSplit();
     if (kept) { C().map.avoid = hudRects(); C().map.setProbes(kept); renderBars(); }
     A.pointer.set({ tool: null, fx, calm: !!calm, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; return oo.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[oo.key]) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
     const api = {
@@ -815,6 +823,30 @@ window.AIQ = window.AIQ || {};
     else if (id === "passport") trile(o);                                // tanda 10: el Pase VIP es un trile
     persist(); renderBars();
   };
+  /* Dividir (tanda 12b): en la pregunta dificil, bajo la placa, "o bien: <otro lugar>" (con los mismos retos de placa; en banderas, su bandera
+     pequena). Un clic o la tecla Tab la cambian, una sola vez y antes de responder; la otra carta se va con el crupier */
+  const SPLIT_OR = L6("o bien:|or:|ou bien :|ou então:|oder:|oppure:||或者：|또는:|または：|или:|albo:");
+  const splitQ = () => { const sp = run && run.split, all = sp && allQ(); return sp && all[sp.alt] ? withSub({ ...all[sp.alt] }) : null; };
+  A.adv.splitAlt = () => { const S = C().S, sp = run && run.split; return sp && !sp.used && !run.inf && sp.key === tgtKey() && S.qi === sp.qi ? splitQ() : null; };   // tambien para la mesa de Continentes barajados
+  function showSplit() {
+    const old = $("splitAlt"); if (old) old.remove();
+    const q = A.adv.splitAlt(), sub = $("askSub"); if (!q || !sub) return;
+    const b = document.createElement("button"); b.id = "splitAlt"; b.type = "button"; b.className = "split-alt";
+    b.innerHTML = `<span class="sa-k">${ic("oracle", "sm")}${A.tx(SPLIT_OR)}</span><span class="sa-n"></span><kbd class="sa-key">Tab</kbd>`;
+    const n = b.querySelector(".sa-n");
+    if (A.adv.isFlagRound() && q.t === "c" && A.FLAGS && q.name && A.FLAGS[q.name.en]) { const fx = A.chal.flagFx && A.chal.flagFx(); n.innerHTML = `<img class="sa-flag" alt="" src="assets/flags/${A.mediaKey(q.name.en)}.svg"${fx ? ` style="filter:${fx}"` : ""}>`; }
+    else if (A.chal.decoAlt) A.chal.decoAlt(n, q); else n.textContent = A.tx(q.name);
+    b.onclick = e => { e.stopPropagation(); splitSwap(); };
+    sub.after(b);
+  }
+  function splitSwap() {
+    const S = C().S, q = A.adv.splitAlt(); if (!q || S.phase !== "asking") return false;
+    run.split.used = true; S.qs[S.qi] = q; if (run.curQ) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]);
+    C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; A.adv.onQuestion(); A.sfx.card(); setTimeout(() => A.sfx.card(), 140);
+    A.adv.flash("oracle", run.splitSeen ? 0 : 2, "⇄"); if (!run.splitSeen) { run.splitSeen = 1; setTimeout(() => A.sfx.jackpot(2), 300); }   // la primera vez de la expedicion, con jackpot
+    persist(); return true;
+  }
+  addEventListener("keydown", e => { if (e.key === "Tab" && $("splitAlt") && C().S.phase === "asking") { e.preventDefault(); splitSwap(); } });
   /* Carta de cambio: otro lugar de la ronda en vez del actual */
   function swapQuestion() {
     const S = C().S, cur = S.qs[S.qi], rr = A.rng(`${run.seed}:swap:${roundNo()}:${S.qi}:${run.qTotal}`); let pick = null;
