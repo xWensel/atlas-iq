@@ -1,7 +1,7 @@
 # Geolite - reglas del proyecto
 
 ## Versiones (obligatorio en cada entrega)
-- Cada entrega que se sube a `main` sube la version MENOR en 1 y deja el ultimo numero en 1: 0.2.1 -> 0.3.1 -> 0.4.1 -> ...
+- La version del juego sigue la numeracion de las notas del parche: 0.2.N. Cada entrega que se sube a `main` sube el ULTIMO numero en 1 (0.2.3 -> 0.2.4 -> 0.2.5 ...), cierra la version anterior y lleva su propia entrada en las notas del parche (`js/parche-data.js`; si es pequena, 1 o 2 lineas). Un parche publicado nunca se edita. El historial anterior (0.N.1, hasta la 0.79.1) se conserva en el README.
 - La version actual es la de `VERSION`. Al subir una entrega, cambia la version en TODOS estos sitios a la vez:
   `VERSION`, `js/support.js` (`A.VERSION`, la que se ve en el juego), `package.json` y `package-lock.json` (`version`),
   y la cache de `sw.js` (`geolite-vX.Y.Z`).

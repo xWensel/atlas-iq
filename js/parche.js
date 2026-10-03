@@ -26,7 +26,8 @@ window.AIQ = window.AIQ || {};
     inpatch: "En este parche|In this patch|Dans ce patch|Neste patch|In diesem Patch|In questa patch||本补丁内容|이 패치 내용|このパッチの内容|В этом патче|W tym patchu",
     latest: "Último|Latest|Dernier|Mais recente|Neuester|Ultima||最新|최신|最新|Последний|Najnowszy",
     new: "Nuevo|New|Nouveau|Novo|Neu|Nuovo||新|새 글|新着|Новое|Nowe",
-    games: "Juego {a} a {b}|Game {a} to {b}|Jeu {a} à {b}|Jogo {a} a {b}|Spiel {a} bis {b}|Gioco {a} a {b}||游戏 {a} 至 {b}|게임 {a} ~ {b}|ゲーム {a}〜{b}|Игра {a}–{b}|Gra {a} do {b}",
+    games: "Compilaciones {a} a {b}|Builds {a} to {b}|Versions {a} à {b}|Compilações {a} a {b}|Builds {a} bis {b}|Build {a} a {b}||构建 {a} 至 {b}|빌드 {a} ~ {b}|ビルド {a}〜{b}|Сборки {a}–{b}|Wersje {a} do {b}",
+    bld: "comp.|build|vers.|comp.|Build|build||构建|빌드|ビルド|сборка|wersja",
     top: "Subir|Back to top|Haut de page|Voltar ao topo|Nach oben|Torna su||回到顶部|맨 위로|先頭へ|Наверх|Do góry",
     close: "Cerrar|Close|Fermer|Fechar|Schließen|Chiudi||关闭|닫기|閉じる|Закрыть|Zamknij",
     prev: "Anterior|Previous|Précédent|Anterior|Zurück|Precedente||上一张|이전|前へ|Назад|Poprzedni",
@@ -70,23 +71,24 @@ window.AIQ = window.AIQ || {};
   /* ------------------------------------------------------------------ pintar un parche */
   const LOC = () => ({ pt: "pt-BR", zh: "zh-CN" }[A.lang] || A.lang || "es");
   const day = s => { try { return new Intl.DateTimeFormat(LOC(), { day: "numeric", month: "long", year: "numeric" }).format(new Date(s + "T12:00:00")); } catch (e) { return s; } };
-  const gamesTxt = p => t("games").replace("{a}", p.games[0]).replace("{b}", p.games[1]);
+  const gamesTxt = p => p.games ? t("games").replace("{a}", p.games[0]).replace("{b}", p.games[1]) : "";
+  const verTxt = v => /^0\.2\./.test(v) ? "v" + v : t("bld") + " " + v;  /* 0.2.N = version-parche; 0.50-0.79 = compilacion antigua */
 
   const shots = imgs => !imgs || !imgs.length ? "" : `<div class="pt-shots">${imgs.map(m => {
     const cap = tx(m.cap || ""), src = "assets/parche/" + m.src + ".webp";
     return `<figure class="pt-shot s-${m.size || "wide"}"><button type="button" class="pt-zoom" data-src="${src}" style="--ar:${m.w} / ${m.h}" aria-label="${esc(cap)} · ${esc(t("zoom"))}"><img src="${src}" width="${m.w}" height="${m.h}" alt="${esc(cap)}" loading="lazy" decoding="async" draggable="false"></button>${cap ? `<figcaption>${esc(cap)}</figcaption>` : ""}</figure>`;
   }).join("")}</div>`;
-  const entry = e => `<article class="pt-en t-${e.tag}"><header><h3>${esc(tx(e.name))}</h3><span class="pt-tag">${esc(tagName(e.tag))}</span>${e.ver ? `<span class="pt-ver">v${esc(e.ver)}</span>` : ""}</header>
+  const entry = e => `<article class="pt-en t-${e.tag}"><header><h3>${esc(tx(e.name))}</h3><span class="pt-tag">${esc(tagName(e.tag))}</span>${e.ver ? `<span class="pt-ver">${esc(verTxt(e.ver))}</span>` : ""}</header>
     <ul>${e.items.map(i => `<li>${rich(i)}</li>`).join("")}</ul>${shots(e.imgs)}</article>`;
   const chapter = c => `<section class="pt-ch" id="ptc-${esc(c.id)}" data-ch="${esc(c.id)}"><header class="pt-chh"><span class="pt-ck">${esc(tx(c.kicker))}</span><h2>${esc(tx(c.title))}</h2></header>
     ${c.intro ? `<p class="pt-lead">${rich(c.intro)}</p>` : ""}
     ${c.cards ? `<div class="pt-cards">${c.cards.map(k => `<div class="pt-card"><b>${esc(tx(k.name))}</b><p>${rich(k.text)}</p></div>`).join("")}</div>` : ""}
     ${(c.entries || []).map(entry).join("")}</section>`;
   const timeline = p => !p.timeline || !p.timeline.length ? "" : `<section class="pt-ch" id="ptc-versiones" data-ch="versiones"><header class="pt-chh"><span class="pt-ck">${esc(t("hist"))}</span><h2>${esc(t("allv"))}</h2></header>
-    <ol class="pt-tl">${p.timeline.map(r => `<li><b>v${esc(r[0])}</b><span>${esc(tx(r[1]))}</span></li>`).join("")}</ol></section>`;
+    <ol class="pt-tl">${p.timeline.map(r => `<li><b>${esc(verTxt(r[0]))}</b><span>${esc(tx(r[1]))}</span></li>`).join("")}</ol></section>`;
   const hero = p => `<header class="pt-hero"><span class="pt-hico">${A.icon("m_patch")}</span><div class="pt-ht">
     <span class="pt-k">${esc(t("patch"))} v${esc(p.id)} · Geolite</span><h1>${esc(tx(p.name))}</h1>
-    <div class="pt-meta"><span>${esc(day(p.date))}</span><span>${esc(gamesTxt(p))}</span></div>
+    <div class="pt-meta"><span>${esc(day(p.date))}</span>${p.games ? `<span>${esc(gamesTxt(p))}</span>` : ""}</div>
     <p class="pt-sum">${rich(p.summary)}</p>${["es", "en", "es-419"].includes(A.lang) ? "" : `<p class="pt-lang">${esc(t("only"))}</p>`}</div></header>`;
   /* el parche se pinta por trozos (cabecera y primer capitulo ya; el resto, uno por fotograma, por debajo de la vista): maquetar de golpe las ~100 entradas costaba un fotograma largo con CPU lenta */
   const parts = p => [hero(p) + (p.chapters[0] ? chapter(p.chapters[0]) : ""), ...p.chapters.slice(1).map(chapter), timeline(p) + `<p class="pt-foot">${esc(t("foot"))}</p>`];

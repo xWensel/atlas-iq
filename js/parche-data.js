@@ -1,7 +1,7 @@
 /*
  * Geolite - NOTAS DEL PARCHE: los datos (js/parche.js los pinta; css/parche.css los viste).
  *
- * Los parches tienen numeracion PROPIA, distinta de la version del juego: v0.2.1 (el primero), v0.2.2, v0.2.3...
+ * Desde la 0.2.3 la version del juego Y el parche llevan el mismo numero (0.2.N); antes eran distintos (el parche 0.2.1 y 0.2.2 agrupan compilaciones 0.50.1 a 0.78.1, mostradas como "comp."). Cada entrega sube el numero y trae su nota (pequena: 1 o 2 lineas).
  * Cada parche junta varias versiones del juego (campo `games`). El jugador los ve desde el icono del cuaderno,
  * en la esquina inferior izquierda de la portada, y navega por los anteriores en la lista de la izquierda.
  *
@@ -35,6 +35,21 @@ window.AIQ = window.AIQ || {};
   const E = (name, tag, ver, items, imgs) => ({ name, tag, ver, items, imgs: imgs || [] });
 
   A.PATCHES = [
+    {
+      id: "0.2.3",
+      name: ["Una versión, una nota", "One version, one note"],
+      date: "2026-10-03",
+      summary: ["Desde ahora la versión del juego y el parche llevan el mismo número, y cada entrega trae su propia nota.",
+        "From now on the game version and the patch share the same number, and every delivery brings its own note."],
+      chapters: [
+        { id: "sistema", kicker: ["Sistema", "System"], title: ["Numeración nueva", "New numbering"],
+          entries: [
+            E(["La versión del juego sigue a las notas", "The game version follows the notes"], "change", "0.2.3", [
+            ["La versión que ves en el juego pasa a ser 0.2.N, igual que los parches: cada entrega sube el último número y cierra la anterior.", "The version you see in the game is now 0.2.N, like the patches: each delivery bumps the last number and closes the previous one."],
+            ["Las versiones antiguas (0.50.1 a 0.79.1) aparecen en las notas como compilaciones, para no confundirlas con los números de parche.", "The old versions (0.50.1 to 0.79.1) appear in the notes as builds, so they are not mixed up with patch numbers."]]),
+          ] },
+      ],
+    },
     {
       id: "0.2.2",
       name: ["Ajuste de la curva", "Curve tuning"],
