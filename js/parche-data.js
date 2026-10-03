@@ -36,6 +36,19 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.25",
+      name: ["El diario, aparte", "The daily, apart"],
+      date: "2026-10-04",
+      summary: ["El Reto diario ya no desbloquea barajas ni da los logros de victoria y de Ascensión: eso solo se gana en la Aventura.", "The Daily challenge no longer unlocks decks or grants the victory and Ascension achievements: those are earned only in Adventure."],
+      chapters: [
+        { id: "diario", kicker: ["Reto diario", "Daily challenge"], title: ["Lo que cuenta", "What counts"],
+          entries: [
+            E(["Logros y barajas", "Achievements and decks"], "change", "0.2.25", [
+              ["Ganar un intento del Reto diario ya no da **Terra Incognita** ni los logros de **Ascensión**, así que tampoco desbloquea barajas. Igual que la Ascensión, se ganan en la Aventura.", "Winning a Daily challenge attempt no longer grants **Terra Incognita** or the **Ascension** achievements, so it doesn't unlock decks either. Like Ascension, they're earned in Adventure."]
+            ]) ] },
+      ],
+    },
+    {
       id: "0.2.24",
       name: ["Revisión a fondo", "A full sweep"],
       date: "2026-10-04",
