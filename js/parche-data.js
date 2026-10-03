@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.18",
+      name: ["La ruleta gira siempre", "The wheel always spins"],
+      date: "2026-10-03",
+      summary: ["Rojo o negro, la Moneda y la Ruleta de premios ya muestran su animación aunque tu sistema tenga las animaciones desactivadas.",
+        "Red or black, the Coin and the Prize wheel now show their animation even if your system has animations turned off."],
+      chapters: [
+        { id: "giro", kicker: ["Campamento", "Camp"], title: ["La Barra", "The Bar"],
+          entries: [
+            E(["La animación no aparecía", "The animation was missing"], "fix", "0.2.18", [
+            ["Con «mostrar animaciones» desactivado en Windows, las ruletas saltaban directas al resultado sin girar. Ahora giran siempre; solo las apaga el ajuste **Reducir movimiento** del propio juego.", "With \"show animations\" turned off in Windows, the wheels jumped straight to the result without spinning. Now they always spin; only the game's own **Reduce motion** setting turns them off."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.17",
       name: ["Casino para todos", "Casino for everyone"],
       date: "2026-10-03",

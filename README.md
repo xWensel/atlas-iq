@@ -4,6 +4,8 @@
 
 > **Versiones:** desde la 0.2.3 la version del juego sigue la numeracion de las notas del parche (0.2.N): cada entrega sube el ultimo numero y lleva su entrada en las notas. Antes (hasta la 0.79.1) cada entrega subia la version menor y terminaba en 1. Se cambia en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.2.18** - Las ruletas del casino (Rojo o negro, Moneda al aire y Ruleta de premios) ya giran aunque Windows tenga desactivadas las animaciones: antes, con ese ajuste del sistema, saltaban directas al resultado sin animacion. Solo las apaga el ajuste Reducir movimiento del propio juego.
+
 **v0.2.17** - La Barra entera (suministro a la izquierda, juego de casino al centro y apuesta a la derecha) (Rojo o negro, Moneda al aire o Ruleta de premios) sale ya en TODOS los Campamentos, tambien para quien aun no ha derrotado a ningun jefe: antes solo aparecian los suministros hasta el primer jefe. Las apuestas laterales (Oferta, Doble o nada, Apuesta final) tambien salen desde el primer Campamento, cuando les toca.
 
 **v0.2.16** - Chinchetas trampa, de verdad: caen 30 / 52 / 80 segun el nivel (antes 8 / 14 / 22), repartidas primero y apretadas despues hasta llenar el mapa, y tambien en el mar (si todas caian en tierra, "chincheta = pais" era una pista). Cada una suena al clavarse (tic de kalimba de A.sfx.pinFall, que ya estaba, ahora con el numero de chinchetas para bajar el volumen). Fuera onLand (sin uso). Recupera el cambio que se quedo sin subir en la carpeta compartida (antigua v0.72.1). Parche v0.2.16 en las notas del juego.

@@ -1643,7 +1643,7 @@ window.AIQ = window.AIQ || {};
   }
   function spinRoulette(o, done) {
     const { pick, n, skip } = o, out = colorOf(n), win = pick === out, zero = out === "green", S = C().S, app = $("app");
-    const reduced = !!(S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = !!(S && S.reduce);
     if (!app) return done();
     rouOpen = true;
     const REPS = 6, pos = WHEEL.indexOf(n), cw = Math.max(60, Math.min(116, Math.round(innerHeight * 0.125), Math.round(innerWidth / 7)));   // casilla entera en px: pixel art
@@ -1788,7 +1788,7 @@ window.AIQ = window.AIQ || {};
 
   /* la capa a pantalla completa que comparten Moneda y Ruleta de premios (la de Rojo o negro es la suya): teclado bloqueado, cierre con fundido, nunca deja el Campamento bloqueado */
   function rouShell(cls, html, vars, done) {
-    const app = $("app"), S = C().S, reduced = !!(S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const app = $("app"), S = C().S, reduced = !!(S && S.reduce);
     if (!app) { done(); return null; }
     rouOpen = true;
     const ov = document.createElement("div"); ov.id = "rouOv"; ov.className = "rou spin " + cls;
