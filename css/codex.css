@@ -333,3 +333,16 @@ html:lang(ko) #codex :is(.cx-nv b, .cx-jump b, .cx-ct-t b, .cx-pn, .cx-rh b, .cx
 html:lang(ja) #codex :is(.cx-nv b, .cx-ct-t b, .cx-pn) { word-break: auto-phrase; }
 /* el crupier ensena 3 s un pais sin descubrir: su bandera sobre la silueta */
 .cx-ct-f .cx-tease { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
+
+/* v0.45: banderas pixel art de cada pais (assets/flags/p, tools/flags_pixel.py): misma silueta ondeante que t_country, siempre nitidas */
+.cx-pxf { image-rendering: pixelated; object-fit: contain; }
+.cx-ct-f > .cx-pxf { position: absolute; inset: 0; width: 100%; height: 100%; padding: 1px 0; box-sizing: border-box; }
+.cx-gh-f > .cx-pxf { position: absolute; inset: 0; width: 100%; height: 100%; padding: 4px 0; box-sizing: border-box; }
+.cx-ct-f .cx-tease.cx-pxf, .cx-card .cx-tease.cx-pxf { object-fit: contain; background: #0d2219; image-rendering: pixelated; }
+.cx-card .cx-art > .cx-ic.cx-pxf { width: 62%; }
+.cx-big .cx-art > .cx-ic.cx-pxf { width: 52%; }
+.cx-rel .cx-ic.cx-pxf { width: 26px; height: 26px; }
+.cx-chap h3 > .cx-ic.cx-pxf { width: 40px; height: 40px; }
+.cx-tcard .cx-ic.cx-pxf { width: 78%; }
+.cx-tags .cx-tflag.cx-pxf { width: 26px; height: 26px; margin: -4px 0; box-shadow: none; object-fit: contain; }
+.cx-mtip img.cx-pxf { width: 30px; height: 30px; margin: -5px 0; box-shadow: none; object-fit: contain; }

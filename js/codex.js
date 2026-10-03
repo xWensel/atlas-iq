@@ -18,6 +18,8 @@ window.AIQ = window.AIQ || {};
   /* iconos propios por tipo (js/icons.js) */
   const TYPE_IC = { city: "t_city", capital: "t_capital", country: "t_country", landmark: "t_landmark", nature: "t_nature", water: "t_water", strait: "t_strait", battle: "t_battle", event: "t_event", history: "chronicler", person: "t_person", curiosity: "t_curio", place: "t_place" };
   const iconSvg = t => A.icon(TYPE_IC[t] || "t_place", "cx-ic");
+  /* icono de una entrada: los paises descubiertos llevan SU bandera pixel (assets/flags/p, tools/flags_pixel.py); t_country (la de Espana) queda de icono de la categoria */
+  const iconOf = (e, un = true) => (un && e.type === "country" && e.id.startsWith("c:") && hasFlag(e.id.slice(2)) ? pxFlag(e.id.slice(2), "cx-ic cx-pxf") : e.type === "country" && !e.id.startsWith("c:") ? A.icon("t_place", "cx-ic") : iconSvg(e.type));
 
   /* continente de un punto (etiqueta de la ficha, pista del Pasaporte en la Aventura y continentes de los retos del mapa, js/map.js).
      Antes Egipto salia en Asia, el Magreb, Siria, Irak e Iran en Europa y Tahiti, Samoa, Tonga, Costa Rica o Panama en Sudamerica */
@@ -404,9 +406,9 @@ window.AIQ = window.AIQ || {};
   const gName = g => (g.ne ? cName(g.ne) : g.qc ? ((A.PCOUNTRY && A.PCOUNTRY[g.qc] && A.tx(A.PCOUNTRY[g.qc])) || g.qc) : regName(g.reg));
   /* banderas ya rasterizadas (tools/flags-raster.cjs): los SVG con escudo se pintan en el hilo principal y una pagina con 40 daba un tiron */
   const hasFlag = ne => { const en = neEn[ne]; return !!(en && A.FLAGS && A.FLAGS[en]); };   // los 199 paises la tienen (data/flags.js); si faltara una, sale el icono de pais
-  const flagSrc = ne => { const en = neEn[ne], F = en && A.FLAGS && A.FLAGS[en]; return F ? `assets/flags/r/${A.mediaKey(en)}.webp` : A.media(`assets/wiki/card/${A.mediaKey("c:" + ne)}.webp`); };
-  const flagFit = ne => { const en = neEn[ne], F = en && A.FLAGS && A.FLAGS[en], r = F ? F[1] / F[2] : 1.5; return r < 1.25 || r > 2.1 ? " fit" : ""; };   // Nepal, Suiza, Vaticano, Catar...: enteras
-  const flagImg = (ne, cls = "") => (hasFlag(ne) ? `<img class="cx-flag${flagFit(ne)}${cls}" alt="" src="${esc(flagSrc(ne))}" decoding="async" draggable="false">` : A.icon("t_country"));
+  const pxSrc = ne => `assets/flags/p/${A.mediaKey(neEn[ne])}.webp`;
+  const pxFlag = (ne, cls = "") => `<img class="ic ${cls}" alt="" src="${pxSrc(ne)}" decoding="async" draggable="false">`;   // bandera ondeante pixel art (misma silueta que t_country)
+  const flagImg = (ne, cls = "") => (hasFlag(ne) ? pxFlag(ne, "cx-pxf" + cls) : A.icon("t_place"));
 
   /* ================================================================== interfaz */
   const S = {
@@ -735,7 +737,7 @@ window.AIQ = window.AIQ || {};
   function cardHTML(id, sub) {
     const e = E[id], un = U(id), tr = tiered(id), m = medOf(id), fr = un && (pump.fr ? idsOf(id).some(x => pump.fr.has(x)) : freshOf(id));
     return `<button type="button" class="cx-card ${un ? "open" : "locked"} ${tr ? "m" + m : un ? "mx" : "m0"}${fr ? " fresh" : ""}" data-go="d:${esc(id)}" data-id="${esc(id)}" data-tf="cxCard">
-      <span class="cx-art">${un ? iconSvg(e.type) : `<span class="cx-bk">${iconSvg(e.type)}</span>`}</span>
+      <span class="cx-art">${un ? iconOf(e) : `<span class="cx-bk">${iconSvg(e.type)}</span>`}</span>
       <span class="cx-pn"${un ? fsAttr(nameOf(e, memOf(id)), 18, 15.5) : ""}>${un ? esc(nameOf(e, memOf(id))) : "???"}</span>${sub ? `<span class="cx-sub">${esc(sub)}</span>` : ""}
       ${tr ? pips(m) : `<span class="cx-kind">${esc(typeLabel(e.type))}</span>`}${fr ? `<span class="cx-new">${esc(P(S.nueva))}</span>` : ""}</button>`;
   }
@@ -803,24 +805,24 @@ window.AIQ = window.AIQ || {};
   function pageDetail(id) {
     const e = E[id]; if (!e) return "";
     const un = U(id), rec = un ? memOf(id) : null, tr = tiered(id), m = medOf(id), L = limits(id), g = index().gs[e.g];
-    const rel = relatedOf(e).map(x => { const o = E[x], u = U(x); return `<button class="cx-rel ${u ? "" : "lk"}" data-go="d:${esc(x)}" type="button">${iconSvg(o.type)}<span>${u ? esc(nameOf(o, memOf(x))) : "???"}</span>${tiered(x) ? pips(medOf(x)) : ""}</button>`; }).join("");
+    const rel = relatedOf(e).map(x => { const o = E[x], u = U(x); return `<button class="cx-rel ${u ? "" : "lk"}" data-go="d:${esc(x)}" type="button">${iconOf(o, u)}<span>${u ? esc(nameOf(o, memOf(x))) : "???"}</span>${tiered(x) ? pips(medOf(x)) : ""}</button>`; }).join("");
     const where = g ? (g.sea ? regName(g.reg) : gKnown(g) ? gName(g) : "???") : "";
     const nav = g && g.all.length > 1 && g.all.includes(id) ? `<span class="cx-steps"><button type="button" class="cx-step" data-step="-1" aria-label="${esc(P(S.prev))}">‹</button><em>${g.all.indexOf(id) + 1} / ${g.all.length}</em><button type="button" class="cx-step" data-step="1" aria-label="${esc(P(S.next))}">›</button></span>` : "";
     const chaps = tr ? [0, 1, 2].map(i => { const has = U([id, id + "~h", id + "~k"][i]);
         return `<section class="cx-chap ${MED[i]}${has ? " on" : ""}" id="cxch${i + 1}"><h3>${medal(i, has)}<b>${esc(i ? A.t(i === 1 ? "codex.tierh" : "codex.tierk") : P(e.type === "country" ? S.chap1c : S.chap1))}</b><em>&lt; ${esc(kmTxt(L[i]))}</em></h3>
           <div class="cx-chb">${has ? `<p class="cx-load">${esc(A.T("Cargando…", "Loading…"))}</p>` : `<p class="cx-lockl">${A.icon("lock", "sm")}${esc(A.core && A.core.S && A.core.S.units === "mi" ? A.t("codex.hint.tier").replace(/\{km\}\s*(?:km|公里|км)/, A.fmtDist(L[i])) : A.t("codex.hint.tier", { km: L[i] }))}</p>`}</div></section>`; }).join("")
-      : `<section class="cx-chap single${un ? " on" : ""}" id="cxch1"><h3>${iconSvg(e.type)}<b>${esc(A.t("codex.about"))}</b></h3><div class="cx-chb">${un ? `<p class="cx-load">${esc(A.T("Cargando…", "Loading…"))}</p>` : `<p class="cx-lockl">${A.icon("lock", "sm")}${esc(howTo(id))}</p>`}</div></section>`;
+      : `<section class="cx-chap single${un ? " on" : ""}" id="cxch1"><h3>${iconOf(e, un)}<b>${esc(A.t("codex.about"))}</b></h3><div class="cx-chb">${un ? `<p class="cx-load">${esc(A.T("Cargando…", "Loading…"))}</p>` : `<p class="cx-lockl">${A.icon("lock", "sm")}${esc(howTo(id))}</p>`}</div></section>`;
     const live = stageFits();                                          // con la mesa a la vista, el lugar sale en el mapa del juego; si no, en su miniatura
     return `<div class="cx-d1">
         <div class="cx-dtop"><div class="cx-d-card">
           <div class="cx-big ${un ? "open" : "locked"} ${tr ? "m" + m : un ? "mx" : "m0"}">
-            <div class="cx-art${rec && rec.img && rec.img.flag ? " flag" : ""}">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">${iconSvg(e.type)}${rec && rec.img ? `<img id="cxHero" class="${photo(rec.img.card)}" alt="" src="${esc(rec.img.card)}" decoding="async" data-light><button class="cx-hd" type="button" data-light ${A.ttAttr(A.t("codex.hd"))}>${A.icon("a_lens")}</button>` : ""}` : `<span class="cx-bk">${iconSvg(e.type)}${A.icon("lock", "q")}</span>`}</div>
+            <div class="cx-art${rec && rec.img && rec.img.flag ? " flag" : ""}">${un ? `<img class="cx-ph" alt="" data-gen="type_${e.type}">${iconOf(e)}${rec && rec.img ? `<img id="cxHero" class="${photo(rec.img.card)}" alt="" src="${esc(rec.img.card)}" decoding="async" data-light><button class="cx-hd" type="button" data-light ${A.ttAttr(A.t("codex.hd"))}>${A.icon("a_lens")}</button>` : ""}` : `<span class="cx-bk">${iconSvg(e.type)}${A.icon("lock", "q")}</span>`}</div>
             <div class="cx-cap"><span class="cx-pn">${un ? esc(nameOf(e, rec)) : esc(A.t("codex.locked"))}</span><span class="cx-mt"><em>${esc(typeLabel(e.type))}</em>${tr ? pips(m) : ""}</span></div><span class="cx-foil"></span>
           </div>
           ${tr ? `<div class="cx-dmeds">${[0, 1, 2].map(i => `<span data-tt="${esc(P(S[MED[i]]) + " · " + P(S.within).replace("{km}", kmTxt(L[i])) + "\n" + (m > i ? P(S.got) : P(S.miss)))}">${medal(i, m > i)}<em>&lt; ${esc(kmTxt(L[i]))}</em></span>`).join("")}</div>` : ""}
         </div>
         <div class="cx-dinfo">
-          <div class="cx-d-top"><p class="cx-tags"><span>${esc(typeLabel(e.type))}</span>${g ? `<span>${g.ne && gKnown(g) ? `<img class="cx-tflag" alt="" src="${esc(flagSrc(g.ne))}">` : A.icon("k_" + g.reg.cont, "sm")}${esc(where)}</span><span>${esc(regName(g.reg))}</span>` : ""}</p>${nav}</div>
+          <div class="cx-d-top"><p class="cx-tags"><span>${esc(typeLabel(e.type))}</span>${g ? `<span>${g.ne && gKnown(g) ? `<img class="cx-tflag cx-pxf" alt="" src="${pxSrc(g.ne)}">` : A.icon("k_" + g.reg.cont, "sm")}${esc(where)}</span><span>${esc(regName(g.reg))}</span>` : ""}</p>${nav}</div>
           <h2>${un ? esc(nameOf(e, rec)) : "???"}</h2>
           ${un && rec && rec.desc ? `<p class="cx-desc">${esc(cap(rec.desc))}</p>` : ""}
           ${un && A.tx(e.fact) ? `<blockquote class="cx-fact">${esc(A.tx(e.fact))}</blockquote>` : ""}
@@ -905,7 +907,7 @@ window.AIQ = window.AIQ || {};
     try {
       const rec = await loadContent(E[id], A.wlang()); if (rec.none || !b.isConnected) return;
       const pn = b.querySelector(".cx-pn"), nm = nameOf(E[id], rec); if (pn.textContent !== nm) { pn.textContent = nm; const f = fitFs(nm, 18, 15.5); pn.style.fontSize = f ? f + "px" : ""; }
-      if (rec.img && !b.querySelector(".cx-art img.cx-th")) {
+      if (rec.img && !(E[id].type === "country" && id.startsWith("c:") && hasFlag(id.slice(2))) && !b.querySelector(".cx-art img.cx-th")) {
         const im = new Image(), th = thumbOf(id, rec); im.decoding = "async"; im.alt = ""; im.className = "cx-th " + photo(rec.img.thumb);
         const dec = () => (im.decode ? im.decode() : Promise.resolve());
         im.src = th; dec().catch(() => { if (im.src.endsWith(rec.img.thumb) || th === rec.img.thumb) throw 0; im.src = rec.img.thumb; return dec(); }).then(() => thumbIn(b, im, rec.img.flag), () => {});
@@ -1016,7 +1018,7 @@ window.AIQ = window.AIQ || {};
     const box = stage.getBoundingClientRect(), z = box.width / Math.max(1, stage.clientWidth);
     if (tip._ne !== ne) {                                               // solo al cambiar de pais: contenido nuevo y una medida
       const g = index().gs["c:" + ne], s = gStats(g), known = gKnown(g);
-      tip.innerHTML = `${known && hasFlag(ne) ? `<img alt="" src="${esc(flagSrc(ne))}">` : ""}<b>${known ? esc(gName(g)) : "???"}</b><em>${pctOf(s)} %</em>`;
+      tip.innerHTML = `${known && hasFlag(ne) ? `<img class="cx-pxf" alt="" src="${pxSrc(ne)}">` : ""}<b>${known ? esc(gName(g)) : "???"}</b><em>${pctOf(s)} %</em>`;
       tip.classList.remove("hidden"); map.cv.style.cursor = "pointer"; tip._ne = ne; tip._w = tip.offsetWidth;
     }
     const x = (cx - box.left) / z, y = (cy - box.top) / z, bw = box.width / z, w = tip._w || 0;
@@ -1099,7 +1101,7 @@ window.AIQ = window.AIQ || {};
     const t = [...g.querySelectorAll(".cx-ct.unk")].find(el => seen(el) && el.querySelector("canvas.cx-sil"));
     const tg = t && index().gs[t.dataset.go.slice(2)];
     if (tg && tg.ne && hasFlag(tg.ne)) {
-      const f = t.querySelector(".cx-ct-f"), nb = t.querySelector(".cx-ct-t b"), img = new Image(); img.className = "cx-tease cx-flag" + flagFit(tg.ne); img.alt = ""; img.onerror = () => img.remove(); img.src = flagSrc(tg.ne);
+      const f = t.querySelector(".cx-ct-f"), nb = t.querySelector(".cx-ct-t b"), img = new Image(); img.className = "cx-tease cx-pxf"; img.alt = ""; img.onerror = () => img.remove(); img.src = pxSrc(tg.ne);
       flip(t, () => { f.appendChild(img); nb.textContent = cName(tg.ne); t.classList.add("teased"); A.sfx.card(); });
       setTimeout(() => { if (t.isConnected) flip(t, () => { img.remove(); nb.textContent = "???"; t.classList.remove("teased"); }); }, 3400);
       return true;
@@ -1111,7 +1113,7 @@ window.AIQ = window.AIQ || {};
         const lon = (c.bx[0] + c.bx[2]) / 2, lat = (c.bx[1] + c.bx[3]) / 2, pt = map.lonLatToScreen(lon, lat), cx = r.left + pt[0], cy = r.top + pt[1];
         if (cx < st.left + 60 || cx > st.right - 60 || cy < st.top + 40 || cy > st.bottom - 40) continue;
         const tip = $("cxTip"); map.setHighlight(c.x.ne); A.sfx.card();
-        tip._ne = null; tip.innerHTML = `<img alt="" src="${esc(flagSrc(c.x.ne))}"><b>${esc(cName(c.x.ne))}</b>`; tip.classList.remove("hidden");
+        tip._ne = null; tip.innerHTML = `<img class="cx-pxf" alt="" src="${pxSrc(c.x.ne)}"><b>${esc(cName(c.x.ne))}</b>`; tip.classList.remove("hidden");
         const z = st.width / Math.max(1, $("cxStage").clientWidth), w = tip.offsetWidth;
         tip.style.left = Math.max(6, (cx - st.left) / z - w / 2) + "px"; tip.style.top = Math.max(4, (cy - st.top) / z - 44) + "px";
         setTimeout(() => { if (!isOpen()) return; map.setHighlight(mapCtx.hi); if (tip._ne == null) tip.classList.add("hidden"); }, 3400);
@@ -1135,7 +1137,7 @@ window.AIQ = window.AIQ || {};
   function toastItem(id) {
     const e = E[id], it = document.createElement("span"); it.className = "cx-ri";
     const lvl = e.parent ? e.tier : tiered(id) ? 1 : 0, what = e.parent ? A.t(e.tier === 2 ? "codex.tierh" : "codex.tierk") : typeLabel(e.type);
-    it.innerHTML = `<span class="cx-tcard m${lvl}"><span class="cx-art">${iconSvg(e.type)}</span>${lvl ? `<span class="cx-tmed">${A.icon("medal_" + MED[lvl - 1])}</span>` : ""}</span><span class="cx-tt"><em>${esc(A.t("codex.new"))} · ${esc(what)}</em><b>${esc(nameOf(e, memOf(id)))}</b></span>`;
+    it.innerHTML = `<span class="cx-tcard m${lvl}"><span class="cx-art">${iconOf(e)}</span>${lvl ? `<span class="cx-tmed">${A.icon("medal_" + MED[lvl - 1])}</span>` : ""}</span><span class="cx-tt"><em>${esc(A.t("codex.new"))} · ${esc(what)}</em><b>${esc(nameOf(e, memOf(id)))}</b></span>`;
     loadContent(e, A.wlang()).then(rec => {
       if (rec.none) return;
       it.querySelector("b").textContent = nameOf(e, rec);
