@@ -36,6 +36,21 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.4",
+      name: ["Perder cuesta", "Losing costs"],
+      date: "2026-10-03",
+      summary: ["Fallar en Rojo o negro ya no sale gratis: pierdes la cuota y la ronda trae un reto más.",
+        "Missing in Red or black is no longer free: you lose the fee and the round brings one more challenge."],
+      chapters: [
+        { id: "apuestas", kicker: ["Apuestas", "Bets"], title: ["Fallar tiene precio", "A miss has a price"],
+          entries: [
+            E(["Rojo o negro: fallar suma un reto", "Red or black: a miss adds a challenge"], "change", "0.2.4", [
+            ["Si pierdes la ruleta (un color equivocado o un cero que no apostaste), pierdes la cuota y la ronda trae un reto más, sellado y a nivel 3. Si la ronda ya tiene 5 retos, no se añade ninguno. En la revancha va sin él.", "If you lose the roulette (a wrong color, or a zero you did not bet on), you lose the fee and the round brings one more challenge, sealed at level 3. If the round already has 5 challenges, none is added. On the rematch it comes without it."],
+            ["La banda de la ruleta lo avisa («Fallas · +1 reto») y la carta de la Barra también.", "The roulette band says so (“You lose · +1 challenge”) and so does the card on the Bar."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.3",
       name: ["Una versión, una nota", "One version, one note"],
       date: "2026-10-03",

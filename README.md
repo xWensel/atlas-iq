@@ -4,6 +4,8 @@
 
 > **Versiones:** desde la 0.2.3 la version del juego sigue la numeracion de las notas del parche (0.2.N): cada entrega sube el ultimo numero y lleva su entrada en las notas. Antes (hasta la 0.79.1) cada entrega subia la version menor y terminaba en 1. Se cambia en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.2.4** - Fallar en Rojo o negro tiene precio. Si pierdes la apuesta (un color equivocado o un cero que no apostaste), pierdes la cuota y la ronda trae un reto mas, sellado y a nivel 3 (con 5 retos ya no cabe; en la revancha va sin el). La banda lo dice ("Fallas · +1 reto"), la carta tambien, y la descripcion cambia en los 12 idiomas. Parche v0.2.4 en las notas del juego.
+
 **v0.2.3** - La version del juego pasa a numerarse como los parches (0.2.N) y cada entrega lleva su propia entrada en las notas del parche. Las compilaciones antiguas (0.50.1 a 0.79.1) quedan etiquetadas como "Compilaciones" en las notas, para que no choquen con los numeros de parche. Nace el parche v0.2.3 "Una version, una nota".
 
 **v0.79.1** - Notas del parche: nace el parche v0.2.2 "Ajuste de la curva" (juego 0.77.1 a 0.78.1) con la curva de A3 y A4, la cobertura de preguntas y la ruleta de Rojo o negro, y el v0.2.1 vuelve a quedar como se publico (0.50.1 a 0.75.1). Regla: un parche publicado queda cerrado y todo cambio posterior va a un parche nuevo (v0.2.2, v0.2.3...); esta en la cabecera de js/parche-data.js.
