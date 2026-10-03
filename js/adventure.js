@@ -256,7 +256,7 @@ window.AIQ = window.AIQ || {};
   const tgtKey = () => roundNo() + ":" + (run.attempt || 0);
   const roundTarget = () => { run.tgt = run.tgt || {}; const k = tgtKey(); if (run.tgt[k] == null) run.tgt[k] = target(); return run.tgt[k]; };
   const baseTarget = () => { const r = roundNo(), base = r >= 11 ? 4777 : 2000 + 250 * r, m = ascFx(run.asc).target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };
-  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); const r = roundNo(), base = r >= 11 ? 4777 : 2000 + 250 * r, m = ascFx(run.asc).target * t.target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };
+  const target = () => { const t = { seconds: 0, target: 1 }; perkList().forEach(p => p.round && p.round(t, run)); t.target = Math.max(0.85, t.target); const r = roundNo(), base = r >= 11 ? 4777 : 2000 + 250 * r, m = ascFx(run.asc).target * t.target; return r >= 11 && m === 1 ? base : Math.round((base * m) / 50) * 50; };   // tanda 12: las rebajas del objetivo (Midas y Mesa de minimos) no pasan del −15 %
   const shopCtx = () => { const x = { price: 0, freeReroll: 0, slots: 3 }; perkList().forEach(p => p.shop && p.shop(x, run)); return x; };
   const inflation = () => 1 + 0.25 * run.act;                            // todo cuesta mas en cada acto: el dinero pesa mas segun avanzas
   const price = c => Math.max(1, Math.round(c * ascFx(run.asc).price * inflation()) + shopCtx().price);
@@ -486,7 +486,7 @@ window.AIQ = window.AIQ || {};
   function roundLevel(keep) {
     const r = roundNo(), boss = isBoss(), def = rdef(), cf = chalFor(r), halve = 1;
     const ctx = { seconds: clamp(Math.round(26 - 1.0 * r + ascFx(run.asc).secs), 10, 28), target: 1 };
-    perkList().forEach(p => p.round && p.round(ctx, run));
+    perkList().forEach(p => p.round && p.round(ctx, run)); ctx.target = Math.max(0.85, ctx.target);
     if (run.sup && run.sup.cafe) ctx.seconds += 4;                                       // suministro: Cafe doble
     ctx.seconds = Math.max(6, ctx.seconds);
     run.chal = cf.list; run.chalName = cf.combo ? cf.combo.n : null; run.chalHalve = halve;
@@ -996,7 +996,8 @@ window.AIQ = window.AIQ || {};
       run.score += S.levelScore; run.cleared++; S.runTotal = run.score;
       const tb = Math.max(Lv.advance, baseTarget()), lt = loot(S.levelScore, tb, boss), mh = has("marginHalf"), mg = mh ? Math.floor(lt.margin / 2) : lt.margin, x = { coins: lt.base + mg }, lines = [[A.T("Ronda superada", "Round cleared"), "+" + lt.base]];
       if (lt.margin) lines.push([et("margin", { p: pctOf(S.levelScore - tb, tb) }) + (mh ? " · ½" : ""), "+" + mg, mh ? "minbet" : null, mh ? "half" : null]);   // la Mesa de minimos paga la mitad del margen
-      if (mh && S.levelScore < tb) lines.push([A.tx(A.RELICS.minbet.n) + " · " + A.tx(SAVED_BY), "", "minbet"]);   // ha decidido la ronda   // cuanto mas por encima del objetivo, mas doblones
+      if (mh && S.levelScore < tb) lines.push([A.tx(A.RELICS.minbet.n) + " · " + A.tx(SAVED_BY), "", "minbet"]);
+      if (has("midas") && !mh && S.levelScore < tb) { lines.push([A.tx(A.RELICS.philosopher.n) + " · " + A.tx(SAVED_BY), "", "philosopher"]); setTimeout(() => { A.sfx.jackpot(2); if (A.core.jpShake) A.core.jpShake(2); }, 1100); }   // tanda 12: Midas te ha salvado   // ha decidido la ronda   // cuanto mas por encima del objetivo, mas doblones
       const cap = sumFlag("interest") || 2, interest = Math.min(cap, Math.floor(run.coins / 10));
       if (interest) { x.coins += interest; lines.push([A.T("Interés (1 por cada 10)", "Interest (1 per 10)"), "+" + interest, interest > 2 ? (perkList().find(p => p.interest) || {}).id : null]); }   // por encima de 2, es el Banquero
       perkList().forEach(p => { if (p.clear) { const y = { coins: 0 }, tx = p.clear(y, run); if (y.coins) { x.coins += y.coins; lines.push([A.tx(p.n), tx || "+" + y.coins, p.id]); } } });
@@ -1089,10 +1090,11 @@ window.AIQ = window.AIQ || {};
      y tras fallar, una carta frena los trucos de la ronda que repites (o el Interruptor, si ninguna reliquia puede) */
   function offers(chest) {
     const rr = A.rng(`${run.seed}:shop:${roundNo()}:${run.attempt || 0}:${run.shopN}:${chest ? 1 : 0}`), R = A.RELICS, out = [];
-    const bag = Object.keys(R).filter(id => (!owned(id) || R[id].amulet) && (chest ? true : R[id].r < 3) && useful(id));   // un amuleto que ya llevas sale como recarga (+2 cargas)
+    const legDone = !!(run.legAct && run.legAct[run.act]);                // tanda 12 (S11): una legendaria por acto, venga de donde venga
+    const bag = Object.keys(R).filter(id => (!owned(id) || R[id].amulet) && (chest ? !(R[id].r === 3 && legDone) : R[id].r < 3) && useful(id));   // un amuleto que ya llevas sale como recarga (+2 cargas)
     const cur = chalFor(roundNo()).list, up = new Set(); cur.forEach(c => (A.CHAL[c.id].counters || []).forEach(id => up.add(id)));
     const reach = {}; bag.forEach(id => { if (ctrOf(id)) reach[id] = helpRounds(id).length; });
-    const wt = id => { const r = R[id].r; return (chest ? [30, 35, 25, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1) * (reach[id] ? 0.7 + 0.3 * Math.min(4, reach[id]) : 1) * (R[id].amulet && run.act === 0 ? 0.5 : 1) * (R[id].ventaja && !perkList().some(p => p.ventaja) ? 2 : 1); };   // sin Ventaja, pesan el doble   // acto I: los amuletos pesan la mitad (que no llenen la mochila)
+    const wt = id => { const r = R[id].r; return (chest ? [0, 50, 40, 10][r] : [60, 30 + run.act * 4, 10 + run.act * 5][r]) * (up.has(id) ? 2.6 : 1) * (reach[id] ? 0.7 + 0.3 * Math.min(4, reach[id]) : 1) * (R[id].amulet && run.act === 0 ? 0.5 : 1) * (R[id].ventaja && !perkList().some(p => p.ventaja) ? 2 : 1); };   // sin Ventaja, pesan el doble   // acto I: los amuletos pesan la mitad (que no llenen la mochila)
     const draw = (pool = bag) => { const tot = pool.reduce((n, id) => n + wt(id), 0); let x = rr() * tot, pick = pool[pool.length - 1]; for (const id of pool) { x -= wt(id); if (x <= 0) { pick = id; break; } } bag.splice(bag.indexOf(pick), 1); return pick; };
     const canTool = id => !!run.tools[id] || Object.keys(run.tools).length < 4;   // con 4 herramientas distintas solo sirven cargas de las tuyas
     const slots = chest ? 3 : shopCtx().slots;
@@ -1110,6 +1112,10 @@ window.AIQ = window.AIQ || {};
       if (!chest && roll > 0.93 && run.lives < run.maxLives && !out.some(o => o.k === "life")) { out.push({ k: "life" }); continue; }
       if (!bag.length) break;
       out.push({ k: "perk", id: draw() });
+    }
+    if (!chest && run.act >= 1 && !legDone && !run.inf) {                 // tanda 12 (S11): la vitrina (no cambia con Cambiar cartas: sale de la semilla del acto)
+      const legs = Object.keys(R).filter(id => R[id].r === 3 && !owned(id) && useful(id)).sort();
+      if (legs.length) out.push({ k: "perk", id: A.rng(`${run.seed}:vit:${run.act}`).pick(legs), vit: true });
     }
     return out;
   }
@@ -1171,8 +1177,8 @@ window.AIQ = window.AIQ || {};
   const routeHtml = () => A.adv.road({ size: "bar", route: run.route, cur: roundNo() });   // siempre las 12 rondas y el infinito (antes, una ventana de 12 que se corria)
   const rerollCost = () => { const sx = shopCtx(); return run.freeUsed < sx.freeReroll ? 0 : price(3 + run.rerolls); };
   /* precio de una carta de la tienda: la de la revancha (s.fix) va a mitad de precio */
-  const cardCost = s => { const full = price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost); return s.fix ? Math.max(1, Math.ceil(full / 2)) : full; };
-  const costHtml = s => (s.fix ? `${CN()}<s class="of-was">${price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost)}</s>${cardCost(s)}` : CN() + cardCost(s));
+  const cardCost = s => { const full = s.vit ? price(18) : price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost); return s.fix ? Math.max(1, Math.ceil(full / 2)) : full; };   // la vitrina: 23 en el acto II y 27 en el III (A0)
+  const costHtml = s => (s.vit ? CN() + cardCost(s) : s.fix ? `${CN()}<s class="of-was">${price(s.k === "perk" ? A.RELICS[s.id].cost : TOOLS[s.id].cost)}</s>${cardCost(s)}` : CN() + cardCost(s));
   /* ---------------- PAN DE ORO (v0.51): la carta legendaria ----------------
      El marco de oro con bisel de pixel, la placa de laton, el terciopelo y el halo van en css/campamento.css. Aqui, el brillo de oro que la barre
      a saltos de pixel (como la clase Holo del prototipo aprobado): un lienzo pequeno por carta, 1 pixel de arte = 3 px del lienzo de 1280x720
@@ -1252,7 +1258,7 @@ window.AIQ = window.AIQ || {};
     const bought = run.bought.includes(i);
     if (s.k === "perk") {
       const p = A.RELICS[s.id];                                           // la carta solo cuenta lo que hace: contra que truco sirve lo descubre el jugador leyendo
-      return `<div class="offer pc r${p.r}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}${run.perks.length >= 5 && !bought && !(p.amulet && owned(s.id)) && !(p.ventaja && perkList().some(q => q.ventaja && q.id !== s.id)) ? " · " + A.tx(SWAP_FOR) : ""}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
+      return `<div class="offer pc r${p.r}${s.vit ? " vit" : ""}${bought ? " sold" : ""}" data-ix="${i}" data-suit="${suitRed(p.suit) ? "red" : "blk"}">${p.r === 3 && !bought ? GLINT : ""}${ixs(p.cost, p.suit)}<span class="of-r">${s.vit ? A.tx(VIT_TAG) + " · " : ""}${p.amulet ? A.tx(AMU_TAG) + (owned(s.id) ? " · " + A.tx(AMU_RE) : "") : p.ventaja ? A.tx(VTG_TAG) + (perkList().some(q => q.ventaja && q.id !== s.id) ? " · " + A.tx(VTG_SWAP) : "") : A.tx(R_NAMES[p.r])}${run.perks.length >= 5 && !bought && !(p.amulet && owned(s.id)) && !(p.ventaja && perkList().some(q => q.ventaja && q.id !== s.id)) ? " · " + A.tx(SWAP_FOR) : ""}</span><div class="of-ico felt">${ic(p.ico)}</div><b class="of-n">${A.tx(p.n)}</b><p>${A.tx(p.d)}</p><button class="buy${chest ? " sq-fit" : ""}" ${bought ? "disabled" : ""}>${bought ? A.T("Comprado", "Owned") : chest ? A.T("Elegir gratis", "Take for free") : costHtml(s)}</button></div>`;   // sq-fit: "Elegir gratis" en una linea en todos los idiomas
     }
     if (s.k === "tool") {
       const t = TOOLS[s.id], have = run.tools[s.id];
@@ -1344,6 +1350,7 @@ window.AIQ = window.AIQ || {};
      los pierdes. Antes de R12, La apuesta final: el jefe trae 2 retos mas; vencerlo a la primera da +2 provisiones para el modo infinito y perder no
      cuesta nada. En las demas visitas, Rojo o negro: tirar cuesta poco y, si aciertas, la proxima ronda paga un 50 % mas y empiezas en racha.
      Los retos de las apuestas van SELLADOS (ni el Comodin ni el soborno los quitan): de los que ya has visto, de una familia que no esta, a nivel 3 */
+  const VIT_TAG = L6("Vitrina|Showcase|Vitrine|Vitrine|Vitrine|Vetrina||橱窗|진열장|ショーケース|Витрина|Gablota");
   const BETS = { double: { n: L6("Doble o nada|Double or nothing|Quitte ou double|Dobro ou nada|Doppelt oder nichts|Lascia o raddoppia||加倍或归零|더블 오어 낫싱|ダブル・オア・ナッシング|Удвоить или потерять|Podwójnie albo nic"), d: L6("Te juegas todos tus doblones. El jefe trae un reto más: si lo vences a la primera, los doblas (+40 como mucho); si no, los pierdes.|You stake all your doubloons. The boss brings one more challenge: beat it on the first try and you double them (+40 at most); otherwise you lose them.|Tu mises tous tes doublons. Le boss apporte un défi de plus : bats-le du premier coup et tu les doubles (+40 maximum) ; sinon, tu les perds.|Você aposta todos os seus dobrões. O chefe traz mais um desafio: vença de primeira e você os dobra (+40 no máximo); senão, perde tudo.|Du setzt alle deine Dublonen. Der Boss bringt eine Herausforderung mehr: Besiegst du ihn im ersten Versuch, verdoppelst du sie (höchstens +40), sonst verlierst du sie.|Punti tutti i tuoi dobloni. Il boss porta una sfida in più: battilo al primo colpo e li raddoppi (+40 al massimo); altrimenti li perdi.||押上你所有的金币。首领多带一个挑战：一次击败它，金币翻倍（最多 +40）；否则全输光。|도블론을 전부 겁니다. 보스가 도전을 하나 더 가져옵니다: 한 번에 이기면 두 배 (최대 +40), 아니면 모두 잃습니다.|ダブロンを全部賭ける。ボスはチャレンジを1つ追加してくる。一発で倒せば倍（最大+40）、だめなら全部失う。|Ставишь все дублоны. Босс приносит ещё одно испытание: победишь с первого раза — удвоишь (максимум +40), иначе всё потеряешь.|Stawiasz wszystkie dublony. Boss przynosi jedno wyzwanie więcej: pokonaj go za pierwszym razem, a je podwoisz (maks. +40); inaczej je tracisz."), s: L6("Todos tus doblones contra el jefe: a la primera, ×2 (+40 máx.); si no, nada.|All your doubloons on the boss: first try, ×2 (+40 max); otherwise, nothing.|Tous tes doublons sur le boss : du premier coup, ×2 (+40 max) ; sinon, rien.|Todos os seus dobrões no chefe: de primeira, ×2 (+40 máx.); senão, nada.|Alle Dublonen auf den Boss: im ersten Versuch ×2 (max. +40), sonst nichts.|Tutti i dobloni sul boss: al primo colpo ×2 (+40 max); altrimenti, niente.||全部金币押在首领身上：一次过关 ×2（最多 +40），否则全没。|도블론 전부를 보스에: 한 번에 이기면 ×2 (최대 +40), 아니면 전부 잃음.|全ダブロンをボスに：一発なら×2（最大+40）、だめなら全部失う。|Все дублоны на босса: с первого раза ×2 (макс. +40), иначе ничего.|Wszystkie dublony na bossa: za pierwszym razem ×2 (maks. +40), inaczej nic."), ico: "bet_double" }, final: { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), d: L6("El jefe final trae 2 retos más. Si lo vences a la primera, +2 provisiones para el modo infinito. Perder no cuesta nada.|The final boss brings 2 more challenges. Beat it on the first try for +2 provisions in infinite mode. Losing costs nothing.|Le boss final apporte 2 défis de plus. Bats-le du premier coup : +2 provisions pour le mode infini. Perdre ne coûte rien.|O chefe final traz mais 2 desafios. Vença de primeira e ganhe +2 provisões para o modo infinito. Perder não custa nada.|Der Endboss bringt 2 Herausforderungen mehr. Besiegst du ihn im ersten Versuch: +2 Proviant für den Endlosmodus. Verlieren kostet nichts.|Il boss finale porta 2 sfide in più. Battilo al primo colpo: +2 provviste per la modalità infinita. Perdere non costa nulla.||最终首领多带 2 个挑战。一次击败它，无限模式补给 +2。输了也不亏。|최종 보스가 도전을 2개 더 가져옵니다. 한 번에 이기면 무한 모드 식량 +2. 져도 잃는 건 없습니다.|最終ボスはチャレンジを2つ追加してくる。一発で倒せばエンドレスモード用にプロビジョン+2。負けても失うものはない。|Финальный босс приносит ещё 2 испытания. Победишь с первого раза — +2 запаса для бесконечного режима. Проигрыш ничего не стоит.|Ostatni boss przynosi 2 wyzwania więcej. Pokonaj go za pierwszym razem: +2 zapasy na tryb nieskończony. Przegrana nic nie kosztuje."), s: L6("El jefe final trae 2 retos más. A la primera: +2 provisiones.|The final boss brings 2 more challenges. First try: +2 provisions.|Le boss final apporte 2 défis de plus. Du premier coup : +2 provisions.|O chefe final traz mais 2 desafios. De primeira: +2 provisões.|Der Endboss bringt 2 Herausforderungen mehr. Im ersten Versuch: +2 Proviant.|Il boss finale porta 2 sfide in più. Al primo colpo: +2 provviste.||最终首领多带 2 个挑战。一次过关：补给 +2。|최종 보스가 도전 2개 추가. 한 번에 이기면 식량 +2.|最終ボスにチャレンジ2つ追加。一発ならプロビジョン+2。|Финальный босс приносит ещё 2 испытания. С первого раза: +2 запаса.|Ostatni boss przynosi 2 wyzwania więcej. Za pierwszym razem: +2 zapasy."), ico: "bet_final" }, red: { n: L6("Rojo o negro|Red or black|Rouge ou noir|Vermelho ou preto|Rot oder Schwarz|Rosso o nero||红或黑|빨강 또는 검정|赤か黒|Красное или чёрное|Czerwone czy czarne"), d: L6("Elige color y gira. Si aciertas, la próxima ronda paga un 50 % más y empiezas en racha.|Pick a color and spin. If you're right, the next round pays 50% more and you start on a streak.|Choisis une couleur et lance. Si tu as raison, la prochaine manche paie 50 % de plus et tu commences en série.|Escolha uma cor e gire. Se acertar, a próxima rodada paga 50% a mais e você começa em sequência.|Wähl eine Farbe und dreh. Liegst du richtig, zahlt die nächste Runde 50 % mehr und du startest mit Serie.|Scegli un colore e gira. Se indovini, il prossimo round paga il 50% in più e parti in serie.||选一种颜色然后转动。猜中的话，下一轮奖励多 50%，并且开局就有连击。|색을 고르고 돌리세요. 맞히면 다음 라운드 보상이 50% 늘고 연속 기록을 안고 시작합니다.|色を選んで回す。当たれば次のラウンドの報酬が50%増え、連続記録つきで始まる。|Выбери цвет и крути. Угадаешь — следующий раунд платит на 50% больше, и ты начинаешь с серией.|Wybierz kolor i zakręć. Jeśli trafisz, następna runda płaci 50% więcej i zaczynasz z serią."), s: L6("Si aciertas: la ronda paga un 50 % más y empiezas en racha.|If you're right: the round pays 50% more and you start on a streak.|Si tu as raison : la manche paie 50 % de plus et tu commences en série.|Se acertar: a rodada paga 50% a mais e você começa em sequência.|Liegst du richtig: Die Runde zahlt 50 % mehr und du startest mit Serie.|Se indovini: il round paga il 50% in più e parti in serie.||猜中：这一轮奖励多 50%，开局就有连击。|맞히면: 라운드 보상 50% 증가, 연속 기록을 안고 시작.|当たれば：ラウンド報酬50%増し、連続記録つきで開始。|Угадаешь: раунд платит на 50% больше, и ты начинаешь с серией.|Trafisz: runda płaci 50% więcej i zaczynasz z serią."), ico: "bet_red" } };
   const BT = { red: L6("Rojo|Red|Rouge|Vermelho|Rot|Rosso||红|빨강|赤|Красное|Czerwone"), black: L6("Negro|Black|Noir|Preto|Schwarz|Nero||黑|검정|黒|Чёрное|Czarne"), go: L6("Apostar|Bet|Miser|Apostar|Setzen|Punta||下注|베팅|賭ける|Ставлю|Stawiam"), on: L6("Apostado|Bet placed|Misé|Apostado|Gesetzt|Puntato||已下注|베팅함|賭けた|Ставка сделана|Postawione"), won: L6("¡Aciertas!|You win!|Gagné !|Acertou!|Gewonnen!|Hai vinto!||猜中了！|맞혔다!|当たり！|Угадал!|Trafione!"), lost: L6("Fallas|You lose|Perdu|Errou|Verloren|Hai perso||没猜中|빗나감|はずれ|Мимо|Pudło"), seal: L6("Apuesta|Bet|Pari|Aposta|Wette|Scommessa||赌注|베팅|賭け|Ставка|Zakład"), lives2: L6("+2 provisiones|+2 provisions|+2 provisions|+2 provisões|+2 Proviant|+2 provviste||+2 补给|식량 +2|+2 プロビジョン|+2 запаса|+2 zapasy") };
   A.adv.BET_SEAL = BT.seal;
@@ -1464,7 +1471,8 @@ window.AIQ = window.AIQ || {};
       if (!chest && A.dealer.campBought) A.dealer.campBought(s.id, A.tx(p.n), run.seed);
       run.coins -= c; run.amu = run.amu || {}; if (recharge) run.amu[s.id] += AMU_LV; else { run.perks.push(s.id); if (p.amulet) run.amu[s.id] = AMU_LV; }
       run.paid = run.paid || {}; run.paidAt = run.paidAt || {}; run.paid[s.id] = (recharge ? run.paid[s.id] || 0 : 0) + c; run.paidAt[s.id] = run.shopKey;
-      if (p.buy) p.buy(run); if (p.r === 3 && chest) run.legAch = 1;   // Botin legendario: solo la del cofre del jefe. Se concede en la tienda (openShop): su aviso no tapa la secuencia
+      if (p.buy) p.buy(run); if (p.r === 3 && chest) run.legAch = 1;
+      if (p.r === 3) (run.legAct = run.legAct || {})[run.act] = s.id;   // tanda 12: la legendaria de este acto   // Botin legendario: solo la del cofre del jefe. Se concede en la tienda (openShop): su aviso no tapa la secuencia
     } else {
       const c = cardCost(s);
       if (!run.tools[s.id] && Object.keys(run.tools).length >= 4) { A.sfx.deny(); shake(el); flash(A.T("Solo 4 herramientas distintas.", "Only 4 different tools.")); return; }
@@ -1472,9 +1480,10 @@ window.AIQ = window.AIQ || {};
       run.coins -= c; addTool(s.id);
     }
     if (s.fix) run.fixUsed = `${roundNo()}:${run.attempt}`;              // ya cobraste la rebaja de esta revancha
-    const leg = chest && s.k === "perk" && A.RELICS[s.id].r === 3;       // la legendaria del cofre: su propia secuencia (y sus sonidos)
+    const leg = (chest || s.vit) && s.k === "perk" && A.RELICS[s.id].r === 3;   // la de la vitrina tambien tiene su secuencia       // la legendaria del cofre: su propia secuencia (y sus sonidos)
     run.bought.push(i); run.visitBuys = (run.visitBuys || 0) + 1; if (!leg) A.sfx.buy(); persist();
     if (chest) { run.stock = null; run.bought = []; if (leg) run.phase = "shop"; persist(); return leg ? legendary(el) : openShop(false); }   // guardada ya en la tienda: si se cierra a mitad, la reliquia es tuya y no vuelve el cofre
+    if (leg) return legendary(el);
     renderShop(chest);
   }
   /* PAN DE ORO: al elegir la legendaria en el cofre del jefe (~2 s, la secuencia del prototipo aprobado). Las otras cartas caen de la mesa y la sala
