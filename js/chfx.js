@@ -15,6 +15,8 @@ window.AIQ = window.AIQ || {};
 (function (A) {
   const X = A.chfx = {};
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), rnd = Math.random, TAU = Math.PI * 2;
+  let qr = null;                                                       // azar con semilla de la pregunta (solo en el Reto diario, ver X.set); en la Aventura, Math.random
+  const R = tag => (qr ? qr[tag] || (qr[tag] = A.rng(qr.key + ":" + tag)) : rnd);
   const say = (k, ...a) => { try { A.sfx[k] && A.sfx[k](...a); } catch (e) { /* audio no listo */ } };
   const reduce = () => document.documentElement.classList.contains("reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;   // el ajuste del juego o el del sistema, como el resto del juego
   /* Destellos suaves (Ajustes > Imagen, apagado por defecto; "reducir movimiento" del juego o del sistema tambien lo activa): cada Rayo es un solo
@@ -369,8 +371,8 @@ void main(){
     const c = E.crack = { on: 1, k: 1, hits: [] }, pts = []; part("chx-shards").innerHTML = "";
     for (let i = 0; i < n; i++) {
       let fx = 0.5, fy = 0.5;
-      for (let tries = 0; tries < 30; tries++) { fx = 0.2 + rnd() * 0.6; fy = 0.3 + rnd() * 0.48; if (pts.every(p => Math.hypot((p[0] - fx) * W, (p[1] - fy) * H) > Math.min(W, H) * 0.36)) break; }
-      pts.push([fx, fy]); c.hits.push({ fx, fy, R: (0.21 + rnd() * 0.08) * Math.sqrt(glass), glass, seed: rnd(), at: 0, img: null });
+      for (let tries = 0; tries < 30; tries++) { fx = 0.2 + R("crack")() * 0.6; fy = 0.3 + R("crack")() * 0.48; if (pts.every(p => Math.hypot((p[0] - fx) * W, (p[1] - fy) * H) > Math.min(W, H) * 0.36)) break; }
+      pts.push([fx, fy]); c.hits.push({ fx, fy, R: (0.21 + R("crack")() * 0.08) * Math.sqrt(glass), glass, seed: R("crack")(), at: 0, img: null });
     }
     c.hits.forEach((h, i) => later(() => land(h), 380 + i * 340));
   }
@@ -443,10 +445,10 @@ void main(){
     const spots = [];
     for (let i = 0; i < n; i++) {
       let fx = 0.5, fy = 0.5;
-      for (let tries = 0; tries < 30; tries++) { fx = 0.16 + rnd() * 0.68; fy = 0.24 + rnd() * 0.56; if (spots.every(s => Math.hypot((s[0] - fx) * W, (s[1] - fy) * H) > 150)) break; }
+      for (let tries = 0; tries < 30; tries++) { fx = 0.16 + R("prints")() * 0.68; fy = 0.24 + R("prints")() * 0.56; if (spots.every(s => Math.hypot((s[0] - fx) * W, (s[1] - fy) * H) > 150)) break; }
       spots.push([fx, fy]);
-      const w = (120 + rnd() * 55) * Math.sqrt(glass), el = document.createElement("i"), sm = document.createElement("i"); el.className = "chx-print"; sm.className = "chx-print smear"; box.append(sm, el);
-      const pr = { fx, fy, w, h: w * 1.32, rot: (rnd() - 0.5) * 1.3, seed: rnd(), el, sm, blur: blurPx, dir: rnd() * TAU, len: w * (0.9 + rnd() * 0.9) };
+      const w = (120 + R("prints")() * 55) * Math.sqrt(glass), el = document.createElement("i"), sm = document.createElement("i"); el.className = "chx-print"; sm.className = "chx-print smear"; box.append(sm, el);
+      const pr = { fx, fy, w, h: w * 1.32, rot: (R("prints")() - 0.5) * 1.3, seed: R("prints")(), el, sm, blur: blurPx, dir: R("prints")() * TAU, len: w * (0.9 + R("prints")() * 0.9) };
       el.style.setProperty("--pb", blurPx.toFixed(2) + "px"); sm.style.setProperty("--pb", (blurPx * 1.25).toFixed(2) + "px"); p.list.push(pr); placePrint(pr);
     }
     later(() => say("smear"), 250);
@@ -501,7 +503,7 @@ void main(){
   };
   function winsOn(n, auto) {
     const box = part("chx-wins"); box.innerHTML = ""; box.classList.add("on");
-    E.wins = { n }; const order = [0, 1, 2, 3].sort(() => rnd() - 0.5);
+    E.wins = { n }; const order = [0, 1, 2, 3].sort(() => R("wins")() - 0.5);
     for (let i = 0; i < n; i++) later(() => openWin(box, i, n, WT.msgs[order[i % 4]], auto), 450 + i * 420);
   }
   function openWin(box, i, n, msg, auto) {
@@ -510,7 +512,7 @@ void main(){
     el.innerHTML = `<div class="cw-bar"><i class="cw-app" aria-hidden="true"></i><b>${tx(WT.title)}</b><button type="button" class="cw-x" data-a="c" aria-label="${tx(WT.close)}">✕</button></div>
       <div class="cw-body"><i class="cw-sign" aria-hidden="true">!</i><p>${tx(msg)}</p></div>
       <div class="cw-foot"><button type="button" class="cw-b" data-a="w">${tx(WT.wait)}</button><button type="button" class="cw-b cw-def" data-a="c">${tx(WT.close)}</button></div><i class="cw-prog"><i></i></i>`;
-    const w = Math.min(340, W - 24), x = clamp(W * 0.5 - w / 2 + (i - (n - 1) / 2) * 70 + (rnd() - 0.5) * W * 0.22, 12, W - w - 12), y = clamp(H * 0.4 - 70 + i * 38 + (rnd() - 0.5) * H * 0.16, 70, H - 190);
+    const w = Math.min(340, W - 24), x = clamp(W * 0.5 - w / 2 + (i - (n - 1) / 2) * 70 + (R("wins")() - 0.5) * W * 0.22, 12, W - w - 12), y = clamp(H * 0.4 - 70 + i * 38 + (R("wins")() - 0.5) * H * 0.16, 70, H - 190);
     Object.assign(el.style, { left: x + "px", top: y + "px", width: w + "px" }); box.appendChild(el);
     const close = () => { if (!el.isConnected || el.classList.contains("bye")) return; el.classList.add("bye"); say("flip", false); setTimeout(() => el.remove(), 140); };
     el.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (!b) return; e.stopPropagation(); if (b.dataset.a === "w") { el.classList.add("waiting"); later(close, 900); } else close(); });
@@ -536,7 +538,7 @@ void main(){
     dead.querySelector("b").textContent = tx(BT.plug); dead.classList.remove("on");
     hud.classList.remove("toast", "crit", "charge", "save"); hud.classList.add("on");
     /* tanda 7: como un movil de verdad: empieza con un 14-26 %, se descarga a saltos (zumbido y parpadeo), avisa al 20, 10 y 5 % y, desde el nivel 2, se apaga un momento al 2 % */
-    E.batt = { on: 1, k: 0, max, pct: -1, toast: false, dim, hud, dead, start: Math.round(14 + rnd() * 12), drain: 0, toasts: {}, died: false, flick: 0, nextS: 0 }; if (eff && eff.p0 != null) { E.batt.sh = true; E.batt.start = eff.p0; E.batt.p1 = eff.p1; }   // tanda 16: la bateria de Pantallazo, una sola para toda la ronda (p0 -> p1 %)
+    E.batt = { on: 1, k: 0, max, pct: -1, toast: false, dim, hud, dead, start: Math.round(14 + R("batt")() * 12), drain: 0, toasts: {}, died: false, flick: 0, nextS: 0 }; if (eff && eff.p0 != null) { E.batt.sh = true; E.batt.start = eff.p0; E.batt.p1 = eff.p1; }   // tanda 16: la bateria de Pantallazo, una sola para toda la ronda (p0 -> p1 %)
    
   }
   function stepBatt(b, dt, now) {
@@ -544,7 +546,7 @@ void main(){
     const el = asking && S.t0 ? (performance.now() - S.t0 - (S.pausedAcc || 0)) / 1000 : 0, pr = b.on ? clamp(el / Math.max(1, S.limit || 10), 0, 1) : 0;
     const tgt = b.on && asking ? (b.sh ? b.max * Math.pow(Math.max(0, (100 - (b.start + (b.p1 - b.start) * pr)) / 95), 1.25) : b.max * (pr * pr * (3 - 2 * pr) * 0.85 + pr * 0.15)) : 0;
     b.k += (tgt - b.k) * (1 - Math.exp(-dt / (b.on ? 0.25 : 0.12)));
-    if (b.on && asking) { if (!b.nextS) b.nextS = now + 1500 + rnd() * 2500; if (now > b.nextS) { b.nextS = now + 2200 + rnd() * 3500; b.drain += 1 + Math.floor(rnd() * 3); b.flick = now; say("buzz", 1); } }   // un bajon de carga
+    if (b.on && asking) { if (!b.nextS) b.nextS = now + 1500 + R("batt")() * 2500; if (now > b.nextS) { b.nextS = now + 2200 + R("batt")() * 3500; b.drain += 1 + Math.floor(R("batt")() * 3); b.flick = now; say("buzz", 1); } }   // un bajon de carga
     const fl = now - b.flick < 240 ? (Math.floor((now - b.flick) / 60) % 2 ? 0 : 0.35) : 0;
     b.dim.style.opacity = Math.min(0.97, b.k + fl).toFixed(3);
     if (b.on) {
@@ -554,7 +556,7 @@ void main(){
         b.toasts[th] = 1; b.hud.querySelector(".cb-toast b").textContent = tx(BT.low) + " · " + th + " %"; b.hud.classList.add("toast"); say("lowbat");
         clearTimeout(b.tT); b.tT = later(() => b.hud && b.hud.classList.remove("toast"), 2200);
       }
-      if (pct <= 2 && !b.sh && !b.died && asking && b.max >= 0.6) { b.died = true; b.dead.classList.add("on"); say("powerdown"); later(() => { b.dead.classList.remove("on"); say("restore"); }, 650 + rnd() * 300); }   // se apaga un momento
+      if (pct <= 2 && !b.sh && !b.died && asking && b.max >= 0.6) { b.died = true; b.dead.classList.add("on"); say("powerdown"); later(() => { b.dead.classList.remove("on"); say("restore"); }, 650 + R("batt")() * 300); }   // se apaga un momento
     } else if (b.k < 0.01) { b.dim.style.opacity = 0; b.hud.classList.remove("on", "charge"); E.batt = null; }
   }
 
@@ -730,6 +732,7 @@ void main(){
   /* ------------------------------------------------------------------ API: configura la pregunta y la limpia al responder */
   X.set = (list, par, fx) => {
     if (!ov) return; size(); kick();
+    { const st = A.chal && A.chal.state, key = A.adv && A.adv.isDaily && A.adv.isDaily() && st ? `${st.seed}:fx:${st.round}:${st.q}` : null; if (!key) qr = null; else if (!qr || qr.key !== key) qr = { key }; }   // Reto diario: grietas, huellas, ventanas y bateria iguales para todos
     const get = id => list.find(c => c.id === id), gl_ = !!gl, off = n => { if (E[n]) E[n].on = 0; };
     const dk = gl_ && get("dark"); if (dk) { const p = par(dk), boss = !!(A.chal.state && A.chal.state.bk), r0 = dk.slam ? Math.max(W, H, 800) : E.dark && E.dark.k > 0.01 ? E.dark.r : boss && DM.r > 0 ? DM.r : p.r; E.dark = keep(E.dark, { tr: p.r, a: p.a, warm: !!fx.halo, fast: dk.slam ? 0.16 : 0.55 }); E.dark.r = r0; if (boss) DM.r = p.r; } else off("dark");   // tanda 16: el foco se cierra en directo hasta su radio (o salta de golpe, si lo enciende la siesta)
     const bs = gl_ && get("blindspot"); if (bs) E.spot = keep(E.spot, { r: par(bs).r }); else off("spot");
@@ -747,7 +750,7 @@ void main(){
   };
   X.reset = () => { DM.r = 0; };
   X.clear = () => {
-    timers.forEach(clearTimeout); timers.length = 0;
+    timers.forEach(clearTimeout); timers.length = 0; qr = null;   // cada pregunta empieza su azar desde su semilla
     for (const n of ["dark", "spot", "smoke", "lens", "seal", "film", "night"]) if (E[n]) E[n].on = 0;
     if (E.rain) { E.rain.on = 0; say("rain", 0); }
     if (E.night) { E.night.on = 0; say("rain", 0); }

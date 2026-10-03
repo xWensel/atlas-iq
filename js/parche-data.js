@@ -36,6 +36,19 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.26",
+      name: ["El mismo cristal para todos", "Same glass for everyone"],
+      date: "2026-10-04",
+      summary: ["En el Reto diario, los retos que tapan el mapa salen igual para todo el mundo.", "In the Daily challenge, the challenges that cover the map now play out the same for everyone."],
+      chapters: [
+        { id: "justo", kicker: ["Reto diario", "Daily challenge"], title: ["Juego limpio", "Fair play"],
+          entries: [
+            E(["Mismo reparto", "Same layout"], "change", "0.2.26", [
+              ["Las grietas de **Cristal roto**, las **huellas**, las ventanas de **No responde** y la **batería** salen en el mismo sitio y en el mismo momento para todos los jugadores del día, como ya pasaba con las Chinchetas trampa. En la Aventura siguen siendo distintas cada vez.", "**Cracked glass**, the **prints**, the **Not responding** windows and the **battery** now appear in the same place and at the same moment for every player of the day, just like the Trap pins. In Adventure they still change every time."]
+            ]) ] },
+      ],
+    },
+    {
       id: "0.2.25",
       name: ["El diario, aparte", "The daily, apart"],
       date: "2026-10-04",
