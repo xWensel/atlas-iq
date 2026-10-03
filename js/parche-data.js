@@ -36,6 +36,20 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.14",
+      name: ["Atraco sin trampas", "A fair heist"],
+      date: "2026-10-03",
+      summary: ["El Atraco de la Ruleta de premios se lleva exactamente la mitad de tus doblones, sin tope.",
+        "The Prize wheel's Heist takes exactly half your doubloons, with no cap."],
+      chapters: [
+        { id: "atraco", kicker: ["Campamento", "Camp"], title: ["La Ruleta de premios", "The Prize wheel"],
+          entries: [
+            E(["Atraco: la mitad, sin reglas", "Heist: half, no rules"], "change", "0.2.14", [
+            ["Pierdes la mitad de lo que lleves, sin tope, redondeada hacia abajo: con 7 doblones pierdes 3.", "You lose half of what you carry, with no cap, rounded down: with 7 doubloons you lose 3."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.13",
       name: ["Iconos de la mesa, pulidos", "Table icons, polished"],
       date: "2026-10-03",
