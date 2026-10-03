@@ -36,6 +36,8 @@ window.AIQ = window.AIQ || {};
     mixed: [L6("¡Jackpot! De todo un poco|Jackpot! A bit of everything|Jackpot ! Un peu de tout|Jackpot! Um pouco de tudo|Jackpot! Von allem etwas|Jackpot! Un po' di tutto||大奖！样样都有|잭팟! 이것저것 다 있어요|ジャックポット！なんでもあり|Джекпот! Всего понемногу|Jackpot! Wszystkiego po trochu")],
     flag: [L6("Banderas del mundo|World flags|Drapeaux du monde|Bandeiras do mundo|Flaggen der Welt|Bandiere del mondo||世界国旗|세계의 국기|世界の国旗|Флаги мира|Flagi świata"), L6("El coleccionista de banderas|The flag collector|Le collectionneur de drapeaux|O colecionador de bandeiras|Der Flaggensammler|Il collezionista di bandiere||国旗收藏家|국기 수집가|国旗コレクター|Коллекционер флагов|Kolekcjoner flag")],
   };
+  const featOf = o => (o ? (o.t === "c" ? C().world.byName[o.key] : A.waters && A.waters.of(o)) || null : null);   // pais o masa de agua: lo que se acierta haciendo clic dentro
+  const kf = o => KIND_FACTOR[o.area ? "country" : o.kind] || 1;                                  // una masa de agua mide como un pais (antes, como un punto: x1,4 y x1,6)
   const KIND_FACTOR = { capital: 1, city: 1, landmark: 0.9, nature: 1.5, battle: 0.9, event: 0.9, country: 0.7, clue: 1, water: 1.6, strait: 1.4 };
   /* 12 rondas: 3 actos de 4 (la 4.a es el jefe). Empieza facil y va cambiando de tema y subiendo el nivel.
      v0.20 (usuario): ciudades y monumentos tienen dos rondas (son la mayor parte del banco); capitales e historia, una; banderas siguen dobles. */
@@ -59,7 +61,8 @@ window.AIQ = window.AIQ || {};
     if (kind === "country") { const key = id.slice(2); if (!C().world.byName[key]) return null; return { t: "c", key, name: names, sub: { es: "", en: "" }, clue: false, answer: null, fact: {}, cid: [id], kind: "country", topic: "country", tier, fame: fame || 0, cEn: [en], cks: [countryKey(en)] }; }
     if (lat == null) return null;
     const k = kind === "history" ? kindOfHistory(en) : kind === "nature" ? kindOfNature(en) : kind;
-    return { t: "p", lat, lon, name: names, sub: cn || { es: "", en: "" }, clue: false, answer: null, fact: {}, cid: [id], kind: k, topic: kind, tier, fame: fame || 0, cEn, cks: cEn.map(countryKey) };
+    const wf = A.waters && A.waters.feat(id);                                                  // v0.2.5: mares, oceanos y lagos se aciertan haciendo clic dentro de su masa de agua (js/aguas.js)
+    return { t: "p", lat: wf && wf.label ? wf.label[1] : lat, lon: wf && wf.label ? wf.label[0] : lon, name: names, sub: cn || { es: "", en: "" }, clue: false, answer: null, fact: {}, cid: [id], kind: k, topic: kind, tier, fame: fame || 0, cEn, cks: cEn.map(countryKey), ...(wf ? { area: id } : {}) };
   }
   const countryKey = e => { const k = String(e || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, ""); return k === "republicofireland" ? "ireland" : k; };   // el mismo pais como pregunta de pais, bandera, pista o lugar
   function pools() {
@@ -621,7 +624,7 @@ window.AIQ = window.AIQ || {};
   };
   const bankMove = (res, i) => {
     const d = run.duel, o = res.o; if (!d || !o || i < 0 || i > 4) return null; const s = d.s[i] || 0, r = roundNo(), rr = A.rng(`${run.seed}:duelp:${r}:${i}`);
-    const scale = clamp(1500 * Math.pow(0.97, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1), dist = clamp(s / 1.2, 20, 1000), km = Math.min(5000, -scale * Math.log(dist / 1000));
+    const scale = clamp(1500 * Math.pow(0.97, r), 300, 1500) * kf(o), dist = clamp(s / 1.2, 20, 1000), km = Math.min(5000, -scale * Math.log(dist / 1000));
     let lat = o.lat, lon = o.lon; if (o.t === "c") { const f = C().world.byName[o.key]; if (!f) return null; const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a)); lon = (big.bbox[0] + big.bbox[2]) / 2; lat = (big.bbox[1] + big.bbox[3]) / 2; }
     const brg = rr() * Math.PI * 2, dd = km / 6371, la1 = lat * Math.PI / 180, lo1 = lon * Math.PI / 180, la2 = Math.asin(Math.sin(la1) * Math.cos(dd) + Math.cos(la1) * Math.sin(dd) * Math.cos(brg)), lo2 = lo1 + Math.atan2(Math.sin(brg) * Math.sin(dd) * Math.cos(la1), Math.cos(dd) - Math.sin(la1) * Math.sin(la2));
     const wrap = x => ((x + 540) % 360) - 180;
@@ -673,7 +676,7 @@ window.AIQ = window.AIQ || {};
     const Lv = C().S.camp.levels[0], limit = C().S.limit || Lv.seconds, halve = 1, boss = run.boss || [], S = C().S;
     const r = roundNo(), c = {
       o, km, left, limit, kind: o.kind || (o.clue ? "clue" : "place"), topic: o.topic || "mixed", cont: continentOf(o), coins: 0, lines: [], xmult: 1, mult: 1, streakStep: 0.2,
-      scale: clamp(1500 * Math.pow(0.97, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1),   // v0.20: el margen se estrecha un 3 % por ronda (antes 6 %)
+      scale: clamp(1500 * Math.pow(0.97, r), 300, 1500) * kf(o),   // v0.20: el margen se estrecha un 3 % por ronda (antes 6 %)
     };
     perkList().forEach(p => p.q && p.q(c, run));
     if (km != null) perkList().forEach(p => p.km && p.km(c, run));
@@ -785,7 +788,7 @@ window.AIQ = window.AIQ || {};
   const TRILE_NOTE = L6("Una de las tres fichas marca el lugar.|One of the three chips marks the place.|Un des trois jetons marque le lieu.|Uma das três fichas marca o lugar.|Einer der drei Chips markiert den Ort.|Una delle tre fiche segna il luogo.||三枚筹码中有一枚标出了地点。|세 칩 중 하나가 장소를 가리킵니다.|3枚のうち1枚が場所を示している。|Одна из трёх фишек отмечает место.|Jeden z trzech żetonów oznacza miejsce.");
   function trile(o) {
     const S = C().S, map = C().map, Wd = C().world, rr = A.rng(`${run.seed}:trile:${roundNo()}:${S.qi}`);
-    const far = 1.5 * 0.5108 * clamp(1500 * Math.pow(0.97, roundNo()), 300, 1500) * (KIND_FACTOR[o.kind] || 1), dist = (a, b) => A.geo.haversine(a[1], a[0], b[1], b[0]);
+    const far = 1.5 * 0.5108 * clamp(1500 * Math.pow(0.97, roundNo()), 300, 1500) * kf(o), dist = (a, b) => A.geo.haversine(a[1], a[0], b[1], b[0]);
     const inner = f => { const ar = p => (p.bbox[2] - p.bbox[0]) * (p.bbox[3] - p.bbox[1]), big = f.polys.reduce((a, b) => (ar(b) > ar(a) ? b : a)), b = big.bbox; let p = [(b[0] + b[2]) / 2, (b[1] + b[3]) / 2]; for (let k = 0; k < 60 && !A.geo.inFeature(p[0], p[1], { polys: [big] }); k++) p = [b[0] + (b[2] - b[0]) * rr(), b[1] + (b[3] - b[1]) * rr()]; return p; };
     let tgt, pool;
     if (o.t === "c") {
@@ -829,7 +832,7 @@ window.AIQ = window.AIQ || {};
     const fx = A.chal.fx(amuPerks()); A.chal.question(o, run.qi, { calm });
     showSplit();
     if (kept) { C().map.avoid = hudRects(); C().map.setProbes(kept); renderBars(); }
-    A.pointer.set({ tool: null, fx, calm: !!calm, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; return oo.t === "c" ? A.geo.distToFeature(lon, lat, C().world.byName[oo.key]) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
+    A.pointer.set({ tool: null, fx, calm: !!calm, noCountry: o.t === "c", windFn: run.wind ? windGhost : null, distFn: (lon, lat) => { const oo = C().S.qs[C().S.qi]; if (!oo) return null; const fo = featOf(oo); return fo ? A.geo.distToFeature(lon, lat, fo) : A.geo.haversine(lat, lon, oo.lat, oo.lon); } });
     const api = {
       fact: o2 => { const txt = fieldNote(o2); if (txt) noteH(txt, "almanac"); },
       half: o2 => { const txt = halfNote(o2); if (txt) noteH(txt, "sextant"); },   // Soplo del crupier (tanda 10)
@@ -948,10 +951,10 @@ window.AIQ = window.AIQ || {};
   A.adv.probe = function (lon, lat) {
     const S = C().S, id = S.tool, t = run.tools[id], map = C().map; if (!t || t.left <= 0) { S.tool = null; renderBars(); return; }
     const o = S.qs[S.qi]; t.left--; run.qTools++; run.rTools++; S.tool = null; S.probeAt = performance.now();   // un doble clic ya no responde la pregunta (ver onPick)
-    const f = o.t === "c" ? C().world.byName[o.key] : null, km = f ? A.geo.distToFeature(lon, lat, f) : A.geo.haversine(lat, lon, o.lat, o.lon);
+    const f = featOf(o), km = f ? A.geo.distToFeature(lon, lat, f) : A.geo.haversine(lat, lon, o.lat, o.lon);
     const list = (run.probes = run.probes || []), P = { lon, lat, ct: map.pickCt };   // ct: marco del mapa deformado donde tocaste (la sonda se dibuja entera alli)
     run.probesK = qKey() + ":" + o.cid[0];
-    if (f ? km === 0 : km < 5) { P.inside = true; P.label = f ? A.T("¡Dentro del país!", "Inside the country!") : A.T("¡Aquí mismo!", "Right here!"); A.sfx.sonar(1); }   // encima del objetivo: ni anillo ni flecha
+    if (f ? km === 0 : km < 5) { P.inside = true; P.label = f ? (o.area ? A.T("¡Dentro!", "Inside!") : A.T("¡Dentro del país!", "Inside the country!")) : A.T("¡Aquí mismo!", "Right here!"); A.sfx.sonar(1); }   // encima del objetivo: ni anillo ni flecha
     else if (id === "sonar") {
       const fz = (A.rng(run.seed + ":sn:" + roundNo() + ":" + S.qi + ":" + list.length)() - 0.5) * (has("sonarErr") ? 0.04 : 0.12);
       P.km = Math.min(20015, km * (1 + fz)); P.label = approx(P.km);   // nunca mas de media vuelta al mundo
@@ -1043,8 +1046,8 @@ window.AIQ = window.AIQ || {};
     if (!run || run.inf || !has("reball")) return false;
     const S = C().S, o = S.qs[S.qi]; if (!o) return false;
     const key = roundNo() + ":" + (run.attempt || 0); run.ballN = run.ballN || {}; if ((run.ballN[key] || 0) >= sumFlag("reball")) return false;
-    const f = o.t === "c" ? C().world.byName[o.key] : null, km = f ? A.geo.distToFeature(lon, lat, f) : A.geo.haversine(lat, lon, o.lat, o.lon);
-    const scale = clamp(1500 * Math.pow(0.97, roundNo()), 300, 1500) * (KIND_FACTOR[o.kind] || 1); if (1000 * Math.exp(-km / scale) >= 600) return false;
+    const f = featOf(o), km = f ? A.geo.distToFeature(lon, lat, f) : A.geo.haversine(lat, lon, o.lat, o.lon);
+    const scale = clamp(1500 * Math.pow(0.97, roundNo()), 300, 1500) * kf(o); if (1000 * Math.exp(-km / scale) >= 600) return false;
     run.ballN[key] = (run.ballN[key] || 0) + 1; (run.ballSaved = run.ballSaved || {})[qKey()] = 1;
     run.probes = run.probes || []; run.probes.push({ lon, lat, ct: C().map.pickCt, cold: true, label: A.tx(OTRA) }); run.probesK = qKey() + ":" + o.cid[0];
     C().map.avoid = hudRects(); C().map.setProbes(run.probes); renderBars();

@@ -42,5 +42,6 @@ window.AIQ.PLACE_COUNTRIES = {
   "strait-of-malacca": ["Q252","Q833"],  // Estrecho de Malaca → Indonesia · Malasia
   "victoria-falls": ["Q954","Q953"],  // Cataratas Victoria → Zimbabue · Zambia
   "yom-kippur-war": ["Q79","Q858"],  // Guerra de Yom Kipur → Egipto · Siria
+  "battle-of-talas": ["Q813","Q232"],  // Batalla de Talas → Kirguistán · Kazajistán
   "battle-of-the-yarmouk": ["Q858"],  // Batalla de Yarmuk → Siria
 };

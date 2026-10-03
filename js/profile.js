@@ -126,7 +126,7 @@ window.AIQ = window.AIQ || {};
       AD("adv_boss5", "☠️", "Cazarrecompensas", "Bounty hunter", "Derrota a 5 jefes en total.", "Defeat 5 bosses in total.", "adv", () => ADV().boss >= 5),
       AD("codex_city", "🏙️", "Turista empedernido", "World traveler", "100 ciudades.", "100 cities.", "codex", c => (c.by.city || [0])[0] >= 100),
       AD("codex_curio", "🎲", "Culturilla general", "Trivia buff", "100 curiosidades.", "100 curiosities.", "codex", c => (c.by.curiosity || [0])[0] >= 100),
-      AD("pixel", "🔬", "Al milímetro", "To the millimeter", "Acierta a menos de 5 km.", "Land within 5 km.", "q", c => c.km != null && c.km <= 5 && !c.inside),   // dentro del pais es km 0: eso ya es Diana, no punteria de 5 km
+      AD("pixel", "🔬", "Al milímetro", "To the millimeter", "Acierta a menos de 5 km.", "Land within 5 km.", "q", c => c.km != null && c.km <= 5 && !c.inside && !c.area),   // dentro del pais es km 0: eso ya es Diana, no punteria de 5 km
       AD("q_1000", "🗺️", "Cartógrafo", "Cartographer", "1.000 preguntas respondidas.", "1,000 questions answered.", "q", () => S().questions >= 1000),
       AD("daily_7", "🗓️", "Constancia", "Consistency", "Juega el Reto diario 7 días distintos.", "Play the Daily challenge on 7 different days.", "daily", () => dailyDays() >= 7),
     ]),
@@ -260,13 +260,13 @@ window.AIQ = window.AIQ || {};
 
   /* ---------------------------------------------------------------- registro de una pregunta */
   const BULL_KM = 25;
-  A.profile.question = ({ km, inside, ratio, streak, left, limit, timeout }) => {
+  A.profile.question = ({ km, inside, area, ratio, streak, left, limit, timeout }) => {
     const s = P.stats; s.questions++; A._sessionQ++;
     if (timeout) { s.timeouts++; save(); A.ach.emit("q", { timeout: true }); return; }
     s.km += km || 0; s.seconds += Math.max(0, limit - left); if (ratio >= 0.4) s.hits++;
-    const bull = inside || (km != null && km <= BULL_KM); if (bull) s.bulls++; if (inside) s.inside++;
+    const bull = inside || area || (km != null && km <= BULL_KM); if (bull) s.bulls++; if (inside) s.inside++;
     s.bestStreak = Math.max(s.bestStreak, streak);
-    save(); A.ach.emit("q", { km, ratio, bull, used: limit - left, left, inside });
+    save(); A.ach.emit("q", { km, ratio, bull, used: limit - left, left, inside, area });
   };
 
   /* Steam: al arrancar se reenvia lo ya conseguido (activar un logro ya activo no hace nada): si Steam no estaba abierto cuando lo ganaste, no se pierde */

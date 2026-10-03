@@ -363,7 +363,7 @@ window.AIQ = window.AIQ || {};
     _drawHl(now) {
       const { hctx: c, W, H, dpr, view: v } = this, m = this.marks;
       c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
-      const hl = m.highlight && this.world.byName[m.highlight]; if (!hl) return;
+      const hl = (m.highlight && this.world.byName[m.highlight]) || (m.area && Object.assign(m.area, { path: A.waters.path(m.area) })); if (!hl) return;   // m.area: masa de agua (js/aguas.js)
       const s = v.s, k = Math.min(1, (now - m.t0) / 500), moving = !!this.anim;
       c.setTransform(s * dpr, 0, 0, -s * dpr, (W / 2 - v.cx * s) * dpr, (H / 2 + v.cy * s) * dpr);
       c.globalAlpha = k; c.fillStyle = "rgba(224,73,43,.22)"; c.fill(hl.path);

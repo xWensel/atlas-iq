@@ -590,9 +590,12 @@
 
   function reveal(guess, left) {
     S.phase = "reveal"; map.setPick(false); S.tense = false; A.music.mode(1); if (S.run) A.chal.reveal();
-    const o = q(), L = lv(), isC = o.t === "c";
+    const o = q(), L = lv(), af = A.waters && A.waters.of(o), isC = o.t === "c" || !!af;      // af: masa de agua (mar, oceano, lago): se acierta dentro, como un pais, y se dibuja su territorio
     let km = null, ans = null, span = [], labelAt = null;
-    if (isC) {
+    if (af) {
+      span = [[af.bbox[0], af.bbox[1]], [af.bbox[2], af.bbox[3]]]; labelAt = [o.lon, o.lat];
+      if (guess) km = A.geo.distToFeature(guess.lon, guess.lat, af);
+    } else if (isC) {
       const f = world.byName[o.key];
       const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a));
       span = [[big.bbox[0], big.bbox[1]], [big.bbox[2], big.bbox[3]]]; labelAt = [(big.bbox[0] + big.bbox[2]) / 2, (big.bbox[1] + big.bbox[3]) / 2];
@@ -606,7 +609,7 @@
       adv = A.adv.score(o, guess ? km : null, left, false); sc = adv.sc; S.streak = adv.streak; chips = adv.chips; mult = adv.mult * adv.xmult; total = adv.total;
       const lt = map.lastTap; map.lastTap = null;                                  // el crupier compara tu mano de verdad con el pin (solo lo comenta)
       adv.guess = guess || null;
-      if (guess && lt && performance.now() - lt.at < 1500) { const d = ll => (isC ? A.geo.distToFeature(ll[0], ll[1], world.byName[o.key]) : A.geo.haversine(ll[1], ll[0], o.lat, o.lon)); try { adv.hand = { raw: d(lt.raw), plain: d(lt.plain) }; } catch (e) { adv.hand = null; } }
+      if (guess && lt && performance.now() - lt.at < 1500) { const d = ll => (isC ? A.geo.distToFeature(ll[0], ll[1], af || world.byName[o.key]) : A.geo.haversine(ll[1], ll[0], o.lat, o.lon)); try { adv.hand = { raw: d(lt.raw), plain: d(lt.plain) }; } catch (e) { adv.hand = null; } }
       A.adv.afterQuestion(adv); if (adv.bank && adv.bank.pt) span = span.concat([adv.bank.pt]);
     } else {
       sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
@@ -619,11 +622,11 @@
     const ratio = sc.dist / sc.distMax;
     if (guess && ratio >= 0.75) S.hits++;
     S.levelScore += total; S.runMax += L.maxPerQ;
-    A.profile.question({ km: guess ? km : null, inside: !!(guess && isC && km === 0), ratio, streak: S.streak, left, limit: S.limit, timeout: !guess });
+    A.profile.question({ km: guess ? km : null, inside: !!(guess && isC && !af && km === 0), area: !!(guess && af && km === 0), ratio, streak: S.streak, left, limit: S.limit, timeout: !guess });
 
     const label = o.clue ? A.tx(o.answer) : A.tx(o.name);
     map.setMarks({
-      guess: guess ? [guess.lon, guess.lat] : null, answer: ans, highlight: isC ? o.key : null, label, labelAt,
+      guess: guess ? [guess.lon, guess.lat] : null, answer: ans, highlight: isC && !af ? o.key : null, area: af || null, label, labelAt,
       dist: guess && km > 0 ? fmtKm(km) : "", pop: total ? "+" + A.fmt(total) : null,
     });
     if (adv && adv.bank && adv.bank.pt) { const bq = S.qi; map.setDecoys([{ lon: adv.bank.pt[0], lat: adv.bank.pt[1], bank: adv.bank.s, bankLabel: A.tx(A.chal.tl("ui_bank")).toUpperCase() + " +" + A.fmt(adv.bank.s), t0: performance.now() + 900, a: 1 }]); setTimeout(() => { if (S.phase === "reveal" && S.qi === bq && A.sfx.bankPin) A.sfx.bankPin(); }, 1500); }   // la chincheta de la banca cae despues de la tuya

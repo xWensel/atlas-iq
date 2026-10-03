@@ -1,0 +1,32 @@
+/* Geolite - aguas con frontera (v0.2.5): los mares, oceanos, golfos, estrechos y lagos del banco se aciertan haciendo clic DENTRO de su masa de
+   agua, como un pais, aunque la frontera no se vea (data/aguas.js, tools/build-aguas.mjs). Se tratan como un pais para medir (km 0 dentro, si no
+   distancia al borde) y la pregunta sigue siendo un lugar para todo lo demas (pistas, etiquetas, Enciclopedia). Al responder se dibuja su territorio. */
+window.AIQ = window.AIQ || {};
+(function (A) {
+  const cache = {};
+  /* la misma forma que un pais del mapa (polys con rings y bbox), para que A.geo.inFeature y A.geo.distToFeature la midan igual */
+  function feat(id) {
+    if (cache[id]) return cache[id];
+    const d = A.WATERS && A.WATERS[id]; if (!d) return null;
+    const polys = d.p.map(rings => {
+      const rr = rings.map(flat => { const r = []; for (let i = 0; i < flat.length; i += 2) r.push([flat[i], flat[i + 1]]); return r; });
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [lo, la] of rr[0]) { if (lo < x0) x0 = lo; if (lo > x1) x1 = lo; if (la < y0) y0 = la; if (la > y1) y1 = la; }
+      return { rings: rr, bbox: [x0, y0, x1, y1] };
+    });
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const p of polys) { x0 = Math.min(x0, p.bbox[0]); y0 = Math.min(y0, p.bbox[1]); x1 = Math.max(x1, p.bbox[2]); y1 = Math.max(y1, p.bbox[3]); }
+    return (cache[id] = { name: id, water: true, polys, bbox: [x0, y0, x1, y1], label: d.c || null, ct: null });
+  }
+  /* trazado en coordenadas proyectadas del mundo (para el mapa 2D de reserva); con las copias de +-una vuelta, como los paises */
+  function path(f) {
+    if (f.path) return f.path;
+    const P = A.geo.project, TAU = Math.PI * 2, base = new Path2D();
+    for (const p of f.polys) for (const ring of p.rings) { ring.forEach(([lo, la], k) => { const [x, y] = P(lo, Math.max(-89.9, Math.min(89.9, la))); k ? base.lineTo(x, y) : base.moveTo(x, y); }); base.closePath(); }
+    const all = new Path2D(); all.addPath(base); all.addPath(base, new DOMMatrix().translate(-TAU, 0)); all.addPath(base, new DOMMatrix().translate(TAU, 0));
+    return (f.path = all);
+  }
+  A.waters = {
+    has: id => !!(A.WATERS && A.WATERS[id]),
+    feat, path,
+    of: o => (o && o.area ? feat(o.area) : null),                 // la masa de agua de una pregunta, o null si es un punto (o un pais)
+  };
+})(window.AIQ);

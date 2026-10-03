@@ -740,7 +740,7 @@ void main(){
     }
 
     /* ---------- tamano / camara ---------- */
-    _emptyMarks() { return { guess: null, answer: null, highlight: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
+    _emptyMarks() { return { guess: null, answer: null, highlight: null, area: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
     setMarks(m) { const hl = m.highlight && this.world.byName[m.highlight]; this.marks = { ...this._emptyMarks(), gct: m.guess ? this.pickCt : null, act: hl ? hl.ct : null, ...m, t0: performance.now() }; this.fxDirty = this.dirty = true; }
     clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.dirty = true; }
     /* paises tenidos por encima de la tierra ({ "Spain": [r, g, b, a] }, 0-1): la Enciclopedia pinta asi lo que llevas descubierto. null = nada */
@@ -1445,11 +1445,33 @@ void main(){
       };
       draw(gp.a, 1); if (gp.b !== gp.a) draw(gp.b, gp.t);
     }
+    /* territorio de una masa de agua (js/aguas.js) al responder: su borde invisible se dibuja como el resalte de un pais. El trazado en pantalla se guarda
+       mientras la camara no se mueve */
+    _drawArea(c, m, now) {
+      const f = m.area, v = this.viewJ || this.view, key = v.cx + "," + v.cy + "," + v.s + "," + this.W + "," + this.H, live = this.dist.spec && this._moved();
+      if (live) { this.dirty = true; return; }                          // con los continentes aun movidos el agua (que no se mueve) se rasgaria: se dibuja cuando el mapa vuelve a su sitio
+      let A_ = this._areaP;
+      if (!A_ || A_.f !== f || A_.key !== key) {
+        const path = new Path2D(), W = this.W, H = this.H;
+        for (const sh of [-360, 0, 360]) for (const p of f.polys) {
+          const b = p.bbox, q1 = this.lonLatToScreen(b[0] + sh, b[1]), q2 = this.lonLatToScreen(b[2] + sh, b[3]);
+          if (Math.max(q1[0], q2[0]) < -W || Math.min(q1[0], q2[0]) > 2 * W || Math.max(q1[1], q2[1]) < -H || Math.min(q1[1], q2[1]) > 2 * H) continue;   // fuera de la vista (con margen)
+          for (const ring of p.rings) { ring.forEach(([lo, la], i) => { const q = this.lonLatToScreen(lo + sh, la); i ? path.lineTo(q[0], q[1]) : path.moveTo(q[0], q[1]); }); path.closePath(); }
+        }
+        A_ = this._areaP = { f, key, path };
+      }
+      const k = Math.min(1, (now - m.t0) / 500), sk = this.sk;
+      c.save(); c.globalAlpha = k; c.fillStyle = this._rgba(sk.red, 0.2); c.fill(A_.path, "evenodd");
+      c.lineJoin = "round"; c.strokeStyle = this._rgba(sk.red, 0.95); c.lineWidth = 2.6; c.stroke(A_.path);
+      c.strokeStyle = this._rgba(sk.paper, 0.8); c.lineWidth = 0.9; c.stroke(A_.path); c.restore();
+      if (now - m.t0 < 700) this.dirty = true;
+    }
     _drawFx(now) {
       const { fctx: c, W, H, dpr } = this, m = this.marks, sk = this.sk;
       c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
       if (!this._orient().on) this._drawGridLabels(c);
       if (this.probes.length) this._drawProbes(c, now);
+      if (m.area) this._drawArea(c, m, now);
       const age = now - m.t0;
       if (m.guess || m.answer || m.labelAt) {
         const G = m.guess && this.lonLatToScreen(m.guess[0], m.guess[1], m.gct), Aa = m.answer && this.lonLatToScreen(m.answer[0], m.answer[1]);

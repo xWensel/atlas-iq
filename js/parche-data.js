@@ -36,6 +36,25 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.6",
+      name: ["El agua tiene frontera", "Water has borders"],
+      date: "2026-10-03",
+      summary: ["Los mares, los océanos y los lagos se aciertan como los países: haces clic dentro de su agua y es acierto pleno.",
+        "Seas, oceans and lakes now work like countries: click inside their water and it counts as a perfect hit."],
+      chapters: [
+        { id: "agua", kicker: ["Preguntas", "Questions"], title: ["Mares, océanos y lagos", "Seas, oceans and lakes"],
+          entries: [
+            E(["Las masas de agua ocupan su territorio", "Bodies of water take up their territory"], "change", "0.2.6", [
+            ["Antes eran un punto en mitad del agua y casi cualquier clic en el océano se castigaba. Ahora cada mar, océano, golfo, estrecho o lago tiene su frontera, invisible mientras respondes: haces clic dentro y es acierto pleno («¡Dentro!»); fuera, cuenta la distancia al borde.", "They used to be a single point in the middle of the water, so almost any click in the ocean was punished. Now every sea, ocean, gulf, strait or lake has its own border, invisible while you answer: click inside and it is a perfect hit (“Inside!”); outside, the distance to the edge counts."],
+            ["Son 54 masas: los 5 océanos (con sus mares marginales), el Mediterráneo, el Negro, el Báltico, el Rojo, el Caribe, el golfo de México, los estrechos de Gibraltar, Malaca y Bering, la bahía de Hudson y 22 lagos, entre ellos el Victoria, el Superior, el Baikal y el Titicaca.", "There are 54 of them: the 5 oceans (with their marginal seas), the Mediterranean, the Black Sea, the Baltic, the Red Sea, the Caribbean, the Gulf of Mexico, the straits of Gibraltar, Malacca and Bering, Hudson Bay and 22 lakes, including Victoria, Superior, Baikal and Titicaca."],
+            ["Al responder se dibuja su territorio en el mapa. El margen de fallo es el de un país (antes era más generoso), y las pistas que apuntan a una masa de agua puntúan igual.", "When you answer, its territory is drawn on the map. The margin for a miss is that of a country (it used to be more generous), and clues that point to a body of water score the same way."]]),
+            E(["Dos lugares corregidos", "Two places fixed"], "fix", "0.2.6", [
+            ["La Primera batalla del Marne estaba en la desembocadura del Marne, en París; ahora está hacia Meaux, donde se libró.", "The First Battle of the Marne sat at the mouth of the Marne, in Paris; it is now near Meaux, where it was fought."],
+            ["La batalla de Talas ahora lleva Kirguistán · Kazajistán: su punto cae en Kirguistán y el texto decía solo Kazajistán.", "The Battle of Talas now reads Kyrgyzstan · Kazakhstan: its point lies in Kyrgyzstan and the text said only Kazakhstan."]]),
+          ] },
+      ],
+    },
+    {
       id: "0.2.5",
       name: ["Amuletos para siempre", "Charms for good"],
       date: "2026-10-03",

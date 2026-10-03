@@ -77,6 +77,7 @@ ${flags.map(([n, c]) => row(n, c)).join("\n")}
 <h2>Map data and software</h2>
 <ul>
 <li><b>World map:</b> <a href="https://github.com/topojson/world-atlas" target="_blank" rel="noopener noreferrer">world-atlas</a> by Mike Bostock (ISC license, <a href="data/LICENSE-world-atlas.txt">text</a>), from <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener noreferrer">Natural Earth</a> (public domain).</li>
+<li><b>Sea, ocean and lake outlines:</b> marine polygons and lakes from <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener noreferrer">Natural Earth</a> (public domain), simplified and merged for the game.</li>
 <li><b>Desktop version:</b> <a href="https://www.electronjs.org/" target="_blank" rel="noopener noreferrer">Electron</a> and Chromium (MIT and other licenses, see LICENSE and LICENSES.chromium.html in the game folder); <a href="https://github.com/ceifa/steamworks.js" target="_blank" rel="noopener noreferrer">steamworks.js</a> (MIT). Steamworks SDK © Valve Corporation.</li>
 </ul>
 

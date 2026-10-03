@@ -26,3 +26,4 @@ dist/
 steam-flavor.json
 steam/*.local.*
 steam-output/
+tools/cache-ne/
