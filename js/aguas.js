@@ -9,7 +9,7 @@ window.AIQ = window.AIQ || {};
     if (cache[id]) return cache[id];
     const d = A.WATERS && A.WATERS[id]; if (!d) return null;
     const polys = d.p.map(rings => {
-      const rr = rings.map(flat => { const r = []; for (let i = 0; i < flat.length; i += 2) r.push([flat[i], flat[i + 1]]); return r; });
+      const rr = rings.map(flat => { const r = []; for (let i = 0; i < flat.length; i += 2) r.push([flat[i], flat[i + 1]]); if (r.length > 2 && (r[0][0] !== r[r.length - 1][0] || r[0][1] !== r[r.length - 1][1])) r.push(r[0].slice()); return r; });   // cerrado: la distancia mide tambien el lado de vuelta al primero
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [lo, la] of rr[0]) { if (lo < x0) x0 = lo; if (lo > x1) x1 = lo; if (la < y0) y0 = la; if (la > y1) y1 = la; }
       return { rings: rr, bbox: [x0, y0, x1, y1] };
     });

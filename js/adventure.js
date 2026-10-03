@@ -322,9 +322,9 @@ window.AIQ = window.AIQ || {};
     list = list.filter(c => !pl.some(p => (p.immune || []).includes(c.id)));
     if (run.board) list = list.map(c => (c.id === "trap" && (c.lv || 1) > 2 ? { ...c, lv: 2 } : c));   // tanda 15: la Pregunta trampa, en el Reto diario, como mucho a nivel 2
     for (const bet of run.inf ? [] : [run.bets && run.bets[r], casOf(r)])      // tanda 11: los de las apuestas (la lateral y Rojo o negro), sellados (si fallas, la revancha va sin ellos)
-      if (bet && bet.retos && !(r === roundNo() && run.attempt > 0 && bet.id !== "offer")) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
+      if (bet && bet.retos && (bet.id === "offer" || r !== roundNo() || (bet.att != null ? bet.att === (run.attempt || 0) : !(run.attempt > 0)))) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
     if (pl.some(p => p.pact) && !boss && !run.inf && r <= LAST && list.length < 4) { const add = pickSealed(r, 1, "pacto", list)[0]; if (add) list.push({ ...add, lv: clamp(list.length ? Math.max(...list.map(c => c.lv || 1)) : 1, 1, 3), sealed: true, sealBy: "pact" }); }   // tanda 13: el reto del Pacto
-    if (boss) while (list.length > 5) { const k = list.findIndex(c => c.x4); if (k < 0) break; list.splice(k, 1); }   // tanda 17 (A4): el reto extra del jefe cede ante los sellados: nunca mas de 5
+    if (boss) { const live = l => l.filter(c => c.wh == null).length + (l.some(c => c.wh != null) ? 1 : 0); while (live(list) > 5) { const k = list.findIndex(c => c.x4); if (k < 0) break; list.splice(k, 1); } }   // tanda 17 (A4): el reto extra del jefe cede ante los sellados: nunca mas de 5
     if (run.chSeen0 && !run.board && run.asc < 3 && !A.adv._force) list = list.map(c => (run.chSeen0.includes(c.id) || c.sealed ? c : { ...c, lv: 1, isNew: true }));   // S12: lo que nunca has visto se estrena a nivel 1
     if (pl.some(p => p.spy)) list = list.map(c => (c.hid ? { ...c, up: true } : c));   // tanda 16: con el Ojo en el cielo, las fichas boca abajo del jefe se ven
     return { list, combo: plan.combo, boss, paid, nulled };
@@ -399,6 +399,7 @@ window.AIQ = window.AIQ || {};
   const et = (k, p) => A.tx(ETX[k]).replace(/\{(\w+)\}/g, (m, x) => (p && p[x] != null ? p[x] : m));
 
   A.adv.begin = function ({ deck = "explorer", asc = 0, seed, ranked = false, board = null, dailyTry = 0, route = null, gift = null } = {}) {
+    resumedIntro = false; flashQ.length = 0;                          // nada de la expedicion anterior (la frase de reanudar, destellos pendientes)
     const d = DECKS[deck] || DECKS.explorer, bonus = gift && A.RELICS[gift] && !d.perks.includes(gift) ? A.RELICS[gift] : null;
     slot = keyOf(!!board); payLeg(loadSlot(!!board));
     /* cjk (sin runas ni sin vocales) se fija al empezar: cambiar de idioma a media expedicion no mueve los trucos ni los sobornos (ver A.chal.plan) */
@@ -438,7 +439,7 @@ window.AIQ = window.AIQ || {};
     const now = r.act * 4 + r.round;
     for (const k in r.bribed || {}) {
       let inPlan = null; if (!r.inf && !A.adv._force && r === run && +k >= now) try { inPlan = chalFor(+k).paid; } catch (e) { inPlan = null; }
-      const gone = r.bribed[k].filter(id => !A.CHAL[id] || (inPlan && !inPlan.includes(id))); if (!gone.length) continue;
+      const gone = r.bribed[k].filter(id => !A.CHAL[id] || (inPlan && !inPlan.includes(id) && !(r.salt && r.salt[k]))); if (!gone.length) continue;
       r.bribed[k] = r.bribed[k].filter(id => !gone.includes(id)); r.bribeN = Math.max(0, (r.bribeN || 0) - gone.length);
       r.coins += gone.length * Math.max(2, Math.round(10 * (+k % 4 === 3 ? 2 : 1) * (1 + 0.5 * r.bribeN) * ascFx(r.asc).price * (1 + 0.25 * Math.floor(+k / 4))));   // lo mas que podia costar sobornarlo en esa ronda (truco de mapa de nivel 3): nunca se devuelve de menos
     }
@@ -467,7 +468,7 @@ window.AIQ = window.AIQ || {};
      Un intento del Reto diario no se tira: se cierra con los puntos que llevaba y cuenta para la puntuacion global del dia. */
   A.adv.abandon = (daily = !!(run && run.board)) => {
     const act = !!run && !!run.board === daily, r = act ? run : loadSlot(daily), key = act ? slot : keyOf(daily); payLeg(r);
-    if (daily && r && r.board && r.dailyTry) A.rank.daily.finish(r.board, r.dailyTry, finalOf(r), { r: r.cleared, won: !!r.won });
+    if (daily && r && r.board && r.dailyTry) A.rank.daily.finish(r.board, r.dailyTry, finalOf(r) + (r.inf ? r.roundScore || 0 : 0), { r: r.cleared, won: !!r.won });
     if (act) run = null;
     try { localStorage.removeItem(key); } catch (e) { /* sin almacenamiento */ }
   };
@@ -653,7 +654,7 @@ window.AIQ = window.AIQ || {};
       <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}${run._virgin ? ` <b class="intro-new">${NEW}</b>` : ""}</p>
       <p class="adv-goal">${A.T("Objetivo", "Target")} ${!run.inf && baseTarget() > Lv.advance ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")}${run.qn > 5 ? " · " + A.tx(BEST5) : ""} · ${Lv.seconds} s</p>
       ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
-      <div class="intro-art">${A.pic("topic_" + (def.topic === "mixed" ? "mixed" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
+      <div class="intro-art">${A.pic("topic_" + (def.topic === "flag" ? "country" : def.topic))}<div class="intro-dealer" id="introDealer"></div></div></div>`;
   };
   /* el crupier habla en la intro: lo que toca segun el momento de la expedicion (primera, revancha, reanudada, reintento, nuevo acto, jefe...)
      + una frase por reto (y protesta si ya llevas el perk que lo anula). El guion vive en js/dealer.js (D.introSeq). */
@@ -691,7 +692,7 @@ window.AIQ = window.AIQ || {};
     const manga = has("sleeve") && !run.inf && run.qi === 5; let streak = c.hit ? S.streak + 1 : 0, guarded = false;
     if (manga) streak = S.streak;                                     // As en la manga: la 6.a ni alarga ni corta la racha
     const gN = sumFlag("guard");                                       // Guardarrachas: los 2 primeros fallos de la ronda no cortan la racha (tampoco el tiempo agotado)
-    if (!c.hit && S.streak > 0 && gN && !run.inf && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
+    if (!c.hit && !manga && S.streak > 0 && gN && !run.inf && (+run.guardUsed || 0) < gN) { streak = S.streak; guarded = true; if (!noSide) { run.guardUsed = (+run.guardUsed || 0) + 1; setTimeout(() => A.adv.flash("streakguard", 2, "✓"), 450); } c.lines.push(["streakguard", A.tx(A.RELICS.streakguard.n), "✓"]); }
     if (!noSide && !run.inf && streak === 2 && S.streak === 1 && has("calm") && run.qi < (run.qn || 5) - 1 && (run.chal || []).some(c2 => (perkList().find(p => p.calm) || {}).calm.includes((A.CHAL[c2.id] || {}).fam))) setTimeout(() => { A.adv.flash("coolhead", 1, "❄"); if (A.sfx.ice) A.sfx.ice(); }, 500);   // Sangre fria: la siguiente, en frio
     c.streak = streak; c.mult = guarded || manga ? 1 : 1 + (streak >= 2 ? Math.min(1.5, c.streakStep * (streak - 1)) : 0);   // la respuesta salvada puntua x1
     c.qi = run.qi;
@@ -851,7 +852,7 @@ window.AIQ = window.AIQ || {};
     perkList().forEach(p => {
       if (!p.open) return;
       const mark = () => { run.hintFl = run.hintFl || {}; if (run.hintFl[p.id] !== rk) { run.hintFl[p.id] = rk; A.adv.flash(p.id, 0); } };
-      p.open({ ...api, fact: x => { mark(); api.fact(x); }, note: (t, i) => { mark(); return api.note(t, i); }, country: x => { mark(); return api.country(x); } }, o, run);
+      p.open({ ...api, fact: x => { mark(); api.fact(x); }, note: (t, i) => { mark(); return api.note(t, i); }, country: x => { mark(); return api.country(x); }, half: x => { if (halfNote(x)) mark(); api.half(x); } }, o, run);
     });
     if (S.qi === 5 && has("sleeve") && !run.inf) A.adv.flash("sleeve", 0, "6");   // la 6.a sale de la manga
     if (S.qi === 0 && !run.inf && run.rfK !== rk) { run.rfK = rk; timers.push(setTimeout(() => { if (C().S.phase === "asking") roundFlashes(); }, 650)); }
@@ -920,7 +921,7 @@ window.AIQ = window.AIQ || {};
   function splitSwap() {
     const S = C().S, q = A.adv.splitAlt(); if (!q || S.phase !== "asking") return false;
     run.split.used = true; S.qs[S.qi] = q; if (run.curQ) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]);
-    C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; A.adv.onQuestion(); A.sfx.card(); setTimeout(() => A.sfx.card(), 140);
+    C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; run.qSpent = null; A.adv.onQuestion(); A.sfx.card(); setTimeout(() => A.sfx.card(), 140);
     A.adv.flash("oracle", run.splitSeen ? 0 : 2, "⇄"); if (!run.splitSeen) { run.splitSeen = 1; setTimeout(() => A.sfx.jackpot(2), 300); }   // la primera vez de la expedicion, con jackpot
     persist(); return true;
   }
@@ -938,7 +939,7 @@ window.AIQ = window.AIQ || {};
     if (!pick) { noteH(A.T("No quedan lugares para cambiar.", "No places left to swap.")); return false; }
     const q = withSub({ ...pick });
     if (run.curQ && !run.inf) run.curQ[S.qi] = q.cid[0]; run.used.push(q.cid[0]); S.qs[S.qi] = q;
-    C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; A.adv.onQuestion(); A.sfx.card(); return true;
+    C().map.clearMarks(); C().refreshPrompt(); hints.length = 0; $("factText").textContent = ""; run.qSpent = null; A.adv.onQuestion(); A.sfx.card(); return true;
   }
   const continentName = o => A.tx(CONT[continentOf(o)] || L("el mar", "the sea"));
   /* distancia aproximada del Sonar, redondeada en la unidad que ves (antes se redondeaba en km y en millas salian cosas como "≈ 621 mi") */
@@ -992,7 +993,7 @@ window.AIQ = window.AIQ || {};
     const on = !!(run && !run.inf && Lv && S.camp.mode === "adventure" && ["asking", "reveal"].includes(S.phase) && S.levelScore >= Lv.advance);
     el.classList.toggle("hidden", !on); if (!on) return;
     const tb = Math.max(Lv.advance, baseTarget()), lt = loot(S.levelScore, tb, isBoss()), got = gain(lt.base + (has("marginHalf") ? Math.floor(lt.margin / 2) : lt.margin));
-    el.innerHTML = `<span>${A.tx(ETX.loot)}</span><b>${CN()}+${got}</b><i>${lt.next ? et("next", { c: gain(lt.base + lt.margin + 1), s: A.fmt(lt.next) }) : A.tx(ETX.max)}</i>`;
+    el.innerHTML = `<span>${A.tx(ETX.loot)}</span><b>${CN()}+${got}</b><i>${lt.next ? et("next", { c: gain(lt.base + (has("marginHalf") ? Math.floor((lt.margin + 1) / 2) : lt.margin + 1)), s: A.fmt(lt.next) }) : A.tx(ETX.max)}</i>`;
   }
   if (A.tips) A.tips.loot = () => A.tx(ETX.lootTip) + "\n" + A.tx(ETX.lootTipD);
   /* ---------------- lucirse (tanda 2): cuando una reliquia TUYA actua, su icono salta en la barra, suena y, si es un premio, tiembla.
@@ -1009,13 +1010,13 @@ window.AIQ = window.AIQ || {};
   }
   /* la queja del amuleto (una por amuleto y expedicion): si el crupier esta hablando, espera su turno durante la pregunta en vez de perderse */
   function amuGripe(id, n) {
-    const am = run && amuHit(A.RELICS[id])[0]; run.relicSeen = run.relicSeen || {};
+    if (!run) return; const am = amuHit(A.RELICS[id])[0]; run.relicSeen = run.relicSeen || {};
     if (!am || run.inf || run.relicSeen[id] || n > 8 || C().S.phase !== "asking") return;
     if (A.dealer.react("amulet", { p: A.tx(A.RELICS[id].n), c: A.tx(A.CHAL[am.id].n) })) { run.relicSeen[id] = 1; return; }
     setTimeout(() => amuGripe(id, n + 1), 1500);
   }
   function flashNext() {
-    const f = flashQ.shift(); if (!f || !run) { flashBusy = false; return; } flashBusy = true;
+    const f = flashQ.shift(); if (!f || !run) { flashQ.length = 0; flashBusy = false; return; } flashBusy = true;
     const el = document.querySelector(`#advBar .ab-perk[data-id="${f.id}"]`), k = flashK++ % 4, asking = C().S.phase === "asking";
     flashOn[f.id] = { f, t: performance.now() }; if (el) flashPaint(el, f);
     if (f.snd) f.snd(); else if (f.lv === 0) A.sfx.chip(0.15 + Math.random() * 0.7); else { A.sfx.coin(k); if (f.lv === 2) setTimeout(() => A.sfx.chip(0.4 + Math.random() * 0.5), 120); }
@@ -1052,7 +1053,7 @@ window.AIQ = window.AIQ || {};
     const S = C().S, o = S.qs[S.qi]; if (!o) return false;
     const key = roundNo() + ":" + (run.attempt || 0); run.ballN = run.ballN || {}; if ((run.ballN[key] || 0) >= sumFlag("reball")) return false;
     const f = featOf(o), km = f ? A.geo.distToFeature(lon, lat, f) : A.geo.haversine(lat, lon, o.lat, o.lon);
-    const scale = clamp(1500 * Math.pow(0.97, roundNo()), 300, 1500) * kf(o); if (1000 * Math.exp(-km / scale) >= 600) return false;
+    const lim0 = (A.codexLimits && o.cid ? A.codexLimits({ id: o.cid[0], cids: o.cid }) : [300, 150, 75])[0]; if (km <= lim0) return false;   // la misma diana que la racha (antes el 60 % de los puntos: de 300 a ~770 km no habia segundo tiro)
     run.ballN[key] = (run.ballN[key] || 0) + 1; (run.ballSaved = run.ballSaved || {})[qKey()] = 1;
     run.probes = run.probes || []; run.probes.push({ lon, lat, ct: C().map.pickCt, cold: true, label: A.tx(OTRA) }); run.probesK = qKey() + ":" + o.cid[0];
     C().map.avoid = hudRects(); C().map.setProbes(run.probes); renderBars();
@@ -1143,7 +1144,7 @@ window.AIQ = window.AIQ || {};
       const insured = !!(run.sup && run.sup.seguro), shielded = insured || (has("shieldAct") && run.shieldAct !== run.act);
       if (shielded && !insured) run.shieldAct = run.act; else if (!shielded) { run.lives--; run.livesLostAct++; }
       const lb = (run.bets || {})[roundNo()], betLost = [];   // tanda 11: la apuesta del jefe se pierde al fallarlo (Doble o nada: lo apostado)
-      if (lb && (lb.id === "double" || lb.id === "final") && !lb.done) { lb.done = 1; betLost.push([A.tx(BETS[lb.id].n), lb.id === "double" ? "−" + lb.stake : "—", null, "bet lost"]); setTimeout(() => A.dealer.say(A.dealer.line("betLose"), { mood: "laugh", hold: 2400 }), 1200); }
+      if (lb && (lb.id === "double" || lb.id === "final") && !lb.done) { lb.done = 1; delete run.bets[roundNo()]; betLost.push([A.tx(BETS[lb.id].n), lb.id === "double" ? "−" + lb.stake : "—", null, "bet lost"]); setTimeout(() => A.dealer.say(A.dealer.line("betLose"), { mood: "laugh", hold: 2400 }), 1200); }
       if (insured) run.segN = (run.segN || 0) + 1;                       // el Seguro de ronda se ha gastado: el siguiente cuesta 2 mas (superar la ronda no lo encarece)
       run.attempt++; run.phase = "retry";
       /* consuelo: lo que puntuaste en la ronda fallida se cobra (1 por cada tercio del objetivo) para comprar ayuda antes de la revancha */
@@ -1274,13 +1275,16 @@ window.AIQ = window.AIQ || {};
   const bribePrice = (c, boss) => { const d = A.CHAL[c.id]; return Math.max(2, Math.round((3 + 2 * (c.lv || 1) + (d.kind === "map" ? 1 : 0)) * (boss ? 2 : 1) * (1 + 0.5 * (run.bribeN || 0)) * ascFx(run.asc).price * inflation())); };
   const freeShuf = () => has("freeShuffle") && !chalFor(roundNo()).boss && run.freeShuf !== run.shopKey;   // tanda 9: una vez por visita con el Ojo en el cielo, salvo jefes
   const chalRerollCost = () => (freeShuf() ? 0 : price(4 + 2 * ((run.salt && run.salt[roundNo()]) || 0)) * (chalFor(roundNo()).boss ? 2 : 1));   // tanda 9 (S9): como el soborno, el doble en el jefe
+  const tapAt = {}, tapOnce = (k, ms = 400) => { const t = performance.now(); if (t - (tapAt[k] || 0) < ms) return false; tapAt[k] = t; return true; };   // un doble clic no cobra dos veces
   function bribe(id) {
+    if (!tapOnce("bribe")) return;
     const r = roundNo(), cf = chalFor(r), c = cf.list.find(x => x.id === id); if (!c) return; const cost = bribePrice(c, cf.boss);
     if (run.coins < cost) { A.sfx.deny(); flash(A.T("No te alcanzan los doblones.", "Not enough doubloons.")); return; }
     run.coins -= cost; run.bribeN = (run.bribeN || 0) + 1; run.bribed = run.bribed || {}; (run.bribed[r] = run.bribed[r] || []).push(id); A.sfx.buy(); persist(); A.ach.emit("adv", { kind: "bribe" });
     A.dealer.enable(true); A.dealer.say(A.dealer.line("bribe"), { mood: "angry", hold: 1800 }); renderShop(run.phase === "chest");
   }
   function rerollChal() {
+    if (!tapOnce("shuffle")) return;
     const r = roundNo(), cost = chalRerollCost(); if (run.coins < cost) { A.sfx.deny(); flash(A.T("No te alcanzan los doblones.", "Not enough doubloons.")); return; }
     if (freeShuf()) { run.freeShuf = run.shopKey; A.adv.flash("spyhole", 0, A.tx(H_FREE)); }
     run.coins -= cost; run.salt = run.salt || {}; run.salt[r] = (run.salt[r] || 0) + 1; A.sfx.reroll(); persist();   // los sobornos pagados se quedan: si el truco vuelve a salir, sigue fuera
@@ -1410,7 +1414,7 @@ window.AIQ = window.AIQ || {};
     return { key: `r:${id}:${mode}:${sellValue(id)}`, cls: `r${p.r}${p.amulet ? " amu" : ""}${btn ? " act" : ""}`, html: pkCard({ ...p, id }, tag, meta, btn),
       wire: (card, close) => { const b = card.querySelector(".pk-act:not(.off)"); if (!b) return;
         b.onclick = e => { e.stopPropagation(); if (card.classList.contains("pk-go")) return; card.classList.add("pk-go");
-          const go = mode === "swap" ? () => { close(true); swapFor(swapIx, id, shopChest); } : () => { close(true); if (run.perks.includes(id)) sell(id, shopChest); };
+          const go = mode === "swap" ? () => { close(true); if (run && C().S.phase === "shop" && swapIx != null) swapFor(swapIx, id, shopChest); } : () => { close(true); if (run && C().S.phase === "shop" && run.perks.includes(id)) sell(id, shopChest); };
           if (matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("reduce-motion")) go(); else { card.classList.add("pk-sold"); setTimeout(go, 230); } }; } };
   }
   A.peek.on(".table.mesa .tr-relic .tr-face", el => peekRelic(el.parentNode.dataset.relic, true));
@@ -1459,6 +1463,7 @@ window.AIQ = window.AIQ || {};
     document.querySelectorAll("#dlg .tr-tool").forEach(c => (c.onclick = e => { e.stopPropagation(); A.peek.toggle(c); }));
     const tb = document.querySelector("#dlg .table.mesa"); if (tb) tb.addEventListener("click", e => { if (swapIx != null && !e.target.closest(".offer")) { swapIx = null; document.querySelectorAll("#dlg .swap-pick, #dlg .swap-src").forEach(x => x.classList.remove("swap-pick", "swap-src")); } });
     if ($("rerollBtn")) $("rerollBtn").onclick = () => {
+      if (!tapOnce("reroll")) return;
       const c = rerollCost(); if (run.coins < c) { A.sfx.deny(); shake($("rerollBtn")); return; } run.coins -= c; if (c === 0) run.freeUsed++; else run.rerolls++; run.shopN++; run.stock = null; A.sfx.reroll();
       if (c > 0 && !run.shellDone && (run.paidRerolls = (run.paidRerolls || 0) + 1) >= 2) { run.shellDone = true; persist(); if (A.dealer.campShell) A.dealer.campShell(); return shellCards(() => openShop(false)); }   // el trile: una vez por expedicion
       openShop(false);
@@ -1528,7 +1533,7 @@ window.AIQ = window.AIQ || {};
   function pickSealed(r, n, tag, baseList) {
     const D = A.CHAL, base = baseList || chalFor(r).list, fs = new Set(base.map(c => D[c.id].fam)), flag = defAt(r).topic === "flag", topic = defAt(r).topic, txt = base.some(c => D[c.id].kind === "text");
     const bad = id => (flag ? D[id].kind === "text" : D[id].kind === "flag") || (txt && D[id].kind === "text") || (run.cjk && id === "runes") || ((topic === "country" || topic === "clue") && (id === "nocountry" || id === "fakepass")) || (topic === "clue" && id === "ticker") || (run.cjk && id === "ticker") || (topic === "clue" && id === "riddle") || (id === "memory" && base.some(c => c.id === "hang" || c.id === "battery")) || ((id === "hang" || id === "battery") && base.some(c => c.id === "memory"));
-    let pool = Object.keys(D).filter(id => !D[id].sub && D[id].kind !== "rule" && id !== "dark" && !fs.has(D[id].fam) && !bad(id));
+    let pool = Object.keys(D).filter(id => !D[id].sub && !D[id].boss && D[id].kind !== "rule" && id !== "dark" && !fs.has(D[id].fam) && !bad(id));
     if (!run.board && run.chSeen0) { const seen = pool.filter(id => run.chSeen0.includes(id)); if (seen.length >= n) pool = seen; }   // de los que ya has visto
     const rr = A.rng(`${run.seed}:${tag}:${r}`), got = [];
     for (const id of rr.shuffle(pool)) { if (fs.has(D[id].fam)) continue; got.push({ id, lv: 3 }); fs.add(D[id].fam); if (got.length === n) break; }
@@ -1557,7 +1562,7 @@ window.AIQ = window.AIQ || {};
     if (k === "red") {
       const att = run.attempt || 0;
       if (b && b.att === att) { const gn = b.out === "green"; return `<div class="sup bet cas bt-red done ${b.win ? "win" : "lose"}${gn ? " zero" : ""}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(gn ? BT2.zero : b.out === "red" ? BT.red : BT.black)}${b.n != null ? " · " + b.n : ""}</b>${A.tx(gn ? BT2.house : b.win ? BT.won : BT.lost)}${b.retos && b.retos.length ? " · " + A.tx(BT2.extra) : ""}</em></div>`; }
-      return `<div class="sup bet cas bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><button class="bt-c bt-cg" type="button" data-pick="green" ${A.ttAttr(A.tx(BT2.green), A.tx(BT2.tip))}>${A.tx(BT2.green)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
+      return `<div class="sup bet cas bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button>${r < LAST ? `<button class="bt-c bt-cg" type="button" data-pick="green" ${A.ttAttr(A.tx(BT2.green), A.tx(BT2.tip))}>${A.tx(BT2.green)}</button>` : ""}<em class="sp-p">${CN()}${redCost()}</em></span></div>`;
     }
     if (b && b.id === k) return `<div class="sup bet on bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.on)}${k === "double" ? " · " + CN() + b.stake : ""}</em></div>`;
     if (!sideOk(k, r)) return "";
@@ -1586,7 +1591,7 @@ window.AIQ = window.AIQ || {};
         run.reds = run.reds || {}; run.reds[r] = { id: "coin", pick, out, win: win || out === "edge", att, stake, pay };
         persist(); A.sfx.rouBet(pick === "heads" ? 0 : 1); if (A.haptic) A.haptic([10]);
         { const cb = document.querySelector("#shopCoins b"); if (cb) cb.textContent = run.coins - pay; }
-        spinCoin({ pick, out, win, pay, stake }, () => { if (!run || C().S.phase !== "shop") return; renderShop(false); });
+        spinCoin({ pick, out, win, pay, stake }, () => { if (!run || C().S.phase !== "shop" || !run.stock) return; renderShop(false); });
       }));
       return;
     }
@@ -1599,7 +1604,7 @@ window.AIQ = window.AIQ || {};
         const info = applyPrize(PRIZES[w], rec, r); run.bar = null;       // el premio puede ser un suministro: la Barra se vuelve a montar
         persist(); A.sfx.rouBet(2); if (A.haptic) A.haptic([10]);
         { const cb = document.querySelector("#shopCoins b"); if (cb) cb.textContent = afterFee; }
-        spinWheel({ w, info }, () => { if (!run || C().S.phase !== "shop") return; renderShop(false); });
+        spinWheel({ w, info }, () => { if (!run || C().S.phase !== "shop" || !run.stock) return; renderShop(false); });
       };
       return;
     }
@@ -1614,7 +1619,7 @@ window.AIQ = window.AIQ || {};
         persist();
         A.sfx.rouBet(pick === "green" ? 2 : pick === "red" ? 0 : 1); if (A.haptic) A.haptic([10]);   // la ficha cae al instante: el clic nunca se queda mudo
         { const cb = document.querySelector("#shopCoins b"); if (cb) cb.textContent = run.coins; }
-        spinRoulette({ pick, n, skip, last: skip === "final", extra: extra.length > 0 }, () => { if (!run || C().S.phase !== "shop") return; skip ? openShop(false) : renderShop(false); });
+        spinRoulette({ pick, n, skip, last: skip === "final", extra: extra.length > 0 }, () => { if (!run || C().S.phase !== "shop") return; if (skip) openShop(false); else if (run.stock) renderShop(false); });
       }));
       return;
     }
@@ -1639,8 +1644,9 @@ window.AIQ = window.AIQ || {};
   /* el salto del verde apostado y acertado: actos I y II, al Campamento de la ronda 1 del acto siguiente (sin jefe ni cofre); en el III, al jefe final */
   function greenSkip() {
     const last = run.act + 1 >= 3;
+    if (last && run.round >= 3) return null;                          // ya ibas al jefe final (en la ronda 12 no se ofrece el verde)
     if (last) run.round = 3;
-    else { run.act++; run.round = 0; const l0 = run.lives; perkList().forEach(p => p.actStart && p.actStart(run)); if (run.lives > l0) run.healAct = run.act; }
+    else { run.act++; run.round = 0; run.livesLostAct = 0; const l0 = run.lives; perkList().forEach(p => p.actStart && p.actStart(run)); if (run.lives > l0) run.healAct = run.act; }
     run.attempt = 0; run.stock = null;
     return last ? "final" : "act";
   }

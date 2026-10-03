@@ -25,7 +25,7 @@ window.AIQ = window.AIQ || {};
   const L6 = s => (A.L6 ? A.L6(s) : { es: s.split("|")[0] });
   const tx = o => (A.tx ? A.tx(o) : o.es);
 
-  let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [];
+  let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [], lostAt = 0;
   const U = {}, t0 = performance.now(), timers = [], DM = { r: 0 };   // DM: el ultimo radio del foco (un jefe lo cierra de pregunta en pregunta)
   const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [], sparks: [], shades: [], wipes: [], teth: null, wind: null, night: null };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
@@ -120,7 +120,7 @@ void main(){
       const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); shs.push(s); return s; };
       prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
       gl.bindVertexArray(gl.createVertexArray());
-      glCv.addEventListener("webglcontextlost", e => { e.preventDefault(); gl = null; });
+      glCv.addEventListener("webglcontextlost", e => { e.preventDefault(); gl = prog = psc = null; linked = false; shs.length = 0; SM.tex = null; lostAt = performance.now(); });   // se rehace en tick() (regl), como el mapa (map.js _revive)
     } catch (e) { console.warn("chfx: sin WebGL2", e); gl = null; }
     return gl;
   }
@@ -165,8 +165,15 @@ void main(){
   }
   const busy = () => !!(E.night || E.dark || E.spot || E.smoke || E.rain || E.lens || E.seal || E.film || E.crack || E.prints || E.batt || E.cut.v > 0.001 || E.cut.tv > 0.001 || E.flash > 0.001 || E.fseq || E.bolts.length || E.puffs.length || E.trail.length || E.sparks.length || E.shades.length || E.wipes.length || E.teth || E.wind);
   function kick() { if (!raf && ov) { last = performance.now(); raf = requestAnimationFrame(tick); } }
+  /* la GPU se reinicio: a los 1,5 s, lienzo y programa nuevos en el mismo sitio; si aun no se puede, otro intento 1,5 s despues (mientras haya efectos) */
+  function regl(now) {
+    lostAt = 0; const old = glCv; glTried = false; glCv = null; initGL();
+    if (gl && glCv) { if (old && old.parentNode) old.replaceWith(glCv); else if (ov && cv) ov.insertBefore(glCv, cv); W = 0; size(); }
+    else { gl = null; glCv = old; lostAt = now; }
+  }
   function tick(now) {
     raf = 0; if (!ov || !ov.isConnected) return;
+    if (lostAt && now - lostAt > 1500) regl(now);
     const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000)); last = now;
     if (size()) rebuild();
     step(dt, now); drawGL(now); draw2D(now);
@@ -726,16 +733,16 @@ void main(){
     const get = id => list.find(c => c.id === id), gl_ = !!gl, off = n => { if (E[n]) E[n].on = 0; };
     const dk = gl_ && get("dark"); if (dk) { const p = par(dk), boss = !!(A.chal.state && A.chal.state.bk), r0 = dk.slam ? Math.max(W, H, 800) : E.dark && E.dark.k > 0.01 ? E.dark.r : boss && DM.r > 0 ? DM.r : p.r; E.dark = keep(E.dark, { tr: p.r, a: p.a, warm: !!fx.halo, fast: dk.slam ? 0.16 : 0.55 }); E.dark.r = r0; if (boss) DM.r = p.r; } else off("dark");   // tanda 16: el foco se cierra en directo hasta su radio (o salta de golpe, si lo enciende la siesta)
     const bs = gl_ && get("blindspot"); if (bs) E.spot = keep(E.spot, { r: par(bs).r }); else off("spot");
-    const cl = gl_ && get("clouds"); if (cl) { if (!E.smoke || !E.smoke.on) sweepReset(); E.smoke = keep(E.smoke, { cover: par(cl).cover, hole: fx.cloudClear || 0, seed: rnd() }); } else off("smoke");
-    const rn = get("rain"); if (rn) rainOn(par(rn).dens); else if (E.rain) { E.rain.on = 0; part("chx-wet").classList.remove("on"); say("rain", 0); }
+    const cl = gl_ && get("clouds"); if (cl) { if (!E.smoke || !E.smoke.on) sweepReset(); E.smoke = keep(E.smoke, { cover: par(cl).cover, hole: fx.cloudClear || 0, seed: E.smoke && E.smoke.on ? E.smoke.seed : rnd() }); } else off("smoke");
+    const rn = get("rain"); if (rn) { if (!(E.rain && E.rain.on)) rainOn(par(rn).dens); } else if (E.rain) { E.rain.on = 0; part("chx-wet").classList.remove("on"); say("rain", 0); }
     if (get("blur") && fx.lensR > 0) E.lens = keep(E.lens, { r: fx.lensR }); else off("lens");
     if ((get("wrongborders") && fx.trueR > 0) || (get("noborders") && fx.peekR > 0)) E.seal = keep(E.seal, { r: 110 }); else off("seal");
     if (get("negative") && !fx.noNegative) E.film = keep(E.film, {}); else off("film");
-    const ck = get("crack"); if (ck) crackOn(par(ck).n, fx.glassMul || 1);
-    const sm = get("smudge"); if (sm) { const p = par(sm); printsOn(p.n, p.px, fx.glassMul || 1); }
-    const hg = get("hang"); if (hg) winsOn(par(hg).n, fx.hangAuto || 0);
+    const ck = get("crack"); if (ck && !(E.crack && E.crack.on)) crackOn(par(ck).n, fx.glassMul || 1);
+    const sm = get("smudge"); if (sm && !(E.prints && E.prints.on)) { const p = par(sm); printsOn(p.n, p.px, fx.glassMul || 1); }
+    const hg = get("hang"); if (hg && !E.wins) winsOn(par(hg).n, fx.hangAuto || 0);
     if (get("wind")) { E.wind = E.wind || { k: 0, st: [], gt: 0 }; E.wind.off = false; } else if (E.wind) E.wind.off = true;   // tanda 8: rachas del Vendaval
-    const bt = get("battery"); if (bt) battOn(par(bt).dim, bt);
+    const bt = get("battery"); if (bt && !(E.batt && E.batt.on)) battOn(par(bt).dim, bt);
     if (gl_ && get("stormnight")) nightOn(); else off("night");
   };
   X.reset = () => { DM.r = 0; };

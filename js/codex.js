@@ -455,7 +455,7 @@ window.AIQ = window.AIQ || {};
   const ui = { built: false, view: { k: "home" }, stack: [], q: "", cur: null, lockN: 0 };
   const esc = s => A.esc(s);                                           // textos de Wikipedia/Commons dentro de innerHTML
   const photo = u => (/\.svg$/i.test(u) ? "" : "cx-photo");           // fotos de Wikipedia/Commons: se reducen suavizadas (css/codex.css); el arte pixel y las banderas SVG siguen nitidos
-  const fold = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();   // busqueda sin tildes ni mayusculas
+  const fold = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/ł/g, "l").replace(/ø/g, "o").replace(/ß/g, "ss").replace(/æ/g, "ae").replace(/œ/g, "oe").replace(/[đð]/g, "d").replace(/þ/g, "th").replace(/ı/g, "i");   // busqueda sin tildes ni mayusculas (ni ł, ø, ß, æ, œ, đ, ð, þ, ı, que NFD no separa)
   const cap = t => (t ? t.charAt(0).toLocaleUpperCase(A.lang) + t.slice(1) : "");
   const kmTxt = km => (A.core && A.core.S && A.core.S.units === "mi" ? A.fmtDist(km) : A.fmt(km) + " km");
   const nameOf = (e, rec) => e.type === "country" && e.id.startsWith("c:") ? cName(e.id.slice(2)) : e.parent ? nameOf(E[e.parent], rec) : e.name[A.lang] || e.name[A.wlang()] || (rec && rec.title && rec.lang === A.wlang() ? rec.title : "") || e.name.en || e.name.es;
@@ -1029,7 +1029,7 @@ window.AIQ = window.AIQ || {};
     const cv = map.cv; let raf = 0, last = null, hov = null;
     const set = ne => { if (ne === hov) return; hov = ne; if (map.setHighlight) map.setHighlight(ne || mapCtx.hi); };
     cv.addEventListener("pointermove", e => {
-      if (!stageOn()) return; last = e;
+      if (!stageOn()) return; last = e; if (ptr && e.pointerType === "mouse" && !(e.buttons & 1)) ptr = null;   // se solto fuera del lienzo
       if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (!stageOn() || !last) return; const drag = ptr && Math.hypot(last.clientX - ptr.x, last.clientY - ptr.y) > 5, ne = drag ? null : pickAt(last.clientX, last.clientY); set(ne); mapTip(ne, last.clientX, last.clientY); });
     });
     cv.addEventListener("pointerleave", () => { if (!stageOn()) return; last = null; set(null); mapTip(null); });

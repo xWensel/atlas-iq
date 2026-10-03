@@ -1643,13 +1643,13 @@ window.AIQ = window.AIQ || {};
     return { e: A.crupier.expr(e), g: g || null };
   }
   const LINGER = 1000;                                                // SIEMPRE un segundo mas: al acabar cada frase se queda antes de irse o de pasar a la siguiente (intro incluida)
-  let held = false, napping = false;                                                   // v0.37: mientras te pregunta el nombre (js/nombre.js) solo habla esa escena (o.force)
+  let held = false, napping = false, napWant = 0;                                                   // v0.37: mientras te pregunta el nombre (js/nombre.js) solo habla esa escena (o.force)
   const flush = () => { const p = pend; pend = null; if (p) D.say(p[0], p[1]); if (!typing) D.hide(); };   // si la que esperaba ya no toca, la anterior se va igual
   /* dice una frase con voz arcade y maquina de escribir. Nunca se le corta a media frase ni se le quita su segundo de mas: si aun esta escribiendo
      (o acaba de terminar), la nueva espera su turno (si llegan varias, solo la ultima). Solo las escenas forzadas (o.force, js/nombre.js) entran ya.
      o.fx: efecto de pantalla (rabieta) que sale justo cuando empieza la frase; o.start, igual: aviso de que por fin empieza (si esperaba turno) */
   D.say = (line, o = {}) => {
-    if (!o.force && (held || napping || (!D.on && !D.onHome))) return;
+    if (!o.force && (held || napping || napWant || (!D.on && !D.onHome))) return;
     if (o.valid && !o.valid()) return;                                // la frase ya no toca (p. ej. la reaccion a una pregunta que ya paso)
     if (el) ensure();
     const left = D.busy && el ? (typing ? Infinity : doneAt + LINGER - Date.now()) : 0;   // tambien las escenas (force) esperan a que acabe la frase en curso
@@ -1686,7 +1686,7 @@ window.AIQ = window.AIQ || {};
   D.enable = on => {
     D.on = !!on; clearTimeout(runT);
     if (on && D.onHome) D.homeTease(false);                           // entrar en partida (p. ej. Continuar desde el inicio) apaga las apariciones del menu
-    if (!on) { if (speaking()) { D.dock(null); D.release(); } else { clear(); D.dock(null); if (el) el.classList.add("hidden"); } }   // a media frase: la acaba en la esquina (sin quedarse enganchado a la pantalla de antes) y se va
+    if (!on) { if (speaking()) { D.dock(null); D.release(); } else { D.dock(null); D.hide(); if (el) el.classList.add("hidden"); } }   // a media frase: la acaba en la esquina (sin quedarse enganchado a la pantalla de antes) y se va
     else { ensure(); el.classList.remove("hidden"); runT = setTimeout(runTick, 18000 + Math.random() * 14000); }
   };
   /* pasa el retrato a un contenedor grande (pantalla de intro) o lo devuelve a la esquina */
@@ -1694,7 +1694,7 @@ window.AIQ = window.AIQ || {};
      (la escena habla despues, cuando le toque). Antes se le cortaba en seco al pasar a la intro, a la salida o a la pregunta del nombre */
   D.dock = host => {
     ensure();
-    if (speaking()) { pend = null; leaving = false; clearTimeout(leaveT); } else { clear(); D.busy = false; }
+    if (speaking()) { pend = null; leaving = false; clearTimeout(leaveT); } else { clear(); D.busy = false; bubble.classList.remove("on"); }
     D.host = host || null; if (host) host.appendChild(el); else $("app").appendChild(el);
     el.classList.toggle("big", !!host); el.classList.remove("camp", "screen"); if (host) el.classList.remove("inline", "home", ...HOME_CORNERS);   // lo del Campamento o del Perfil no le sigue
   };
@@ -1718,8 +1718,9 @@ window.AIQ = window.AIQ || {};
   /* tanda 16: LA SIESTA DEL CRUPIER. Duerme en su esquina de la partida, sin globo y sin reaccionar a nada (napping calla D.say); nap(false) lo despierta sin
      decir nada (quien habla luego es la escena). napLevel(l, z): l = lo inquieto que duerme (0 profundo, 1 se revuelve, 2 casi despierto), z = el ruido de 0 a 1 */
   D.nap = on => {
-    if (!on) { napping = false; if (el) { el.classList.remove("nap", "nap1", "nap2"); el.style.removeProperty("--nz"); } return; }
-    ensure(); clear(); leaving = false; clearTimeout(leaveT); D.busy = false; napping = false; el.classList.remove("hidden");
+    if (!on) { clearTimeout(napWant); napWant = 0; napping = false; if (el) { el.classList.remove("nap", "nap1", "nap2"); el.style.removeProperty("--nz"); } return; }
+    if (speaking()) { pend = null; clearTimeout(napWant); napWant = setTimeout(() => { napWant = 0; D.nap(true); }, Math.max(0, doneAt + LINGER - Date.now()) + 60); return; }   // a media frase no se duerme: la acaba (nunca se le corta)
+    clearTimeout(napWant); napWant = 0; ensure(); clear(); leaving = false; clearTimeout(leaveT); D.busy = false; napping = false; el.classList.remove("hidden");
     el.className = "dealer in nap"; bubble.classList.remove("on"); spr.release(); spr.set("sleep"); spr.shown(true); fitCorner(); spr.fit(); napping = true;
   };
   D.napLevel = (l, z) => { if (!napping || !el) return; el.classList.toggle("nap1", l === 1); el.classList.toggle("nap2", l === 2); el.style.setProperty("--nz", (z || 0).toFixed(2)); spr.set(l >= 2 ? "suspicious" : "sleep", { quiet: true }); };

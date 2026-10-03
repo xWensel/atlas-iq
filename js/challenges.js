@@ -244,7 +244,7 @@ window.AIQ = window.AIQ || {};
         }
         if (act >= 3) { const rr = A.rng(`${seed}:legend:${r}`), all = rr.shuffle([...TEXT, ...MAPD, ...PTR, ...RULE]).filter(id => !noop(id)); combo = { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), ids: [] }; list = []; const fam = new Set(); for (const id of all) { const f = famOf(id); if (fam.has(f)) continue; fam.add(f); list.push({ id, lv: 3 }); combo.ids.push(id); if (list.length === 4) break; } }
       if (asc >= 4 && act < 3) {                                                  // Ascension 4: el jefe trae un poder extra de otra familia (ni el Apagon ni una pareja que choque)
-        const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids);
+        const fam = new Set(list.map(x => famOf(x.id))), ids = list.map(x => x.id), pool = [...TEXT, ...MAPD, ...PTR].filter(id => !fam.has(famOf(id))), bad = x => noop(x) || x === "dark" || clashes(x, ids) || (D[x].kind === "text" && list.some(c => D[c.id].kind === "text"));
         if (pool.length) { const rb = A.rng(`${seed}:boss2:${act}`); let id = rb.pick(pool); if (bad(id)) { const ok = pool.filter(x => !bad(x)); if (ok.length) id = rb.pick(ok); } list.push({ id, lv, x4: 1 }); }   // x4: el reto extra de Ascension 4 (cede ante los sellados: nunca mas de 5, ver chalFor)
       }
       return { list, boss, combo };
@@ -537,7 +537,7 @@ window.AIQ = window.AIQ || {};
     if (!isSub && !o.clue && has("riddle")) { const r = riddleText(o); if (r) { text = r; riddle = true; } }
     if (alt && !riddle && obj[alt]) text = obj[alt];
     let chars = [...text]; const orig = chars.slice(), isL = i => isLetter(chars[i] || " ");
-    const letters = chars.map((c, i) => (isLetter(c) ? i : -1)).filter(i => i >= 0), fixed = new Set(), hidden = new Set(), dots = new Set(), runes = new Set();
+    const letters = chars.map((c, i) => (isLetter(c) ? i : -1)).filter(i => i >= 0), fixed = new Set(), hidden = new Set(), dots = new Set(), runes = new Map();
     if (!riddle) {
       const an = get("anagram"), full = !!an && an.lv >= 3;            // a tope: todo menos la 1.a letra, tambien en palabras de 3
       if (an && letters.length >= (full ? 3 : 4)) {
@@ -546,7 +546,7 @@ window.AIQ = window.AIQ || {};
       const sw = get("swap");
       if (sw && letters.length >= 3) { const pk = par(sw).pairs, want = Math.floor(pk) + (pk % 1 && rnd() < pk % 1 ? 1 : 0); let done = 0, tries = 0; while (done < want && tries++ < 20) { const k = letters[Math.floor(rnd() * (letters.length - 1))]; if (isL(k + 1) && chars[k] !== chars[k + 1] && !fixed.has(k)) { [chars[k], chars[k + 1]] = [chars[k + 1], chars[k]]; fixed.add(k); fixed.add(k + 1); done++; } } }
       const rn = get("runes");
-      if (rn) { const p = par(rn), pool = letters.filter(i => lookOf(chars[i])); rnd.shuffle(pool).slice(0, Math.max(2, Math.round(letters.length * p.frac))).forEach(i => { chars[i] = lookOf(chars[i]); runes.add(i); }); }
+      if (rn) { const p = par(rn), pool = letters.filter(i => lookOf(chars[i])); rnd.shuffle(pool).slice(0, Math.max(2, Math.round(letters.length * p.frac))).forEach(i => { runes.set(i, chars[i]); chars[i] = lookOf(chars[i]); }); }
       if (get("novowels")) letters.forEach(i => { if (VOWELS.test(orig[i]) && i > 0) dots.add(i); });
       const ms = get("missing");
       const ml = dots.size ? letters.filter(i => !dots.has(i)) : letters;   // tanda 6: sin vocales y ademas tinta borrada: se borran consonantes
@@ -561,7 +561,7 @@ window.AIQ = window.AIQ || {};
       const dur = (0.07 + rnd() * 0.09).toFixed(3), del = (-rnd() * 0.3).toFixed(3), ax = ((rnd() - 0.5) * 2 * amp).toFixed(2), ay = ((rnd() - 0.5) * 2 * amp).toFixed(2), ar = ((rnd() - 0.5) * amp * 1.6).toFixed(2);
       let cz = ""; if (crazy) { const sa = rnd() * Math.PI * 2, sd = 0.7 + rnd() * 0.9; cz = `--sx:${(Math.cos(sa) * sd * 1.4).toFixed(2)}em;--sy:${(Math.sin(sa) * sd).toFixed(2)}em;--sr:${((rnd() - 0.5) * 320).toFixed(0)}deg;`; }
       const st = (amp ? `--dur:${dur}s;--del:${del}s;--ax:${ax}px;--ay:${ay}px;--ar:${ar}deg;` : "") + (damp ? `--dy:${(damp * (0.6 + rnd() * 0.8)).toFixed(2)}em;--di:${i};` : "") + (memOn ? `--fd:${(rnd() * 0.6).toFixed(2)}s;` : "") + cz;
-      return `<b class="${c.join(" ")}" data-n="${i}" data-g="${ch}" style="${st}"${amp ? ' data-sh="1"' : ""}${damp ? ' data-dn="1"' : ""}${crazy ? ' data-cz="1"' : ""}>${glyph}</b>`;
+      return `<b class="${c.join(" ")}" data-n="${i}" data-g="${runes.has(i) ? runes.get(i) : ch}" style="${st}"${amp ? ' data-sh="1"' : ""}${damp ? ' data-dn="1"' : ""}${crazy ? ' data-cz="1"' : ""}>${glyph}</b>`;
     });
     let html = "", word = "";                                        // cada palabra en un bloque que no se parte (si no, las letras sueltas saltan de linea)
     /* Adivinanza en chino o japones: sin espacios, el texto entero era un solo bloque y se salia de la placa (hasta 2.000 px). Ahi se puede cortar
@@ -623,7 +623,7 @@ window.AIQ = window.AIQ || {};
   };
   const layoutMemo = (map, key, fn) => { let L = LAYM.get(key); if (!L) { L = fn(); LAYM.set(key, L); if (LAYM.size > 8) LAYM.delete(LAYM.keys().next().value); } return { ...L, shift: L.shift.map(p => p.slice()), scale: L.scale.slice() }; };
   function mapSpec(map, o, L0, qi) {
-    const L = L0 || cur(), get = id => L.find(c => c.id === id), has = id => L.some(c => c.id === id), qks = S.bk && qi != null ? ":" + qi : "";   // tanda 16: los efectos de ESTA pregunta (y su colocacion, aparte en cada una)
+    const L = L0 || cur(), get = id => L.find(c => c.id === id), has = id => L.some(c => c.id === id), qks = S.bk && BX[S.bk] && qi != null ? ":" + qi : "";   // tanda 16: los efectos de ESTA pregunta (y su colocacion, aparte en cada una)
     const spec = { shift: [0, 1, 2, 3, 4, 5, 6].map(() => [0, 0]), rot: [0, 0, 0, 0, 0, 0, 0], wob: 0, lineA: 1, orient: null, ct: 6 }; let any = false;
     const rr = A.rng(`${S.seed}:m:${S.round}${qks}`), fl0 = get("flip");
     const ori = has("mirrorx") && !S.fx.unmirrorMap ? { rot: 0, mx: 1 } : fl0 && !S.fx.unmirrorMap ? { rot: Math.PI, mx: fl0.lv >= 3 ? 1 : 0 } : null;   // el mismo giro que se pone mas abajo
@@ -888,7 +888,7 @@ window.AIQ = window.AIQ || {};
   };
   /* pone un efecto en mitad de la pregunta (la siesta que acaba en Apagon) */
   function inject(effs) {
-    if (!S.on || S.suspended) return; S.bl = (S.bl || S.list).concat(effs); const dk = get("dark");
+    if (!S.on || S.suspended) return; S.bl = (S.bl || S.list).concat(effs); if (S.qlist) S.qlist = S.qlist.concat(S.calm ? effs.filter(c => !S.calm.includes(D[c.id].fam)) : effs); const dk = get("dark");
     if (dk) {
       say("dark");
       if (A.chfx && A.chfx.ok()) A.chfx.set(cur(), par, S.fx);
@@ -1179,7 +1179,7 @@ window.AIQ = window.AIQ || {};
       if (map && map.clearDistort) { map.clearDistort(300); map.setLens && map.setLens(null); map.setDecoys && map.setDecoys([]); }
       const app = $("app"); if (app) app.classList.remove("ch-negative");
       if (S.ov) { S.ov.classList.remove("on"); for (const c of ["blur", "myopia", "myopia2", "dark", "halo", "spot"]) layer(c).classList.remove("on"); layer("flick").style.opacity = 0; layer("flash").style.opacity = 0; layer("night").classList.remove("on"); }
-      clearText(); if (A.pointer && A.pointer.mods) A.pointer.mods();
+      clearText(); if (A.pointer && A.pointer.set) A.pointer.set({ tool: null, fx: {}, calm: false, windFn: null, distFn: null, noCountry: false }); if (A.pointer && A.pointer.mods) A.pointer.mods();
     },
     /* Dividir (tanda 12b): el lugar alternativo bajo la placa, con los mismos retos de texto (ninguna de las dos se lee limpia) */
     decoAlt: (el, o) => { if (!S.on || S.suspended || !cur().some(c => D[c.id].kind === "text")) { el.textContent = A.tx(o.name); return; } deco(el, o, o.name, null, true); },

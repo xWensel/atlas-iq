@@ -64,9 +64,10 @@ window.AIQ = window.AIQ || {};
       pc.beginPath(); pc.moveTo(-2, 22); pc.lineTo(22, -2); pc.moveTo(-12, 12); pc.lineTo(12, -12); pc.moveTo(8, 32); pc.lineTo(32, 8); pc.stroke();
       this.hatch = this.hctx.createPattern(p, "repeat");
       if (document.fonts) document.fonts.ready.then(() => { this.dirty = this.fxDirty = true; });
-      const loop = t => { this._frame(t); requestAnimationFrame(loop); };
+      let errN = 0; const loop = t => { try { this._frame(t); } catch (e) { if (errN++ < 5) console.error("Mapa 2D:", e); } requestAnimationFrame(loop); };   // como el WebGL: una excepcion suelta no congela el mapa
       requestAnimationFrame(loop);
     }
+    setDecoys(list) { this.decoys = list || []; this.fxDirty = true; }   // los senuelos solo se pintan en el mapa WebGL; aqui basta con guardarlos
     _emptyMarks() { return { guess: null, answer: null, highlight: null, label: null, labelAt: null, dist: "", pop: null, t0: 0 }; }
     setMarks(m) { this.marks = { ...this._emptyMarks(), ...m, t0: performance.now() }; this.fxDirty = this.hlDirty = true; }
     clearMarks() { this.marks = this._emptyMarks(); this.probes = []; this.fxDirty = this.hlDirty = true; }
@@ -192,7 +193,7 @@ window.AIQ = window.AIQ || {};
       });
       cv.addEventListener("pointermove", e => {
         if (e.pointerType === "mouse") { const r = cv.getBoundingClientRect(); this.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; this.fxDirty = true; }
-        const p = this.pointers.get(e.pointerId); if (!p) return;
+        const p = this.pointers.get(e.pointerId); if (!p) return; if (e.pointerType === "mouse" && !(e.buttons & 1)) { up({ pointerId: e.pointerId, type: "pointercancel" }); return; }   // el boton ya no esta pulsado: el arrastre acabo fuera
         const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
         if (Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > (e.pointerType === "touch" ? 10 : 5)) p.moved = true;
         if (this.pointers.size === 1 && p.moved) {
@@ -214,7 +215,7 @@ window.AIQ = window.AIQ || {};
         this._wasPinch = this.pointers.size > 0; if (this.pointers.size === 0) this._wasPinch = false;
         this.sharpStale = true;
       };
-      cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+      cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up); cv.addEventListener("lostpointercapture", up);
       cv.addEventListener("wheel", e => {
         e.preventDefault(); const r = cv.getBoundingClientRect();
         this.zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0016) * A.mapSens.zoom), e.clientX - r.left, e.clientY - r.top, false);

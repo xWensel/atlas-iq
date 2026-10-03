@@ -85,6 +85,7 @@ window.AIQ = window.AIQ || {};
     A.chal.inject([{ id: "dark", lv: 3, of: "siesta", slam: 1, tw: 1 }]);                       // se despierta de golpe: esa pregunta sigue con Apagon a nivel 3
     D.enable(true); D.say(A.L6(A.chal.T16.ui_siestaWake), { mood: "furious", hold: 1800 });
   }
+  document.addEventListener("aiq:mapcanvas", () => { if (!Nap.cv) return; Nap.cv.removeEventListener("wheel", napWheel); const m = mapOf(); Nap.cv = (m && m.cv) || null; if (Nap.cv) Nap.cv.addEventListener("wheel", napWheel, { passive: true }); });   // el mapa recreo su lienzo
   function napStop() { if (Nap.cv) { Nap.cv.removeEventListener("wheel", napWheel); Nap.cv = null; } Nap.on = false; Nap.woke = false; Nap.noise = 0; if (A.dealer.nap) A.dealer.nap(false); }
   (function wrapTool() { const t0 = setInterval(() => { if (A.adv && A.adv.useTool) { clearInterval(t0); const u = A.adv.useTool; A.adv.useTool = function (...a) { if (Nap.on) J.noise(40); return u.apply(this, a); }; } }, 500); })();   // cada herramienta: +40
 
@@ -116,7 +117,7 @@ window.AIQ = window.AIQ || {};
   function bsodShow() {
     if (BS) return; const dur = half() ? 900 : 1500, el = document.createElement("div"); el.id = "bsodFx";
     el.innerHTML = `<div class="bs-in"><b class="bs-sad">:(</b><p>${esc(tl("ui_bsodMsg"))}</p><p class="bs-c"><span class="bs-pct">0</span>% — ${esc(tl("ui_bsodCollect"))}</p><div class="bs-row"><i class="bs-qr"></i><span>${esc(tl("ui_bsodStop"))}: GEOGRAPHY_CRITICAL_ERROR</span></div></div>`;
-    document.body.appendChild(el); BS = { el }; say("bsodOn"); const g = game(); if (g.limit != null) g.limit += dur / 1000;   // el tiempo se devuelve
+    document.body.appendChild(el); BS = { el }; say("bsodOn"); const g = game(); if (g.limit != null) g.limit += (dur + 220) / 1000;   // el tiempo se devuelve (tambien los 0,22 s en que se va)
     const t0 = performance.now(), pct = el.querySelector(".bs-pct"), iv = setInterval(() => { pct.textContent = String(Math.min(100, Math.round(((performance.now() - t0) / dur) * 100))); }, 60);
     for (const ev of ["pointerdown", "click", "pointermove", "wheel"]) el.addEventListener(ev, e => e.stopPropagation(), true);
     BS.iv = iv; setTimeout(() => { clearInterval(iv); if (BS && BS.el === el) { BS = null; gone(el); say("restore"); } }, dur);
@@ -130,7 +131,7 @@ window.AIQ = window.AIQ || {};
   function albumShow(qi, e) {
     const st = CS(), order = st.pub.filter(c => c.wh != null).sort((a, b) => a.wh - b.wh), D = A.CHAL; let box = $("albumFx"); if (box) box.remove();
     box = document.createElement("div"); box.id = "albumFx";
-    const slot = (c, i) => i < qi ? `<span class="al-s done">${A.icon(D[c.id].ico, "sm")}</span>` : i === qi ? `<span class="al-s cur">${A.icon(D[c.id].ico)}</span>` : `<span class="al-s back">${A.icon("boss_hat", "sm")}</span>`;
+    const slot = c => c.wh < qi ? `<span class="al-s done">${A.icon(D[c.id].ico, "sm")}</span>` : c.wh === qi ? `<span class="al-s cur">${A.icon(D[c.id].ico)}</span>` : `<span class="al-s back">${A.icon("boss_hat", "sm")}</span>`;
     box.innerHTML = `<h4>${esc(tl("ui_album"))} ${qi + 1}/5</h4><div class="al-row">${order.map(slot).join("")}</div><p class="al-n">${esc(A.tx(D[e.of || e.id].n))}</p>`;
     document.body.appendChild(box); say("albumStamp", qi); later(() => gone(box), 2800);
   }
@@ -144,7 +145,7 @@ window.AIQ = window.AIQ || {};
     const grad = WF.map((f, i) => `${WC[i]} ${i * SL}deg ${(i + 1) * SL}deg`).join(","), ics = WF.map((f, i) => `<img class="wh-i" alt="" src="assets/icons/${WI[f]}.webp" style="transform:rotate(${(i + 0.5) * SL}deg) translateY(-92px) rotate(${-(i + 0.5) * SL}deg)">`).join("");
     el.innerHTML = `<div class="wh-wrap"><div class="wh-pt"></div><div class="wh-disc" style="background:conic-gradient(${grad})">${ics}<i class="wh-hub"></i></div><p class="wh-t">${esc(tl("ui_wheelSpin"))}</p></div>`; document.body.appendChild(el);
     for (const ev of ["pointerdown", "click", "wheel"]) el.addEventListener(ev, ev2 => ev2.stopPropagation(), true);
-    const disc = el.querySelector(".wh-disc"), rot = 360 * 3 + (360 - (idx + 0.5) * SL) + (Math.random() - 0.5) * SL * 0.5, g = game(); if (g.limit != null) g.limit += dur / 1000;   // el tiempo se devuelve
+    const disc = el.querySelector(".wh-disc"), rot = 360 * 3 + (360 - (idx + 0.5) * SL) + (Math.random() - 0.5) * SL * 0.5, g = game(); if (g.limit != null) g.limit += (dur + 1120) / 1000;   // el tiempo se devuelve entero: tapa los clics hasta que se va (giro, 0,9 s y 0,22 s de salida)
     void disc.offsetWidth; disc.style.transition = `transform ${dur}ms cubic-bezier(.12,.7,.18,1)`; disc.style.transform = `rotate(${rot}deg)`;
     const ease = t => 1 - Math.pow(1 - t, 3.2); let n = 0, last = 0; for (let k = 1; k <= 3 * WF.length + idx + 1; k++) { const a = k * SL / rot; if (a > 1) break; const tt = 1 - Math.pow(1 - a, 1 / 3.2); later(() => say("wheelTick", a), tt * dur); n++; last = tt; }
     later(() => { say("wheelLand"); el.classList.add("land"); el.querySelector(".wh-t").textContent = A.tx(A.chal.tl("fam_" + WF[idx])); }, dur + 40);

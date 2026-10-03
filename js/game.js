@@ -928,7 +928,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
       ${adv ? `<button class="btn-line" id="saveExitBtn">${A.T("Guardar y salir al menú", "Save and exit to menu")}</button><button class="btn-line danger" id="newRunBtn">${newLbl}</button>`
             : `<button class="btn-line" id="exitBtn">${A.T("Salir al menú", "Exit to menu")}</button>`}</div></div>`;
     $("resBtn").onclick = onResume; $("resBtn").focus();
-    const leave = to => { closeVeil(); S.paused = false; A.music.muffle(false); if (adv) A.adv.leave(); showTitle(to); };
+    const leave = to => { closeVeil(); if (adv) A.adv.leave(); S.paused = false; A.music.muffle(false); showTitle(to); };   // primero se guarda (con la pausa puesta): si no, el rato en el menu de pausa contaba como tiempo gastado y al volver la pregunta salia agotada
     if (adv) {
       const home = daily ? "daily" : "adventure";
       $("saveExitBtn").onclick = () => { A.sfx.ui(); leave(home); };
@@ -973,6 +973,7 @@ ${cxTip(o)}"><span>${A.t("codex.title")}</span><i>${[0, 1, 2].map(i => `<u style
   $("pauseBtn").onclick = togglePause;
   function toggleFs() {
     const host = window.geoliteHost;
+    if (host && host.windowMode && host.windowMode() === "border") return;   // Sin bordes ya llena la pantalla; cambiar de marco recrea la ventana y recargaba el juego (el Clasico perdia el nivel). Se cambia en Ajustes > Video
     const to = host && host.windowMode ? (host.windowMode() === "full" ? "window" : "full") : document.fullscreenElement ? "window" : "full";
     if (A.dealer && A.dealer.noteWindow) A.dealer.noteWindow(to);
     if (host && host.setWindowMode) { host.setWindowMode(to); return; }

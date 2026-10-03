@@ -68,7 +68,7 @@ window.AIQ = window.AIQ || {};
   }
 
   function show(quiet) {
-    const tour = cur; if (!tour) return;
+    const tour = cur; if (!tour) return; if (face) face.shown(true);
     while (tour.i < tour.steps.length) { const s = tour.steps[tour.i]; if (s.box === "center" || [...document.querySelectorAll(s.sel)].some(visible)) break; tour.i++; }
     if (tour.i >= tour.steps.length) return finish(true);
     const step = tour.steps[tour.i], el = ensure();
@@ -83,7 +83,7 @@ window.AIQ = window.AIQ || {};
     nx.onclick = () => { tour.i++; show(); }; el.querySelector(".tour-skip").onclick = () => finish(false, true);
   }
   function finish(done, skipAll) {
-    const tour = cur; cur = null; const el = $("tour"); if (el) { el.classList.remove("on"); setTimeout(() => el.classList.add("hidden"), 220); }
+    const tour = cur; cur = null; const el = $("tour"); if (el) { el.classList.remove("on"); setTimeout(() => el.classList.add("hidden"), 220); } if (face) face.shown(false);
     removeEventListener("resize", onResize); removeEventListener("keydown", onKey, true); freeze(false);
     if (tour) { P().tour = P().tour || {}; P().tour[tour.id] = 1; if (skipAll) { P().tour.q = P().tour.camp = 1; } A.profile.save(); }
     if (tour && skipAll && A.dealer && A.dealer.tourSkip) A.dealer.tourSkip();         // "¿Saltarte MI tutorial?"

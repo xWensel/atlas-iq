@@ -3,7 +3,7 @@
  * HTTP local (no file://) para que Service Worker, fetch relativo y rutas
  * funcionen exactamente igual que en el navegador.
  */
-const { app, BrowserWindow, ipcMain, screen, shell, session } = require("electron");
+const { app, BrowserWindow, ipcMain, screen, shell, session, Menu, dialog } = require("electron");
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -62,6 +62,7 @@ function wireWindow(w) {
   const external = u => { if (/^https?:\/\//i.test(u)) shell.openExternal(u).catch(() => {}); };
   w.webContents.setWindowOpenHandler(({ url }) => { external(url); return { action: "deny" }; });
   w.webContents.on("will-navigate", (e, url) => { if (!local(url)) { e.preventDefault(); external(url); } });
+  if (!app.isPackaged) w.webContents.on("before-input-event", (e, i) => { if (i.type === "keyDown" && i.key === "F12") w.webContents.toggleDevTools(); });   // sin menu (ver whenReady): en desarrollo, F12 abre las herramientas
 }
 
 function buildWindow(mode, url) {
@@ -72,7 +73,7 @@ function buildWindow(mode, url) {
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, preload: path.join(ROOT, "preload.js") },
   };
   if (mode === "border") {
-    const b = screen.getPrimaryDisplay().bounds; Object.assign(opts, b, { resizable: true, fullscreen: false });
+    const b = (win && !win.isDestroyed() ? screen.getDisplayMatching(win.getBounds()) : screen.getPrimaryDisplay()).bounds; Object.assign(opts, b, { resizable: true, fullscreen: false });   // en el monitor donde estaba la ventana (antes siempre el principal, y sin marco no se podia devolver)
   } else {
     opts.width = 1280; opts.height = 800; opts.fullscreen = mode === "full";
   }
@@ -148,7 +149,7 @@ function startServer() {
     /* puerto FIJO: el guardado (localStorage) va por origen y el puerto forma parte de el; con un puerto
        aleatorio cada arranque empezaria sin partidas, perfil ni Enciclopedia. Solo si esta ocupado se prueba el siguiente */
     let port = PORT;
-    server.on("error", err => { if (err.code === "EADDRINUSE" && port < PORT + 20) server.listen(++port, "127.0.0.1"); else throw err; });
+    server.on("error", err => { if ((err.code === "EADDRINUSE" || err.code === "EACCES") && port < PORT + 20) server.listen(++port, "127.0.0.1"); else { dialog.showErrorBox("Geolite", "No se pudo abrir el servidor local del juego. / Could not start the game's local server.\n\n" + err.message); app.quit(); } });   // EACCES: puerto reservado por Windows (Hyper-V, WSL); antes la excepcion dejaba el proceso vivo sin ventana
     server.on("listening", () => resolve(server.address().port));
     server.listen(port, "127.0.0.1");
   });
@@ -170,6 +171,7 @@ else {
     /* permisos: solo lo que el juego usa (pantalla completa, copiar el resultado al portapapeles, bloqueo del puntero); el resto se deniega */
     const OK = new Set(["fullscreen", "clipboard-sanitized-write", "pointerLock"]);
     session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(OK.has(perm)));
+    Menu.setApplicationMenu(null);   // sin el menu por defecto: sus atajos (Ctrl+R recarga, Ctrl+W cierra, Ctrl+-/+ zoom, Ctrl+Mayus+I) seguian vivos con la barra oculta
     createWindow();
   });
 }

@@ -1199,7 +1199,7 @@ void main(){
       });
       cv.addEventListener("pointermove", e => {
         if (e.pointerType === "mouse") { const r = cv.getBoundingClientRect(); this.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; this.fxDirty = true; }
-        const p = this.pointers.get(e.pointerId); if (!p) return;
+        const p = this.pointers.get(e.pointerId); if (!p) return; if (e.pointerType === "mouse" && !(e.buttons & 1)) { up({ pointerId: e.pointerId, type: "pointercancel" }); return; }   // el boton ya no esta pulsado: el arrastre acabo fuera
         let dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
         if (this._orient().on) { const [a0, b0] = this._orientOut(0, 0), [a1, b1] = this._orientOut(dx, dy); dx = a1 - a0; dy = b1 - b0; }   // arrastrar: solo el giro (la curva CRT no cambia el sentido)
         if (Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > (e.pointerType === "touch" ? 10 : 5)) p.moved = true;
@@ -1230,7 +1230,7 @@ void main(){
         }
         this._wasPinch = this.pointers.size > 0; if (this.pointers.size === 0) this._wasPinch = false;
       };
-      cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+      cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up); cv.addEventListener("lostpointercapture", up);
       cv.addEventListener("wheel", e => {
         e.preventDefault(); const r = cv.getBoundingClientRect();
         this.zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.012 : 0.0018) * A.mapSens.zoom), e.clientX - r.left, e.clientY - r.top);
@@ -1496,18 +1496,18 @@ void main(){
       if (live) { this.dirty = true; return; }                          // con los continentes aun movidos el agua (que no se mueve) se rasgaria: se dibuja cuando el mapa vuelve a su sitio
       let A_ = this._areaP;
       if (!A_ || A_.f !== f || A_.key !== key) {
-        const path = new Path2D(), W = this.W, H = this.H;
+        const path = new Path2D(), edge = new Path2D(), W = this.W, H = this.H;
         for (const sh of [-360, 0, 360]) for (const p of f.polys) {
           const b = p.bbox, q1 = this.lonLatToScreen(b[0] + sh, b[1]), q2 = this.lonLatToScreen(b[2] + sh, b[3]);
           if (Math.max(q1[0], q2[0]) < -W || Math.min(q1[0], q2[0]) > 2 * W || Math.max(q1[1], q2[1]) < -H || Math.min(q1[1], q2[1]) > 2 * H) continue;   // fuera de la vista (con margen)
-          for (const ring of p.rings) { ring.forEach(([lo, la], i) => { const q = this.lonLatToScreen(lo + sh, la); i ? path.lineTo(q[0], q[1]) : path.moveTo(q[0], q[1]); }); path.closePath(); }
+          for (const ring of p.rings) { let lo0 = 0; ring.forEach(([lo, la], i) => { const q = this.lonLatToScreen(lo + sh, la); i ? path.lineTo(q[0], q[1]) : path.moveTo(q[0], q[1]); i && !(Math.abs(lo) >= 179.999 && Math.abs(lo0) >= 179.999) ? edge.lineTo(q[0], q[1]) : edge.moveTo(q[0], q[1]); lo0 = lo; }); path.closePath(); }
         }
-        A_ = this._areaP = { f, key, path };
+        A_ = this._areaP = { f, key, path, edge };
       }
       const k = Math.min(1, (now - m.t0) / 500), sk = this.sk;
       c.save(); c.globalAlpha = k; c.fillStyle = this._rgba(sk.red, 0.2); c.fill(A_.path, "evenodd");
-      c.lineJoin = "round"; c.strokeStyle = this._rgba(sk.red, 0.95); c.lineWidth = 2.6; c.stroke(A_.path);
-      c.strokeStyle = this._rgba(sk.paper, 0.8); c.lineWidth = 0.9; c.stroke(A_.path); c.restore();
+      c.lineJoin = "round"; c.strokeStyle = this._rgba(sk.red, 0.95); c.lineWidth = 2.6; c.stroke(A_.edge);
+      c.strokeStyle = this._rgba(sk.paper, 0.8); c.lineWidth = 0.9; c.stroke(A_.edge); c.restore();
       if (now - m.t0 < 700) this.dirty = true;
     }
     _drawFx(now) {

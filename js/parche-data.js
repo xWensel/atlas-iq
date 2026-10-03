@@ -36,6 +36,74 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.24",
+      name: ["Revisión a fondo", "A full sweep"],
+      date: "2026-10-04",
+      summary: ["Hemos repasado el juego entero, pantalla a pantalla y carta a carta, y arreglado todo lo que fallaba: trampas sin querer en las apuestas y las reliquias, retos que no hacían lo que decían, distancias mal medidas en mares y océanos, el crupier cortado a media frase y varios sustos de la versión de escritorio.",
+        "We went through the whole game, screen by screen and card by card, and fixed everything that was off: accidental exploits in bets and relics, challenges that didn't do what they said, wrong distances for seas and oceans, the dealer cut off mid-sentence and a few scares in the desktop version."],
+      chapters: [
+        { id: "aventura", kicker: ["Aventura", "Adventure"], title: ["Apuestas, reliquias y tiempo", "Bets, relics and time"],
+          entries: [
+            E(["Apuestas", "Bets"], "fix", "0.2.24", [
+              ["**Doble o nada** y **La apuesta final** perdidas ya no salen como activas en el Campamento de la revancha, ni se puede recuperar lo apostado.", "A lost **Double or nothing** or **Final bet** no longer shows as active in the rematch Camp, and you can't take your stake back."],
+              ["En el Campamento de la revancha, perder en el casino trae de verdad el reto que anuncia.", "In the rematch Camp, losing at the casino really brings the challenge it announces."],
+              ["**Rojo o negro** ya no ofrece el verde en la ronda 12: ya vas directo al jefe final.", "**Red or black** no longer offers green in round 12: you're already heading for the final boss."],
+              ["Un doble clic en **Sobornar**, **Barajar** o **Cambiar cartas** ya no cobra dos veces.", "A double click on **Bribe**, **Reshuffle** or **New cards** no longer charges you twice."]
+            ]),
+            E(["Reliquias", "Relics"], "fix", "0.2.24", [
+              ["**Corazón**: al venderlo se lleva también la provisión que te dio. Antes, comprarlo y venderlo regalaba una.", "**Heart**: selling it also takes back the provision it gave. Before, buying and selling it gave you one for free."],
+              ["**Segunda bola**: repite el tiro siempre que tu clic no hace racha (más de 300 km), como dice la carta. Desde la 0.2.20, entre 300 y unos 770 km no había segundo tiro.", "**Second ball**: you shoot again whenever your click doesn't make a streak (over 300 km), as the card says. Since 0.2.20 there was no second shot between 300 and about 770 km."],
+              ["**Ficha de propina** cobra solo las respuestas que hacen racha, y **Guardarrachas** no se gasta en la 6.ª pregunta de **As en la manga**.", "**Tip chip** only pays answers that make a streak, and **Streak guard** isn't spent on the 6th question of **Ace up the sleeve**."],
+              ["Con **Mesa de mínimos**, el botín en vivo anuncia el escalón que cobrarás de verdad.", "With **Low-stakes table**, the live loot shows the tier you'll really get."],
+              ["El **Soplo del crupier** se luce como las demás pistas.", "The **Dealer's tip-off** shows off like the other hints."],
+              ["Vender una reliquia desde su carta justo al empezar la ronda ya no la cobra y la deja actuar.", "Selling a relic from its card right as the round starts no longer pays you and keeps it working."]
+            ]),
+            E(["Tiempo y partidas guardadas", "Time and saved runs"], "fix", "0.2.24", [
+              ["**Guardar y salir** desde la pausa ya no te devuelve una pregunta agotada al continuar.", "**Save and exit** from the pause menu no longer brings you back to a timed-out question."],
+              ["Tras minimizar la ventana, **Descarte** o **Dividir** ya no restan otra vez el tiempo gastado.", "After minimizing the window, **Discard** or **Split** no longer subtract the time spent a second time."],
+              ["Reanudar una expedición ya no devuelve los sobornos de una ronda que barajaste.", "Resuming an expedition no longer refunds bribes from a round you reshuffled."],
+              ["**Reto diario**: terminar el intento en el modo infinito cuenta también los puntos del infinito.", "**Daily challenge**: ending the attempt in infinite mode also counts the infinite points."],
+              ["La intro de las rondas de banderas ya tiene ilustración.", "The intro of flag rounds now has its illustration."]
+            ]) ] },
+        { id: "retos", kicker: ["Retos y jefes", "Challenges and bosses"], title: ["Que hagan lo que dicen", "Doing what they say"],
+          entries: [
+            E(["Retos", "Challenges"], "fix", "0.2.24", [
+              ["Los retos sellados (Oferta de la casa, Pacto con la casa, casino) ya no sacan retos que solo existen dentro de un jefe y que fuera no hacían nada.", "Sealed challenges (House offer, Pact with the house, casino) no longer draw challenges that only exist inside a boss and did nothing outside it."],
+              ["Si Windows reinicia la tarjeta gráfica en mitad de un efecto (Apagón, Humo de sala, Noche de tormenta, Punto ciego), el efecto vuelve en un momento. Antes desaparecía y ya no volvía en toda la sesión.", "If Windows resets the graphics card in the middle of an effect (Blackout, Smoky room, Stormy night, Blind spot), the effect comes back in a moment. Before it vanished for the rest of the session."],
+              ["**Runas**: tras responder, el nombre vuelve a leerse bien.", "**Runes**: after answering, the name reads properly again."],
+              ["Al salir de una Aventura, el puntero olvida tus reliquias: en el Clásico ya no salen el termómetro, la lupa, las guías ni el nombre del país.", "When you leave an Adventure, the pointer forgets your relics: Classic no longer shows the thermometer, magnifier, guides or country name."]
+            ]),
+            E(["Jefes", "Bosses"], "fix", "0.2.24", [
+              ["**Ascensión 4**: la Rueda de la fortuna y El coleccionista ya traen su reto extra (antes lo perdían siempre), y el poder extra nunca es un segundo reto de la placa.", "**Ascension 4**: the Wheel of fortune and The collector now bring their extra challenge (they always lost it before), and the extra power is never a second plate challenge."],
+              ["La **Rueda de la fortuna** devuelve todo el tiempo que tapa la pantalla (se perdía algo más de 1 s por pregunta), y el **Pantallazo azul** también.", "The **Wheel of fortune** gives back all the time it covers the screen (you lost just over 1 s per question), and so does the **Blue screen**."],
+              ["**La siesta del crupier**: al despertar en Apagón, el Apagón llega siempre, sin reiniciar a mitad de pregunta el cristal, las huellas, la lluvia, la batería ni las ventanas que ya habías cerrado; y la rueda del ratón sigue haciendo ruido aunque se reinicie la tarjeta gráfica.", "**The dealer's nap**: waking up into Blackout always brings the Blackout, without resetting the glass, prints, rain, battery or the windows you'd closed mid-question; and the mouse wheel keeps making noise even if the graphics card resets."],
+              ["**Duelo con la banca**: el mapa ya no se recoloca en cada pregunta; y el álbum de **El coleccionista** cuadra aunque sobornes una carta boca abajo.", "**Showdown with the bank**: the map no longer rearranges on every question; and **The collector**'s album lines up even if you bribe a face-down card."]
+            ]) ] },
+        { id: "mapa", kicker: ["Mapa", "Map"], title: ["Medir bien", "Measuring right"],
+          entries: [
+            E(["Mapa y Enciclopedia", "Map and Encyclopedia"], "fix", "0.2.24", [
+              ["Mares, océanos y estrechos: la distancia se mide hasta su último borde. Desde el Atlántico, el Índico salía a 1.182 km en vez de 187.", "Seas, oceans and straits: distance is measured up to their last edge. From the Atlantic, the Indian Ocean came out at 1,182 km instead of 187."],
+              ["Al revelar el Pacífico, el Ártico o el Austral ya no sale una raya roja en el antimeridiano.", "Revealing the Pacific, Arctic or Southern Ocean no longer draws a red line on the antimeridian."],
+              ["Si sueltas el ratón fuera de la ventana mientras arrastras el mapa (Alt+Tab, superposición de Steam), el mapa ya no se queda pegado.", "Releasing the mouse outside the window while dragging the map (Alt+Tab, Steam overlay) no longer leaves the map stuck."],
+              ["Sin WebGL2 (mapa de reserva), el Pase VIP y el Duelo con la banca ya no atascan la partida.", "Without WebGL2 (fallback map), the VIP pass and the Showdown with the bank no longer freeze the run."],
+              ["**Enciclopedia**: buscar sin letras especiales encuentra Białoruś, Beringstraße o Đà Nẵng, y la carta del **lémur** por fin se desbloquea (con Madagascar).", "**Encyclopedia**: searching without special letters finds Białoruś, Beringstraße or Đà Nẵng, and the **lemur** card can finally be unlocked (with Madagascar)."]
+            ]) ] },
+        { id: "mesa", kicker: ["Crupier y escritorio", "Dealer and desktop"], title: ["Sin sustos", "No scares"],
+          entries: [
+            E(["Crupier", "Dealer"], "fix", "0.2.24", [
+              ["En **La siesta del crupier** ya no se duerme a media frase: la termina, con su segundo de más.", "In **The dealer's nap** he no longer falls asleep mid-sentence: he finishes it, plus his extra second."],
+              ["Su última frase del veredicto ya no reaparece en la portada, y el del tutorial deja de moverse al cerrarlo.", "His last verdict line no longer reappears on the title screen, and the tutorial one stops moving once closed."],
+              ["Las flechas ya no cambian de canción mientras pasas fichas en la Enciclopedia o capturas en estas notas.", "The arrow keys no longer change the song while you flip through Encyclopedia cards or screenshots in these notes."]
+            ]),
+            E(["Versión de escritorio", "Desktop version"], "fix", "0.2.24", [
+              ["Fuera el menú oculto: Ctrl+R ya no recarga la partida, Ctrl+W no cierra el juego y Ctrl+− / Ctrl++ no cambian el zoom (el pixel art quedaba borroso).", "No more hidden menu: Ctrl+R no longer reloads your run, Ctrl+W doesn't close the game and Ctrl+− / Ctrl++ don't change the zoom (the pixel art went blurry)."],
+              ["**Sin bordes** se abre en el monitor donde está la ventana, y en ese modo la tecla F ya no recarga el juego (se cambia en Ajustes).", "**Borderless** opens on the monitor the window is on, and in that mode the F key no longer reloads the game (change it in Settings)."],
+              ["Si Windows tiene reservado el puerto del juego, se usa el siguiente; si no queda ninguno, sale un aviso en vez de quedarse abierto sin ventana.", "If Windows has the game's port reserved, the next one is used; if none is free, you get a message instead of the game hanging without a window."],
+              ["Clasificaciones: **Hoy** y **Ayer** ya no reciben partidas de otro día ni tu mejor marca al cambiarte el nombre, y una expedición que no llegó al servidor se reenvía al ver la tabla.", "Leaderboards: **Today** and **Yesterday** no longer get runs from another day or your best ever when you change your name, and an expedition that didn't reach the server is resent when you view the table."]
+            ]) ] },
+      ],
+    },
+    {
       id: "0.2.23",
       name: ["Un pacto que cumple", "A pact that delivers"],
       date: "2026-10-04",

@@ -197,7 +197,7 @@ window.AIQ = window.AIQ || {};
     ["kangaroo", Q, "Kangaroo", "Canguro", -25.2744, 133.7751, ["canberra", "sydney", "melbourne", "c:Australia"]],
     ["kiwi-bird", Q, "Kiwi (bird)", "Kiwi (ave)", -41.2865, 174.7762, ["wellington", "auckland", "christchurch"]],
     ["penguins", Q, "Penguin", "Pingüinos", -54.8019, -68.303, ["ushuaia", "cape-town", "dunedin"]],
-    ["lemur", Q, "Lemur", "Lémures", -18.7669, 46.8691, ["madagascar"]],
+    ["lemur", Q, "Lemur", "Lémures", -18.7669, 46.8691, ["c:Madagascar"]],
     ["komodo-dragon", Q, "Komodo dragon", "Dragón de Komodo", -8.5, 119.5, ["komodo-national-park", "c:Indonesia"]],
     ["galapagos-tortoise", Q, "Galápagos tortoise", "Tortuga gigante de Galápagos", -0.6774, -90.5517, ["galapagos-islands"]],
     ["llama", Q, "Llama", "Llama", -13.5319, -71.9675, ["cusco", "la-paz", "lake-titicaca", "machu-picchu"]],

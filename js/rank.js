@@ -47,8 +47,8 @@ window.AIQ = window.AIQ || {};
       /* tus intentos del dia no llegaron (jugaste sin red, servidor dormido, limite de envios): se reenvian una vez y se vuelve a pedir la tabla */
       const st = !again && /^daily-\d{8}$/.test(board) && R.daily.get(board);
       if (st && st.done && (!j.me || j.me.score < st.total)) { await R.daily.submit(board); return R.top(board, n, true); }
-      const mine = !again && /^day-\d{8}$/.test(board) && (A.profile.get().boards[board] || []).find(r => r.id === A.profile.get().id);
-      if (mine && (!j.me || j.me.score < mine.score)) { await post({ board, id: mine.id, name: R.name(), score: mine.score }); return R.top(board, n, true); }
+      const mine = !again && /^(day-\d{8}|adv-all)$/.test(board) && (A.profile.get().boards[board] || []).find(r => r.id === A.profile.get().id);   // la Aventura tambien: una expedicion que no llego al servidor se reenvia al ver la tabla
+      if (mine && (!j.me || j.me.score < mine.score)) { await post({ board, id: mine.id, name: R.name(), score: mine.score, nd: 1 }); return R.top(board, n, true); }
       return { global: true, rows: j.rows, me: j.me || null, count: j.count || j.rows.length };
     } } catch (e) { /* cae a local */ } }
     return { global: false, rows: R.localTop(board, n) };
@@ -70,7 +70,7 @@ window.AIQ = window.AIQ || {};
     const list = (P.boards[board] = P.boards[board] || []);
     const mine = list.find(r => r.id === P.id); if (mine) { if (row.score > mine.score) Object.assign(mine, row); } else list.push(row);
     P.boards[board] = list.sort((a, b) => b.score - a.score).slice(0, 50); A.profile.save(); R.ver++;
-    const global = (await R.check()) ? await post({ board, ...row }) : null; R.ver++;
+    const global = (await R.check()) ? await post({ board, ...row, nd: 1 }) : null; R.ver++;
     return { record: rec, global };
   };
   /* v0.37: cambias de nombre -> se cambia en tus filas locales y se reenvia a las tablas que se ven (Aventura, hoy y ayer). El servidor se queda con
@@ -81,7 +81,7 @@ window.AIQ = window.AIQ || {};
     A.profile.save(); R.ver++;
     if (!(await R.check())) return;
     const adv = (P.boards["adv-all"] || []).find(r => r.id === P.id), jobs = [];
-    if (adv) jobs.push(post({ board: "adv-all", id: P.id, name, score: adv.score }));
+    if (adv) jobs.push(post({ board: "adv-all", id: P.id, name, score: adv.score, nd: 1 }));   // nd: cambiar de nombre ya no mete tu mejor marca de siempre en "Hoy"
     for (const b of [R.day.board(), R.day.yesterday()]) { const m = (P.boards[b] || []).find(r => r.id === P.id); if (m) jobs.push(post({ board: b, id: P.id, name, score: m.score })); }
     for (const b of [R.daily.board(), R.daily.yesterday()]) { const st = R.daily.get(b); if (st.done) jobs.push(post({ board: b, id: P.id, name, tries: st.tries.filter(t => !t.live).map(t => t.s || 0) })); }
     await Promise.all(jobs); R.ver++;
