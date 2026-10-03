@@ -26,7 +26,7 @@ window.AIQ = window.AIQ || {};
   const tx = o => (A.tx ? A.tx(o) : o.es);
 
   let ov = null, glCv = null, gl = null, prog = null, cv = null, g2 = null, raf = 0, W = 0, H = 0, K = 1, D2 = 1, last = 0, glTried = false, psc = null, linked = false, shs = [];
-  const U = {}, t0 = performance.now(), timers = [];
+  const U = {}, t0 = performance.now(), timers = [], DM = { r: 0 };   // DM: el ultimo radio del foco (un jefe lo cierra de pregunta en pregunta)
   const E = { dark: null, spot: null, smoke: null, rain: null, lens: null, seal: null, film: null, crack: null, prints: null, batt: null, wins: null, cut: { v: 0, tv: 0, e: 0, b: 0, bt: 0, soft: false }, flash: 0, fseq: null, bolts: [], puffs: [], trail: [], sparks: [], shades: [], wipes: [], teth: null, wind: null, night: null };
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
   const ptr = () => (A.chal && A.chal.state && A.chal.state.px) || { x: W / 2, y: H / 2 };
@@ -178,6 +178,7 @@ void main(){
   const fadeK = (o, dt, tau = 0.18) => { o.k += (o.on - o.k) * (1 - Math.exp(-dt / tau)); return o.on || o.k > 0.01; };
   function step(dt, now) {
     for (const n of ["dark", "spot", "smoke", "lens", "seal", "film", "night"]) if (E[n] && !fadeK(E[n], dt)) E[n] = null;
+    if (E.dark && E.dark.tr != null && E.dark.r !== E.dark.tr) { E.dark.r += (E.dark.tr - E.dark.r) * (1 - Math.exp(-dt / (E.dark.fast || 0.55))); if (Math.abs(E.dark.r - E.dark.tr) < 0.4) E.dark.r = E.dark.tr; }
     if (E.night) nightStep(E.night, dt, now);
     if (E.rain) { if (fadeK(E.rain, dt, 0.25)) stepRain(E.rain, dt, now); else { E.rain = null; part("chx-drops").innerHTML = ""; } }
     if (E.crack && !E.crack.on) { E.crack.k -= dt / 0.35; if (E.crack.k <= 0) { E.crack = null; part("chx-shards").innerHTML = ""; } }
@@ -519,7 +520,7 @@ void main(){
     low: L6("Batería baja|Low battery|Batterie faible|Bateria fraca|Akku schwach|Batteria scarica|Batería baja|电量不足|배터리 부족|バッテリー残量低下|Низкий заряд|Słaba bateria"),
     plug: L6("Conecta el cargador|Plug in your charger|Branche ton chargeur|Conecte o carregador|Schließ das Ladegerät an|Collega il caricabatterie|Conecta el cargador|请连接充电器|충전기를 연결하세요|充電器を接続してください|Подключи зарядку|Podłącz ładowarkę"),
   };
-  function battOn(max) {
+  function battOn(max, eff) {
     let dim = document.getElementById("chxDim"), hud = document.getElementById("chxBat");
     if (!dim) { dim = document.createElement("div"); dim.id = "chxDim"; document.body.appendChild(dim); }
     if (!hud) { hud = document.createElement("div"); hud.id = "chxBat"; hud.innerHTML = `<div class="cb-cell"><i class="cb-lvl"></i></div><b class="cb-pct"></b><div class="cb-toast"><b></b><span></span></div>`; document.body.appendChild(hud); }
@@ -528,24 +529,25 @@ void main(){
     dead.querySelector("b").textContent = tx(BT.plug); dead.classList.remove("on");
     hud.classList.remove("toast", "crit", "charge", "save"); hud.classList.add("on");
     /* tanda 7: como un movil de verdad: empieza con un 14-26 %, se descarga a saltos (zumbido y parpadeo), avisa al 20, 10 y 5 % y, desde el nivel 2, se apaga un momento al 2 % */
-    E.batt = { on: 1, k: 0, max, pct: -1, toast: false, dim, hud, dead, start: Math.round(14 + rnd() * 12), drain: 0, toasts: {}, died: false, flick: 0, nextS: 0 };
+    E.batt = { on: 1, k: 0, max, pct: -1, toast: false, dim, hud, dead, start: Math.round(14 + rnd() * 12), drain: 0, toasts: {}, died: false, flick: 0, nextS: 0 }; if (eff && eff.p0 != null) { E.batt.sh = true; E.batt.start = eff.p0; E.batt.p1 = eff.p1; }   // tanda 16: la bateria de Pantallazo, una sola para toda la ronda (p0 -> p1 %)
+   
   }
   function stepBatt(b, dt, now) {
     const S = game(), asking = S.phase === "asking" && !S.paused && !(A.chal && A.chal.suspended && A.chal.suspended());
     const el = asking && S.t0 ? (performance.now() - S.t0 - (S.pausedAcc || 0)) / 1000 : 0, pr = b.on ? clamp(el / Math.max(1, S.limit || 10), 0, 1) : 0;
-    const tgt = b.on && asking ? b.max * (pr * pr * (3 - 2 * pr) * 0.85 + pr * 0.15) : 0;
+    const tgt = b.on && asking ? (b.sh ? b.max * Math.pow(Math.max(0, (100 - (b.start + (b.p1 - b.start) * pr)) / 95), 1.25) : b.max * (pr * pr * (3 - 2 * pr) * 0.85 + pr * 0.15)) : 0;
     b.k += (tgt - b.k) * (1 - Math.exp(-dt / (b.on ? 0.25 : 0.12)));
     if (b.on && asking) { if (!b.nextS) b.nextS = now + 1500 + rnd() * 2500; if (now > b.nextS) { b.nextS = now + 2200 + rnd() * 3500; b.drain += 1 + Math.floor(rnd() * 3); b.flick = now; say("buzz", 1); } }   // un bajon de carga
     const fl = now - b.flick < 240 ? (Math.floor((now - b.flick) / 60) % 2 ? 0 : 0.35) : 0;
     b.dim.style.opacity = Math.min(0.97, b.k + fl).toFixed(3);
     if (b.on) {
-      const pct = Math.max(1, Math.round(b.start * (1 - pr) - b.drain));
+      const pct = b.sh ? Math.max(1, Math.round(b.start + (b.p1 - b.start) * pr)) : Math.max(1, Math.round(b.start * (1 - pr) - b.drain));
       if (pct !== b.pct) { b.pct = pct; b.hud.querySelector(".cb-pct").textContent = pct + "%"; b.hud.querySelector(".cb-lvl").style.width = Math.max(6, pct * 3.6) + "%"; b.hud.classList.toggle("crit", pct <= 5); b.hud.classList.toggle("save", pct <= 20 && pct > 5); }
       for (const th of [20, 10, 5]) if (pct <= th && b.start > th && !b.toasts[th]) {
         b.toasts[th] = 1; b.hud.querySelector(".cb-toast b").textContent = tx(BT.low) + " · " + th + " %"; b.hud.classList.add("toast"); say("lowbat");
         clearTimeout(b.tT); b.tT = later(() => b.hud && b.hud.classList.remove("toast"), 2200);
       }
-      if (pct <= 2 && !b.died && asking && b.max >= 0.6) { b.died = true; b.dead.classList.add("on"); say("powerdown"); later(() => { b.dead.classList.remove("on"); say("restore"); }, 650 + rnd() * 300); }   // se apaga un momento
+      if (pct <= 2 && !b.sh && !b.died && asking && b.max >= 0.6) { b.died = true; b.dead.classList.add("on"); say("powerdown"); later(() => { b.dead.classList.remove("on"); say("restore"); }, 650 + rnd() * 300); }   // se apaga un momento
     } else if (b.k < 0.01) { b.dim.style.opacity = 0; b.hud.classList.remove("on", "charge"); E.batt = null; }
   }
 
@@ -722,7 +724,7 @@ void main(){
   X.set = (list, par, fx) => {
     if (!ov) return; size(); kick();
     const get = id => list.find(c => c.id === id), gl_ = !!gl, off = n => { if (E[n]) E[n].on = 0; };
-    const dk = gl_ && get("dark"); if (dk) { const p = par(dk); E.dark = keep(E.dark, { r: p.r, a: p.a, warm: !!fx.halo }); } else off("dark");
+    const dk = gl_ && get("dark"); if (dk) { const p = par(dk), boss = !!(A.chal.state && A.chal.state.bk), r0 = dk.slam ? Math.max(W, H, 800) : E.dark && E.dark.k > 0.01 ? E.dark.r : boss && DM.r > 0 ? DM.r : p.r; E.dark = keep(E.dark, { tr: p.r, a: p.a, warm: !!fx.halo, fast: dk.slam ? 0.16 : 0.55 }); E.dark.r = r0; if (boss) DM.r = p.r; } else off("dark");   // tanda 16: el foco se cierra en directo hasta su radio (o salta de golpe, si lo enciende la siesta)
     const bs = gl_ && get("blindspot"); if (bs) E.spot = keep(E.spot, { r: par(bs).r }); else off("spot");
     const cl = gl_ && get("clouds"); if (cl) { if (!E.smoke || !E.smoke.on) sweepReset(); E.smoke = keep(E.smoke, { cover: par(cl).cover, hole: fx.cloudClear || 0, seed: rnd() }); } else off("smoke");
     const rn = get("rain"); if (rn) rainOn(par(rn).dens); else if (E.rain) { E.rain.on = 0; part("chx-wet").classList.remove("on"); say("rain", 0); }
@@ -733,9 +735,10 @@ void main(){
     const sm = get("smudge"); if (sm) { const p = par(sm); printsOn(p.n, p.px, fx.glassMul || 1); }
     const hg = get("hang"); if (hg) winsOn(par(hg).n, fx.hangAuto || 0);
     if (get("wind")) { E.wind = E.wind || { k: 0, st: [], gt: 0 }; E.wind.off = false; } else if (E.wind) E.wind.off = true;   // tanda 8: rachas del Vendaval
-    const bt = get("battery"); if (bt) battOn(par(bt).dim);
+    const bt = get("battery"); if (bt) battOn(par(bt).dim, bt);
     if (gl_ && get("stormnight")) nightOn(); else off("night");
   };
+  X.reset = () => { DM.r = 0; };
   X.clear = () => {
     timers.forEach(clearTimeout); timers.length = 0;
     for (const n of ["dark", "spot", "smoke", "lens", "seal", "film", "night"]) if (E[n]) E[n].on = 0;

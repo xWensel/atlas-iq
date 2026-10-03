@@ -474,6 +474,19 @@ window.AIQ = window.AIQ || {};
     }),
     trapStamp: go(t => { thump(t, { vol: 0.2, f0: 150, f1: 46, dur: 0.14 }); noise(t, 0.04, { lp: 1600, vol: 0.08 }); const b = 46 + Math.floor(Math.random() * 3); bell(b, t + 0.03, { vol: 0.06, dur: 0.7, rev: 0.4 }); bell(b + 6, t + 0.09, { vol: 0.045, dur: 0.6, rev: 0.4 }); }),
     giantGrow: go((t, up = true) => { noise(t, 0.5, { lp: up ? 220 : 1500, sweepTo: up ? 1500 : 220, vol: 0.05, type: "bandpass", q: 0.9 }); thump(t + 0.05, { vol: 0.1, f0: up ? 70 : 110, f1: up ? 110 : 55, dur: 0.35 }); pluck((up ? 60 : 72) + Math.floor(Math.random() * 3) * 2, t + 0.1, { vol: 0.04, dur: 0.3, rev: 0.3 }); }),
+    /* tanda 16: jefes con identidad (flojitos y nunca iguales): subir de tono, la siesta, el salvapantallas, el pantallazo azul, el album, la rueda y la banca */
+    bossRise: go((t, q = 1) => { const k = Math.min(4, q); thump(t, { vol: 0.1 + 0.035 * k, f0: 88 + k * 7, f1: 34, dur: 0.3 }); noise(t, 0.3 + 0.07 * k, { lp: 280 + k * 240, sweepTo: 1500 + k * 800, vol: 0.026 + 0.008 * k, type: "bandpass", q: 1 }); [0, 7, 12, 19].slice(0, 1 + Math.ceil(k / 2)).forEach((st, i) => bell(58 + k * 2 + st, t + 0.05 + i * 0.06, { vol: 0.03 + 0.005 * k, dur: 0.5, rev: 0.4 })); }),
+    napOn: go(t => { [0, 0.55].forEach((d, i) => { noise(t + d, 0.45, { lp: 380 - i * 60, sweepTo: 160, vol: 0.03, type: "bandpass", q: 0.7 }); pluck(50 - i * 2, t + d + 0.05, { vol: 0.035, dur: 0.5, rev: 0.4 }); }); }),
+    napStir: go((t, l = 1) => { noise(t, 0.2, { lp: 500 + l * 300, sweepTo: 200, vol: 0.03 + l * 0.01, type: "bandpass", q: 0.9 }); thump(t, { vol: 0.05 + l * 0.02, f0: 70, f1: 40, dur: 0.12 }); }),
+    napWake: go(t => { thump(t, { vol: 0.32, f0: 130, f1: 34, dur: 0.22 }); noise(t, 0.07, { hp: 2400, vol: 0.08 }); bell(52, t + 0.02, { vol: 0.07, dur: 0.7, rev: 0.4 }); bell(58, t + 0.05, { vol: 0.05, dur: 0.8, rev: 0.4 }); }),
+    ssOn: go(t => { noise(t, 0.5, { lp: 3000, sweepTo: 300, vol: 0.04, type: "bandpass", q: 0.8 }); pluck(70, t + 0.1, { vol: 0.03, dur: 0.4, rev: 0.4 }); pluck(63, t + 0.3, { vol: 0.03, dur: 0.5, rev: 0.4 }); }),
+    ssBounce: go(t => { pluck(88 + Math.floor(Math.random() * 4) * 2, t, { vol: 0.02, dur: 0.1, bright: 3, rev: 0.1 }); }),
+    ssWake: go(t => { noise(t, 0.2, { lp: 400, sweepTo: 4000, vol: 0.035, type: "bandpass", q: 1 }); pluck(84, t + 0.05, { vol: 0.04, dur: 0.2, rev: 0.2 }); }),
+    bsodOn: go(t => { noise(t, 0.04, { hp: 3000, vol: 0.06 }); thump(t, { vol: 0.2, f0: 120, f1: 50, dur: 0.15 }); const os = ctx.createOscillator(), g = ctx.createGain(); os.type = "square"; os.frequency.setValueAtTime(440, t + 0.05); os.connect(g).connect(sfxBus); env(g, t + 0.05, 0.005, 0.02, 0.16); os.start(t + 0.05); os.stop(t + 0.3); }),
+    albumStamp: go((t, q = 0) => { thump(t, { vol: 0.2, f0: 150, f1: 46, dur: 0.14 }); noise(t, 0.04, { lp: 1600, vol: 0.08 }); bell(58 + q * 2, t + 0.03, { vol: 0.05, dur: 0.6, rev: 0.4 }); pluck(84 + q * 2, t + 0.12, { vol: 0.04, dur: 0.3, rev: 0.3 }); }),
+    wheelTick: go((t, a = 0.5) => { pluck(90 + Math.round(a * 6), t, { vol: 0.025, dur: 0.05, bright: 3, rev: 0.05 }); noise(t, 0.008, { hp: 4000, vol: 0.02 }); }),
+    wheelLand: go(t => { thump(t, { vol: 0.14, f0: 160, f1: 60, dur: 0.1 }); bell(84, t, { vol: 0.06, dur: 0.7, rev: 0.4 }); bell(91, t + 0.07, { vol: 0.05, dur: 0.9, rev: 0.5 }); }),
+    bankPin: go(t => { thump(t, { vol: 0.12, f0: 340, f1: 130, dur: 0.05 }); bell(88, t + 0.02, { vol: 0.06, dur: 0.5, rev: 0.4 }); bell(95, t + 0.1, { vol: 0.05, dur: 0.7, rev: 0.4 }); }),
     goal: go(t => {
       thump(t, { vol: 0.26, f0: 150, f1: 48, dur: 0.18 }); noise(t, 0.05, { hp: 2600, vol: 0.06 });
       MOTIF.forEach((m, i) => { pluck(m + 12, t + 0.02 + i * 0.075, { vol: 0.13, dur: 0.75, rev: 0.5 }); bell(m + 24, t + 0.02 + i * 0.075, { vol: 0.03, dur: 0.3, rev: 0.3 }); });

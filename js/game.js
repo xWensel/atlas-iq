@@ -133,7 +133,9 @@
     if (S.run) A.adv.refresh();
     odoSet($("scLevel"), S.levelScore, cash ? { ms: cash.ms, delay: cash.delay } : { ms: 900 });
     $("scTotal").textContent = A.fmt(S.runTotal + S.levelScore);
-    $("scNeed").textContent = L.advance > 1 ? A.fmt(L.advance) : "—";
+    { const dh = S.run && A.adv.duelHud ? A.adv.duelHud() : null, lb = $("scNeed").parentNode.firstElementChild;   // tanda 16: Duelo con la banca (la meta es su puntuacion, que sube con cada respuesta suya)
+      if (dh) { lb.textContent = A.tx(A.chal.tl("ui_bank")); $("scNeed").textContent = A.fmt(dh.bank); $("scMark").style.right = (100 - dh.pct) + "%"; S.duelOn = true; }
+      else { if (S.duelOn) { S.duelOn = false; lb.textContent = A.t("score.need"); $("scMark").style.right = ""; } $("scNeed").textContent = L.advance > 1 ? A.fmt(L.advance) : "—"; } }
     $("scBar").style.transition = cash ? `width ${cash.gauge}ms cubic-bezier(.2, .8, .2, 1) ${cash.delay}ms` : "";
     $("scBar").style.width = Math.min(100, (S.levelScore / Math.max(1, L.advance)) * 100) + "%";
     $("scBar").classList.toggle("done", L.advance > 1 && S.levelScore >= L.advance);
@@ -605,7 +607,7 @@
       const lt = map.lastTap; map.lastTap = null;                                  // el crupier compara tu mano de verdad con el pin (solo lo comenta)
       adv.guess = guess || null;
       if (guess && lt && performance.now() - lt.at < 1500) { const d = ll => (isC ? A.geo.distToFeature(ll[0], ll[1], world.byName[o.key]) : A.geo.haversine(ll[1], ll[0], o.lat, o.lon)); try { adv.hand = { raw: d(lt.raw), plain: d(lt.plain) }; } catch (e) { adv.hand = null; } }
-      A.adv.afterQuestion(adv);
+      A.adv.afterQuestion(adv); if (adv.bank && adv.bank.pt) span = span.concat([adv.bank.pt]);
     } else {
       sc = guess ? L.score(o, km, left) : { dist: 0, time: 0, distMax: 1, timeMax: 1 };
       S.streak = guess && sc.dist / sc.distMax >= 0.6 ? S.streak + 1 : 0;
@@ -624,6 +626,7 @@
       guess: guess ? [guess.lon, guess.lat] : null, answer: ans, highlight: isC ? o.key : null, label, labelAt,
       dist: guess && km > 0 ? fmtKm(km) : "", pop: total ? "+" + A.fmt(total) : null,
     });
+    if (adv && adv.bank && adv.bank.pt) { const bq = S.qi; map.setDecoys([{ lon: adv.bank.pt[0], lat: adv.bank.pt[1], bank: adv.bank.s, bankLabel: A.tx(A.chal.tl("ui_bank")).toUpperCase() + " +" + A.fmt(adv.bank.s), t0: performance.now() + 900, a: 1 }]); setTimeout(() => { if (S.phase === "reveal" && S.qi === bq && A.sfx.bankPin) A.sfx.bankPin(); }, 1500); }   // la chincheta de la banca cae despues de la tuya
     map.fitPoints(guess ? [...span, [guess.lon, guess.lat]] : span, padForDialog(), 1100);
 
     const tier = !guess ? 5 : isC && km === 0 ? 4 : ratio >= 0.96 ? 4 : ratio >= 0.75 ? 3 : ratio >= 0.4 ? 2 : ratio >= 0.05 ? 1 : 0;

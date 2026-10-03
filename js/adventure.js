@@ -280,7 +280,7 @@ window.AIQ = window.AIQ || {};
   /* tanda 6b: el plan de la ronda r (barajada si la barajaste), con el historial del plan base de la expedicion */
   const planOf = r => A.chal.plan(run.seed + ((run.salt && run.salt[r]) ? ":" + run.salt[r] : ""), r, run.asc, defAt(r).topic, run.cjk, { base: run.seed, topics: x => defAt(x).topic, first: !!run.first });
   const chalFor = (r, pl = perkList()) => {
-    const plan = planOf(r), boss = r % 4 === 3;
+    const plan = A.adv._forceBoss ? A.chal.plan(run.seed, r, run.asc, defAt(r).topic, run.cjk, { base: run.seed, topics: x => defAt(x).topic, first: !!run.first, force: A.adv._forceBoss }) : planOf(r), boss = r % 4 === 3;
     let list = A.adv._force ? A.adv._force.map(id => { const [i, l] = String(id).split("@"); return A.chal.canon({ id: i, lv: +l || 2 }); }) : plan.list.slice();
     const bribed = (run.bribed && run.bribed[r]) || [], paid = list.filter(c => bribed.includes(c.id)).map(c => c.id); if (bribed.length) list = list.filter(c => !bribed.includes(c.id));   // sobornados en el Campamento (paid: los que estaban en esta tirada; barajar no borra los sobornos)
     const sum = f => pl.reduce((n, p) => n + (p[f] || 0), 0), nulled = [];
@@ -292,6 +292,7 @@ window.AIQ = window.AIQ || {};
     if (bet && bet.retos && !(r === roundNo() && run.attempt > 0 && bet.id !== "offer")) list = list.concat(bet.retos.filter(b => !list.some(c => c.id === b.id)).map(c => ({ ...c, sealed: true, sealBy: bet.id === "offer" ? "offer" : "bet" })));
     if (pl.some(p => p.pact) && !boss && !run.inf && r <= LAST && list.length < 4) { const add = pickSealed(r, 1, "pacto", list)[0]; if (add) list.push({ ...add, lv: clamp(list.length ? Math.max(...list.map(c => c.lv || 1)) : 1, 1, 3), sealed: true, sealBy: "pact" }); }   // tanda 13: el reto del Pacto
     if (run.chSeen0 && !run.board && run.asc < 3 && !A.adv._force) list = list.map(c => (run.chSeen0.includes(c.id) || c.sealed ? c : { ...c, lv: 1, isNew: true }));   // S12: lo que nunca has visto se estrena a nivel 1
+    if (pl.some(p => p.spy)) list = list.map(c => (c.hid ? { ...c, up: true } : c));   // tanda 16: con el Ojo en el cielo, las fichas boca abajo del jefe se ven
     return { list, combo: plan.combo, boss, paid, nulled };
   };
 
@@ -508,7 +509,8 @@ window.AIQ = window.AIQ || {};
     perkList().forEach(p => p.round && p.round(ctx, run)); ctx.target = Math.max(0.85, ctx.target);
     if (run.sup && run.sup.cafe) ctx.seconds += 4;                                       // suministro: Cafe doble
     ctx.seconds = Math.max(6, ctx.seconds);
-    run.chal = cf.list; run.chalName = cf.combo ? cf.combo.n : null; run.chalHalve = halve;
+    run.chal = cf.list; run.chalName = cf.combo ? cf.combo.n : null; run.chalHalve = halve; run.chalKey = cf.boss && cf.combo ? cf.combo.k : null; run.chalDesc = cf.boss && cf.combo ? cf.combo.d : null;
+    run.duel = !run.inf && run.chalKey === "duel" ? mkDuel(roundTarget()) : null;   // tanda 16: Duelo con la banca
     const rules = cf.list.map(c => (c.id === "storm" ? "clock" : c.id)).filter(id => ["wind", "clock", "silence"].includes(id)), st = cf.list.find(c => c.id === "storm");
     if (st) ctx.seconds = Math.max(6, Math.round(ctx.seconds * [0.75, 0.65, 0.55][clamp((st.lv || 1) - 1, 0, 2)]));   // Contrarreloj (tanda 6): 0,75 / 0,65 / 0,55 del tiempo
     run.boss = rules; run.wind = null;
@@ -536,7 +538,8 @@ window.AIQ = window.AIQ || {};
     S.run = run; S.camp = { id: "adv", mode: "adventure", title: { es: "Aventura", en: "Adventure" }, home: { lat: 20, lon: 10, zoom: 1 }, levels: [Lv] };
     S.runTotal = run.score; S.runMax = 0; C().map.setHome(S.camp.home); C().map.setStyle(mapStyleFor());
     amuSpend();
-    A.dealer.enable(true); A.chal.begin(run.chal, A.chal.fx(perkList()), { seed: run.seed, round: roundNo(), halve: run.chalHalve });
+    A.dealer.enable(true); if (run.duel) run.duel.n = keep ? run.qi : 0;
+    A.chal.begin(run.chal, A.chal.fx(perkList()), { seed: run.seed, round: roundNo(), halve: run.chalHalve, boss: run.chalKey, asc: run.asc, topic: run.topic, cjk: run.cjk });
     persist(); A.ach.emit("adv", { kind: "round", act: run.act }); C().startLevel(0);
     if (keep) { S.qi = run.qi; S.levelScore = run.roundScore; S.streak = run.streak || 0; S.hits = run.rGood; C().updateHud && C().updateHud(); }
     if (Lv.boss) setTimeout(() => A.sfx.boss(), 200);
@@ -578,6 +581,22 @@ window.AIQ = window.AIQ || {};
   /* en el Reto diario, la etiqueta del acto dice en que intento vas (en lugar del subtitulo del acto) */
   const dailyLbl = k => A.pick6("Reto diario {k}/3|Daily {k}/3|Défi du jour {k}/3|Desafio diário {k}/3|Tagesherausforderung {k}/3|Sfida giornaliera {k}/3||每日挑战 {k}/3|일일 도전 {k}/3|デイリーチャレンジ {k}/3|Испытание дня {k}/3|Wyzwanie dnia {k}/3").replace("{k}", k);
   const actSub = info => (run && run.board && run.dailyTry ? dailyLbl(run.dailyTry) : A.tx(info.t));
+  /* tanda 16: DUELO CON LA BANCA. El objetivo de la ronda es la puntuacion del crupier, repartida en sus 5 respuestas (suman EXACTAMENTE el objetivo). Su chincheta cae
+     despues de la tuya: la distancia sale de lo que puntua (como la tuya) y el rumbo, de la semilla. No cambia el equilibrio: solo como se ve */
+  const mkDuel = T => {
+    const rr = A.rng(`${run.seed}:duels:${roundNo()}`), w = Array.from({ length: 5 }, () => 0.55 + rr() * 0.9), sw = w.reduce((a, b) => a + b, 0), s = w.map(x => Math.round(T * x / sw)), sum = () => s.reduce((a, b) => a + b, 0);
+    for (let k = 0; k < 6; k++) { const over = s.map((x, i) => (x > 1350 ? i : -1)).filter(i => i >= 0); if (!over.length) break; let ex = 0; over.forEach(i => { ex += s[i] - 1350; s[i] = 1350; }); const rest = s.map((_, i) => i).filter(i => !over.includes(i)); rest.forEach(i => { s[i] += Math.round(ex / rest.length); }); }
+    s[4] += T - sum(); return { s, n: 0, T };
+  };
+  const bankMove = (res, i) => {
+    const d = run.duel, o = res.o; if (!d || !o || i < 0 || i > 4) return null; const s = d.s[i] || 0, r = roundNo(), rr = A.rng(`${run.seed}:duelp:${r}:${i}`);
+    const scale = clamp(1500 * Math.pow(0.97, r), 300, 1500) * (KIND_FACTOR[o.kind] || 1), dist = clamp(s / 1.2, 20, 1000), km = Math.min(5000, -scale * Math.log(dist / 1000));
+    let lat = o.lat, lon = o.lon; if (o.t === "c") { const f = C().world.byName[o.key]; if (!f) return null; const big = f.polys.reduce((a, b) => ((b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) > (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) ? b : a)); lon = (big.bbox[0] + big.bbox[2]) / 2; lat = (big.bbox[1] + big.bbox[3]) / 2; }
+    const brg = rr() * Math.PI * 2, dd = km / 6371, la1 = lat * Math.PI / 180, lo1 = lon * Math.PI / 180, la2 = Math.asin(Math.sin(la1) * Math.cos(dd) + Math.cos(la1) * Math.sin(dd) * Math.cos(brg)), lo2 = lo1 + Math.atan2(Math.sin(brg) * Math.sin(dd) * Math.cos(la1), Math.cos(dd) - Math.sin(la1) * Math.sin(la2));
+    const wrap = x => ((x + 540) % 360) - 180;
+    return { s, n: i, pt: [wrap(lo2 * 180 / Math.PI), clamp(la2 * 180 / Math.PI, -70, 78)], sum: d.s.slice(0, i + 1).reduce((a, b) => a + b, 0) };
+  };
+  A.adv.duelHud = () => { const d = run && run.duel && !run.inf ? run.duel : null; if (!d) return null; const bank = d.s.slice(0, d.n || 0).reduce((a, b) => a + b, 0); return { bank, pct: Math.min(100, 100 * bank / Math.max(1, d.T)) }; };
   A.adv.introHtml = Lv => {
     if (run.inf) {
       return `<div class="intro-in adv"><div class="intro-left"><div class="intro-num blind">${A.blind("small", "s_compass")}</div><div class="intro-body">
@@ -590,11 +609,11 @@ window.AIQ = window.AIQ || {};
     /* territorio nuevo: una ronda mas alla de tu mejor ronda de siempre (desde la 2.a expedicion, una vez por expedicion): sello "Nuevo" y el crupier lo dice */
     const Pv = A.profile.get(); run._virgin = !run.attempt && (Pv.adv.runs || 0) >= 2 && roundNo() + 1 > (Pv.adv.bestRound || 0) && !run.virginShown; if (run._virgin) run.virginShown = true;
     const NEW = A.pick6("Nuevo|New|Nouveau|Novo|Neu|Nuovo||新领域|새 영역|未踏|Впервые|Nowe");
-    const chips = list.map(c => { const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)}${c.isNew ? ` <span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</em>` : ""}</div></div>`; }).join("");
+    const chips = list.map(c => { if (c.hid && !c.up) return `<div class="adv-debuff k-rule"><span>${ic(BOSS_IC)}</span><div><b>${A.tx(A.chal.tl("ui_faceDown"))}</b><i>${A.tx(A.chal.tl(run.chalKey === "collector" ? "ui_faceDownColl" : "ui_faceDownWheel"))}</i></div></div>`; const d = A.CHAL[c.id]; return `<div class="adv-debuff k-${d.kind}"><span>${ic(d.ico)}</span><div><b>${A.tx(d.n)}${c.isNew ? ` <span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b><i>${A.tx(d.d)}</i>${c.id === "wind" && run.wind ? `<em>${A.T("Viento hacia", "Wind toward")} ${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</em>` : ""}</div></div>`; }).join("");
     const kind = Lv.boss ? "boss" : run.round === 0 ? "small" : "big", inner = Lv.boss ? BOSS_IC : run.round === 0 ? "s_pin" : "s_compass";
     return `<div class="intro-in adv${Lv.boss ? " is-boss" : ""}"><div class="intro-left"><div class="intro-num blind">${A.blind(kind, inner)}</div><div class="intro-body">
       <span class="tag">${A.tx(info.n)} · ${actSub(info)}</span><h2>${A.tx(Lv.topicName)}</h2>
-      ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}
+      ${Lv.boss && run.chalName ? `<p class="boss-combo">${A.tx(run.chalName)}</p>` : ""}${Lv.boss && run.chalDesc && run.chalDesc.es ? `<p class="boss-d">${A.tx(run.chalDesc)}</p>` : ""}
       <p class="intro-sub">${Lv.boss ? A.T("Jefe del acto", "Act boss") : A.T("Ronda", "Round") + " " + (run.round + 1)} · ${A.tx(info.f)}${run._virgin ? ` <b class="intro-new">${NEW}</b>` : ""}</p>
       <p class="adv-goal">${A.T("Objetivo", "Target")} ${!run.inf && baseTarget() > Lv.advance ? `<s class="of-was">${A.fmt(baseTarget())}</s> ` : ""}<b>${A.fmt(Lv.advance)}</b> · ${run.qn} ${A.T("lugares", "places")}${run.qn > 5 ? " · " + A.tx(BEST5) : ""} · ${Lv.seconds} s</p>
       ${list.length ? `<h4 class="adv-chal-h">${A.T("El crupier toca la mesa", "The dealer touches the table")}</h4>` : ""}${chips}</div></div>
@@ -604,14 +623,14 @@ window.AIQ = window.AIQ || {};
      + una frase por reto (y protesta si ya llevas el perk que lo anula). El guion vive en js/dealer.js (D.introSeq). */
   let resumedIntro = false;                                           // la proxima intro es la primera tras reanudar una partida guardada
   A.adv.introReady = (Lv, talked) => {                                // talked: avisa cuando el crupier ha acabado de hablar (con su segundo de mas)
-    const host = $("introDealer"); if (!host || !run) return 0; const D = A.dealer, list = run.chal || [];
+    const host = $("introDealer"); if (!host || !run) return 0; const D = A.dealer, list = (run.chal || []).filter(c => !c.hid || c.up);   // las fichas boca abajo no se anuncian
     D.enable(true); D.dock(host);
     const counters = list.some(c => (A.CHAL[c.id].counters || []).some(id => owned(id)));
     const seq = D.introSeq({
       boss: !!Lv.boss, last: roundNo() === 11, inf: !!run.inf, fresh: run.act === 0 && run.round === 0 && !run.qTotal && !run.attempt, resumed: resumedIntro, ranked: !!run.ranked,
       dailyTry: run.dailyTry || 0, dailyTotal: run.board && run.dailyTry ? A.rank.daily.get(run.board).total : 0,
       act: run.act, round: run.round, attempt: run.attempt, lives: run.lives, chal: list.slice(0, Lv.boss ? 3 : 2).map(c => c.id), form: list.slice(0, Lv.boss ? 3 : 2).map(c => A.chal.formOf(c)), isNew: list.slice(0, Lv.boss ? 3 : 2).map(c => !!c.isNew), counters,
-      rn: roundNo() + 1, bossName: Lv.boss && run.chalName ? A.tx(run.chalName) : "", virgin: !!run._virgin,
+      rn: roundNo() + 1, bossName: Lv.boss && run.chalName ? A.tx(run.chalName) : "", bossKey: Lv.boss ? run.chalKey : null, virgin: !!run._virgin,
     });
     resumedIntro = false;
     D.sequence(seq, talked); return seq.reduce((n, it) => n + A.tx(it.line).length * 40 + 900 + D.LINGER, 0);   // cada frase, con su segundo de mas
@@ -659,6 +678,7 @@ window.AIQ = window.AIQ || {};
     if (res.dist >= 750) run.rGood++; run.leftSum += Math.max(0, res.left || 0); run.roundScore += res.total; run.qTotal++;
     const prevStreak = run.streak || 0, prevScore = run.roundScore - res.total, goalLv = C().S.camp && C().S.camp.levels && C().S.camp.levels[0];
     run.streak = res.streak || 0; run.qi++; run.qTools = 0;
+    if (run.duel && !run.inf) { run.duel.n = run.qi; res.bank = bankMove(res, run.qi - 1); }   // tanda 16: la banca responde despues que tu
     if (run.inf && !run.infOver) {
       const S = C().S, Lv = S.camp.levels[0];
       Lv.seconds = Math.max(3, Math.round((Lv.seconds - 0.2) * 10) / 10); run.infSeconds = Lv.seconds;
@@ -1019,7 +1039,8 @@ window.AIQ = window.AIQ || {};
     bar.classList.remove("hidden");
     bar.innerHTML = `<div class="ab-top"><span class="ab-act" data-tf="abact">${A.tx(info.n)}</span><span class="ab-coins" id="abCoins" data-tf="abcoins">${CN()}<b>${run.coins}</b></span><span class="ab-hearts" data-tf="abhearts">${hearts()}</span></div>
       <div class="ab-perks">${run.perks.map(id => `<span class="ab-perk" data-id="${id}" title="${A.tx(A.RELICS[id].n)} — ${A.tx(A.RELICS[id].d)}">${ic(id)}${isAmu(id) ? pips((run.amu || {})[id] || 0, "ab-pips") : ""}${id === "hoard" && run.hucha ? `<b class="hc-n">${run.hucha}</b>` : ""}</span>`).join("")}</div>
-      ${(run.chal || []).length ? `<div class="ab-chal">${run.chal.map(c => A.chal.chip(run.calmOn && ((perkList().find(p => p.calm) || {}).calm || []).includes((A.CHAL[c.id] || {}).fam) ? { ...c, calm: true } : c, true)).join("")}</div>` : ""}
+      ${(run.chal || []).length ? `<div class="ab-chal">${(A.chal.barList ? A.chal.barList(run.chal) : run.chal).map(c => A.chal.chip(run.calmOn && ((perkList().find(p => p.calm) || {}).calm || []).includes((A.CHAL[c.id] || {}).fam) ? { ...c, calm: true } : c, true)).join("")}</div>` : ""}
+      ${A.jefes ? A.jefes.riseHtml() : ""}
       ${run.wind ? `<div class="ab-wind"><svg viewBox="-12 -12 24 24" style="transform:rotate(${run.wind.brg}deg)"><path d="M0 -9 L6 4 L0 1 L-6 4 Z"/></svg><span>${dirName(run.wind.brg)} · ${A.fmtDist(run.wind.km)}</span></div>` : ""}`;
     flashKeep(bar);
     const ids = Object.keys(run.tools);
@@ -1198,7 +1219,7 @@ window.AIQ = window.AIQ || {};
       const count = `<span class="nr-n">${n ? n + " " + (n === 1 ? A.T("reto", "challenge") : A.T("retos", "challenges")) : A.T("Sin retos", "No challenges")}</span>`;
       if (!main) return `<div class="nr far${cf.boss ? " boss" : ""}"><div class="nr-head">${badge}<div class="nr-ttl"><span class="nr-k">${kick}</span><b class="nr-name">${name}</b></div><div class="nr-chips">${cf.list.map(c => A.chal.chip(c, true)).join("")}</div>${count}</div></div>`;
       const shuffle = n ? `<button class="chipbtn nr-shuffle" id="chalReroll" type="button" data-tt="${A.T("Barajar: el crupier elige otros retos para la próxima ronda", "Reshuffle: the dealer picks other challenges for the next round")}">${ic("dice", "sm")}<span>${A.T("Barajar", "Reshuffle")}</span>${freeShuf() ? `<em class="nr-free">${ic("spyhole", "sm")}${A.tx(H_FREE)}</em>` : `<em>${CN()}${chalRerollCost()}</em>`}</button>` : "";
-      const lis = cf.list.map(c => { const dd = A.CHAL[c.id];
+      const lis = cf.list.map(c => { const hd = c.hid && !c.up, dd = hd ? { kind: "rule", ico: BOSS_IC, n: A.chal.tl("ui_faceDown"), d: A.chal.tl(cf.combo && cf.combo.k === "collector" ? "ui_faceDownColl" : "ui_faceDownWheel") } : A.CHAL[c.id];
         return `<li class="nr-row k-${dd.kind}"><span class="nr-ic">${ic(dd.ico)}</span><b class="nr-rn">${A.tx(dd.n)}${c.isNew ? ` <span class="ch-new">${A.tx(A.chal.NEW_TAG)}</span>` : ""} <i class="ch-lv">${"●".repeat(c.lv || 1)}</i></b>${c.sealed ? `<em class="nr-have nr-seal">${A.tx(c.sealBy === "pact" ? BT.pact : c.sealBy === "offer" ? BT.sold : BT.seal)}</em>` : ""}<button class="nr-buy${c.sealed ? " hidden" : ""}" type="button" data-r="${rr}" data-id="${c.id}" data-tt="${A.T("Sobornar al crupier: quita este reto de la próxima ronda. Cada soborno encarece los siguientes.", "Bribe the dealer: removes this challenge from the next round. Each bribe makes the next ones pricier.")}">${A.T("Sobornar", "Bribe")}<span class="nr-p">${CN()}${bribePrice(c, cf.boss)}</span></button><p>${A.tx(dd.d)}</p></li>`; }).join("")
         + done.map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.T("Sobornado", "Bribed")}</em></li>`).join("")
         + (cf.nulled || []).map(id => `<li class="nr-row done"><span class="nr-ic">${ic(A.CHAL[id].ico)}</span><b class="nr-rn">${A.tx(A.CHAL[id].n)}</b><em class="nr-have">${A.tx(NULLED)}</em></li>`).join("");   // los que quita tu Comodin

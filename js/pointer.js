@@ -142,7 +142,7 @@ window.AIQ = window.AIQ || {};
     if (m && m.tremble) {
       const hb = Math.min(1, beat(now)), amp = m.tremble.px * (0.4 + 1.25 * hb);
       if (now - tj > (hb > 0.3 ? 25 : 45)) { tj = now; jx = (Math.random() - 0.5) * 2 * amp; jy = (Math.random() - 0.5) * 2 * amp; } x += jx; y += jy;
-      const bn = Math.floor(now / BEAT); if (bn !== beatN) { beatN = bn; if (P.on && m.tremble.px >= 9 && A.sfx.heart) A.sfx.heart(); }   // un latido flojito (desde el nivel 2)
+      const bn = Math.floor(now / BEAT); if (bn !== beatN) { beatN = bn; if (P.on && m.tremble.px >= 5 && A.sfx.heart) A.sfx.heart(); }   // un latido flojito (desde el nivel 2)
     }
     P.wind = null;
     if (P.st.windFn) {                                                 // Vendaval: el viento empuja el puntero

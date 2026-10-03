@@ -454,3 +454,51 @@ html.reduce-motion #zzFx .zz-scan { display: none; }
 @keyframes trap-fold { from { scale: 0; transform-origin: 100% 0; } to { scale: 1; transform-origin: 100% 0; } }
 @keyframes trap-slam { 0% { transform: rotate(-16deg) scale(2.6); opacity: 0; } 55% { opacity: 1; } 100% { transform: rotate(5deg) scale(1); } }
 html.reduce-motion .trap-corner, html.reduce-motion .trap-stamp { animation: none !important; }
+
+/* ================================================================ tanda 16: JEFES CON IDENTIDAD (js/jefes.js) */
+.boss-d { margin: -2px 0 8px; max-width: 34em; font-family: var(--mono); font-weight: 700; font-size: clamp(13px, calc(2 * var(--vh)), 16px); line-height: 1.25; color: #f4e9d6; opacity: .92; }
+.ab-rise { display: flex; gap: 4px; align-items: center; margin-top: 6px; padding: 4px 7px; width: max-content; border-radius: 999px; background: rgba(22, 36, 28, .92); box-shadow: 0 3px 0 rgba(0, 0, 0, .35); }
+.ab-rise i { position: relative; width: 20px; height: 9px; border-radius: 3px; background: #2a3a30; box-shadow: inset 0 0 0 1.5px #0d1812; }
+.ab-rise i.on, .ab-rise i.cur { box-shadow: inset 0 0 0 1.5px #3a0f12; }
+.ab-rise i:nth-child(1).on, .ab-rise i:nth-child(1).cur { background: #f8b449; } .ab-rise i:nth-child(2).on, .ab-rise i:nth-child(2).cur { background: #f59a3a; } .ab-rise i:nth-child(3).on, .ab-rise i:nth-child(3).cur { background: #ec7332; }
+.ab-rise i:nth-child(4).on, .ab-rise i:nth-child(4).cur { background: #e0432f; } .ab-rise i:nth-child(5).on, .ab-rise i:nth-child(5).cur { background: #c4182f; }
+.ab-rise i.cur { animation: rise-cur .8s steps(2, end) infinite alternate; } .ab-rise i.cur.pop { animation: rise-pop .55s cubic-bezier(.2, 1.8, .4, 1), rise-cur .8s steps(2, end) .55s infinite alternate; }
+@keyframes rise-cur { from { filter: brightness(1); } to { filter: brightness(1.45); } } @keyframes rise-pop { 0% { transform: scale(2.4, 2.2); } 100% { transform: none; } }
+.ab-noise { display: flex; align-items: center; gap: 7px; margin-top: 5px; font: 700 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #fdf5fd; }
+.ab-noise span { position: relative; width: 120px; height: 9px; border-radius: 4px; background: #0d1812; box-shadow: inset 0 0 0 1.5px #16241c; overflow: hidden; } .ab-noise i { display: block; height: 100%; background: linear-gradient(90deg, #4ee3c1, #f8b449 60%, #fe5f55); transition: width .12s linear; } .ab-noise.woke i { width: 100% !important; background: #fe5f55; }
+@media (min-width: 901px) and (min-height: 561px) { .ab-noise { display: none; } }
+#bossPulse { position: fixed; inset: 0; z-index: 99010; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, transparent 52%, rgba(255, 50, 40, calc(.14 + var(--q, 1) * .06)) 100%); }
+#bossPulse.on { animation: boss-pulse .75s ease-out; } @keyframes boss-pulse { 0% { opacity: 0; } 14% { opacity: 1; } 100% { opacity: 0; } }
+.ch-chip.tw { box-shadow: inset 0 0 0 2px #ffd95a, 0 0 12px rgba(255, 217, 90, .5), 0 3px 0 rgba(0, 0, 0, .35); } .ch-chip.tw.tw-in { animation: tw-in .6s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes tw-in { 0% { transform: scale(1.5) rotate(-4deg); opacity: .2; } 100% { transform: none; opacity: 1; } }
+.ch-chip.ch-hid { opacity: .88; filter: saturate(.65); } .ch-chip.ch-hid b { letter-spacing: .3em; }
+/* La siesta: el crupier duerme en su esquina; el ruido llena su barra y cambia su cara */
+.dealer.nap .dl-bubble { display: none; }
+.dealer.nap .dl-face::before { content: ""; position: absolute; left: 20%; right: 20%; bottom: -8px; height: 9px; border-radius: 4px; background: #0d1812; box-shadow: 0 0 0 2px #16241c; }
+.dealer.nap .dl-face::after { content: ""; position: absolute; left: 20%; right: 20%; bottom: -8px; height: 9px; border-radius: 4px; background: linear-gradient(90deg, #4ee3c1, #f8b449 62%, #fe5f55); clip-path: inset(0 calc((1 - var(--nz, 0)) * 100%) 0 0 round 4px); z-index: 1; }
+.dealer.nap1 .dl-face { filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .4)) drop-shadow(0 0 7px rgba(248, 180, 73, .6)); }
+.dealer.nap2 .dl-face { filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .4)) drop-shadow(0 0 10px rgba(254, 95, 85, .85)); animation: nap-shiver .16s steps(2, end) infinite alternate; } @keyframes nap-shiver { from { translate: -1px 0; } to { translate: 1px 0; } }
+html.reduce-motion .dealer.nap2 .dl-face { animation: none; }
+/* Rompe la cuarta pared: salvapantallas y pantallazo azul */
+#ssFx { position: fixed; inset: 0; z-index: 99100; background: #02040c; cursor: none; animation: ss-in .35s ease both; } #ssFx.half { background: rgba(2, 4, 12, .62); } #ssFx.bye { opacity: 0; transition: opacity .2s; }
+#ssFx canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; } #ssFx .ss-logo { position: absolute; left: 0; top: 0; width: 96px; height: 96px; image-rendering: pixelated; will-change: transform; filter: drop-shadow(0 0 10px rgba(180, 120, 255, .7)); }
+#ssFx .ss-hint { position: absolute; left: 0; right: 0; bottom: 9%; margin: 0; text-align: center; font: 700 16px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: rgba(255, 255, 255, .55); animation: ss-blink 1.6s steps(2, end) infinite; }
+@keyframes ss-in { from { opacity: 0; } to { opacity: 1; } } @keyframes ss-blink { 50% { opacity: .35; } }
+#bsodFx { position: fixed; inset: 0; z-index: 99200; background: #0a6cc4; color: #fff; font-family: var(--mono); cursor: none; } #bsodFx.bye { opacity: 0; transition: opacity .12s; }
+#bsodFx .bs-in { position: absolute; left: 8vw; top: 13vh; max-width: 74vw; } #bsodFx .bs-sad { display: block; font: 700 clamp(70px, 16vh, 170px)/1 var(--mono); margin-bottom: 3vh; } #bsodFx p { margin: 0 0 2.2vh; font-weight: 700; font-size: clamp(16px, 3.2vh, 30px); line-height: 1.25; }
+#bsodFx .bs-c { font-size: clamp(14px, 2.4vh, 22px); } #bsodFx .bs-row { display: flex; align-items: center; gap: 16px; margin-top: 4vh; font-size: clamp(12px, 2vh, 18px); font-weight: 700; } #bsodFx .bs-qr { flex: none; width: clamp(56px, 11vh, 100px); aspect-ratio: 1; background: conic-gradient(#fff 25%, #0a6cc4 0 50%, #fff 0 75%, #0a6cc4 0) 0 0 / 22% 22%; box-shadow: 0 0 0 4px #fff; image-rendering: pixelated; }
+/* El coleccionista: el album */
+#albumFx { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 99020; padding: 8px 14px 10px; background: #fdf5fd; color: #16241c; box-shadow: inset 0 0 0 3px #16241c, 0 6px 0 rgba(0, 0, 0, .4); text-align: center; pointer-events: none; animation: al-in .5s cubic-bezier(.2, 1.4, .4, 1) both; }
+#albumFx h4 { margin: 0 0 5px; font: 700 12px var(--mono); letter-spacing: .2em; text-transform: uppercase; } #albumFx .al-row { display: flex; gap: 6px; justify-content: center; }
+#albumFx .al-s { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 6px; background: #16241c; box-shadow: inset 0 0 0 2px #3b5547; } #albumFx .al-s .ic { width: 32px; height: 32px; } #albumFx .al-s.done { opacity: .75; } #albumFx .al-s.back { opacity: .55; }
+#albumFx .al-s.cur { background: #3b1f6b; box-shadow: inset 0 0 0 2px #ffd95a; animation: al-stamp .5s cubic-bezier(.2, 1.7, .4, 1) .15s both; } #albumFx .al-s.cur .ic { width: 38px; height: 38px; }
+#albumFx .al-n { margin: 6px 0 0; font: 700 15px var(--mono); }
+#albumFx.bye { opacity: 0; transition: opacity .22s; }
+@keyframes al-in { from { transform: translate(-50%, -140%); } to { transform: translate(-50%, 0); } } @keyframes al-stamp { 0% { transform: scale(2.6) rotate(-14deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+/* Rueda de la fortuna */
+#wheelFx { position: fixed; inset: 0; z-index: 99050; display: grid; place-items: center; background: radial-gradient(circle, rgba(6, 13, 9, .55), rgba(6, 13, 9, .2) 70%); animation: ss-in .15s ease both; } #wheelFx.bye { opacity: 0; transition: opacity .22s; }
+#wheelFx .wh-wrap { position: relative; width: 264px; text-align: center; } #wheelFx .wh-pt { position: absolute; left: 50%; top: -14px; width: 0; height: 0; margin-left: -12px; border: 12px solid transparent; border-top: 22px solid #fe5f55; filter: drop-shadow(0 2px 0 #16241c); z-index: 2; }
+#wheelFx .wh-disc { position: relative; width: 264px; height: 264px; border-radius: 50%; box-shadow: 0 0 0 6px #16241c, 0 8px 0 6px rgba(0, 0, 0, .4); will-change: transform; } #wheelFx .wh-i { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; image-rendering: pixelated; }
+#wheelFx .wh-hub { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px; border-radius: 50%; background: #fdf5fd; box-shadow: 0 0 0 4px #16241c; }
+#wheelFx .wh-t { margin: 18px 0 0; font: 400 34px/1 var(--sans); color: #fdf5fd; text-shadow: 0 3px 0 #16241c; } #wheelFx.land .wh-t { color: #ffd95a; animation: al-stamp .4s cubic-bezier(.2, 1.7, .4, 1); }
+html.reduce-motion #ssFx, html.reduce-motion #albumFx, html.reduce-motion #wheelFx, html.reduce-motion .ch-chip.tw.tw-in, html.reduce-motion .ab-rise i.pop, html.reduce-motion #bossPulse.on { animation: none !important; }

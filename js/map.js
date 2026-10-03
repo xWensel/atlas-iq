@@ -1476,7 +1476,7 @@ void main(){
       }
       if (this.decoys && this.decoys.length) {                          // tanda 7: con t0, la chincheta cae del cielo a su hora (y la capa sigue animada mientras caen)
         let live = false;
-        for (const d of this.decoys) { const age = d.t0 ? now - d.t0 : 2000; if (age < 0) { live = true; continue; } if (age < 1400) live = true; const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.chip ? 1 : d.a == null ? 0.9 : d.a; if (d.chip) this._tokenRain(c, q[0], q[1], age); else this._pinRain(c, q[0], q[1], sk.red, sk.paper, age); c.restore(); }
+        for (const d of this.decoys) { const age = d.t0 ? now - d.t0 : 2000; if (age < 0) { live = true; continue; } if (age < 1400) live = true; const q = this.lonLatToScreen(d.lon, d.lat); c.save(); c.globalAlpha = d.chip ? 1 : d.a == null ? 0.9 : d.a; if (d.chip) this._tokenRain(c, q[0], q[1], age); else if (d.bank != null) { this._pinRain(c, q[0], q[1], "#f8b449", sk.paper, age); if (age > 760) this._chip(c, d.bankLabel, q[0], q[1] - 64, { center: true, font: `italic 700 17px ${this._fd()}`, alpha: Math.min(1, (age - 760) / 300) }); } else this._pinRain(c, q[0], q[1], sk.red, sk.paper, age); c.restore(); }
         if (live) this.fxDirty = true;
       }
       if (this.pickEnabled && this.mouse && !this.pointers.size && !this.hideReticle) this._reticle(c, this.mouse.x, this.mouse.y);
