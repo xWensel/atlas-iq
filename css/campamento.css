@@ -139,9 +139,9 @@
 /* tanda 12 (S11): la vitrina, una cuarta carta con la legendaria del acto */
 .offer.pc.vit .of-r { color: #b8741a; }
 .offer.swap-src { box-shadow: 0 0 0 3px #f8b449, 0 0 26px rgba(248, 180, 73, .55); }
-.tr-relic.swap-pick .tr-face { outline: 3px solid #f8b449; outline-offset: 1px; animation: swap-pick 1s ease-in-out infinite; cursor: pointer; }
-.tr-relic.swap-pick::after { content: "⇄"; position: absolute; top: -9px; left: 50%; transform: translateX(-50%); padding: 0 5px; border-radius: 6px; background: #f8b449; color: #16241c; font: 800 12px/1.3 var(--mono, monospace); box-shadow: 0 0 0 2px #16241c; pointer-events: none; }
-@keyframes swap-pick { 50% { outline-color: #fff2c4; } }
+.tr-relic.swap-pick .tr-face { outline: 3px solid #c2372e; outline-offset: 1px; animation: swap-pick 1s ease-in-out infinite; cursor: pointer; }
+.tr-relic.swap-pick::after { content: attr(data-sv); position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 0 6px 0 19px; border-radius: 999px; background: #c2372e url(../assets/icons/coin.webp) 4px 50% / 12px 12px no-repeat; image-rendering: pixelated; color: #ffd98a; font: 800 12px/1.4 var(--mono, monospace); white-space: nowrap; box-shadow: 0 0 0 2px #16241c; pointer-events: none; }   /* 0.2.21: lo que cobras al venderla (antes "⇄") */
+@keyframes swap-pick { 50% { outline-color: #ffd98a; } }
 html.reduce-motion .tr-relic.swap-pick .tr-face { animation: none; }
 .nr.far .nr-k { font-size: 10px; } .nr.far .nr-chips .ch-chip { padding-top: 1px; padding-bottom: 1px; }
 .nr.far .nr-name { font-size: 18px; } .nr.far .nr-ttl { flex: 0 1 auto; }

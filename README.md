@@ -4,6 +4,8 @@
 
 > **Versiones:** desde la 0.2.3 la version del juego sigue la numeracion de las notas del parche (0.2.N): cada entrega sube el ultimo numero y lleva su entrada en las notas. Antes (hasta la 0.79.1) cada entrega subia la version menor y terminaba en 1. Se cambia en `VERSION`, `js/support.js`, `package.json`, `package-lock.json`, `sw.js` y esta lista. Detalle en `CLAUDE.md`.
 
+**v0.2.22** - Mochila llena: al elegir carta, las reliquias ya no llevan la flecha de cambio (⇄) que parecia mandarlas a la tienda; cada una ensena en rojo, con su moneda, lo que cobras al venderla (+N).
+
 **v0.2.21** - Con la mochila llena, el cofre del jefe y el Campamento ya no hablan de "cambiar": la carta dice "vende una…", eliges que reliquia vendes y su carta grande lleva el boton Vender con lo que te dan; la carta elegida entra en su hueco. La Ventaja dice "vende la otra". Fuera los restos de CSS de las cargas de los amuletos.
 
 **v0.2.20** - Acierto y veredicto atados a las dianas de la Enciclopedia: acertar (racha, bandera, Guardarrachas) es caer a 300 km o menos (x2 en mares y naturaleza), no el 60 % de los puntos; el veredicto del ticket es 75 / 150 / 300 km, como los anillos y los jackpots. La puntuacion no cambia. Ademas, el zoom del revelado acierta con Gigantes y enanos: el mapa se encuadra tal como queda al deshacerse el reto.

@@ -1969,7 +1969,7 @@ window.AIQ = window.AIQ || {};
       const swapV = p.ventaja ? perkList().find(q => q.ventaja && q.id !== s.id) : null;
       if (!swapV && run.perks.length >= maxPerks()) {                // tanda 9 (S10): mochila llena: eliges cual vendes y la carta entra en su hueco, en un gesto
         if (run.coins + Math.max(...run.perks.map(sellValue)) < c) return noFunds(el);
-        swapIx = i; document.querySelectorAll("#dlg .tr-relic").forEach(x => x.classList.add("swap-pick")); document.querySelectorAll("#dlg .offer").forEach(x => x.classList.toggle("swap-src", x === el)); A.sfx.card(); flash(A.tx(SWAP_PICK)); return;
+        swapIx = i; document.querySelectorAll("#dlg .tr-relic").forEach(x => { x.classList.add("swap-pick"); x.dataset.sv = "+" + sellValue(x.dataset.relic); }); document.querySelectorAll("#dlg .offer").forEach(x => x.classList.toggle("swap-src", x === el)); A.sfx.card(); flash(A.tx(SWAP_PICK)); return;   // 0.2.21: cada reliquia ensena lo que te dan por venderla (antes una flecha de cambio)
       }
       if (run.coins + (swapV ? sellValue(swapV.id) : 0) < c) return noFunds(el);
       if (swapV) { run.coins += sellValue(swapV.id); run.perks.splice(run.perks.indexOf(swapV.id), 1); if (run.paid) delete run.paid[swapV.id]; A.sfx.sell(); }   // la Ventaja vieja se vende

@@ -36,6 +36,21 @@ window.AIQ = window.AIQ || {};
 
   A.PATCHES = [
     {
+      id: "0.2.22",
+      name: ["Lo que vale", "What it's worth"],
+      date: "2026-10-04",
+      summary: ["Con la mochila llena, tus reliquias enseñan lo que cobras por venderlas, no una flecha de cambio.",
+        "With a full pack, your relics show what you get for selling them, not a swap arrow."],
+      chapters: [
+        { id: "precio", kicker: ["Campamento", "Camp"], title: ["Mochila llena", "Full pack"],
+          entries: [
+            E(["Precio de venta a la vista", "Sale price in sight"], "change", "0.2.22", [
+              ["Al elegir una carta con la mochila llena, cada reliquia lleva una etiqueta roja con su moneda y lo que te dan por venderla (**+N**). Fuera la flecha ⇄, que parecía mandarla a la tienda.",
+                "When you pick a card with a full pack, each relic wears a red tag with its coin and what you get for selling it (**+N**). The ⇄ arrow, which looked like it sent it to the shop, is gone."]
+            ]) ] },
+      ],
+    },
+    {
       id: "0.2.21",
       name: ["Vender, no cambiar", "Sell, don't swap"],
       date: "2026-10-04",
