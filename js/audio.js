@@ -296,6 +296,15 @@ window.AIQ = window.AIQ || {};
     /* racha: cada nivel de racha sube un peldano */
     streak: go((t, n) => { const b = scaleNote(4 + Math.min(n, 7) * 2, 60); pluck(b, t, { vol: 0.12, dur: 0.4 }); pluck(b + 7, t + 0.07, { vol: 0.1, dur: 0.5 }); noise(t, 0.25, { hp: 2500, vol: 0.03, sweepTo: 9000, type: "highpass" }); }),
     tick: go((t, n) => pluck(88 - n * 2, t, { vol: 0.08, dur: 0.08, bright: 4, rev: 0.05 })),
+    /* ruleta lineal del Campamento (v0.73): la ficha al apostar, el "no va mas" (campanilla), el arranque (barrido + golpe; la musica baja), el tic de matraca de
+       cada casilla (v: 0 rapido .. 1 casi parada: mas grave, mas fuerte y mas largo), el latido del casi-fallo, el tope final y el cero */
+    rouBet: go((t, k = 0) => { noise(t, 0.018, { hp: 4200, vol: 0.07 }); thump(t, { vol: 0.15, f0: 230, f1: 90, dur: 0.1 }); bell(86 + k * 3, t + 0.004, { vol: 0.05, dur: 0.3, rev: 0.25 }); bell(93 + k * 3, t + 0.045, { vol: 0.04, dur: 0.35, rev: 0.25 }); noise(t + 0.09, 0.012, { hp: 5200, vol: 0.04 }); }),
+    rouNoMore: go(t => { bell(91, t, { vol: 0.07, dur: 0.9, rev: 0.4 }); bell(91, t + 0.13, { vol: 0.06, dur: 1.1, rev: 0.4 }); thump(t, { vol: 0.12, f0: 120, f1: 60, dur: 0.2 }); }),
+    rouStart: go(t => { noise(t, 0.6, { lp: 300, sweepTo: 6500, vol: 0.085, type: "bandpass", q: 1.2 }); thump(t, { vol: 0.26, f0: 140, f1: 46, dur: 0.3 }); for (let i = 0; i < 6; i++) noise(t + 0.04 + i * 0.045, 0.01, { hp: 3000 + i * 500, vol: 0.04 }); A.music.duck(0.4, 3600); }),
+    rouTick: go((t, v = 0) => { pluck(86 - v * 22, t, { vol: 0.05 + v * 0.05, dur: 0.05 + v * 0.09, bright: 3.5, rev: 0.1 + v * 0.2 }); thump(t, { vol: 0.035 + v * 0.09, f0: 520 - v * 260, f1: 180, dur: 0.035 }); noise(t, 0.01 + v * 0.01, { hp: 3800, vol: 0.03 + v * 0.04 }); }),
+    rouCrawl: go(t => { thump(t, { vol: 0.3, f0: 72, f1: 36, dur: 0.16 }); thump(t + 0.17, { vol: 0.22, f0: 66, f1: 34, dur: 0.18 }); thump(t + 0.62, { vol: 0.3, f0: 72, f1: 36, dur: 0.16 }); pad([43, 50], t, 1.1, 0.035, sfxBus); }),
+    rouStop: go(t => { thump(t, { vol: 0.42, f0: 170, f1: 50, dur: 0.24 }); noise(t, 0.07, { lp: 2600, vol: 0.11 }); noise(t + 0.012, 0.02, { hp: 5000, vol: 0.06 }); bell(79, t + 0.02, { vol: 0.07, dur: 0.7, rev: 0.3 }); }),
+    rouZero: go(t => { thump(t, { vol: 0.4, f0: 95, f1: 30, dur: 0.55 }); bell(67, t + 0.02, { vol: 0.08, dur: 1.4, rev: 0.4 }); bell(60, t + 0.1, { vol: 0.07, dur: 1.4, rev: 0.4 }); A.music.duck(0.3, 1500); }),
     intro: go(t => { noise(t, 0.5, { lp: 400, sweepTo: 6000, vol: 0.09, type: "bandpass", q: 1.4 }); thump(t + 0.32, { vol: 0.25, f0: 100, f1: 40, dur: 0.3 }); MOTIF.forEach((m, i) => pluck(m - 12, t + 0.34 + i * 0.09, { vol: 0.1, dur: 0.6 })); A.music.duck(0.4, 1800); }),
     stamp: go(t => { thump(t, { vol: 0.45, f0: 120, f1: 32, dur: 0.35 }); noise(t, 0.12, { lp: 1600, vol: 0.14 }); }),
     win: go(t => {
@@ -446,7 +455,13 @@ window.AIQ = window.AIQ || {};
        y las chispas de la lampara. Flojitos y nunca iguales */
     sweep: go((t, k = 0.5) => { noise(t, 0.32 + Math.random() * 0.14, { lp: 500 + k * 900, sweepTo: 1800 + Math.random() * 900, vol: 0.02 + k * 0.03, type: "bandpass", q: 0.8 }); }),
     wipe: go(t => { noise(t, 0.26, { lp: 700, sweepTo: 3200 + Math.random() * 600, vol: 0.05, type: "bandpass", q: 1.4 }); const os = ctx.createOscillator(), g = ctx.createGain(); os.type = "triangle"; os.frequency.setValueAtTime(820 + Math.random() * 120, t + 0.05); os.frequency.exponentialRampToValueAtTime(1250 + Math.random() * 150, t + 0.2); os.connect(g).connect(sfxBus); env(g, t + 0.05, 0.01, 0.018, 0.16); os.start(t + 0.05); os.stop(t + 0.3); }),
-    pinFall: go(t => { const os = ctx.createOscillator(), g = ctx.createGain(), f = 2100 + Math.random() * 500; os.type = "sine"; os.frequency.setValueAtTime(f, t); os.frequency.exponentialRampToValueAtTime(f * 0.42, t + 0.6); os.connect(g).connect(sfxBus); env(g, t, 0.05, 0.008, 0.55); os.start(t); os.stop(t + 0.7); thump(t + 0.62, { vol: 0.09, f0: 340 + Math.random() * 80, f1: 130, dur: 0.05 }); noise(t + 0.62, 0.035, { hp: 2600, vol: 0.028 }); }),
+    /* v0.72: la chincheta suena al CLAVARSE (no mientras cae) como un tic de kalimba muy corto, en pentatonica y nunca igual; con decenas
+       cayendo no se apilan: separacion minima entre tics y volumen que baja con el numero de chinchetas (k = su orden, n = cuantas caen) */
+    pinFall: (() => { let last = -1; const PENTA = [72, 74, 76, 79, 81, 84, 86, 88]; return go((t, k = 0, n = 10) => {
+      if (t - last < 0.09) return; last = t;
+      const m = PENTA[Math.floor(Math.random() * PENTA.length)], v = 0.05 * Math.min(1, Math.sqrt(8 / Math.max(8, n)) * (0.8 + Math.random() * 0.4));
+      pluck(m, t, { vol: v, dur: 0.16, bright: 2.5, rev: 0.35 }); noise(t, 0.02, { hp: 3200, vol: v * 0.22 });
+    }); })(),
     /* tanda 8: el retumbar del terremoto, el latido del Pulso y una racha del Vendaval */
     ice: go(t => { [96, 103, 108].forEach((m, i) => bell(m + (Math.random() < 0.5 ? 0 : 2), t + i * 0.05, { vol: 0.03, dur: 0.5, rev: 0.6 })); noise(t, 0.2, { hp: 6000, sweepTo: 12000, vol: 0.02, type: "highpass" }); }),   // tanda 9: Sangre fria
     rumble: go((t, lv = 1) => { noise(t, 0.85, { lp: 150 + lv * 30, sweepTo: 55, vol: 0.08 + lv * 0.02 }); thump(t, { vol: 0.2, f0: 72, f1: 32, dur: 0.5 }); thump(t + 0.17 + Math.random() * 0.06, { vol: 0.11, f0: 60, f1: 30, dur: 0.4 }); }),

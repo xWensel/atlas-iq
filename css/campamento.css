@@ -336,3 +336,75 @@ html.reduce-motion .go2::after { animation: none; opacity: .6; }
 /* tanda 4: la Ventaja de la mochila lleva un sello dorado (solo cabe una) */
 .table.mesa .tr-relic.vtg .tr-face::after { content: ""; position: absolute; top: 3px; right: 3px; width: 9px; height: 9px; border-radius: 50%; background: #ffd95a; box-shadow: 0 0 0 1px #16241c, inset -2px -2px 0 #c46a1b, inset 1px 1px 0 #fff6c8; pointer-events: none; }
 .nr-k .of-was { opacity: .6; margin-right: 3px; text-decoration-thickness: 2px; }
+
+/* ---------------------------------------------------------------- v0.73: la ruleta lineal de Rojo o negro (banda a pantalla completa, rueda europea con cero) */
+.table.mesa .sup.bet .bt-cg { background: #1b8a4a; }
+.table.mesa .sup.bet .bt-pick { gap: 5px; } .table.mesa .sup.bet .bt-c { padding: 5px 8px 4px; font-size: 12px; }
+.table.mesa .sup.bet.zero.lose .bt-res b { color: #8fe6b0; }
+.rou { --cw: 96px; position: absolute; inset: 0; z-index: 100000; display: grid; place-items: center; pointer-events: auto; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, rgba(12, 7, 7, .9), rgba(2, 4, 3, .97) 82%); animation: rou-bg .3s ease-out both; }
+@keyframes rou-bg { from { opacity: 0; } }
+.rou.out { animation: rou-out .28s ease-in both; pointer-events: none; } @keyframes rou-out { to { opacity: 0; } }
+.rou.skippable { cursor: pointer; }
+.rou-stage { position: relative; width: 100%; }
+.rou-top { position: absolute; left: 0; right: 0; bottom: calc(100% + 44px); display: flex; flex-direction: column; align-items: center; gap: calc(var(--cw) * .28); pointer-events: none; }
+.rou-pick { display: inline-flex; align-items: center; gap: 10px; padding: 7px 20px 6px 12px; border-radius: 999px; background: #0a140f; color: #ffd98a; box-shadow: inset 0 0 0 2px #f8b449, 0 4px 0 2px #0a140f;
+  font-family: var(--mono); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; animation: rou-drop .5s var(--spring) both; }
+.rou-pick b { font-weight: 400; color: #fff; } .rp-k { opacity: .8; }
+.rp-dot { width: 18px; height: 18px; border-radius: 50%; box-shadow: 0 0 0 2px #0a140f, inset 0 3px 0 rgba(255, 255, 255, .35), inset 0 -3px 0 rgba(0, 0, 0, .3); }
+.rp-red { background: #d63a2f; } .rp-black { background: #23252e; } .rp-green { background: #1b8a4a; }
+@keyframes rou-drop { from { opacity: 0; transform: translateY(-26px) scale(.9); } }
+.rou-band { position: relative; width: 100%; height: calc(var(--cw) * 1.5); background: #070d09; animation: rou-open .46s var(--spring) both;
+  box-shadow: 0 -4px 0 #0a140f, 0 -8px 0 #f0b94f, 0 -11px 0 #9a6a1c, 0 -14px 0 #0a140f, 0 4px 0 #0a140f, 0 8px 0 #f0b94f, 0 11px 0 #9a6a1c, 0 14px 0 #0a140f, 0 40px 70px rgba(0, 0, 0, .65); }
+@keyframes rou-open { from { transform: scaleY(.05); opacity: 0; } }
+.rou-band::before, .rou-band::after { content: ""; position: absolute; top: 0; bottom: 0; width: 24%; z-index: 3; pointer-events: none; }
+.rou-band::before { left: 0; background: linear-gradient(90deg, #04100a 8%, rgba(4, 16, 10, 0)); } .rou-band::after { right: 0; background: linear-gradient(270deg, #04100a 8%, rgba(4, 16, 10, 0)); }
+.rou-lights { --lc: #ffe08a; --ld: #4a3410; position: absolute; left: 0; right: 0; height: 10px; z-index: 5; pointer-events: none; background-size: 56px 10px;
+  background-image: linear-gradient(90deg, var(--lc) 0 10px, transparent 10px 28px, var(--ld) 28px 38px, transparent 38px 56px); animation: rou-chase .5s steps(1) infinite; }
+.rou-lights.top { top: -32px; } .rou-lights.bot { bottom: -32px; }
+@keyframes rou-chase { 50% { background-position: 28px 0; } }
+.rou.done.is-red .rou-lights { --lc: #ff7a62; --ld: #ff7a62; } .rou.done.is-black .rou-lights { --lc: #eef2f0; --ld: #eef2f0; } .rou.done.is-green .rou-lights { --lc: #5dea98; --ld: #5dea98; }
+.rou.done .rou-lights { animation: rou-flash .26s steps(1) 8; } @keyframes rou-flash { 50% { opacity: .25; } }
+.rou-view { position: absolute; inset: 0; overflow: hidden; contain: layout paint; }
+.rou-strip { position: absolute; left: 50%; top: 0; height: 100%; display: flex; will-change: transform; }
+.rc { flex: none; width: var(--cw); height: 100%; box-sizing: border-box; position: relative; display: grid; place-items: center; font-style: normal; background: var(--cc);
+  box-shadow: inset 0 0 0 3px #070d09, inset 0 6px 0 var(--ch), inset 0 -7px 0 var(--cs); }
+.rc b { font: 900 calc(var(--cw) * .5)/1 var(--serif); color: #fff; text-shadow: 0 3px 0 rgba(0, 0, 0, .42); }
+.rc-red { --cc: #c9362c; --ch: #ee6a52; --cs: #8c2320; } .rc-black { --cc: #22242d; --ch: #3d4150; --cs: #101117; } .rc-green { --cc: #1b8a4a; --ch: #52d68a; --cs: #0f5f33; }
+.rc.cur { filter: brightness(1.25); }
+.rou.done .rc { filter: brightness(.34) saturate(.55); transition: filter .35s; }
+.rou.done .rc.hit { filter: none; z-index: 2; animation: rou-hit .22s steps(1) 6; } @keyframes rou-hit { 50% { filter: brightness(1.5); } }
+.rou-ptr { position: absolute; left: 50%; top: -22px; bottom: -22px; width: 0; z-index: 4; pointer-events: none; }
+.pt-line { position: absolute; left: -2px; top: 18px; bottom: 18px; width: 4px; background: #ffd95a; box-shadow: 0 0 0 2px #0a140f, 0 0 18px 4px rgba(255, 217, 90, .5); }
+.rou.done .pt-line { opacity: 0; }
+.pt-top, .pt-bot { position: absolute; left: -18px; width: 4px; height: 4px; filter: drop-shadow(3px 0 0 #0a140f) drop-shadow(-3px 0 0 #0a140f) drop-shadow(0 3px 0 #0a140f) drop-shadow(0 -3px 0 #0a140f); }
+.pt-top { top: 0; box-shadow: 0px 0px 0 #ffd95a, 4px 0px 0 #ffd95a, 8px 0px 0 #ffd95a, 12px 0px 0 #ffd95a, 16px 0px 0 #ffd95a, 20px 0px 0 #ffd95a, 24px 0px 0 #ffd95a, 28px 0px 0 #ffd95a, 32px 0px 0 #ffd95a, 4px 4px 0 #ffd95a, 8px 4px 0 #ffd95a, 12px 4px 0 #ffd95a, 16px 4px 0 #ffd95a, 20px 4px 0 #ffd95a, 24px 4px 0 #ffd95a, 28px 4px 0 #ffd95a, 8px 8px 0 #ffd95a, 12px 8px 0 #ffd95a, 16px 8px 0 #ffd95a, 20px 8px 0 #ffd95a, 24px 8px 0 #ffd95a, 12px 12px 0 #ffd95a, 16px 12px 0 #ffd95a, 20px 12px 0 #ffd95a, 16px 16px 0 #ffd95a; }
+.pt-bot { top: calc(100% - 20px); box-shadow: 16px 0px 0 #ffd95a, 12px 4px 0 #ffd95a, 16px 4px 0 #ffd95a, 20px 4px 0 #ffd95a, 8px 8px 0 #ffd95a, 12px 8px 0 #ffd95a, 16px 8px 0 #ffd95a, 20px 8px 0 #ffd95a, 24px 8px 0 #ffd95a, 4px 12px 0 #ffd95a, 8px 12px 0 #ffd95a, 12px 12px 0 #ffd95a, 16px 12px 0 #ffd95a, 20px 12px 0 #ffd95a, 24px 12px 0 #ffd95a, 28px 12px 0 #ffd95a, 0px 16px 0 #ffd95a, 4px 16px 0 #ffd95a, 8px 16px 0 #ffd95a, 12px 16px 0 #ffd95a, 16px 16px 0 #ffd95a, 20px 16px 0 #ffd95a, 24px 16px 0 #ffd95a, 28px 16px 0 #ffd95a, 32px 16px 0 #ffd95a; }
+.pt-frame { position: absolute; left: calc(var(--cw) / -2 - 5px); width: calc(var(--cw) + 10px); top: 17px; bottom: 17px; box-sizing: border-box; border: 5px solid #ffd95a; opacity: 0;
+  box-shadow: 0 0 0 3px #0a140f, inset 0 0 0 3px #0a140f, 0 0 30px 6px rgba(255, 217, 90, .45); }
+.rou.done .pt-frame { opacity: 1; animation: rou-frame .24s steps(1) 6; } @keyframes rou-frame { 50% { opacity: .35; } }
+.rou-res { order: -1; display: flex; flex-direction: column; align-items: center; gap: calc(var(--cw) * .2); visibility: hidden; }
+.rou.done .rou-res { visibility: visible; }
+.rr-plate { display: inline-flex; align-items: baseline; gap: 16px; padding: 8px 28px 10px 24px; border-radius: 12px; background: var(--cc);
+  box-shadow: 0 0 0 3px #0a140f, inset 0 5px 0 var(--ch), inset 0 -7px 0 var(--cs), 0 8px 0 3px #0a140f; }
+.rr-plate b { font: 900 calc(var(--cw) * .5)/1 var(--serif); letter-spacing: .05em; text-transform: uppercase; color: #fff; text-shadow: 0 3px 0 rgba(0, 0, 0, .42); }
+.rr-plate i { font: 400 calc(var(--cw) * .3)/1 var(--mono); font-style: normal; color: rgba(255, 255, 255, .85); }
+@keyframes rou-stamp { from { opacity: 0; transform: scale(1.7) rotate(-5deg); } }
+.rr-msg { font: 900 calc(var(--cw) * .34)/1 var(--serif); letter-spacing: .03em; color: #ffe9a6; text-shadow: 0 3px 0 rgba(0, 0, 0, .6); }
+.rou.done .rr-plate { animation: rou-stamp .55s var(--spring) both; } .rou.done .rr-msg { animation: rou-up .45s .25s var(--spring) both; }
+@keyframes rou-up { from { opacity: 0; transform: translateY(14px); } }
+.rou.lose .rr-msg { color: #c9d1cc; } .rou.zero.win .rr-msg { color: #7dffb0; } .rou.zero.lose .rr-msg { color: #ff9a86; }
+html.reduce-motion .rou, html.reduce-motion .rou * { animation: none !important; }
+
+/* v0.73.1: el "no va mas", las bombillas que corren, los numeros que se funden a toda velocidad, el latido del casi-fallo y el fogonazo del tope */
+.rou-no { position: absolute; left: 0; right: 0; top: 0; text-align: center; font: 900 calc(var(--cw) * .62)/1 var(--serif); letter-spacing: .06em; color: #ffe9a6; text-shadow: 0 4px 0 #0a140f, 0 0 26px rgba(255, 217, 90, .5); animation: rou-no 1.15s both; pointer-events: none; }
+@keyframes rou-no { 0% { opacity: 0; transform: scale(1.5); } 18% { opacity: 1; transform: scale(1); } 72% { opacity: 1; } 100% { opacity: 0; transform: scale(.96); } }
+.rou.spin .rou-lights { animation-duration: .16s; }
+.rou.crawl .rou-lights { animation-duration: 1s; }
+.rou.fast .rc b { opacity: .18; }
+.rc b { transition: opacity .25s; }
+.rou-band { transition: transform .55s ease-in-out; } .rou.crawl .rou-band { transform: scale(1.014); }
+.rou-wash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at 50% 50%, var(--wc, rgba(255, 217, 90, .55)), transparent 70%); }
+.rou.win .rou-wash { --wc: rgba(255, 217, 90, .55); } .rou.zero .rou-wash { --wc: rgba(80, 230, 140, .6); } .rou.lose:not(.zero) .rou-wash { --wc: rgba(0, 0, 0, .35); }
+.rou.flash .rou-wash { animation: rou-wash .55s ease-out; } @keyframes rou-wash { 0% { opacity: 1; } 100% { opacity: 0; } }
+html.reduce-motion .rou-no { display: none; }

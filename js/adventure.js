@@ -1463,6 +1463,13 @@ window.AIQ = window.AIQ || {};
   const BETS = { offer: { n: L6("Oferta de la casa|House offer|Offre de la maison|Oferta da casa|Angebot des Hauses|Offerta della casa||赌场的报价|하우스의 제안|ハウスの申し出|Предложение заведения|Oferta kasyna"), d: L6("Elige cuántos retos de más aceptas en la próxima ronda (de 1 a 3): cobras al momento y entran sellados, a nivel 3.|Choose how many extra challenges you accept next round (1 to 3): you get paid at once and they come in sealed, at level 3.|Choisis combien de défis en plus tu acceptes à la prochaine manche (de 1 à 3) : tu es payé tout de suite et ils arrivent scellés, au niveau 3.|Escolha quantos desafios a mais aceita na próxima rodada (de 1 a 3): recebe na hora e eles entram selados, no nível 3.|Wähl, wie viele zusätzliche Herausforderungen du nächste Runde annimmst (1 bis 3): Du kassierst sofort, und sie kommen versiegelt auf Stufe 3.|Scegli quante sfide in più accetti nel prossimo round (da 1 a 3): incassi subito ed entrano sigillate, al livello 3.||选择下一轮多接受几个挑战（1 到 3 个）：立刻拿钱，挑战以 3 级封印加入。|다음 라운드에 받을 추가 도전 수를 고르세요 (1~3): 즉시 돈을 받고, 도전은 3단계로 봉인되어 들어옵니다.|次のラウンドで追加のチャレンジをいくつ受けるか選ぶ（1〜3）：すぐに支払われ、レベル3で封印されて入る。|Выбери, сколько лишних испытаний примешь в следующем раунде (от 1 до 3): плата сразу, а они входят запечатанными, на уровне 3.|Wybierz, ile dodatkowych wyzwań przyjmiesz w następnej rundzie (od 1 do 3): płacę od razu, a wchodzą zapieczętowane, na poziomie 3."), s: L6("Te pago por cada reto de más que aceptes en la próxima ronda.|I'll pay you for each extra challenge you accept next round.|Je te paie pour chaque défi en plus que tu acceptes à la prochaine manche.|Eu te pago por cada desafio a mais que aceitar na próxima rodada.|Ich zahle dir für jede zusätzliche Herausforderung, die du nächste Runde annimmst.|Ti pago per ogni sfida in più che accetti nel prossimo round.||下一轮每多接受一个挑战，我就付你钱。|다음 라운드에 도전을 하나 더 받을 때마다 돈을 주지.|次のラウンドで追加のチャレンジを受けるごとに払おう。|Плачу за каждое лишнее испытание, которое примешь в следующем раунде.|Płacę za każde dodatkowe wyzwanie, które przyjmiesz w następnej rundzie."), ico: "bet_offer" }, double: { n: L6("Doble o nada|Double or nothing|Quitte ou double|Dobro ou nada|Doppelt oder nichts|Lascia o raddoppia||加倍或归零|더블 오어 낫싱|ダブル・オア・ナッシング|Удвоить или потерять|Podwójnie albo nic"), d: L6("Te juegas todos tus doblones. El jefe trae un reto más: si lo vences a la primera, los doblas (+40 como mucho); si no, los pierdes.|You stake all your doubloons. The boss brings one more challenge: beat it on the first try and you double them (+40 at most); otherwise you lose them.|Tu mises tous tes doublons. Le boss apporte un défi de plus : bats-le du premier coup et tu les doubles (+40 maximum) ; sinon, tu les perds.|Você aposta todos os seus dobrões. O chefe traz mais um desafio: vença de primeira e você os dobra (+40 no máximo); senão, perde tudo.|Du setzt alle deine Dublonen. Der Boss bringt eine Herausforderung mehr: Besiegst du ihn im ersten Versuch, verdoppelst du sie (höchstens +40), sonst verlierst du sie.|Punti tutti i tuoi dobloni. Il boss porta una sfida in più: battilo al primo colpo e li raddoppi (+40 al massimo); altrimenti li perdi.||押上你所有的金币。首领多带一个挑战：一次击败它，金币翻倍（最多 +40）；否则全输光。|도블론을 전부 겁니다. 보스가 도전을 하나 더 가져옵니다: 한 번에 이기면 두 배 (최대 +40), 아니면 모두 잃습니다.|ダブロンを全部賭ける。ボスはチャレンジを1つ追加してくる。一発で倒せば倍（最大+40）、だめなら全部失う。|Ставишь все дублоны. Босс приносит ещё одно испытание: победишь с первого раза — удвоишь (максимум +40), иначе всё потеряешь.|Stawiasz wszystkie dublony. Boss przynosi jedno wyzwanie więcej: pokonaj go za pierwszym razem, a je podwoisz (maks. +40); inaczej je tracisz."), s: L6("Todos tus doblones contra el jefe: a la primera, ×2 (+40 máx.); si no, nada.|All your doubloons on the boss: first try, ×2 (+40 max); otherwise, nothing.|Tous tes doublons sur le boss : du premier coup, ×2 (+40 max) ; sinon, rien.|Todos os seus dobrões no chefe: de primeira, ×2 (+40 máx.); senão, nada.|Alle Dublonen auf den Boss: im ersten Versuch ×2 (max. +40), sonst nichts.|Tutti i dobloni sul boss: al primo colpo ×2 (+40 max); altrimenti, niente.||全部金币押在首领身上：一次过关 ×2（最多 +40），否则全没。|도블론 전부를 보스에: 한 번에 이기면 ×2 (최대 +40), 아니면 전부 잃음.|全ダブロンをボスに：一発なら×2（最大+40）、だめなら全部失う。|Все дублоны на босса: с первого раза ×2 (макс. +40), иначе ничего.|Wszystkie dublony na bossa: za pierwszym razem ×2 (maks. +40), inaczej nic."), ico: "bet_double" }, final: { n: L6("La apuesta final|The final bet|La mise finale|A aposta final|Der letzte Einsatz|La puntata finale||最后的赌注|마지막 베팅|最後の賭け|Последняя ставка|Ostatni zakład"), d: L6("El jefe final trae 2 retos más. Si lo vences a la primera, +2 provisiones para el modo infinito. Perder no cuesta nada.|The final boss brings 2 more challenges. Beat it on the first try for +2 provisions in infinite mode. Losing costs nothing.|Le boss final apporte 2 défis de plus. Bats-le du premier coup : +2 provisions pour le mode infini. Perdre ne coûte rien.|O chefe final traz mais 2 desafios. Vença de primeira e ganhe +2 provisões para o modo infinito. Perder não custa nada.|Der Endboss bringt 2 Herausforderungen mehr. Besiegst du ihn im ersten Versuch: +2 Proviant für den Endlosmodus. Verlieren kostet nichts.|Il boss finale porta 2 sfide in più. Battilo al primo colpo: +2 provviste per la modalità infinita. Perdere non costa nulla.||最终首领多带 2 个挑战。一次击败它，无限模式补给 +2。输了也不亏。|최종 보스가 도전을 2개 더 가져옵니다. 한 번에 이기면 무한 모드 식량 +2. 져도 잃는 건 없습니다.|最終ボスはチャレンジを2つ追加してくる。一発で倒せばエンドレスモード用にプロビジョン+2。負けても失うものはない。|Финальный босс приносит ещё 2 испытания. Победишь с первого раза — +2 запаса для бесконечного режима. Проигрыш ничего не стоит.|Ostatni boss przynosi 2 wyzwania więcej. Pokonaj go za pierwszym razem: +2 zapasy na tryb nieskończony. Przegrana nic nie kosztuje."), s: L6("El jefe final trae 2 retos más. A la primera: +2 provisiones.|The final boss brings 2 more challenges. First try: +2 provisions.|Le boss final apporte 2 défis de plus. Du premier coup : +2 provisions.|O chefe final traz mais 2 desafios. De primeira: +2 provisões.|Der Endboss bringt 2 Herausforderungen mehr. Im ersten Versuch: +2 Proviant.|Il boss finale porta 2 sfide in più. Al primo colpo: +2 provviste.||最终首领多带 2 个挑战。一次过关：补给 +2。|최종 보스가 도전 2개 추가. 한 번에 이기면 식량 +2.|最終ボスにチャレンジ2つ追加。一発ならプロビジョン+2。|Финальный босс приносит ещё 2 испытания. С первого раза: +2 запаса.|Ostatni boss przynosi 2 wyzwania więcej. Za pierwszym razem: +2 zapasy."), ico: "bet_final" }, red: { n: L6("Rojo o negro|Red or black|Rouge ou noir|Vermelho ou preto|Rot oder Schwarz|Rosso o nero||红或黑|빨강 또는 검정|赤か黒|Красное или чёрное|Czerwone czy czarne"), d: L6("Elige color y gira. Si aciertas, la próxima ronda paga un 50 % más y empiezas en racha.|Pick a color and spin. If you're right, the next round pays 50% more and you start on a streak.|Choisis une couleur et lance. Si tu as raison, la prochaine manche paie 50 % de plus et tu commences en série.|Escolha uma cor e gire. Se acertar, a próxima rodada paga 50% a mais e você começa em sequência.|Wähl eine Farbe und dreh. Liegst du richtig, zahlt die nächste Runde 50 % mehr und du startest mit Serie.|Scegli un colore e gira. Se indovini, il prossimo round paga il 50% in più e parti in serie.||选一种颜色然后转动。猜中的话，下一轮奖励多 50%，并且开局就有连击。|색을 고르고 돌리세요. 맞히면 다음 라운드 보상이 50% 늘고 연속 기록을 안고 시작합니다.|色を選んで回す。当たれば次のラウンドの報酬が50%増え、連続記録つきで始まる。|Выбери цвет и крути. Угадаешь — следующий раунд платит на 50% больше, и ты начинаешь с серией.|Wybierz kolor i zakręć. Jeśli trafisz, następna runda płaci 50% więcej i zaczynasz z serią."), s: L6("Si aciertas: la ronda paga un 50 % más y empiezas en racha.|If you're right: the round pays 50% more and you start on a streak.|Si tu as raison : la manche paie 50 % de plus et tu commences en série.|Se acertar: a rodada paga 50% a mais e você começa em sequência.|Liegst du richtig: Die Runde zahlt 50 % mehr und du startest mit Serie.|Se indovini: il round paga il 50% in più e parti in serie.||猜中：这一轮奖励多 50%，开局就有连击。|맞히면: 라운드 보상 50% 증가, 연속 기록을 안고 시작.|当たれば：ラウンド報酬50%増し、連続記録つきで開始。|Угадаешь: раунд платит на 50% больше, и ты начинаешь с серией.|Trafisz: runda płaci 50% więcej i zaczynasz z serią."), ico: "bet_red" } };
   const BT = { red: L6("Rojo|Red|Rouge|Vermelho|Rot|Rosso||红|빨강|赤|Красное|Czerwone"), black: L6("Negro|Black|Noir|Preto|Schwarz|Nero||黑|검정|黒|Чёрное|Czarne"), go: L6("Apostar|Bet|Miser|Apostar|Setzen|Punta||下注|베팅|賭ける|Ставлю|Stawiam"), on: L6("Apostado|Bet placed|Misé|Apostado|Gesetzt|Puntato||已下注|베팅함|賭けた|Ставка сделана|Postawione"), won: L6("¡Aciertas!|You win!|Gagné !|Acertou!|Gewonnen!|Hai vinto!||猜中了！|맞혔다!|当たり！|Угадал!|Trafione!"), lost: L6("Fallas|You lose|Perdu|Errou|Verloren|Hai perso||没猜中|빗나감|はずれ|Мимо|Pudło"), sold: L6("Vendido|Sold|Vendu|Vendido|Verkauft|Venduto||成交|판매 완료|成立|Продано|Sprzedane"), pact: L6("Pacto|Pact|Pacte|Pacto|Pakt|Patto||契约|계약|契約|Договор|Pakt"), seal: L6("Apuesta|Bet|Pari|Aposta|Wette|Scommessa||赌注|베팅|賭け|Ставка|Zakład"), lives2: L6("+2 provisiones|+2 provisions|+2 provisions|+2 provisões|+2 Proviant|+2 provviste||+2 补给|식량 +2|+2 プロビジョン|+2 запаса|+2 zapasy") };
   A.adv.BET_SEAL = BT.seal;
+  /* v0.73: la ruleta con cero (la rueda europea: 37 casillas, una verde). Verde apostado y acertado: te saltas el acto; verde ajeno: gana la casa */
+  const BT2 = { green: L6("Verde|Green|Vert|Verde|Grün|Verde||绿|초록|緑|Зелёное|Zielone"), zero: L6("Cero|Zero|Zéro|Zero|Null|Zero||零|0|ゼロ|Ноль|Zero"),
+    skip: L6("¡Te saltas el acto!|You skip the act!|Tu sautes l'acte !|Você pula o ato!|Du überspringst den Akt!|Salti l'atto!||跳过这一幕！|막을 건너뜁니다!|幕を飛ばす！|Акт пропущен!|Przeskakujesz akt!"),
+    toFinal: L6("¡Directo al jefe final!|Straight to the final boss!|Direct au boss final !|Direto ao chefe final!|Direkt zum Endboss!|Dritto al boss finale!||直达最终首领！|곧장 최종 보스로!|そのまま最終ボスへ！|Прямо к финальному боссу!|Prosto do ostatecznego bossa!"),
+    noMore: L6("NO VA MÁS|NO MORE BETS|RIEN NE VA PLUS|NADA MAIS VAI|NICHTS GEHT MEHR|NULLA VA PIÙ||停止下注|베팅 마감|ベット終了|СТАВКИ СДЕЛАНЫ|KONIEC ZAKŁADÓW"),
+    house: L6("Gana la casa|The house wins|La maison gagne|A casa ganha|Das Haus gewinnt|Vince il banco||庄家赢|하우스 승리|ハウスの勝ち|Заведение выигрывает|Kasyno wygrywa"),
+    tip: L6("1 entre 37: si sale, te saltas el acto entero (en el último, vas directo al jefe final). Si sale y no lo elegiste, gana la casa.|1 in 37: if it hits, you skip the whole act (in the last one, straight to the final boss). If it hits and you didn't pick it, the house wins.|1 sur 37 : s'il sort, tu sautes l'acte entier (au dernier, direct au boss final). S'il sort sans que tu l'aies choisi, la maison gagne.|1 em 37: se sair, você pula o ato inteiro (no último, vai direto ao chefe final). Se sair e você não escolheu, a casa ganha.|1 aus 37: Fällt es, überspringst du den ganzen Akt (im letzten geht's direkt zum Endboss). Fällt es und du hast es nicht gewählt, gewinnt das Haus.|1 su 37: se esce, salti l'intero atto (nell'ultimo, dritto al boss finale). Se esce e non l'hai scelto, vince il banco.||37 选 1：开出就跳过整幕（最后一幕则直达最终首领）。开出但你没选，庄家赢。|37분의 1: 나오면 막 전체를 건너뜁니다 (마지막 막에서는 곧장 최종 보스). 나왔는데 고르지 않았다면 하우스가 이깁니다.|37分の1：出れば幕を丸ごと飛ばす（最後の幕では最終ボスへ直行）。出たのに選んでいなければ、ハウスの勝ち。|1 из 37: выпадет — пропускаешь весь акт (в последнем — сразу к финальному боссу). Выпадет, а ты не выбрал — выигрывает заведение.|1 do 37: jeśli wypadnie, przeskakujesz cały akt (w ostatnim — prosto do ostatecznego bossa). Jeśli wypadnie, a go nie wybrałeś, wygrywa kasyno.") };
   const offerRound = act => act * 4 + A.rng(`${run.seed}:oferta:${act}`).pick([0, 1, 2]);   // tanda 13: la Oferta de la casa, en un Campamento sorteado del acto II y otro del III
   const betKind = r => (r > LAST ? null : r % 4 === 3 ? (r === LAST ? "final" : "double") : Math.floor(r / 4) >= 1 && r === offerRound(Math.floor(r / 4)) ? "offer" : "red");
   const offerPay = c => { const d = A.CHAL[c.id]; return Math.max(1, Math.round(0.6 * (3 + 2 * (c.lv || 3) + (d.kind === "map" ? 1 : 0)) * ascFx(run.asc).price * inflation())); };   // el 60 % del soborno base, sin la escalada
@@ -1490,8 +1497,8 @@ window.AIQ = window.AIQ || {};
     }
     if (k === "red") {
       const att = run.attempt || 0;
-      if (b && b.id === "red" && b.att === att) return `<div class="sup bet bt-red done ${b.win ? "win" : "lose"}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(b.out === "red" ? BT.red : BT.black)}</b>${A.tx(b.win ? BT.won : BT.lost)}</em></div>`;
-      return `<div class="sup bet bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
+      if (b && b.id === "red" && b.att === att) { const gn = b.out === "green"; return `<div class="sup bet bt-red done ${b.win ? "win" : "lose"}${gn ? " zero" : ""}" data-bet="red">${head}<em class="bt-res"><b>${A.tx(gn ? BT2.zero : b.out === "red" ? BT.red : BT.black)}${b.n != null ? " · " + b.n : ""}</b>${A.tx(gn ? BT2.house : b.win ? BT.won : BT.lost)}</em></div>`; }
+      return `<div class="sup bet bt-red" data-bet="red">${head}<span class="bt-pick"><button class="bt-c bt-cr" type="button" data-pick="red">${A.tx(BT.red)}</button><button class="bt-c bt-cb" type="button" data-pick="black">${A.tx(BT.black)}</button><button class="bt-c bt-cg" type="button" data-pick="green" ${A.ttAttr(A.tx(BT2.green), A.tx(BT2.tip))}>${A.tx(BT2.green)}</button><em class="sp-p">${CN()}${redCost()}</em></span></div>`;
     }
     if (b && b.id === k) return `<div class="sup bet on bt-${k}" data-bet="${k}" role="button" tabindex="0">${head}<em class="sp-on">${A.tx(BT.on)}${k === "double" ? " · " + CN() + b.stake : ""}</em></div>`;
     const cap = cf.list.filter(c => !c.x4).length + (k === "final" ? 2 : 1) <= 5;
@@ -1511,10 +1518,14 @@ window.AIQ = window.AIQ || {};
     }
     if (k === "red") {
       el.querySelectorAll("[data-pick]").forEach(btn => (btn.onclick = e => {
-        e.stopPropagation(); const c = redCost(); if (run.coins < c) { A.sfx.deny(); shake(el); return; }
-        const att = run.attempt || 0, out = A.rng(`${run.seed}:rojo:${r}:${att}`)() < 0.5 ? "red" : "black", pick = btn.dataset.pick;
-        run.coins -= c; run.bets = run.bets || {}; run.bets[r] = { id: "red", pick, out, win: pick === out, att }; persist();   // guardada antes de girar: recargar no la cambia
-        spinRed(el, () => { renderShop(false); const b = run.bets[r]; if (b.win) { A.sfx.jackpot(1); if (A.core.jpShake) A.core.jpShake(1); } else A.sfx.lose(); A.dealer.enable(true); A.dealer.say(A.dealer.line(b.win ? "betWin" : "betLose"), { mood: b.win ? "angry" : "laugh", hold: 2200 }); });
+        e.stopPropagation(); if (rouOpen) return; const c = redCost(); if (run.coins < c) { A.sfx.deny(); shake(el); return; }
+        const att = run.attempt || 0, n = Math.floor(A.rng(`${run.seed}:rojo:${r}:${att}`)() * 37), out = colorOf(n), pick = btn.dataset.pick;   // la rueda europea: 18 rojos, 18 negros y el cero
+        run.coins -= c; run.bets = run.bets || {}; const win = pick === out; run.bets[r] = { id: "red", pick, out, n, win, att };
+        const skip = win && out === "green" ? greenSkip() : null;   // el salto ya esta hecho y guardado antes de girar: recargar a medias no lo deshace (la ruleta solo lo ensena)
+        persist();
+        A.sfx.rouBet(pick === "green" ? 2 : pick === "red" ? 0 : 1); if (A.haptic) A.haptic([10]);   // la ficha cae al instante: el clic nunca se queda mudo
+        { const cb = document.querySelector("#shopCoins b"); if (cb) cb.textContent = run.coins; }
+        spinRoulette({ pick, n, skip, last: skip === "final" }, () => { if (!run || C().S.phase !== "shop") return; skip ? openShop(false) : renderShop(false); });
       }));
       return;
     }
@@ -1527,11 +1538,101 @@ window.AIQ = window.AIQ || {};
       A.dealer.enable(true); A.dealer.say(A.dealer.line("betDeal"), { mood: "sly", hold: 2400 });   // cierra el trato
     };
   }
-  /* la ruleta gira 2 s en la carta, con el tic-tic de la bola cada vez mas lento */
-  function spinRed(el, done) {
-    el.classList.add("spinning"); const reduced = C().S.reduce || matchMedia("(prefers-reduced-motion: reduce)").matches; let t = 0, k = 0;
-    if (reduced) return setTimeout(done, 400);
-    const tick = () => { if (t > 1900) return done(); A.sfx.tick(); const gap = 60 + k * k * 4; k++; t += gap; setTimeout(tick, gap); }; tick();
+  /* ---------------- la ruleta lineal de Rojo o negro (v0.73) ----------------
+     Una banda a pantalla completa con las 37 casillas de la rueda europea, en su orden real (el 0 verde, 18 rojos, 18 negros). Un puntero dorado
+     fijo en el centro; la tira arranca a toda velocidad, frena cada vez mas, roza la casilla contigua y se asienta en la ganadora (~3 s).
+     Todo el resultado ya esta decidido y guardado: esto solo lo ensena. Pixel art: casillas de ancho entero, posiciones redondeadas al pixel,
+     nada de medir la maquetacion por fotograma (la tira se mueve solo con transform). */
+  const WHEEL = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];   // el orden de la rueda
+  const REDN = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
+  const colorOf = n => (n === 0 ? "green" : REDN.has(n) ? "red" : "black");
+  let rouOpen = false;
+  /* el salto del verde apostado y acertado: actos I y II, al Campamento de la ronda 1 del acto siguiente (sin jefe ni cofre); en el III, al jefe final */
+  function greenSkip() {
+    const last = run.act + 1 >= 3;
+    if (last) run.round = 3;
+    else { run.act++; run.round = 0; const l0 = run.lives; perkList().forEach(p => p.actStart && p.actStart(run)); if (run.lives > l0) run.healAct = run.act; }
+    run.attempt = 0; run.stock = null;
+    return last ? "final" : "act";
+  }
+  function spinRoulette(o, done) {
+    const { pick, n, skip } = o, out = colorOf(n), win = pick === out, zero = out === "green", S = C().S, app = $("app");
+    const reduced = !!(S && S.reduce) || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!app) return done();
+    rouOpen = true;
+    const REPS = 6, pos = WHEEL.indexOf(n), cw = Math.max(60, Math.min(116, Math.round(innerHeight * 0.125), Math.round(innerWidth / 7)));   // casilla entera en px: pixel art
+    const SF = 37 * 4 + pos, S0 = 37 + ((pos + 14) % 37), SEND = SF + 0.5;                       // casilla final y casilla de salida; el puntero para en el centro de la casilla
+    const cNext = colorOf(WHEEL[(pos + 1) % 37]), cPrev = colorOf(WHEEL[(pos + 36) % 37]);
+    const off = cNext !== out ? 0.7 : cPrev !== out ? -0.7 : 0, S1 = SEND + off;                  // el casi-fallo: se pasa a la casilla contigua de otro color (o se queda corto) y la ultima casilla se arrastra hasta la ganadora
+    const T_IN = 0.34, D1 = off ? 2.15 : 2.5, D2 = off ? 0.55 : 0, ease = x => 1 - Math.pow(1 - x, 3.6), easeIO = x => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
+    const warp = t => (t < 0.16 ? (t * t) / 0.32 : t - 0.08);                                     // arranque con 0,16 s de aceleracion (la velocidad es continua en el empalme)
+    const sAt = t => { if (t <= 0) return S0 + 0.5; const w = warp(t); return w < D1 ? S0 + 0.5 + (S1 - S0 - 0.5) * ease(w / D1) : D2 ? S1 + (SEND - S1) * easeIO(Math.min(1, (w - D1) / D2)) : S1; };
+    const END = D1 + D2 + 0.08;                                                                   // t en que la tira queda parada
+    const cells = []; for (let i = 0; i < REPS * 37; i++) { const v = WHEEL[i % 37]; cells.push(`<i class="rc rc-${colorOf(v)}"><b>${v}</b></i>`); }
+    const pickName = A.tx(pick === "red" ? BT.red : pick === "black" ? BT.black : BT2.green), outName = A.tx(zero ? BT2.zero : out === "red" ? BT.red : BT.black);
+    const msg = zero ? (win ? A.tx(o.last ? BT2.toFinal : BT2.skip) : A.tx(BT2.house)) : A.tx(win ? BT.won : BT.lost);
+    const ov = document.createElement("div"); ov.id = "rouOv"; ov.className = `rou spin${win ? " win" : " lose"}${zero ? " zero" : ""}`; ov.style.setProperty("--cw", cw + "px");
+    ov.innerHTML = `<div class="rou-stage"><div class="rou-top"><b class="rou-no">${A.tx(BT2.noMore)}</b><div class="rou-res"><span class="rr-plate rc-${out}"><b>${outName}</b><i>${n}</i></span><span class="rr-msg">${msg}</span></div>
+        <div class="rou-pick"><span class="rp-dot rp-${pick}"></span><span class="rp-k">${A.tx(BT.seal)}</span><b>${pickName}</b></div></div>
+      <div class="rou-band"><i class="rou-lights top"></i><div class="rou-view"><div class="rou-strip">${cells.join("")}</div></div>
+        <div class="rou-ptr"><i class="pt-top"></i><i class="pt-line"></i><i class="pt-bot"></i><span class="pt-frame"></span></div><i class="rou-lights bot"></i></div></div><u class="rou-wash"></u>`;
+    app.appendChild(ov);
+    const strip = ov.querySelector(".rou-strip"), ptr = ov.querySelector(".rou-ptr"), band = ov.querySelector(".rou-band"), kids = strip.children;
+    const place = s => { strip.style.transform = `translate3d(${-Math.round(s * cw)}px,0,0)`; };
+    place(S0 + 0.5);
+    const block = e => { e.preventDefault(); e.stopPropagation(); };                                // mientras gira, ni el teclado llega al Campamento de detras
+    addEventListener("keydown", block, true);
+    let closed = false, revealed = false, t0 = 0, last = S0 + 0.5, lastT = 0, lastTick = 0, cur = -1, fast = false, crawl = false;
+    const cleanup = () => { removeEventListener("keydown", block, true); rouOpen = false; };
+    const close = () => {
+      if (closed) return; closed = true; removeEventListener("keydown", block, true); ov.classList.add("out");
+      setTimeout(() => { ov.remove(); rouOpen = false; done(); }, reduced ? 0 : 280);
+    };
+    const bail = e => { try { console.error("ruleta", e); } catch (x) { /* nada */ } if (closed) return; closed = true; cleanup(); ov.remove(); done(); };   // pase lo que pase, el Campamento nunca se queda bloqueado
+    const reveal = () => {
+      if (revealed) return; revealed = true; place(SEND); ov.classList.remove("spin", "fast", "crawl"); ov.classList.add("done", "is-" + out);
+      if (cur >= 0 && kids[cur]) kids[cur].classList.remove("cur"); kids[SF].classList.add("hit");
+      A.sfx.rouStop(); if (A.haptic) A.haptic([zero ? 60 : 30]);
+      if (!reduced) band.animate([{ transform: "translateY(0)" }, { transform: "translateY(8px)" }, { transform: "translateY(-3px)" }, { transform: "translateY(0)" }], { duration: 300, easing: "ease-out" });   // el golpe del tope
+      ov.classList.add("flash");
+      setTimeout(() => {
+        A.dealer.enable(true);
+        if (zero && win) { A.sfx.jackpot(2); if (A.core.jpShake) A.core.jpShake(3); if (A.haptic) A.haptic([40, 40, 80]); A.dealer.say(A.dealer.line(o.last ? "betGreenFinal" : "betGreenWin"), { mood: "angry", face: "furious", gesture: o.last ? "tremble_body" : "stamp", fx: "shake", hold: 3400 }); }
+        else if (zero) { A.sfx.rouZero(); A.sfx.lose(); if (A.core.jpShake) A.core.jpShake(2); A.dealer.say(A.dealer.line("betGreenLose"), { mood: "laugh", face: "laugh", gesture: "fan_self", hold: 2600 }); }
+        else if (win) { A.sfx.jackpot(1); if (A.core.jpShake) A.core.jpShake(1); A.dealer.say(A.dealer.line("betWin"), { mood: "angry", hold: 2200 }); }
+        else { A.sfx.lose(); A.dealer.say(A.dealer.line("betLose"), { mood: "laugh", hold: 2200 }); }
+      }, 150);
+      setTimeout(() => { ov.addEventListener("click", close); ov.classList.add("skippable"); }, 600);
+      setTimeout(close, zero ? 2900 : 2300);                                                      // el cero se queda mas: hay que verlo
+    };
+    try {
+      if (reduced) { reveal(); return; }
+      A.sfx.rouNoMore(); setTimeout(() => { if (!closed && !revealed) A.sfx.rouStart(); }, T_IN * 1000);
+      const frame = now => {
+        try {
+          if (!ov.isConnected) { cleanup(); return; }                                              // otra pantalla se llevo la capa por delante: que no se quede el teclado bloqueado
+          if (revealed) return;
+          if (!t0) t0 = now + T_IN * 1000;
+          const t = (now - t0) / 1000, s = sAt(t), dt = Math.max(1, now - lastT) / 1000, v = lastT ? Math.abs(s - last) / dt : 0;   // v: casillas por segundo
+          place(s);
+          if ((v > 30) !== fast) { fast = v > 30; ov.classList.toggle("fast", fast); }              // a toda velocidad los numeros se funden: solo color
+          if (off && !crawl && t > 0 && warp(t) >= D1) { crawl = true; ov.classList.add("crawl"); ov.classList.remove("spin"); A.sfx.rouCrawl(); }   // la ultima casilla: latido y bombillas lentas
+          const idx = Math.floor(s);
+          if (idx !== cur) {
+            if (cur >= 0 && kids[cur]) kids[cur].classList.remove("cur");
+            cur = idx; if (v < 16 && kids[cur]) kids[cur].classList.add("cur");                     // solo la ilumina cuando se la puede leer
+            if (t > 0 && now - lastTick > 34) {
+              lastTick = now; const slow = Math.max(0, Math.min(1, 1 - v / 60)); A.sfx.rouTick(slow); if (A.haptic && v < 10) A.haptic([6]);
+              if (v < 45) { const dy = 3 + slow * 6; ptr.animate([{ transform: "translateY(0)" }, { transform: `translateY(${dy}px)` }, { transform: "translateY(0)" }], { duration: 70 + slow * 60, easing: "ease-out" }); }   // la lengueta del puntero cede mas cuanto mas lento
+            }
+          }
+          last = s; lastT = now;
+          if (t >= END) return reveal();
+          requestAnimationFrame(frame);
+        } catch (e) { bail(e); }
+      };
+      requestAnimationFrame(frame);
+    } catch (e) { bail(e); }
   }
   const SUPS = [
     { id: "cafe", cost: 4, ico: "sup_cafe", n: A.L("Café doble", "Double espresso"), d: A.L("+4 s por pregunta en la próxima ronda", "+4 s per question next round") },
